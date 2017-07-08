@@ -16,6 +16,7 @@
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/find_end_return.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/util/tuple.hpp>
@@ -35,6 +36,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         typedef typename hpx::traits::segmented_local_iterator_traits<
                 Result
             >::local_raw_iterator type;
+    };
+
+    template <typename Iterator>
+    struct local_algorithm_result<find_end_return<Iterator> >
+    {
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+                Iterator
+            >::local_raw_iterator iterator_type;
+        typedef find_end_return<iterator_type> type;
     };
 
     template <typename Result1, typename Result2>

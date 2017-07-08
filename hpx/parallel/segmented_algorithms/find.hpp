@@ -13,6 +13,7 @@
 #include <hpx/parallel/algorithms/find.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/find_end_return.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -345,13 +346,6 @@ namespace hpx { namespace parallel { inline namespace v1
         find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type);
 
-        template <typename FwdIter>
-        struct find_end_return
-        {
-            FwdIter seq_first;
-            int partial_position;
-        };
-
         /// \cond NOINTERNAL
         template<typename Iter>
         struct seg_find_end : public detail::algorithm<seg_find_end<Iter>, find_end_return<Iter> >
@@ -360,28 +354,29 @@ namespace hpx { namespace parallel { inline namespace v1
               : seg_find_end<Iter>::algorithm("segmented_find_end")
             {}
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename FwdIter1, typename SeqVec,
                 typename Pred>
             static find_end_return<FwdIter1>
             sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, Pred && op,
-                FwdIter1 start, int g_cursor = 0)
+                SeqVec sequence, Pred && op,
+                FwdIter1 start, unsigned int g_cursor = 0)
             {
-                int cursor = g_cursor;
+                unsigned int cursor = g_cursor;
                 while(last1 != first1)
                 {
-                    if(op(*first1, first2[cursor]))
+                    if(op(*first1, sequence[cursor]))
                     {
                         if(cursor == 0)
                             start = first1;
                         cursor++;
-                        if(cursor == std::distance(first2,last2))
+                        if(cursor == sequence.size())
                         {
-                            find_end_return<FwdIter1> ret = {start,-1};
+                            find_end_return<FwdIter1> ret = {start,
+                                (unsigned int) sequence.size()};
                             return ret;
                         }
                     }
-                    else if(op(*first1, *first2))
+                    else if(op(*first1, sequence[0]))
                     {
                         start = first1;
                         cursor = 1;
@@ -479,10 +474,14 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
             typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
+            typedef typename std::iterator_traits<FwdIter2>::value_type seq_value_type;
 
             segment_iterator sit = traits::segment(first1);
             segment_iterator send = traits::segment(last1);
             FwdIter1 output = first1;
+
+            std::vector<seq_value_type> sequence(first2, last2);
+
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -491,7 +490,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     find_end_return<local_iterator_type> out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, first2, last2, op, beg
+                        algo, policy, std::true_type(), beg, end, sequence, op, beg
                     );
                     output=traits::compose(send, out.seq_first);
                 }
@@ -507,7 +506,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, first2, last2, op, beg
+                        algo, policy, std::true_type(), beg, end, sequence, op, beg
                     );
                     if(out.seq_first != end)
                         output=traits::compose(sit, out.seq_first);
@@ -522,7 +521,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
-                            algo, policy, std::true_type(), beg, end, first2, last2,
+                            algo, policy, std::true_type(), beg, end, sequence,
                             op, out.seq_first, out.partial_position
                         );
                         if(out.seq_first != end)
@@ -536,7 +535,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, first2, last2,
+                        algo, policy, std::true_type(), beg, end, sequence,
                         op, out.seq_first, out.partial_position
                     );
                     if(out.seq_first != end)
