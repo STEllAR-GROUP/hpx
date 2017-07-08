@@ -48,92 +48,95 @@ namespace hpx { namespace serialization
         std::string throw_auxinfo_;
 
         // retrieve information related to exception_info
-        if (exception_info const* xi = get_exception_info(ep)) {
-            char const* func = xi->function_name();
+        try {
+            std::rethrow_exception(ep);
+        }
+        catch (exception_info const& xi) {
+            char const* func = xi.function_name();
             if (func) {
                 throw_function_ = *func;
             }
             else {
                 std::string const* s =
-                    xi->get<hpx::detail::throw_function>();
+                    xi.get<hpx::detail::throw_function>();
                 if (s)
                     throw_function_ = *s;
             }
 
-            char const* file = xi->file_name();
+            char const* file = xi.file_name();
             if (file) {
                 throw_file_ = *file;
             }
             else {
                 std::string const* s =
-                    xi->get<hpx::detail::throw_file>();
+                    xi.get<hpx::detail::throw_file>();
                 if (s)
                     throw_file_ = *s;
             }
 
-            int line = xi->line();
+            int line = xi.line();
             if (line) {
                 throw_line_ = line;
             }
             else {
                 long const* l =
-                    xi->get<hpx::detail::throw_line>();
+                    xi.get<hpx::detail::throw_line>();
                 if (l)
                     throw_line_ = *l;
             }
 
             std::uint32_t const* locality =
-                xi->get<hpx::detail::throw_locality>();
+                xi.get<hpx::detail::throw_locality>();
             if (locality)
                 throw_locality_ = *locality;
 
             std::string const* hostname_ =
-                xi->get<hpx::detail::throw_hostname>();
+                xi.get<hpx::detail::throw_hostname>();
             if (hostname_)
                 throw_hostname_ = *hostname_;
 
             std::int64_t const* pid_ =
-                xi->get<hpx::detail::throw_pid>();
+                xi.get<hpx::detail::throw_pid>();
             if (pid_)
                 throw_pid_ = *pid_;
 
             std::size_t const* shepherd =
-                xi->get<hpx::detail::throw_shepherd>();
+                xi.get<hpx::detail::throw_shepherd>();
             if (shepherd)
                 throw_shepherd_ = *shepherd;
 
             std::size_t const* thread_id =
-                xi->get<hpx::detail::throw_thread_id>();
+                xi.get<hpx::detail::throw_thread_id>();
             if (thread_id)
                 throw_thread_id_ = *thread_id;
 
             std::string const* thread_name =
-                xi->get<hpx::detail::throw_thread_name>();
+                xi.get<hpx::detail::throw_thread_name>();
             if (thread_name)
                 throw_thread_name_ = *thread_name;
 
             std::string const* back_trace =
-                xi->get<hpx::detail::throw_stacktrace>();
+                xi.get<hpx::detail::throw_stacktrace>();
             if (back_trace)
                 throw_back_trace_ = *back_trace;
 
             std::string const* env_ =
-                xi->get<hpx::detail::throw_env>();
+                xi.get<hpx::detail::throw_env>();
             if (env_)
                 throw_env_ = *env_;
 
             std::string const* config_ =
-                xi->get<hpx::detail::throw_config>();
+                xi.get<hpx::detail::throw_config>();
             if (config_)
                 throw_config_ = *config_;
 
             std::string const* state_ =
-                xi->get<hpx::detail::throw_state>();
+                xi.get<hpx::detail::throw_state>();
             if (state_)
                 throw_state_ = *state_;
 
             std::string const* auxinfo_ =
-                xi->get<hpx::detail::throw_auxinfo>();
+                xi.get<hpx::detail::throw_auxinfo>();
             if (auxinfo_)
                 throw_auxinfo_ = *auxinfo_;
         }
