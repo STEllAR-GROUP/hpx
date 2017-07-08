@@ -9,6 +9,7 @@
 #include <hpx/include/parallel_partition.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/random.hpp>
 #include <boost/range/functions.hpp>
 
 #include <cstddef>
@@ -76,6 +77,22 @@ struct user_defined_type
     int val;
 };
 
+struct random_fill
+{
+    random_fill(int rand_base, int range)
+        : gen(std::rand()),
+        dist(rand_base - range / 2, rand_base + range / 2)
+    {}
+
+    int operator()()
+    {
+        return dist(gen);
+    }
+
+    boost::random::mt19937 gen;
+    boost::random::uniform_int_distribution<> dist;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag, typename DataType, typename Pred>
 void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
@@ -94,7 +111,7 @@ void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
     std::vector<DataType> c(size),
         d_true_res(size), d_false_res(size),
         d_true_sol(size), d_false_sol(size);
-    std::iota(boost::begin(c), boost::end(c), DataType(rand_base - std::rand() % size));
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
     auto result = hpx::parallel::partition_copy(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
@@ -132,7 +149,7 @@ void test_partition_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred
     std::vector<DataType> c(size),
         d_true_res(size), d_false_res(size),
         d_true_sol(size), d_false_sol(size);
-    std::iota(boost::begin(c), boost::end(c), DataType(rand_base - std::rand() % size));
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
     auto f = hpx::parallel::partition_copy(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
