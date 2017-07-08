@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "read_values.hpp"
 #include "partition.hpp"
