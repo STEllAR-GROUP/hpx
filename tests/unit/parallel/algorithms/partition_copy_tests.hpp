@@ -121,11 +121,13 @@ void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
         std::begin(d_true_sol), std::begin(d_false_sol),
         pred);
 
+    HPX_TEST(get<0>(result).base() == std::end(c));
+
     bool equality_true = std::equal(
-        std::begin(d_true_res), get<0>(result).base(),
+        std::begin(d_true_res), get<1>(result).base(),
         std::begin(d_true_sol), get<0>(solution));
     bool equality_false = std::equal(
-        std::begin(d_false_res), get<1>(result).base(),
+        std::begin(d_false_res), get<2>(result).base(),
         std::begin(d_false_sol), get<1>(solution));
 
     HPX_TEST(equality_true);
@@ -160,11 +162,13 @@ void test_partition_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred
         std::begin(d_true_sol), std::begin(d_false_sol),
         pred);
 
+    HPX_TEST(get<0>(result).base() == std::end(c));
+
     bool equality_true = std::equal(
-        std::begin(d_true_res), get<0>(result).base(),
+        std::begin(d_true_res), get<1>(result).base(),
         std::begin(d_true_sol), get<0>(solution));
     bool equality_false = std::equal(
-        std::begin(d_false_res), get<1>(result).base(),
+        std::begin(d_false_res), get<2>(result).base(),
         std::begin(d_false_sol), get<1>(solution));
 
     HPX_TEST(equality_true);

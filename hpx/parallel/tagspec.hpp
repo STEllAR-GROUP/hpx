@@ -1,4 +1,5 @@
 //  Copyright (c) 2015-2016 Hartmut Kaiser
+//  Copyright (c)      2017 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,6 +20,8 @@ namespace hpx { namespace parallel { inline namespace v1
     HPX_DEFINE_TAG_SPECIFIER(end)       // defines tag::end
     HPX_DEFINE_TAG_SPECIFIER(in1)       // defines tag::in1
     HPX_DEFINE_TAG_SPECIFIER(in2)       // defines tag::in2
+    HPX_DEFINE_TAG_SPECIFIER(out1)      // defines tag::out1
+    HPX_DEFINE_TAG_SPECIFIER(out2)      // defines tag::out2
 
 #if defined(HPX_MSVC)
 #pragma push_macro("min")
