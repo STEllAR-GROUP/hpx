@@ -98,7 +98,7 @@ void test_partition_copy(ExPolicy policy, DataType)
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
     auto result = hpx::parallel::partition_copy(policy,
-        c, boost::begin(d_true_res), boost::begin(d_false_res),
+        c, std::begin(d_true_res), std::begin(d_false_res),
         pred);
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol),

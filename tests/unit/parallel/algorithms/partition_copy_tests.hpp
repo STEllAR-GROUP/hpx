@@ -113,8 +113,8 @@ void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
     auto result = hpx::parallel::partition_copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        iterator(boost::begin(d_true_res)), iterator(boost::begin(d_false_res)),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        iterator(std::begin(d_true_res)), iterator(std::begin(d_false_res)),
         pred);
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol),
@@ -153,8 +153,8 @@ void test_partition_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
     auto f = hpx::parallel::partition_copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        iterator(boost::begin(d_true_res)), iterator(boost::begin(d_false_res)),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        iterator(std::begin(d_true_res)), iterator(std::begin(d_false_res)),
         pred);
     auto result = f.get();
     auto solution = std::partition_copy(std::begin(c), std::end(c),
@@ -187,13 +187,13 @@ void test_partition_copy_exception(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         auto result = hpx::parallel::partition_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(d_true)), iterator(boost::begin(d_false)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
             throw_always());
 
         HPX_TEST(false);
@@ -217,14 +217,14 @@ void test_partition_copy_exception_async(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         auto f = hpx::parallel::partition_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(d_true)), iterator(boost::begin(d_false)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
             throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -256,13 +256,13 @@ void test_partition_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         auto result = hpx::parallel::partition_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(d_true)), iterator(boost::begin(d_false)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
             throw_bad_alloc());
 
         HPX_TEST(false);
@@ -285,14 +285,14 @@ void test_partition_copy_bad_alloc_async(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         auto f = hpx::parallel::partition_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(d_true)), iterator(boost::begin(d_false)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(d_true)), iterator(std::begin(d_false)),
             throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
