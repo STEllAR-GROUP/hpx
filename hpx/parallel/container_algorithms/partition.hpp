@@ -44,13 +44,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     in which it executes the assignments.
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam OutIter1    The type of the iterator representing the
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    /// \tparam OutIter2    The type of the iterator representing the
+    ///                     forward iterator.
+    /// \tparam FwdIter3    The type of the iterator representing the
     ///                     destination range for the elements that don't satisfy
     ///                     the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -109,13 +109,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the output iterator to the end of the \a dest_true range, and
     ///           the output iterator to the end of the \a dest_false range.
     ///
-    template <typename ExPolicy, typename Rng, typename OutIter1, typename OutIter2,
+    template <typename ExPolicy, typename Rng, typename FwdIter2, typename FwdIter3,
         typename Pred, typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
         traits::is_range<Rng>::value &&
-        hpx::traits::is_iterator<OutIter1>::value &&
-        hpx::traits::is_iterator<OutIter2>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value &&
+        hpx::traits::is_iterator<FwdIter3>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             ExPolicy, Pred, traits::projected_range<Proj, Rng>
@@ -124,10 +124,10 @@ namespace hpx { namespace parallel { inline namespace v1
         ExPolicy,
         hpx::util::tagged_tuple<
             tag::in(typename traits::range_traits<Rng>::iterator_type),
-            tag::out1(OutIter1), tag::out2(OutIter2)>
+            tag::out1(FwdIter2), tag::out2(FwdIter3)>
     >::type
     partition_copy(ExPolicy && policy, Rng && rng,
-        OutIter1 dest_true, OutIter2 dest_false, Pred && pred,
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred && pred,
         Proj && proj = Proj())
     {
         return partition_copy(std::forward<ExPolicy>(policy),

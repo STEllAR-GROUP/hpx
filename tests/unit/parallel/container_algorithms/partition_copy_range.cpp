@@ -160,6 +160,7 @@ void test_partition_copy_async(ExPolicy policy, DataType)
     HPX_TEST(equality_false);
 }
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
 template <typename ExPolicy, typename DataType>
 void test_partition_copy_outiter(ExPolicy policy, DataType)
 {
@@ -244,6 +245,7 @@ void test_partition_copy_outiter_async(ExPolicy policy, DataType)
     HPX_TEST(equality_true);
     HPX_TEST(equality_false);
 }
+#endif
 
 template <typename DataType>
 void test_partition_copy()
@@ -268,6 +270,7 @@ void test_partition_copy()
         DataType());
 #endif
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_partition_copy_outiter(execution::seq, DataType());
     test_partition_copy_outiter(execution::par, DataType());
     test_partition_copy_outiter(execution::par_unseq, DataType());
@@ -284,6 +287,7 @@ void test_partition_copy()
         DataType());
     test_partition_copy_outiter(execution_policy(execution::par(execution::task)),
         DataType());
+#endif
 #endif
 }
 

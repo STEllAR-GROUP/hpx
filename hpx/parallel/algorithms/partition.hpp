@@ -403,7 +403,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<output_iterator_offset> curr,
                         hpx::shared_future<output_iterator_offset> next
-                    ) mutable
+                    ) mutable -> void
                     {
                         HPX_UNUSED(flags);
                         HPX_UNUSED(policy);
@@ -483,19 +483,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam OutIter1    The type of the iterator representing the
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    /// \tparam OutIter2    The type of the iterator representing the
+    ///                     forward iterator.
+    /// \tparam FwdIter3    The type of the iterator representing the
     ///                     destination range for the elements that don't satisfy
     ///                     the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition_copy requires \a Pred to meet
@@ -552,43 +552,58 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the output iterator to the end of the \a dest_true range, and
     ///           the output iterator to the end of the \a dest_false range.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter1, typename OutIter2,
+    template <typename ExPolicy, typename FwdIter1,
+        typename FwdIter2, typename FwdIter3,
         typename Pred, typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter>::value &&
-        hpx::traits::is_iterator<OutIter1>::value &&
-        hpx::traits::is_iterator<OutIter2>::value &&
-        traits::is_projected<Proj, InIter>::value &&
+        hpx::traits::is_iterator<FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value &&
+        hpx::traits::is_iterator<FwdIter3>::value &&
+        traits::is_projected<Proj, FwdIter1>::value &&
         traits::is_indirect_callable<
-            ExPolicy, Pred, traits::projected<Proj, InIter>
+            ExPolicy, Pred, traits::projected<Proj, FwdIter1>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_tuple<
-        tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)>
+        tag::in(FwdIter1), tag::out1(FwdIter2), tag::out2(FwdIter3)>
     >::type
-    partition_copy(ExPolicy&& policy, InIter first, InIter last,
-        OutIter1 dest_true, OutIter2 dest_false, Pred && pred,
+    partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred && pred,
         Proj && proj = Proj())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Required at least input iterator.");
         static_assert(
-            (hpx::traits::is_output_iterator<OutIter1>::value ||
-                hpx::traits::is_forward_iterator<OutIter1>::value) &&
-            (hpx::traits::is_output_iterator<OutIter2>::value ||
-                hpx::traits::is_forward_iterator<OutIter2>::value),
+            (hpx::traits::is_output_iterator<FwdIter2>::value ||
+                hpx::traits::is_forward_iterator<FwdIter2>::value) &&
+            (hpx::traits::is_output_iterator<FwdIter3>::value ||
+                hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value ||
-               !hpx::traits::is_forward_iterator<OutIter1>::value ||
-               !hpx::traits::is_forward_iterator<OutIter2>::value
+               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter2>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter3>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Required at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter3>::value),
+            "Requires at least forward iterator.");
 
-        typedef hpx::util::tuple<InIter, OutIter1, OutIter2> result_type;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+        typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
 
         return hpx::util::make_tagged_tuple<tag::in, tag::out1, tag::out2>(
             detail::partition_copy<result_type>().call(
