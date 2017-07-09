@@ -5,14 +5,10 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_partition.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <string>
 
 #include "partition_copy_tests.hpp"

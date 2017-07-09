@@ -9,11 +9,11 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/random.hpp>
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>

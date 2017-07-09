@@ -11,14 +11,14 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/traits/is_range.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
 
 #include <boost/range/functions.hpp>
 
@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typename Pred, typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
+        hpx::traits::is_range<Rng>::value &&
         hpx::traits::is_iterator<FwdIter2>::value &&
         hpx::traits::is_iterator<FwdIter3>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
@@ -123,7 +123,7 @@ namespace hpx { namespace parallel { inline namespace v1
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_tuple<
-            tag::in(typename traits::range_traits<Rng>::iterator_type),
+            tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
             tag::out1(FwdIter2), tag::out2(FwdIter3)>
     >::type
     partition_copy(ExPolicy && policy, Rng && rng,
