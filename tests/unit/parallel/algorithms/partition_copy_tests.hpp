@@ -44,11 +44,14 @@ struct throw_bad_alloc
 struct user_defined_type
 {
     user_defined_type() = default;
-    user_defined_type(int rand_no) : val(rand_no) {}
+    user_defined_type(int rand_no)
+        : val(rand_no),
+        name(name_list[std::rand() % name_list.size()])
+    {}
 
     bool operator<(int rand_base) const
     {
-        static std::string const base_name = "BCA";
+        static std::string const base_name = "BASE";
 
         if (this->name < base_name)
             return true;
@@ -63,18 +66,14 @@ struct user_defined_type
         return this->name == t.name && this->val == t.val;
     }
 
-    user_defined_type const& operator++()
-    {
-        static const std::vector<std::string> name_list = {
-            "ABB", "ABC", "ACB", "BCA", "CAA", "CAAA", "CAAB"
-        };
-        name = name_list[std::rand() % name_list.size()];
-        ++val;
-        return *this;
-    }
+    static const std::vector<std::string> name_list;
 
     std::string name;
     int val;
+};
+
+const std::vector<std::string> user_defined_type::name_list{
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
 };
 
 struct random_fill
