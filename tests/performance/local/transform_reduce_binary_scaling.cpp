@@ -12,11 +12,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 struct plus
 {

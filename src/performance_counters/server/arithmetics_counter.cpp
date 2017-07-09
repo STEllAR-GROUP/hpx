@@ -394,7 +394,7 @@ namespace hpx { namespace performance_counters { namespace detail
 
                     if (paths.countername_ == "divide")
                     {
-                        if (names.size() < 1)
+                        if (names.size() < 2)
                         {
                             HPX_THROWS_IF(ec, bad_parameter,
                                 "arithmetics_counter_creator",

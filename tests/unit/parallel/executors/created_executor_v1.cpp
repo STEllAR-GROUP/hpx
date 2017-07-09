@@ -21,7 +21,6 @@
 #include <vector>
 
 #include <boost/range/iterator_range.hpp>
-#include <boost/range/functions.hpp>
 
 using hpx::parallel::parallel_executor;
 using hpx::util::deferred_call;
@@ -71,7 +70,7 @@ void test_void_bulk_sync()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -89,7 +88,7 @@ void test_void_bulk_async()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -139,12 +138,12 @@ int parallel_sum(iter first, iter last, int num_parts)
         traits::bulk_async_execute(exec,
             [](boost::iterator_range<iter> const& rng) -> int
             {
-                return std::accumulate(boost::begin(rng), boost::end(rng), 0);
+                return std::accumulate(std::begin(rng), std::end(rng), 0);
             },
             input);
 
     return std::accumulate(
-        boost::begin(v), boost::end(v), 0,
+        std::begin(v), std::end(v), 0,
         [](int a, hpx::future<int>& b) -> int
         {
             return a + b.get();
@@ -158,7 +157,7 @@ int void_parallel_sum(iter first, iter last, int num_parts)
     typedef hpx::parallel::executor_traits<void_parallel_executor> traits;
 
     std::vector<int> temp(num_parts + 1, 0);
-    std::iota(boost::begin(temp), boost::end(temp), 0);
+    std::iota(std::begin(temp), std::end(temp), 0);
 
     std::ptrdiff_t section_size = std::distance(first, last) / num_parts;
 
@@ -176,16 +175,16 @@ int void_parallel_sum(iter first, iter last, int num_parts)
 
     hpx::when_all(f).get();
 
-    return std::accumulate(boost::begin(temp), boost::end(temp), 0);
+    return std::accumulate(std::begin(temp), std::end(temp), 0);
 }
 
 void sum_test()
 {
     std::vector<int> vec(10007);
     auto random_num = [](){ return std::rand() % 50 - 25; };
-    std::generate(boost::begin(vec), boost::end(vec), random_num);
+    std::generate(std::begin(vec), std::end(vec), random_num);
 
-    int sum = std::accumulate(boost::begin(vec), boost::end(vec), 0);
+    int sum = std::accumulate(std::begin(vec), std::end(vec), 0);
     int num_parts = std::rand() % 5 + 3;
 
     // Return futures holding results of parallel_sum and void_parallel_sum
@@ -194,11 +193,11 @@ void sum_test()
     typedef hpx::parallel::executor_traits<parallel_executor> traits;
     hpx::future<int> f_par =
         traits::async_execute(exec, &parallel_sum,
-            boost::begin(vec), boost::end(vec), num_parts);
+            std::begin(vec), std::end(vec), num_parts);
 
     hpx::future<int> f_void_par =
         traits::async_execute(exec, &void_parallel_sum,
-            boost::begin(vec), boost::end(vec), num_parts);
+            std::begin(vec), std::end(vec), num_parts);
 
     HPX_TEST(f_par.get() == sum);
     HPX_TEST(f_void_par.get() == sum);

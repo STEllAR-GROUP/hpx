@@ -12,12 +12,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 #include <boost/format.hpp>
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 int test_count = 100;
@@ -36,15 +36,15 @@ void measure_transform_reduce(std::size_t size)
     // invoke transform_reduce
     double result =
         hpx::parallel::transform_reduce(hpx::parallel::execution::par,
-            boost::begin(data_representation),
-            boost::end(data_representation),
-            0.0,
-            [](Point r)
-            {
-                return r.x * r.y;
-            },
-            std::plus<double>()
-        );
+        std::begin(data_representation),
+        std::end(data_representation),
+        0.0,
+        [](Point r)
+        {
+            return r.x * r.y;
+        },
+        std::plus<double>()
+    );
     HPX_UNUSED(result);
 }
 
@@ -56,15 +56,15 @@ void measure_transform_reduce_old(std::size_t size)
     //invoke old reduce
     Point result =
         hpx::parallel::reduce(hpx::parallel::execution::par,
-            boost::begin(data_representation),
-            boost::end(data_representation),
-            Point{0.0, 0.0},
-            [](Point res, Point curr)
-            {
-                return Point{
-                    res.x * res.y + curr.x * curr.y, 1.0};
-            }
-        );
+        std::begin(data_representation),
+        std::end(data_representation),
+        Point{0.0, 0.0},
+        [](Point res, Point curr)
+        {
+            return Point{
+                res.x * res.y + curr.x * curr.y, 1.0};
+        }
+    );
     HPX_UNUSED(result);
 }
 

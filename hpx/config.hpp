@@ -14,6 +14,7 @@
 #error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
+#include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
@@ -555,10 +556,8 @@
    "This function is deprecated and will be removed in the future."
 #  if defined(HPX_MSVC)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
-#  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+#  elif defined(__GNUC__)
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
-#  elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
-#    define HPX_DEPRECATED(x) __attribute__((__deprecated__))
 #  endif
 #  if !defined(HPX_DEPRECATED)
 #    define HPX_DEPRECATED(x)  /**/

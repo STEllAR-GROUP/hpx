@@ -25,9 +25,9 @@ set(benchmarks
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
   set(benchmarks
       ${benchmarks}
-      transform_reduce_binary
+      transform_reduce_binary_scaling
      )
-  set(transform_reduce_binary_FLAGS DEPENDENCIES iostreams_component)
+  set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)

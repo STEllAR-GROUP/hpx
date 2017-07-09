@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2015 Hartmut Kaiser
 //
@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
-        util::unique_function_nonser<void(void*)> const& ctor);
+        util::unique_function_nonser<void(void*)> const& ctor, void** p);
 
     template <typename Component, typename ...Ts>
     naming::gid_type create_with_args(Ts&&... ts);
