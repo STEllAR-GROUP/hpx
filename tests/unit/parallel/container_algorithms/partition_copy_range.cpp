@@ -50,8 +50,8 @@ struct user_defined_type
 
     static const std::vector<std::string> name_list;
 
-    std::string name;
     int val;
+    std::string name;
 };
 
 const std::vector<std::string> user_defined_type::name_list{

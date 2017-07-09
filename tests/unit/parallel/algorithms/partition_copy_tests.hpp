@@ -12,17 +12,16 @@
 #include <boost/random.hpp>
 #include <boost/range/functions.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-
 struct throw_always
 {
     template <typename T>
@@ -68,8 +67,8 @@ struct user_defined_type
 
     static const std::vector<std::string> name_list;
 
-    std::string name;
     int val;
+    std::string name;
 };
 
 const std::vector<std::string> user_defined_type::name_list{
@@ -334,15 +333,15 @@ void test_partition_copy()
 
     ////////// Test cases for user defined type.
     test_partition_copy(execution::seq, IteratorTag(), user_defined_type(),
-        [rand_base](auto const& t) -> bool {
+        [rand_base](user_defined_type const& t) -> bool {
             return t < rand_base;
         }, rand_base);
     test_partition_copy(execution::par, IteratorTag(), user_defined_type(),
-        [rand_base](auto const& t) -> bool {
+        [rand_base](user_defined_type const& t) -> bool {
             return !(t < rand_base);
         }, rand_base);
     test_partition_copy(execution::par_unseq, IteratorTag(), user_defined_type(),
-        [rand_base](auto const& t) -> bool {
+        [rand_base](user_defined_type const& t) -> bool {
             return t < rand_base;
         }, rand_base);
 
@@ -359,12 +358,12 @@ void test_partition_copy()
     ////////// Asynchronous test cases for user defined type.
     test_partition_copy_async(execution::seq(execution::task), IteratorTag(),
         user_defined_type(),
-        [rand_base](auto const& t) -> bool {
+        [rand_base](user_defined_type const& t) -> bool {
             return !(t < rand_base);
         }, rand_base);
     test_partition_copy_async(execution::par(execution::task), IteratorTag(),
         user_defined_type(),
-        [rand_base](auto const& t) -> bool {
+        [rand_base](user_defined_type const& t) -> bool {
             return t < rand_base;
         }, rand_base);
 
@@ -374,7 +373,7 @@ void test_partition_copy()
             return true;
         }, rand_base);
     test_partition_copy(execution::par_unseq, IteratorTag(), user_defined_type(),
-        [rand_base](auto const& t) -> bool {
+        [rand_base](user_defined_type const& t) -> bool {
             return false;
         }, rand_base);
 }
