@@ -60,8 +60,8 @@ set(partitioned_vector_find_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_find_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 4)
-set(partitioned_vector_find_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_find_PARAMETERS
+set(partitioned_vector_find_end_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_find_end_PARAMETERS
     LOCALITIES 10
     THREADS_PER_LOCALITY 4)
 

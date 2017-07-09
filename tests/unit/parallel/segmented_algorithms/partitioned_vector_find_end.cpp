@@ -25,7 +25,7 @@ void test_find_end(ExPolicy && policy,
     auto last = hpx::parallel::find_end(policy, xvalues.begin(),
         xvalues.end(), sequence.begin(), sequence.end());
     HPX_TEST_EQ(*last,1);
-    // printf("%d\n", *last);
+    printf("%d\n", (int) *last);
 }
 
 template <typename ExPolicy, typename T>
@@ -35,7 +35,7 @@ void test_find_end_async(ExPolicy && policy,
     auto last = hpx::parallel::find_end(policy, xvalues.begin(),
         xvalues.end(), sequence.begin(), sequence.end()).get();
     HPX_TEST_EQ(*last,1);
-    // printf("Async %d\n", *last);
+    printf("Async %d\n", (int) *last);
 }
 
 template <typename T>
