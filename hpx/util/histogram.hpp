@@ -7,8 +7,8 @@
 #define HISTOGRAM_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/iterator_range.hpp>
 
-#include <boost/range/iterator_range.hpp>
 #include <boost/parameter/keyword.hpp>
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/extractor.hpp>
@@ -73,7 +73,7 @@ namespace hpx { namespace util
             typedef std::vector<float_type> array_type;
 
             // for boost::result_of
-            typedef boost::iterator_range<
+            typedef util::iterator_range<
                     typename histogram_type::iterator
                 > result_type;
 
@@ -158,7 +158,7 @@ namespace hpx { namespace util
                 }
 
                 // returns a range of pairs
-                return boost::make_iterator_range(this->histogram_);
+                return util::make_iterator_range(this->histogram_);
             }
 
         private:
