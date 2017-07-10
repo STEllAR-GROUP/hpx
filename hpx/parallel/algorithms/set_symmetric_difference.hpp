@@ -31,9 +31,9 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter3>
+        template <typename FwdIter>
         struct set_symmetric_difference
-          : public detail::algorithm<set_symmetric_difference<FwdIter3>, FwdIter3>
+          : public detail::algorithm<set_symmetric_difference<FwdIter>, FwdIter>
         {
             set_symmetric_difference()
               : set_symmetric_difference::algorithm("set_symmetric_difference")
@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F>
-            static FwdIter3
+            static FwdIter
             sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, OutIter dest, F && f)
             {
@@ -52,10 +52,10 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename RanIter1, typename RanIter2,
                 typename F>
             static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter3
+                ExPolicy, FwdIter
             >::type
             parallel(ExPolicy && policy, RanIter1 first1, RanIter1 last1,
-                RanIter2 first2, RanIter2 last2, FwdIter3 dest, F && f)
+                RanIter2 first2, RanIter2 last2, FwdIter dest, F && f)
             {
                 typedef typename std::iterator_traits<RanIter1>::difference_type
                     difference_type1;
@@ -65,12 +65,12 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (first1 == last1)
                 {
                     return util::detail::convert_to_result(
-                        detail::copy<std::pair<RanIter2, FwdIter3> >()
+                        detail::copy<std::pair<RanIter2, FwdIter> >()
                             .call(
                                 std::forward<ExPolicy>(policy),
                                 std::false_type(), first2, last2, dest
                             ),
-                            [](std::pair<RanIter2, FwdIter3> const& p) -> FwdIter3
+                            [](std::pair<RanIter2, FwdIter> const& p) -> FwdIter
                             {
                                 return p.second;
                             });
@@ -79,18 +79,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (first2 == last2)
                 {
                     return util::detail::convert_to_result(
-                        detail::copy<std::pair<RanIter1, FwdIter3> >()
+                        detail::copy<std::pair<RanIter1, FwdIter> >()
                             .call(
                                 std::forward<ExPolicy>(policy),
                                 std::false_type(), first1, last1, dest
                             ),
-                            [](std::pair<RanIter1, FwdIter3> const& p) -> FwdIter3
+                            [](std::pair<RanIter1, FwdIter> const& p) -> FwdIter
                             {
                                 return p.second;
                             });
                 }
 
-                typedef typename set_operations_buffer<FwdIter3>::type buffer_type;
+                typedef typename set_operations_buffer<FwdIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
                 return set_operation(std::forward<ExPolicy>(policy),
@@ -241,8 +241,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
-               !hpx::traits::is_random_access_iterator<FwdIter2>::value ||
-               !hpx::traits::is_random_access_iterator<FwdIter3>::value
+               !hpx::traits::is_random_access_iterator<FwdIter2>::value
             > is_seq;
 
         return detail::set_symmetric_difference<FwdIter3>().call(

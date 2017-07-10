@@ -171,22 +171,22 @@ namespace hpx { namespace parallel { inline namespace v1
                 return sequential_reverse_copy(first, last, dest_first);
             }
 
-            template <typename ExPolicy, typename BidirIter, typename OutIter>
+            template <typename ExPolicy, typename BidirIter, typename FwdIter>
             static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<BidirIter, OutIter>
+                ExPolicy, std::pair<BidirIter, FwdIter>
             >::type
             parallel(ExPolicy && policy, BidirIter first, BidirIter last,
-                OutIter dest_first)
+                FwdIter dest_first)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
 
                 return util::detail::convert_to_result(
-                    detail::copy<std::pair<iterator, OutIter> >().call(
+                    detail::copy<std::pair<iterator, FwdIter> >().call(
                         std::forward<ExPolicy>(policy), std::false_type(),
                         iterator(last), iterator(first), dest_first
                     ),
-                    [](std::pair<iterator, OutIter> const& p)
-                        -> std::pair<BidirIter, OutIter>
+                    [](std::pair<iterator, FwdIter> const& p)
+                        -> std::pair<BidirIter, FwdIter>
                     {
                         return std::make_pair(p.first.base(), p.second);
                     });
@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \tparam BidirIter   The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     bidirectional iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -238,11 +238,11 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \returns  The \a reverse_copy algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(BidirIter), tag::out(OutIter)> >
+    ///           \a hpx::future<tagged_pair<tag::in(BidirIter), tag::out(FwdIter)> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
+    ///           returns \a tagged_pair<tag::in(BidirIter), tag::out(FwdIter)>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
@@ -250,40 +250,40 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename BidirIter, typename OutIter,
+    template <typename ExPolicy, typename BidirIter, typename FwdIter,
     HPX_CONCEPT_REQUIRES_(
         hpx::traits::is_iterator<BidirIter>::value &&
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<OutIter>::value)>
+        hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(OutIter)>
+        ExPolicy, hpx::util::tagged_pair<tag::in(BidirIter), tag::out(FwdIter)>
     >::type
     reverse_copy(ExPolicy && policy, BidirIter first, BidirIter last,
-        OutIter dest_first)
+        FwdIter dest_first)
     {
         static_assert(
             (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
             "Requires at least bidirectional iterator.");
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_forward_iterator<OutIter>::value),
+            (hpx::traits::is_output_iterator<FwdIter>::value ||
+                hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
 #else
         static_assert(
-            (hpx::traits::is_forward_iterator<OutIter>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 #endif
 
         return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::reverse_copy<std::pair<BidirIter, OutIter> >().call(
+            detail::reverse_copy<std::pair<BidirIter, FwdIter> >().call(
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, dest_first));
     }

@@ -260,12 +260,12 @@ namespace hpx { namespace parallel { inline namespace v1
         // -------------------------------------------------------------------
         template<
             typename ExPolicy,
-            typename RanIter, typename RanIter2, typename FwdIter, typename FwdIter2,
-            typename Compare, typename Func
+            typename RanIter, typename RanIter2, typename FwdIter1,
+            typename FwdIter2, typename Compare, typename Func
         >
-        static std::pair<FwdIter, FwdIter2>
+        static std::pair<FwdIter1, FwdIter2>
         reduce_by_key_impl(ExPolicy &&policy, RanIter key_first, RanIter key_last,
-            RanIter2 values_first, FwdIter keys_output, FwdIter2 values_output,
+            RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
             Compare &&comp, Func &&func)
         {
             using namespace hpx::parallel::v1::detail;
@@ -414,9 +414,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // reduce_by_key wrapper struct
-        template<typename FwdIter, typename FwdIter2>
+        template<typename FwdIter1, typename FwdIter2>
         struct reduce_by_key : public detail::algorithm<
-            reduce_by_key<FwdIter, FwdIter2>, std::pair<FwdIter, FwdIter2> >
+            reduce_by_key<FwdIter1, FwdIter2>, std::pair<FwdIter1, FwdIter2> >
         {
             reduce_by_key()
               : reduce_by_key::algorithm("reduce_by_key")
@@ -425,9 +425,9 @@ namespace hpx { namespace parallel { inline namespace v1
             template <
                 typename ExPolicy, typename RanIter, typename RanIter2,
                 typename Compare, typename Func>
-            static std::pair<FwdIter, FwdIter2>
+            static std::pair<FwdIter1, FwdIter2>
             sequential(ExPolicy &&policy, RanIter key_first, RanIter key_last,
-                RanIter2 values_first, FwdIter keys_output, FwdIter2 values_output,
+                RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
                 Compare && comp, Func &&func)
             {
                 return reduce_by_key_impl(
@@ -441,20 +441,20 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename Compare, typename Func>
             static typename
                 util::detail::algorithm_result<ExPolicy,
-                std::pair<FwdIter, FwdIter2>>::type
+                std::pair<FwdIter1, FwdIter2>>::type
             parallel(ExPolicy &&policy, RanIter key_first, RanIter key_last,
-                RanIter2 values_first, FwdIter keys_output, FwdIter2 values_output,
+                RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
                 Compare && comp, Func &&func)
             {
                 return util::detail::algorithm_result<ExPolicy,
-                        std::pair<FwdIter, FwdIter2>
+                        std::pair<FwdIter1, FwdIter2>
                     >::get(
                         execution::async_execute(
                             policy.executor(),
                             hpx::util::deferred_call(
                                 &hpx::parallel::v1::detail::reduce_by_key_impl<
                                     ExPolicy&&, RanIter, RanIter2,
-                                    FwdIter, FwdIter2, Compare&&, Func&&>,
+                                    FwdIter1, FwdIter2, Compare&&, Func&&>,
                                 policy, key_first, key_last,
                                 values_first, keys_output, values_output,
                                 std::forward<Compare>(comp),
@@ -496,7 +496,7 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \tparam RanIter2    The type of the value iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
+    /// \tparam FwdIter1    The type of the iterator representing the
     ///                     destination key range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -550,7 +550,7 @@ namespace hpx { namespace parallel { inline namespace v1
     //-----------------------------------------------------------------------------
     template<
         typename ExPolicy,
-        typename RanIter, typename RanIter2, typename FwdIter, typename FwdIter2,
+        typename RanIter, typename RanIter2, typename FwdIter1, typename FwdIter2,
         typename Compare =
             std::equal_to<typename std::iterator_traits<RanIter>::value_type>,
         typename Func = std::plus<
@@ -559,26 +559,26 @@ namespace hpx { namespace parallel { inline namespace v1
             execution::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<RanIter>::value &&
             hpx::traits::is_iterator<RanIter2>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value
         )
     >
     typename util::detail::algorithm_result<
-        ExPolicy, std::pair<FwdIter, FwdIter2>
+        ExPolicy, std::pair<FwdIter1, FwdIter2>
     >::type
     reduce_by_key(ExPolicy &&policy, RanIter key_first, RanIter key_last,
-        RanIter2 values_first, FwdIter keys_output, FwdIter2 values_output,
+        RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
         Compare &&comp = Compare(),
         Func &&func = Func()
         )
     {
         typedef util::detail::algorithm_result<
-            ExPolicy, std::pair<FwdIter, FwdIter2>> result;
+            ExPolicy, std::pair<FwdIter1, FwdIter2> > result;
 
         static_assert(
             (hpx::traits::is_random_access_iterator<RanIter>::value) &&
             (hpx::traits::is_random_access_iterator<RanIter2>::value) &&
-            (hpx::traits::is_forward_iterator<FwdIter>::value) &&
+            (hpx::traits::is_forward_iterator<FwdIter1>::value) &&
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "iterators : Random_access for inputs and forward for outputs.");
 
@@ -593,7 +593,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::reduce_by_key<FwdIter,FwdIter2>().call(
+        return detail::reduce_by_key<FwdIter1,FwdIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(), key_first, key_last,
             values_first, keys_output, values_output,
             std::forward<Compare>(comp),

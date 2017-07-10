@@ -680,9 +680,9 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename Iter>
+        template <typename FwdIter>
         struct find_first_of
-          : public detail::algorithm<find_first_of<Iter>, Iter>
+          : public detail::algorithm<find_first_of<FwdIter>, FwdIter>
         {
             find_first_of()
               : find_first_of::algorithm("find_first_of")
@@ -708,18 +708,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 return last;
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Pred>
+            template <typename ExPolicy, typename FwdIter2, typename Pred>
             static typename util::detail::algorithm_result<
-                ExPolicy, Iter
+                ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy && policy, Iter first, Iter last,
-                FwdIter s_first, FwdIter s_last, Pred && op)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
-                typedef util::detail::algorithm_result<ExPolicy, Iter> result;
-                typedef typename std::iterator_traits<Iter>::reference reference;
-                typedef typename std::iterator_traits<Iter>::difference_type
-                    difference_type;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef typename std::iterator_traits<FwdIter>::reference reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
+                typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
 
                 s_difference_type diff = std::distance(s_first, s_last);
@@ -732,11 +732,12 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, Iter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
                         [s_first, s_last, tok, op](
-                            Iter it, std::size_t part_size, std::size_t base_idx
+                            FwdIter it, std::size_t part_size,
+                            std::size_t base_idx
                         ) mutable -> void
                         {
                             util::loop_idx_n(
@@ -745,7 +746,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     reference v, std::size_t i
                                 ) -> void
                                 {
-                                    for(FwdIter iter = s_first; iter != s_last;
+                                    for(FwdIter2 iter = s_first; iter != s_last;
                                         ++iter)
                                     {
                                         if (hpx::util::invoke(op, v, *iter))
@@ -753,7 +754,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     }
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> Iter
+                        [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                         {
                             difference_type find_first_of_res = tok.get_data();
 
@@ -827,11 +828,11 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<FwdIter> if the
+    /// \returns  The \a find_first_of algorithm returns a \a hpx::future<FwdIter1> if the
     ///           execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a FwdIter1 otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
     ///           [s_first, s_last).
@@ -860,7 +861,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter1>::value
             > is_seq;
 #else
         static_assert(

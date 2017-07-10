@@ -51,17 +51,17 @@ namespace hpx { namespace parallel { inline namespace v1
                     first, last, dest, std::forward<Op>(op));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename Op>
+            template <typename ExPolicy, typename FwdIter, typename Op>
             static typename util::detail::algorithm_result<
                 ExPolicy, Iter
             >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 Iter dest, Op && op)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter1, Iter>
+                typedef hpx::util::zip_iterator<FwdIter, FwdIter, Iter>
                     zip_iterator;
                 typedef util::detail::algorithm_result<ExPolicy, Iter> result;
-                typedef typename std::iterator_traits<FwdIter1>::difference_type
+                typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
                 if (first == last)
@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 difference_type count = std::distance(first, last) - 1;
 
-                FwdIter1 prev = first;
+                FwdIter prev = first;
                 *dest++ = *first++;
 
                 if (count == 0)

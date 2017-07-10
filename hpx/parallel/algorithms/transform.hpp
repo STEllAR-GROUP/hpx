@@ -691,7 +691,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam FwdIter3   se The type of the iterator representing the
+    /// \tparam FwdIter3    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.

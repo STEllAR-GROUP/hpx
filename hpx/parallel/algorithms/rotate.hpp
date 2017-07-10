@@ -65,10 +65,10 @@ namespace hpx { namespace parallel { inline namespace v1
             return std::make_pair(first, last);
         }
 
-        template <typename ExPolicy, typename FwdIter1>
-        hpx::future<std::pair<FwdIter1, FwdIter1> >
-        rotate_helper(ExPolicy policy, FwdIter1 first, FwdIter1 new_first,
-            FwdIter1 last)
+        template <typename ExPolicy, typename FwdIter>
+        hpx::future<std::pair<FwdIter, FwdIter> >
+        rotate_helper(ExPolicy policy, FwdIter first, FwdIter new_first,
+            FwdIter last)
         {
             typedef std::false_type non_seq;
 
@@ -77,18 +77,18 @@ namespace hpx { namespace parallel { inline namespace v1
                     .on(policy.executor())
                     .with(policy.parameters());
 
-            detail::reverse<FwdIter1> r;
+            detail::reverse<FwdIter> r;
             return dataflow(
-                [=](hpx::future<FwdIter1>&& f1, hpx::future<FwdIter1>&& f2) mutable
-                ->  hpx::future<std::pair<FwdIter1, FwdIter1> >
+                [=](hpx::future<FwdIter>&& f1, hpx::future<FwdIter>&& f2) mutable
+                ->  hpx::future<std::pair<FwdIter, FwdIter> >
                 {
                     // propagate exceptions
                     f1.get(); f2.get();
 
-                    hpx::future<FwdIter1> f = r.call(p, non_seq(), first, last);
+                    hpx::future<FwdIter> f = r.call(p, non_seq(), first, last);
                     return f.then(
-                        [=] (hpx::future<FwdIter1> && f) mutable
-                        ->  std::pair<FwdIter1, FwdIter1>
+                        [=] (hpx::future<FwdIter> && f) mutable
+                        ->  std::pair<FwdIter, FwdIter>
                         {
                             f.get();    // propagate exceptions
                             std::advance(first, std::distance(new_first, last));
@@ -113,12 +113,12 @@ namespace hpx { namespace parallel { inline namespace v1
                 return sequential_rotate(first, new_first, last);
             }
 
-            template <typename ExPolicy, typename FwdIter1>
+            template <typename ExPolicy, typename FwdIter>
             static typename util::detail::algorithm_result<
                 ExPolicy, IterPair
             >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 new_first,
-                FwdIter1 last)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter new_first,
+                FwdIter last)
             {
                 return util::detail::algorithm_result<
                         ExPolicy, IterPair
@@ -140,7 +140,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     ///
@@ -163,39 +163,39 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note The type of dereferenced \a FwdIter1 must meet the requirements
+    /// \note The type of dereferenced \a FwdIter must meet the requirements
     ///       of \a MoveAssignable and \a MoveConstructible.
     ///
     /// \returns  The \a rotate algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::begin(FwdIter1), tag::end(FwdIter1)> >
+    ///           \a hpx::future<tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)> >
     ///           if the execution policy is of type
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::begin(FwdIter1), tag::end(FwdIter1)>
+    ///           returns \a tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
     ///           otherwise.
     ///           The \a rotate algorithm returns the iterator equal to
     ///           pair(first + (last - new_first), last).
     ///
-    template <typename ExPolicy, typename FwdIter1,
+    template <typename ExPolicy, typename FwdIter,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value)>
+        hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        hpx::util::tagged_pair<tag::begin(FwdIter1), tag::end(FwdIter1)>
+        hpx::util::tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
     >::type
-    rotate(ExPolicy && policy, FwdIter1 first, FwdIter1 new_first, FwdIter1 last)
+    rotate(ExPolicy && policy, FwdIter first, FwdIter new_first, FwdIter last)
     {
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_bidirectional_iterator<FwdIter1>::value
+               !hpx::traits::is_bidirectional_iterator<FwdIter>::value
             > is_seq;
 
         return hpx::util::make_tagged_pair<tag::begin, tag::end>(
-            detail::rotate<std::pair<FwdIter1, FwdIter1> >().call(
+            detail::rotate<std::pair<FwdIter, FwdIter> >().call(
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, new_first, last));
     }

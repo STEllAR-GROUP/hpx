@@ -259,18 +259,18 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <typename Algo, typename ExPolicy, typename FwdIter,
-            typename OutIter>
+        template <typename Algo, typename ExPolicy, typename FwdIter1,
+            typename FwdIter2>
         typename util::detail::algorithm_result<
-            ExPolicy, std::pair<FwdIter, OutIter>
+            ExPolicy, std::pair<FwdIter1, FwdIter2>
         >::type
-        transfer_(ExPolicy&& policy, FwdIter first, FwdIter last, OutIter dest,
-            std::true_type)
+        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, std::true_type)
         {
             if (first == last)
             {
                 return util::detail::algorithm_result<
-                        ExPolicy, std::pair<FwdIter, OutIter>
+                        ExPolicy, std::pair<FwdIter1, FwdIter2>
                     >::get(std::make_pair(last, dest));
             }
 
@@ -283,13 +283,13 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename Algo, typename ExPolicy, typename FwdIter,
-            typename OutIter>
+        template <typename Algo, typename ExPolicy, typename FwdIter1,
+            typename FwdIter2>
         typename util::detail::algorithm_result<
-            ExPolicy, std::pair<FwdIter, OutIter>
+            ExPolicy, std::pair<FwdIter1, FwdIter2>
         >::type
-        transfer_(ExPolicy&& policy, FwdIter first, FwdIter last, OutIter dest,
-            std::false_type);
+        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, std::false_type);
 
         /// \endcond
     }

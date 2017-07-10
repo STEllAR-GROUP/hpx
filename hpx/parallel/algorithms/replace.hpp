@@ -70,17 +70,17 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename T1,
+            template <typename ExPolicy, typename FwdIter, typename T1,
                 typename T2, typename Proj>
             static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter1
+                ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 T1 const& old_value, T2 const& new_value, Proj && proj)
             {
-                typedef typename std::iterator_traits<FwdIter1>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::value_type type;
 
-                return for_each_n<FwdIter1>().call(
+                return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), std::false_type(),
                     first, std::distance(first, last),
                     [old_value, new_value, proj](type& t) -> void
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
@@ -140,35 +140,35 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace algorithm returns a \a hpx::future<FwdIter1> if
+    /// \returns  The \a replace algorithm returns a \a hpx::future<FwdIter> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a void otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename T1, typename T2,
+    template <typename ExPolicy, typename FwdIter, typename T1, typename T2,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        traits::is_projected<Proj, FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
+        traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             ExPolicy, std::equal_to<T1>,
-                traits::projected<Proj, FwdIter1>,
+                traits::projected<Proj, FwdIter>,
                 traits::projected<Proj, T1 const*>
         >::value)>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
-    replace(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    replace(ExPolicy && policy, FwdIter first, FwdIter last,
         T1 const& old_value, T2 const& new_value, Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::replace<FwdIter1>().call(
+        return detail::replace<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, old_value, new_value, std::forward<Proj>(proj));
     }
@@ -213,17 +213,17 @@ namespace hpx { namespace parallel { inline namespace v1
                     new_value, std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename F,
+            template <typename ExPolicy, typename FwdIter, typename F,
                 typename T, typename Proj>
             static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter1
+                ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 F && f, T const& new_value, Proj && proj)
             {
-                typedef typename std::iterator_traits<FwdIter1>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::value_type type;
 
-                return for_each_n<FwdIter1>().call(
+                return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), std::false_type(),
                     first, std::distance(first, last),
                     [f, new_value, proj](type& t) -> void
@@ -252,7 +252,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
@@ -283,7 +283,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -301,33 +301,33 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter1>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
-    ///           and returns \a void otherwise.
+    ///           and returns \a FwdIter otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename F, typename T,
+    template <typename ExPolicy, typename FwdIter, typename F, typename T,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        traits::is_projected<Proj, FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
+        traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
-            ExPolicy, F, traits::projected<Proj, FwdIter1>
+            ExPolicy, F, traits::projected<Proj, FwdIter>
         >::value)>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
-    replace_if(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    replace_if(ExPolicy && policy, FwdIter first, FwdIter last,
         F && f, T const& new_value, Proj && proj = Proj())
     {
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::replace_if<FwdIter1>().call(
+        return detail::replace_if<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, std::forward<F>(f), new_value,
             std::forward<Proj>(proj));

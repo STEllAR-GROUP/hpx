@@ -85,11 +85,11 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the swap operations.
-    /// \tparam FwdIter1 The type of the first range of iterators to swap
+    /// \tparam FwdIter1    The type of the first range of iterators to swap
     ///                     (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam ForwardIter2 The type of the second range of iterators to swap
+    /// \tparam FwdIter2    The type of the second range of iterators to swap
     ///                     (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -115,8 +115,8 @@ namespace hpx { namespace parallel { inline namespace v1
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
-    ///           \a hpx::future<ForwardIter2>  if the execution policy is of
-    ///           type \a parallel_task_policy and returns \a ForwardIter2
+    ///           \a hpx::future<FwdIter2>  if the execution policy is of
+    ///           type \a parallel_task_policy and returns \a FwdIter2
     ///           otherwise.
     ///           The \a swap_ranges algorithm returns iterator to the element
     ///           past the last element exchanged in the range beginning with

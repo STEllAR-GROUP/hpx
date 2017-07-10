@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename OutIter>
+    template <typename FwdIter>
     struct set_operations_buffer
     {
         template <typename T>
@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             T const* item_;
         };
 
-        typedef typename std::iterator_traits<OutIter>::value_type value_type;
+        typedef typename std::iterator_traits<FwdIter>::value_type value_type;
         typedef typename std::conditional<
             std::is_scalar<value_type>::value,
             value_type, rewritable_ref<value_type>
@@ -68,11 +68,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename RanIter1, typename RanIter2,
-        typename OutIter, typename F, typename Combiner, typename SetOp>
-    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename FwdIter, typename F, typename Combiner, typename SetOp>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     set_operation(ExPolicy policy,
         RanIter1 first1, RanIter1 last1, RanIter2 first2, RanIter2 last2,
-        OutIter dest, F && f, Combiner && combiner, SetOp && setop)
+        FwdIter dest, F && f, Combiner && combiner, SetOp && setop)
     {
         typedef typename std::iterator_traits<RanIter1>::difference_type
             difference_type1;
@@ -83,7 +83,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         difference_type1 len1 = std::distance(first1, last1);
         difference_type2 len2 = std::distance(first2, last2);
 
-        typedef typename set_operations_buffer<OutIter>::type buffer_type;
+        typedef typename set_operations_buffer<FwdIter>::type buffer_type;
         boost::shared_array<buffer_type> buffer(
             new buffer_type[combiner(len1, len2)]);
 
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
 
         // fill the buffer piecewise
-        return parallel::util::partitioner<ExPolicy, OutIter, void>::call(
+        return parallel::util::partitioner<ExPolicy, FwdIter, void>::call(
             policy, chunks.get(), cores,
             // first step, is applied to all partitions
             [=](set_chunk_data* curr_chunk, std::size_t part_size) -> void
@@ -156,7 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     ) - buffer_dest;
             },
             // second step, is executed after all partitions are done running
-            [buffer, chunks, cores, dest](std::vector<future<void> >&&) -> OutIter
+            [buffer, chunks, cores, dest](std::vector<future<void> >&&) -> FwdIter
             {
                 // accumulate real length
                 set_chunk_data* chunk = chunks.get();

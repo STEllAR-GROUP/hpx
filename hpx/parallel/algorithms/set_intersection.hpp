@@ -31,9 +31,9 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter3>
+        template <typename FwdIter>
         struct set_intersection
-          : public detail::algorithm<set_intersection<FwdIter3>, FwdIter3>
+          : public detail::algorithm<set_intersection<FwdIter>, FwdIter>
         {
             set_intersection()
               : set_intersection::algorithm("set_intersection")
@@ -52,10 +52,10 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename RanIter1, typename RanIter2,
                 typename F>
             static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter3
+                ExPolicy, FwdIter
             >::type
             parallel(ExPolicy && policy, RanIter1 first1, RanIter1 last1,
-                RanIter2 first2, RanIter2 last2, FwdIter3 dest, F && f)
+                RanIter2 first2, RanIter2 last2, FwdIter dest, F && f)
             {
                 typedef typename std::iterator_traits<RanIter1>::difference_type
                     difference_type1;
@@ -65,12 +65,12 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (first1 == last1 || first2 == last2)
                 {
                     typedef util::detail::algorithm_result<
-                            ExPolicy, FwdIter3
+                            ExPolicy, FwdIter
                         > result;
                     return result::get(std::move(dest));
                 }
 
-                typedef typename set_operations_buffer<FwdIter3>::type buffer_type;
+                typedef typename set_operations_buffer<FwdIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
                 return set_operation(std::forward<ExPolicy>(policy),
@@ -215,8 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
                !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
-               !hpx::traits::is_random_access_iterator<FwdIter2>::value ||
-               !hpx::traits::is_random_access_iterator<FwdIter3>::value
+               !hpx::traits::is_random_access_iterator<FwdIter2>::value
             > is_seq;
 
         return detail::set_intersection<FwdIter3>().call(
