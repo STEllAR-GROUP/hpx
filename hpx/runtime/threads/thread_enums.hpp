@@ -61,9 +61,15 @@ namespace hpx { namespace threads
         thread_priority_default = 0,      ///< use default priority
         thread_priority_low = 1,          ///< low thread priority
         thread_priority_normal = 2,       ///< normal thread priority (default)
-        thread_priority_critical = 3,     ///< high thread priority
-        thread_priority_boost = 4         ///< high thread priority for first
+        thread_priority_high = 3,         ///< high thread priority,
+                                          ///< child threads don't inherit high
+                                          ///< priority
+        thread_priority_boost = 4,        ///< high thread priority for first
                                           ///< invocation, normal afterwards
+        thread_priority_high_recursive = 5, ///< high thread priority
+
+        // obsolete, kept for compatibility only
+        thread_priority_critical = thread_priority_high_recursive,
     };
 
     /// Get the readable string representing the name of the given thread_priority

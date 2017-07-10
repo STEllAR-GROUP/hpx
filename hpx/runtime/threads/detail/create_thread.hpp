@@ -73,8 +73,11 @@ namespace hpx { namespace threads { namespace detail
         // Pass critical priority from parent to child.
         if (self)
         {
-            if (thread_priority_critical == threads::get_self_id()->get_priority())
-                data.priority = thread_priority_critical;
+            if (thread_priority_high_recursive ==
+                threads::get_self_id()->get_priority())
+            {
+                data.priority = thread_priority_high_recursive;
+            }
         }
 
         // create the new thread

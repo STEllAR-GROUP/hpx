@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     // run a thread with high priority
     {
         hpx::parallel::execution::default_executor high_priority_executor(
-            hpx::threads::thread_priority_critical);
+            hpx::threads::thread_priority_high);
 
         hpx::future<void> f =
             hpx::async(high_priority_executor, &run_with_high_priority);
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
     // combine both
     {
         hpx::parallel::execution::default_executor fancy_executor(
-            hpx::threads::thread_priority_critical,
+            hpx::threads::thread_priority_high,
             hpx::threads::thread_stacksize_large);
 
         hpx::future<void> f =

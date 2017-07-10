@@ -63,7 +63,9 @@ namespace hpx { namespace threads
             "suspended",
             "depleted",
             "terminated",
-            "staged"
+            "staged",
+            "pending_do_not_schedule",
+            "pending_boost"
         };
     }
 
@@ -107,8 +109,9 @@ namespace hpx { namespace threads
             "default",
             "low",
             "normal",
-            "critical",
-            "boost"
+            "high (non-recursive)",
+            "boost",
+            "high (recursive)"
         };
     }
 
