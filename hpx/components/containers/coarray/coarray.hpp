@@ -60,6 +60,9 @@ namespace hpx
             using iterator =
                 typename std::array<std::size_t,N>::iterator;
 
+            using const_iterator =
+                typename std::array<std::size_t,N>::const_iterator;
+
             template<typename ... I>
             coarray_sizes(I... i)
             : sizes_({{i...}})
@@ -95,19 +98,14 @@ namespace hpx
                 return sizes_.end();
             }
 
-            template<typename View, typename Iterator, std::size_t ... I>
-            void update_view(
-                View & v,
-                std::size_t num_images,
-                hpx::util::detail::pack_c<std::size_t, I...>,
-                hpx::lcos::spmd_block const & block,
-                Iterator && begin,
-                Iterator && last) const
+            const_iterator begin() const
             {
-                v = View(block,
-                    std::forward<Iterator>(begin),
-                    std::forward<Iterator>(last),
-                    {(sizes_[I]!= std::size_t(-1) ? sizes_[I] : num_images)...});
+                return sizes_.cbegin();
+            }
+
+            const_iterator end() const
+            {
+                return sizes_.cend();
             }
 
         private:
@@ -136,11 +134,11 @@ namespace hpx
             std::size_t num_segments,
             std::size_t unroll)
         {
-        using iterator = typename
-                std::vector<hpx::naming::id_type>::iterator;
+            using iterator = typename
+                    std::vector<hpx::naming::id_type>::iterator;
 
-        using const_iterator = typename
-                std::vector<hpx::naming::id_type>::const_iterator;
+            using const_iterator = typename
+                    std::vector<hpx::naming::id_type>::const_iterator;
 
             std::vector<hpx::naming::id_type> out(num_segments);
 
@@ -157,6 +155,23 @@ namespace hpx
 
            return out;
        }
+
+        template<typename Iterator, std::size_t ... I>
+        base_type update_view(
+            hpx::detail::coarray_sizes<N> const & cosizes,
+            std::size_t num_images,
+            hpx::util::detail::pack_c<std::size_t, I...>,
+            hpx::lcos::spmd_block const & block,
+            Iterator && begin,
+            Iterator && last) const
+        {
+            return base_type(
+                block,
+                std::forward<Iterator>(begin),
+                std::forward<Iterator>(last),
+                {(cosizes.begin()[I]!= std::size_t(-1)
+                    ? cosizes.begin()[I] : num_images)...});
+        }
 
     public:
         explicit coarray(
@@ -175,7 +190,7 @@ namespace hpx
             {
                 std::size_t num_segments = N > 0 ? 1 : 0;
 
-                for(std::size_t i : cosizes)
+                for(std::size_t const & i : cosizes)
                 {
                     num_segments *= (i != std::size_t(-1) ? i : num_images);
                 }
@@ -198,9 +213,8 @@ namespace hpx
             else
                 vector_.connect_to(hpx::launch::sync, name + "_hpx_coarray");
 
-            cosizes.update_view(
-                view, num_images, indices(),
-                    block, vector_.begin(), vector_.end());
+            view = update_view(cosizes,
+                num_images, indices(), block, vector_.begin(), vector_.end());
         }
 
         template<typename... I,

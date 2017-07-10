@@ -109,7 +109,7 @@ namespace hpx { namespace detail
 
         // Note: Put operation. Race condition may occur, be sure that
         // operator=() is called by only one thread at a time.
-        view_element && operator=(Data && other)
+        void operator=(Data && other)
         {
             if ( is_data_here() )
             {
@@ -124,13 +124,11 @@ namespace hpx { namespace detail
             {
                 this->set_data(hpx::launch::sync, std::move(other) );
             }
-
-            return std::move(*this);
         }
 
         // Note: Put operation. Race condition may occur, be sure that
         // operator=() is called by only one thread at a time.
-        view_element && operator=(Data const & other)
+        void operator=(Data const & other)
         {
             if ( is_data_here() )
             {
@@ -145,12 +143,10 @@ namespace hpx { namespace detail
             {
                 this->set_data(hpx::launch::sync, Data(other) );
             }
-
-            return std::move(*this);
         }
 
         // Note: Put operation. Free of race conditions.
-        view_element && operator=(view_element<T,Data> && other)
+        void operator=(view_element<T,Data> && other)
         {
             if(other.is_owned_by_current_thread())
             {
@@ -168,8 +164,6 @@ namespace hpx { namespace detail
                 else
                     this->set_data(hpx::launch::sync, other.const_data() );
             }
-
-            return std::move(*this);
         }
 
         T operator[](std::size_t i) const
