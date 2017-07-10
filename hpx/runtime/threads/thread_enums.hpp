@@ -68,17 +68,17 @@ namespace hpx { namespace threads
             taken from the normal priority queue, this is usually a first
             in-first-out ordering of tasks (depending on scheduler choice).
             This is the default priority. */
-        thread_priority_high = 3,         /*!< Task goes onto a special high
-            priority queue and will be executed before normal/low priority
-            tasks are taken (some schedulers modify the behavior slightly and
-            the documentation for those should be consulted). */
-        thread_priority_boost = 4,        /*!< Same as \a thread_priorit_highy
-            except that the thread will fall back to \a thread_priority_normal
-            if resumed after being suspended. */
-        thread_priority_high_recursive = 5, /*!< The task is a high priority
+        thread_priority_high_recursive = 3, /*!< The task is a high priority
             task and any child tasks spawned by this task will be made high
             priority as well - unless they are specifically flagged as non
             default priority. */
+        thread_priority_boost = 4,        /*!< Same as \a thread_priority_high
+            except that the thread will fall back to \a thread_priority_normal
+            if resumed after being suspended. */
+        thread_priority_high = 5,         /*!< Task goes onto a special high
+            priority queue and will be executed before normal/low priority
+            tasks are taken (some schedulers modify the behavior slightly and
+            the documentation for those should be consulted). */
 
         /// \cond NOINTERNAL
         // obsolete, kept for compatibility only

@@ -109,9 +109,9 @@ namespace hpx { namespace threads
             "default",
             "low",
             "normal",
-            "high (non-recursive)",
-            "boost",
             "high (recursive)"
+            "boost",
+            "high (non-recursive)",
         };
     }
 
