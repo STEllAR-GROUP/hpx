@@ -221,11 +221,22 @@ namespace util {
                 decltype(std::move(*(std::declval<Container>().begin()))),
                 decltype(*(std::declval<Container>().begin()))>::type;
 
+            /// Removes all qualifier and references from the given type
+            /// if the type is a l-value or r-value reference.
+            template <typename T>
+            using dereferenced_of_t =
+                typename std::conditional<std::is_reference<T>::value,
+                    typename std::decay<T>::type, T>::type;
+
             /// Returns the type which is resulting if the mapping is applied to
             /// an element in the container.
+            ///
+            /// Since standard containers don't allow to be instantiated with
+            /// references we try to construct the container from a copied
+            /// version.
             template <typename Container, typename Mapping>
-            using mapped_type_from_t =
-                typename invoke_result<Mapping, element_of_t<Container>>::type;
+            using mapped_type_from_t = dereferenced_of_t<
+                typename invoke_result<Mapping, element_of_t<Container>>::type>;
 
             /// We create a new container, which may hold the resulting type
             template <typename M, typename T>

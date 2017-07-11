@@ -628,6 +628,43 @@ static void testStrategicContainerTraverse()
                     nested.begin(), nested.end(), [](int i) { return i == 2; });
             })));
     }
+
+    /// - Ensure correct container remapping when returning references
+    {
+        // l-value references
+        {
+            std::vector<std::unique_ptr<int>> container;
+            container.push_back(std::unique_ptr<int>(new int(7)));
+
+            std::vector<int> res = map_pack(
+                [](std::unique_ptr<int> const& ref) -> int const& {
+                    // ...
+                    return *ref;
+                },
+                container);
+
+            HPX_TEST_EQ(res.size(), 1U);
+            HPX_TEST_EQ(res[0], 7);
+        }
+
+        // r-value references
+        {
+            std::vector<std::unique_ptr<std::unique_ptr<int>>> container;
+            container.push_back(std::unique_ptr<std::unique_ptr<int>>(
+                new std::unique_ptr<int>(new int(7))));
+
+            std::vector<std::unique_ptr<int>> res = map_pack(
+                [](std::unique_ptr<std::unique_ptr<int>> &
+                    ref) -> std::unique_ptr<int>&& {
+                    // ...
+                    return std::move(*ref);
+                },
+                container);
+
+            HPX_TEST_EQ(res.size(), 1U);
+            HPX_TEST_EQ((*res[0]), 7);
+        }
+    }
 }
 
 static void testStrategicTupleLikeTraverse()
