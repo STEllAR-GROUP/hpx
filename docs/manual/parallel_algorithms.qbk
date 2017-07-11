@@ -330,6 +330,11 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_transform.hpp>`]
      [[cpprefalgodocs transform]]
     ]
+	[[ [algoref unique_copy] ]
+     [Applies a function to a range of elements.]
+     [`<hpx/include/parallel_unique.hpp>`]
+     [[cpprefalgodocs unique_copy]]
+    ]
 ]
 
 [table Set operations on sorted sequences (In Header: `<hpx/include/parallel_algorithm.hpp>`)
