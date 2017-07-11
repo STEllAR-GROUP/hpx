@@ -27,6 +27,7 @@ set(tests
     transform_range
     transform_range_binary
     transform_range_binary2
+    unique_copy_range
    )
 
 foreach(test ${tests})

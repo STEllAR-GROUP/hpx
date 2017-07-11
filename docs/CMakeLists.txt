@@ -119,6 +119,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/rotate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/sort.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/transform.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/unique.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/auto_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/dynamic_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_fwd.hpp"

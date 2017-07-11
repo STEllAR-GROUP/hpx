@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \param dest         Refers to the beginning of the destination range.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
+    ///                     sequence specified by [first, last). This is an
     ///                     binary predicate which returns \a true for the
     ///                     required elements. The signature of this predicate
     ///                     should be equivalent to:

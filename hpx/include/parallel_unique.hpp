@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_UNIQUE_JUL_07_2017_1631PM
 
 #include <hpx/parallel/algorithms/unique.hpp>
+#include <hpx/parallel/container_algorithms/unique.hpp>
 
 #endif
 
