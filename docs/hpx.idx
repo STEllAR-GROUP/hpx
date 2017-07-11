@@ -536,6 +536,7 @@ invoke_fused_r                        "" "header\.hpx\.util\.invoke_fused_r.*"
 
 # hpx/util/pack_traversal.hpp
 map_pack                              "" "header\.hpx\.util\.pack_traversal.*"
+spread_this                           "" "header\.hpx\.util\.pack_traversal.*"
 traverse_pack                         "" "header\.hpx\.util\.pack_traversal.*"
 
 # hpx/util/unwrapped.hpp

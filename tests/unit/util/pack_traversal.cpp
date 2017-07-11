@@ -748,6 +748,106 @@ static void testStrategicTupleLikeTraverse()
     }
 }
 
+/// A mapper which duplicates the given element
+struct duplicate_mapper
+{
+    template <typename T>
+    auto operator()(T arg) -> decltype(hpx::util::spread_this(arg, arg))
+    {
+        return hpx::util::spread_this(arg, arg);
+    }
+};
+
+/// A mapper which removes the current element
+struct zero_mapper
+{
+    template <typename T>
+    auto operator()(T arg) -> decltype(hpx::util::spread_this())
+    {
+        return hpx::util::spread_this();
+    }
+};
+
+static void testSpreadTraverse()
+{
+    // 1:2 mappings (multiple arguments)
+    {
+        tuple<int, int, int, int> res = map_pack(duplicate_mapper{}, 1, 2);
+
+        auto expected = make_tuple(1, 1, 2, 2);
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        using Result = decltype(map_pack(zero_mapper{}, 0, 1, 2));
+        static_assert(std::is_void<Result>::value, "Failed...");
+    }
+}
+
+static void testSpreadContainerTraverse()
+{
+    // 1:2 mappings (multiple arguments)
+    {
+        std::vector<tuple<int, int>> res =
+            map_pack(duplicate_mapper{}, std::vector<int>{1});
+
+        std::vector<tuple<int, int>> expected;
+        expected.push_back(make_tuple(1, 1));
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        std::vector<hpx::util::tuple<>> res =
+            map_pack(zero_mapper{}, std::vector<int>{1});
+        HPX_TEST_EQ(res.size(), 1U);
+    }
+}
+
+static void testSpreadTupleLikeTraverse()
+{
+    // 1:2 mappings (multiple arguments)
+    {
+        tuple<tuple<int, int, int, int>> res =
+            map_pack(duplicate_mapper{}, make_tuple(make_tuple(1, 2)));
+
+        tuple<tuple<int, int, int, int>> expected =
+            make_tuple(make_tuple(1, 1, 2, 2));
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        tuple<hpx::util::tuple<>> res =
+            map_pack(zero_mapper{}, make_tuple(make_tuple(1, 2)));
+        (void) res;
+    }
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    // 1:2 mappings (multiple arguments)
+    {
+        std::array<tuple<int, int>, 2> res =
+            map_pack(duplicate_mapper{}, std::array<int, 2>{{1, 2}});
+
+        std::array<tuple<int, int>, 2> expected{
+            {make_tuple(1, 1), make_tuple(2, 2)}};
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        std::array<tuple<>, 2> res =
+            map_pack(zero_mapper{}, std::array<int, 2>{{1, 2}});
+        (void) res;
+    }
+#endif
+}
+
 int main(int, char**)
 {
     testMixedTraversal();
@@ -758,6 +858,10 @@ int main(int, char**)
     testStrategicTraverse();
     testStrategicContainerTraverse();
     testStrategicTupleLikeTraverse();
+
+    testSpreadTraverse();
+    testSpreadContainerTraverse();
+    testSpreadTupleLikeTraverse();
 
     return hpx::util::report_errors();
 }

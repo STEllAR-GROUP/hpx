@@ -11,6 +11,7 @@
 #include <hpx/traits/is_range.hpp>
 #include <hpx/traits/is_tuple_like.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/result_of.hpp>
@@ -25,6 +26,173 @@
 namespace hpx {
 namespace util {
     namespace detail {
+        /// Exposes useful facilities for dealing with 1:n mappings
+        namespace spreading {
+            /// A struct to mark a tuple to be unpacked into the parent context
+            template <typename... T>
+            class spread_box
+            {
+                tuple<T...> boxed_;
+
+            public:
+                explicit spread_box(tuple<T...> boxed)
+                  : boxed_(std::move(boxed))
+                {
+                }
+
+                tuple<T...> unbox()
+                {
+                    return std::move(boxed_);
+                }
+            };
+
+            /// Deduces to a true_type if the fiven type is a flat tuple
+            template <typename T>
+            struct is_spread : std::false_type
+            {
+            };
+            template <typename... T>
+            struct is_spread<spread_box<T...>> : std::true_type
+            {
+            };
+
+            /// Converts types to the type and spread_box objects to its
+            /// underlying tuple.
+            template <typename T>
+            T unpack(T&& type)
+            {
+                return std::forward<T>(type);
+            }
+            template <typename... T>
+            auto unpack(spread_box<T...> type) -> decltype(type.unbox())
+            {
+                return type.unbox();
+            }
+
+            /// Deduces to the type unpack is returning when called with the
+            /// the given type T.
+            template <typename T>
+            using unpacked_of_t = decltype(unpack(std::declval<T>()));
+
+            /// Converts types to the type and spread_box objects to its
+            /// underlying tuple. If the type is mapped to zero elements,
+            /// the return type will be void.
+            template <typename T>
+            auto unpack_or_void(T&& type)
+                -> decltype(unpack(std::forward<T>(type)))
+            {
+                return unpack(std::forward<T>(type));
+            }
+            inline void unpack_or_void(spread_box<>)
+            {
+            }
+
+            /// Converts types to the a tuple carrying the single type and
+            /// spread_box objects to its underlying tuple.
+            template <typename T>
+            tuple<T> undecorate(T&& type)
+            {
+                return {std::forward<T>(type)};
+            }
+            template <typename... T>
+            auto undecorate(spread_box<T...> type) -> decltype(type.unbox())
+            {
+                return type.unbox();
+            }
+
+            /// A tag for mapping the arguments to a tuple
+            struct functional_tupelize_tag
+            {
+            };
+
+            /// Use the recursive instantiation for a variadic pack which
+            /// may contain spread types
+            template <typename C, typename... T>
+            auto apply_spread_impl(std::true_type, C&& callable, T&&... args)
+                -> decltype(invoke_fused(std::forward<C>(callable),
+                    tuple_cat(undecorate(std::forward<T>(args))...)))
+            {
+                return invoke_fused(std::forward<C>(callable),
+                    tuple_cat(undecorate(std::forward<T>(args))...));
+            }
+            template <typename... T>
+            auto apply_spread_impl(
+                std::true_type, functional_tupelize_tag, T&&... args)
+                -> decltype(tuple_cat(undecorate(std::forward<T>(args))...))
+            {
+                // Optimized version to prevent useless tuple
+                // unpacking and re-assembling
+                return tuple_cat(undecorate(std::forward<T>(args))...);
+            }
+
+            /// Use the linear instantiation for variadic packs which don't
+            /// contain spread types.
+            template <typename C, typename... T>
+            auto apply_spread_impl(std::false_type, C&& callable, T&&... args)
+                -> typename invoke_result<C, T...>::type
+            {
+                return hpx::util::invoke(
+                    std::forward<C>(callable), std::forward<T>(args)...);
+            }
+            template <typename... T>
+            tuple<T...> apply_spread_impl(
+                std::false_type, functional_tupelize_tag, T&&... args)
+
+            {
+                // Optimized version to prevent useless tuple
+                // unpacking and re-assembling
+                return tuple<T...>{std::forward<T>(args)...};
+            }
+
+            /// Deduces to a true_type if any of the given types marks
+            /// the underlying type to be spread into the current context.
+            template <typename... T>
+            using is_any_spread_t = any_of<is_spread<T>...>;
+
+            template <typename C, typename... T>
+            auto map_spread(C&& callable, T&&... args)
+                -> decltype(apply_spread_impl(is_any_spread_t<T...>{},
+                    std::forward<C>(callable), std::forward<T>(args)...))
+            {
+                // Check whether any of the args is a detail::flatted_tuple_t,
+                // if not, use the linear called version for better
+                // compilation speed.
+                return apply_spread_impl(is_any_spread_t<T...>{},
+                    std::forward<C>(callable), std::forward<T>(args)...);
+            }
+
+            /// Converts the given variadic arguments into a tuple in a way
+            /// that spread return values are inserted into the current pack.
+            template <typename... T>
+            auto tupelize(T&&... args) -> decltype(
+                map_spread(functional_tupelize_tag{}, std::forward<T>(args)...))
+            {
+                return map_spread(
+                    functional_tupelize_tag{}, std::forward<T>(args)...);
+            }
+
+            /// Converts an empty tuple to void
+            template <typename First, typename... Rest>
+            tuple<First, Rest...> voidify_empty_tuple(tuple<First, Rest...> val)
+            {
+                return std::move(val);
+            }
+            inline void voidify_empty_tuple(tuple<>)
+            {
+            }
+
+            /// Converts the given variadic arguments into a tuple in a way
+            /// that spread return values are inserted into the current pack.
+            ///
+            /// If the returned tuple is empty, voidis returned instead.
+            template <typename... T>
+            auto tupelize_or_void(T&&... args) -> decltype(
+                voidify_empty_tuple(tupelize(std::forward<T>(args)...)))
+            {
+                return voidify_empty_tuple(tupelize(std::forward<T>(args)...));
+            }
+        }    // end namespace spreading
+
         /// Just traverses the pack with the given callable object,
         /// no result is returned or preserved.
         struct strategy_traverse_tag
@@ -236,7 +404,8 @@ namespace util {
             /// version.
             template <typename Container, typename Mapping>
             using mapped_type_from_t = dereferenced_of_t<
-                typename invoke_result<Mapping, element_of_t<Container>>::type>;
+                spreading::unpacked_of_t<typename invoke_result<Mapping,
+                    element_of_t<Container>>::type>>;
 
             /// We create a new container, which may hold the resulting type
             template <typename M, typename T>
@@ -266,8 +435,8 @@ namespace util {
                 for (auto&& val :
                     container_accessor_of(std::forward<T>(container)))
                 {
-                    remapped.push_back(std::forward<M>(mapper)(
-                        std::forward<decltype(val)>(val)));
+                    remapped.push_back(spreading::unpack(std::forward<M>(
+                        mapper)(std::forward<decltype(val)>(val))));
                 }
 
                 return remapped;    // RVO
@@ -282,8 +451,8 @@ namespace util {
                 for (auto&& val :
                     container_accessor_of(std::forward<T>(container)))
                 {
-                    val = std::forward<M>(mapper)(
-                        std::forward<decltype(val)>(val));
+                    val = spreading::unpack(std::forward<M>(mapper)(
+                        std::forward<decltype(val)>(val)));
                 }
                 return std::forward<T>(container);
             }
@@ -359,14 +528,24 @@ namespace util {
 #endif
                 >
             {
+                struct materializer
+                {
+                    template <typename... Args>
+                    Base<Args...> operator()(Args&&... args) const
+                    {
+                        return Base<Args...>{std::forward<Args>(args)...};
+                    }
+                };
+
                 M mapper_;
 
                 template <typename... Args>
                 auto operator()(Args&&... args)
-                    -> Base<typename invoke_result<M, OldArgs>::type...>
+                    -> decltype(spreading::map_spread(materializer{},
+                        std::declval<M>()(std::forward<Args>(args))...))
                 {
-                    return Base<typename invoke_result<M, OldArgs>::type...>{
-                        mapper_(std::forward<Args>(args))...};
+                    return spreading::map_spread(
+                        materializer{}, mapper_(std::forward<Args>(args))...);
                 }
             };
             template <typename M, template <typename...> class Base,
@@ -409,10 +588,15 @@ namespace util {
 
                 template <typename... Args>
                 auto operator()(Args&&... args)
-                    -> Base<typename invoke_result<M, OldArg>::type, Size>
+                    -> Base<decltype(spreading::unpack(std::declval<
+                                typename invoke_result<M, OldArg>::type>())),
+                        Size>
                 {
-                    return Base<typename invoke_result<M, OldArg>::type, Size>{
-                        {mapper_(std::forward<Args>(args))...}};
+                    return Base<
+                        decltype(spreading::unpack(std::declval<
+                            typename invoke_result<M, OldArg>::type>())),
+                        Size>{{spreading::unpack(
+                        mapper_(std::forward<Args>(args)))...}};
                 }
             };
             template <typename M, template <typename, std::size_t> class Base,
@@ -669,13 +853,6 @@ namespace util {
                     std::forward<T>(element));
             }
 
-            /// Boxes the given values into an according tuple
-            template <typename... T>
-            tuple<T...> box(T&&... args)
-            {
-                return tuple<T...>{std::forward<T>(args)...};
-            }
-
         public:
             explicit mapping_helper(M mapper)
               : mapper_(std::move(mapper))
@@ -684,11 +861,18 @@ namespace util {
 
             /// \copybrief try_traverse
             template <typename T>
-            auto init_traverse(Strategy strategy, T&& element)
-                -> decltype(std::declval<mapping_helper>().try_traverse(
-                    strategy, std::declval<T>()))
+            auto init_traverse(strategy_remap_tag, T&& element)
+                -> decltype(spreading::unpack_or_void(
+                    std::declval<mapping_helper>().try_traverse(
+                        strategy_remap_tag{}, std::declval<T>())))
             {
-                return try_traverse(strategy, std::forward<T>(element));
+                return spreading::unpack_or_void(try_traverse(
+                    strategy_remap_tag{}, std::forward<T>(element)));
+            }
+            template <typename T>
+            void init_traverse(strategy_traverse_tag, T&& element)
+            {
+                try_traverse(strategy_traverse_tag{}, std::forward<T>(element));
             }
 
             /// Calls the traversal method for every element in the pack,
@@ -696,7 +880,7 @@ namespace util {
             template <typename First, typename Second, typename... T>
             auto init_traverse(strategy_remap_tag strategy, First&& first,
                 Second&& second, T&&... rest)
-                -> decltype(std::declval<mapping_helper>().box(
+                -> decltype(spreading::tupelize_or_void(
                     std::declval<mapping_helper>().try_traverse(
                         strategy, std::forward<First>(first)),
                     std::declval<mapping_helper>().try_traverse(
@@ -704,7 +888,8 @@ namespace util {
                     std::declval<mapping_helper>().try_traverse(
                         strategy, std::forward<T>(rest))...))
             {
-                return box(try_traverse(strategy, std::forward<First>(first)),
+                return spreading::tupelize_or_void(
+                    try_traverse(strategy, std::forward<First>(first)),
                     try_traverse(strategy, std::forward<Second>(second)),
                     try_traverse(strategy, std::forward<T>(rest))...);
             }

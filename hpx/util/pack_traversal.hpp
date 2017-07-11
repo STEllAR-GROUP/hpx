@@ -8,6 +8,7 @@
 
 #include <hpx/util/detail/pack_traversal_impl.hpp>
 
+#include <type_traits>
 #include <utility>
 
 #if defined(DOXYGEN)
@@ -61,6 +62,17 @@ namespace util {
         return detail::apply_pack_transform(detail::strategy_remap_tag{},
             std::forward<Mapper>(mapper),
             std::forward<T>(pack)...);
+    }
+
+    /// Indicate that the result shall be spread across the parent container
+    /// if possible. This can be used to create a mapper function used
+    /// in map_pack that maps one element to an arbitrary count (1:n).
+    template <typename... T>
+    detail::spreading::spread_box<typename std::decay<T>::type...> spread_this(
+        T&&... args)
+    {
+        return detail::spreading::spread_box<typename std::decay<T>::type...>(
+            make_tuple(std::forward<T>(args)...));
     }
 
     /// Traverses the pack with the given visitor.
