@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             auto base_val = *first;
 
-            *dest++ = *first;
+            *dest++ = base_val;
 
             while (++first != last)
             {
@@ -93,7 +93,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     hpx::util::invoke(proj, *first)))
                 {
                     base_val = *first;
-                    *dest++ = *first;
+                    *dest++ = base_val;
                 }
             }
             return std::make_pair(std::move(last), std::move(dest));
