@@ -121,6 +121,7 @@ set(tests
     uninitialized_moven
     uninitialized_value_construct
     uninitialized_value_constructn
+    unique_copy
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
