@@ -68,7 +68,8 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 #endif
 
-            count_iteration& operator=(count_iteration const&) = delete;
+            count_iteration& operator=(count_iteration const&) = default;
+            count_iteration& operator=(count_iteration &&) = default;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -104,16 +105,16 @@ namespace hpx { namespace parallel { inline namespace v1
               : count::algorithm("count")
             {}
 
-            template <typename ExPolicy, typename Iter, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             static difference_type
-            sequential(ExPolicy && policy, Iter first, Iter last, T const& value)
+            sequential(ExPolicy && policy, InIter first, InIter last, T const& value)
             {
                 auto f1 =
                     count_iteration<ExPolicy, detail::compare_to<T> >(
                         detail::compare_to<T>(value));
 
                 using hpx::util::placeholders::_1;
-                typename std::iterator_traits<Iter>::difference_type ret = 0;
+                typename std::iterator_traits<InIter>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,
@@ -154,21 +155,27 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename T>
+        template <typename ExPolicy, typename FwdIter, typename T>
         inline typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
         >::type
-        count_(ExPolicy && policy, InIter first, InIter last, T const& value,
+        count_(ExPolicy && policy, FwdIter first, FwdIter last, T const& value,
             std::false_type)
         {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             typedef std::integral_constant<bool,
                     parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
                 > is_seq;
+#else
+            typedef parallel::execution::is_sequenced_execution_policy<
+                        ExPolicy
+                    > is_seq;
+#endif
 
-            typedef typename std::iterator_traits<InIter>::difference_type
+            typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
 
             return detail::count<difference_type>().call(
@@ -176,11 +183,11 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T>
+        template <typename ExPolicy, typename FwdIter, typename T>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
         >::type
-        count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
+        count_(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
             std::true_type);
 
         /// \endcond
@@ -196,9 +203,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam T           The type of the value to search for (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -225,24 +232,30 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
-    ///           is defined by \a std::iterator_traits<InIter>::difference_type.
+    ///           is defined by \a std::iterator_traits<FwdIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename InIter, typename T>
+    template <typename ExPolicy, typename FwdIter, typename T>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type
+            typename std::iterator_traits<FwdIter>::difference_type
         >::type
     >::type
-    count(ExPolicy && policy, InIter first, InIter last, T const& value)
+    count(ExPolicy && policy, FwdIter first, FwdIter last, T const& value)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Required at least input iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
+#endif
 
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::count_(
             std::forward<ExPolicy>(policy), first, last, value,
@@ -264,14 +277,14 @@ namespace hpx { namespace parallel { inline namespace v1
               : count_if::algorithm("count_if")
             {}
 
-            template <typename ExPolicy, typename Iter, typename Pred>
+            template <typename ExPolicy, typename InIter, typename Pred>
             static difference_type
-            sequential(ExPolicy && policy, Iter first, Iter last, Pred && op)
+            sequential(ExPolicy && policy, InIter first, InIter last, Pred && op)
             {
                 auto f1 = count_iteration<ExPolicy, Pred>(op);
 
                 using hpx::util::placeholders::_1;
-                typename std::iterator_traits<Iter>::difference_type ret = 0;
+                typename std::iterator_traits<InIter>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,
@@ -309,21 +322,27 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename InIter, typename F>
+        template <typename ExPolicy, typename FwdIter, typename F>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
         >::type
-        count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+        count_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type)
         {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
             typedef std::integral_constant<bool,
                     parallel::execution::is_sequenced_execution_policy<
                         ExPolicy
                     >::value ||
-                   !hpx::traits::is_forward_iterator<InIter>::value
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
                 > is_seq;
+#else
+            typedef parallel::execution::is_sequenced_execution_policy<
+                        ExPolicy
+                    > is_seq;
+#endif
 
-            typedef typename std::iterator_traits<InIter>::difference_type
+            typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
 
             return detail::count_if<difference_type>().call(
@@ -332,11 +351,11 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename F>
+        template <typename ExPolicy, typename FwdIter, typename F>
         typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<InIter>::difference_type
+            ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
         >::type
-        count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+        count_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type);
 
         /// \endcond
@@ -353,9 +372,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a count_if requires \a F to meet the
@@ -379,7 +398,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
     /// \note The assignments in the parallel \a count_if algorithm invoked with
@@ -397,24 +416,29 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
-    ///           is defined by \a std::iterator_traits<InIter>::difference_type.
+    ///           is defined by \a std::iterator_traits<FwdIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename InIter, typename F>
+    template <typename ExPolicy, typename FwdIter, typename F>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<InIter>::difference_type
+            typename std::iterator_traits<FwdIter>::difference_type
         >::type
     >::type
-    count_if(ExPolicy && policy, InIter first, InIter last, F && f)
+    count_if(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Required at least input iterator.");
-
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
+#endif
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         return detail::count_if_(
             std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),

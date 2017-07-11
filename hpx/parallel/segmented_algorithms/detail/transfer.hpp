@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,19 +34,19 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename InIter, typename OutIter>
+        template <typename FwdIter, typename OutIter>
         struct iterators_are_segmented
           : std::integral_constant<bool,
-                hpx::traits::segmented_iterator_traits<InIter>
+                hpx::traits::segmented_iterator_traits<FwdIter>
                     ::is_segmented_iterator::value &&
                 hpx::traits::segmented_iterator_traits<OutIter>
                     ::is_segmented_iterator::value>
         {};
 
-        template <typename InIter, typename OutIter>
+        template <typename FwdIter, typename OutIter>
         struct iterators_are_not_segmented
           : std::integral_constant<bool,
-                !hpx::traits::segmented_iterator_traits<InIter>
+                !hpx::traits::segmented_iterator_traits<FwdIter>
                     ::is_segmented_iterator::value &&
                 !hpx::traits::segmented_iterator_traits<OutIter>
                     ::is_segmented_iterator::value>
@@ -259,17 +259,18 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename FwdIter1,
+            typename FwdIter2>
         typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
+            ExPolicy, std::pair<FwdIter1, FwdIter2>
         >::type
-        transfer_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            std::true_type)
+        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, std::true_type)
         {
             if (first == last)
             {
                 return util::detail::algorithm_result<
-                        ExPolicy, std::pair<InIter, OutIter>
+                        ExPolicy, std::pair<FwdIter1, FwdIter2>
                     >::get(std::make_pair(last, dest));
             }
 
@@ -282,12 +283,13 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename Algo, typename ExPolicy, typename InIter, typename OutIter>
+        template <typename Algo, typename ExPolicy, typename FwdIter1,
+            typename FwdIter2>
         typename util::detail::algorithm_result<
-            ExPolicy, std::pair<InIter, OutIter>
+            ExPolicy, std::pair<FwdIter1, FwdIter2>
         >::type
-        transfer_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            std::false_type);
+        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, std::false_type);
 
         /// \endcond
     }

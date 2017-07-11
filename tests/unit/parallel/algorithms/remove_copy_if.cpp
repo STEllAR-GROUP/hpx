@@ -177,6 +177,7 @@ void test_remove_copy_if()
         IteratorTag());
 #endif
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_remove_copy_if_outiter(execution::seq, IteratorTag());
     test_remove_copy_if_outiter(execution::par, IteratorTag());
     test_remove_copy_if_outiter(execution::par_unseq, IteratorTag());
@@ -196,13 +197,16 @@ void test_remove_copy_if()
     test_remove_copy_if_outiter(
         execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
+#endif
 }
 
 void remove_copy_if_test()
 {
     test_remove_copy_if<std::random_access_iterator_tag>();
     test_remove_copy_if<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_remove_copy_if<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -309,7 +313,9 @@ void remove_copy_if_exception_test()
 {
     test_remove_copy_if_exception<std::random_access_iterator_tag>();
     test_remove_copy_if_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_remove_copy_if_exception<std::input_iterator_tag>();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -415,7 +421,9 @@ void remove_copy_if_bad_alloc_test()
 {
     test_remove_copy_if_bad_alloc<std::random_access_iterator_tag>();
     test_remove_copy_if_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_remove_copy_if_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

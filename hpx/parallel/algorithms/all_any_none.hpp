@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -108,9 +108,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
@@ -133,7 +133,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed
     ///                     to it. The type \a Type must be such that an object
-    ///                     of type \a InIter can be dereferenced and then
+    ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
     /// The application of function objects in parallel algorithm
@@ -156,21 +156,29 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a f returns true for no elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename InIter, typename F>
+    template <typename ExPolicy, typename FwdIter, typename F>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    none_of(ExPolicy && policy, InIter first, InIter last, F && f)
+    none_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::none_of().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -256,9 +264,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a any_of requires \a F to meet the
@@ -281,7 +289,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed
     ///                     to it. The type \a Type must be such that an object
-    ///                     of type \a InIter can be dereferenced and then
+    ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
     /// The application of function objects in parallel algorithm
@@ -304,21 +312,29 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a f returns true for at least one element in the range,
     ///           false otherwise. It returns false if the range is empty.
     ///
-    template <typename ExPolicy, typename InIter, typename F>
+    template <typename ExPolicy, typename FwdIter, typename F>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    any_of(ExPolicy && policy, InIter first, InIter last, F && f)
+    any_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::any_of().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -403,9 +419,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a all_of requires \a F to meet the
@@ -428,7 +444,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed
     ///                     to it. The type \a Type must be such that an object
-    ///                     of type \a InIter can be dereferenced and then
+    ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
     /// The application of function objects in parallel algorithm
@@ -451,21 +467,29 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a f returns true for all elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename InIter, typename F>
+    template <typename ExPolicy, typename FwdIter, typename F>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    all_of(ExPolicy && policy, InIter first, InIter last, F && f)
+    all_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::all_of().call(
             std::forward<ExPolicy>(policy), is_seq(),

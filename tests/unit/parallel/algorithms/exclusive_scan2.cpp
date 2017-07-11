@@ -101,7 +101,9 @@ void exclusive_scan_test2()
 {
     test_exclusive_scan2<std::random_access_iterator_tag>();
     test_exclusive_scan2<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_exclusive_scan2<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

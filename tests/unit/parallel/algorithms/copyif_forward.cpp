@@ -94,6 +94,7 @@ void test_copy_if_async(ExPolicy p)
     HPX_TEST_EQ(count, d.size());
 }
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
 template <typename ExPolicy>
 void test_copy_if_outiter(ExPolicy policy)
 {
@@ -150,6 +151,7 @@ void test_copy_if_outiter_async(ExPolicy p)
 
     HPX_TEST_EQ(c.size()/2, d.size());
 }
+#endif
 
 void test_copy_if()
 {
@@ -171,6 +173,7 @@ void test_copy_if()
     test_copy_if(execution_policy(execution::par(execution::task)));
 #endif
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_copy_if_outiter(execution::seq);
     test_copy_if_outiter(execution::par);
     test_copy_if_outiter(execution::par_unseq);
@@ -185,6 +188,7 @@ void test_copy_if()
 
     test_copy_if_outiter(execution_policy(execution::seq(execution::task)));
     test_copy_if_outiter(execution_policy(execution::par(execution::task)));
+#endif
 #endif
 }
 

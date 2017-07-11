@@ -70,6 +70,7 @@ void test_copy_async(ExPolicy p, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
 template <typename ExPolicy, typename IteratorTag>
 void test_copy_outiter(ExPolicy policy, IteratorTag)
 {
@@ -121,6 +122,7 @@ void test_copy_outiter_async(ExPolicy p, IteratorTag)
         }));
     HPX_TEST_EQ(count, d.size());
 }
+#endif
 
 template <typename IteratorTag>
 void test_copy()
@@ -142,6 +144,7 @@ void test_copy()
     test_copy(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     //assure output iterator will work
     test_copy_outiter(execution::seq, IteratorTag());
     test_copy_outiter(execution::par, IteratorTag());
@@ -158,13 +161,16 @@ void test_copy()
     test_copy_outiter(execution_policy(execution::seq(execution::task)), IteratorTag());
     test_copy_outiter(execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
+#endif
 }
 
 void copy_test()
 {
     test_copy<std::random_access_iterator_tag>();
     test_copy<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_copy<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -269,7 +275,9 @@ void copy_exception_test()
 {
     test_copy_exception<std::random_access_iterator_tag>();
     test_copy_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_copy_exception<std::input_iterator_tag>();
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -372,7 +380,9 @@ void copy_bad_alloc_test()
 {
     test_copy_bad_alloc<std::random_access_iterator_tag>();
     test_copy_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_copy_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

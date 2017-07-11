@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -93,10 +93,10 @@ namespace hpx { namespace parallel { inline namespace v1
             return first;
         }
 
-        template <typename InIter1, typename InIter2, typename F,
+        template <typename FwdIter1, typename FwdIter2, typename F,
             typename CancelToken>
-        bool sequential_includes(InIter1 first1, InIter1 last1, InIter2 first2,
-            InIter2 last2, F && f, CancelToken& tok)
+        bool sequential_includes(FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            FwdIter2 last2, F && f, CancelToken& tok)
         {
             while (first2 != last2)
             {
@@ -222,14 +222,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the source iterators used for the
+    /// \tparam FwdIter1    The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators used for the
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a includes requires \a Pred to meet the
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such
-    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
     ///
@@ -279,27 +279,38 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           sorted range [first2, last2) is found within the sorted range
     ///           [first1, last1). Also returns true if [first2, last2) is empty.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::less>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    includes(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, Pred && op = Pred())
+    includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, Pred && op = Pred())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
+               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter2>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::includes().call(
             std::forward<ExPolicy>(policy), is_seq(),

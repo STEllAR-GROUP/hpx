@@ -100,7 +100,9 @@ void lexicographical_compare_test1()
 {
     test_lexicographical_compare1<std::random_access_iterator_tag>();
     test_lexicographical_compare1<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_lexicographical_compare1<std::input_iterator_tag>();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -182,7 +184,9 @@ void lexicographical_compare_test2()
 {
     test_lexicographical_compare2<std::random_access_iterator_tag>();
     test_lexicographical_compare2<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_lexicographical_compare2<std::input_iterator_tag>();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -266,7 +270,9 @@ void lexicographical_compare_test3()
 {
     test_lexicographical_compare3<std::random_access_iterator_tag>();
     test_lexicographical_compare3<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_lexicographical_compare3<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -96,7 +96,9 @@ void reduce_test1()
 {
     test_reduce1<std::random_access_iterator_tag>();
     test_reduce1<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_reduce1<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -168,7 +170,9 @@ void reduce_test2()
 {
     test_reduce2<std::random_access_iterator_tag>();
     test_reduce2<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_reduce2<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -238,7 +242,9 @@ void reduce_test3()
 {
     test_reduce3<std::random_access_iterator_tag>();
     test_reduce3<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_reduce3<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -342,7 +348,9 @@ void reduce_exception_test()
 {
     test_reduce_exception<std::random_access_iterator_tag>();
     test_reduce_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_reduce_exception<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -444,7 +452,9 @@ void reduce_bad_alloc_test()
 {
     test_reduce_bad_alloc<std::random_access_iterator_tag>();
     test_reduce_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_reduce_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

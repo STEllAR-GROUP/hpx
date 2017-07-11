@@ -38,6 +38,14 @@ particular order):
 * Removed the (broken) component type `hpx::lcos::queue<T>`. The old type is
   still available at configure time by passing
   `-DHPX_WITH_QUEUE_COMPATIBILITY=On` to __cmake__.
+* The parallel algorithms adopted for C++17 restrict the iterator categories
+  usable with those to at least forward iterators. Our implementation of the
+  parallel algorithms was supporting input iterators (and output iterators)
+  as well by simply falling back to sequential execution. We have now made
+  our implementations conforming by requiring at least forward iterators. In
+  order to enable the old behavior use the the compatibility option
+  `-DHPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT=On` on the __cmake__ command
+  line.
 
 [heading Breaking Changes]
 

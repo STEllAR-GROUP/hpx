@@ -925,6 +925,14 @@ if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
 endif()
 
+# HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT: introduced in V1.1.0
+hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
+    "Enable weaker (non-conforming) iterator requirements for parallel algorithms (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+  hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################

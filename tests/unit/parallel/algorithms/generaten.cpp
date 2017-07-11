@@ -96,7 +96,9 @@ void generate_n_test()
 {
     test_generate_n<std::random_access_iterator_tag>();
     test_generate_n<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_generate_n<std::output_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

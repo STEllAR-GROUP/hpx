@@ -94,7 +94,9 @@ void find_if_test()
 {
     test_find_if<std::random_access_iterator_tag>();
     test_find_if<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_find_if<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,7 +202,9 @@ void find_if_exception_test()
 {
     test_find_if_exception<std::random_access_iterator_tag>();
     test_find_if_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_find_if_exception<std::input_iterator_tag>();
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -305,7 +309,9 @@ void find_if_bad_alloc_test()
 {
     test_find_if_bad_alloc<std::random_access_iterator_tag>();
     test_find_if_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_find_if_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
