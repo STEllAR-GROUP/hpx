@@ -13,6 +13,7 @@
 
 #include <cstddef>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -49,9 +50,27 @@ void bulk_test( hpx::lcos::spmd_block block,
             {tile,tile},
             {N,N} );
 
-        for ( auto & v : hpx::local_view(my_subview) )
+        auto local = hpx::local_view(my_subview);
+
+        for(auto it = local.begin(); it != local.end(); it++)
         {
-            v = std::vector<double>( elt_size, double(idx) );
+            // It's a local write operation
+            *it = std::vector<double>(elt_size,idx);
+        }
+
+        auto left_it  = local.begin();
+        auto right_it = local.cbegin();
+
+        // Note: Useless computation, since we assign segments to themselves
+        for(; left_it != local.end(); left_it++, right_it++)
+        {
+            // Check that dereferencing iterator and const_iterator does not
+            // retrieve the same type
+            HPX_TEST((
+                !std::is_same<decltype(*left_it),decltype(*right_it)>::value));
+
+            // It's a local write operation
+            *left_it = *right_it;
         }
 
         idx++;

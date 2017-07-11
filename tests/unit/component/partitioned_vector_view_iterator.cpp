@@ -33,6 +33,10 @@ void bulk_test( hpx::lcos::spmd_block block,
         = hpx::partitioned_vector<double>;
     using view_type
         = hpx::partitioned_vector_view<double,3>;
+    using view_type_iterator
+        = typename view_type::iterator;
+    using const_view_type_iterator
+        = typename view_type::const_iterator;
 
     vector_type my_vector;
     my_vector.connect_to(hpx::launch::sync, vec_name);
@@ -47,10 +51,25 @@ void bulk_test( hpx::lcos::spmd_block block,
     if(block.this_image() == 0)
     {
         // Traverse all the co-indexed elements
-        for (auto && v : my_view)
+        for(auto i = my_view.begin(); i != my_view.end(); i++)
         {
             // It's a Put operation
-            v = std::vector<double>(elt_size,idx++);
+            *i = std::vector<double>(elt_size,idx++);
+        }
+
+        auto left_it  = my_view.begin();
+        auto right_it = my_view.cbegin();
+
+        // Note: Useless computation, since we assign segments to themselves
+        for(; left_it != my_view.end(); left_it++, right_it++)
+        {
+            // Check that dereferencing iterator and const_iterator does not
+            // retrieve the same type
+            HPX_TEST((
+                !std::is_same<decltype(*left_it),decltype(*right_it)>::value));
+
+            // It's a Put operation
+            *left_it = *right_it;
         }
     }
 
@@ -80,6 +99,27 @@ void bulk_test( hpx::lcos::spmd_block block,
 
                     idx++;
                 }
+
+        idx = 0;
+
+        // Re-check by traversing all the co-indexed elements
+        for(auto i = my_view.cbegin(); i != my_view.cend(); i++)
+        {
+            std::vector<double> result(elt_size,idx);
+
+            // It's a Get operation
+            std::vector<double> value = (std::vector<double>)(*i);
+
+            const_iterator it1 = result.begin(), it2 = value.begin();
+            const_iterator end1 = result.end();
+
+            for (; it1 != end1; ++it1, ++it2)
+            {
+                HPX_TEST_EQ(*it1, *it2);
+            }
+
+            idx++;
+        }
     }
 }
 HPX_PLAIN_ACTION(bulk_test, bulk_test_action);
