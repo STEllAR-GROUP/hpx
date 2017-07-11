@@ -44,7 +44,7 @@ struct random_fill
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename InIter, typename OutIter>
-double run_unique_copy_benchmark_std(std::size_t test_count,
+double run_unique_copy_benchmark_std(int test_count,
     InIter first, InIter last, OutIter dest)
 {
     std::uint64_t time = hpx::util::high_resolution_clock::now();
@@ -61,7 +61,7 @@ double run_unique_copy_benchmark_std(std::size_t test_count,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-double run_unique_copy_benchmark_hpx(std::size_t test_count, ExPolicy policy,
+double run_unique_copy_benchmark_hpx(int test_count, ExPolicy policy,
     FwdIter1 first, FwdIter1 last, FwdIter2 dest)
 {
     std::uint64_t time = hpx::util::high_resolution_clock::now();
@@ -79,7 +79,7 @@ double run_unique_copy_benchmark_hpx(std::size_t test_count, ExPolicy policy,
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void run_benchmark(std::size_t vector_size, std::size_t random_range,
-    std::size_t test_count, IteratorTag)
+    int test_count, IteratorTag)
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
@@ -156,7 +156,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t random_range = vm["random_range"].as<std::size_t>();
-    std::size_t test_count = vm["test_count"].as<int>();
+    int test_count = vm["test_count"].as<int>();
     std::string iterator_tag_str = correct_iterator_tag_str(
         vm["iterator_tag"].as<std::string>());
 
