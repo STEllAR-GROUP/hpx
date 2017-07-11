@@ -96,10 +96,10 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     std::vector<int> v(vector_size);
     std::vector<int> result_true(v.size()), result_false(v.size());
-    iterator first = iterator(boost::begin(v));
-    iterator last = iterator(boost::end(v));
-    iterator dest_true = iterator(boost::begin(result_true));
-    iterator dest_false = iterator(boost::begin(result_false));
+    iterator first = iterator(std::begin(v));
+    iterator last = iterator(std::end(v));
+    iterator dest_true = iterator(std::begin(result_true));
+    iterator dest_false = iterator(std::begin(result_false));
 
     // initialize data
     using namespace hpx::parallel;

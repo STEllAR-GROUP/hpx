@@ -88,9 +88,9 @@ void run_benchmark(std::size_t vector_size, std::size_t random_range,
 
     std::vector<int> v(vector_size);
     std::vector<int> result(v.size());
-    iterator first = iterator(boost::begin(v));
-    iterator last = iterator(boost::end(v));
-    iterator dest = iterator(boost::begin(result));
+    iterator first = iterator(std::begin(v));
+    iterator last = iterator(std::end(v));
+    iterator dest = iterator(std::begin(result));
 
     // initialize data
     using namespace hpx::parallel;

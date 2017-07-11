@@ -10,7 +10,6 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/random.hpp>
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -122,8 +121,8 @@ void test_unique_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
 
     auto result = hpx::parallel::unique_copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        iterator(boost::begin(dest_res)),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        iterator(std::begin(dest_res)),
         pred);
     auto solution = std::unique_copy(std::begin(c), std::end(c),
         std::begin(dest_sol),
@@ -154,8 +153,8 @@ void test_unique_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred,
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
 
     auto f = hpx::parallel::unique_copy(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        iterator(boost::begin(dest_res)),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        iterator(std::begin(dest_res)),
         pred);
     auto result = f.get();
     auto solution = std::unique_copy(std::begin(c), std::end(c),
@@ -187,8 +186,8 @@ void test_unique_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try {
         auto result = hpx::parallel::unique_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(dest)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(dest)),
             throw_always());
 
         HPX_TEST(false);
@@ -218,8 +217,8 @@ void test_unique_copy_exception_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try {
         auto f = hpx::parallel::unique_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(dest)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(dest)),
             throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -256,8 +255,8 @@ void test_unique_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         auto result = hpx::parallel::unique_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(dest)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(dest)),
             throw_bad_alloc());
 
         HPX_TEST(false);
@@ -286,8 +285,8 @@ void test_unique_copy_bad_alloc_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try {
         auto f = hpx::parallel::unique_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(dest)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(dest)),
             throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
@@ -327,8 +326,8 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag,
         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
         auto result = hpx::parallel::unique_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(dest_res)));
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(dest_res)));
         auto solution = std::unique_copy(std::begin(c), std::end(c),
             std::begin(dest_sol));
 
@@ -345,8 +344,8 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag,
 
         DataType val;
         auto result = hpx::parallel::unique_copy(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            iterator(boost::begin(dest_res)),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            iterator(std::begin(dest_res)),
             [](DataType const& a, DataType const& b) -> bool {
                 return a == b;
             },
@@ -365,7 +364,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag,
             std::input_iterator_tag> iterator;
 
         auto result = hpx::parallel::v1::detail::sequential_unique_copy(
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(dest_res),
             [](DataType const& a, DataType const& b) -> bool {
                 return a == b;
