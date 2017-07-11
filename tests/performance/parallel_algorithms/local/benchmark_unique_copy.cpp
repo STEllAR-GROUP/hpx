@@ -78,8 +78,8 @@ double run_unique_copy_benchmark_hpx(int test_count, ExPolicy policy,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void run_benchmark(std::size_t vector_size, std::size_t random_range,
-    int test_count, IteratorTag)
+void run_benchmark(std::size_t vector_size, int test_count,
+    std::size_t random_range, IteratorTag)
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
