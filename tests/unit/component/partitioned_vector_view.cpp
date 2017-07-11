@@ -192,8 +192,7 @@ void async_bulk_test( hpx::lcos::spmd_block block,
 
     block.sync_all(hpx::launch::async)
     .then(
-        [&block, &in, &out, width, height, local_width, local_height,
-            local_leading_dimension] (hpx::future<void> event)
+        [&block, &in, &out, width, height] (hpx::future<void> event)
         {
             event.get();
 
@@ -208,7 +207,7 @@ void async_bulk_test( hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
     .then(
-        [&block, &in, &out, width, height, local_width, local_height,
+        [&block, &out, local_width, local_height,
             local_leading_dimension] (hpx::future<void> event)
         {
             event.get();
@@ -228,7 +227,7 @@ void async_bulk_test( hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
     .then(
-        [&block, &in, &out, width, height, local_width, local_height,
+        [&block, &out, width, height, local_width, local_height,
             local_leading_dimension] (hpx::future<void> event)
         {
             event.get();
