@@ -9,6 +9,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/iterator_range.hpp>
 #include <hpx/util/protect.hpp>
 
 #include <boost/format.hpp>
@@ -47,7 +48,7 @@ int hpx_main()
     iterator_type itr_b = v1.begin();
     iterator_type itr_e = v1.end();
 
-    typedef boost::iterator_range<iterator_type> range_type;
+    typedef hpx::util::iterator_range<iterator_type> range_type;
 
     range_type my_range(itr_b, itr_e);
 

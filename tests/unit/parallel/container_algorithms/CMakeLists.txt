@@ -12,6 +12,7 @@ set(tests
     max_element_range
     min_element_range
     minmax_element_range
+    partition_copy_range
     remove_copy_range
     remove_copy_if_range
     replace_range

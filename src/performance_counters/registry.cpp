@@ -712,6 +712,8 @@ namespace hpx { namespace performance_counters
         try {
             // extract parameters
             std::size_t sample_interval = 1000;   // default sampling interval
+            bool reset_base_counter = false;
+
             if (!parameters.empty())
                 sample_interval = parameters[0];
 
@@ -721,16 +723,26 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::mean>
                 > counter_t;
+
+                if (parameters.size() > 1)
+                    reset_base_counter = (parameters[1] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
-                    complemented_info, base_counter_name, sample_interval, 0);
+                    complemented_info, base_counter_name, sample_interval, 0,
+                    reset_base_counter);
             }
             else if (p.countername_ == "stddev") {
                 typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::variance>
                 > counter_t;
+
+                if (parameters.size() > 1)
+                    reset_base_counter = (parameters[1] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
-                    complemented_info, base_counter_name, sample_interval, 0);
+                    complemented_info, base_counter_name, sample_interval, 0,
+                    reset_base_counter);
             }
             else if (p.countername_ == "rolling_average") {
                 typedef hpx::components::component<
@@ -742,9 +754,12 @@ namespace hpx { namespace performance_counters
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
+                if (parameters.size() > 2)
+                    reset_base_counter = (parameters[2] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
-                    window_size);
+                    window_size, reset_base_counter);
             }
 #if BOOST_VERSION >= 105600
             else if (p.countername_ == "rolling_stddev") {
@@ -757,9 +772,12 @@ namespace hpx { namespace performance_counters
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
+                if (parameters.size() > 2)
+                    reset_base_counter = (parameters[2] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
-                    window_size);
+                    window_size, reset_base_counter);
             }
 #endif
             else if (p.countername_ == "median") {
@@ -767,24 +785,39 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::median>
                 > counter_t;
+
+                if (parameters.size() > 1)
+                    reset_base_counter = (parameters[1] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
-                    complemented_info, base_counter_name, sample_interval, 0);
+                    complemented_info, base_counter_name, sample_interval, 0,
+                    reset_base_counter);
             }
             else if (p.countername_ == "max") {
                 typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::max>
                 > counter_t;
+
+                if (parameters.size() > 1)
+                    reset_base_counter = (parameters[1] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
-                    complemented_info, base_counter_name, sample_interval, 0);
+                    complemented_info, base_counter_name, sample_interval, 0,
+                    reset_base_counter);
             }
             else if (p.countername_ == "min") {
                 typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
                         boost::accumulators::tag::min>
                 > counter_t;
+
+                if (parameters.size() > 1)
+                    reset_base_counter = (parameters[1] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
-                    complemented_info, base_counter_name, sample_interval, 0);
+                    complemented_info, base_counter_name, sample_interval, 0,
+                    reset_base_counter);
             }
             else if (p.countername_ == "rolling_min") {
                 typedef hpx::components::component<
@@ -796,9 +829,12 @@ namespace hpx { namespace performance_counters
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
+                if (parameters.size() > 2)
+                    reset_base_counter = (parameters[2] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
-                    window_size);
+                    window_size, reset_base_counter);
             }
             else if (p.countername_ == "rolling_max") {
                 typedef hpx::components::component<
@@ -810,9 +846,12 @@ namespace hpx { namespace performance_counters
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
+                if (parameters.size() > 2)
+                    reset_base_counter = (parameters[2] != 0) ? true : false;
+
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
-                    window_size);
+                    window_size, reset_base_counter);
             }
             else {
                 HPX_THROWS_IF(ec, bad_parameter,

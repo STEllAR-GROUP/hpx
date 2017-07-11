@@ -8,6 +8,7 @@
 
 #include <hpx/include/parallel_container_algorithm.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/iterator_range.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -31,7 +32,7 @@ void test_for_each(ExPolicy && policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::parallel::for_each(std::forward<ExPolicy>(policy),
-        boost::make_iterator_range(
+        hpx::util::make_iterator_range(
             iterator(std::begin(c)), iterator(std::end(c))
         ),
         [](std::size_t& v) {
@@ -59,7 +60,7 @@ void test_for_each_async(ExPolicy && p, IteratorTag)
 
     hpx::future<void> f =
         hpx::parallel::for_each(std::forward<ExPolicy>(p),
-            boost::make_iterator_range(
+            hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))
             ),
             [](std::size_t& v) {
@@ -92,7 +93,7 @@ void test_for_each_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::parallel::for_each(policy,
-            boost::make_iterator_range(
+            hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))
             ),
             [](std::size_t& v) { throw std::runtime_error("test"); });
@@ -124,7 +125,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
     try {
         hpx::future<void> f =
             hpx::parallel::for_each(p,
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     iterator(std::begin(c)), iterator(std::end(c))
                 ),
                 [](std::size_t& v) { throw std::runtime_error("test"); });
@@ -160,7 +161,7 @@ void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::parallel::for_each(policy,
-            boost::make_iterator_range(
+            hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))
             ),
             [](std::size_t& v) { throw std::bad_alloc(); });
@@ -191,7 +192,7 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
     try {
         hpx::future<void> f =
             hpx::parallel::for_each(p,
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     iterator(std::begin(c)), iterator(std::end(c))
                 ),
                 [](std::size_t& v) { throw std::bad_alloc(); });

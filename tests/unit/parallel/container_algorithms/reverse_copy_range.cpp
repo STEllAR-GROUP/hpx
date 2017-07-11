@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_reverse.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/iterator_range.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -129,7 +130,7 @@ void test_reverse_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try {
         hpx::parallel::reverse_copy(policy,
-            boost::make_iterator_range(
+            hpx::util::make_iterator_range(
                 decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c),
@@ -165,7 +166,7 @@ void test_reverse_copy_exception_async(ExPolicy p, IteratorTag)
     try {
         auto f =
             hpx::parallel::reverse_copy(p,
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(std::begin(c)),
                     decorated_iterator(
                         std::end(c),
@@ -241,7 +242,7 @@ void test_reverse_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::reverse_copy(policy,
-            boost::make_iterator_range(
+            hpx::util::make_iterator_range(
                 decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c),
@@ -276,7 +277,7 @@ void test_reverse_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     try {
         auto f =
             hpx::parallel::reverse_copy(p,
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(std::begin(c)),
                     decorated_iterator(
                         std::end(c),

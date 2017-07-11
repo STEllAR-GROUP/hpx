@@ -9,6 +9,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/iterator_range.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -19,8 +20,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/range/iterator_range.hpp>
 
 using hpx::parallel::parallel_executor;
 using hpx::util::deferred_call;
@@ -105,14 +104,14 @@ void test_void_bulk_async()
 // Sum using hpx's parallel_executor and the above void_parallel_executor
 
 // Create shape argument for parallel_executor
-std::vector<boost::iterator_range<iter> >
+std::vector<hpx::util::iterator_range<iter> >
 split(iter first, iter last, int parts)
 {
     typedef std::iterator_traits<iter>::difference_type sz_type;
     sz_type count = std::distance(first, last);
     sz_type increment = count/parts;
 
-    std::vector<boost::iterator_range<iter> > results;
+    std::vector<hpx::util::iterator_range<iter> > results;
     while(first != last)
     {
         iter prev = first;
@@ -120,7 +119,7 @@ split(iter first, iter last, int parts)
             first,
             (std::min)(increment, std::distance(first,last))
         );
-        results.push_back(boost::make_iterator_range(prev, first));
+        results.push_back(hpx::util::make_iterator_range(prev, first));
     }
     return results;
 }
@@ -131,12 +130,12 @@ int parallel_sum(iter first, iter last, int num_parts)
     parallel_executor exec;
     typedef hpx::parallel::executor_traits<parallel_executor> traits;
 
-    std::vector<boost::iterator_range<iter> > input =
+    std::vector<hpx::util::iterator_range<iter> > input =
         split(first, last, num_parts);
 
     std::vector<hpx::future<int> > v =
         traits::bulk_async_execute(exec,
-            [](boost::iterator_range<iter> const& rng) -> int
+            [](hpx::util::iterator_range<iter> const& rng) -> int
             {
                 return std::accumulate(std::begin(rng), std::end(rng), 0);
             },

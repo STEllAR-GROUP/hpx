@@ -79,6 +79,8 @@ namespace boost
       { "(\\bboost\\s*::\\s*current_exception\\b)", "std::current_exception" },
       { "(\\bboost\\s*::\\s*rethrow_exception\\b)", "std::rethrow_exception" },
       { "(\\bboost\\s*::\\s*enable_error_info\\b)", "hpx::throw_with_info" },
+      { "(\\bboost\\s*::\\s*iterator_range\\b)", "hpx::util::iterator_range" },
+      { "(\\bboost\\s*::\\s*make_iterator_range\\b)", "hpx::util::make_iterator_range" },
       /////////////////////////////////////////////////////////////////////////
       { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },

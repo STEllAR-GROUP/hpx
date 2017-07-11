@@ -78,6 +78,7 @@ set(tests
     mismatch_binary
     move
     none_of
+    partition_copy
     reduce_
     reduce_by_key
     remove_copy
