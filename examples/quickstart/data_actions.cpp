@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,7 +49,7 @@ struct data_get_action
     // Return the referenced data
     static data_type invoke(
         hpx::naming::address::address_type /*lva*/,
-        naming::address::component_type /*comptype*/)
+        hpx::naming::address::component_type /*comptype*/)
     {
         return *Data;
     }
@@ -77,7 +77,7 @@ struct data_set_action
     // Return the referenced data
     static void invoke(
         hpx::naming::address::address_type /*lva*/,
-        naming::address::component_type /*comptype*/,
+        hpx::naming::address::component_type /*comptype*/,
         data_type const& data)
     {
         *Data = data;
