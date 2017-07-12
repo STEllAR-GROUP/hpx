@@ -391,74 +391,77 @@ namespace hpx { namespace parallel { inline namespace v1
                 return ret;
             }
 
-            // template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            //     typename Pred>
-            // static typename util::detail::algorithm_result<
-            //     ExPolicy, find_end_return<FwdIter1>
-            // >::type
-            // parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            //     FwdIter2 first2, FwdIter2 last2, Pred && op)
-            // {
-            //     typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
-            //     typedef typename std::iterator_traits<FwdIter1>::reference reference;
-            //     typedef typename std::iterator_traits<FwdIter1>::difference_type
-            //         difference_type;
-            //
-            //     difference_type diff = std::distance(first2, last2);
-            //     if (diff <= 0)
-            //         return result::get(std::move(last1));
-            //
-            //     difference_type count = std::distance(first1, last1);
-            //     if (diff > count)
-            //         return result::get(std::move(last1));
-            //
-            //     util::cancellation_token<
-            //         difference_type, std::greater<difference_type>
-            //     > tok(-1);
-            //
-            //     return util::partitioner<ExPolicy, FwdIter1, void>::
-            //         call_with_index(
-            //             std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
-            //             [=](FwdIter1 it, std::size_t part_size,
-            //                 std::size_t base_idx) mutable
-            //             {
-            //                 FwdIter1 curr = it;
-            //
-            //                 util::loop_idx_n(
-            //                     base_idx, it, part_size, tok,
-            //                     [=, &tok, &curr](reference t, std::size_t i)
-            //                     {
-            //                         ++curr;
-            //                         if (op(t, *first2))
-            //                         {
-            //                             difference_type local_count = 1;
-            //                             FwdIter2 needle = first2;
-            //                             FwdIter1 mid = curr;
-            //
-            //                             for (difference_type len = 0;
-            //                                  local_count != diff && len != count;
-            //                                  (void) ++local_count, ++len, ++mid)
-            //                             {
-            //                                 if (*mid != *++needle)
-            //                                     break;
-            //                             }
-            //
-            //                             if (local_count == diff)
-            //                                 tok.cancel(i);
-            //                         }
-            //                     });
-            //             },
-            //             [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter1
-            //             {
-            //                 difference_type find_end_res = tok.get_data();
-            //                 if (find_end_res != count)
-            //                     std::advance(first1, find_end_res);
-            //                 else
-            //                     first1 = last1;
-            //
-            //                 return std::move(first1);
-            //             });
-            // }
+        //     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        //         typename Pred>
+        //     static typename util::detail::algorithm_result<
+        //         ExPolicy, find_end_return<FwdIter1>
+        //     >::type
+        //     parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+        //         SeqVec sequence, Pred && op,
+        //         FwdIter1 start, unsigned int g_cursor = 0)
+        //     {
+        //         typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
+        //         typedef typename std::iterator_traits<FwdIter1>::reference reference;
+        //         typedef typename std::iterator_traits<FwdIter1>::difference_type
+        //             difference_type;
+        //
+        //         difference_type diff = sequence.size();
+        //         if (diff <= 0)
+        //             return result::get(std::move(last1));
+        //
+        //         difference_type count = std::distance(first1, last1);
+        //         if (diff > count)
+        //             return result::get(std::move(last1));
+        //
+        //         util::cancellation_token<
+        //             difference_type, std::greater<difference_type>
+        //         > tok(-1);
+        //
+        //         unsigned int cursor = g_cursor;
+        //
+        //         return util::partitioner<ExPolicy, FwdIter1, void>::
+        //             call_with_index(
+        //                 std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
+        //                 [=](FwdIter1 it, std::size_t part_size,
+        //                     std::size_t base_idx) mutable
+        //                 {
+        //                     FwdIter1 curr = it;
+        //
+        //                     util::loop_idx_n(
+        //                         base_idx, it, part_size, tok,
+        //                         [=, &tok, &curr](reference t, std::size_t i)
+        //                         {
+        //                             ++curr;
+        //                             if (op(t, *first2))
+        //                             {
+        //                                 difference_type local_count = 1;
+        //                                 FwdIter2 needle = first2;
+        //                                 FwdIter1 mid = curr;
+        //
+        //                                 for (difference_type len = 0;
+        //                                      local_count != diff && len != count;
+        //                                      (void) ++local_count, ++len, ++mid)
+        //                                 {
+        //                                     if (*mid != *++needle)
+        //                                         break;
+        //                                 }
+        //
+        //                                 if (local_count == diff)
+        //                                     tok.cancel(i);
+        //                             }
+        //                         });
+        //                 },
+        //                 [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter1
+        //                 {
+        //                     difference_type find_end_res = tok.get_data();
+        //                     if (find_end_res != count)
+        //                         std::advance(first1, find_end_res);
+        //                     else
+        //                         first1 = last1;
+        //
+        //                     return std::move(first1);
+        //                 });
+        //     }
         };
 
         template <typename Algo, typename ExPolicy, typename FwdIter1,
