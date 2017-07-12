@@ -12,26 +12,32 @@
 #include <algorithm>
 #include <string>
 
-#include "is_heap_tests.hpp"
+#include "unique_copy_tests.hpp"
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-void is_heap_test()
+void unique_copy_test()
 {
-    std::cout << "--- is_heap_test ---" << std::endl;
-    test_is_heap<std::random_access_iterator_tag>();
+    std::cout << "--- unique_copy_test ---" << std::endl;
+    test_unique_copy<std::random_access_iterator_tag>();
+    test_unique_copy<std::bidirectional_iterator_tag>();
+    test_unique_copy<std::forward_iterator_tag>();
 }
 
-void is_heap_exception_test()
+void unique_copy_exception_test()
 {
-    std::cout << "--- is_heap_exception_test ---" << std::endl;
-    test_is_heap_exception<std::random_access_iterator_tag>();
+    std::cout << "--- unique_copy_exception_test ---" << std::endl;
+    test_unique_copy_exception<std::random_access_iterator_tag>();
+    test_unique_copy_exception<std::bidirectional_iterator_tag>();
+    test_unique_copy_exception<std::forward_iterator_tag>();
 }
 
-void is_heap_bad_alloc_test()
+void unique_copy_bad_alloc_test()
 {
-    std::cout << "--- is_heap_bad_alloc_test ---" << std::endl;
-    test_is_heap_bad_alloc<std::random_access_iterator_tag>();
+    std::cout << "--- unique_copy_bad_alloc_test ---" << std::endl;
+    test_unique_copy_bad_alloc<std::random_access_iterator_tag>();
+    test_unique_copy_bad_alloc<std::bidirectional_iterator_tag>();
+    test_unique_copy_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,9 +50,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    is_heap_test();
-    is_heap_exception_test();
-    is_heap_bad_alloc_test();
+    unique_copy_test();
+    unique_copy_exception_test();
+    unique_copy_bad_alloc_test();
 
     std::cout << "Test Finish!" << std::endl;
 

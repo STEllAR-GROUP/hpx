@@ -548,9 +548,9 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \a tagged_tuple<tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)>
     ///           otherwise.
     ///           The \a partition_copy algorithm returns the tuple of
-    ///           the input iterator \a last,
-    ///           the output iterator to the end of the \a dest_true range, and
-    ///           the output iterator to the end of the \a dest_false range.
+    ///           the source iterator \a last,
+    ///           the destination iterator to the end of the \a dest_true range, and
+    ///           the destination iterator to the end of the \a dest_false range.
     ///
     template <typename ExPolicy, typename FwdIter1,
         typename FwdIter2, typename FwdIter3,
