@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, init, red_op)
+                        std::true_type(), beg, end, T(0), red_op)
                     );
                 }
 
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         overall_result = hpx::util::invoke(red_op, overall_result,
                             dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, init, red_op)
+                            std::true_type(), beg, end, T(0), red_op)
                         );
                     }
                 }
@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, init, red_op)
+                        std::true_type(), beg, end, T(0), red_op)
                     );
                 }
             }
@@ -139,7 +139,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, init, red_op)
+                            beg, end, T(0), red_op)
                     );
                 }
             }
@@ -152,7 +152,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, init, red_op)
+                            beg, end, T(0), red_op)
                     );
                 }
 
@@ -166,7 +166,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         segments.push_back(
                             dispatch_async(traits::get_id(sit),
                                 algo, policy, forced_seq(),
-                                beg, end, init, red_op)
+                                beg, end, T(0), red_op)
                         );
                     }
                 }
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, init, red_op)
+                            beg, end, T(0), red_op)
                     );
                 }
             }
