@@ -1461,6 +1461,51 @@ system and application performance.
          this counter is accessed. Any wildcards in the counter names will
          be expanded.]
     ]
+    [   [`/arithmetics/mean`]
+        [None]
+        [Returns the average value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/variance`]
+        [None]
+        [Returns the standard deviation of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/median`]
+        [None]
+        [Returns the median value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/min`]
+        [None]
+        [Returns the minimum value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/max`]
+        [None]
+        [Returns the maximum value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
 ]
 
 [note The /arithmetics counters can consume an arbitrary number of other counters.

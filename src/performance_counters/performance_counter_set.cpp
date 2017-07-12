@@ -27,13 +27,15 @@
 namespace hpx { namespace performance_counters
 {
     performance_counter_set::performance_counter_set(std::string const& name,
-        bool reset)
+            bool reset)
+      : invocation_count_(0)
     {
         add_counters(name, reset);
     }
 
     performance_counter_set::performance_counter_set(
-        std::vector<std::string> const& names, bool reset)
+            std::vector<std::string> const& names, bool reset)
+      : invocation_count_(0)
     {
         add_counters(names, reset);
     }
@@ -257,6 +259,7 @@ namespace hpx { namespace performance_counters
         {
             std::unique_lock<mutex_type> l(mtx_);
             ids = ids_;
+            ++invocation_count_;
         }
 
         std::vector<hpx::future<counter_value> > v;
@@ -298,6 +301,7 @@ namespace hpx { namespace performance_counters
         {
             std::unique_lock<mutex_type> l(mtx_);
             ids = ids_;
+            ++invocation_count_;
         }
 
         std::vector<hpx::future<counter_values_array> > v;
@@ -329,6 +333,13 @@ namespace hpx { namespace performance_counters
                 "performance_counter_set::get_counter_values_aray");
             return std::vector<counter_values_array>();
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::size_t performance_counter_set::get_invocation_count() const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return invocation_count_;
     }
 }}
 
