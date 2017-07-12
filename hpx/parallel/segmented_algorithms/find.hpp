@@ -391,77 +391,80 @@ namespace hpx { namespace parallel { inline namespace v1
                 return ret;
             }
 
-        //     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        //         typename Pred>
-        //     static typename util::detail::algorithm_result<
-        //         ExPolicy, find_end_return<FwdIter1>
-        //     >::type
-        //     parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        //         SeqVec sequence, Pred && op,
-        //         FwdIter1 start, unsigned int g_cursor = 0)
-        //     {
-        //         typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
-        //         typedef typename std::iterator_traits<FwdIter1>::reference reference;
-        //         typedef typename std::iterator_traits<FwdIter1>::difference_type
-        //             difference_type;
-        //
-        //         difference_type diff = sequence.size();
-        //         if (diff <= 0)
-        //             return result::get(std::move(last1));
-        //
-        //         difference_type count = std::distance(first1, last1);
-        //         if (diff > count)
-        //             return result::get(std::move(last1));
-        //
-        //         util::cancellation_token<
-        //             difference_type, std::greater<difference_type>
-        //         > tok(-1);
-        //
-        //         unsigned int cursor = g_cursor;
-        //
-        //         return util::partitioner<ExPolicy, FwdIter1, void>::
-        //             call_with_index(
-        //                 std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
-        //                 [=](FwdIter1 it, std::size_t part_size,
-        //                     std::size_t base_idx) mutable
-        //                 {
-        //                     FwdIter1 curr = it;
-        //
-        //                     util::loop_idx_n(
-        //                         base_idx, it, part_size, tok,
-        //                         [=, &tok, &curr](reference t, std::size_t i)
-        //                         {
-        //                             ++curr;
-        //                             if (op(t, *first2))
-        //                             {
-        //                                 difference_type local_count = 1;
-        //                                 FwdIter2 needle = first2;
-        //                                 FwdIter1 mid = curr;
-        //
-        //                                 for (difference_type len = 0;
-        //                                      local_count != diff && len != count;
-        //                                      (void) ++local_count, ++len, ++mid)
-        //                                 {
-        //                                     if (*mid != *++needle)
-        //                                         break;
-        //                                 }
-        //
-        //                                 if (local_count == diff)
-        //                                     tok.cancel(i);
-        //                             }
-        //                         });
-        //                 },
-        //                 [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter1
-        //                 {
-        //                     difference_type find_end_res = tok.get_data();
-        //                     if (find_end_res != count)
-        //                         std::advance(first1, find_end_res);
-        //                     else
-        //                         first1 = last1;
-        //
-        //                     return std::move(first1);
-        //                 });
-        //     }
+            template <typename ExPolicy, typename FwdIter1, typename SeqVec,
+                typename Pred>
+            static typename util::detail::algorithm_result<
+                ExPolicy, find_end_return<FwdIter1>
+            >::type
+            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+                SeqVec sequence, Pred && op,
+                FwdIter1 start, unsigned int g_cursor = 0)
+            {
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
+                typedef typename std::iterator_traits<FwdIter1>::reference reference;
+                typedef typename std::iterator_traits<FwdIter1>::difference_type
+                    difference_type;
+
+                difference_type diff = sequence.size();
+                if (diff <= 0)
+                    return result::get(std::move(last1));
+
+                difference_type count = std::distance(first1, last1);
+                if (diff > count)
+                    return result::get(std::move(last1));
+
+                util::cancellation_token<
+                    difference_type, std::greater<difference_type>
+                > tok(-1);
+
+                unsigned int cursor = g_cursor;
+
+                return util::partitioner<ExPolicy, FwdIter1, void>::
+                    call_with_index(
+                        std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
+                        [=](FwdIter1 it, std::size_t part_size,
+                            std::size_t base_idx) mutable
+                        {
+                            FwdIter1 curr = it;
+
+                            util::loop_idx_n(
+                                base_idx, it, part_size, tok,
+                                [=, &tok, &curr, &sequence, &cursor](reference t, std::size_t i)
+                                {
+                                    ++curr;
+                                    if (op(t, sequence[cursor]))
+                                    {
+                                        difference_type local_count = 1;
+
+                                        FwdIter1 mid = curr;
+
+                                        for (difference_type len = cursor;
+                                             local_count != diff && len != count;
+                                             (void) ++local_count, ++len, ++mid)
+                                        {
+                                            if (!op(*mid, sequence[local_count]))
+                                                break;
+                                        }
+
+                                        if (local_count == diff)
+                                            tok.cancel(i);
+                                        cursor = local_count;
+                                    }
+                                });
+                        },
+                        [=](std::vector<hpx::future<void> > &&) mutable
+                            -> find_end_return<FwdIter1>
+                        {
+                            difference_type find_end_res = tok.get_data();
+                            if (find_end_res != count)
+                                std::advance(first1, find_end_res);
+                            else
+                                first1 = last1;
+                            find_end_return<FwdIter1> ret = {std::move(first1),
+                                cursor};
+                            return ret;
+                        });
+            }
         };
 
         template <typename Algo, typename ExPolicy, typename FwdIter1,
@@ -557,14 +560,15 @@ namespace hpx { namespace parallel { inline namespace v1
         segmented_find_end(Algo && algo, ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred && op, std::false_type)
         {
-          return util::detail::algorithm_result<
-                  ExPolicy, FwdIter1
-              >::get(std::forward<FwdIter1>(first1));
+            return util::detail::algorithm_result<
+                    ExPolicy, FwdIter1
+                >::get(std::forward<FwdIter1>(first1));
         }
         //     typedef hpx::traits::segmented_iterator_traits<FwdIter1> traits;
         //     typedef typename traits::segment_iterator segment_iterator;
         //     typedef typename traits::local_iterator local_iterator_type;
         //     typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
+        //     typedef typename std::iterator_traits<FwdIter2>::value_type seq_value_type;
         //
         //     typedef std::integral_constant<bool,
         //             !hpx::traits::is_forward_iterator<FwdIter1>::value
@@ -573,8 +577,10 @@ namespace hpx { namespace parallel { inline namespace v1
         //     segment_iterator sit = traits::segment(first1);
         //     segment_iterator send = traits::segment(last1);
         //
-        //     std::vector<future<FwdIter1> > segments;
+        //     std::vector<future<find_end_return<local_iterator_type> > > segments;
         //     segments.reserve(std::distance(sit, send));
+        //
+        //     std::vector<seq_value_type> sequence(first2, last2);
         //
         //     if (sit == send)
         //     {
@@ -584,13 +590,13 @@ namespace hpx { namespace parallel { inline namespace v1
         //         if (beg != end)
         //         {
         //             segments.push_back(
-        //                 hpx::make_future<FwdIter1>(
+        //                 hpx::make_future<find_end_return<FwdIter1> >(
         //                     dispatch_async(traits::get_id(sit), algo,
-        //                         policy, forced_seq(), beg, end, first2, last2, op),
-        //                     [send,end,last1](local_iterator_type const& out)
-        //                         -> FwdIter1
+        //                         policy, forced_seq(), beg, end, sequence, op, beg),
+        //                     [send,end,last1](find_end_return<local_iterator_type> const& out)
+        //                         -> find_end_return<FwdIter1>
         //                     {
-        //                         if(out != end)
+        //                         if(out.seq_first != end)
         //                             return traits::compose(send, out);
         //                         else
         //                             return last1;
@@ -604,13 +610,13 @@ namespace hpx { namespace parallel { inline namespace v1
         //         if (beg != end)
         //         {
         //             segments.push_back(
-        //                 hpx::make_future<FwdIter1>(
+        //                 hpx::make_future<find_end_return<FwdIter1> >(
         //                     dispatch_async(traits::get_id(sit), algo,
-        //                         policy, forced_seq(), beg, end, first2, last2, op),
-        //                     [sit,end,last1](local_iterator_type const& out)
-        //                         -> FwdIter1
+        //                         policy, forced_seq(), beg, end, sequence, op, beg),
+        //                     [send,end,last1](find_end_return<local_iterator_type> const& out)
+        //                         -> find_end_return<FwdIter1>
         //                     {
-        //                         if(out != end)
+        //                         if(out.seq_first != end)
         //                             return traits::compose(sit, out);
         //                         else
         //                             return last1;
@@ -625,13 +631,13 @@ namespace hpx { namespace parallel { inline namespace v1
         //             if (beg != end)
         //             {
         //                 segments.push_back(
-        //                     hpx::make_future<FwdIter1>(
+        //                     hpx::make_future<find_end_return<FwdIter1> >(
         //                         dispatch_async(traits::get_id(sit), algo,
-        //                             policy, forced_seq(), beg, end, first2, last2, op),
-        //                         [sit,end,last1](local_iterator_type const& out)
-        //                             -> FwdIter1
+        //                             policy, forced_seq(), beg, end, sequence, op, beg),
+        //                         [send,end,last1](find_end_return<local_iterator_type> const& out)
+        //                             -> find_end_return<FwdIter1>
         //                         {
-        //                             if(out != end)
+        //                             if(out.seq_first != end)
         //                                 return traits::compose(sit, out);
         //                             else
         //                                 return last1;
@@ -645,13 +651,13 @@ namespace hpx { namespace parallel { inline namespace v1
         //         if (beg != end)
         //         {
         //             segments.push_back(
-        //                 hpx::make_future<FwdIter1>(
+        //                 hpx::make_future<find_end_return<FwdIter1> >(
         //                     dispatch_async(traits::get_id(sit), algo,
-        //                         policy, forced_seq(), beg, end, first2, last2, op),
-        //                     [sit,end,last1](local_iterator_type const& out)
-        //                         -> FwdIter1
+        //                         policy, forced_seq(), beg, end, sequence, op, beg),
+        //                     [send,end,last1](find_end_return<local_iterator_type> const& out)
+        //                         -> find_end_return<FwdIter1>
         //                     {
-        //                         if(out != end)
+        //                         if(out.seq_first != end)
         //                             return traits::compose(sit, out);
         //                         else
         //                             return last1;
