@@ -22,7 +22,7 @@ HPX_REGISTER_PARTITIONED_VECTOR(int);
 template <typename T>
 void initialize(hpx::partitioned_vector<T> & xvalues)
 {
-    T init_array[42] = {1,2,3,4, 5,1,2,3, 3,5,5,3, 4,2,3,2, 1,2,3,4, 1,2,3,4,
+    T init_array[42] = {1,2,3,4, 5,1,2,3, 3,5,5,3, 4,2,3,2, 1,2,3,4, 5,6,5,6,
         1,2,3,4, 1,1,2,3, 4,5,4,3, 2,1,1,2,3,4};
     for(int i=0; i<42; i++)
     {
@@ -32,21 +32,21 @@ void initialize(hpx::partitioned_vector<T> & xvalues)
 
 template <typename ExPolicy, typename T>
 void test_find_end(ExPolicy && policy,
-    hpx::partitioned_vector<T> & xvalues, std::vector<T> & sequence)
+    hpx::partitioned_vector<T> & xvalues, std::vector<T> & sequence, int position)
 {
     auto last = hpx::parallel::find_end(policy, xvalues.begin(),
         xvalues.end(), sequence.begin(), sequence.end());
-    HPX_TEST_EQ(*last,sequence[0]);
+    HPX_TEST_EQ(std::distance(xvalues.begin(), last),position);
     // printf("%d\n", (int) *last);
 }
 
 template <typename ExPolicy, typename T>
 void test_find_end_async(ExPolicy && policy,
-    hpx::partitioned_vector<T> & xvalues, std::vector<T> & sequence)
+    hpx::partitioned_vector<T> & xvalues, std::vector<T> & sequence, int position)
 {
     auto last = hpx::parallel::find_end(policy, xvalues.begin(),
         xvalues.end(), sequence.begin(), sequence.end()).get();
-    HPX_TEST_EQ(*last,sequence[0]);
+    HPX_TEST_EQ(std::distance(xvalues.begin(), last),position);
     // printf("Async %d\n", (int) *last);
 }
 
@@ -58,44 +58,60 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
     initialize(xvalues);
 
     std::vector<T> sequence = {(T)1,(T)2,(T)3,(T)4};
-    test_find_end(hpx::parallel::execution::seq, xvalues, sequence);
-    // test_find_end(hpx::parallel::execution::par, xvalues, sequence);
+    test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 38);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 38);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
-        xvalues, sequence);
+        xvalues, sequence, 38);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-        // xvalues, sequence);
+        // xvalues, sequence, 38);
 
     sequence = {(T)4,(T)5,(T)1,(T)2};
-    test_find_end(hpx::parallel::execution::seq, xvalues, sequence);
-    // test_find_end(hpx::parallel::execution::par, xvalues, sequence);
+    test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 3);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 3);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
-        xvalues, sequence);
+        xvalues, sequence, 3);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-        // xvalues, sequence);
+        // xvalues, sequence, 3);
 
     sequence = {(T)2,(T)3,(T)3,(T)5};
-    test_find_end(hpx::parallel::execution::seq, xvalues, sequence);
-    // test_find_end(hpx::parallel::execution::par, xvalues, sequence);
+    test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 6);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 6);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
-        xvalues, sequence);
+        xvalues, sequence, 6);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-        // xvalues, sequence);
+        // xvalues, sequence, 6);
 
     sequence = {(T)2,(T)3,(T)2,(T)1};
-    test_find_end(hpx::parallel::execution::seq, xvalues, sequence);
-    // test_find_end(hpx::parallel::execution::par, xvalues, sequence);
+    test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 13);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 13);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
-        xvalues, sequence);
+        xvalues, sequence, 13);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-        // xvalues, sequence);
+        // xvalues, sequence, 13);
 
     sequence = {(T)3,(T)2,(T)1,(T)1};
-    test_find_end(hpx::parallel::execution::seq, xvalues, sequence);
-    // test_find_end(hpx::parallel::execution::par, xvalues, sequence);
+    test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 35);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 35);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
-        xvalues, sequence);
+        xvalues, sequence, 35);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-        // xvalues, sequence);
+        // xvalues, sequence, 35);
+
+    sequence = {(T)5,(T)6};
+    test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 22);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 22);
+    test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
+        xvalues, sequence, 22);
+    // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
+        // xvalues, sequence, 22);
+
+    sequence = {(T)3,(T)4,(T)2,(T)3,(T)2,(T)1};
+    test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 11);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 22);
+    test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
+        xvalues, sequence, 11);
+    // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
+        // xvalues, sequence, 22);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
