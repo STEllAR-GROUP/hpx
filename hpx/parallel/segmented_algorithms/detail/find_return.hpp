@@ -9,11 +9,11 @@
 namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
-    // segmented_find_end_return
+    // segmented_find_return
     namespace detail
     {
         template <typename FwdIter>
-        struct find_end_return
+        struct find_return
         {
             FwdIter seq_first;
             unsigned int partial_position;

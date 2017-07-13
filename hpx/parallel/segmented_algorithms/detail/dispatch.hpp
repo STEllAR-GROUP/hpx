@@ -15,7 +15,7 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/segmented_algorithms/detail/find_end_return.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/find_return.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 #include <hpx/util/tuple.hpp>
@@ -66,19 +66,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 
     template <typename Iterator>
     struct algorithm_result_helper<
-        find_end_return<Iterator>,
+        find_return<Iterator>,
         typename std::enable_if<
                 hpx::traits::is_segmented_local_iterator<Iterator>::value
             >::type>
     {
         typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
 
-        static HPX_FORCEINLINE find_end_return<Iterator>
-        call(find_end_return<typename traits::local_raw_iterator> && in)
+        static HPX_FORCEINLINE find_return<Iterator>
+        call(find_return<typename traits::local_raw_iterator> && in)
         {
             auto it = in.seq_first;
             auto ret_it = traits::remote(std::move(it));
-            find_end_return<Iterator> ret;
+            find_return<Iterator> ret;
             ret.seq_first = ret_it;
             ret.partial_position = in.partial_position;
             return ret;
@@ -165,24 +165,24 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 
     template <typename Iterator>
     struct algorithm_result_helper<
-        future<find_end_return<Iterator> >,
+        future<find_return<Iterator> >,
         typename std::enable_if<
                 hpx::traits::is_segmented_local_iterator<Iterator>::value
             >::type>
     {
         typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
 
-        static HPX_FORCEINLINE future<find_end_return<Iterator> >
-        call(future<find_end_return<typename traits::local_raw_iterator> >&& f)
+        static HPX_FORCEINLINE future<find_return<Iterator> >
+        call(future<find_return<typename traits::local_raw_iterator> >&& f)
         {
-            typedef future<find_end_return<typename traits::local_raw_iterator> > argtype;
+            typedef future<find_return<typename traits::local_raw_iterator> > argtype;
             return f.then(
-                [](argtype&& f) -> find_end_return<Iterator>
+                [](argtype&& f) -> find_return<Iterator>
                 {
                     auto in=f.get();
                     auto it = in.seq_first;
                     auto ret_it = traits::remote(std::move(it));
-                    find_end_return<Iterator> ret;
+                    find_return<Iterator> ret;
                     ret.seq_first = ret_it;
                     ret.partial_position = in.partial_position;
                     return ret;
