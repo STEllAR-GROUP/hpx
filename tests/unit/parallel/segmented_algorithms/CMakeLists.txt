@@ -19,6 +19,7 @@ set(tests
     partitioned_vector_reduce
     partitioned_vector_find
     partitioned_vector_find_end
+    partitioned_vector_find_first_of
    )
 
 set(partitioned_vector_copy_FLAGS DEPENDENCIES partitioned_vector_component)
@@ -62,6 +63,10 @@ set(partitioned_vector_find_PARAMETERS
     THREADS_PER_LOCALITY 4)
 set(partitioned_vector_find_end_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_find_end_PARAMETERS
+    LOCALITIES 10
+    THREADS_PER_LOCALITY 4)
+set(partitioned_vector_find_first_of_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_find_first_of_PARAMETERS
     LOCALITIES 10
     THREADS_PER_LOCALITY 4)
 

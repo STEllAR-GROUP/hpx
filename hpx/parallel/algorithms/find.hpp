@@ -815,6 +815,34 @@ namespace hpx { namespace parallel { inline namespace v1
                         });
             }
         };
+
+        template <typename ExPolicy, typename InIter, typename FwdIter,
+            typename Pred>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
+        find_first_of_(ExPolicy && policy, InIter first, InIter last,
+            FwdIter s_first, FwdIter s_last, Pred && op, std::false_type)
+        {
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<InIter>::value
+                > is_seq;
+
+            return detail::find_first_of<InIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, s_first, s_last, std::forward<Pred>(op));
+        }
+
+        template <typename ExPolicy, typename InIter, typename FwdIter,
+            typename Pred>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, InIter>::type
+        >::type
+        find_first_of_(ExPolicy && policy, InIter first, InIter last,
+            FwdIter s_first, FwdIter s_last, Pred && op, std::true_type);
         /// \endcond
     }
 
@@ -909,14 +937,10 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
-            > is_seq;
+        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
-        return detail::find_first_of<InIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, s_first, s_last, std::forward<Pred>(op));
+        return detail::find_first_of_(std::forward<ExPolicy>(policy),
+            first1, last1, first2, last2, std::forward<Pred>(op), is_segmented());
     }
 }}}
 
