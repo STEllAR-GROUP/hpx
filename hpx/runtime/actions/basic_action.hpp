@@ -985,8 +985,16 @@ namespace hpx { namespace serialization
 #define HPX_ACTION_HAS_NORMAL_PRIORITY(action)                                \
     HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_normal)          \
 /**/
+#define HPX_ACTION_HAS_HIGH_PRIORITY(action)                                  \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high)            \
+/**/
+#define HPX_ACTION_HAS_HIGH_RECURSIVE_PRIORITY(action)                        \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high_recursive)  \
+/**/
+
+// obsolete, kept for compatibility
 #define HPX_ACTION_HAS_CRITICAL_PRIORITY(action)                              \
-    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_critical)        \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high_recursive)  \
 /**/
 
 /// \endcond

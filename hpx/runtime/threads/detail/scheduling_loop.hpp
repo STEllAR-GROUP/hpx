@@ -315,7 +315,7 @@ namespace hpx { namespace threads { namespace detail
             },
             hpx::util::thread_description("background_work"),
             0,
-            thread_priority_critical,
+            thread_priority_high_recursive,
             num_thread,
             get_stack_size(thread_stacksize_large),
             &scheduler);

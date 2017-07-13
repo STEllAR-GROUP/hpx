@@ -63,7 +63,9 @@ namespace hpx { namespace threads
             "suspended",
             "depleted",
             "terminated",
-            "staged"
+            "staged",
+            "pending_do_not_schedule",
+            "pending_boost"
         };
     }
 
@@ -107,14 +109,15 @@ namespace hpx { namespace threads
             "default",
             "low",
             "normal",
-            "critical",
-            "boost"
+            "high (recursive)"
+            "boost",
+            "high (non-recursive)",
         };
     }
 
     char const* get_thread_priority_name(thread_priority priority)
     {
-        if (priority < thread_priority_default || priority > thread_priority_boost)
+        if (priority < thread_priority_default || priority > thread_priority_high)
             return "unknown";
         return strings::thread_priority_names[priority];
     }
