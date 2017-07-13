@@ -23,8 +23,8 @@ namespace hpx { namespace components
             "component_memory",                                 /*  2 */
             "component_memory_block",                           /*  3 */
             "component_base_lco",                               /*  4 */
-            "component_base_lco_with_value",                    /*  5 */
-            "component_base_lco_with_value_managed",            /*  6 */
+            "component_base_lco_with_value_unmanaged",          /*  5 */
+            "component_base_lco_with_value",                    /*  6 */
             "component_latch",                                  /*  7 (0x70006) */
             "component_barrier",                                /*  8 (0x80004) */
             "component_flex_barrier",                           /*  9 (0x90004) */

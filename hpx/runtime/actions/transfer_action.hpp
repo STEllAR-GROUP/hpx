@@ -77,13 +77,13 @@ namespace hpx { namespace actions
         void
         schedule_thread(util::detail::pack_c<std::size_t, Is...>,
             naming::gid_type const& target_gid,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             naming::address::component_type comptype,
             std::size_t num_thread);
 
         // schedule a new thread
         void schedule_thread(naming::gid_type const& target_gid,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             naming::address::component_type comptype,
             std::size_t num_thread);
 

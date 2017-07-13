@@ -191,7 +191,7 @@ namespace traits {
 
     template <typename Result, typename RemoteResult>
     struct component_type_database<
-        lcos::detail::promise_lco<Result, RemoteResult>>
+        lcos::detail::promise_lco<Result, RemoteResult> >
     {
         static components::component_type value;
 
@@ -203,7 +203,7 @@ namespace traits {
             if (value == components::component_invalid)
             {
                 value = derived_component_type(++detail::unique_type,
-                    components::component_base_lco_with_value_managed);
+                    components::component_base_lco_with_value);
             }
             return value;
         }

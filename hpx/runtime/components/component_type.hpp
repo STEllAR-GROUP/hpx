@@ -41,18 +41,18 @@ namespace hpx { namespace components
         component_base_lco = 4,
 
         // Base component for LCOs that produce values.
-        component_base_lco_with_value = 5,
+        component_base_lco_with_value_unmanaged = 5,
 
         // (Managed) base component for LCOs that produce values.
-        component_base_lco_with_value_managed = 6,
+        component_base_lco_with_value = 6,
 
         // Synchronization latch, barrier, and flex_barrier LCOs.
-        component_latch = ((7 << 16) | component_base_lco_with_value_managed),
+        component_latch = ((7 << 16) | component_base_lco_with_value),
         component_barrier = ((8 << 16) | component_base_lco),
         component_flex_barrier = ((9 << 16) | component_base_lco),
 
         // An LCO representing a value which may not have been computed yet.
-        component_promise = ((10 << 16) | component_base_lco_with_value_managed),
+        component_promise = ((10 << 16) | component_base_lco_with_value),
 
         // AGAS locality services.
         component_agas_locality_namespace = 11,
@@ -123,27 +123,27 @@ namespace hpx { namespace components
 
         // special case for lco's
         if (lhs_base == component_base_lco &&
-                (rhs_base == component_base_lco_with_value ||
-                 rhs_base == component_base_lco_with_value_managed))
+                (rhs_base == component_base_lco_with_value_unmanaged ||
+                 rhs_base == component_base_lco_with_value))
         {
             return true;
         }
 
         if (rhs_base == component_base_lco &&
-                (lhs_base == component_base_lco_with_value ||
-                 lhs_base == component_base_lco_with_value_managed))
+                (lhs_base == component_base_lco_with_value_unmanaged ||
+                 lhs_base == component_base_lco_with_value))
+        {
+            return true;
+        }
+
+        if (lhs_base == component_base_lco_with_value_unmanaged &&
+            rhs_base == component_base_lco_with_value)
         {
             return true;
         }
 
         if (lhs_base == component_base_lco_with_value &&
-            rhs_base == component_base_lco_with_value_managed)
-        {
-            return true;
-        }
-
-        if (lhs_base == component_base_lco_with_value_managed &&
-            rhs_base == component_base_lco_with_value)
+            rhs_base == component_base_lco_with_value_unmanaged)
         {
             return true;
         }
