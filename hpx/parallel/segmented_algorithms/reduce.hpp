@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/reduce.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-
-#include <hpx/util/invoke.hpp>
 
 #include <exception>
 #include <algorithm>
@@ -61,8 +61,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result = dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, init, red_op);
+                    overall_result = hpx::util::invoke(red_op, overall_result,
+                        dispatch(traits::get_id(sit), algo, policy,
+                            std::true_type(), beg, end, red_op));
                 }
             }
             else {
@@ -73,7 +74,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, T(0), red_op)
+                            std::true_type(), beg, end, red_op)
                     );
                 }
 
@@ -86,7 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         overall_result = hpx::util::invoke(red_op, overall_result,
                             dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, T(0), red_op)
+                                std::true_type(), beg, end, red_op)
                         );
                     }
                 }
@@ -98,7 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, T(0), red_op)
+                            std::true_type(), beg, end, red_op)
                     );
                 }
             }
@@ -139,7 +140,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, T(0), red_op)
+                            beg, end, red_op)
                     );
                 }
             }
@@ -152,7 +153,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, T(0), red_op)
+                            beg, end, red_op)
                     );
                 }
 
@@ -166,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         segments.push_back(
                             dispatch_async(traits::get_id(sit),
                                 algo, policy, forced_seq(),
-                                beg, end, T(0), red_op)
+                                beg, end, red_op)
                         );
                     }
                 }
@@ -179,7 +180,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, T(0), red_op)
+                            beg, end, red_op)
                     );
                 }
             }
@@ -228,7 +229,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             return segmented_reduce(
-                reduce<init_type>(),
+                segmented_reduce<init_type>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::forward<T>(init), std::forward<F>(f), is_seq());
         }
