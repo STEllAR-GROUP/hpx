@@ -8,6 +8,7 @@
 
 #include <hpx/include/parallel_partition.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/random.hpp>
 
@@ -194,6 +195,7 @@ void test_partition_copy_exception(ExPolicy policy, IteratorTag)
             iterator(std::begin(d_true)), iterator(std::begin(d_false)),
             throw_always());
 
+        HPX_UNUSED(result);
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -263,6 +265,7 @@ void test_partition_copy_bad_alloc(ExPolicy policy, IteratorTag)
             iterator(std::begin(d_true)), iterator(std::begin(d_false)),
             throw_bad_alloc());
 
+        HPX_UNUSED(result);
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {
@@ -369,10 +372,12 @@ void test_partition_copy()
     ////////// Corner test cases.
     test_partition_copy(execution::par, IteratorTag(), int(),
         [rand_base](const int n) -> bool {
+            HPX_UNUSED(rand_base);
             return true;
         }, rand_base);
     test_partition_copy(execution::par_unseq, IteratorTag(), user_defined_type(),
         [rand_base](user_defined_type const& t) -> bool {
+            HPX_UNUSED(rand_base);
             return false;
         }, rand_base);
 }

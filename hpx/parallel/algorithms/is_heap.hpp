@@ -25,6 +25,7 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -80,6 +81,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         [tok, second](std::vector<hpx::future<void> > &&) mutable
                             -> bool
                         {
+                            HPX_UNUSED(second);
                             difference_type find_res =
                                 static_cast<difference_type>(tok.get_data());
 
