@@ -14,8 +14,9 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
-#include <exception>
 #include <algorithm>
+#include <cstddef>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <numeric>
@@ -62,8 +63,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 },
                 hpx::util::unwrapped([r](std::vector<T> && results)
                 {
-                    auto rfirst = boost::begin(results);
-                    auto rlast = boost::end(results);
+                    auto rfirst = std::begin(results);
+                    auto rlast = std::end(results);
                     T val = *rfirst;;
                     rfirst++;
                     while(rlast != rfirst)
@@ -128,8 +129,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 },
                 hpx::util::unwrapped([r](std::vector<T> && results)
                 {
-                    auto rfirst = boost::begin(results);
-                    auto rlast = boost::end(results);
+                    auto rfirst = std::begin(results);
+                    auto rlast = std::end(results);
                     T val = *rfirst;;
                     rfirst++;
                     while(rlast != rfirst)
