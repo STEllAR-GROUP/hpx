@@ -852,17 +852,17 @@ namespace hpx { namespace parallel { inline namespace v1
                     ExPolicy
                 > is_seq;
 
-            if (first1 == last1)
+            if (first == last)
             {
                 return util::detail::algorithm_result<
                         ExPolicy, InIter
-                    >::get(std::forward<InIter>(first1));
+                    >::get(std::forward<InIter>(first));
             }
             typedef hpx::traits::segmented_iterator_traits<InIter>
                 iterator_traits;
             return segmented_find_first_of(
                 seg_find_first_of<typename iterator_traits::local_iterator>(),
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
+                std::forward<ExPolicy>(policy), first, last, s_first, s_last,
                 std::forward<Pred>(op), is_seq());
         }
 

@@ -940,7 +940,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
 
         return detail::find_first_of_(std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, std::forward<Pred>(op), is_segmented());
+            first, last, s_first, s_last, std::forward<Pred>(op), is_segmented());
     }
 }}}
 
