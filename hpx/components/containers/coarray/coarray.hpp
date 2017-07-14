@@ -126,7 +126,7 @@ namespace hpx
     private:
         using base_type = partitioned_vector_view<T,N,Data>;
         using indices =
-            typename hpx::util::detail::make_index_pack_unroll<N>::type;
+            typename hpx::util::detail::make_index_pack<N>::type;
 
         std::vector<hpx::naming::id_type>
         get_unrolled_localities(
