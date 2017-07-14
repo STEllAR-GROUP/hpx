@@ -26,17 +26,25 @@
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
     template <typename T>
-    struct segmented_reduce : public detail::algorithm<segmented_reduce<T>, T>
+    struct seg_reduce : public detail::algorithm<seg_reduce<T>, T>
     {
-        segmented_reduce()
-          : segmented_reduce::algorithm("reduce")
+        seg_reduce()
+          : seg_reduce::algorithm("reduce")
         {}
 
         template <typename ExPolicy, typename InIter, typename Reduce>
         static T
         sequential(ExPolicy, InIter first, InIter last, Reduce && r)
         {
-            return std::accumulate(first, last, std::forward<Reduce>(r));
+            T val = *first;
+            auto iter = first;
+            iter++;
+            while(last != iter)
+            {
+                val = hpx::util::invoke(r, val, *iter);
+                iter++;
+            };
+            return val;
         }
 
         template <typename ExPolicy, typename FwdIter, typename Reduce>
@@ -54,18 +62,26 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 },
                 hpx::util::unwrapped([r](std::vector<T> && results)
                 {
-                    return util::accumulate_n(boost::begin(results),
-                        boost::size(results), r);
+                    auto rfirst = boost::begin(results);
+                    auto rlast = boost::end(results);
+                    T val = *rfirst;;
+                    rfirst++;
+                    while(rlast != rfirst)
+                    {
+                        val = hpx::util::invoke(r, val, *rfirst);
+                        rfirst++;
+                    };
+                    return val;
                 }));
         }
     };
 
     template <typename T>
-    struct segmented_transform_reduce
-      : public detail::algorithm<segmented_transform_reduce<T>, T>
+    struct seg_transform_reduce
+      : public detail::algorithm<seg_transform_reduce<T>, T>
     {
-        segmented_transform_reduce()
-          : segmented_transform_reduce::algorithm("transform_reduce")
+        seg_transform_reduce()
+          : seg_transform_reduce::algorithm("transform_reduce")
         {}
 
         template <typename ExPolicy, typename InIter, typename Reduce,
@@ -74,15 +90,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         sequential(ExPolicy, InIter first, InIter last, Reduce && r,
             Convert && conv)
         {
-            typedef typename std::iterator_traits<InIter>::value_type
-                value_type;
-
-            return std::accumulate(first, last,
-                [&r, &conv](T const& res, value_type const& next)
-                {
-                    return hpx::util::invoke(r, res,
-                        hpx::util::invoke(conv, next));
-                });
+            T val = hpx::util::invoke(conv, *first);
+            auto iter = first;
+            iter++;
+            while(last != iter)
+            {
+                val = hpx::util::invoke(r, val, hpx::util::invoke(conv, *iter));
+                iter++;
+            };
+            return val;
         }
 
         template <typename ExPolicy, typename FwdIter, typename Reduce,
@@ -112,8 +128,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 },
                 hpx::util::unwrapped([r](std::vector<T> && results)
                 {
-                    return util::accumulate_n(boost::begin(results),
-                        boost::size(results), r);
+                    auto rfirst = boost::begin(results);
+                    auto rlast = boost::end(results);
+                    T val = *rfirst;;
+                    rfirst++;
+                    while(rlast != rfirst)
+                    {
+                        val = hpx::util::invoke(r, val, *rfirst);
+                        rfirst++;
+                    };
+                    return val;
                 }));
         }
     };

@@ -213,8 +213,8 @@ namespace hpx { namespace parallel { inline namespace v1
             execution::is_execution_policy<ExPolicy>::value,
             typename util::detail::algorithm_result<ExPolicy, T>::type
         >::type
-        reduce_(ExPolicy&& policy, InIter first, InIter last
-            , T init, F && f, std::true_type)
+        reduce_(ExPolicy&& policy, InIter first, InIter last,
+            T init, F && f, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
@@ -229,7 +229,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             return segmented_reduce(
-                segmented_reduce<init_type>(),
+                seg_reduce<init_type>(),
                 std::forward<ExPolicy>(policy), first, last,
                 std::forward<T>(init), std::forward<F>(f), is_seq());
         }

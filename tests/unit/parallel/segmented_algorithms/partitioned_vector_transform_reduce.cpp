@@ -42,7 +42,7 @@ T test_transform_reduce(ExPolicy && policy,
         hpx::parallel::transform_reduce(policy,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            T(0), std::plus<T>(), multiply()
+            T(1), std::plus<T>(), multiply()
         );
 }
 
@@ -57,7 +57,7 @@ test_transform_reduce_async(ExPolicy && policy,
         hpx::parallel::transform_reduce(policy,
             make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
             make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            T(0), std::plus<T>(), multiply()
+            T(1), std::plus<T>(), multiply()
         );
 }
 
@@ -68,21 +68,21 @@ void transform_reduce_tests(std::size_t num,
 {
     HPX_TEST_EQ(
         test_transform_reduce(hpx::parallel::execution::seq, xvalues, yvalues),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_transform_reduce(hpx::parallel::execution::par, xvalues, yvalues),
-        T(num));
+        T(num + 1));
 
     HPX_TEST_EQ(
         test_transform_reduce_async(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_transform_reduce_async(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
-        T(num));
+        T(num + 1));
 }
 
 template <typename T>
