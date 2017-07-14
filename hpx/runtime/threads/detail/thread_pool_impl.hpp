@@ -140,7 +140,7 @@ namespace detail
             sched_->Scheduler::do_some_work(num_thread);
         }
 
-        std::size_t get_thread_offset() const
+        inline std::size_t get_thread_offset() const
         {
             return thread_offset_;
         }
