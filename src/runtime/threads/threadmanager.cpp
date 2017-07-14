@@ -282,10 +282,14 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     threadmanager_impl::threadmanager_impl(
+#ifdef HPX_HAVE_TIMER_POOL
             util::io_service_pool& timer_pool,
+#endif
             notification_policy_type& notifier)
       : num_threads_(hpx::get_resource_partitioner().get_num_threads()),
+#ifdef HPX_HAVE_TIMER_POOL
         timer_pool_(timer_pool),
+#endif
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
@@ -1863,11 +1867,13 @@ namespace hpx { namespace threads
         // the main thread needs to have a unique thread_num
 
         // the main thread needs to have a unique thread_num
-        // threads are numbered 0..N-1, so we can use N for this thread
+        // worker threads are numbered 0..N-1, so we can use N for this thread
         init_tss(num_threads);
 
+#ifdef HPX_HAVE_TIMER_POOL
         LTM_(info) << "run: running timer pool";
         timer_pool_.run(false);
+#endif
 
         for (auto& pool_iter : pools_)
         {
@@ -1880,7 +1886,9 @@ namespace hpx { namespace threads
             }
             if (!pool_iter->run(lk, std::ref(*startup_), num_threads_in_pool))
             {
+#ifdef HPX_HAVE_TIMER_POOL
                 timer_pool_.stop();
+#endif
                 return false;
             }
         }
@@ -1909,6 +1917,7 @@ namespace hpx { namespace threads
         }
         deinit_tss();
 
+#ifdef HPX_HAVE_TIMER_POOL
         LTM_(info) << "stop: stopping timer pool";
         timer_pool_.stop();    // stop timer pool as well
         if (blocking)
@@ -1916,6 +1925,7 @@ namespace hpx { namespace threads
             timer_pool_.join();
             timer_pool_.clear();
         }
+#endif
     }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS

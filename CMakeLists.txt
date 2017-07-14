@@ -637,6 +637,21 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   unset(_all)
 endforeach()
 
+## Experimental settings
+hpx_option(HPX_WITH_IO_POOL BOOL
+  "Disable internal IO thread pool, do not change if not absolutely necessary (default: ON)"
+  ON CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_IO_POOL)
+  hpx_add_config_define(HPX_HAVE_IO_POOL)
+endif()
+
+hpx_option(HPX_WITH_TIMER_POOL BOOL
+  "Disable internal timer thread pool, do not change if not absolutely necessary (default: ON)"
+  ON CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_TIMER_POOL)
+  hpx_add_config_define(HPX_HAVE_TIMER_POOL)
+endif()
+
 ## AGAS related build options
 hpx_option(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)"

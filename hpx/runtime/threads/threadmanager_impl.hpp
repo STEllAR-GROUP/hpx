@@ -57,10 +57,12 @@ namespace hpx { namespace threads
         typedef detail::thread_pool* pool_type;
         typedef threads::policies::scheduler_base* scheduler_type;
         typedef std::vector<pool_type> pool_vector;
-
+#ifdef HPX_HAVE_TIMER_POOL
         threadmanager_impl(util::io_service_pool& timer_pool,
                 notification_policy_type& notifier);
-
+#else
+        threadmanager_impl(notification_policy_type& notifier);
+#endif
         ~threadmanager_impl();
 
         void init();
@@ -381,8 +383,9 @@ namespace hpx { namespace threads
 
         std::vector<detail::pool_id_type> threads_lookup_;
 
+#ifdef HPX_HAVE_TIMER_POOL
         util::io_service_pool& timer_pool_;     // used for timed set_state
-
+#endif
         util::block_profiler<register_thread_tag> thread_logger_;
         util::block_profiler<register_work_tag> work_logger_;
         util::block_profiler<set_state_tag> set_state_logger_;
