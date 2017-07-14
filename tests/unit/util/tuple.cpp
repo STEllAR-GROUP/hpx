@@ -329,6 +329,34 @@ void tie_test()
 
 
 // ----------------------------------------------------------------------------
+// - testing cat -----------------------------------------------------------
+// ----------------------------------------------------------------------------
+void tuple_cat_test()
+{
+    hpx::util::tuple<int, float> two = hpx::util::make_tuple(1, 2.f);
+
+    // Cat two tuples
+    {
+        hpx::util::tuple<int, float, int, float> res =
+            hpx::util::tuple_cat(two, two);
+
+        auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f);
+
+        HPX_TEST((res == expected));
+    }
+
+    // Cat multiple tuples
+    {
+        hpx::util::tuple<int, float, int, float, int, float> res =
+            hpx::util::tuple_cat(two, two, two);
+
+        auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f, 1, 2.f);
+
+        HPX_TEST((res == expected));
+    }
+}
+
+// ----------------------------------------------------------------------------
 // - testing tuple equality   -------------------------------------------------
 // ----------------------------------------------------------------------------
 
@@ -429,6 +457,7 @@ int main(int argc, char* argv[])
         mutate_test();
         make_tuple_test();
         tie_test();
+        tuple_cat_test();
         equality_test();
         ordering_test();
         const_tuple_test();

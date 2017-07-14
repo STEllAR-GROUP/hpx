@@ -746,6 +746,7 @@ namespace hpx { namespace util
     //constexpr tuple<Ctypes ...> tuple_cat(Tuples&&...);
     namespace detail
     {
+        /// Deduces to the overall size of all given tuples
         template <std::size_t Size, typename Tuples>
         struct tuple_cat_size_impl;
 
@@ -782,18 +783,12 @@ namespace hpx { namespace util
         {
             typedef tuple_element<I, Head> base_type;
 
+            template <typename THead, typename... TTail>
             static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type&
-            get(Head& head, Tail& ...tail) noexcept
+                auto get(THead&& head, TTail&&... /*tail*/) noexcept
+                -> decltype(base_type::get(std::forward<THead>(head)))
             {
-                return base_type::get(head);
-            }
-
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type const&
-            get(Head const& head, Tail& ...tail) noexcept
-            {
-                return base_type::get(head);
+                return base_type::get(std::forward<THead>(head));
             }
         };
 
@@ -813,18 +808,12 @@ namespace hpx { namespace util
               , detail::pack<Tail...>
             > base_type;
 
+            template <typename THead, typename... TTail>
             static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type&
-            get(Head& head, Tail& ...tail) noexcept
+                auto get(THead&& /*head*/, TTail&&... tail) noexcept
+                -> decltype(base_type::get(std::forward<TTail>(tail)...))
             {
-                return base_type::get(tail...);
-            }
-
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type const&
-            get(Head const& head, Tail& ...tail) noexcept
-            {
-                return base_type::get(tail...);
+                return base_type::get(std::forward<TTail>(tail)...);
             }
         };
 
@@ -861,11 +850,12 @@ namespace hpx { namespace util
 
     template <typename ...Tuples>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename detail::tuple_cat_result<Tuples...>::type
-    tuple_cat(Tuples&&... tuples)
+        typename detail::tuple_cat_result<
+            typename std::decay<Tuples>::type...>::type
+        tuple_cat(Tuples&&... tuples)
     {
-        return detail::tuple_cat_result<Tuples...>::make(
-            std::forward<Tuples>(tuples)...);
+        return detail::tuple_cat_result<typename std::decay<Tuples>::type...>::
+            make(std::forward<Tuples>(tuples)...);
     }
 
     // 20.4.2.7, relational operators
