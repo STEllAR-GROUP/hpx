@@ -37,15 +37,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         static T
         sequential(ExPolicy, InIter first, InIter last, Reduce && r)
         {
-            T val = *first;
-            auto iter = first;
-            iter++;
-            while(last != iter)
-            {
-                val = hpx::util::invoke(r, val, *iter);
-                iter++;
-            };
-            return val;
+            return util::accumulate<T>(first, last, r);
         }
 
         template <typename ExPolicy, typename FwdIter, typename Reduce>
@@ -65,14 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 {
                     auto rfirst = std::begin(results);
                     auto rlast = std::end(results);
-                    T val = *rfirst;;
-                    rfirst++;
-                    while(rlast != rfirst)
-                    {
-                        val = hpx::util::invoke(r, val, *rfirst);
-                        rfirst++;
-                    };
-                    return val;
+                    return util::accumulate<T>(rfirst, rlast, r);
                 }));
         }
     };
@@ -91,15 +76,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         sequential(ExPolicy, InIter first, InIter last, Reduce && r,
             Convert && conv)
         {
-            T val = hpx::util::invoke(conv, *first);
-            auto iter = first;
-            iter++;
-            while(last != iter)
-            {
-                val = hpx::util::invoke(r, val, hpx::util::invoke(conv, *iter));
-                iter++;
-            };
-            return val;
+            typedef typename std::iterator_traits<InIter>::reference
+                reference;
+            return util::accumulate<T>(first, last,
+                [=](T const& res, reference next)
+                {
+                    return hpx::util::invoke(r, res,
+                        hpx::util::invoke(conv, next));
+                },
+                std::forward<Convert>(conv)
+            );
         }
 
         template <typename ExPolicy, typename FwdIter, typename Reduce,
@@ -131,14 +117,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 {
                     auto rfirst = std::begin(results);
                     auto rlast = std::end(results);
-                    T val = *rfirst;;
-                    rfirst++;
-                    while(rlast != rfirst)
-                    {
-                        val = hpx::util::invoke(r, val, *rfirst);
-                        rfirst++;
-                    };
-                    return val;
+                    return util::accumulate<T>(rfirst, rlast, r);
                 }));
         }
     };
