@@ -19,7 +19,7 @@
 #include <hpx/util/detail/pp/stringize.hpp>
 //
 #include <boost/preprocessor.hpp>
-
+#include <sched.h>
 // ------------------------------------------------------------------
 // Set flags to help simplify the log defines
 // ------------------------------------------------------------------
@@ -103,7 +103,7 @@ namespace detail {
                 hpx::this_thread::get_id().native_handle().get();
             os << hexpointer(dummy);
         }
-        os << nhex(12) << std::this_thread::get_id();
+        os << nhex(12) << std::this_thread::get_id() << " cpu " << decnumber(sched_getcpu());
         return os;
     }
 
