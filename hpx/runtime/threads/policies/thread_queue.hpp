@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,6 +29,7 @@
 #include <boost/atomic.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/preprocessor/stringize.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -37,6 +38,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -117,6 +119,15 @@ namespace hpx { namespace threads { namespace policies
                     "hpx.thread_queue.max_delete_count", "1000"));
             return max_delete_count;
         }
+
+        inline int get_max_terminated_threads()
+        {
+            static int max_terminated_threads =
+                boost::lexical_cast<int>(hpx::get_config_entry(
+                    "hpx.thread_queue.max_terminated_threads",
+                    std::to_string(HPX_HAVE_SCHEDULER_MAX_TERMINATED_THREADS)));
+            return max_terminated_threads;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -173,6 +184,9 @@ namespace hpx { namespace threads { namespace policies
 
         // number of terminated threads to discard
         int const max_delete_count;
+
+        // number of terminated threads to collect before cleaning them up
+        int const max_terminated_threads;
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef std::unordered_set<thread_id_type> thread_map_type;
@@ -540,6 +554,7 @@ namespace hpx { namespace threads { namespace policies
             min_add_new_count(detail::get_min_add_new_count()),
             max_add_new_count(detail::get_max_add_new_count()),
             max_delete_count(detail::get_max_delete_count()),
+            max_terminated_threads(detail::get_max_terminated_threads()),
             thread_map_count_(0),
             work_items_(128, queue_num),
             work_items_count_(0),
@@ -882,7 +897,7 @@ namespace hpx { namespace threads { namespace policies
                 terminated_items_.push(thrd);
 
                 std::int64_t count = ++terminated_items_count_;
-                if (count > HPX_MAX_TERMINATED_THREADS)
+                if (count > max_terminated_threads)
                 {
                     cleanup_terminated(true);   // clean up all terminated threads
                 }

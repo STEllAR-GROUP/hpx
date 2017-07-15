@@ -512,6 +512,17 @@ if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
 
+# Count number of terminated threads before forcefully cleaning up all of
+# them. Note: terminated threads are cleaned up either when this number is
+# reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
+# reached, which will clean up the terminated threads for _all_ thread queues.
+hpx_option(HPX_WITH_SCHEDULER_MAX_TERMINATED_THREADS STRING
+  "Maximum number of terminated threads collected before those are cleaned up (default: 100)"
+  "100" CATEGORY "Thread Manager" ADVANCED)
+
+hpx_add_config_define(HPX_HAVE_SCHEDULER_MAX_TERMINATED_THREADS
+  ${HPX_WITH_SCHEDULER_MAX_TERMINATED_THREADS})
+
 hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
