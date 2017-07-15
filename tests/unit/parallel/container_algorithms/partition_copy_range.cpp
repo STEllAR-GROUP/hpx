@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_partition.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/random.hpp>
 
@@ -104,6 +105,7 @@ void test_partition_copy(ExPolicy policy, DataType)
         std::begin(d_true_sol), std::begin(d_false_sol),
         pred);
 
+    HPX_UNUSED(solution);
     HPX_TEST(get<0>(result) == std::end(c));
 
     bool equality_true = std::equal(
@@ -147,6 +149,7 @@ void test_partition_copy_async(ExPolicy policy, DataType)
         std::begin(d_true_sol), std::begin(d_false_sol),
         pred);
 
+    HPX_UNUSED(solution);
     HPX_TEST(get<0>(result) == std::end(c));
 
     bool equality_true = std::equal(

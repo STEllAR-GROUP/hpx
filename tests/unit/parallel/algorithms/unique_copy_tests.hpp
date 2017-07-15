@@ -8,6 +8,7 @@
 
 #include <hpx/include/parallel_unique.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/random.hpp>
 
@@ -190,6 +191,7 @@ void test_unique_copy_exception(ExPolicy policy, IteratorTag)
             iterator(std::begin(dest)),
             throw_always());
 
+        HPX_UNUSED(result);
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -259,6 +261,7 @@ void test_unique_copy_bad_alloc(ExPolicy policy, IteratorTag)
             iterator(std::begin(dest)),
             throw_bad_alloc());
 
+        HPX_UNUSED(result);
         HPX_TEST(false);
     }
     catch(std::bad_alloc const&) {

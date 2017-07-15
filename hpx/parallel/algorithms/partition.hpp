@@ -30,6 +30,7 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -454,6 +455,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     ->  hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>
                     {
                         HPX_UNUSED(flags);
+                        HPX_UNUSED(count);
 
                         output_iterator_offset count_pair = items.back().get();
                         std::size_t count_true = get<0>(count_pair);
