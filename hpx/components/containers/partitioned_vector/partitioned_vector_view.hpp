@@ -77,8 +77,7 @@ namespace hpx
             list_type hw_sizes = {})
         : begin_( begin ), end_( begin ), block_( block )
         {
-            using indices =
-                typename hpx::util::detail::make_index_pack_unroll<N>::type;
+            using indices = typename hpx::util::detail::make_index_pack<N>::type;
 
             // Physical sizes is equal to logical sizes if physical sizes are
             // not defined

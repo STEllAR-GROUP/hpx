@@ -32,8 +32,7 @@ namespace hpx {
     private:
         using pvector_iterator = hpx::vector_iterator<T,Data>;
         using segment_iterator = typename pvector_iterator::segment_iterator;
-        using indices =
-            typename hpx::util::detail::make_index_pack_unroll<N>::type;
+        using indices = typename hpx::util::detail::make_index_pack<N>::type;
 
     template<std::size_t... I>
     std::size_t  increment_solver( std::size_t dist,
