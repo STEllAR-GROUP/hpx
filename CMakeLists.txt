@@ -672,7 +672,7 @@ endif()
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
   if(NOT OPENMP_FOUND)
@@ -681,7 +681,7 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
   "Enable examples requiring TBB support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
   if(NOT TBB_FOUND)
@@ -690,7 +690,7 @@ if(HPX_WITH_EXAMPLES_TBB)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
   "Enable examples requiring QThreads support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
   if(NOT QTHREADS_FOUND)
@@ -699,7 +699,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
   if(NOT HDF5_FOUND)
@@ -711,7 +711,7 @@ endif()
 if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
     "Enable examples requiring Qt4 support (default: OFF)." OFF
-    CATEGORY "Tools" ADVANCED)
+    CATEGORY "Build Targets" ADVANCED)
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
     if(NOT QT4_FOUND)
@@ -1899,6 +1899,10 @@ if(HPX_WITH_VIM_YCM)
   )
   hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
+
+################################################################################
+# print overall configuration summary
+include(HPX_PrintSummary)
 
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).
