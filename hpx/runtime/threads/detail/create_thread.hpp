@@ -83,7 +83,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         if (data.priority == thread_priority_default)
-            data.priority == thread_priority_normal;
+            data.priority = thread_priority_normal;
 
         // create the new thread
         std::size_t num_thread = data.num_os_thread;
