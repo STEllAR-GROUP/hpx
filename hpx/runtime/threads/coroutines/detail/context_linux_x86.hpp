@@ -236,7 +236,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                 std::memset(&action, '\0', sizeof(action));
                 action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
-                action.sa_sigaction = &sigsegv_handler;
+                action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
 
                 sigaltstack(&segv_stack, nullptr);
                 sigfillset(&action.sa_mask);
@@ -254,21 +254,17 @@ namespace hpx { namespace threads { namespace coroutines
                     << std::internal << std::hex
                     << std::setw(sizeof(addr)*2+2)
                     << std::setfill('0') << static_cast<int*>(addr)
-                    << "." << std::endl;
+                    << ".\n\n";
 
-                std::cerr << std::endl << "Configure the hpx runtime to "
-                    << "allocate a larger "
-                    << "coroutine stack size." << std::endl
-                    << "Use the hpx.stacks.small_size, "
-                    << "hpx.stacks.medium_size, "
-                    << std::endl
-                    << "hpx.stacks.large_size, "
-                    << "or hpx.stacks.huge_size runtime "
-                    << std::endl
-                    << "flags to configure coroutine heap sizes."
-                    << std::endl << std::endl;
+                std::cerr
+                    << "Configure the hpx runtime to allocate a larger coroutine "
+                       "stack size.\n Use the hpx.stacks.small_size, "
+                       "hpx.stacks.medium_size,\n hpx.stacks.large_size, "
+                       "or hpx.stacks.huge_size configuration\nflags to configure "
+                       "coroutine stack sizes.\n"
+                    << std::endl;
 
-                std::exit(EXIT_FAILURE);
+                std::terminate();
             }
 #endif
             ~x86_linux_context_impl()
