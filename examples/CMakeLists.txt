@@ -15,7 +15,6 @@ set(subdirs
     cancelable_action
     future_reduce
     heartbeat
-    interpolate1d
     jacobi
     jacobi_smp
     nqueen
@@ -37,8 +36,9 @@ if(HPX_WITH_QUEUE_COMPATIBILITY)
      )
 endif()
 
-if(HPX_WITH_FORTRAN)
+if(HPX_WITH_EXAMPLES_HDF5)
   set(subdirs ${subdirs}
+    interpolate1d
     sheneos
     )
 endif()
