@@ -76,11 +76,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         static HPX_FORCEINLINE find_return<Iterator>
         call(find_return<typename traits::local_raw_iterator> && in)
         {
-            auto it = in.seq_first;
-            auto ret_it = traits::remote(std::move(it));
             find_return<Iterator> ret;
-            ret.seq_first = ret_it;
+            ret.seq_first = traits::remote(std::move(in.seq_first));
+            ret.seq_last = traits::remote(std::move(in.seq_last));
             ret.partial_position = in.partial_position;
+            ret.last_position = in.last_position;
             return ret;
         }
     };
@@ -180,11 +180,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 [](argtype&& f) -> find_return<Iterator>
                 {
                     auto in=f.get();
-                    auto it = in.seq_first;
-                    auto ret_it = traits::remote(std::move(it));
                     find_return<Iterator> ret;
-                    ret.seq_first = ret_it;
+                    ret.seq_first = traits::remote(std::move(in.seq_first));
+                    ret.seq_last = traits::remote(std::move(in.seq_last));
                     ret.partial_position = in.partial_position;
+                    ret.last_position = in.last_position;
                     return ret;
                 });
         }

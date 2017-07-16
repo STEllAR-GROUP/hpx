@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_SEGMENTED_FIND_RETURN)
-#define HPX_PARALLEL_SEGMENTED_FIND_RETURN
+#if !defined(HPX_PARALLEL_SEGMENTED_FIND)
+#define HPX_PARALLEL_SEGMENTED_FIND
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 cursor = found_cursor;
                 start = found_start;
             }
-            find_return<FwdIter1> ret = {start, cursor};
+            find_return<FwdIter1> ret = {start, cursor, start, cursor};
             return ret;
         }
 
@@ -73,58 +73,65 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             ExPolicy, find_return<FwdIter1>
         >::type
         parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            SeqVec sequence, Pred && op,
-            FwdIter1 start, unsigned int g_cursor = 0)
+            SeqVec sequence, Pred && op)
         {
-            typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
+            typedef util::detail::algorithm_result<ExPolicy,
+                find_return<FwdIter1> > result;
             typedef typename std::iterator_traits<FwdIter1>::reference reference;
             typedef typename std::iterator_traits<FwdIter1>::difference_type
                 difference_type;
 
+            find_return<FwdIter1> ret;
+
             difference_type diff = sequence.size();
             if (diff <= 0)
-                return result::get(std::move(last1));
+            {
+                ret = {std::move(last1), 0, std::move(first1), 0};
+                return result::get(ret);
+            }
 
             difference_type count = std::distance(first1, last1);
             if (diff > count)
-                return result::get(std::move(last1));
+            {
+                ret = {std::move(last1), 0, std::move(first1), 0};
+                return result::get(ret);
+            }
 
             util::cancellation_token<
                 difference_type, std::greater<difference_type>
             > tok(-1);
 
-            unsigned int cursor = g_cursor;
-
-            return util::partitioner<ExPolicy, FwdIter1, void>::
+            return util::partitioner<ExPolicy, find_return<FwdIter1>, void>::
                 call_with_index(
-                    std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
+                    std::forward<ExPolicy>(policy), first1, count, 1,
                     [=](FwdIter1 it, std::size_t part_size,
                         std::size_t base_idx) mutable
                     {
                         FwdIter1 curr = it;
-
+                        printf("call_with_index base_idx = %ld part_size = %ld\n", base_idx, part_size);
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
-                            [=, &tok, &curr, &sequence, &cursor](reference t, std::size_t i)
+                            [=, &tok, &curr](reference t, std::size_t i)
                             {
+                                printf("loop_idx_n, i = %ld\n", i);
                                 ++curr;
-                                if (op(t, sequence[cursor]))
+                                if (op(t, sequence[0]))
                                 {
                                     difference_type local_count = 1;
 
                                     FwdIter1 mid = curr;
 
-                                    for (difference_type len = cursor;
+                                    for (difference_type len = 0;
                                          local_count != diff && len != count;
                                          (void) ++local_count, ++len, ++mid)
                                     {
+                                        printf("inner for, len = %ld\n", len);
                                         if (!op(*mid, sequence[local_count]))
                                             break;
                                     }
 
                                     if (local_count == diff)
                                         tok.cancel(i);
-                                    cursor = local_count;
                                 }
                             });
                     },
@@ -137,7 +144,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         else
                             first1 = last1;
                         find_return<FwdIter1> ret = {std::move(first1),
-                            cursor};
+                            0, std::move(last1), 0};
+                        printf("Combine partition difference_type = %ld\n", find_end_res);
                         return ret;
                     });
         }

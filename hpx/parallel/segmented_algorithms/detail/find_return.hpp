@@ -6,6 +6,8 @@
 #if !defined(HPX_PARALLEL_SEGMENTED_FIND_END_RETURN)
 #define HPX_PARALLEL_SEGMENTED_FIND_END_RETURN
 
+#include <cstddef>
+
 namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -16,12 +18,14 @@ namespace hpx { namespace parallel { inline namespace v1
         struct find_return
         {
             FwdIter seq_first;
-            unsigned int partial_position;
+            std::size_t partial_position;
+            FwdIter seq_last;
+            std::size_t last_position;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                ar & seq_first & partial_position;
+                ar & seq_first & partial_position & seq_last & last_position;
             }
         };
     }
