@@ -242,6 +242,8 @@ namespace hpx
         friend class const_segment_vector_iterator<
             T, Data, typename partitions_vector_type::const_iterator>;
 
+        friend struct serializer::detail::partitioned_vector_segmented_serializer<T>;
+
         std::size_t get_partition_size() const
         {
             std::size_t num_parts = partitions_.size();
