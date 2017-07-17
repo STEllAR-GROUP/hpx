@@ -22,9 +22,9 @@ HPX_REGISTER_PARTITIONED_VECTOR(int);
 template <typename T>
 void initialize(hpx::partitioned_vector<T> & xvalues)
 {
-    T init_array[42] = {1,2,3,4, 5,1,2,3, 3,5,5,3, 4,2,3,2, 1,2,3,4, 5,6,5,6,
-        1,2,3,4, 1,1,2,3, 4,5,4,3, 2,1,1,2,3,4};
-    for(int i=0; i<42; i++)
+    T init_array[45] = {1,2,3,4, 5,1,2,3, 3,5,5,3, 4,2,3,2, 1,2,3,4, 5,6,5,6,
+        1,2,3,4, 1,1,2,3, 4,5,4,3, 2,1,1,2,3,4, 1,2,3};
+    for(int i=0; i<45; i++)
     {
         xvalues.set_value(i,init_array[i]);
     }
@@ -53,13 +53,13 @@ void test_find_first_of_async(ExPolicy && policy,
 template <typename T>
 void find_first_of_tests(std::vector<hpx::id_type> &localities)
 {
-    std::size_t const num = 42;
+    std::size_t const num = 45;
     hpx::partitioned_vector<T> xvalues(num, hpx::container_layout(localities));
     initialize(xvalues);
 
     std::vector<T> sequence = {(T)1,(T)2,(T)3,(T)4};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 0);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 0);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 0);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 0);
     // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -67,7 +67,7 @@ void find_first_of_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)4,(T)5,(T)1,(T)2};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 3);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 3);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 3);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 3);
     // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -75,7 +75,7 @@ void find_first_of_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)2,(T)3,(T)3,(T)5};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 6);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 6);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 6);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 6);
     // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -83,7 +83,7 @@ void find_first_of_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)2,(T)3,(T)2,(T)1};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 13);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 13);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 13);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 13);
     // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -91,7 +91,7 @@ void find_first_of_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)3,(T)2,(T)1,(T)1};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 35);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 35);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 35);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 35);
     // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -99,7 +99,7 @@ void find_first_of_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)5,(T)6};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 20);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 20);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 20);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 20);
     // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -107,11 +107,11 @@ void find_first_of_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)3,(T)4,(T)2,(T)3,(T)2,(T)1};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 11);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 22);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 11);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 11);
     // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-        // xvalues, sequence, 22);
+        // xvalues, sequence, 11);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -6,9 +6,10 @@
 #if !defined(HPX_PARALLEL_SEGMENTED_FIND)
 #define HPX_PARALLEL_SEGMENTED_FIND
 
+#include <hpx/util/invoke.hpp>
+
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
@@ -33,7 +34,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             FwdIter1 found_start = start;
             while(last1 != first1)
             {
-                if(op(*first1, sequence[cursor]))
+                if(hpx::util::invoke(op, *first1, sequence[cursor]))
                 {
                     if(cursor == 0)
                         start = first1;
@@ -47,7 +48,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     }
 
                 }
-                else if(op(*first1, sequence[0]))
+                else if(hpx::util::invoke(op, *first1, sequence[0]))
                 {
                     start = first1;
                     cursor = 1;
@@ -63,7 +64,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 cursor = found_cursor;
                 start = found_start;
             }
-            find_return<FwdIter1> ret = {start, cursor, start, cursor};
+            find_return<FwdIter1> ret = {std::move(start), cursor,
+                std::move(last1), 0};
             return ret;
         }
 
@@ -91,11 +93,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             }
 
             difference_type count = std::distance(first1, last1);
-            if (diff > count)
-            {
-                ret = {std::move(last1), 0, std::move(first1), 0};
-                return result::get(ret);
-            }
 
             util::cancellation_token<
                 difference_type, std::greater<difference_type>
@@ -108,14 +105,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         std::size_t base_idx) mutable
                     {
                         FwdIter1 curr = it;
-                        printf("call_with_index base_idx = %ld part_size = %ld\n", base_idx, part_size);
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
                             [=, &tok, &curr](reference t, std::size_t i)
                             {
-                                printf("loop_idx_n, i = %ld\n", i);
                                 ++curr;
-                                if (op(t, sequence[0]))
+                                if (hpx::util::invoke(op, t, sequence[0]))
                                 {
                                     difference_type local_count = 1;
 
@@ -125,8 +120,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                          local_count != diff && len != count;
                                          (void) ++local_count, ++len, ++mid)
                                     {
-                                        printf("inner for, len = %ld\n", len);
-                                        if (!op(*mid, sequence[local_count]))
+                                        if (!hpx::util::invoke(op, *mid,
+                                                sequence[local_count]))
                                             break;
                                     }
 
@@ -138,14 +133,73 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     [=](std::vector<hpx::future<void> > &&) mutable
                         -> find_return<FwdIter1>
                     {
+                        FwdIter1 seq_start = first1, seq_last;
+                        std::size_t partial_position, last_position = 0;
                         difference_type find_end_res = tok.get_data();
                         if (find_end_res != count)
-                            std::advance(first1, find_end_res);
+                        {
+                            std::advance(seq_start, find_end_res);
+                            partial_position = sequence.size();
+                        }
                         else
-                            first1 = last1;
-                        find_return<FwdIter1> ret = {std::move(first1),
-                            0, std::move(last1), 0};
-                        printf("Combine partition difference_type = %ld\n", find_end_res);
+                        {
+                            FwdIter1 curr = first1;
+                            std::size_t index = 0;
+                            while(!hpx::util::invoke(op, *curr, sequence[index]))
+                            {
+                                index++;
+                            };
+                            partial_position = index;
+                            seq_start = curr;
+                            for(; index != sequence.size(); index++)
+                            {
+                                if(hpx::util::invoke(op, *curr, sequence[index]))
+                                {
+                                    curr++;
+                                }
+                                else if(hpx::util::invoke(op, *(--curr), sequence[index]))
+                                {
+                                    ;
+                                }
+                                else
+                                    break;
+                            }
+                            if(index != sequence.size())
+                            {
+                                partial_position = 0;
+                                seq_start = last1;
+                            }
+                        }
+                        FwdIter1 curr = last1 - 1;
+                        std::size_t index = 0;
+                        for(; std::distance(first1, curr) != 0; curr--)
+                        {
+                            if(hpx::util::invoke(op, *curr, sequence[index]))
+                                break;
+                            if(std::distance(curr, last1)>diff)
+                            {
+                                curr = last1;
+                                break;
+                            }
+                        }
+                        seq_last = curr;
+                        if(curr != last1 && curr != seq_start)
+                        {
+                            for(; curr != last1; curr++, index++)
+                            {
+                                if(!hpx::util::invoke(op, *curr, sequence[index]))
+                                {
+                                    seq_last = last1;
+                                    last_position = 0;
+                                }
+                            }
+                            if(seq_last != last1)
+                                last_position = index-1;
+                        }
+                        find_return<FwdIter1> ret = {std::move(seq_start),
+                            partial_position, std::move(seq_last), last_position};
+                        printf("Combine partition difference_type = %ld partial_position = %ld last_position = %ld\n", find_end_res,
+                            partial_position, last_position);
                         return ret;
                     });
         }
@@ -175,8 +229,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     cursor++;
                     if(cursor == sequence.size())
                     {
-                        find_return<FwdIter1> ret = {start,
-                            (unsigned int) sequence.size()};
+                        find_return<FwdIter1> ret = {std::move(last1),
+                            0, std::move(start), (unsigned int) sequence.size()};
                         return ret;
                     }
                 }
@@ -191,7 +245,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 }
                 first1++;
             };
-            find_return<FwdIter1> ret = {start, cursor};
+            find_return<FwdIter1> ret = {std::move(last1), 0,
+                std::move(start), cursor};
             return ret;
         }
 
@@ -201,56 +256,134 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             ExPolicy, find_return<FwdIter1>
         >::type
         parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            SeqVec sequence, Pred && op,
-            FwdIter1 start, unsigned int g_cursor = 0)
+            SeqVec sequence, Pred && op)
         {
-            typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
+            typedef util::detail::algorithm_result<ExPolicy,
+                find_return<FwdIter1> > result;
             typedef typename std::iterator_traits<FwdIter1>::reference reference;
             typedef typename std::iterator_traits<FwdIter1>::difference_type
                 difference_type;
 
+            find_return<FwdIter1> ret;
+
             difference_type diff = sequence.size();
             if (diff <= 0)
-                return result::get(std::move(last1));
+            {
+                ret = {std::move(first1), 0, std::move(last1), 0};
+                return result::get(ret);
+            }
 
             difference_type count = std::distance(first1, last1);
-            if (diff > count)
-                return result::get(std::move(last1));
 
-            util::cancellation_token<
-                difference_type, std::greater<difference_type>
-            > tok(-1);
+            util::cancellation_token<difference_type> tok(count);
 
-            unsigned int cursor = g_cursor;
 
-            return util::partitioner<ExPolicy, FwdIter1, void>::
+            return util::partitioner<ExPolicy, find_return<FwdIter1>, void>::
                 call_with_index(
                     std::forward<ExPolicy>(policy), first1, count, 1,
                     [=](FwdIter1 it,
                         std::size_t part_size, std::size_t base_idx) mutable
                     {
+                        FwdIter1 curr = it;
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
-                            [&tok,&sequence, &cursor, &op]
-                            (reference v, std::size_t i)
+                            [=, &tok, &curr, &op]
+                            (reference t, std::size_t i)
                             {
-                                for(int i = 0; i < sequence.size(); ++i)
+                                ++curr;
+                                if (hpx::util::invoke(op, t, sequence[0]))
                                 {
-                                    if(op(v,sequence[i]))
+                                    difference_type local_count = 1;
+
+                                    FwdIter1 mid = curr;
+
+                                    for (difference_type len = 0;
+                                         local_count != diff && len != count;
+                                         (void) ++local_count, ++len, ++mid)
+                                    {
+                                        if (!hpx::util::invoke(op, *mid,
+                                                sequence[local_count]))
+                                            break;
+                                    }
+
+                                    if (local_count == diff)
+                                    {
                                         tok.cancel(i);
+                                    }
                                 }
                             });
                     },
                     [=](std::vector<hpx::future<void> > &&) mutable
                         -> find_return<FwdIter1>
                     {
+                        FwdIter1 seq_last = first1, seq_start;
+                        std::size_t partial_position = 0, last_position;
                         difference_type find_first_of_res = tok.get_data();
                         if(find_first_of_res != count)
-                            std::advance(first1, find_first_of_res);
+                        {
+                            std::advance(seq_last, find_first_of_res);
+                            last_position = sequence.size();
+                        }
                         else
-                            first1 = last1;
-
-                        return std::move(first1);
+                        {
+                            FwdIter1 curr = last1 - 1;
+                            std::size_t index = 0;
+                            for(; std::distance(first1, curr) != 0; curr--)
+                            {
+                                if(hpx::util::invoke(op, *curr, sequence[index]))
+                                    break;
+                                if(std::distance(curr, last1)>diff)
+                                {
+                                    curr = last1;
+                                    break;
+                                }
+                            }
+                            seq_last = curr;
+                            if(curr != last1 && curr != seq_start)
+                            {
+                                for(; curr != last1; curr++, index++)
+                                {
+                                    if(!hpx::util::invoke(op, *curr, sequence[index]))
+                                    {
+                                        seq_last = last1;
+                                        last_position = 0;
+                                    }
+                                }
+                                if(seq_last != last1)
+                                    last_position = index-1;
+                            }
+                        }
+                        FwdIter1 curr = first1;
+                        std::size_t index = 0;
+                        while(!hpx::util::invoke(op, *curr, sequence[index]))
+                        {
+                            index++;
+                        };
+                        partial_position = index;
+                        seq_start = curr;
+                        for(; index != sequence.size(); index++)
+                        {
+                            if(hpx::util::invoke(op, *curr, sequence[index]))
+                            {
+                                curr++;
+                            }
+                            else if(hpx::util::invoke(op, *(--curr), sequence[index]))
+                            {
+                                ;
+                            }
+                            else
+                                break;
+                        }
+                        if(index != sequence.size())
+                        {
+                            partial_position = 0;
+                            seq_start = last1;
+                        }
+                        find_return<FwdIter1> ret = {std::move(seq_start),
+                            partial_position, std::move(seq_last), last_position};
+                        printf("Combine partition difference_type = %ld prefix = %ld partial_position = %ld last_position = %ld\n",
+                            find_first_of_res, std::distance(first1, seq_start), partial_position, last_position);
+                        return ret;
                     });
         }
     };

@@ -22,9 +22,9 @@ HPX_REGISTER_PARTITIONED_VECTOR(int);
 template <typename T>
 void initialize(hpx::partitioned_vector<T> & xvalues)
 {
-    T init_array[42] = {1,2,3,4, 5,1,2,3, 3,5,5,3, 4,2,3,2, 1,2,3,4, 5,6,5,6,
-        1,2,3,4, 1,1,2,3, 4,5,4,3, 2,1,1,2,3,4};
-    for(int i=0; i<42; i++)
+    T init_array[45] = {1,2,3,4, 5,1,2,3, 3,5,5,3, 4,2,3,2, 1,2,3,4, 5,6,5,6,
+        1,2,3,4, 1,1,2,3, 4,5,4,3, 2,1,1,2,3,4, 1,2,3};
+    for(int i=0; i<45; i++)
     {
         xvalues.set_value(i,init_array[i]);
     }
@@ -53,7 +53,7 @@ void test_find_end_async(ExPolicy && policy,
 template <typename T>
 void find_end_tests(std::vector<hpx::id_type> &localities)
 {
-    std::size_t const num = 42;
+    std::size_t const num = 45;
     hpx::partitioned_vector<T> xvalues(num, T(0), hpx::container_layout(localities));
     initialize(xvalues);
 
