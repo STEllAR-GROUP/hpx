@@ -526,7 +526,7 @@ namespace hpx { namespace components
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        static void register_as_helper(Derived && f,
+        static void register_as_helper(client_base const& f,
             std::string const& symbolic_name)
         {
             hpx::agas::register_name(launch::sync, symbolic_name, f.get());

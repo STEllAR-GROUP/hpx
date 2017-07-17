@@ -102,10 +102,11 @@ int main()
     std::size_t tile     = 10;
     std::size_t elt_size = 8;
 
-    std::size_t raw_size = N*N*elt_size;
+    // (N+1) replaces N for padding purpose
+    std::size_t raw_size = N*(N+1)*elt_size;
 
     vector_type my_vector(raw_size,
-        hpx::container_layout( N*N, hpx::find_all_localities() ));
+        hpx::container_layout( N*(N+1), hpx::find_all_localities() ));
 
     std::string vec_name("my_vector");
     my_vector.register_as(hpx::launch::sync, vec_name);

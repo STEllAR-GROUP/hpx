@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,11 +7,11 @@
 #include <hpx/hpx.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-#include <boost/range/functions.hpp>
+#include <hpx/util/iterator_range.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -33,21 +33,21 @@ void test_transform(ExPolicy policy, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     auto result =
         hpx::parallel::transform(policy,
-            c, boost::begin(d),
+            c, std::begin(d),
             [](std::size_t v) {
                 return v + 1;
             });
 
-    HPX_TEST(hpx::util::get<0>(result) == boost::end(c));
-    HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
+    HPX_TEST(hpx::util::get<0>(result) == std::end(c));
+    HPX_TEST(hpx::util::get<1>(result) == std::end(d));
 
     // verify values
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1 + 1, v2);
             ++count;
@@ -68,23 +68,23 @@ void test_transform_async(ExPolicy p, IteratorTag)
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     auto f =
         hpx::parallel::transform(p,
-            c, boost::begin(d),
+            c, std::begin(d),
             [](std::size_t& v) {
                 return v + 1;
             });
     f.wait();
 
     auto result = f.get();
-    HPX_TEST(hpx::util::get<0>(result) == boost::end(c));
-    HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
+    HPX_TEST(hpx::util::get<0>(result) == std::end(c));
+    HPX_TEST(hpx::util::get<1>(result) == std::end(d));
 
     // verify values
     std::size_t count = 0;
-    HPX_TEST(std::equal(boost::begin(c), boost::end(c), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1 + 1, v2);
             ++count;
@@ -121,7 +121,9 @@ void transform_test()
 {
     test_transform<std::random_access_iterator_tag>();
     test_transform<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_transform<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,15 +139,15 @@ void test_transform_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::transform(policy,
-            boost::make_iterator_range(
-                iterator(boost::begin(c)), iterator(boost::end(c))
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c)), iterator(std::end(c))
             ),
-            boost::begin(d),
+            std::begin(d),
             [](std::size_t v) {
                 return throw std::runtime_error("test"), v;
             });
@@ -171,17 +173,17 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         auto f =
             hpx::parallel::transform(p,
-                boost::make_iterator_range(
-                    iterator(boost::begin(c)), iterator(boost::end(c))
+                hpx::util::make_iterator_range(
+                    iterator(std::begin(c)), iterator(std::end(c))
                 ),
-                boost::begin(d),
+                std::begin(d),
                 [](std::size_t v) {
                     return throw std::runtime_error("test"), v;
                 });
@@ -233,7 +235,9 @@ void transform_exception_test()
 {
     test_transform_exception<std::random_access_iterator_tag>();
     test_transform_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_transform_exception<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,15 +253,15 @@ void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::transform(policy,
-            boost::make_iterator_range(
-                iterator(boost::begin(c)), iterator(boost::end(c))
+            hpx::util::make_iterator_range(
+                iterator(std::begin(c)), iterator(std::end(c))
             ),
-            boost::begin(d),
+            std::begin(d),
             [](std::size_t v) {
                 return throw std::bad_alloc(), v;
             });
@@ -282,17 +286,17 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         auto f =
             hpx::parallel::transform(p,
-                boost::make_iterator_range(
-                    iterator(boost::begin(c)), iterator(boost::end(c))
+                hpx::util::make_iterator_range(
+                    iterator(std::begin(c)), iterator(std::end(c))
                 ),
-                boost::begin(d),
+                std::begin(d),
                 [](std::size_t v) {
                     return throw std::bad_alloc(), v;
                 });
@@ -343,7 +347,9 @@ void transform_bad_alloc_test()
 {
     test_transform_bad_alloc<std::random_access_iterator_tag>();
     test_transform_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_transform_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

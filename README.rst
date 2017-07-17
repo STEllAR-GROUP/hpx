@@ -85,6 +85,14 @@ integration service tracks the current build status for the master branch:
      :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master
      :alt: HPX master branch build status
 
+The `AppVeyor <https://ci.appveyor.com/project/hkaiser/hpx>`_ contiguous 
+integration tracks the status for Windows builds using the native Visual Studio 2017
+toolchain: |appveyor_status|.
+
+.. |appveyor_status| image:: https://ci.appveyor.com/api/projects/status/sd3ehemep05fhaj1/branch/master?svg=true
+     :target: https://ci.appveyor.com/project/hkaiser/hpx/branch/master
+     :alt: HPX master branch Windows build status
+
 In any case, if you happen to run into problems we very much encourage and appreciate
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.

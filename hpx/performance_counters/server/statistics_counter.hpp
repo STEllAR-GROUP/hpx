@@ -59,7 +59,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
-            std::size_t parameter1, std::size_t parameter2);
+            std::size_t parameter1, std::size_t parameter2,
+            bool reset_base_counter);
 
         /// Overloads from the base_counter base class.
         hpx::performance_counters::counter_value
@@ -108,6 +109,7 @@ namespace hpx { namespace performance_counters { namespace server
         bool has_prev_value_;
 
         std::size_t parameter1_, parameter2_;
+        bool reset_base_counter_;
     };
 }}}
 

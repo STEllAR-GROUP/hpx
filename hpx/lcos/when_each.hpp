@@ -139,11 +139,11 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -273,8 +273,8 @@ namespace hpx { namespace lcos
             void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
-                    boost::begin(util::unwrap_ref(util::get<I>(t_))),
-                    boost::end(util::unwrap_ref(util::get<I>(t_))));
+                    util::begin(util::unwrap_ref(util::get<I>(t_))),
+                    util::end(util::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future

@@ -8,7 +8,6 @@
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 
-#include <boost/exception/exception.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <exception>
@@ -154,7 +153,7 @@ namespace hpx
     error_code::error_code(int err, hpx::exception const& e)
     {
         this->boost::system::error_code::assign(err, get_hpx_category());
-        exception_ = get_exception_ptr(e);
+        exception_ = std::make_exception_ptr(e);
     }
 
     error_code::error_code(std::exception_ptr const& e)
@@ -169,8 +168,8 @@ namespace hpx
             try {
                 std::rethrow_exception(exception_);
             }
-            catch (boost::exception const& be) {
-                return dynamic_cast<std::exception const*>(&be)->what();
+            catch (std::exception const& be) {
+                return be.what();
             }
         }
         return get_error_what(*this);   // provide at least minimal error text

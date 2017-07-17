@@ -690,7 +690,7 @@ void test_write(
 static void transfer_data(general_buffer_type recv,
   hpx::future<transfer_buffer_type> &&f)
 {
-  transfer_buffer_type buffer(std::move(f.get()));
+  transfer_buffer_type buffer(f.get());
 //  if (buffer.data() != recv.data())
   {
     std::copy(buffer.data(), buffer.data() + buffer.size(), recv.data());

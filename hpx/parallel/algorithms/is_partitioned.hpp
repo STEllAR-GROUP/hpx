@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -18,7 +21,6 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -40,16 +42,17 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             std::vector<hpx::future<bool> >::iterator first = res.begin();
             std::vector<hpx::future<bool> >::iterator last = res.end();
-            while (first!=last && first->get())
+            while (first != last && first->get())
             {
                 ++first;
             }
             if (first != last)
             {
                 ++first;
-                while(first != last)
+                while (first != last)
                 {
-                    if(first->get()) return false;
+                    if (first->get())
+                        return false;
                     ++first;
                 }
             }
@@ -64,14 +67,11 @@ namespace hpx { namespace parallel { inline namespace v1
               : is_partitioned::algorithm("is_partitioned")
             {}
 
-            template<typename ExPolicy, typename Pred>
+            template<typename ExPolicy, typename InIter, typename Pred>
             static bool
-            sequential(ExPolicy, Iter first, Iter last,
-                Pred && pred)
+            sequential(ExPolicy, InIter first, InIter last, Pred && pred)
             {
-                return std::is_partitioned(first,
-                    last,
-                    std::forward<Pred>(pred));
+                return std::is_partitioned(first, last, std::forward<Pred>(pred));
             }
 
             template <typename ExPolicy, typename Pred>
@@ -95,16 +95,17 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         HPX_UNUSED(policy);
 
-                        bool fst_bool = pred(*part_begin);
+                        bool fst_bool = hpx::util::invoke(pred, *part_begin);
                         if (part_count == 1)
                             return fst_bool;
 
                         util::loop_n<ExPolicy>(
                             ++part_begin, --part_count, tok,
-                            [&fst_bool, &pred, &tok](Iter const& a) {
-                                if (fst_bool != pred(*a))
+                            [&fst_bool, &pred, &tok](Iter const& a) -> void
+                            {
+                                if (fst_bool != hpx::util::invoke(pred, *a))
                                 {
-                                    if(fst_bool)
+                                    if (fst_bool)
                                         fst_bool = false;
                                     else
                                         tok.cancel();
@@ -136,9 +137,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter     The type of the source iterators used for the
+    /// \tparam FwdIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
@@ -155,7 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that objects of
-    ///                     types \a InIter can be dereferenced and then
+    ///                     types \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
     /// The predicate operations in the parallel \a is_partitioned algorithm invoked
@@ -177,23 +178,31 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename ExPolicy, typename InIter, typename Pred>
+    template <typename ExPolicy, typename FwdIter, typename Pred>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    is_partitioned(ExPolicy && policy, InIter first, InIter last, Pred && pred)
+    is_partitioned(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Requires at least forward iterator.");
 
-        return detail::is_partitioned<InIter>().call(
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+        return detail::is_partitioned<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
             std::forward<Pred>(pred));
     }

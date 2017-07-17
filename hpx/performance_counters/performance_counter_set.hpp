@@ -100,6 +100,8 @@ namespace hpx { namespace performance_counters
             return get_values<T>(reset).get(ec);
         }
 
+        std::size_t get_invocation_count() const;
+
     protected:
         bool find_counter(counter_info const& info, bool reset, error_code& ec);
 
@@ -121,6 +123,7 @@ namespace hpx { namespace performance_counters
         std::vector<naming::id_type> ids_;    // global ids of counter instances
         std::vector<std::uint8_t> reset_;     // != 0 if counter should be reset
 
+        mutable std::uint64_t invocation_count_;
         bool print_counters_locally_;         // handle only local counters
     };
 }}

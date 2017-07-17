@@ -12,10 +12,10 @@
 #include <hpx/include/parallel_for_each.hpp>
 
 #include <boost/format.hpp>
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -57,7 +57,7 @@ std::uint64_t foreach_vector(Policy && policy, Vector const& v)
     {
         hpx::parallel::for_each(
             std::forward<Policy>(policy),
-            boost::begin(v), boost::end(v), wait_op<Vector>()
+            std::begin(v), std::end(v), wait_op<Vector>()
         );
     }
 

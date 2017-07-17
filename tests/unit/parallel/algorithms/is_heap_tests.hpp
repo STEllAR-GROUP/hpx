@@ -9,10 +9,9 @@
 #include <hpx/include/parallel_is_heap.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -80,15 +79,15 @@ void test_is_heap(ExPolicy policy, IteratorTag, DataType = DataType(),
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<DataType> c(10007);
-    std::iota(boost::begin(c), boost::end(c), DataType(std::rand()));
+    std::iota(std::begin(c), std::end(c), DataType(std::rand()));
 
-    auto heap_end_iter = std::next(boost::begin(c), std::rand() % c.size());
-    std::make_heap(boost::begin(c), heap_end_iter);
+    auto heap_end_iter = std::next(std::begin(c), std::rand() % c.size());
+    std::make_heap(std::begin(c), heap_end_iter);
 
     if (test_for_is_heap)
     {
         bool result = hpx::parallel::is_heap(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)));
+            iterator(std::begin(c)), iterator(std::end(c)));
         bool solution = std::is_heap(std::begin(c), std::end(c));
 
         HPX_TEST(result == solution);
@@ -96,7 +95,7 @@ void test_is_heap(ExPolicy policy, IteratorTag, DataType = DataType(),
     else
     {
         iterator result = hpx::parallel::is_heap_until(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)));
+            iterator(std::begin(c)), iterator(std::end(c)));
         auto solution = std::is_heap_until(std::begin(c), std::end(c));
 
         HPX_TEST(result.base() == solution);
@@ -115,15 +114,15 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<DataType> c(10007);
-    std::iota(boost::begin(c), boost::end(c), DataType(std::rand()));
+    std::iota(std::begin(c), std::end(c), DataType(std::rand()));
 
-    auto heap_end_iter = std::next(boost::begin(c), std::rand() % c.size());
-    std::make_heap(boost::begin(c), heap_end_iter);
+    auto heap_end_iter = std::next(std::begin(c), std::rand() % c.size());
+    std::make_heap(std::begin(c), heap_end_iter);
 
     if (test_for_is_heap)
     {
         bool result = hpx::parallel::is_heap(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)), pred);
+            iterator(std::begin(c)), iterator(std::end(c)), pred);
         bool solution = std::is_heap(std::begin(c), std::end(c), pred);
 
         HPX_TEST(result == solution);
@@ -131,7 +130,7 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
     else
     {
         iterator result = hpx::parallel::is_heap_until(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)), pred);
+            iterator(std::begin(c)), iterator(std::end(c)), pred);
         auto solution = std::is_heap_until(std::begin(c), std::end(c), pred);
 
         HPX_TEST(result.base() == solution);
@@ -150,15 +149,15 @@ void test_is_heap_async(ExPolicy policy, IteratorTag, DataType = DataType(),
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<DataType> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto heap_end_iter = std::next(boost::begin(c), std::rand() % c.size());
-    std::make_heap(boost::begin(c), heap_end_iter);
+    auto heap_end_iter = std::next(std::begin(c), std::rand() % c.size());
+    std::make_heap(std::begin(c), heap_end_iter);
 
     if (test_for_is_heap)
     {
         auto f = hpx::parallel::is_heap(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)));
+            iterator(std::begin(c)), iterator(std::end(c)));
         bool result = f.get();
         bool solution = std::is_heap(std::begin(c), std::end(c));
 
@@ -167,7 +166,7 @@ void test_is_heap_async(ExPolicy policy, IteratorTag, DataType = DataType(),
     else
     {
         auto f = hpx::parallel::is_heap_until(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)));
+            iterator(std::begin(c)), iterator(std::end(c)));
         iterator result = f.get();
         auto solution = std::is_heap_until(std::begin(c), std::end(c));
 
@@ -188,21 +187,21 @@ void test_is_heap_exception(ExPolicy policy, IteratorTag,
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::make_heap(boost::begin(c), boost::end(c));
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::make_heap(std::begin(c), std::end(c));
 
     bool caught_exception = false;
     try {
         if (test_for_is_heap)
         {
             hpx::parallel::is_heap(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_always());
         }
         else
         {
             hpx::parallel::is_heap_until(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_always());
         }
 
@@ -227,8 +226,8 @@ void test_is_heap_exception_async(ExPolicy policy, IteratorTag,
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::make_heap(boost::begin(c), boost::end(c));
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::make_heap(std::begin(c), std::end(c));
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -236,7 +235,7 @@ void test_is_heap_exception_async(ExPolicy policy, IteratorTag,
         if (test_for_is_heap)
         {
             auto f = hpx::parallel::is_heap(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_always());
             returned_from_algorithm = true;
             f.get();
@@ -244,7 +243,7 @@ void test_is_heap_exception_async(ExPolicy policy, IteratorTag,
         else
         {
             auto f = hpx::parallel::is_heap_until(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_always());
             returned_from_algorithm = true;
             f.get();
@@ -277,21 +276,21 @@ void test_is_heap_bad_alloc(ExPolicy policy, IteratorTag,
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::make_heap(boost::begin(c), boost::end(c));
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::make_heap(std::begin(c), std::end(c));
 
     bool caught_bad_alloc = false;
     try {
         if (test_for_is_heap)
         {
             hpx::parallel::is_heap(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_bad_alloc());
         }
         else
         {
             hpx::parallel::is_heap_until(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_bad_alloc());
         }
 
@@ -315,8 +314,8 @@ void test_is_heap_bad_alloc_async(ExPolicy policy, IteratorTag,
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::make_heap(boost::begin(c), boost::end(c));
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::make_heap(std::begin(c), std::end(c));
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -324,7 +323,7 @@ void test_is_heap_bad_alloc_async(ExPolicy policy, IteratorTag,
         if (test_for_is_heap)
         {
             auto f = hpx::parallel::is_heap(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_bad_alloc());
             returned_from_algorithm = true;
             f.get();
@@ -332,7 +331,7 @@ void test_is_heap_bad_alloc_async(ExPolicy policy, IteratorTag,
         else
         {
             auto f = hpx::parallel::is_heap_until(policy,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_bad_alloc());
             returned_from_algorithm = true;
             f.get();

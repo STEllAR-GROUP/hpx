@@ -25,6 +25,7 @@
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -64,19 +65,23 @@ namespace hpx { namespace parallel { inline namespace v1
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
                         [tok, first, comp](RandIter it,
-                            std::size_t part_size, std::size_t base_idx) mutable
+                            std::size_t part_size, std::size_t base_idx
+                        ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, first, &comp](type const& v, std::size_t i)
+                                [&tok, first, &comp](
+                                    type const& v, std::size_t i
+                                ) -> void
                                 {
-                                    if (comp(*(first + i / 2), v))
+                                    if (hpx::util::invoke(comp, *(first + i / 2), v))
                                         tok.cancel(0);
                                 });
                         },
                         [tok, second](std::vector<hpx::future<void> > &&) mutable
                             -> bool
                         {
+                            HPX_UNUSED(second);
                             difference_type find_res =
                                 static_cast<difference_type>(tok.get_data());
 

@@ -5,6 +5,7 @@
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
 # Copyright (c) 2014-2016 Andreas Schaefer
+# Copyright (c) 2017      Abhimanyu Rawat
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -124,6 +125,13 @@ if(MSVC)
   if(HPX_WITH_VCPKG)
     hpx_add_config_define(HPX_HAVE_VCPKG)
   endif()
+
+  hpx_option(HPX_WITH_VS_STARTUP_PROJECT STRING
+    "Define the startup project for the HPX solution (default: ALL_BUILD)."
+    "ALL_BUILD" ADVANCED)
+  if(HPX_WITH_VS_STARTUP_PROJECT)
+    set(VS_STARTUP_PROJECT ${HPX_WITH_VS_STARTUP_PROJECT})
+  endif()
 endif()
 
 ################################################################################
@@ -139,6 +147,21 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 #    set(DEFAULT_MALLOC "jemalloc")
 endif()
 
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT OFF)
+  string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UC)
+  if("${CMAKE_BUILD_TYPE_UC}" STREQUAL "DEBUG")
+    set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT ON)
+  endif()
+  hpx_option(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION
+    BOOL
+    "Enable stackoverflow detection for HPX threads/coroutines. (default: OFF, debug: ON)"
+    ${HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT} ADVANCED)
+  if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+    hpx_add_config_define(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+  endif()
+endif()
+
 hpx_option(HPX_WITH_MALLOC
   STRING
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
@@ -149,6 +172,11 @@ hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
+
+hpx_option(HPX_WITH_STACKOVERFLOW_DETECTION
+  BOOL
+  "Enable Stack Overflow Detection (default: OFF)"
+  OFF ADVANCED)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -906,10 +934,18 @@ endif()
 
 # HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
 hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
-    "Enable old overloads for inclkusive_scan (default: ON)"
+    "Enable old overloads for inclusive_scan (default: ON)"
     ON ADVANCED)
 if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
+endif()
+
+# HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT: introduced in V1.1.0
+hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
+    "Enable weaker (non-conforming) iterator requirements for parallel algorithms (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+  hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
 endif()
 
 ################################################################################
@@ -1385,6 +1421,18 @@ if(HPX_WITH_HWLOC)
   hpx_libraries(${HWLOC_LIBRARIES})
   include_directories(${HWLOC_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_HWLOC)
+endif()
+
+hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION "\"${HPX_WITH_STACKOVERFLOW_DETECTION}\"")
+
+if(HPX_WITH_STACKOVERFLOW_DETECTION)
+  find_package(LibSigSegv)
+  if(NOT LIBSIGSEGV_FOUND)
+    hpx_error("LibSigSegv could not be found and HPX_WITH_STACKOVERFLOW_DETECTION=ON, please specify LIBSIGSEGV_ROOT to point to the correct location or set HPX_WITH_STACKOVERFLOW_DETECTION to OFF")
+  endif()
+  hpx_libraries(${LIBSIGSEGV_LIBRARIES})
+  include_directories(${LIBSIGSEGV_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION)
 endif()
 
 ################################################################################

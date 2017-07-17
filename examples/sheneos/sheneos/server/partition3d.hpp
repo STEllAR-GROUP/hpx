@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,10 +7,6 @@
 #define HPX_SHENEOS_PARTITION3D_AUG_08_2011_1220PM
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -18,6 +14,8 @@
 #include <vector>
 
 #include "../dimension.hpp"
+
+#include <boost/scoped_array.hpp>
 
 namespace sheneos
 {
@@ -32,6 +30,11 @@ namespace sheneos
         double temp_;
         double rho_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // one mutex per application instance
+    typedef hpx::lcos::local::spinlock mutex_type;
+    extern mutex_type mtx_;
 }
 
 namespace sheneos { namespace server
@@ -40,6 +43,7 @@ namespace sheneos { namespace server
     class HPX_COMPONENT_EXPORT partition3d
       : public hpx::components::component_base<partition3d>
     {
+    private:
         inline void init_dimension(std::string const&, int, dimension const&,
             char const*, boost::scoped_array<double>&);
 
@@ -48,12 +52,12 @@ namespace sheneos { namespace server
             std::size_t array_size);
 
         /// Get index of a given value in the one-dimensional array-slice.
-        inline std::size_t get_index(dimension::type d, double value);
+        inline std::size_t get_index(dimension::type d, double value) const;
 
         /// Tri-linear interpolation routine.
         inline double tl_interpolate(double* values,
             std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
-            double delta_ye, double delta_logtemp, double delta_logrho);
+            double delta_ye, double delta_logtemp, double delta_logrho) const;
 
     public:
         enum eos_values {
@@ -104,7 +108,7 @@ namespace sheneos { namespace server
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
         std::vector<double> interpolate(double ye, double temp, double rho,
-            std::uint32_t eosvalues);
+            std::uint32_t eosvalues) const;
 
         /// Perform an interpolation of one given field on this partition.
         ///
@@ -114,7 +118,7 @@ namespace sheneos { namespace server
         /// \param eosvalues [in] The EOS value to interpolate. Must be
         ///                  in the range of this partition.
         double interpolate_one(double ye, double temp, double rho,
-            std::uint32_t eosvalue);
+            std::uint32_t eosvalue) const;
 
         /// Perform several interpolations of all given fields on this partition.
         ///
@@ -124,7 +128,7 @@ namespace sheneos { namespace server
         ///                  in the range of this partition.
         std::vector<std::vector<double> >
         interpolate_bulk(std::vector<sheneos_coord> const& coords,
-            std::uint32_t eosvalues);
+            std::uint32_t eosvalues) const;
 
         /// Perform several interpolations of one given field on this partition.
         ///
@@ -134,7 +138,7 @@ namespace sheneos { namespace server
         ///                  in the range of this partition.
         std::vector<double>
         interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
-            std::uint32_t eosvalue);
+            std::uint32_t eosvalue) const;
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -148,9 +152,9 @@ namespace sheneos { namespace server
 
     protected:
         double interpolate_one(sheneos_coord const& c,
-            std::uint32_t eosvalue);
+            std::uint32_t eosvalue) const;
         std::vector<double> interpolate(sheneos_coord const& c,
-            std::uint32_t eosvalues);
+            std::uint32_t eosvalues) const;
 
     private:
         dimension dim_[dimension::dim];

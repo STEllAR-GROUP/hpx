@@ -11,16 +11,14 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/traits/is_range.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/rotate.hpp>
 #include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -75,19 +73,19 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename Rng,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value)>
+        hpx::traits::is_range<Rng>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<
-            tag::begin(typename traits::range_iterator<Rng>::type),
-            tag::end(typename traits::range_iterator<Rng>::type)
+            tag::begin(typename hpx::traits::range_iterator<Rng>::type),
+            tag::end(typename hpx::traits::range_iterator<Rng>::type)
         >
     >::type
     rotate(ExPolicy && policy, Rng && rng,
-        typename traits::range_iterator<Rng>::type middle)
+        typename hpx::traits::range_iterator<Rng>::type middle)
     {
         return rotate(std::forward<ExPolicy>(policy),
-            boost::begin(rng), middle, boost::end(rng));
+            hpx::util::begin(rng), middle, hpx::util::end(rng));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -140,20 +138,20 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename Rng, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
+        hpx::traits::is_range<Rng>::value &&
         hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<
-            tag::in(typename traits::range_iterator<Rng>::type),
+            tag::in(typename hpx::traits::range_iterator<Rng>::type),
             tag::out(OutIter)
         >
     >::type
     rotate_copy(ExPolicy && policy, Rng && rng,
-        typename traits::range_iterator<Rng>::type middle, OutIter dest_first)
+        typename hpx::traits::range_iterator<Rng>::type middle, OutIter dest_first)
     {
         return rotate_copy(std::forward<ExPolicy>(policy),
-            boost::begin(rng), middle, boost::end(rng), dest_first);
+            hpx::util::begin(rng), middle, hpx::util::end(rng), dest_first);
     }
 }}}
 
