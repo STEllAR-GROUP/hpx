@@ -21,7 +21,7 @@ namespace hpx {
     {
         util::static_<resource::resource_partitioner, std::false_type> rp;
 
-        if(rp.get().cmd_line_parsed() == false){
+        if (rp.get().cmd_line_parsed() == false) {
             // if the resource partitioner is not accessed for the first time
             // if the command-line parsing has not yet been done
             throw std::invalid_argument(
@@ -190,7 +190,7 @@ namespace resource
     // mechanism for adding resources
     // num threads = number of threads desired on a PU. defaults to 1.
     // note: if num_threads > 1 => oversubscription
-    void init_pool_data::add_resource(std::size_t pu_index, std::size_t num_threads){
+    void init_pool_data::add_resource(std::size_t pu_index, std::size_t num_threads) {
 
         if (pu_index >= hpx::threads::hardware_concurrency()) {
             throw std::invalid_argument("Processing unit index out of bounds. The total number of processing units on this machine is " +
@@ -243,7 +243,7 @@ namespace resource
         initial_thread_pools_.push_back(init_pool_data("default"));
 
         // allow only one resource_partitioner instance
-        if(instance_number_counter_++ >= 0)
+        if (instance_number_counter_++ >= 0)
             throw std::runtime_error("Cannot instantiate more than one resource partitioner");
     }
 
@@ -298,34 +298,31 @@ namespace resource
 
                 // loop on the processing units
                 for (std::size_t k=0; k<topology_.get_number_of_core_pus(j); ++k) {
-                    if(pu_exposed(pid)){
+                    if (pu_exposed(pid)) {
                         c.pus_.push_back(pu());
                         pu &p   = c.pus_.back();
-
                         p.id_   = pid;
                         p.core_ = &c;
 
                         p.thread_occupancy_ = affinity_data_.get_thread_occupancy(pid);
-                        if(p.thread_occupancy_ == 0)
-                            throw std::runtime_error("PU #" + std::to_string(pid) + " has thread occupancy 0");
+                        if (p.thread_occupancy_ == 0)
+                            throw std::runtime_error("PU #" + std::to_string(pid)
+                                + " has thread occupancy 0");
                         p.thread_occupancy_count_ = p.thread_occupancy_;
                         core_contains_exposed_pus = true;
                     }
-
                     pid++;
-
                 }
 
-                if(core_contains_exposed_pus){
+                if (core_contains_exposed_pus) {
                     numa_domain_contains_exposed_cores = true;
                 } else {
                     nd.cores_.pop_back();
                 }
-
             }
 
-            if(!numa_domain_contains_exposed_cores)
-                nd.cores_.pop_back();
+            if (!numa_domain_contains_exposed_cores)
+                numa_domains_.pop_back();
 
         }
     }
@@ -356,7 +353,7 @@ namespace resource
         }
 
         // Check whether any of the pools defined up to now are empty
-        if(check_empty_pools()) {
+        if (check_empty_pools()) {
             throw std::invalid_argument("Pools empty of resources are not allowed. Please re-run this application with allow-empty-pool-policy (not implemented yet)");
         }
         //! FIXME add allow-empty-pools policy. Wait, does this even make sense??
@@ -413,8 +410,8 @@ namespace resource
 
         // set this scheduler on the pools that do not have a specified scheduler yet
         std::size_t npools(initial_thread_pools_.size());
-        for(size_t i(0); i<npools; i++){
-            if(initial_thread_pools_[i].scheduling_policy_ == unspecified){
+        for(size_t i(0); i<npools; i++) {
+            if (initial_thread_pools_[i].scheduling_policy_ == unspecified) {
                 initial_thread_pools_[i].scheduling_policy_ = default_scheduler;
             }
         }
@@ -436,8 +433,8 @@ namespace resource
     {
         std::vector<threads::mask_type> new_affinity_masks;
 
-        for(auto& itp : initial_thread_pools_){
-            for(auto& mask : itp.assigned_pus_){
+        for(auto& itp : initial_thread_pools_) {
+            for(auto& mask : itp.assigned_pus_) {
                 new_affinity_masks.push_back(mask);
             }
         }
@@ -451,12 +448,12 @@ namespace resource
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
 
-        for(size_t i(0); i<num_thread_pools; i++){
-            if(initial_thread_pools_[i].assigned_pus_.size() == 0){
+        for(size_t i(0); i<num_thread_pools; i++) {
+            if (initial_thread_pools_[i].assigned_pus_.size() == 0) {
                 return false;
             }
-            for(auto assigned_pus : initial_thread_pools_[i].assigned_pus_){
-                if(!threads::any(assigned_pus)) {
+            for(auto assigned_pus : initial_thread_pools_[i].assigned_pus_) {
+                if (!threads::any(assigned_pus)) {
                     return true;
                 }
             }
@@ -473,7 +470,7 @@ namespace resource
     // create a new thread_pool
     void resource_partitioner::create_thread_pool(const std::string &name, scheduling_policy sched)
     {
-        if(name.empty())
+        if (name.empty())
             throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
 
         if (name == "default") {
@@ -484,7 +481,7 @@ namespace resource
         //! if there already exists a pool with this name
         std::size_t num_thread_pools = initial_thread_pools_.size();
         for(size_t i(1); i<num_thread_pools; i++) {
-            if(name == initial_thread_pools_[i].pool_name_)
+            if (name == initial_thread_pools_[i].pool_name_)
                 throw std::invalid_argument("there already exists a pool named " + name + ".\n");
         }
 
@@ -494,7 +491,7 @@ namespace resource
     // create a new thread_pool
     void resource_partitioner::create_thread_pool(const std::string &name, scheduler_function scheduler_creation)
     {
-        if(name.empty())
+        if (name.empty())
             throw std::invalid_argument("cannot instantiate a initial_thread_pool with empty string as a name.");
 
         if (name == "default") {
@@ -505,7 +502,7 @@ namespace resource
         //! if there already exists a pool with this name
         std::size_t num_thread_pools = initial_thread_pools_.size();
         for(size_t i(1); i<num_thread_pools; i++) {
-            if(name == initial_thread_pools_[i].pool_name_)
+            if (name == initial_thread_pools_[i].pool_name_)
                 throw std::invalid_argument("there already exists a pool named " + name + ".\n");
         }
 
@@ -521,17 +518,17 @@ namespace resource
         //! FIXME except if policy allow_extra_thread_creation is activated
         //! then I don't have to check the occupancy count ...
         // check occupancy counter and decrement it
-        if (p.thread_occupancy_count_ > 0){
+        if (p.thread_occupancy_count_ > 0) {
             p.thread_occupancy_count_--;
             get_pool(pool_name)->add_resource(p.id_, num_threads);
 
             // Make sure the total number of requested threads does not exceed the number of threads
             // requested on the command line
             //! FIXME except if policy allow_extra_thread_creation is activated
-            if(init_pool_data::num_threads_overall > cfg_.num_threads_){
+            if (init_pool_data::num_threads_overall > cfg_.num_threads_) {
                 //! FIXME add allow_empty_default_pool policy
-/*                if(rp-policy == allow_empty_default_pool
-                    && init_pool_data::num_threads_overall == cfg_.num_threads_){
+/*                if (rp-policy == allow_empty_default_pool
+                    && init_pool_data::num_threads_overall == cfg_.num_threads_) {
                     // then it's all fine
                 } else {*/
                     throw std::runtime_error("Creation of " +
@@ -585,11 +582,11 @@ namespace resource
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
-    void resource_partitioner::set_scheduler(scheduling_policy sched, const std::string &pool_name){
+    void resource_partitioner::set_scheduler(scheduling_policy sched, const std::string &pool_name) {
         get_pool(pool_name)->scheduling_policy_ = sched;
     }
 
-    void resource_partitioner::configure_pools(){
+    void resource_partitioner::configure_pools() {
         setup_pools();
         setup_schedulers();
         reconfigure_affinities();
@@ -602,7 +599,7 @@ namespace resource
     scheduling_policy resource_partitioner::which_scheduler(const std::string &pool_name) {
         // look up which scheduler is needed
         scheduling_policy sched_type = get_pool(pool_name)->scheduling_policy_;
-        if(sched_type == unspecified)
+        if (sched_type == unspecified)
             throw std::invalid_argument("Thread pool " + pool_name + " cannot be instantiated with unspecified scheduler type.");
 
         return sched_type;
@@ -639,7 +636,7 @@ namespace resource
 
     const init_pool_data* resource_partitioner::get_pool(std::size_t pool_index) const {
 
-        if(pool_index >= initial_thread_pools_.size()){
+        if (pool_index >= initial_thread_pools_.size()) {
             throw std::invalid_argument(
                     "Pool index " + std::to_string(pool_index) + " too large: the resource partitioner owns only " +
                             std::to_string(initial_thread_pools_.size()) + " thread pools.\n");
@@ -649,7 +646,7 @@ namespace resource
     }
 
     const std::string &resource_partitioner::get_pool_name(size_t index) const {
-        if(index >= initial_thread_pools_.size())
+        if (index >= initial_thread_pools_.size())
             throw std::invalid_argument("pool " + std::to_string(index) + " (zero-based index) requested out of bounds. The resource_partitioner owns only "
                                         + std::to_string(initial_thread_pools_.size()) + " pools\n");
         return initial_thread_pools_[index].pool_name_;
@@ -681,7 +678,7 @@ namespace resource
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
 
-        if(fill_internal_topology){
+        if (fill_internal_topology) {
             // set data describing internal topology backend
             fill_topology_vectors();
         }
@@ -714,12 +711,12 @@ namespace resource
     // has to be private bc pointers become invalid after data member thread_pools_ is resized
     // we don't want to allow the user to use it
     const init_pool_data* resource_partitioner::get_pool(const std::string &pool_name) const {
-        auto pool = std::find_if(
+        auto pool = std::find_if (
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
                 [&pool_name](init_pool_data itp) -> bool {return (itp.pool_name_ == pool_name);}
         );
 
-        if(pool != initial_thread_pools_.end()){
+        if (pool != initial_thread_pools_.end()) {
             const init_pool_data* ret(&(*pool));
             return ret;
         }
@@ -729,12 +726,12 @@ namespace resource
     }
 
     init_pool_data* resource_partitioner::get_pool(const std::string &pool_name) {
-        auto pool = std::find_if(
+        auto pool = std::find_if (
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
                 [&pool_name](init_pool_data itp) -> bool {return (itp.pool_name_ == pool_name);}
         );
 
-        if(pool != initial_thread_pools_.end()){
+        if (pool != initial_thread_pools_.end()) {
             init_pool_data* ret(&(*pool));
             return ret;
         }
@@ -745,12 +742,12 @@ namespace resource
 
 
     init_pool_data* resource_partitioner::get_default_pool() {
-        auto pool = std::find_if(
+        auto pool = std::find_if (
                 initial_thread_pools_.begin(), initial_thread_pools_.end(),
                 [](init_pool_data itp) -> bool {return (itp.pool_name_ == "default");}
         );
 
-        if(pool != initial_thread_pools_.end()){
+        if (pool != initial_thread_pools_.end()) {
             init_pool_data* ret(&(*pool));
             return ret;
         }
@@ -762,7 +759,7 @@ namespace resource
     void resource_partitioner::print_init_pool_data() const {           //! make this prettier
         std::cout << "the resource partitioner owns "
                   << initial_thread_pools_.size() << " pool(s) : \n";
-        for(auto itp : initial_thread_pools_){
+        for(auto itp : initial_thread_pools_) {
             itp.print_pool();
         }
     }
