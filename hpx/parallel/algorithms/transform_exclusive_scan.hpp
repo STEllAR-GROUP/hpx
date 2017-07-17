@@ -14,6 +14,7 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T, typename Op, typename Conv,
     HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
+        is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter1>::value &&
         hpx::traits::is_iterator<FwdIter2>::value &&
         hpx::traits::is_invocable<Conv,

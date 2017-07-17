@@ -320,7 +320,7 @@ namespace hpx { namespace parallel { inline namespace v1
     transform(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         F && f, Proj && proj = Proj())
     {
-        typedef hpx::traits::is_segmented_iterator<InIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
         return detail::transform_(
             std::forward<ExPolicy>(policy), first, last, dest,
             std::forward<F>(f), proj, is_segmented());

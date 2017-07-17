@@ -337,7 +337,7 @@ namespace hpx { namespace parallel { inline namespace v1
     transform_inclusive_scan(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Op && op, Conv && conv, T init)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
         return detail::transform_inclusive_scan_(std::forward<ExPolicy>(policy),
             first, last, dest, std::forward<Conv>(conv), std::move(init),
             std::forward<Op>(op), is_segmented());
@@ -552,15 +552,6 @@ namespace hpx { namespace parallel { inline namespace v1
     transform_inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Conv && conv, Op && op)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_output_iterator<FwdIter2>::value ||
-                hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least output iterator.");
-
         typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
 
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
