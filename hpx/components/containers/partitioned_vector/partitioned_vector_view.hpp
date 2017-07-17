@@ -202,7 +202,7 @@ namespace hpx
                            , sw_basis_.back());
         }
 
-        const_iterator cbegin()
+        const_iterator cbegin() const
         {
             return const_iterator( block_
                                 , cbegin_, cend_
@@ -210,7 +210,7 @@ namespace hpx
                                 , 0);
         }
 
-        const_iterator cend()
+        const_iterator cend() const
         {
             return const_iterator( block_
                            , cend_, cend_
