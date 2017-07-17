@@ -17,9 +17,9 @@ namespace hpx { namespace serialization
 {
     namespace detail
     {
-        template<typename T>
         partitioned_vector_segmented_serializer
         {
+            template<typename T>
             static void serialize(input_archive & ar,
                 hpx::partitioned_vector<T> & v, std::false_type)
             {
@@ -29,6 +29,7 @@ namespace hpx { namespace serialization
                     "hpx::serialization::serialize requires segemented partitioned_vector");
             }
 
+            template<typename T>
             static void serialize(input_archive & ar,
                 hpx::partitioned_vector<T> & v, std::true_type)
             {
@@ -38,6 +39,7 @@ namespace hpx { namespace serialization
                 fconnect.wait();
             }
 
+            template<typename T>
             static void serialize(output_archive & ar,
                 const hpx::partitioned_vector<T> & v, std::false_type) const
             {
@@ -51,6 +53,7 @@ namespace hpx { namespace serialization
                     "hpx::serialization::serialize requires a registered partitioned_vector");
             }
 
+            template<typename T>
             static void serialize(output_archive & ar,
                 const hpx::partitioned_vector<T> & v, std::true_type) const
             {
@@ -66,7 +69,7 @@ namespace hpx { namespace serialization
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         auto vitr = std::begin(v);
-        detail::partitioned_vector_segmented_serializer::serialize(
+        detail::partitioned_vector_segmented_serializer::serialize<T>(
             ar, v, is_segmented(vitr));
     }
 
@@ -77,7 +80,7 @@ namespace hpx { namespace serialization
         typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         auto vitr = std::begin(v);
-        detail::partitioned_vector_segmented_serializer::serialize(
+        detail::partitioned_vector_segmented_serializer::serialize<T>(
             ar, v, is_segmented(vitr));
     }
 
