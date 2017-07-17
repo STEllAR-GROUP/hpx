@@ -17,7 +17,7 @@ namespace hpx { namespace serialization
 {
     namespace detail
     {
-        partitioned_vector_segmented_serializer
+        struct partitioned_vector_segmented_serializer
         {
             template<typename T>
             static void serialize(input_archive & ar,
