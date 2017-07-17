@@ -26,7 +26,7 @@ namespace hpx { namespace serialization
                 static_assert(
                     hpx::parallel::is_partitioned(hpx::parallel::execution::par,
                         std::begin(v), std::end(v), [](std::size_t n) { return n > 0; });
-                    "hpx::serialization::serialize requires segemented partitioned_vector");
+                    "hpx::serialization::serialize requires segmented partitioned_vector");
             }
 
             template<typename T>
@@ -46,7 +46,7 @@ namespace hpx { namespace serialization
                 static_assert(
                     hpx::parallel::is_partitioned(hpx::parallel::execution::par,
                         std::begin(v), std::end(v), [](std::size_t n) { return n > 0; });
-                    "hpx::serialization::serialize requires segemented partitioned_vector");
+                    "hpx::serialization::serialize requires segmented partitioned_vector");
 
                 static_assert(
                     v.registered_name_.size() > 0,
