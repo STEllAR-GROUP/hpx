@@ -16,6 +16,7 @@
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/transform_iterator.hpp>
 #include <hpx/util/tuple.hpp>
 //
@@ -346,11 +347,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef typename std::iterator_traits<RanIter2>::value_type value_type;
 
                 zip_iterator_in states_begin = make_zip_iterator(values_first,
-                    std::begin(key_state));
+                    hpx::util::begin(key_state));
                 zip_iterator_in states_end = make_zip_iterator(
-                    values_first + number_of_keys, std::end(key_state));
+                    values_first + number_of_keys, hpx::util::end(key_state));
                 zip_iterator_vout states_out_begin = make_zip_iterator(values_output,
-                    std::begin(key_state));
+                    hpx::util::begin(key_state));
                 //
 
                 zip_type_in initial;
@@ -398,11 +399,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 return make_pair_result(
                     hpx::parallel::copy_if(sync_policy,
                         make_zip_iterator(key_first, values_output,
-                            std::begin(key_state)),
+                            hpx::util::begin(key_state)),
                         make_zip_iterator(key_last, values_output + number_of_keys,
-                            std::end(key_state)),
+                            hpx::util::end(key_state)),
                         make_zip_iterator(keys_output, values_output,
-                            std::begin(key_state)),
+                            hpx::util::begin(key_state)),
                         // copies to dest only when 'end' state is true
                         [](zip2_ref it)
                         {
