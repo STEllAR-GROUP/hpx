@@ -113,11 +113,9 @@ namespace hpx
 {
     // forward struct declaration
     //
-    namespace serialization {
-        namespace detail {
+    namespace serialization { namespace detail {
             struct partitioned_vector_segmented_serializer;
-        }
-    }
+    } }
 
     /// hpx::partitioned_vector is a sequence container that encapsulates
     /// dynamic size arrays.
@@ -250,7 +248,7 @@ namespace hpx
         friend class const_segment_vector_iterator<
             T, Data, typename partitions_vector_type::const_iterator>;
 
-        friend struct serialization::detail::partitioned_vector_segmented_serializer;
+        friend struct hpx::serialization::detail::partitioned_vector_segmented_serializer;
 
         std::size_t get_partition_size() const
         {

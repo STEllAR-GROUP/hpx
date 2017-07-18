@@ -41,7 +41,7 @@ namespace hpx { namespace serialization
 
             template<typename T>
             static void serialize(output_archive & ar,
-                const hpx::partitioned_vector<T> & v, std::false_type) const
+                const hpx::partitioned_vector<T> & v, std::false_type) 
             {
                 static_assert(
                     hpx::parallel::is_partitioned(hpx::parallel::execution::par,
@@ -55,7 +55,7 @@ namespace hpx { namespace serialization
 
             template<typename T>
             static void serialize(output_archive & ar,
-                const hpx::partitioned_vector<T> & v, std::true_type) const
+                const hpx::partitioned_vector<T> & v, std::true_type)
             {
                 ar << v.registered_name_;
             }
