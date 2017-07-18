@@ -17,6 +17,7 @@ set(tests
     serialization_smart_ptr
     serialization_unordered_map
     serialization_vector
+    serialization_partitioned_vector
     serialization_variant
     serialize_buffer
     zero_copy_serialization
