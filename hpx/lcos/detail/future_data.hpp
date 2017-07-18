@@ -1178,6 +1178,18 @@ namespace hpx { namespace traits
             return get_function_annotation<F1>::call(f.f1_);
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename F1, typename F2>
+    struct get_function_annotation_itt<lcos::detail::compose_cb_impl<F1, F2> >
+    {
+        static char const*
+            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
+        {
+            return get_function_annotation_itt<F1>::call(f.f1_);
+        }
+    };
+#endif
 #endif
 }}
 
