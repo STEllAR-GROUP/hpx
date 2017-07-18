@@ -55,6 +55,22 @@ extern "C" void swapcontext_stack (void***, void**) throw() __attribute((regparm
 extern "C" void swapcontext_stack2 (void***, void**) throw()__attribute((regparm(2)));
 #endif
 
+#if defined(__GNUG__)
+#if defined(HPX_GCC_SPLITSTACK_ENABLED)
+
+typedef void *[64] splitstack_ptr;
+
+extern "C" {
+    void *__splitstack_makecontext(std::size_t, splitstack_ptr, std::size_t *);
+    void __splitstack_releasecontext(splitstack_ptr);
+    void __splitstack_resetcontext(splitstack_ptr);
+    void __splitstack_block_signals_context(splitstack_ptr, int * new_value, int * old_value);
+}
+
+
+#endif
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace coroutines
 {
@@ -168,7 +184,21 @@ namespace hpx { namespace threads { namespace coroutines
                             m_stack_size));
                 }
 
+#if defined(__GNUG__)
+#if defined(HPX_GCC_SPLITSTACK_ENABLED)
+                m_stack = __splitstack_makecontext(static_cast<std::size_t>(m_stack_size), splitstack_segment, size);
+                assert(m_stack);
+                if(!m_stack) {
+                    m_stack = nullptr;
+                    std::terminate();
+                }
+
+                int off = 0;
+                __splitstack_block_signals_context(splitstack_segment, &off, 0);
+#elif
                 m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
+#endif
+#endif
                 HPX_ASSERT(m_stack);
                 posix::watermark_stack(m_stack, static_cast<std::size_t>(m_stack_size));
 
@@ -199,7 +229,14 @@ namespace hpx { namespace threads { namespace coroutines
                     VALGRIND_STACK_DEREGISTER(
                         reinterpret_cast<std::size_t>(m_sp[valgrind_id_idx]));
 #endif
+
+#if defined(__GNUG__)
+#if defined(HPX_GCC_SPLITSTACK_ENABLED)
+                    __splitstack_releasecontext(splitstack_segment);
+#elif
                     posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
+#endif
+#endif
                 }
             }
 
@@ -342,6 +379,11 @@ namespace hpx { namespace threads { namespace coroutines
             static const std::size_t funp_idx = 4;
 #endif
 
+#if defined(__GNUG__)
+#if defined(HPX_GCC_SPLITSTACK_ENABLED)
+            splitstack_ptr splitstack_segment;            
+#endif
+#endif
             std::ptrdiff_t m_stack_size;
             void* m_stack;
         };
