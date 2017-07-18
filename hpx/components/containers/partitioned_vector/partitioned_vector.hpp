@@ -111,6 +111,14 @@ HPX_DISTRIBUTED_METADATA_DECLARATION(
 
 namespace hpx
 {
+    // forward struct declaration
+    //
+    namespace serialization {
+        namespace detail {
+            struct partitioned_vector_segmented_serializer;
+        }
+    }
+
     /// hpx::partitioned_vector is a sequence container that encapsulates
     /// dynamic size arrays.
     ///
