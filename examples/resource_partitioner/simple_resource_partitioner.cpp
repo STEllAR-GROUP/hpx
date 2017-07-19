@@ -251,7 +251,7 @@ int main(int argc, char* argv[])
     {
         std::cout << "User defined scheduler creation callback " << std::endl;
         high_priority_sched* scheduler = new high_priority_sched(
-            num_threads, "shared-priority-scheduler");
+            num_threads, 1, "shared-priority-scheduler");
 
         scheduler_mode mode = scheduler_mode(
             scheduler_mode::do_background_work | scheduler_mode::delay_exit);
@@ -274,10 +274,9 @@ int main(int argc, char* argv[])
         {
             std::cout << "User defined scheduler creation callback " << std::endl;
             high_priority_sched* scheduler = new high_priority_sched(
-                num_threads, "shared-priority-scheduler");
+                num_threads, 1, "shared-priority-scheduler");
 
-            scheduler_mode mode = scheduler_mode(
-                scheduler_mode::do_background_work | scheduler_mode::delay_exit);
+            scheduler_mode mode = scheduler_mode(scheduler_mode::delay_exit);
 
             return new hpx::threads::detail::thread_pool_impl<high_priority_sched>(
                 scheduler, notifier, pool_index, pool_name, mode, thread_offset);
