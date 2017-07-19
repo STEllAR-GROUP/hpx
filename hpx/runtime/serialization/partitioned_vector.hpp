@@ -12,6 +12,7 @@
 
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/include/partitioned_vector.hpp>
+#include <hpx/parallel/algorithms/is_partitioned.hpp>
 
 namespace hpx { namespace serialization
 {
@@ -24,7 +25,7 @@ namespace hpx { namespace serialization
                 hpx::partitioned_vector<T> & v, std::false_type)
             {
                 static_assert(
-                    hpx::parallel::is_partitioned(hpx::parallel::execution::par,
+                    hpx::parallel::is_partitioned(hpx::parallel::par,
                         std::begin(v), std::end(v), [](std::size_t n) { return n > 0; });
                     "hpx::serialization::serialize requires segmented partitioned_vector");
             }
@@ -44,7 +45,7 @@ namespace hpx { namespace serialization
                 const hpx::partitioned_vector<T> & v, std::false_type) 
             {
                 static_assert(
-                    hpx::parallel::is_partitioned(hpx::parallel::execution::par,
+                    hpx::parallel::is_partitioned(hpx::parallel::par,
                         std::begin(v), std::end(v), [](std::size_t n) { return n > 0; });
                     "hpx::serialization::serialize requires segmented partitioned_vector");
 
