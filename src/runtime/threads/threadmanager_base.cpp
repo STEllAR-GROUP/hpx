@@ -67,15 +67,6 @@ namespace detail {
 namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
-    // Return the number of the NUMA node the current thread is running on
-    std::size_t get_numa_node_number()
-    {
-        std::size_t thread_num = hpx::get_worker_thread_num();
-        return get_topology().get_numa_node_number(
-            get_thread_manager().get_pu_num(thread_num));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     std::int64_t get_thread_count(thread_state_enum state)
     {
         return get_thread_manager().get_thread_count(state);

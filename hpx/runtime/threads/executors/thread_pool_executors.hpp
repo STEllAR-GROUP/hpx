@@ -79,7 +79,7 @@ namespace hpx { namespace threads { namespace executors
             mask_cref_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
             {
-                return hpx::get_resource_partitioner().get_affinity_data()->get_pu_mask(num_thread, scheduler_.numa_sensitive());
+                return hpx::get_resource_partitioner().get_pu_mask(num_thread, scheduler_.numa_sensitive());
             }
 
             /// Set the new scheduler mode

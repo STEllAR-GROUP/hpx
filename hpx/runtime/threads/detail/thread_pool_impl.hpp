@@ -118,23 +118,10 @@ namespace detail
         {
             resize(used_processing_units_, threads::hardware_concurrency());
             for (std::size_t i = 0; i != pool_threads; ++i)
-                used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(threads_offset+i, sched_->numa_sensitive());
+                used_processing_units_ |= get_resource_partitioner().get_pu_mask(threads_offset+i, sched_->numa_sensitive());
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        std::size_t get_pu_num(std::size_t num_thread) const
-        {
-            return get_resource_partitioner()
-                .get_affinity_data()
-                ->get_pu_num(num_thread);
-        }
-
-        // input: num_thread in global indexing
-        mask_cref_type get_pu_mask(std::size_t num_thread) const
-        {
-            return get_resource_partitioner().get_affinity_data()->get_pu_mask(num_thread, sched_->numa_sensitive());
-        }
-
         void do_some_work(std::size_t num_thread)
         {
             sched_->Scheduler::do_some_work(num_thread);

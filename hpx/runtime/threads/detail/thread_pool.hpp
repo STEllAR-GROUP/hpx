@@ -118,8 +118,6 @@ namespace hpx { namespace threads { namespace detail
 
         virtual policies::scheduler_base *get_scheduler() const = 0;
 
-        virtual std::size_t get_pu_num(std::size_t num_thread) const = 0;
-        virtual mask_cref_type get_pu_mask(std::size_t num_thread) const = 0;
         mask_cref_type get_used_processing_units() const;
 
         // performance counters

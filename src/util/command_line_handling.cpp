@@ -1083,6 +1083,7 @@ namespace hpx { namespace util
     {
         threads::topology& top = threads::create_topology();
         runtime & rt = get_runtime();
+        auto &rp = hpx::get_resource_partitioner();
         {
             std::ostringstream strm;    // make sure all output is kept together
 
@@ -1091,8 +1092,7 @@ namespace hpx { namespace util
             for (std::size_t i = 0; i != num_threads; ++i)
             {
                 // print the mask for the current PU
-                threads::mask_cref_type pu_mask =
-                    rt.get_thread_manager().get_pu_mask(top, i);
+                threads::mask_cref_type pu_mask = rp.get_pu_mask(i, false);
                 std::string pool_name = rt.get_thread_manager().get_pool(i)->get_pool_name();
 
                 if (!threads::any(pu_mask))

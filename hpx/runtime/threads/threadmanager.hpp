@@ -195,13 +195,8 @@ namespace threads
 
         /// Returns of the number of the processing unit the given thread
         /// is allowed to run on
-        virtual std::size_t get_pu_num(std::size_t) const = 0;
 
         virtual compat::thread & get_os_thread_handle(std::size_t) = 0;
-
-        /// Return the mask for processing units the given thread is allowed
-        /// to run on.
-        virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
 /*        virtual std::int64_t get_executed_threads(

@@ -297,21 +297,6 @@ namespace hpx { namespace threads
         template <typename Scheduler>
         void register_counter_types();
 
-        /// Returns of the number of the processing units the given thread
-        /// is allowed to run on
-        std::size_t get_pu_num(std::size_t num_thread) const
-        {
-            return hpx::get_resource_partitioner().get_affinity_data()->get_pu_num(num_thread);
-        }
-
-        /// Return the mask for processing units the given thread is allowed
-        /// to run on.
-        mask_cref_type get_pu_mask(topology const& topology,
-            std::size_t num_thread) const
-        {//! FIXME pool::get_pu_mask could be called via RP rather than via TP -> sched
-            pool_type corresponding_pool = get_pool(threads_lookup_[num_thread]);
-            return corresponding_pool->get_pu_mask(num_thread);
-        }
 
         /// Returns the mask identifying all processing units used by this
         /// thread manager.
