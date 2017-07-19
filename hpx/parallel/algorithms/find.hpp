@@ -801,7 +801,7 @@ namespace hpx { namespace parallel { inline namespace v1
             parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter1> result;
                 typedef typename std::iterator_traits<FwdIter1>::reference reference;
                 typedef typename std::iterator_traits<FwdIter1>::difference_type
                     difference_type;
