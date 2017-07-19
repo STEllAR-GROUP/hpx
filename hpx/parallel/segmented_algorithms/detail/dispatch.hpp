@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
 
         static HPX_FORCEINLINE Iterator
-        call(typename traits::local_raw_iterator&& it)
+        call(typename traits::local_raw_iterator && it)
         {
             return traits::remote(std::move(it));
         }
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         typename traits3::local_iterator
                     >
                 {
-                    auto && p = f.get();
+                    auto p = f.get();
                     return hpx::util::make_tuple(
                         traits1::remote(std::move(hpx::util::get<0>(p))),
                         traits2::remote(std::move(hpx::util::get<1>(p))),

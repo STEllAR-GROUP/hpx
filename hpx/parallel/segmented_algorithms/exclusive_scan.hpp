@@ -166,7 +166,6 @@ namespace hpx { namespace parallel { inline namespace v1
             std::true_type, Conv && conv)
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
-
             return segmented_scan_par<
                 exclusive_scan<typename traits_out::local_raw_iterator>>(
                 std::forward<ExPolicy>(policy),
@@ -183,7 +182,6 @@ namespace hpx { namespace parallel { inline namespace v1
             std::false_type, Conv && conv)
         {
             typedef std::vector<T> vector_type;
-
             return segmented_scan_par_non<
                 segmented_exclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),

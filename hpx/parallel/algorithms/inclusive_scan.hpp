@@ -42,25 +42,27 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential inclusive_scan.
-        template <typename InIter, typename OutIter, typename T, typename Op>
+        template <typename InIter, typename OutIter, typename T, typename Op,
+            typename Conv = util::projection_identity>
         OutIter sequential_inclusive_scan(InIter first, InIter last,
-            OutIter dest, T init, Op && op)
+            OutIter dest, T init, Op && op, Conv && conv = Conv())
         {
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init = op(init, *first);
+                init = hpx::util::invoke(op, init, hpx::util::invoke(conv, *first));
                 *dest = init;
             }
             return dest;
         }
 
-        template <typename InIter, typename OutIter, typename T, typename Op>
+        template <typename InIter, typename OutIter, typename T, typename Op,
+            typename Conv =util::projection_identity>
         T sequential_inclusive_scan_n(InIter first, std::size_t count,
-            OutIter dest, T init, Op && op)
+            OutIter dest, T init, Op && op, Conv && conv = Conv())
         {
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
-                init = op(init, *first);
+                init = hpx::util::invoke(op, init, hpx::util::invoke(conv, *first));
                 *dest = init;
             }
             return init;
@@ -76,21 +78,22 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 
             template <typename ExPolicy, typename InIter, typename OutIter,
-                typename T, typename Op>
+                typename T, typename Op, typename Conv = util::projection_identity>
             static OutIter
             sequential(ExPolicy, InIter first, InIter last, OutIter dest,
-                T const& init, Op && op)
+                T const& init, Op && op, Conv && conv = Conv())
             {
                 return sequential_inclusive_scan(first, last, dest,
-                    init, std::forward<Op>(op));
+                    init, std::forward<Op>(op), std::forward<Conv>(conv));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename T, typename Op>
+            template <typename ExPolicy, typename FwdIter1, typename T, typename Op,
+                typename Conv = util::projection_identity>
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter2
             >::type
             parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-                 FwdIter2 dest, T const& init, Op && op)
+                 FwdIter2 dest, T const& init, Op && op, Conv && conv = Conv())
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter2>
                     result;
@@ -116,7 +119,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 using hpx::util::make_zip_iterator;
 
                 auto f3 =
-                    [op, policy](
+                    [op, conv, policy](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<T> curr, hpx::shared_future<T> next
                     )
@@ -141,16 +144,16 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op](zip_iterator part_begin, std::size_t part_size) -> T
+                    [op, conv](zip_iterator part_begin, std::size_t part_size) -> T
                     {
-                        T part_init = get<0>(*part_begin);
+                        T part_init = hpx::util::invoke(conv, get<0>(*part_begin));
                         get<1>(*part_begin++) = part_init;
                         auto iters = part_begin.get_iterator_tuple();
                         return sequential_inclusive_scan_n(
                             get<0>(iters),
                             part_size-1,
                             get<1>(iters),
-                            part_init, op);
+                            part_init, op, conv);
                     },
                     // step 2 propagates the partition results from left
                     // to right

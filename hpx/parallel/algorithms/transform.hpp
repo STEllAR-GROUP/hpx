@@ -323,7 +323,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
         return detail::transform_(
             std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<F>(f), proj, is_segmented());
+            std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -667,7 +667,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return detail::transform_(
             std::forward<ExPolicy>(policy), first1, last1, first2, dest,
-            std::forward<F>(f), proj1, proj2, is_segmented());
+            std::forward<F>(f), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -923,7 +924,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return detail::transform_(
             std::forward<ExPolicy>(policy), first1, last1, first2, last2, dest,
-            std::forward<F>(f), proj1, proj2, is_segmented());
+            std::forward<F>(f), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2), is_segmented());
 
     }
 }}}

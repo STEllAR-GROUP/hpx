@@ -231,5 +231,5 @@ int main()
     for_each_tests<double>(localities);
     for_each_n_tests<int>(localities);
     for_each_n_tests<double>(localities);
-    return 0;
+    return hpx::util::report_errors();
 }
