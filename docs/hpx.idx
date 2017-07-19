@@ -478,6 +478,9 @@ broadcast_apply_with_index            "" "header\.hpx\.lcos\.broadcast.*"
 gather_here                           "" "header\.hpx\.lcos\.gather.*"
 gather_there                          "" "header\.hpx\.lcos\.gather.*"
 
+HPX_REGISTER_GATHER_DECLARATION       "" "header\.hpx\.lcos\.gather.*"
+HPX_REGISTER_GATHER                   "" "header\.hpx\.lcos\.gather.*"
+
 # hpx/lcos/reduce.hpp
 reduce                                "" "header\.hpx\.lcos\.reduce.*"
 reduce_with_index                     "" "header\.hpx\.lcos\.reduce.*"
@@ -568,3 +571,4 @@ HPX_PLAIN_ACTION_ID                       "" "HPX_PLAIN_ACTION_ID"
 
 # hpx/runtime/components/component_factory.hpp
 HPX_REGISTER_COMPONENT                    "" "HPX_REGISTER_COMPONENT"
+

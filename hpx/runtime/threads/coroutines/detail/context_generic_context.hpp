@@ -26,13 +26,8 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/version.hpp>
-
-#if BOOST_VERSION < 105100
-#error Boost.Context is available only with Boost V1.51 or later
-#endif
-
 #include <boost/atomic.hpp>
+#include <boost/version.hpp>
 
 #if BOOST_VERSION < 106100
 #include <boost/context/all.hpp>
@@ -48,7 +43,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS) && BOOST_VERSION >= 105300
+#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
 
 #define HPX_COROUTINES_SEGMENTS 10
 

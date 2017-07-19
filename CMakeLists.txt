@@ -1533,7 +1533,7 @@ endif()
 if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
   if(NOT Boost_CONTEXT_FOUND)
-    hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
+    hpx_error("The usage of Boost.Context was selected but Boost.Context was not found.")
   endif()
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     if(Boost_VERSION LESS 105600)
@@ -1838,24 +1838,6 @@ if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(
     DIRECTORY external/asio/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-endif()
-
-if(Boost_VERSION LESS 105300)
-  # Install Boost.Atomic library for older Boost versions only
-  install(
-    DIRECTORY external/atomic/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-
-  # Install Boost.Lockfree library for older Boost versions only
-  install(
-    DIRECTORY external/lockfree/boost
     DESTINATION include/hpx/external
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
