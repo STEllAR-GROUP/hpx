@@ -195,8 +195,10 @@ namespace hpx { namespace actions
             static threads::thread_priority
             call(threads::thread_priority priority)
             {
-                if (priority == threads::thread_priority_default)
-                    return threads::thread_priority_normal;
+//              The mapping to 'normal' is now done at the last possible moment
+//              in the scheduler.
+//                 if (priority == threads::thread_priority_default)
+//                     return threads::thread_priority_normal;
                 return priority;
             }
         };

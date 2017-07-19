@@ -7,12 +7,11 @@
 
 #include <hpx/include/traits.hpp>
 #include <hpx/include/lcos.hpp>
-
-#include <boost/range/iterator_range.hpp>
+#include <hpx/util/iterator_range.hpp>
 
 #include <vector>
 
-typedef boost::iterator_range<
+typedef hpx::util::iterator_range<
         std::vector<hpx::shared_future<void> >::iterator
     > future_range;
 

@@ -42,7 +42,9 @@ void for_each_test()
 {
     test_for_each<std::random_access_iterator_tag, Proj>();
     test_for_each<std::forward_iterator_tag, Proj>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_for_each<std::input_iterator_tag, Proj>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,7 +81,9 @@ void for_each_exception_test()
 {
     test_for_each_exception<std::random_access_iterator_tag, Proj>();
     test_for_each_exception<std::forward_iterator_tag, Proj>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_for_each_exception<std::input_iterator_tag, Proj>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,7 +120,9 @@ void for_each_bad_alloc_test()
 {
     test_for_each_bad_alloc<std::random_access_iterator_tag, Proj>();
     test_for_each_bad_alloc<std::forward_iterator_tag, Proj>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_for_each_bad_alloc<std::input_iterator_tag, Proj>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

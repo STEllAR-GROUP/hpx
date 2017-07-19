@@ -25,6 +25,9 @@ set(tests
     new_binpacking
     new_colocated
     unordered_map
+    partitioned_vector_view
+    partitioned_vector_view_iterator
+    partitioned_vector_subview
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
@@ -100,6 +103,14 @@ set(new__PARAMETERS LOCALITIES 2)
 set(new_binpacking_PARAMETERS LOCALITIES 2)
 set(new_colocated_PARAMETERS LOCALITIES 2)
 
+set(partitioned_vector_view_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(partitioned_vector_view_iterator_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_iterator_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(partitioned_vector_subview_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_subview_PARAMETERS THREADS_PER_LOCALITY 4)
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -137,4 +148,3 @@ foreach(test ${tests})
 endforeach()
 
 add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
-

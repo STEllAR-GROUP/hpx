@@ -8,9 +8,9 @@ set(subdirs
    )
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.performance.parallel_algorithms.${subdir})
+  add_hpx_pseudo_target(tests.performance.parallel_algorithms.${subdir}_)
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms
-                              tests.performance.parallel_algorithms.${subdir})
+                              tests.performance.parallel_algorithms.${subdir}_)
 endforeach()
 

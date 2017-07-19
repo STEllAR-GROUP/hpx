@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { inline namespace v2
     {
         /// \cond NOINTERNAL
         ///////////////////////////////////////////////////////////////////////
-        void handle_task_block_exceptions(parallel::exception_list& errors)
+        inline void handle_task_block_exceptions(parallel::exception_list& errors)
         {
             try {
                 std::rethrow_exception(std::current_exception());

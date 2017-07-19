@@ -393,7 +393,8 @@ namespace verbs
             parcelport_scheduler.register_thread_nullary(
                     util::bind(&parcelport::background_work_scheduler_thread, this),
                     "background_work_scheduler_thread",
-                    threads::pending, true, threads::thread_priority_critical,
+                    threads::pending, true,
+                    threads::thread_priority_high_recursive,
                     std::size_t(-1), threads::thread_stacksize_default, ec);
 
             FUNC_END_DEBUG_MSG;

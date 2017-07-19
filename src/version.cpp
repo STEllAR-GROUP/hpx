@@ -271,7 +271,7 @@ namespace hpx
 
     std::string boost_version()
     {
-        // BOOST_VERSION: 105400
+        // BOOST_VERSION: 105700
         return boost::str(boost::format("V%d.%d.%d") %
             (BOOST_VERSION / 100000) % (BOOST_VERSION / 100 % 1000) %
             (BOOST_VERSION % 100));

@@ -6,6 +6,8 @@
 set(benchmarks
     benchmark_is_heap
     benchmark_is_heap_until
+    benchmark_partition_copy
+    benchmark_unique_copy
    )
 
 foreach(benchmark ${benchmarks})
@@ -21,13 +23,13 @@ foreach(benchmark ${benchmarks})
                      FOLDER "Benchmarks/ParallelAlgorithms/Local")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.parallel_algorithms.local.${benchmark})
+  add_hpx_pseudo_target(tests.performance.parallel_algorithms.local_.${benchmark})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms.local
-                        tests.performance.parallel_algorithms.local.${benchmark})
+  add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms.local_
+                        tests.performance.parallel_algorithms.local_.${benchmark})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms.local.${benchmark}
+  add_hpx_pseudo_dependencies(tests.performance.parallel_algorithms.local_.${benchmark}
                               ${benchmark}_exe)
 endforeach()

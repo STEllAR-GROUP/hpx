@@ -259,9 +259,7 @@ set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
-  "HPX_ENABLE_ASSERT_HANDLER"
-  "HPX_COROUTINE_EXPORTS") # Do we still need this?
-
+  "HPX_ENABLE_ASSERT_HANDLER")
 
 ################################################################################
 # Emulation of SwapContext on Windows

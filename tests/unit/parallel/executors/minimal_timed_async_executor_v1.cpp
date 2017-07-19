@@ -8,8 +8,6 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -163,7 +161,7 @@ struct test_timed_async_executor3 : test_timed_async_executor1
     typedef hpx::parallel::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    void apply_execute(hpx::util::steady_time_point const& abs_time, F && f,
+    void post(hpx::util::steady_time_point const& abs_time, F && f,
         Ts &&... ts)
     {
         hpx::this_thread::sleep_until(abs_time);

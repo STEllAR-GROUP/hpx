@@ -20,46 +20,6 @@ set(tests
     partitioned_vector_find
    )
 
-set(partitioned_vector_copy_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_for_each_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_for_each_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_transform_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_transform_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_handle_values_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_iter_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_move_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_transform_reduce_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_reduce_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_inclusive_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_transform_scan_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_transform_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_inclusive_scan_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_inclusive_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_exclusive_scan_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_exclusive_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-set(partitioned_vector_find_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_find_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
-
 # add dependencies to partitioned_vector_target when Cuda is enabled
 if(HPX_WITH_CUDA)
   include_directories(${CUDA_INCLUDE_DIRS})
@@ -72,7 +32,8 @@ foreach(test ${tests})
   set(sources
       ${test}.cpp)
 
-  set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(${test}_FLAGS DEPENDENCIES partitioned_vector_component)
+  set(${test}_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
 
   source_group("Source Files" FILES ${sources})
 

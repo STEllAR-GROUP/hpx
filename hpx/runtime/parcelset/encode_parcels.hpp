@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/exception_info.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -243,7 +244,7 @@ namespace hpx
                     // We have to repackage all exceptions thrown by the
                     // serialization library as otherwise we will loose the
                     // e.what() description of the problem, due to slicing.
-                    throw boost::enable_error_info(
+                    hpx::throw_with_info(
                         hpx::exception(serialization_error, e.what()));
                     return 0;
                 }

@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -36,7 +38,7 @@ namespace hpx { namespace parallel { inline namespace v1
     {
         /// \cond NOINTERNAL
         struct lexicographical_compare
-            : public detail::algorithm<lexicographical_compare, bool>
+          : public detail::algorithm<lexicographical_compare, bool>
         {
             lexicographical_compare()
               : lexicographical_compare::algorithm("lexicographical_compare")
@@ -86,15 +88,16 @@ namespace hpx { namespace parallel { inline namespace v1
                         std::forward<ExPolicy>(policy),
                         make_zip_iterator(first1, first2), count, 1,
                         [pred, tok](zip_iterator it, std::size_t part_count,
-                            std::size_t base_idx) mutable
+                            std::size_t base_idx) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_count, tok,
-                                [&pred, &tok](reference t, std::size_t i)
+                                [&pred, &tok](reference t, std::size_t i) -> void
                                 {
                                     using hpx::util::get;
-                                    if (pred(get<0>(t), get<1>(t)) ||
-                                        pred(get<1>(t), get<0>(t)))
+                                    using hpx::util::invoke;
+                                    if (invoke(pred, get<0>(t), get<1>(t)) ||
+                                        invoke(pred, get<1>(t), get<0>(t)))
                                     {
                                         tok.cancel(i);
                                     }
@@ -108,7 +111,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             std::advance(first2, mismatched);
 
                             if (first1 != last1 && first2 != last2)
-                                return pred(*first1, *first2);
+                                return hpx::util::invoke(pred, *first1, *first2);
 
                             return first2 != last2;
                         });
@@ -129,14 +132,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the source iterators used for the
+    /// \tparam FwdIter1    The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam InIter2     The type of the source iterators used for the
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a lexicographical_compare requires \a Pred to
@@ -192,27 +195,38 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           it returns false.
     /// range [first2, last2), it returns false.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::less>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, Pred && pred = Pred())
+    lexicographical_compare(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, Pred && pred = Pred())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
+               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter2>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), is_seq(),

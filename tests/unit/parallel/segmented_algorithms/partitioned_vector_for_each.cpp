@@ -1,3 +1,4 @@
+// Copyright (c) 2014-2015 Hartmut Kaiser
 //  Copyright (c) 2017 Ajai V George
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -230,5 +231,5 @@ int main()
     for_each_tests<double>(localities);
     for_each_n_tests<int>(localities);
     for_each_n_tests<double>(localities);
-    return 0;
+    return hpx::util::report_errors();
 }

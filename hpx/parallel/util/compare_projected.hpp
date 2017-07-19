@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,8 +27,8 @@ namespace hpx { namespace parallel { namespace util
         inline bool operator()(T1 && t1, T2 && t2) const
         {
             return hpx::util::invoke(comp_,
-                hpx::util::invoke(proj_, t1),
-                hpx::util::invoke(proj_, t2));
+                hpx::util::invoke(proj_, std::forward<T1>(t1)),
+                hpx::util::invoke(proj_, std::forward<T2>(t2)));
         }
 
         Compare comp_;

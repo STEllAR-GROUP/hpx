@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_mismatch.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <utility>
@@ -37,19 +36,19 @@ void test_mismatch_binary1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
-    iterator begin1 = iterator(boost::begin(c1));
-    iterator end1 = iterator(boost::end(c1));
+    iterator begin1 = iterator(std::begin(c1));
+    iterator end1 = iterator(std::end(c1));
 
     {
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2), boost::end(c2));
+            begin1, end1, std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
             c2.size());
     }
 
@@ -58,11 +57,11 @@ void test_mismatch_binary1(ExPolicy policy, IteratorTag)
         ++c1[changed_idx];
 
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2), boost::end(c2));
+            begin1, end1, std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
             changed_idx);
     }
 }
@@ -80,23 +79,23 @@ void test_mismatch_binary1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
-    iterator begin1 = iterator(boost::begin(c1));
-    iterator end1 = iterator(boost::end(c1));
+    iterator begin1 = iterator(std::begin(c1));
+    iterator end1 = iterator(std::end(c1));
 
     {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(p,
-                begin1, end1, boost::begin(c2), boost::end(c2));
+                begin1, end1, std::begin(c2), std::end(c2));
         f.wait();
 
         // verify values
         return_type result = f.get();
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)),
             c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2),
             result.second)), c2.size());
     }
 
@@ -106,14 +105,14 @@ void test_mismatch_binary1_async(ExPolicy p, IteratorTag)
 
         hpx::future<return_type> f =
             hpx::parallel::mismatch(p,
-                begin1, end1, boost::begin(c2), boost::end(c2));
+                begin1, end1, std::begin(c2), std::end(c2));
         f.wait();
 
         // verify values
         return_type result = f.get();
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)),
             changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2),
             result.second)), changed_idx);
     }
 }
@@ -146,7 +145,9 @@ void mismatch_binary_test1()
 {
     test_mismatch_binary1<std::random_access_iterator_tag>();
     test_mismatch_binary1<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_mismatch_binary1<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,21 +168,21 @@ void test_mismatch_binary2(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
-    iterator begin1 = iterator(boost::begin(c1));
-    iterator end1 = iterator(boost::end(c1));
+    iterator begin1 = iterator(std::begin(c1));
+    iterator end1 = iterator(std::end(c1));
 
     {
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2), boost::end(c2),
+            begin1, end1, std::begin(c2), std::end(c2),
             std::equal_to<std::size_t>());
 
         // verify values
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)),
             c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2),
             result.second)), c2.size());
     }
 
@@ -190,12 +191,12 @@ void test_mismatch_binary2(ExPolicy policy, IteratorTag)
         ++c1[changed_idx];
 
         return_type result = hpx::parallel::mismatch(policy,
-            begin1, end1, boost::begin(c2), boost::end(c2),
+            begin1, end1, std::begin(c2), std::end(c2),
             std::equal_to<std::size_t>());
 
         // verify values
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2), result.second)),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
             changed_idx);
     }
 }
@@ -213,23 +214,23 @@ void test_mismatch_binary2_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
-    iterator begin1 = iterator(boost::begin(c1));
-    iterator end1 = iterator(boost::end(c1));
+    iterator begin1 = iterator(std::begin(c1));
+    iterator end1 = iterator(std::end(c1));
 
     {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(p,
-                begin1, end1, boost::begin(c2), boost::end(c2),
+                begin1, end1, std::begin(c2), std::end(c2),
                 std::equal_to<std::size_t>());
         f.wait();
 
         // verify values
         return_type result = f.get();
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2),
             result.second)), c2.size());
     }
 
@@ -239,14 +240,14 @@ void test_mismatch_binary2_async(ExPolicy p, IteratorTag)
 
         hpx::future<return_type> f =
             hpx::parallel::mismatch(p,
-                begin1, end1, boost::begin(c2), boost::end(c2),
+                begin1, end1, std::begin(c2), std::end(c2),
                 std::equal_to<std::size_t>());
         f.wait();
 
         // verify values
         return_type result = f.get();
         HPX_TEST_EQ(std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(boost::begin(c2),
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2),
             result.second)), changed_idx);
     }
 }
@@ -279,7 +280,9 @@ void mismatch_binary_test2()
 {
     test_mismatch_binary2<std::random_access_iterator_tag>();
     test_mismatch_binary2<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_mismatch_binary2<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -300,14 +303,14 @@ void test_mismatch_binary_exception(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
     bool caught_exception = false;
     try {
         hpx::parallel::mismatch(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2),
+            iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
@@ -338,16 +341,16 @@ void test_mismatch_binary_exception_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2), boost::end(c2),
+                iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2),
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::runtime_error("test"), true;
                 });
@@ -403,7 +406,9 @@ void mismatch_binary_exception_test()
 {
     test_mismatch_binary_exception<std::random_access_iterator_tag>();
     test_mismatch_binary_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_mismatch_binary_exception<std::input_iterator_tag>();
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -424,14 +429,14 @@ void test_mismatch_binary_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::mismatch(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2),
+            iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
             });
@@ -461,16 +466,16 @@ void test_mismatch_binary_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
-    std::iota(boost::begin(c2), boost::end(c2), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<return_type> f =
             hpx::parallel::mismatch(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2), boost::end(c2),
+                iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2),
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::bad_alloc(), true;
                 });
@@ -525,7 +530,9 @@ void mismatch_binary_bad_alloc_test()
 {
     test_mismatch_binary_bad_alloc<std::random_access_iterator_tag>();
     test_mismatch_binary_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_mismatch_binary_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

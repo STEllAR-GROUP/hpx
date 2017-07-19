@@ -10,11 +10,10 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test(int passed_through)
@@ -58,7 +57,7 @@ void test_bulk_sync()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -76,7 +75,7 @@ void test_bulk_async()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;

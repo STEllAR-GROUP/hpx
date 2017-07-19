@@ -119,7 +119,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     if (zerocopy)
         chunks = new std::vector<hpx::serialization::serialization_chunk>();
 
-    std::uint32_t dest_locality_id = outp.destination_locality_id();
+    //std::uint32_t dest_locality_id = outp.destination_locality_id();
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)

@@ -10,6 +10,7 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/exception_info.hpp>
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
@@ -675,7 +676,7 @@ namespace hpx { namespace threads { namespace detail
                 }
                 catch (std::exception const& e) {
                     // Repackage exceptions to avoid slicing.
-                    throw boost::enable_error_info(
+                    hpx::throw_with_info(
                         hpx::exception(unhandled_exception, e.what()));
                 }
             }
