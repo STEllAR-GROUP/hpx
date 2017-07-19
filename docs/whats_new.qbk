@@ -53,13 +53,87 @@ particular order):
   minimal gcc version we now test on is gcc V4.9.
 * We have dropped support for the Visual Studio 2013 compiler version. The
   minimal Visual Studio version we now test on is Visual Studio 2015.5.
+* We have dropped support for the Boost V1.51-V1.54. The minimal version of
+  Boost we now test is Boost V1.55.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 2768] - Is there iterator tag for HPX?
+* [pr    2765] - gcc split stack support for HPX threads #620
+* [pr    2764] - Fix some uses of begin/end, remove unnecessary includes
+* [pr    2763] - Bump minimal Boost version to 1.55.0
+* [pr    2758] - Remove various warnings detected by clang 5.0
+* [issue 2757] - In case of a "raw thread" is needed per core for implementing
+                 parallel algorithm, what is good practice in HPX?
+* [pr    2755] - Removing make_index_pack_unrolled
+* [pr    2754] - Implement parallel::unique_copy
+* [pr    2753] - Fixing detection of [[fallthrough]] attribute
+* [pr    2752] - New thread priority names
+* [pr    2751] - Replace boost::exception with proposed exception_info
+* [pr    2750] - Replace boost::iterator_range
+* [pr    2749] - Fixing hdf5 examples
+* [issue 2748] - HPX fails to build with enabled hdf5 examples
+* [issue 2747] - Inherited task priorities break certain DAG optimizations
+* [pr    2745] - Adding extended arithmetic performance counters
+* [pr    2744] - Adding ability to statistics counters to reset base counter
+* [issue 2743] - Statistics counter does not support reseting
+* [pr    2742] - Making sure Vc V2 builds without additional HPX configuration
+                 flags
+* [pr    2740] - Coroutine stackoverflow detection for linux/posix; Issue #2408
+* [pr    2739] - Add files via upload
+* [pr    2738] - Appveyor support
+* [pr    2737] - Fixing 2735
+* [issue 2735] - partitioned_vector_subview test failing
+* [pr    2734] - Add C++11 range utilities
+* [pr    2733] - Adapting iterator requirements for parallel algorithms
+* [pr    2731] - Adding on_migrated event handler to migratable component
+                 instances
+* [issue 2729] - Add on_migrated() event handler to migratable components
+* [issue 2728] - Why Projection is needed in parallel algorithms?
+* [pr    2727] - Cmake files for StackOverflow Detection
+* [pr    2726] - CMake for Stack Overflow Detection
+* [pr    2724] - Fix examples in Action documentation
+* [pr    2723] - Enable lcos::channel<T>::register_as
+* [issue 2722] - channel register_as() failing on compilation
+* [pr    2719] - Add documentation for partitioned_vector and add features in
+                 pack.hpp
+* [pr    2717] - Config support for fallthrough attribute
+* [pr    2716] - Implement parallel::partition_copy
+* [pr    2715] - initial import of icu string serializer
+* [pr    2714] - initial import of valarray serializer
+* [pr    2713] - Remove slashes before CMAKE_FILES_DIRECTORY variables
+* [pr    2712] - Fixing wait for 1751
+* [pr    2711] - Adjust code for minimal supported GCC having being bumped to 4.9
+* [pr    2710] - Adding code of conduct
+* [pr    2709] - Fixing UB in destroy tests
+* [pr    2708] - Add inline to prevent multiple definition issue
+* [issue 2707] - Multiple defined symbols for task_block.hpp in VS2015
+* [pr    2706] - Adding .clang-format file
+* [pr    2704] - Add a synchronous mapping API
+* [issue 2703] - Request: Add the .clang-format file to the repository
+* [issue 2702] - STEllAR-GROUP/Vc slower than VCv1 possibly due to wrong
+                 instructions generated
+* [issue 2701] - Dataper with STEllAR-GROUP/Vc requires obscure flag
+* [issue 2699] - Iterator requirements are different from standard in parallel
+                 copy_if.
+* [pr    2698] - Properly releasing parcelport write handlers
+* [issue 2697] - Compile error in addressing_service.cpp
+* [issue 2696] - Building and using HPX statically: undefined references from
+                 runtime_support_server.cpp
+* [issue 2695] - Executor changes cause compilation failures
+* [pr    2694] - Refining C++ language mode detection for MSVC
+* [pr    2693] - P0443 r2
+* [pr    2692] - Partially reverting changes to parcel_await
+* [issue 2689] - HPX build fails when HPX_WITH_CUDA is enabled
+* [pr    2688] - Make Cuda Clang builds pass
 * [pr    2687] - Add an is_tuple_like trait for sequenceable type detection
+* [pr    2686] - Allowing throttling scheduler to be used without idle backoff
+* [pr    2685] - Add support of std::array to hpx::util::tuple_size and tuple_element
+* [pr    2684] - Adding new statistics performance counters
 * [pr    2683] - Replace boost::exception_ptr with std::exception_ptr
+* [issue 2682] - HPX does not compile with HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF=OFF
 * [pr    2681] - Attempt to fix problem in managed_component_base
 * [pr    2680] - Fix bad size during archive creation
 * [pr    2677] - Adding include check for std::addressof
@@ -70,6 +144,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2672] - C++17 invoke forms
 * [pr    2671] - Adding uninitialized_value_construct and
                  uninitialized_value_construct_n
+* [pr    2670] - Integrate spmd multidimensionnal views for partitioned_vectors
 * [pr    2669] - Adding uninitialized_default_construct and
                  uninitialized_default_construct_n
 * [pr    2668] - Fixing documentation index
@@ -103,6 +178,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2633] - Distributed define_spmd_block
 * [pr    2632] - Making sure container serialization uses size-compatible types
 * [pr    2631] - Add lcos::local::one_element_channel
+* [pr    2629] - Move unordered_map out of parcelport into hpx/concurrent
 * [pr    2628] - Making sure that shutdown does not hang
 * [pr    2627] - Fix serialization
 * [pr    2626] - Generate `cmake_variables.qbk` and `cmake_toolchains.qbk` outside
@@ -131,6 +207,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2605] - Parcelport libfabric3
 * [pr    2604] - Adding allocator support to promise and friends
 * [pr    2603] - Barrier hang
+* [pr    2602] - Changes to scheduler to steal from one high-priority queue
 * [pr    2600] - Compat fixes
 * [pr    2599] - Compatibility layer for threading support
 * [pr    2598] - V1.1
@@ -146,6 +223,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2495] - wait_or_add_new returning thread_id_type
 * [issue 2471] - no type named 'fcontext_t' in namespace
 * [issue 2266] - hpx_0.9.99 make tests fail
+* [pr    2454] - Fix a couple of warnings and compiler errors
 * [pr    2453] - Timed executor support
 * [pr    2447] - Implementing new executor API (P0443)
 * [pr    2195] - Support for code completion in VIM
