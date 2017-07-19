@@ -10,6 +10,7 @@
 
 #include <utility>
 
+#if defined(DOXYGEN)
 namespace hpx {
 namespace util {
     /// Maps the pack with the given mapper.
@@ -24,7 +25,7 @@ namespace util {
     /// and preserved through the hierarchy.
     ///
     ///    ```cpp
-    ///    // Maps all ints to floats
+    ///    // Maps all integers to floats
     ///    map_pack([](int value) {
     ///        return float(value);
     ///    },
@@ -43,6 +44,14 @@ namespace util {
     ///               multiple elements, the pack is wrapped into
     ///               a `hpx::tuple`.
     ///
+    template <typename Mapper, typename... T>
+    <unspecified> map_pack(Mapper&& mapper, T&&... pack);
+}
+}
+#else // DOXYGEN
+
+namespace hpx {
+namespace util {
     template <typename Mapper, typename... T>
     auto map_pack(Mapper&& mapper, T&&... pack)
         -> decltype(detail::apply_pack_transform(detail::strategy_remap_tag{},
@@ -70,4 +79,5 @@ namespace util {
 }    // end namespace util
 }    // end namespace hpx
 
-#endif    // HPX_UTIL_PACK_TRAVERSAL_HPP
+#endif  // DOXYGEN
+#endif  // HPX_UTIL_PACK_TRAVERSAL_HPP

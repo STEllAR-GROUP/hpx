@@ -392,7 +392,7 @@ namespace hpx
     /// OS-thread and the HPX-thread id, the locality id and the stack backtrace
     /// of the point where the original exception was thrown.
     ///
-    /// \param e    The parameter \p e will be inspected for all diagnostic
+    /// \param xi   The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
     ///             where the exception was thrown. This parameter can be one
     ///             of the following types: \a hpx::exception_info,
@@ -437,7 +437,7 @@ namespace hpx
     /// diagnostic information element representing the error message as stored
     /// in the given exception instance.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -490,7 +490,7 @@ namespace hpx
     /// diagnostic information element representing the locality id as stored
     /// in the given exception instance.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -569,7 +569,7 @@ namespace hpx
     /// diagnostic information element representing the host name as stored in
     /// the given exception instance.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -614,7 +614,7 @@ namespace hpx
     ///             If the exception instance does not hold
     ///             this information, the function will return 0.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -655,7 +655,7 @@ namespace hpx
     ///             thrown. If the exception instance does not hold
     ///             this information, the function will return an empty string.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -695,7 +695,7 @@ namespace hpx
     ///             thrown. If the exception instance does not hold
     ///             this information, the function will return an empty string.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -735,7 +735,7 @@ namespace hpx
     ///             thrown. If the exception instance does not hold
     ///             this information, the function will return an empty string.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -777,7 +777,7 @@ namespace hpx
     ///             not hold this information, the function will return an empty
     ///             string.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -818,7 +818,7 @@ namespace hpx
     ///             thrown. If the exception instance does not hold
     ///             this information, the function will return -1.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -860,7 +860,7 @@ namespace hpx
     ///             thrown. If the exception instance does not hold
     ///             this information, the function will return std::size(-1).
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -902,7 +902,7 @@ namespace hpx
     ///             does not hold this information, the function will return
     ///             std::size_t(0).
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -944,7 +944,7 @@ namespace hpx
     ///             thrown. If the exception instance does not hold
     ///             this information, the function will return an empty string.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -985,7 +985,7 @@ namespace hpx
     ///             thrown. If the exception instance does not hold
     ///             this information, the function will return an empty string.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,
@@ -1026,7 +1026,7 @@ namespace hpx
     ///             was thrown. If the exception instance does not hold
     ///             this information, the function will return an empty string.
     ///
-    /// \param e    The parameter \p e will be inspected for the requested
+    /// \param xi   The parameter \p e will be inspected for the requested
     ///             diagnostic information elements which have been stored at
     ///             the point where the exception was thrown. This parameter
     ///             can be one of the following types: \a hpx::exception_info,

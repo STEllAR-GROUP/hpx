@@ -508,6 +508,10 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \tparam Compare     The type of the optional function/function object to use
     ///                     to compare keys (deduced).
     ///                     Assumed to be std::equal_to otherwise.
+    /// \tparam Func        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a copy_if requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -515,7 +519,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     the algorithm will be applied to.
     /// \param key_last     Refers to the end of the sequence of key elements the
     ///                     algorithm will be applied to.
-    /// \param value_first  Refers to the beginning of the sequence of value elements
+    /// \param values_first Refers to the beginning of the sequence of value elements
     ///                     the algorithm will be applied to.
     /// \param keys_output  Refers to the start output location for the keys
     ///                     produced by the algorithm.
@@ -528,6 +532,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     second, and false otherwise. It is assumed that comp
     ///                     will not apply any non-constant function through the
     ///                     dereferenced iterator.
+    /// \param func         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&.
+    ///                     The types \a Type1 \a Ret must be
+    ///                     such that an object of type \a FwdIter can be
+    ///                     dereferenced and then implicitly converted to any
+    ///                     of those types.
     ///
     /// \a comp has to induce a strict weak ordering on the values.
     ///
