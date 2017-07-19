@@ -34,8 +34,8 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter>
-        struct find : public detail::algorithm<find<FwdIter>, FwdIter>
+        template <typename Iter>
+        struct find : public detail::algorithm<find<Iter>, Iter>
         {
             find()
                 : find::algorithm("find")
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return std::find(first, last, val);
             }
 
-            template <typename ExPolicy, typename InIter, typename T>
+            template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
