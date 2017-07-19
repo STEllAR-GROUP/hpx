@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
-            InIter output = first;
+            InIter output = last;
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -69,43 +69,52 @@ namespace hpx { namespace parallel { inline namespace v1
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::end(sit);
                 local_iterator_type out = traits::local(last);
-
+                bool found = false;
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f_or_val
                     );
                     if(out != end)
-                        output=traits::compose(sit,out);
+                        found = true;
                 }
-
-                // handle all of the full partitions
-                for (++sit; sit != send; ++sit)
+                if(!found)
                 {
+                    // handle all of the full partitions
+                    for (++sit; sit != send; ++sit)
+                    {
+                        beg = traits::begin(sit);
+                        end = traits::end(sit);
+                        out = traits::begin(send);
+                        if (beg != end)
+                        {
+                            out = dispatch(traits::get_id(sit),
+                                algo, policy, std::true_type(), beg, end, f_or_val
+                            );
+                            if(out != end)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(!found)
+                {
+                    // handle the beginning of the last partition
                     beg = traits::begin(sit);
-                    end = traits::end(sit);
-                    out = traits::begin(send);
+                    end = traits::local(last);
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, f_or_val
                         );
                         if(out != end)
-                            output=traits::compose(sit,out);
+                            found = true;
                     }
                 }
-
-                // handle the beginning of the last partition
-                beg = traits::begin(sit);
-                end = traits::local(last);
-                if (beg != end)
-                {
-                    out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, f_or_val
-                    );
-                    if(out != end)
-                        output=traits::compose(sit,out);
-                }
+                if(found)
+                    output=traits::compose(sit,out);
             }
             return result::get(std::move(output));
         }
