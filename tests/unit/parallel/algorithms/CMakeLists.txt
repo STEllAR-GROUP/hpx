@@ -18,7 +18,6 @@ set(tests
     copy
     copyif_random
     copyif_forward
-    copyif_input
     copyif_exception
     copyif_bad_alloc
     copyn
@@ -78,6 +77,7 @@ set(tests
     mismatch_binary
     move
     none_of
+    partition_copy
     reduce_
     reduce_by_key
     remove_copy
@@ -120,6 +120,7 @@ set(tests
     uninitialized_moven
     uninitialized_value_construct
     uninitialized_value_constructn
+    unique_copy
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
@@ -129,6 +130,12 @@ if(HPX_WITH_EXECUTOR_COMPATIBILITY)
       inclusive_scan_executors_v1
       is_sorted_executors_v1
       uninitialized_copy_executors_v1
+     )
+endif()
+
+if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+  set(tests ${tests}
+      copyif_input
      )
 endif()
 

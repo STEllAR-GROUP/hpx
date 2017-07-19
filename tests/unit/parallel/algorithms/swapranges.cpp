@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_swap_ranges.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -31,15 +30,15 @@ void test_swap_ranges(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::fill(boost::begin(d), boost::end(d), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::fill(std::begin(d), std::end(d), std::rand());
 
     hpx::parallel::swap_ranges(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d));
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
     //equal begins at one, therefore counter is started at 1
     std::size_t count = 1;
-    HPX_TEST(std::equal(boost::begin(c) + 1, boost::end(c), boost::begin(c),
+    HPX_TEST(std::equal(std::begin(c) + 1, std::end(c), std::begin(c),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -48,7 +47,7 @@ void test_swap_ranges(ExPolicy policy, IteratorTag)
     HPX_TEST_EQ(count, c.size());
 
     count = 1;
-    HPX_TEST(std::equal(boost::begin(d) + 1, boost::end(d), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(d) + 1, std::end(d), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -65,18 +64,18 @@ void test_swap_ranges_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::fill(boost::begin(d), boost::end(d), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::fill(std::begin(d), std::end(d), std::rand());
 
     hpx::future<base_iterator> f =
         hpx::parallel::swap_ranges(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
-            boost::begin(d));
+            iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d));
 
     f.wait();
 
     std::size_t count = 1;
-    HPX_TEST(std::equal(boost::begin(c) + 1, boost::end(c), boost::begin(c),
+    HPX_TEST(std::equal(std::begin(c) + 1, std::end(c), std::begin(c),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -84,7 +83,7 @@ void test_swap_ranges_async(ExPolicy p, IteratorTag)
         }));
 
     count = 1;
-    HPX_TEST(std::equal(boost::begin(d) + 1, boost::end(d), boost::begin(d),
+    HPX_TEST(std::equal(std::begin(d) + 1, std::end(d), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -136,17 +135,17 @@ void test_swap_ranges_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::fill(boost::begin(d), boost::end(d), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::fill(std::begin(d), std::end(d), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::swap_ranges(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)),
-            boost::begin(d));
+            decorated_iterator(std::end(c)),
+            std::begin(d));
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
@@ -169,8 +168,8 @@ void test_swap_ranges_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::fill(boost::begin(d), boost::end(d), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::fill(std::begin(d), std::end(d), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -178,10 +177,10 @@ void test_swap_ranges_exception_async(ExPolicy p, IteratorTag)
         hpx::future<base_iterator> f =
             hpx::parallel::swap_ranges(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
-                boost::begin(d));
+                decorated_iterator(std::end(c)),
+                std::begin(d));
         returned_from_algorithm = true;
         f.get();
 
@@ -246,17 +245,17 @@ void test_swap_ranges_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(100007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::fill(boost::begin(d), boost::end(d), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::fill(std::begin(d), std::end(d), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::swap_ranges(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
-            boost::begin(d));
+            decorated_iterator(std::end(c)),
+            std::begin(d));
         HPX_TEST(false);
     }
     catch (std::bad_alloc const&) {
@@ -278,8 +277,8 @@ void test_swap_ranges_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::fill(boost::begin(d), boost::end(d), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::fill(std::begin(d), std::end(d), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -287,10 +286,10 @@ void test_swap_ranges_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<base_iterator> f =
             hpx::parallel::swap_ranges(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
-                boost::begin(d));
+                decorated_iterator(std::end(c)),
+                std::begin(d));
         returned_from_algorithm = true;
         f.get();
 

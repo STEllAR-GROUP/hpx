@@ -1,10 +1,216 @@
-[/=============================================================================
-    Copyright (C) 2007-2015 Hartmut Kaiser
+[/==============================================================================
+    Copyright (C) 2017 Antoine Tran Tan
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-=============================================================================/]
+===============================================================================/]
 
-[section:iostreams The __hpx__ Vector Component]
+[section:containers Segmented Containers]
+
+In parallel programming, there is now a plethora of solutions aimed at
+implementing "partially contiguous" or segmented data structures,
+whether on shared memory systems or distributed memory systems. __hpx__
+implements such structures by drawing inspiration from Standard C++ containers.
+
+[section:parallel_containers Using Segmented Containers]
+
+[def __container_layout__
+[classref hpx::container_distribution_policy `container_distribution_policy`]]
+
+A segmented container is a template class that is described in the namespace
+`hpx`. All segmented containers are very similar semantically to their
+sequential counterpart (defined in `namespace std`) but with an additional
+template parameter named `DistPolicy`. The distribution policy is an
+optional parameter that is passed last to the segmented container constructor
+(after the container size when no default value is given, after the default value
+if not). The distribution policy describes the manner in which a container is
+segmented and the placement of each segment among the available runtime
+localities.
+
+However, only a part of the `std` container member functions were reimplemented:
+
+* [def Object based member functions]
+  `(constructor)`, `(destructor)`, `operator=`
+* [def Element access]
+  `operator[]`
+* [def Iterators]
+  `begin`, `cbegin`, `end`, `cend`
+* [def Capacity]
+  `size`
+
+An example of how to use the `partitioned_vector` container
+would be :
+
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
+
+    // By default, the number of segments is equal to the current number of
+    // localities
+    //
+    hpx::partitioned_vector<double> va(50);
+    hpx::partitioned_vector<double> vb(50, 0.0);
+
+
+An example of how to use the `partitioned_vector` container
+with distribution policies would be:
+
+    #include <hpx/include/partitioned_vector.hpp>
+    #include <hpx/runtime/find_localities.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
+
+    std::size_t num_segments = 10;
+    std::vector<hpx::id_type> locs = hpx::find_all_localities()
+
+    auto layout =
+            hpx::container_layout( num_segments, locs );
+
+    // The number of segments is 10 and those segments are spread across the
+    // localities collected in the variable locs in a Round-Robin manner
+    //
+    hpx::partitioned_vector<double> va(50, layout);
+    hpx::partitioned_vector<double> vb(50, 0.0, layout);
+
+By definition, a segmented container must be accessible from
+any thread although its construction is synchronous only for the thread who has
+called its constructor. To overcome this problem, it is possible to assign a
+symbolic name to the segmented container.
+
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
+
+    hpx::future<void> fserver = hpx::async(
+      [](){
+        hpx::partitioned_vector<double> v(50);
+
+        // Register the 'partitioned_vector' with the name "some_name"
+        //
+        v.register_as("some_name");
+
+        /* Do some code  */
+      });
+
+    hpx::future<void> fclient =
+      hpx::async(
+        [](){
+          // Naked 'partitioned_vector'
+          //
+          hpx::partitioned_vector<double> v;
+
+          // Now the variable v points to the same 'partitioned_vector' that has
+          // been registered with the name "some_name"
+          //
+          v.connect_to("some_name");
+
+          /* Do some code  */
+        });
+
+[heading Segmented Containers]
+
+__hpx__ provides the following segmented containers:
+
+[table Sequence Containers
+    [[Name]     [Description]   [In Header] [Class page at cppreference.com]]
+    [[ [hpx::partitioned_vector] ]
+     [Dynamic segmented contiguous array.]
+     [`<hpx/include/partitioned_vector.hpp>`]
+     [[cpprefcontdocs vector]]
+    ]
+]
+
+[table Unordered Associative Containers
+    [[Name]     [Description]   [In Header] [Class page at cppreference.com]]
+    [[ [hpx::unordered_map] ]
+     [Segmented collection of key-value pairs, hashed by keys, keys are unique.]
+     [`<hpx/include/unordered_map.hpp>`]
+     [[cpprefcontdocs unordered_map]]
+    ]
+]
+
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:segmented_iterators Segmented Iterators and Segmented Iterator Traits]
+
+The basic iterator used in the STL library is only suitable for
+one-dimensional structures. The iterators we use in `hpx` must adapt to
+the segmented format of our containers. Our iterators are then able to know when
+incrementing themselves if the next element of type `T` is in the same data
+segment or in another segment. In this second case, the iterator will
+automatically point to the beginning of the next segment.
+
+[note Note that the dereference operation (`operator *`) does not directly return
+      a reference of type `T&` but an intermediate object wrapping this
+      reference. When this object is used as an l-value, a remote write
+      operation is performed; When this object is used as an r-value,
+      implicit conversion to `T` type will take care of performing remote read
+      operation.
+]
+
+It is sometimes useful not only to iterate element by element, but also
+segment by segment, or simply get a local iterator in order to avoid
+additional construction costs at each deferencing operations. To mitigate
+this need, the [classref hpx::traits::segmented_iterator_traits
+`hpx::traits::segmented_iterator_traits`] are used.
+
+With `segmented_iterator_traits`, users can uniformly get the iterators
+which specifically iterates over segments (by providing a segmented iterator
+as a parameter), or get the local begin/end iterators of the nearest
+local segment (by providing a per-segment iterator as a parameter).
+
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
+
+    using iterator = hpx::partitioned_vector<T>::iterator;
+    using traits   = hpx::traits::segmented_iterator_traits<iterator>;
+
+    hpx::partitioned_vector<T> v;
+    std::size_t count = 0;
+
+    auto seg_begin = traits::segment(v.begin());
+    auto seg_end   = traits::segment(v.end());
+
+    // Iterate over segments
+    for (auto seg_it = seg_begin; seg_it != seg_end; ++seg_it)
+    {
+        auto loc_begin = traits::begin(seg_it)
+        auto loc_end   = traits::end(seg_it);
+
+        // Iterate over elements inside segments
+        for (auto lit = loc_begin; lit != loc_end; ++lit, ++count)
+        {
+            *lit = count;
+        }
+    }
+
+Which is equivalent to:
+
+    hpx::partitioned_vector<T> v;
+    std::size_t count = 0;
+
+    auto begin = v.begin();
+    auto end   = v.end();
+
+    for (auto it = begin; it != end; ++it, ++count)
+    {
+        *it = count;
+    }
+
+[endsect]
 
 [endsect]

@@ -12,14 +12,13 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/find_return.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-#include <hpx/util/tuple.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <exception>
 #include <list>
@@ -58,7 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits;
 
         static HPX_FORCEINLINE Iterator
-        call(typename traits::local_raw_iterator&& it)
+        call(typename traits::local_raw_iterator && it)
         {
             return traits::remote(std::move(it));
         }
@@ -219,7 +218,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         typename traits2::local_iterator
                     >
                 {
-                    auto p = f.get();
+                    auto && p = f.get();
                     return std::make_pair(
                         traits1::remote(p.first),
                         traits2::remote(p.second));
@@ -261,7 +260,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         typename traits3::local_iterator
                     >
                 {
-                    auto p = f.get();
+                    auto && p = f.get();
                     return hpx::util::make_tuple(
                         traits1::remote(std::move(hpx::util::get<0>(p))),
                         traits2::remote(std::move(hpx::util::get<1>(p))),

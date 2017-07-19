@@ -26,7 +26,7 @@ T test_reduce(ExPolicy && policy,
     return
         hpx::parallel::reduce(policy,
             xvalues.begin(), xvalues.end(),
-            T(0), std::plus<T>()
+            T(1), std::plus<T>()
         );
 }
 
@@ -38,7 +38,7 @@ test_reduce_async(ExPolicy && policy,
     return
         hpx::parallel::reduce(policy,
             xvalues.begin(), xvalues.end(),
-            T(0), std::plus<T>()
+            T(1), std::plus<T>()
         );
 }
 
@@ -48,21 +48,21 @@ void reduce_tests(std::size_t num,
 {
     HPX_TEST_EQ(
         test_reduce(hpx::parallel::execution::seq, xvalues),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_reduce(hpx::parallel::execution::par, xvalues),
-        T(num));
+        T(num + 1));
 
     HPX_TEST_EQ(
         test_reduce_async(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
             xvalues).get(),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_reduce_async(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
             xvalues).get(),
-        T(num));
+        T(num + 1));
 }
 
 template <typename T>
@@ -79,5 +79,5 @@ int main()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     reduce_tests<int>(localities);
     reduce_tests<double>(localities);
-    return 0;
+    return hpx::util::report_errors();
 }

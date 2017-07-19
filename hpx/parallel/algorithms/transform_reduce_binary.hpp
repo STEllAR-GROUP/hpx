@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -115,7 +116,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 // of the elements of a value-pack
                 auto result =
                     util::detail::accumulate_values<ExPolicy>(
-                        [&op1](T const& sum, T const& val)
+                        [&op1](T const& sum, T const& val) -> T
                         {
                             return hpx::util::invoke(op1, sum, val);
                         },
@@ -201,7 +202,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         // this is to support vectorization, it will call op1
                         // for each of the elements of a value-pack
                         auto result = util::detail::accumulate_values<ExPolicy>(
-                            [&op1](T const& sum, T const& val)
+                            [&op1](T const& sum, T const& val) -> T
                             {
                                 return hpx::util::invoke(op1, sum, val);
                             },
@@ -251,16 +252,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the first source iterators used
+    /// \tparam FwdIter1    The type of the first source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an input iterator.
-    /// \tparam InIter2     The type of the second source iterators used
+    ///                     requirements of an forward iterator.
+    /// \tparam FwdIter2    The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     requirements of an forward iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     /// \param policy       The execution policy to use for the scheduling of
@@ -287,29 +284,40 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a T otherwise.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter1>::value &&
-        hpx::traits::is_iterator<InIter2>::value)>
+        hpx::traits::is_iterator<FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
-    transform_reduce(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, T init)
+    transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, T init)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
+               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter2>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::transform_reduce_binary<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
@@ -327,20 +335,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the first source iterators used
+    /// \tparam FwdIter1    The type of the first source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an input iterator.
-    /// \tparam InIter2     The type of the second source iterators used
+    ///                     requirements of an forward iterator.
+    /// \tparam FwdIter2    The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     requirements of an forward iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
     ///                     the multiplication operation.
+    /// \tparam Convert     The type of the unary function object used to
+    ///                     transform the elements of the input sequence before
+    ///                     invoking the reduce function.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -394,44 +401,55 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a T otherwise.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
         typename Reduce, typename Convert,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<InIter1>::value &&
-        hpx::traits::is_iterator<InIter2>::value &&
+        hpx::traits::is_iterator<FwdIter1>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value &&
         hpx::traits::is_invocable<Convert,
-                typename std::iterator_traits<InIter1>::value_type,
-                typename std::iterator_traits<InIter2>::value_type
+                typename std::iterator_traits<FwdIter1>::value_type,
+                typename std::iterator_traits<FwdIter2>::value_type
             >::value &&
         hpx::traits::is_invocable<Reduce,
                 typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<InIter1>::value_type,
-                    typename std::iterator_traits<InIter2>::value_type
+                    typename std::iterator_traits<FwdIter1>::value_type,
+                    typename std::iterator_traits<FwdIter2>::value_type
                 >::type,
                 typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<InIter1>::value_type,
-                    typename std::iterator_traits<InIter2>::value_type
+                    typename std::iterator_traits<FwdIter1>::value_type,
+                    typename std::iterator_traits<FwdIter2>::value_type
                 >::type
             >::value)>
     typename util::detail::algorithm_result<ExPolicy, T>::type
-    transform_reduce(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, T init, Reduce && red_op, Convert && conv_op)
+    transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
 
         typedef std::integral_constant<bool,
-                is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter1>::value ||
-               !hpx::traits::is_forward_iterator<InIter2>::value
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter2>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::transform_reduce_binary<T>().call(
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,

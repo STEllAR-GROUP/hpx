@@ -50,22 +50,22 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::util::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
-            executor.apply_execute([] HPX_DEVICE (){});
+            executor.post([] HPX_DEVICE (){});
             target.synchronize();
         }
         double elapsed = timer.elapsed();
-        std::cout << "executor.apply_execute([](){}) + synchronize:        "
+        std::cout << "executor.post([](){}) + synchronize:        "
             << elapsed << '\n';
     }
     {
         hpx::util::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
-            executor.apply_execute([] HPX_DEVICE (){});
+            executor.post([] HPX_DEVICE (){});
             target.get_future().get();
         }
         double elapsed = timer.elapsed();
-        std::cout << "executor.apply_execute([](){}) + get_future().get(): "
+        std::cout << "executor.post([](){}) + get_future().get(): "
             << elapsed << '\n';
     }
     {

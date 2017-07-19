@@ -232,7 +232,7 @@ struct stepper
             auto range = boost::irange(b, np);
             using hpx::parallel::execution::par;
             hpx::parallel::for_each(
-                par, boost::begin(range), boost::end(range),
+                par, std::begin(range), std::end(range),
                 [&U, nx](std::size_t i)
                 {
                     U[0][i] = hpx::make_ready_future(
@@ -246,7 +246,7 @@ struct stepper
             auto range = boost::irange(b, np);
             using hpx::parallel::execution::par;
             hpx::parallel::for_each(
-                par, boost::begin(range), boost::end(range),
+                par, std::begin(range), std::end(range),
                 [&U, nx, data](std::size_t i)
                 {
                     U[0][i] = hpx::make_ready_future(

@@ -7,10 +7,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_adjacent_difference.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -29,18 +29,18 @@ void test_adjacent_difference(ExPolicy policy)
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
-    auto it = hpx::parallel::adjacent_difference(policy, boost::begin(c),
-        boost::end(c), boost::begin(d));
-    std::adjacent_difference(boost::begin(c),
-        boost::end(c), boost::begin(d_ans));
+    auto it = hpx::parallel::adjacent_difference(policy, std::begin(c),
+        std::end(c), std::begin(d));
+    std::adjacent_difference(std::begin(c),
+        std::end(c), std::begin(d_ans));
 
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d),
-        boost::begin(d_ans), [](std::size_t lhs, std::size_t rhs) -> bool
+    HPX_TEST(std::equal(std::begin(d), std::end(d),
+        std::begin(d_ans), [](std::size_t lhs, std::size_t rhs) -> bool
         {
             return lhs == rhs;
         }));
 
-    HPX_TEST(boost::end(d) == it);
+    HPX_TEST(std::end(d) == it);
 }
 
 template <typename ExPolicy>
@@ -54,19 +54,19 @@ void test_adjacent_difference_async(ExPolicy p)
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
-    auto f_it = hpx::parallel::adjacent_difference(p, boost::begin(c),
-        boost::end(c), boost::begin(d));
-    std::adjacent_difference(boost::begin(c),
-        boost::end(c), boost::begin(d_ans));
+    auto f_it = hpx::parallel::adjacent_difference(p, std::begin(c),
+        std::end(c), std::begin(d));
+    std::adjacent_difference(std::begin(c),
+        std::end(c), std::begin(d_ans));
 
     f_it.wait();
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d),
-        boost::begin(d_ans), [](std::size_t lhs, std::size_t rhs) -> bool
+    HPX_TEST(std::equal(std::begin(d), std::end(d),
+        std::begin(d_ans), [](std::size_t lhs, std::size_t rhs) -> bool
         {
             return lhs == rhs;
         }));
 
-    HPX_TEST(boost::end(d) == f_it.get());
+    HPX_TEST(std::end(d) == f_it.get());
 }
 
 void adjacent_difference_test()

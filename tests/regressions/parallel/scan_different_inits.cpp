@@ -25,11 +25,11 @@ void test_zero()
     std::vector<int> b, c, d, e, f, g;
 
     Iter i_inc_add =
-        inclusive_scan(execution::par, a.begin(), a.end(), b.begin(), 100,
-        [](int bar, int baz){ return bar+baz; });
+        inclusive_scan(execution::par, a.begin(), a.end(), b.begin(),
+        [](int bar, int baz){ return bar+baz; }, 100);
     Iter i_inc_mult =
-        inclusive_scan(execution::par, a.begin(), a.end(), c.begin(), 10,
-        [](int bar, int baz){ return bar*baz; });
+        inclusive_scan(execution::par, a.begin(), a.end(), c.begin(),
+        [](int bar, int baz){ return bar*baz; }, 10);
     Iter i_exc_add =
         exclusive_scan(execution::par, a.begin(), a.end(), d.begin(), 100,
         [](int bar, int baz){ return bar+baz; });
@@ -64,12 +64,12 @@ void test_async_zero()
 
     Fut_Iter f_inc_add =
         inclusive_scan(execution::par(execution::task),
-            a.begin(), a.end(), b.begin(), 100,
-            [](int bar, int baz){ return bar+baz; });
+            a.begin(), a.end(), b.begin(),
+            [](int bar, int baz){ return bar+baz; }, 100);
     Fut_Iter f_inc_mult =
         inclusive_scan(execution::par(execution::task),
-            a.begin(), a.end(), c.begin(), 10,
-            [](int bar, int baz){ return bar*baz; });
+            a.begin(), a.end(), c.begin(),
+            [](int bar, int baz){ return bar*baz; }, 10);
     Fut_Iter f_exc_add =
         exclusive_scan(execution::par(execution::task),
             a.begin(), a.end(), d.begin(), 100,
@@ -114,9 +114,9 @@ void test_one(std::vector<int> a)
     auto fun_conv = [](int foo){ return foo - 3; };
 
     Iter f_inc_add =
-        inclusive_scan(execution::par, a.begin(), a.end(), b.begin(), 10, fun_add);
+        inclusive_scan(execution::par, a.begin(), a.end(), b.begin(), fun_add, 10);
     Iter f_inc_mult =
-        inclusive_scan(execution::par, a.begin(), a.end(), c.begin(), 10, fun_mult);
+        inclusive_scan(execution::par, a.begin(), a.end(), c.begin(), fun_mult, 10);
     Iter f_exc_add =
         exclusive_scan(execution::par, a.begin(), a.end(), d.begin(), 10, fun_add);
     Iter f_exc_mult =
@@ -173,10 +173,10 @@ void test_async_one(std::vector<int> a)
 
     Fut_Iter f_inc_add =
         inclusive_scan(execution::par(execution::task),
-            a.begin(), a.end(), b.begin(), 10, fun_add);
+            a.begin(), a.end(), b.begin(), fun_add, 10);
     Fut_Iter f_inc_mult =
         inclusive_scan(execution::par(execution::task),
-            a.begin(), a.end(), c.begin(), 10, fun_mult);
+            a.begin(), a.end(), c.begin(), fun_mult, 10);
     Fut_Iter f_exc_add =
         exclusive_scan(execution::par(execution::task),
             a.begin(), a.end(), d.begin(), 10, fun_add);

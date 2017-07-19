@@ -128,5 +128,5 @@ int main()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     find_tests<int>(localities);
     find_tests<double>(localities);
-    return 0;
+    return hpx::util::report_errors();
 }

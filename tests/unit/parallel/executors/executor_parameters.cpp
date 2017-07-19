@@ -8,9 +8,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-#include <boost/range/iterator_range.hpp>
-#include <boost/range/functions.hpp>
+#include <hpx/util/iterator_range.hpp>
 
 #include <algorithm>
 #include <chrono>

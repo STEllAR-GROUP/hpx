@@ -1,0 +1,39 @@
+#  Copyright (c) 2017 Hartmut Kaiser
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+version: '{branch}-{build}'
+
+image:
+  - Visual Studio 2017
+
+configuration:
+  - Debug
+
+platform:
+  - x64
+
+shallow_clone: true
+skip_branch_with_pr: true
+
+init:
+  - cmd: git config --global core.autocrlf input
+
+install:
+  - ps: Start-FileDownload 'http://stellar-group.org/files/vcpkg-export-hpx-dependencies.7z' -FileName 'C:\projects\vcpkg-export-hpx-dependencies.7z' -Timeout 60000
+  - cmd: 7z x "C:\projects\vcpkg-export-hpx-dependencies.7z" -y -oC:\projects\vcpkg >NUL
+
+before_build:
+  - cmd: cmake -H. -Bbuild -A%PLATFORM% -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_TOOLCHAIN_FILE=C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake -DHPX_WITH_GIT_COMMIT=%APPVEYOR_REPO_COMMIT% -DHPX_WITH_PSEUDO_DEPENDENCIES=On -DHPX_WITH_EXAMPLES=On -DHPX_WITH_EXAMPLES_HDF5=On -DHPX_WITH_TESTS=Off -DHPX_WITH_RUNTIME=Off
+
+build_script:
+  - cmd: cmake --build build --config %CONFIGURATION% --target core -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
+  - cmd: cmake --build build --config %CONFIGURATION% --target examples -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
+#  - cmd: cmake --build build --config %CONFIGURATION% --target tests/regressions -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
+
+test_script:
+  - cmd: |
+      set PATH=%PATH%;C:\projects\vcpkg\installed\x64-windows\debug\bin
+      python build\bin\hpxrun.py -l2 -t2 build\Debug\bin\hello_world.exe -- --hpx:bind=none
+

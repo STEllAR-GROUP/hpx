@@ -43,7 +43,9 @@ void uninitialized_move_test()
 {
     test_uninitialized_move<std::random_access_iterator_tag>();
     test_uninitialized_move<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_uninitialized_move<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,7 +84,9 @@ void uninitialized_move_exception_test()
 {
     test_uninitialized_move_exception<std::random_access_iterator_tag>();
     test_uninitialized_move_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_uninitialized_move_exception<std::input_iterator_tag>();
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -121,7 +125,9 @@ void uninitialized_move_bad_alloc_test()
 {
     test_uninitialized_move_bad_alloc<std::random_access_iterator_tag>();
     test_uninitialized_move_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_uninitialized_move_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

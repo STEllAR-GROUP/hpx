@@ -11,7 +11,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
+#include <iterator>
 
 #include <cstddef>
 #include <vector>
@@ -40,9 +40,9 @@ T test_transform_reduce(ExPolicy && policy,
     using hpx::util::make_zip_iterator;
     return
         hpx::parallel::transform_reduce(policy,
-            make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
-            make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            T(0), std::plus<T>(), multiply()
+            make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
+            make_zip_iterator(std::end(xvalues), std::end(yvalues)),
+            T(1), std::plus<T>(), multiply()
         );
 }
 
@@ -55,9 +55,9 @@ test_transform_reduce_async(ExPolicy && policy,
     using hpx::util::make_zip_iterator;
     return
         hpx::parallel::transform_reduce(policy,
-            make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
-            make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
-            T(0), std::plus<T>(), multiply()
+            make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
+            make_zip_iterator(std::end(xvalues), std::end(yvalues)),
+            T(1), std::plus<T>(), multiply()
         );
 }
 
@@ -68,21 +68,21 @@ void transform_reduce_tests(std::size_t num,
 {
     HPX_TEST_EQ(
         test_transform_reduce(hpx::parallel::execution::seq, xvalues, yvalues),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_transform_reduce(hpx::parallel::execution::par, xvalues, yvalues),
-        T(num));
+        T(num + 1));
 
     HPX_TEST_EQ(
         test_transform_reduce_async(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_transform_reduce_async(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
-        T(num));
+        T(num + 1));
 }
 
 template <typename T>
@@ -108,5 +108,5 @@ int main()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     transform_reduce_tests<int>(localities);
     transform_reduce_tests<double>(localities);
-    return 0;
+    return hpx::util::report_errors();
 }

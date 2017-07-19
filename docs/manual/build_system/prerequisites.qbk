@@ -26,7 +26,7 @@ work, but we do not test __hpx__ with other platforms, so please be warned.
 In the simplest case, __hpx__ depends on one set of libraries: __boost__. So,
 before you read further, please make sure you have a recent version of
 __boost__ installed on your target machine. __hpx__ currently requires at least
-Boost V1.51.0 to work properly. It may build and run with older versions, but
+Boost V1.55.0 to work properly. It may build and run with older versions, but
 we do not test __hpx__ with those versions, so please be warned.
 
 Installing the Boost libraries is described in detail in Boost's own
@@ -63,8 +63,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__cmake__                  ][3.1              ][3.0.2           ]]
 
     [[[*Required Libraries]]]
-    [[__boost_libraries__        ][1.57.0 or newer    ][1.51.0          ]
-        [See below for an important limitation when using Boost V1.54.0.]]
+    [[__boost_libraries__        ][1.57.0 or newer    ][1.55.0          ]
     [[__hwloc__                  ][1.10                ][1.2 (Xeon Phi: 1.6)]
         [Used for OS-thread pinning and NUMA awareness. This library is optional on Mac OSX.]]
 ]
@@ -92,7 +91,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__cmake__                  ][3.1                ][3.0.2           ]]
 
     [[[*Required Libraries]]]
-    [[__boost__                  ][1.57.0 or newer    ][1.51.0          ]
+    [[__boost__                  ][1.57.0 or newer    ][1.55.0          ]
      [See below for an important limitation when using Boost V1.55.0.]]
     [[__hwloc__                  ][1.10                ][1.5             ]
         [Used for OS-thread pinning and NUMA awareness.]]
@@ -100,8 +99,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
 
 [note You need to build the following Boost libraries for __hpx__:
       Boost.DateTime, Boost.Filesystem, Boost.ProgramOptions, Boost.Regex,
-      Boost.System, Boost.Thread, Boost.Chrono, and Boost.Atomic (starting
-      Boost 1.53.0). ]
+      Boost.System, Boost.Thread, Boost.Chrono, and Boost.Atomic. ]
 
 Depending on the options you chose while building and installing __hpx__,
 you will find that __hpx__ may depend on several other libraries such as those

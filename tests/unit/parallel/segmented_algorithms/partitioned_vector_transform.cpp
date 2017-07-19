@@ -305,11 +305,11 @@ void transform_binary2_tests(std::vector<hpx::id_type> &localities)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    transform_tests<int,double>(localities);
+    transform_tests<int,int>(localities);
     transform_tests<double,int>(localities);
     transform_binary_tests<int,int,double>(localities);
     transform_binary_tests<double,double,int>(localities);
     transform_binary2_tests<int,int,double>(localities);
     transform_binary2_tests<double,double,int>(localities);
-    return 0;
+    return hpx::util::report_errors();
 }
