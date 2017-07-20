@@ -16,6 +16,8 @@
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/is_partitioned.hpp>
 
+#include <hpx/throw_exception.hpp>
+
 namespace hpx { namespace serialization
 {
     namespace detail
@@ -26,10 +28,10 @@ namespace hpx { namespace serialization
             static void serialize(input_archive & ar,
                 hpx::partitioned_vector<T> & v, std::false_type)
             {
-                static_assert(
-                    hpx::parallel::is_partitioned(hpx::parallel::par,
-                        std::begin(v), std::end(v), [](std::size_t n) { return n > 0; }),
-                    "hpx::serialization::serialize requires segmented partitioned_vector");
+                HPX_THROW_EXCEPTION(
+                    hpx::invalid_status,
+                    "hpx::serialization::serialize",
+                    "requires segmented partitioned_vector");
             }
 
             template<typename T>
@@ -46,14 +48,20 @@ namespace hpx { namespace serialization
             static void serialize(output_archive & ar,
                 const hpx::partitioned_vector<T> & v, std::false_type) 
             {
-                static_assert(
-                    hpx::parallel::is_partitioned(hpx::parallel::par,
-                        std::begin(v), std::end(v), [](std::size_t n) { return n > 0; }),
-                    "hpx::serialization::serialize requires segmented partitioned_vector");
+                if(v.registered_name_.size() < 1) {
 
-                static_assert(
-                    v.registered_name_.size() > 0,
-                    "hpx::serialization::serialize requires a registered partitioned_vector");
+                    HPX_THROW_EXCEPTION(
+                        hpx::invalid_status,
+                        "hpx::serialization::serialize",
+                        "partitioned_vector is not registered");
+
+                }
+
+                HPX_THROW_EXCEPTION(
+                    hpx::invalid_status,
+                    "hpx::serialization::serialize",
+                    "requires segmented partitioned_vector");
+
             }
 
             template<typename T>
@@ -69,7 +77,8 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, hpx::partitioned_vector<T> & v,
         unsigned)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef typename hpx::partitioned_vector<T>::iterator FwdIter;
+        typedef typename hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         auto vitr = std::begin(v);
         detail::partitioned_vector_segmented_serializer::serialize<T>(
@@ -80,7 +89,8 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, const hpx::partitioned_vector<T> & v,
         unsigned)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef typename hpx::partitioned_vector<T>::iterator FwdIter;
+        typedef typename hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
         auto vitr = std::begin(v);
         detail::partitioned_vector_segmented_serializer::serialize<T>(
