@@ -65,7 +65,7 @@ void test_bulk_sync()
     hpx::compute::cuda::target target;
     executor exec(target);
 //    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1), v);
-    hpx::parallel::execution::sync_bulk_execute(exec, bulk_test(), v);
+    hpx::parallel::execution::bulk_sync_execute(exec, bulk_test(), v);
 }
 
 void test_bulk_async()
@@ -84,7 +84,7 @@ void test_bulk_async()
 //        exec, hpx::util::bind(&bulk_test, _1), v)
 //    ).get();
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(exec, bulk_test(), v)
+        hpx::parallel::execution::bulk_async_execute(exec, bulk_test(), v)
     ).get();
 }
 

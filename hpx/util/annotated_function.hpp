@@ -35,7 +35,13 @@ namespace hpx { namespace util
 {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
-#if HPX_HAVE_ITTNOTIFY != 0
+#if (!defined(__NVCC__) && !defined(__CUDACC__))
+    struct annotate_function
+    {
+        template <typename F>
+        explicit HPX_HOST_DEVICE annotate_function(F && f){}
+    };
+#elif HPX_HAVE_ITTNOTIFY != 0
     struct annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
@@ -170,7 +176,8 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name) {}
-        template <typename F> explicit annotate_function(F && f) {}
+        template <typename F>
+        explicit HPX_HOST_DEVICE annotate_function(F && f) {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
