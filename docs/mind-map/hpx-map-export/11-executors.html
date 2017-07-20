@@ -1,0 +1,1366 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>Executors etc.</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="4k8p41uh687ec01smf2fei6v79">Executors etc.</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="11-executors_files/images/Executors etc..jpg"></div>
+<h2 class="topic">
+<a href="http://open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4406.pdf" name="327lfi7ufgv1v54at6v7ukjf8r">executor</a>
+</h2>
+<div class="notesContainer">
+<p>in the sense of N4406</p>
+</div>
+<h3 class="topic">
+<a name="6jef04uduib6nfpllkb3m0rjo1">&nbsp;
+blahblah
+</a>
+</h3>
+<h3 class="topic">
+<a name="1e7fi95j5ljp5drrhmebtfbgdq">&nbsp;&nbsp;executor tag</a>
+</h3>
+<p class="relationships">See Also: <a href="#4668cn30051ma0d14q42er1i6r">timed_executor_tag (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="49tnci39q5j4d74ur8cq64058p">&nbsp;&nbsp;&nbsp;derived classes</a>
+</h3>
+<div class="notesContainer">
+<p>in is_executor.hpp</p>
+</div>
+<h3 class="topic">
+<a name="6hpuc3elvei48sdqhjhler0osc">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::distribution_policy_executor</a>
+</h3>
+<h3 class="topic">
+<a name="5r0bg42rt24r9d4vvgfh9vg74j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+creates groups of parallel execution agents 
+which execute in threads implicitly created by the executor 
+and placed on any of the associated localities.
+Uses any of the existing distribution policies.
+(like `hpx::components::colocating_distribution_policy et.al.).
+</a>
+</h3>
+<h3 class="topic">
+<a name="6pqb7mv6q1ralg5f462nv1mp3i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;template &lt;typename DistPolicy&gt;
+    class distribution_policy_executor : public executor_tag
+
+DistPolicy     The distribution policy type for which an executor should be created. The expression hpx::traits::is_distribution_policy&lt;DistPolicy&gt;::value must evaluate to true.</a>
+</h3>
+<h3 class="topic">
+<a name="5tf7ossih8vv37nsptbfn178pd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="4backjltiqpu1nar3rmhd06d23">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static void apply_execute(F &amp;&amp; f, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="0jacsjaq0tgh883c0393ccngou">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::future&lt;...&gt; async_execute(F &amp;&amp; f, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="4707a35h6akmmu9ki63ntbb1m7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;execute</a>
+</h3>
+<h3 class="topic">
+<a name="1925m5mqjg6kb9l2or0r0eqi46">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="5bmp3h1vlopclkc0fkgv75rl63">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DistPolicy policy_</a>
+</h3>
+<h3 class="topic">
+<a name="3hmnff8qdmg551p910i12fcf92">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;available distribution policies</a>
+</h3>
+<h3 class="topic">
+<a name="0rilm49n59og895rqvd9hts4ia">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::detail::target_distribution_policy&lt;cuda::target&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="323jsc65689ss5e4pse1r9pt0j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::cuda::target_distribution_policy</a>
+</h3>
+<h3 class="topic">
+<a name="174nbk7nrt8s389dv5snnlft8l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::detail::target_distribution_policy&lt;host::target&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="693m9u9nno4nv12k3qn37pisqt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::host::target_distribution_policy</a>
+</h3>
+<h3 class="topic">
+<a name="5mpe1rp2vos0jojcsnfl5iuhv0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A target_distribution_policy used for CPU bound localities.</a>
+</h3>
+<h3 class="topic">
+<a name="244eto4v9blm4g3q85oim141up">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::components::target_distribution_policy</a>
+</h3>
+<h3 class="topic">
+<a name="6190r15qks8dgkcoar8hr7sims">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This class specifies the parameters for a simple distribution policy to use for creating (and evenly distributing) a given number of items on a given set of localities.</a>
+</h3>
+<h3 class="topic">
+<a name="681rqskrnmq7hla3of1r68shbe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::components::binpacking_distribution_policy</a>
+</h3>
+<h3 class="topic">
+<a name="6mgnd7s2kq0q7gu55fbg91ah2b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This class specifies the parameters for a binpacking distribution policy to use for creating a given number of items on a given set of localities. The  binpacking policy will distribute the new objects in a way such that each of the localities will equalize the number of overall objects of this type based on a given criteria (by default this criteria is the overall number of objects of this type).</a>
+</h3>
+<h3 class="topic">
+<a name="0se57fmrmo6leirs9977a832r8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::components::colocating_distribution_policy</a>
+</h3>
+<h3 class="topic">
+<a name="4mmj0beum7knt72ts3gvigglo8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this class specifies the parameters for a distribution policy to use for creating a given number of items on the locality where a given object is currently placed.</a>
+</h3>
+<h3 class="topic">
+<a name="2r22mmi0jtsan1rp1d675m6bsh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::components::default_distribution_policy</a>
+</h3>
+<h3 class="topic">
+<a name="1nnn77jkdhqh9ahoei09ddc4ah">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This class specifies the parameters for a simple distribution policy to use for creating (and evenly distributing) a given number of items on a given set of localities.</a>
+</h3>
+<h3 class="topic">
+<a name="3mnocajs0ge7nqunuvp2f5js7l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;derived class</a>
+</h3>
+<h3 class="topic">
+<a name="02vk0cga5neq8iitn0kfv10jrp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::container_distribution_policy</a>
+</h3>
+<h3 class="topic">
+<a name="5gfvsr9h562t8tvhveaeemqo8i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This class specifies the block chunking policy parameters to use 
+for the partitioning of the data in a hpx::partitioned_vector</a>
+</h3>
+<h3 class="topic">
+<a name="6majafh6hjppc1k629tg1q8itb">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::parallel_executor</a>
+</h3>
+<h3 class="topic">
+<a name="100622sj5b9rspq1omgnu5ekr9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+creates groups of parallel execution agents 
+which execute in threads implicitly created by the executor. 
+This executor uses a given launch policy.
+</a>
+</h3>
+<h3 class="topic">
+<a name="53gtpuhittmgotab2gqj0a452f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="1ibv74a73a03jktuqu8t9tevjp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;launch l_</a>
+</h3>
+<h3 class="topic">
+<a name="167h3tq2t2ej44pausc0fpjsau">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_spread_</a>
+</h3>
+<h3 class="topic">
+<a name="2mbeeg2vilt9chi3k7k1msp61m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_tasks_</a>
+</h3>
+<h3 class="topic">
+<a name="4g4q4t7d19dbb62lj1dgvb5vr0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="03jvorolllg7utmpjuaguhn3b4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="6m9v229tl321350j7r3prqfep2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static void apply_execute(F &amp;&amp; f, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="1ou1r276dgh3ptivvvn22qt86g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::future&lt;...&gt; async_execute(F &amp;&amp; f, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="5mi8sc4ta4qijkp622rno0adpa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;hpx::future&lt;...&gt;&gt; bulk_async_execute(F &amp;&amp; f, S const&amp; shape, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="6bukqpputt847f67ln5f84i99f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::future&lt;void&gt; spawn (...)</a>
+</h3>
+<h3 class="topic">
+<a name="5tp5sp65t45manuuu1ber8m3fp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void serialize(...)</a>
+</h3>
+<h3 class="topic">
+<a name="56vsl9lda90pbjoaqttn5onrkj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default: Associate the auto_chunk_size executor parameters type with this executor.</a>
+</h3>
+<h3 class="topic">
+<a name="6gels151t5sthobdo1cksu1v7u">&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::sequential_executor</a>
+</h3>
+<h3 class="topic">
+<a name="26imh4o1b2mqlni7psgn4qtn0h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+creates groups of sequential execution agents 
+which execute in the calling thread. 
+The sequential order is given by the lexicographical order of indices in the index space.
+</a>
+</h3>
+<h3 class="topic">
+<a name="57mi45hdb9hkouta08sv6dp2i5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="1tagkv1b3jo7aaaj24o8vtjjmb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="2dgvgjukqku9urucac34kmbv6h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;static void apply_execute(F &amp;&amp; f, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="52d1774mh00qsf4srasfmcu7j1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::future&lt;...&gt; async_execute(F &amp;&amp; f, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="6pj66tl5f9kptrm0t5dcgks2ck">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;hpx::future&lt;...&gt;&gt; bulk_async_execute(F &amp;&amp; f, S const&amp; shape, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="6p6c6tn0o4cuaf2mpelg9tv9ae">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void serialize(...)</a>
+</h3>
+<h3 class="topic">
+<a name="46vg4vors008khq5bmaen3d8e7">&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::cuda::concurrent_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7qb89ffjv7cf0hvutabu24g81g">&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::cuda::default_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4o5nd4piqujgb638rq63qf6dfj">&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::host::block_executor</a>
+</h3>
+<h3 class="topic">
+<a name="31dkmuo056c284vcjnpa3sth79">&nbsp;&nbsp;&nbsp;&nbsp;hpx::compute::host::default_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4668cn30051ma0d14q42er1i6r">&nbsp;&nbsp;timed_executor_tag</a>
+</h3>
+<p class="relationships">See Also: <a href="#1e7fi95j5ljp5drrhmebtfbgdq">executor tag (derived from)</a>
+</p>
+<h2 class="topic">
+<a href="http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3562.pdf" name="1ttr3i87b4pps4mb2nbt4eh6e9">hpx::threads::executor</a>
+</h2>
+<div class="notesContainer">
+<p>in the sense of N3562</p>
+<p></p>
+<p>in runtime/threads/thread_executor.hpp</p>
+</div>
+<h3 class="topic">
+<a name="6ntk333poelucrs0fvfhrjctjk">&nbsp;hpx::threads::detail::executor_base</a>
+</h3>
+<div class="notesContainer">
+<p>in file: runtime/threadsthread_executor.hpp</p>
+</div>
+<p class="relationships">See Also: <a href="#72h5visdvacujgvm5l5dlfplg0">boost::intrusive_ptr&lt;detail::executor_base&gt; executor_data_;</a>
+</p>
+<h3 class="topic">
+<a name="5b5nbk4n2rpsdevjkg4rqitth5">&nbsp;&nbsp;hpx::threads::detail::scheduled_executor_base</a>
+</h3>
+<p class="relationships">See Also: <a href="#1sfkvdb8komo0j8u3f2pfthjuh">hpx::threads::executors::detail::
+this_thread executors&lt;Scheduler&gt;</a>
+</p>
+<h3 class="topic">
+<a name="1n8bi293admbb8k54ngsjhvdm0">&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::thread_pool_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1j1bi81g2d0ps3bi2h52mf74f1">&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::service_executor</a>
+</h3>
+<p class="relationships">See Also: <a href="#6vtln3fol1b4081ffei2j9k0c7">Calls constructor of detail::service_executor
+with appropriate parameter depending on t</a>
+</p>
+<h3 class="topic">
+<a name="2pp6k5lgo9p4oa8u4jn697umad">&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="1lihelfugnpjjtt1hs07butt40">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool* pool_;</a>
+</h3>
+<h3 class="topic">
+<a name="7m0d4b3a805ukj6c1ksl9jmjv1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class runtime_impl
+has 3 data members called</a>
+</h3>
+<h3 class="topic">
+<a name="49qf8bqs8njadmpgsjmba8mu7u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool main_pool_;</a>
+</h3>
+<h3 class="topic">
+<a name="73n78526v9hrf48t9j665e2r70">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool io_pool_;</a>
+</h3>
+<h3 class="topic">
+<a name="4u2kg855215cg1f26bkairfj93">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool timer_pool_;</a>
+</h3>
+<h3 class="topic">
+<a name="677kugee0e139tjemjg0u7j8rg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::uint64_t&gt; task_count_;</a>
+</h3>
+<h3 class="topic">
+<a name="7lhf306kl0lnrkgcrmg1of29b7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcos::local::counting_semaphore shutdown_sem_;</a>
+</h3>
+<h3 class="topic">
+<a name="4uef187oojldm6alsacv8hjmds">&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::this_thread_executor</a>
+</h3>
+<h3 class="topic">
+<a name="557a0rv8muuqq20imvic0emfeh">&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::thread_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1m4u4tah6b39l53vr4mqa16ba3">&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::thread_pool_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="6m6qrj9vf41nnuu6hub50rjqvg">&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::current_executor</a>
+</h3>
+<h3 class="topic">
+<a name="5lmb5ouh8noc2nm3tku4rqgq4r">&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::default_executor</a>
+</h3>
+<h3 class="topic">
+<a name="266ktrvns5jcubqbtaq33p84gj">&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="0hum8h45n1aufb59u3gh6577ho">&nbsp;&nbsp;&nbsp;util::atomic_count count_;</a>
+</h3>
+<h3 class="topic">
+<a name="67d10fii9q2g3s941rlh42k7hg">&nbsp;hpx::threads::executor</a>
+</h3>
+<p class="relationships">See Also: <a href="#7pfusplgeegedkn8gc98chcfug">hpx::threads::executors::scheduled_executor (is derived from)</a>
+</p>
+<h3 class="topic">
+<a name="4mj22qhagshofjn5ddn36q4ea7">&nbsp;&nbsp;Class executor is an abstract base class defining an abstract interface of objects that are
+capable of scheduling and coordinating work submitted by clients. Work units submitted to an
+executor may be executed in one or more separate threads.</a>
+</h3>
+<h3 class="topic">
+<a name="5um2e1kgnelhmv7lg0d0enmpq2">&nbsp;&nbsp;&nbsp;API</a>
+</h3>
+<h3 class="topic">
+<a name="34l6ceee6t8294u3ce9aa9u0ff">&nbsp;&nbsp;&nbsp;&nbsp;executor::~executor()</a>
+</h3>
+<h3 class="topic">
+<a name="562up96ketdig6q3llcb34q983">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effects: Destroys the executor.
+Synchronization: All closure initiations happen before the completion of the executor destructor. 
+
+[Note: As a consequence, all closures that will ever execute will have completed before the completion of the executor destructor, and programmers can protect against data races with the  destruction of the environment. Whether or not a concrete executor initiates all closures is defined by the semantics defined by that concrete executor.]</a>
+</h3>
+<h3 class="topic">
+<a name="7ffdsdtejpegnpkdt5vjicbjve">&nbsp;&nbsp;&nbsp;&nbsp;void executor::add(std::function&lt;void&gt; closure);</a>
+</h3>
+<h3 class="topic">
+<a name="4bk6ct61bvto9ggqav85hitiit">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effects: The specified function object shall be scheduled for execution by the executor at some point in the future.
+Synchronization: completion of closure on a particular thread happens before destruction of that thread&rsquo;s thread&shy;duration variables. 
+
+[Note: The consequence is that closures may use thread&shy; duration variables, but in general such use is risky. In general executors don&rsquo;t make guarantees about which thread an individual closure executes in.]
+
+Error conditions: If invoking closure throws an exception, the executor shall call terminate .</a>
+</h3>
+<h3 class="topic">
+<a name="3tsc31sse1t66rt21fknf8rvdt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;What if the closure needs to take arguments? 
+Bundle them up using bind or packaged_task</a>
+</h3>
+<h3 class="topic">
+<a name="4gd9ks4rk3k6ncvg268ctvvsa3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// Get a reference to one of the IO specific HPX io_service objects ...
+hpx::threads::executors::io_pool_executor scheduler;
+
+// ... and schedule the handler to run on one of its OS-threads.
+scheduler.add(hpx::util::bind(&amp;do_async_io, string_to_write, p));
+</a>
+</h3>
+<h3 class="topic">
+<a name="5bn19pmnq06c3ctr7u1g6o9igt">&nbsp;&nbsp;&nbsp;&nbsp;size_t executor::num_pending_closures() ;</a>
+</h3>
+<h3 class="topic">
+<a name="392mofj8evjuc81qn2loshigfe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns: the number of function objects waiting to be executed. 
+
+[Note: this is intended for logging/debugging and for coarse load balancing decisions. 
+Other uses are inherently risky because other threads may be executing or adding closures.]</a>
+</h3>
+<h3 class="topic">
+<a name="79lv8bnisjfoqt7g8ucvdv2f2b">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="72h5visdvacujgvm5l5dlfplg0">&nbsp;&nbsp;&nbsp;&nbsp;boost::intrusive_ptr&lt;detail::executor_base&gt; executor_data_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#6ntk333poelucrs0fvfhrjctjk">hpx::threads::detail::executor_base</a>
+</p>
+<h3 class="topic">
+<a name="7pfusplgeegedkn8gc98chcfug">&nbsp;hpx::threads::executors::scheduled_executor</a>
+</h3>
+<div class="notesContainer">
+<p>runtime/threads/thread_executor.hpp</p>
+<p></p>
+</div>
+<p class="relationships">See Also: <a href="#67d10fii9q2g3s941rlh42k7hg">hpx::threads::executor (is derived from)</a>, <a href="#58d20o0namml4ja7ak82abbj8t">hpx::threads::executors::this_thread_static_queue_executor</a>
+</p>
+<h3 class="topic">
+<a name="2m0egp3jk71lri32pmm2090djs">&nbsp;&nbsp;
+Abstract base class 
+extends the executor interface
+allows clients to pass in work items that will be executed some time in the future.
+</a>
+</h3>
+<h3 class="topic">
+<a name="3kb3lbn3ve9imabvqfr9turui8">&nbsp;&nbsp;&nbsp;derived classes</a>
+</h3>
+<h3 class="topic">
+<a name="1odv6271r7mgh95lpnkp9fbhet">&nbsp;&nbsp;&nbsp;&nbsp;loop_executor</a>
+</h3>
+<h3 class="topic">
+<a name="25l2feqiivot9cd33q8kcondig">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in N3562 but not in hpx source</a>
+</h3>
+<h3 class="topic">
+<a name="4e3fuhp1ifckrf1tbk1dde6hql">&nbsp;&nbsp;&nbsp;&nbsp;serial_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1b6j90uhsga76oeu6rofo01cpf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not in HPX source</a>
+</h3>
+<h3 class="topic">
+<a name="3gmkuoutjpi3ifrp9djsqpps3u">&nbsp;&nbsp;&nbsp;&nbsp;Executors that are connected to the virtual resource manager somehow:
+- templated on Scheduler
+- have a Scheduler as a data member
+- register on RM-instance in the constructor</a>
+</h3>
+<h3 class="topic">
+<a name="1sfkvdb8komo0j8u3f2pfthjuh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::
+this_thread executors&lt;Scheduler&gt;</a>
+</h3>
+<p class="relationships">See Also: <a href="#5b5nbk4n2rpsdevjkg4rqitth5">hpx::threads::detail::scheduled_executor_base</a>
+</p>
+<h3 class="topic">
+<a name="2tesn5fenb97h0t8mnrmlhlt83">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this is what is constructed in the constructor of ...
+(with correct template parameter)</a>
+</h3>
+<h3 class="topic">
+<a name="58d20o0namml4ja7ak82abbj8t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::this_thread_static_queue_executor</a>
+</h3>
+<p class="relationships">See Also: <a href="#7pfusplgeegedkn8gc98chcfug">hpx::threads::executors::scheduled_executor</a>
+</p>
+<h3 class="topic">
+<a name="0j19gjheuup0rmi7huju49mi0q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::this_thread_static_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4l0dvvlsln961130b7nheaenbp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;internal structure</a>
+</h3>
+<h3 class="topic">
+<a name="1rqo2aplbst97lvmj46oo2h0l9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="0r5sic2qi7p24lqqjffdfh4cdg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scheduler scheduler_</a>
+</h3>
+<h3 class="topic">
+<a name="506vhpaec0qi0a7ufsabqq3c83">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcos::local::counting_semaphore shutdown_sem_</a>
+</h3>
+<h3 class="topic">
+<a name="66bh3qle2352ptu39gso50rbgj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;used in destructor</a>
+</h3>
+<h3 class="topic">
+<a name="55tcfgfon3mooo99410qsj981g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t thread_num</a>
+</h3>
+<h3 class="topic">
+<a name="72neneo1pi3q2h6fa7qj6ae09n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t parent_thread_num_</a>
+</h3>
+<h3 class="topic">
+<a name="4cnvpu05hkfcb1i7ufhqja67l7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t orig_thread_num_</a>
+</h3>
+<h3 class="topic">
+<a name="187i0v27jafrc5p2p6aphrv7da">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::uint64_t&gt; tasks_scheduled_</a>
+</h3>
+<h3 class="topic">
+<a name="0a04peu4j881b52j3l6ouqad7h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::uint64_t&gt; tasks_completed_</a>
+</h3>
+<h3 class="topic">
+<a name="765re6bj673sfd0mctkcont962">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t cookie_</a>
+</h3>
+<h3 class="topic">
+<a name="55cio80l5nvmlgl144nfgv77ko">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ressource manager registration</a>
+</h3>
+<h3 class="topic">
+<a name="3scmfccod7npvrkmapq6uepnl1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;threads::thread_self* self_</a>
+</h3>
+<h3 class="topic">
+<a name="1rhgass7uu92rplfc3vddmdjlm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;store the self reference to the HPX thread running this scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="72js47ccnii8b1hno4cgn15h99">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mutex_type mtx_</a>
+</h3>
+<h3 class="topic">
+<a name="3qrm0n1ujhu3o4j2ghktbph0fv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protect scheduler initialisation</a>
+</h3>
+<h3 class="topic">
+<a name="119e6q461rtdq1q0vdh3aq8e9a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;collect statistics</a>
+</h3>
+<p class="summary">(<a href="#187i0v27jafrc5p2p6aphrv7da">boost::atomic&lt;std::uint64_t&gt; tasks_scheduled_</a>, <a href="#0a04peu4j881b52j3l6ouqad7h">boost::atomic&lt;std::uint64_t&gt; tasks_completed_</a>)</p>
+<h3 class="topic">
+<a name="6ljl7uukn0skjepcman7s685j9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="5im3gsg7jtd6tepp00n6omi3dq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public</a>
+</h3>
+<h3 class="topic">
+<a name="7milt95cnsj8sbao9h6fldnf13">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="7sn0t8u16cg2epsha13eqog6ks">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sets data members</a>
+</h3>
+<h3 class="topic">
+<a name="66kqkhrph23j54hrlaevr0mvlv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instanciates a new scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="0dff5gp2rdv3ickvoa2q7ju4j7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;using struct init_parameter_type, 
+which is a struct defined for each different kind of scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="4ph9rk2iiah5t322ehlmuvhisk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;informs the resource manager about this new executor</a>
+</h3>
+<h3 class="topic">
+<a name="6jrqv2p8gv8gv2fv50r30reh5o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;causes the resource manager to interact with this executor using the manage_executor interface</a>
+</h3>
+<h3 class="topic">
+<a name="4nao3bkvcelo0f3qud3v12r7mk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::uint64_t num_pending_closures(error_code&amp; ec) const;</a>
+</h3>
+<h3 class="topic">
+<a name="2fg1gg3ea4deh9tht4gvorovbi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return an estimate of the number of waiting tasks</a>
+</h3>
+<h3 class="topic">
+<a name="1sg7s9rovjsa27q0u1p7n5cve8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void reset_thread_distribution();</a>
+</h3>
+<h3 class="topic">
+<a name="0njoa0khbgnsvcup86rdl5qo82">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reset internal (round-robin) thread distribution scheme</a>
+</h3>
+<h3 class="topic">
+<a name="6o70aag8hs9dsrqqgubs66ieei">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void set_scheduler_mode(threads::policies::schedules_mode mode)</a>
+</h3>
+<h3 class="topic">
+<a name="6kat014fo352i8msujemc1l338">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the new scheduler_mode</a>
+</h3>
+<h3 class="topic">
+<a name="0d1a5ih9eau8p0sdcjfl75k370">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;protected</a>
+</h3>
+<h3 class="topic">
+<a name="657jfun9eoijq5m6859m7qim08">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_policy_element</a>
+</h3>
+<h3 class="topic">
+<a name="2kqofj074pdihc121o9f36kap0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the requested policy element</a>
+</h3>
+<h3 class="topic">
+<a name="1r59uk3u01d9jfgjdq5m2k6rbk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;functions (used by resource manager to interact with the scheduler)</a>
+</h3>
+<h3 class="topic">
+<a name="0rfb1ppfcjuret3q47apa8cslk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_policy_element(threads::detail::executor_parameter_p, error_code&amp; ec) const;</a>
+</h3>
+<h3 class="topic">
+<a name="0ogm6i7tnm2phl24s038gvti4h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void get_statistics(executor_statistics&amp; stats, error_code&amp; ec) const;</a>
+</h3>
+<h3 class="topic">
+<a name="2vg7m8fv41926oh1684bsu95e9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return statistics collected by this scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="1arm4792v1qg718h0ki0ftvafk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void add_processing_unit(std::size_t virt_core, std::size_t thread_num, error_code&amp; ec)</a>
+</h3>
+<h3 class="topic">
+<a name="4lbqs63h4ctu17ac8mv8cahec9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;provide the given PU to the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="3j71jl6tor3av07lra9q6hop7b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void remove_processing_unit(std::size_t thread_num, error_code&amp; ec)</a>
+</h3>
+<h3 class="topic">
+<a name="2u32uh999sg7823u2n25qnst23">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remove the given PU from the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="0fgau2ag0hahkb6jhqblplfggr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void suspend_back_into_calling_context();</a>
+</h3>
+<h3 class="topic">
+<a name="7g1cm68d7fttssqaod1pu9qgnv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;give invoking context a chance to catch up with its tasks</a>
+</h3>
+<h3 class="topic">
+<a name="7fa3v0bamgqo4aprvu8iufrsog">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private</a>
+</h3>
+<h3 class="topic">
+<a name="4lldjej2nj0qnuj3608ut732ks">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run()</a>
+</h3>
+<h3 class="topic">
+<a name="2m1ob0mgjdlrien2jdhuso4n5s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;internal run method. Executes all work</a>
+</h3>
+<h3 class="topic">
+<a name="1ahnu2thlmjnk9qeud6pgtuljr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;how does it schedule HPX-threads?</a>
+</h3>
+<h3 class="topic">
+<a name="2sdiglhlrkh2f60645cqf2fobe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uses threads::detail::create_thread to give the HPX-thread to the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="51p3m8t1g0ahhk6umvjb415qet">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef</a>
+</h3>
+<p class="summary">(<a href="#2tesn5fenb97h0t8mnrmlhlt83">this is what is constructed in the constructor of ...
+(with correct template parameter)</a>, <a href="#4l0dvvlsln961130b7nheaenbp">internal structure</a>)</p>
+<h3 class="topic">
+<a name="3vkp29mshvt4cukfur0rku10tf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this_thread executors</a>
+</h3>
+<h3 class="topic">
+<a name="656ljbl1ka28snburechj7ttbd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::this_thread_static_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7rvdq3m4oged63lkk73iia8q49">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::this_thread_static_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="3n6k3ur0i8a9c810jh7q158s03">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::
+thread_pool_executor&lt;Scheduler&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="7bpgq2upet3pk89f57bq3sifpm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::local_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7js4rn6t18l49noh0ov8l48ooh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::static_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="5f61ngefq5sr5l5qguo2i34i4l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::throttle_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="00k7ajhkh9uhg5c9mj0aj7kfle">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::local_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="536ml2eejaqom7bs5v6pst41pt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::static_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="41b2vpmhpg7nmqmln5ptjgh8f8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;internal structure</a>
+</h3>
+<h3 class="topic">
+<a name="24321bb4jbbn0rd1ko9lctojbv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="1d5evs1gbtpldgmfvefr0kulji">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="14pcq5g2f7p5mgrmt6cesourg5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public</a>
+</h3>
+<h3 class="topic">
+<a name="0gnteg5t5mf52noriiv5mdrc7u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::uint64_t num_pending_closures(error_code&amp; ec) const;</a>
+</h3>
+<h3 class="topic">
+<a name="0aqhji7lvnn5vfakv7ag2t2dt3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef</a>
+</h3>
+<p class="summary">(<a href="#7bpgq2upet3pk89f57bq3sifpm">hpx::threads::executors::local_queue_executor</a>, <a href="#7js4rn6t18l49noh0ov8l48ooh">hpx::threads::executors::static_queue_executor</a>, <a href="#5f61ngefq5sr5l5qguo2i34i4l">hpx::threads::executors::throttle_queue_executor</a>, <a href="#00k7ajhkh9uhg5c9mj0aj7kfle">hpx::threads::executors::local_priority_queue_executor</a>, <a href="#536ml2eejaqom7bs5v6pst41pt">hpx::threads::executors::static_priority_queue_executor</a>)</p>
+<h3 class="topic">
+<a name="2bc7sj5qomnj8f20suvm400lf5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queue executors</a>
+</h3>
+<h3 class="topic">
+<a name="2e58g0m97ovu5u9i3bcu5daq4s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallell::local_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4ptak2prfvn8pfeeb4dsbisdtd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallell::static_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="75n1btdn1vvnjqiqsn5fhaj44e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallell::throttle_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1lfketqellvas0c9gs0tjncjjm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallell::local_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="196jj7bgbbpf1hjimasl9jjv4o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallell::static_priority_queue_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4jiersb9s8ogm9t6ls78hrqipn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create executors 
+on top of the corresponding 
+HPX schedulers</a>
+</h3>
+<p class="summary">(<a href="#2e58g0m97ovu5u9i3bcu5daq4s">hpx::parallell::local_queue_executor</a>, <a href="#4ptak2prfvn8pfeeb4dsbisdtd">hpx::parallell::static_queue_executor</a>, <a href="#75n1btdn1vvnjqiqsn5fhaj44e">hpx::parallell::throttle_queue_executor</a>, <a href="#1lfketqellvas0c9gs0tjncjjm">hpx::parallell::local_priority_queue_executor</a>, <a href="#196jj7bgbbpf1hjimasl9jjv4o">hpx::parallell::static_priority_queue_executor</a>)</p>
+<h3 class="topic">
+<a name="6cpc6ljt2l75dosj9ek6bpfda0">&nbsp;&nbsp;&nbsp;&nbsp;Executors that are very much connected to schedulers
+- are templated on Scheduler
+- have a Scheduler as a data member
+But are not connected to the resource manager</a>
+</h3>
+<h3 class="topic">
+<a name="2jmmss6iotl3cedgoo5qrt1fsd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::
+thread_pool_os_executor&lt;Scheduler&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="05m7527g334oipe89qvmcr5v99">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::local_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="560mpls9an2havlte6ohjtal4u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::static_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="0n3regnkardnsd7bhg9rreqfn3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::local_priority_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="19ndpmg9spvhvh02n8vov7kgk8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::static_priority_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="35j55j9qejbilhqgb33omkeipt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef</a>
+</h3>
+<p class="summary">(<a href="#05m7527g334oipe89qvmcr5v99">hpx::threads::executors::local_queue_os_executor</a>, <a href="#560mpls9an2havlte6ohjtal4u">hpx::threads::executors::static_queue_os_executor</a>, <a href="#0n3regnkardnsd7bhg9rreqfn3">hpx::threads::executors::local_priority_queue_os_executor</a>, <a href="#19ndpmg9spvhvh02n8vov7kgk8">hpx::threads::executors::static_priority_queue_os_executor</a>)</p>
+<h3 class="topic">
+<a name="33te1h3vnrkc5l2v9n8ca3s48o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;os-queue executors</a>
+</h3>
+<h3 class="topic">
+<a name="2rkk1nst2i2faan7vgud0i8l0v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::local_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7sdl3qrhrbilsbqjrhcvm308f2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="3s93elmosikfref1egtpb9qg8l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::local_priority_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7f9ck4cpqdo0bcg12940np6fsh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_priority_queue_os_executor</a>
+</h3>
+<h3 class="topic">
+<a name="0d2oia812jbm4to7e3kokftjkv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail
+thread_pool_attached_executor&lt;Scheduler&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="57t6bc5hl3h64homskdr9p25p2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::local_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="3phcuut2b0t4etap2jq24hp741">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::static_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4oferdgc1ig9fmrv0adqu2oua5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::local_priority_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1bi06a29k0t1e861ka7viv4o2h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::static_priority_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4277aklqr4ngei0fvm6ejr7q5m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef</a>
+</h3>
+<p class="summary">(<a href="#57t6bc5hl3h64homskdr9p25p2">hpx::threads::executors::local_queue_attached_executor</a>, <a href="#3phcuut2b0t4etap2jq24hp741">hpx::threads::executors::static_queue_attached_executor</a>, <a href="#4oferdgc1ig9fmrv0adqu2oua5">hpx::threads::executors::local_priority_queue_attached_executor</a>, <a href="#1bi06a29k0t1e861ka7viv4o2h">hpx::threads::executors::static_priority_queue_attached_executor</a>)</p>
+<h3 class="topic">
+<a name="3defje3jn6cafiovapg8prge5j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queue_attached executors</a>
+</h3>
+<h3 class="topic">
+<a name="6butku9uro2cri4efrubn6084v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::local_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="31gpcene089og0eipvp98jt1m3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7can0ntqoq9qipe4uu3c8l8hih">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::local_priority_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="3o0bnmpnttafqs316pd5vuk3ko">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::static_priority_queue_attached_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7s7u13r0jml6bfoatjdbg3qj0f">&nbsp;&nbsp;&nbsp;&nbsp;Executors that put tasks on real OS-threads, 
+instead of executing them as HPX-threads.</a>
+</h3>
+<h3 class="topic">
+<a name="00holiq843o1l6grdj5e9pcb17">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::detail::
+service_executor</a>
+</h3>
+<h3 class="topic">
+<a name="477i2ap93vt4gsmmahbnueqdb8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::service_executor</a>
+</h3>
+<h3 class="topic">
+<a name="6be3e8f2rg4bfortc7rshn65jq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="4ae44193an4183geebvh0oq1j3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;service_executor(
+    service_executor_type t,
+    char const* name_suffix = "")
+    : scheduled_executor(detail::get_service_executor(t, name_suffix))</a>
+</h3>
+<p class="relationships">See Also: <a href="#00e8q6ddk9sd44veov1ma1acbj">namespace hpx::threads::executors::detail
+{
+	inline threads::detail::scheduled_executor_base*
+        get_service_executor(
+		service_executor_type t,
+            	char const* name_suffix = "")
+}</a>
+</p>
+<h3 class="topic">
+<a name="0s6at348j3qe4bdp5gt7n80mqs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::timer_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="68v9vgkhoig0lrvkbmbpus7f3p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="2ioaabj0agc2k8oubnn6ja1k2u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;timer_pool_executor()
+    : scheduled_executor(detail::get_service_executor(
+                service_executor_type::timer_thread_pool))
+{}</a>
+</h3>
+<h3 class="topic">
+<a name="6o1hibg8medfmt18bk5lj1cmol">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::main_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="6tcdm2pigo2spugp5bm0hgm540">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="56nd466c1opk8l0294s4944a43">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main_pool_executor()
+          : scheduled_executor(detail::get_service_executor(
+                service_executor_type::main_thread))
+        {}</a>
+</h3>
+<h3 class="topic">
+<a name="64b5df28mjrselin73obeb3agc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::parcel_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="7i2093bi90sqc1h16auhvi2smj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="10spo10cha8e4a2v2dohp2ue9k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parcel_pool_executor(char const* name_suffix = "-tcp")
+          : scheduled_executor(detail::get_service_executor(
+                service_executor_type::parcel_thread_pool, name_suffix))
+        {}</a>
+</h3>
+<h3 class="topic">
+<a name="6fe92q629022inbd7nsk62f5dp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::io_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4vj0m679m85sd3gv1pngj4hen5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="15baopujaa3gfaefbg4rv68inr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;io_pool_executor()
+          : scheduled_executor(detail::get_service_executor(
+                service_executor_type::io_thread_pool))
+        {}</a>
+</h3>
+<h3 class="topic">
+<a name="02tl8elcela3jshbe659ffll0u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enum class service_executor_type
+{
+        io_thread_pool,
+        parcel_thread_pool,
+        timer_thread_pool,
+        main_thread
+};</a>
+</h3>
+<h3 class="topic">
+<a name="1gb7iuhenk8j464rl97nuiavnr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The type of the HPX thread pool to use for a given service_executor.
+Allows to specify the kind of the HPX thread pool to use for a given service_executor.
+Passed as parameter to the constructor of </a>
+</h3>
+<h3 class="topic">
+<a name="00e8q6ddk9sd44veov1ma1acbj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;namespace hpx::threads::executors::detail
+{
+	inline threads::detail::scheduled_executor_base*
+        get_service_executor(
+		service_executor_type t,
+            	char const* name_suffix = "")
+}</a>
+</h3>
+<p class="relationships">See Also: <a href="#4ae44193an4183geebvh0oq1j3">service_executor(
+    service_executor_type t,
+    char const* name_suffix = "")
+    : scheduled_executor(detail::get_service_executor(t, name_suffix))</a>
+</p>
+<h3 class="topic">
+<a name="6vtln3fol1b4081ffei2j9k0c7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calls constructor of detail::service_executor
+with appropriate parameter depending on t</a>
+</h3>
+<p class="relationships">See Also: <a href="#1j1bi81g2d0ps3bi2h52mf74f1">hpx::threads::executors::detail::service_executor</a>
+</p>
+<h3 class="topic">
+<a name="7nngtngrbdbjjoo28ihaqfg9bp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;derives from</a>
+</h3>
+<p class="summary">(<a href="#477i2ap93vt4gsmmahbnueqdb8">hpx::threads::executors::service_executor</a>, <a href="#0s6at348j3qe4bdp5gt7n80mqs">hpx::threads::executors::timer_pool_executor</a>, <a href="#6o1hibg8medfmt18bk5lj1cmol">hpx::threads::executors::main_pool_executor</a>, <a href="#64b5df28mjrselin73obeb3agc">hpx::threads::executors::parcel_pool_executor</a>, <a href="#6fe92q629022inbd7nsk62f5dp">hpx::threads::executors::io_pool_executor</a>)</p>
+<h3 class="topic">
+<a name="6142tbovqucuoo5h7h5urhppuv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::service_executor</a>
+</h3>
+<h3 class="topic">
+<a name="2ebsjoojfiu9q2hibb8oovcncf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::timer_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="2mdvcq17nd74d2u16tnl6n2dhu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="4gq4ngr2iteulahnv7q51mv9cb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;timer_pool_executor()
+          : service_executor(
+                threads::executors::service_executor_type::timer_thread_pool)
+        {}</a>
+</h3>
+<h3 class="topic">
+<a name="235ek7d130vn9besbh380m26up">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::main_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="0seo4gb6vr01roaolmac3mhcum">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="22r5ogvv3vut2nlffjba923udm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main_pool_executor()
+          : service_executor(
+                threads::executors::service_executor_type::main_thread)
+        {}</a>
+</h3>
+<h3 class="topic">
+<a name="57ft05jeq44onqo89fnju7v7db">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::parcel_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="51vuasdkloplmp41bdkph5cl93">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="5o4utpgq8hcl4fo0arim3nl8ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parcel_pool_executor(char const* name_suffix = "-tcp")
+          : service_executor(
+                threads::executors::service_executor_type::parcel_thread_pool,
+                name_suffix)
+        {}</a>
+</h3>
+<h3 class="topic">
+<a name="618hjlelooths4em2v2nrq1sj9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::io_pool_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1b6nebjq6ulh8cm9qup1nlf3do">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="4orlfuno2o3v7pg1ko05uc2v6n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;io_pool_executor()
+          : service_executor(
+                threads::executors::service_executor_type::io_thread_pool)
+        {}</a>
+</h3>
+<h3 class="topic">
+<a name="5fqbvvtg137kf65s8cklgvmcju">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;creates groups of parallel execution agents which execute in one of the kernel threads 
+associated with a given pool category 
+(I/O, parcel, or timer pool, or on the main thread of the application).
+
+A service_executor exposes one of the predefined HPX thread pools
+through an executor interface.
+
+All tasks executed by one of these executors will run on
+one of the OS-threads dedicated for the given thread pool. 
+The tasks will not run as HPX-threads.</a>
+</h3>
+<p class="summary">(<a href="#2ebsjoojfiu9q2hibb8oovcncf">hpx::parallel::timer_pool_executor</a>, <a href="#235ek7d130vn9besbh380m26up">hpx::parallel::main_pool_executor</a>, <a href="#57ft05jeq44onqo89fnju7v7db">hpx::parallel::parcel_pool_executor</a>, <a href="#618hjlelooths4em2v2nrq1sj9">hpx::parallel::io_pool_executor</a>)</p>
+<h3 class="topic">
+<a name="15doalaq42ljn8v9mo04nd3psg">&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::default_executor</a>
+</h3>
+<p class="relationships">See Also: <a href="#0jn23nh38rr1dhgnnlhul5f15m">scheduled_executor* default_executor(); (not the same thing!)</a>
+</p>
+<h3 class="topic">
+<a name="6di89hvq9m2vasn6b98i3ocbos">&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::executors::current_executor</a>
+</h3>
+<h3 class="topic">
+<a name="1brfbap9chs0pjdjg19lits62b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="3bt0r08759g4n771adk03noa62">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;policies::scheduler_base* scheduler_base_;</a>
+</h3>
+<h3 class="topic">
+<a name="1025aq0rfj3rd8rktuagkpctck">&nbsp;&nbsp;&nbsp;&nbsp;typedef</a>
+</h3>
+<p class="summary">(<a href="#15doalaq42ljn8v9mo04nd3psg">hpx::threads::executors::default_executor</a>)</p>
+<h3 class="topic">
+<a name="4hvoecr2uqdrd66lqmdmob4vdk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::parallel::default_executor</a>
+</h3>
+<h3 class="topic">
+<a name="20lin4idcedsjac8akqi7c29vv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;refers to the currently used base-executor</a>
+</h3>
+<h3 class="topic">
+<a name="1o75ics2jak8ia5ghcqsi0r21n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="7kac1ji59mpvt3qdg5hmt94q8q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_stacksize stacksize_;
+thread_priority priority_;
+std::size_t os_thread_;</a>
+</h3>
+<h3 class="topic">
+<a name="3tmicrck8p09cibfj5eqfq4rqd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructors</a>
+</h3>
+<h3 class="topic">
+<a name="5mkffa6rlg2su4hao34iadtrns">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default_executor()</a>
+</h3>
+<h3 class="topic">
+<a name="7m4dav7lac5ndojimpmtkjlr8i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default_executor(thread_stacksize stacksize)</a>
+</h3>
+<h3 class="topic">
+<a name="6nho7mhqkv4v2b0q0esfke53hm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default_executor(thread_priority priority,
+                thread_stacksize stacksize = thread_stacksize_default,
+                std::size_t os_thread = std::size_t(-1))</a>
+</h3>
+<h3 class="topic">
+<a name="2dninc142msb2q28d16vp2sc6n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default_executor(std::size_t os_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="7q0p24bsb8nsvd1rm9rnkftiln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;examples</a>
+</h3>
+<h3 class="topic">
+<a name="5vo5fdqvh2elaf8a4m9l62si5g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    // run a thread on a large stack
+    {
+        hpx::threads::executors::default_executor large_stack_executor(
+            hpx::threads::thread_stacksize_large);
+
+        hpx::future&lt;void&gt; f =
+            hpx::async(large_stack_executor, &amp;run_with_large_stack);
+        f.wait();
+    }
+
+    // run a thread with high priority
+    {
+        hpx::threads::executors::default_executor high_priority_executor(
+            hpx::threads::thread_priority_critical);
+
+        hpx::future&lt;void&gt; f =
+            hpx::async(high_priority_executor, &amp;run_with_high_priority);
+        f.wait();
+    }
+
+    // combine both
+    {
+        hpx::threads::executors::default_executor fancy_executor(
+            hpx::threads::thread_priority_critical,
+            hpx::threads::thread_stacksize_large);
+
+        hpx::future&lt;void&gt; f =
+            hpx::async(fancy_executor, &amp;run_with_large_stack);
+        f.wait();
+    }</a>
+</h3>
+<h3 class="topic">
+<a name="4ucr8788fjnqf3pd637em8llkt">&nbsp;&nbsp;&nbsp;API</a>
+</h3>
+<h3 class="topic">
+<a name="3nedv4s9td90gf5fp49ieu8nok">&nbsp;&nbsp;&nbsp;&nbsp;void add(closure_type &amp;&amp; f,
+    util::thread_description const&amp; description,
+    threads::thread_state_enum initial_state, bool run_now,
+    threads::thread_stacksize stacksize, error_code&amp; ec);</a>
+</h3>
+<h3 class="topic">
+<a name="6fv50qpvhdj5rug5r9obmhkqa5">&nbsp;&nbsp;&nbsp;&nbsp;void add_at(
+    chrono::system_clock::time_point abs_time,
+    function&lt;void()&gt; closure);</a>
+</h3>
+<div class="notesContainer">
+<p>N3562</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="1tfns60vt28jp7213f7sj718m4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void add_at(
+    util::steady_clock::time_point const&amp; abs_time,
+    closure_type &amp;&amp; f, util::thread_description const&amp; description,
+    threads::thread_stacksize stacksize, error_code&amp; ec);</a>
+</h3>
+<div class="notesContainer">
+<p>HPX</p>
+</div>
+<h3 class="topic">
+<a name="2dcl60i7ho6ln9m2rut06am84u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effects: The specified function object shall be scheduled for execution by the executor at some point in the future no sooner than the time represented by abs_time .
+
+Synchronization: completion of closure on a particular thread happens before
+destruction of that thread&rsquo;s thread&shy;duration variables.
+
+Error conditions: If invoking closure throws an exception, the executor shall call terminate .</a>
+</h3>
+<h3 class="topic">
+<a name="6rnepnpe4ui6ha6idi481fgudn">&nbsp;&nbsp;&nbsp;&nbsp;void add_after(
+    chrono::system_clock::duration rel_time,
+    function&lt;void()&gt; closure);</a>
+</h3>
+<div class="notesContainer">
+<p>N356</p>
+</div>
+<h3 class="topic">
+<a name="54vhlpj3j2sflamn70vamvp11j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void add_after(
+    util::steady_clock::duration const&amp; rel_time,
+    closure_type &amp;&amp; f, util::thread_description const&amp; description,
+    threads::thread_stacksize stacksize, error_code&amp; ec);</a>
+</h3>
+<div class="notesContainer">
+<p>HPX</p>
+</div>
+<h3 class="topic">
+<a name="0ppalbn4b2n9aajlovpvbg30sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effects: The specified function object shall be scheduled for execution by the executor at
+some point in the future no sooner than time rel_time from now.
+
+Synchronization: completion of closure on a particular thread happens before destruction of that thread&rsquo;s thread&shy;duration variables.
+
+Error conditions: If invoking closure throws an exception, the executor shall call terminate .</a>
+</h3>
+<h3 class="topic">
+<a name="3mjdi5nnv638ga4s4l3ualfa01">&nbsp;&nbsp;&nbsp;&nbsp;utility 
+functions</a>
+</h3>
+<h3 class="topic">
+<a name="0jn23nh38rr1dhgnnlhul5f15m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scheduled_executor* default_executor();</a>
+</h3>
+<p class="relationships">See Also: <a href="#15doalaq42ljn8v9mo04nd3psg">hpx::threads::executors::default_executor (not the same thing!)</a>
+</p>
+<h3 class="topic">
+<a name="7q2edup9njqg8c35u9bknalv2e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns: a non&shy;null pointer to the default executor defined by the active process. 
+If set_default_executor hasn&rsquo;t been called then the return value is a pointer to an
+executor of unspecified type. 
+
+[Note: implementations are encouraged to ensure that separate tasks added to the initial default executor can wait on each other without deadlocks.]</a>
+</h3>
+<h3 class="topic">
+<a name="5ps6anut5o84b7jrge31lb19dr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void set_default_executor(scheduled_executor* executor);</a>
+</h3>
+<h3 class="topic">
+<a name="3otmuubve8hgungbrnko33kv2i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Effect: the default executor of the active process is set to the given executor instance.
+
+Requires: executor shall not be null.
+
+Synchronization: Changing and using the default executor is sequentially consistent.</a>
+</h3>
+<h3 class="topic">
+<a name="2d2mk15k2d47dsfhmdh1iuh8kh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;executor* singleton_inline_executor();</a>
+</h3>
+<h3 class="topic">
+<a name="6ee9bq60f5eqguv56v7h8e81v7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns: a non&shy;null pointer to an executor that immediately executes any closure that is added to it using add() . 
+Multiple invocations return a pointer to the same object.</a>
+</h3>
+<h3 class="topic">
+<a name="7714mmoscak5lf9qoteb8sjvf4">&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="7e20hn0ki0o64o3ppvr5gus707">&nbsp;&nbsp;boost::intrusive_ptr&lt;detail::executor_base&gt; executor_data_</a>
+</h3>
+<h2 class="topic">
+<a name="7k4nmflq9rknqm9554492mas18">executor_traits</a>
+</h2>
+<div class="notesContainer">
+<p>in the sense of N440</p>
+</div>
+<h3 class="topic">
+<a name="2u0l02h5kqtps3n6rb0cq6ch2e">&nbsp;
+used to request execution agents from an executor
+
+analogous to the interaction between containers and allocator_traits
+
+exposes executor functionality
+defines what executors have to implement: 
+- async_execute() 
+
+All other functions will be emulated by executor_traits 
+in terms of async_execute if not specialised
+</a>
+</h3>
+<h3 class="topic">
+<a name="5jiki8a4f37av6uoj1mouvk8co">&nbsp;&nbsp;typedefs</a>
+</h3>
+<h3 class="topic">
+<a name="5mbidnbtemjqs63mpmdrjh5ni7">&nbsp;&nbsp;&nbsp;typedef Executor executor_type</a>
+</h3>
+<h3 class="topic">
+<a name="1584lrf7j8apqelf6qhsufaa75">&nbsp;&nbsp;&nbsp;&nbsp;the type of the executor associated with this instance of executor_traits</a>
+</h3>
+<h3 class="topic">
+<a name="38mn7qa7c1r9uo28trb8f5po2j">&nbsp;&nbsp;&nbsp;typedef typename detail::execution_category&lt;executor_type&gt;::type
+            execution_category;</a>
+</h3>
+<h3 class="topic">
+<a name="7dj3anqgef2osfug5t9oclhaoe">&nbsp;&nbsp;&nbsp;&nbsp;the category of agents created by bulk_execute() and bulk_async_execute()</a>
+</h3>
+<h3 class="topic">
+<a name="41onbhr10irkjnppcljnpptha3">&nbsp;&nbsp;&nbsp;&nbsp;this evaluates to executor_type::execution_category if it exists;
+otherwise it evaluates to parallel_execution_tag</a>
+</h3>
+<h3 class="topic">
+<a name="73ugdkn513r9qo09q7bk472n77">&nbsp;&nbsp;&nbsp;template &lt;typename T&gt;
+struct future
+{
+     typedef typename detail::future_type&lt;executor_type, T&gt;::type type;
+};</a>
+</h3>
+<h3 class="topic">
+<a name="4j8q9ef7j71qrfr3t8t0j8hti1">&nbsp;&nbsp;&nbsp;&nbsp;the type of the future returned by async_execute()</a>
+</h3>
+<h3 class="topic">
+<a name="7gprjedjtj8d2nv4dhparp0c82">&nbsp;&nbsp;&nbsp;&nbsp;this evaluates to executor_type::future_type&lt;T&gt; is it exists,
+otherwise it evaluates to hpx::future&lt;T&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="41gcqfo5r5vupq3fknl4ip2uq8">&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="4i30536btg2vks4svlc5su7s3s">&nbsp;&nbsp;&nbsp;template&lt;typename Executor_, typename F, typename ... Ts&gt;
+
+static void apply_execute(
+
+    Executor_ &amp;&amp; exec,F &amp;&amp; f, Ts &amp;&amp; ... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="03khjchnbdvtpfjpq40h2qbr86">&nbsp;&nbsp;&nbsp;&nbsp;Singleton form for asynchronous fire and forget execution agent creation</a>
+</h3>
+<h3 class="topic">
+<a name="2r35etotn79f34bma6lf2c2qtd">&nbsp;&nbsp;&nbsp;&nbsp;create a single function invocation f()
+- asynchronously (fire and forget)
+- using the associated executor</a>
+</h3>
+<h3 class="topic">
+<a name="13udl8h9375i70gi5bisvvkd2t">&nbsp;&nbsp;&nbsp;&nbsp;This calls </a>
+</h3>
+<h3 class="topic">
+<a name="3hjlvqkqcjodgbdte5ouop10mg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if available: </a>
+</h3>
+<h3 class="topic">
+<a name="62elrjsoufpo4sj6jvf2n7g6k1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exec.apply_execute(f, ts...) </a>
+</h3>
+<h3 class="topic">
+<a name="0deij7gk9l12hfg1qgta03557k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;otherwise, </a>
+</h3>
+<h3 class="topic">
+<a name="0kq4tljletec2qf9gs569b8re0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exec.async_execute() </a>
+</h3>
+<h3 class="topic">
+<a name="10g76ibudreuq075s6vn7nbgc7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while discarding the 
+returned future</a>
+</h3>
+<h3 class="topic">
+<a name="11hj5kre30dq77mg7v29lnouf8">&nbsp;&nbsp;&nbsp;template &lt;typename Executor_, typename F, typename ... Ts&gt;
+
+static auto async_execute(
+
+     Executor_ &amp;&amp; exec, F &amp;&amp; f, Ts &amp;&amp;... ts)</a>
+</h3>
+<div class="notesContainer">
+<p>Executors have to implement only `async_execute()`. </p>
+<p></p>
+<p>All other functions will be emulated by this `executor_traits` in terms of this single basic primitive. However, some executors will </p>
+<p>naturally specialize all operations for maximum efficiency.</p>
+</div>
+<h3 class="topic">
+<a name="21btq9b4u7u5ab49kfl6nt004k">&nbsp;&nbsp;&nbsp;&nbsp;Singleton form of asynchronous execution agent</a>
+</h3>
+<h3 class="topic">
+<a name="7h9ltqnnnic3b0cstd20s2ve2n">&nbsp;&nbsp;&nbsp;&nbsp;create a single function invocation f()
+- asynchronously
+- using the associated executor</a>
+</h3>
+<h3 class="topic">
+<a name="57f08rbaf76gknp6j4lpecsnnr">&nbsp;&nbsp;&nbsp;&nbsp;this calls</a>
+</h3>
+<h3 class="topic">
+<a name="7lhtvd4h5lnu7f8a0pi53pmdqp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exec.async_execute(f, ts ...)</a>
+</h3>
+<h3 class="topic">
+<a name="6n6gd721nhak69t2olvhjqaog8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and returns f(ts...)'s result 
+through a future</a>
+</h3>
+<h3 class="topic">
+<a name="2ch85e4ilalleqp3n3ag55pluc">&nbsp;&nbsp;&nbsp;template &lt;typename Executor_, typename F, typename ... Ts&gt;
+
+static auto execute(
+
+     Executor_ &amp;&amp; exec, F &amp;&amp; f, Ts &amp;&amp;...ts)</a>
+</h3>
+<h3 class="topic">
+<a name="17phgudegqd8b4j0mjc92844lo">&nbsp;&nbsp;&nbsp;&nbsp;Singleton form of synchronous execution agent creation</a>
+</h3>
+<h3 class="topic">
+<a name="16vtun1jsmfedcieksecbfql69">&nbsp;&nbsp;&nbsp;&nbsp;create a single function invocation f()
+- synchronously
+- using the associated executor
+- the execution of the supplied function synchronizes with the caller</a>
+</h3>
+<h3 class="topic">
+<a name="231olor5s2dvki2o7ubr5tuvga">&nbsp;&nbsp;&nbsp;&nbsp;this calls</a>
+</h3>
+<h3 class="topic">
+<a name="2at4s9teae8js9hg08ueilkp31">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if available: </a>
+</h3>
+<h3 class="topic">
+<a name="5bf0u03dm126mbt6i2casmuc1r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exec.execute(f)</a>
+</h3>
+<h3 class="topic">
+<a name="4hf95j2s8h2oj9q4mscsbp4gt2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;otherwise</a>
+</h3>
+<h3 class="topic">
+<a name="1ijno0dscgnhlishikvcmp6ej5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::async(f).get()</a>
+</h3>
+<h3 class="topic">
+<a name="38dab1up7m781gtd87a1m85b49">&nbsp;&nbsp;&nbsp;&nbsp;returns f(ts...)'s result</a>
+</h3>
+<p class="summary">(<a href="#231olor5s2dvki2o7ubr5tuvga">this calls</a>)</p>
+<h3 class="topic">
+<a name="34spaktgtn5mvp9coiq3vs9tav">&nbsp;&nbsp;&nbsp;template &lt;typename Executor_, typename F, typename Shape, typename ... Ts&gt;
+
+static auto bulk_async_execute(
+
+     Executor_ &amp;&amp; exec, F &amp;&amp; f, Shape const&amp; shape, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="1ledmlvktio0rjf6vr3162emhv">&nbsp;&nbsp;&nbsp;&nbsp;Bulk form of asynchronous execution agent creation</a>
+</h3>
+<h3 class="topic">
+<a name="68jutuh7lb45k1k5qq53qg3e03">&nbsp;&nbsp;&nbsp;&nbsp;create a group of function invocations f(i)
+- asynchronously
+- whose ordering is given by the execution_category associated with the executor</a>
+</h3>
+<h3 class="topic">
+<a name="4e9gvsfnbjpksvu8gcu5lh3330">&nbsp;&nbsp;&nbsp;&nbsp;The shape objects which defines the iteration boundaries 
+for the arguments to be passed to f.</a>
+</h3>
+<h3 class="topic">
+<a name="1qruqpl49pntdetrm0i10btmfo">&nbsp;&nbsp;&nbsp;&nbsp;this calls</a>
+</h3>
+<h3 class="topic">
+<a name="4kpnmq0horo2di8660jk6pa6cj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if available</a>
+</h3>
+<h3 class="topic">
+<a name="4eg4r5171scn9kpv9memathf51">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exec.async_execute(f, shape)</a>
+</h3>
+<h3 class="topic">
+<a name="4ktbgpq0ov7geup8caokl94l81">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;otherwise</a>
+</h3>
+<h3 class="topic">
+<a name="18a0ushha2bnf23l8v4l7s9164">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::async(f, i)</a>
+</h3>
+<h3 class="topic">
+<a name="5d76m16iakj42ov3vilqfa7hgj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as often as needed</a>
+</h3>
+<h3 class="topic">
+<a name="42fvkrj5b9ulqp5f3g4rmfijkm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns a vector of futures
+holding the returned value of each invocation of f</a>
+</h3>
+<h3 class="topic">
+<a name="2ir4fis50kdshbhokr9al1f9nn">&nbsp;&nbsp;&nbsp;template &lt;typename Executor_, typename F, typename Shape, typename ... Ts&gt;
+
+static auto bulk_execute(
+
+     Executor_ &amp;&amp; exec, F &amp;&amp; f, Shape const&amp; shape, Ts &amp;&amp;... ts)</a>
+</h3>
+<h3 class="topic">
+<a name="59fn6436aa97976nton27ffm7t">&nbsp;&nbsp;&nbsp;&nbsp;Bulk form of synchronous execution agent creation</a>
+</h3>
+<h3 class="topic">
+<a name="6bkppul8rflv4gkag8u1ong59s">&nbsp;&nbsp;&nbsp;&nbsp;create a group of function invocations f(i)
+- synchronously
+- whose order is given by the execution_category associated with the executor
+- the function synchronizes the execution of all scheduled functions with the caller</a>
+</h3>
+<h3 class="topic">
+<a name="6121cc1onnhclt2kbqpltd3den">&nbsp;&nbsp;&nbsp;&nbsp;The shape objects which defines the iteration boundaries 
+for the arguments to be passed to f.</a>
+</h3>
+<h3 class="topic">
+<a name="5jojhnfujk8gdpjaonntua8j4g">&nbsp;&nbsp;&nbsp;&nbsp;this calls</a>
+</h3>
+<h3 class="topic">
+<a name="3tom0t71g8smrmiok87qe54tb8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if available</a>
+</h3>
+<h3 class="topic">
+<a name="3re66uuns3c656qnsl1srnegnj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exec.execute(f, shape)</a>
+</h3>
+<h3 class="topic">
+<a name="57lnqns7dl6bv2tfa3mo1aqnkj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;otherwise</a>
+</h3>
+<h3 class="topic">
+<a name="765lvh5ndfvb507einetp034jj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::async(f,i) as often as needed</a>
+</h3>
+<h3 class="topic">
+<a name="4udppeeh048ensfnffi1erl86u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns a vector 
+holding the returned value of each invocation of f
+except when f returns void, in which case void is returned</a>
+</h3>
+<h3 class="topic">
+<a name="4b6cru5h1p2iecmhm0mrg537nk">&nbsp;&nbsp;how does it work?</a>
+</h3>
+<h3 class="topic">
+<a name="6jjsk3u787aobgskk1v61so6e8">&nbsp;&nbsp;&nbsp;manipulate all types of executors uniformly</a>
+</h3>
+<h3 class="topic">
+<a name="2n7c57a9ofri5qm4l49adsqdic">&nbsp;&nbsp;&nbsp;&nbsp;executor_traits&lt;my_executor_t&gt;::execute(my_executor,
+    [](size_t i){ // perform task i },
+    range(0, n));</a>
+</h3>
+<h3 class="topic">
+<a name="2bf4rq5j95vfgp4j4ikvngq6bg">&nbsp;&nbsp;&nbsp;different invocations</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.org/2015/05/hpx-and-cpp-executors/" name="08igm5qn31nuv7lpn6f6f1gfji">&nbsp;&nbsp;&nbsp;&nbsp;using hpx::future;
+using std::vector;
+
+some_executor_type exec;
+some_shape_type inputs;
+auto fire_n_forget = [](){ /*..accomplish something..*/ };
+auto f1 = [](){ /*..compute..*/ return t; };
+auto f2 = [](T t_a){ /*..compute..*/ return t_b; };
+
+typedef executor_traits&lt;some_executor_type&gt; traits;
+
+// executor calls fire_n_forget function but is not required to 
+// wait for the function to finish
+traits::apply_execute(exec, fire_n_forget)
+
+// executor calls f1 and returns the result
+traits::execute(exec, f1);
+
+// Bulk overload. Calls f2 for each of the inputs and returns a
+// vector&lt;T&gt; holding the results
+traits::execute(exec, f2, inputs);
+
+// Asynchronously calls f1 and returns a future of the result
+traits::async_execute(exec, f1)
+
+// Bulk overload. Calls f2 for each of the inputs and returns a
+// vector&lt;future&lt;T&gt;&gt; holding the results
+traits::async_execute(exec, f2, inputs);</a>
+</h3>
+<h2 class="topic">
+<a name="10qaganvbrjdd1c1r7tsvn5ep9">is_executor</a>
+</h2>
+<h3 class="topic">
+<a name="5jh1bld029trr8ckajeh58s5ba">&nbsp;
+The type is_executor can be used to detect executor types
+for the purpose of excluding function signatures
+from otherwise ambiguous overload resolution participation.
+</a>
+</h3>
+</body>
+</html>

@@ -1,0 +1,790 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>
+
+hpx::threads::topology
+
+</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="0aevd55l01le98rslmgt09r1k8">
+
+hpx::threads::topology
+
+</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="7-topology_files/images/  hpx  threads  topology  .jpg"></div>
+<h2 class="topic">
+<a href="#11ldtni6dlh6ofo0em0vbomt9f" name="0k424984tiqt34r38490p8c0fv">hpx::threads::topology</a>
+</h2>
+<p class="relationships">See Also: <a href="#18020kb7gks9bcsr3gqq0u3n3j">hpx::threads::hwloc_topology_info (is derived from)</a>, <a href="#7jtqdefrc8t67toor3031480tt">hpx::threads::noop_topology (is derived from)</a>
+</p>
+<h3 class="topic">
+<a name="6doer1al5jtqt2afc2b9tdmqil">&nbsp;
+abstract base class
+that allows to query 
+information about the 
+system's topology
+</a>
+</h3>
+<h3 class="topic">
+<a name="4h6c0eseiqaqggo4f4okcib0th">&nbsp;&nbsp;has no data members</a>
+</h3>
+<h3 class="topic">
+<a name="6hou7r8fvt5dr90aidb921uhep">&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="726s8ndu2h9qds72pksh2a6in4">&nbsp;&nbsp;&nbsp;get affinity masks</a>
+</h3>
+<h3 class="topic">
+<a name="0ijca5176qb6on4k7k8uerk73p">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_numa_node_number(std::size_t num_thread,
+            error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="7ssq45lhh7o1dprhjmflp41jss">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return the NUMA node number of the processing unit the given thread is running on.</a>
+</h3>
+<h3 class="topic">
+<a name="0tfsnm0ufid98i46lok8jraqjm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;num_thread is the OS-thread index</a>
+</h3>
+<h3 class="topic">
+<a name="56l407kpait19bl1oagh3ihb9a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ec         [in,out] this represents the error status on exit, 
+             if this is pre-initialized to \a hpx#throws, the function will throw on error instead.</a>
+</h3>
+<h3 class="topic">
+<a name="4jvmgkgq4k5ndiiirm4mk5pl9p">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_cref_type get_machine_affinity_mask(
+            error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="7s3m6uuljlq9ib3f3dj36ole8e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return a bit mask where each set bit corresponds to a processing unit available to the application.</a>
+</h3>
+<h3 class="topic">
+<a name="5aaqb61ve4fopsekd1vu5mb7em">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ec         [in,out] this represents the error status on exit, 
+             if this is pre-initialized to \a hpx#throws, the function will throw on error instead.</a>
+</h3>
+<h3 class="topic">
+<a name="7ctljgiotlc120ita68vn48kaa">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_type get_service_affinity_mask(
+            mask_cref_type used_processing_units, error_code&amp; ec = throws) const;</a>
+</h3>
+<div class="notesContainer">
+<p>the only one that isn't purely virtual</p>
+</div>
+<h3 class="topic">
+<a name="5b7u0bgkaq49kmsqev6le9mnnl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return a bit mask where each set bit corresponds to a
+processing unit available to the service threads in the application.</a>
+</h3>
+<h3 class="topic">
+<a name="5sum6h250t75prtb61tvthh92d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;used_processing_units [in] This is the mask of processing
+units which are not available for service threads.</a>
+</h3>
+<h3 class="topic">
+<a name="3lu7j3l0h8qa8kb3brd58221m7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ec         [in,out] this represents the error status on exit, 
+             if this is pre-initialized to \a hpx#throws, the function will throw on error instead.</a>
+</h3>
+<h3 class="topic">
+<a name="42na5n8eoh9ers7pgg38k7fvgh">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_cref_type get_socket_affinity_mask(std::size_t num_thread,
+            bool numa_sensitive, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="7pgrpfqc1uaqiacegi86tk480r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return a bit mask where each set bit corresponds to a
+processing unit available to the given thread inside
+the socket it is running on.</a>
+</h3>
+<h3 class="topic">
+<a name="5a63p5uqelrpt7l5ogek6tckub">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ec         [in,out] this represents the error status on exit, 
+             if this is pre-initialized to \a hpx#throws, the function will throw on error instead.</a>
+</h3>
+<h3 class="topic">
+<a name="5slfbbo0hhn3gq00p4q2bt7npm">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_cref_type get_numa_node_affinity_mask(
+    		std::size_t num_thread,
+            bool numa_sensitive, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="3lq8mueth0c5s3qnr1p4jpn2o2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return bit-mask corresponding to all PUs of the NUMA domain 
+containing the PU number given by num_thread</a>
+</h3>
+<div class="notesContainer">
+<p>used in affinity_data::get_pu_mask</p>
+</div>
+<h3 class="topic">
+<a name="2oj9q7i7rqsf7nbsbnko1i30ck">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_type get_numa_node_affinity_mask_from_numa_node(
+            std::size_t num_node) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="3k0qt1lve0bh3ti53utta96kmo">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_cref_type get_core_affinity_mask(
+	std::size_t num_thread,
+    bool numa_sensitive, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="7qdb73fdn28g01rdrnkf173qi4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return bitmask corresponding to all PUs of the core 
+containing the PU number given by num_thread</a>
+</h3>
+<h3 class="topic">
+<a name="0hqrl45nahaje0t84o7ldvmsl6">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_cref_type get_thread_affinity_mask(
+	std::size_t num_thread,
+    bool numa_sensitive = false, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="76m4ipstg07fes5cvf8is1db27">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the bitmask corresponding to 
+a mask with just the PU corresponding to num_thread
+set</a>
+</h3>
+<h3 class="topic">
+<a name="06uj39pefudn8h1927u5h1ht9j">&nbsp;&nbsp;&nbsp;&nbsp;virtual void set_thread_affinity_mask(boost::thread&amp; t,
+            mask_cref_type mask, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="7fdnfga5m2d60k5hestdogngmf">&nbsp;&nbsp;&nbsp;&nbsp;virtual mask_type get_thread_affinity_mask_from_lva(
+            naming::address_type, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="732am8ouao4dd0juieq1r612hm">&nbsp;&nbsp;&nbsp;virtual void set_thread_affinity_mask(mask_cref_type mask,
+            error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="4l3i67bn33aovt9dlvqu3dk68a">&nbsp;&nbsp;&nbsp;virtual void print_affinity_mask(std::ostream&amp; os,
+            std::size_t num_thread, mask_type const&amp; m) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a href="#5qfktmcdaessavvalvbevn4s4e" name="5pacmtl4trueik97amu9k23nos">&nbsp;&nbsp;&nbsp;virtual bool reduce_thread_priority(error_code&amp; ec = throws) const;</a>
+</h3>
+<h3 class="topic">
+<a name="22si7ns0df778ad4l7qel8aenl">&nbsp;&nbsp;&nbsp;&nbsp;reduce thread priority of the current thread</a>
+</h3>
+<h3 class="topic">
+<a name="3l8hbvt41pma41mmec059se3pf">&nbsp;&nbsp;&nbsp;get number of ... </a>
+</h3>
+<h3 class="topic">
+<a name="1br1i7i0ft3j1tdjo4scgl7muj">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_sockets() const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="50m2bepd36dtqh7qfhipi37dh6">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_numa_nodes() const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="4auk8m89r5bc94h2tluokamb8a">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_cores() const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="3d9eh4lf3h9ks9jkci9ictulhc">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_pus() const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="1dpdsbhfnij9fp0nrdvmhj6aep">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_numa_node_cores(std::size_t numa) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="74boleb99pkpb0pf1t37c3jc3m">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_numa_node_pus(std::size_t numa) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="7litr9t6d19klnlprr5qbm0k6s">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_socket_pus(std::size_t socket) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="31a9egod4i9u1478f0rpkropvc">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_number_of_core_pus(std::size_t core) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="2pn6ddp33akkboa47hain98hlo">&nbsp;&nbsp;&nbsp;&nbsp;virtual std::size_t get_core_number(std::size_t num_thread, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="0jg43c2s4oed109h6fi1s9c4c8">&nbsp;&nbsp;&nbsp;virtual mask_type get_cpubind_mask(error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="71d76ads2v9lm64f89ferd3m8c">&nbsp;&nbsp;&nbsp;virtual mask_type get_cpubind_mask(boost::thread &amp; handle, error_code&amp; ec = throws) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="3uc10iq8gndv58suu14iae8l6p">&nbsp;&nbsp;&nbsp;virtual void write_to_log() const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="5bptsjm8uqf6k7ke0bl4hfiodf">&nbsp;&nbsp;&nbsp;virtual void* allocate(std::size_t len) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="7qurt8gn7rcv9h1jk8p8pnibmk">&nbsp;&nbsp;&nbsp;&nbsp;equivalent to malloc(), except it tries to allocate page-aligned memory from the OS</a>
+</h3>
+<h3 class="topic">
+<a name="78b8lfi1lk458mdtg1sq3pp5pc">&nbsp;&nbsp;&nbsp;virtual void deallocate(void* addr, std::size_t len) const = 0;</a>
+</h3>
+<h3 class="topic">
+<a name="1hkatpfruohloivmsoqkm3b53t">&nbsp;&nbsp;&nbsp;&nbsp;Free memory that was previously allocated by allocate</a>
+</h3>
+<h3 class="topic">
+<a name="30ei73evcne98n8a7s9cg5sh4j">&nbsp;&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a href="#03t8f3oq8akd6qlkr9nucouaos" name="555lpm5sru6p5885krb8tv1una">&nbsp;&nbsp;&nbsp;topology const&amp; get_topology()</a>
+</h3>
+<h3 class="topic">
+<a name="7afdjbhsqpq8pij7trph5u2rkj">&nbsp;&nbsp;&nbsp;&nbsp;if success, returns
+get_runtime_ptr()-&gt;get_topology()</a>
+</h3>
+<h3 class="topic">
+<a name="17750qqgss9121okl2oa0f303o">&nbsp;&nbsp;&nbsp;&nbsp;creates a topology using the helper-struct static_</a>
+</h3>
+<p class="relationships">See Also: <a href="#7ijothu1544f8cs7ge8d34598n">hwloc_topology_info&amp; create_topology()</a>
+</p>
+<h3 class="topic">
+<a name="7l2rdvbkr8vsorkv7u6o54np0f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Provides thread-safe initialization of a single static instance of T.
+This instance is guaranteed to be constructed on static storage in a
+thread-safe manner, on the first call to the constructor of static_.</a>
+</h3>
+<h3 class="topic">
+<a name="31ttputvjjkr4fd664fg0fhfgf">&nbsp;&nbsp;&nbsp;std::size_t hardware_concurrency();</a>
+</h3>
+<h3 class="topic">
+<a name="03psgeq4264adp2duc4u1l4gaq">&nbsp;&nbsp;&nbsp;threads::create_topology()</a>
+</h3>
+<h3 class="topic">
+<a href="#1dj2mh6r2vau4152fdcgtqcdff" name="2e1grji252hbm8jm95goht70en">&nbsp;&nbsp;&nbsp;&nbsp;called by constructor of runtime</a>
+</h3>
+<h2 class="topic">
+<a name="18020kb7gks9bcsr3gqq0u3n3j">hpx::threads::hwloc_topology_info</a>
+</h2>
+<p class="relationships">See Also: <a href="#0k424984tiqt34r38490p8c0fv">hpx::threads::topology (is derived from)</a>
+</p>
+<h3 class="topic">
+<a name="5s6emq71nf11m3mo5tmsq8nrla">&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="4f2shdrthkppec70gd2no48dmo">&nbsp;&nbsp;static mask_type empty_mask</a>
+</h3>
+<h3 class="topic">
+<a name="6hitmiqphn4knum8b0l3ihjkq4">&nbsp;&nbsp;hwloc_topology_t topo;</a>
+</h3>
+<h3 class="topic">
+<a name="7l44ktd5nhlr7ne6vhe9ieri47">&nbsp;&nbsp;&nbsp;class representing a topology in hwloc</a>
+</h3>
+<h3 class="topic">
+<a name="43tufh1laq68o6hlmpf34b4992">&nbsp;&nbsp;static const std::size_t pu_offset</a>
+</h3>
+<h3 class="topic">
+<a name="1cl873gvprhs62alok569rupq4">&nbsp;&nbsp;static const std::size_t core_offset</a>
+</h3>
+<h3 class="topic">
+<a name="0unkobbhi5dfvffogu1vb9nt5s">&nbsp;&nbsp;std::size_t num_of_pus</a>
+</h3>
+<h3 class="topic">
+<a name="4qst01ldbmi5irlpjhbjbf909i">&nbsp;&nbsp;mutable hpx::util::spinlock topo_mtx</a>
+</h3>
+<h3 class="topic">
+<a name="63sjbj4sg3v31t25713jm9ai77">&nbsp;&nbsp;numbers</a>
+</h3>
+<h3 class="topic">
+<a name="5n7hmhdgqms5o5lrgr9mmonsqs">&nbsp;&nbsp;&nbsp;std::vector&lt;std::size_t&gt; socket_numbers_</a>
+</h3>
+<h3 class="topic">
+<a name="73iblmnkv2q2la4aohpl4tbetr">&nbsp;&nbsp;&nbsp;&nbsp;is a vector of size num_of_pus, giving the socket number each PU is on</a>
+</h3>
+<h3 class="topic">
+<a name="4i0k5n4d6baj6dndpr7gs4ggvb">&nbsp;&nbsp;&nbsp;std::vector&lt;std::size_t&gt; numa_node_numbers_</a>
+</h3>
+<h3 class="topic">
+<a name="67e8sl09tb66s0od0n3c98lhuf">&nbsp;&nbsp;&nbsp;&nbsp;is a vector of size num_of_pus, giving the numa-node number each PU is on</a>
+</h3>
+<h3 class="topic">
+<a name="2dmo0gg6vshnr4gdb55qv48s1k">&nbsp;&nbsp;&nbsp;std::vector&lt;std::size_t&gt; pu_numbers_</a>
+</h3>
+<h3 class="topic">
+<a name="0c6lgc8sv0hqt25cmbkn7vg28i">&nbsp;&nbsp;&nbsp;std::vector&lt;std::size_t&gt; core_numbers_</a>
+</h3>
+<h3 class="topic">
+<a name="4t9627p32mm1j5ukv868l15c9q">&nbsp;&nbsp;&nbsp;&nbsp;is a vector of size num_of_pus, giving the core number each PU is on</a>
+</h3>
+<h3 class="topic">
+<a name="0vcphvvvgn7uper6rr8vli41o5">&nbsp;&nbsp;affinity mask</a>
+</h3>
+<h3 class="topic">
+<a name="2bvttqs859v9dh870agi4mhhk6">&nbsp;&nbsp;&nbsp;mask_type machine_affinity_mask_</a>
+</h3>
+<h3 class="topic">
+<a name="65ihpurkas98ouk8s1rcrvu9el">&nbsp;&nbsp;&nbsp;std::vector&lt;mask_type&gt; socket_affinity_masks_</a>
+</h3>
+<h3 class="topic">
+<a name="5ld8eamtagr3r0paafku6mfgub">&nbsp;&nbsp;&nbsp;std::vector&lt;mask_type&gt; numa_node_affinity_masks_</a>
+</h3>
+<h3 class="topic">
+<a name="4mp0i4ofl4265okkprc5jk5r0u">&nbsp;&nbsp;&nbsp;std::vector&lt;mask_type&gt; core_affinity_masks_</a>
+</h3>
+<h3 class="topic">
+<a name="2dq5ta3b3j7c6i7pi4m06mer9m">&nbsp;&nbsp;&nbsp;std::vector&lt;mask_type&gt; thread_affinity_masks_</a>
+</h3>
+<h3 class="topic">
+<a name="3t926s2liio18b2tbe3e9rfego">&nbsp;&nbsp;constant pu offset
+mainly for skipping the first core on the Xeon Phi which is reserved for OS-related tasks</a>
+</h3>
+<p class="summary">(<a href="#43tufh1laq68o6hlmpf34b4992">static const std::size_t pu_offset</a>, <a href="#1cl873gvprhs62alok569rupq4">static const std::size_t core_offset</a>)</p>
+<h3 class="topic">
+<a name="1igvh9hlspt7khkuhbga6b436j">&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="70be5orah7ekdmocvrjkqteu34">&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="25hr3sg8n01m037uh03hmfm5t7">&nbsp;&nbsp;destructor</a>
+</h3>
+<h3 class="topic">
+<a name="2n2jl7soe9f3s8piju8l7o800n">&nbsp;&nbsp;get ... number</a>
+</h3>
+<h3 class="topic">
+<a name="0ltm3hlughnpmtrceu3i3sv02a">&nbsp;&nbsp;&nbsp;std::size_t get_socket_number(std::size_t num_thread, error_code &amp;ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="6r3t5bpdpvd0h4tk4dpumgin8m">&nbsp;&nbsp;&nbsp;std::size_t get_numa_node_number(std::size_t num_thread, error_code&amp; ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="7mrg7p95g6o6nnev91s7koda9t">&nbsp;&nbsp;&nbsp;std::size_t get_core_number(std::size_t num_thread, error_code&amp; ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="3riestm58caotll10t6ve82nsu">&nbsp;&nbsp;&nbsp;std::size_t get_pu_number(std::size_t num_core, std::size_t num_pu, errorcode&amp; ec = throws) const</a>
+</h3>
+<h3 class="topic">
+<a name="2k20nihboqu1q97ahd96vm8h15">&nbsp;&nbsp;get affinity masks (cf above)</a>
+</h3>
+<h3 class="topic">
+<a name="4rvavr79c9pdjcttgj2v6016h2">&nbsp;&nbsp;init ... 
+(public) </a>
+</h3>
+<h3 class="topic">
+<a name="1a84foe0eth0kngqkgu7e5f42f">&nbsp;&nbsp;&nbsp;mask_type init_socket_affinity_mask_from_socket(std::size_t num_socket) const;</a>
+</h3>
+<h3 class="topic">
+<a name="3i9kni3lv171vrg8kucp8tplq8">&nbsp;&nbsp;&nbsp;mask_type init_numa_node_affinity_mask_from_numa_node(std::size_t num_numa_node) const;</a>
+</h3>
+<h3 class="topic">
+<a name="4c1vfaljmaasaq055dmoqkmfff">&nbsp;&nbsp;&nbsp;mask_type init_core_affinity_mask_from_core(std::size_t num_core, mask_cref_type default_mask = mask_type()) const;</a>
+</h3>
+<h3 class="topic">
+<a name="4d6umn1nggntc9vm1uhuho89n2">&nbsp;&nbsp;&nbsp;mask_type init_thread_affinity_mask(std::size_t num_thread) const</a>
+</h3>
+<h3 class="topic">
+<a name="0t61q6gmgspo43kee0g9igcml3">&nbsp;&nbsp;&nbsp;mask_type init_thread_affinity_mask(std::size_t num_core, std::size_t num_pu) const;</a>
+</h3>
+<h3 class="topic">
+<a name="2alqneocfqgnufmu70tjfeps2d">&nbsp;&nbsp;get_cpubind_mask ... </a>
+</h3>
+<h3 class="topic">
+<a name="4pta1pgs51ah2qj0q2u4l9trdd">&nbsp;&nbsp;get_number_of ... </a>
+</h3>
+<h3 class="topic">
+<a name="2uqvfqq2kd20ubgvjjou1o7rv0">&nbsp;&nbsp;print ... </a>
+</h3>
+<h3 class="topic">
+<a name="2dt2s9lmtddl2g6rel0nj787gd">&nbsp;&nbsp;write_to_log ... </a>
+</h3>
+<h3 class="topic">
+<a name="2g7spd3qno82sbhmf3fjqrlrkv">&nbsp;&nbsp;allocate and deallocate</a>
+</h3>
+<h3 class="topic">
+<a name="4qabph1rglf14p5fh320fcm245">&nbsp;&nbsp;init ... 
+(private)</a>
+</h3>
+<h3 class="topic">
+<a name="7rbs5q84vivptks6bfs7ui3bms">&nbsp;&nbsp;&nbsp;std::size_t init_socket_number(std::size_t num_thread, hwloc_obj_type_t type))</a>
+</h3>
+<h3 class="topic">
+<a name="3l854b1v9q4mb5fp2vr7vtv9ka">&nbsp;&nbsp;&nbsp;std::size_t init_socket_number(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="0get6io306mabc6pl5qd3gomg9">&nbsp;&nbsp;&nbsp;std::size_t init_numa_node_number(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="7af4ouvoh7uggo43qacfaa2r7a">&nbsp;&nbsp;&nbsp;std::size_t init_core_number(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="4hlgqau8800art8jsvk3hskob5">&nbsp;&nbsp;&nbsp;mask_type init_machine_affinity_mask() const;</a>
+</h3>
+<h3 class="topic">
+<a name="4lfi32iudt8c3vma78qe8usu7n">&nbsp;&nbsp;&nbsp;mask_type init_socket_affinity_mask(std::size_t num_thread) const</a>
+</h3>
+<h3 class="topic">
+<a name="2nh517voathuh34o9i3j279b7s">&nbsp;&nbsp;&nbsp;mask_type init_numa_node_affinity_mask(std::size_t num_thread) const</a>
+</h3>
+<h3 class="topic">
+<a name="17sgc8o8vfplodr4qpkh668vga">&nbsp;&nbsp;&nbsp;mask_type init_core_affinity_mask(std::size_t num_thread) const</a>
+</h3>
+<h3 class="topic">
+<a name="4enmomd7mjim5g349e8123urmg">&nbsp;&nbsp;&nbsp;mask_type default_mask = numa_node_affinity_masks_[num_thread];</a>
+</h3>
+<h3 class="topic">
+<a name="772c7bmhofjrffbfrgpivc3h8p">&nbsp;&nbsp;&nbsp;void init_num_of_pus();</a>
+</h3>
+<h3 class="topic">
+<a name="1k6sm7js70laoliufenif6c877">&nbsp;&nbsp;extract ... </a>
+</h3>
+<h3 class="topic">
+<a name="1e6p8avj9bqi8kf37sdv3ddqpt">&nbsp;&nbsp;&nbsp;void extract_node_mask(hwloc_obj_t parent, mask_type&amp; mask) const</a>
+</h3>
+<h3 class="topic">
+<a name="4th2uv8crl19nsgom44hpqcnbf">&nbsp;&nbsp;&nbsp;std::size_t extract_node_count(hwloc_obj_t parent, hwloc_obj_type_t type, std::size_t count) const</a>
+</h3>
+<h3 class="topic">
+<a name="7ahaobh8bqouioiufbgnj08f89">&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="7ijothu1544f8cs7ge8d34598n">&nbsp;&nbsp;hwloc_topology_info&amp; create_topology()</a>
+</h3>
+<p class="relationships">See Also: <a href="#17750qqgss9121okl2oa0f303o">creates a topology using the helper-struct static_</a>
+</p>
+<h2 class="topic">
+<a name="0s0qaumdmmb7eqfb5i1j24vk5h">other relevant functions</a>
+</h2>
+<h3 class="topic">
+<a name="5dp2frlhr9asbm1cnpno09shhr">&nbsp;hardware_concurrency()</a>
+</h3>
+<h3 class="topic">
+<a name="2q7p5o402ahppjrgd2kalfrgpg">&nbsp;&nbsp;returns the number of PUs in the systems</a>
+</h3>
+<h3 class="topic">
+<a name="0u1g5c09403cdmdk24c5m6dtsa">&nbsp;&nbsp;&nbsp;Subtopic 1</a>
+</h3>
+<h3 class="topic">
+<a name="2dldde7udemh720r0kog3sgfd3">&nbsp;&nbsp;    std::size_t hwloc_hardware_concurrency()
+    {
+        threads::topology&amp; top = threads::create_topology();
+        return top.get_number_of_pus();
+    }</a>
+</h3>
+<h3 class="topic">
+<a name="1k6ho0u7aonj6tdrcmgjm9m43c">&nbsp;&nbsp;    struct hw_concurrency
+    {
+        hw_concurrency()
+#if defined(__ANDROID__) &amp;&amp; defined(ANDROID)
+          : num_of_cores_(::android_getCpuCount())
+#elif defined(HPX_HAVE_HWLOC)
+          : num_of_cores_(detail::hwloc_hardware_concurrency())
+#else
+          : num_of_cores_(boost::thread::hardware_concurrency())
+#endif
+        {
+            if (num_of_cores_ == 0)
+                num_of_cores_ = 1;
+        }
+
+        std::size_t num_of_cores_;
+    };
+
+    std::size_t hardware_concurrency()
+    {
+        util::static_&lt;hw_concurrency, hardware_concurrency_tag&gt; hwc;
+        return hwc.get().num_of_cores_;
+    }
+</a>
+</h3>
+<h2 class="topic">
+<a name="46ovv9t6t2u3pjcr576o141n1d">other relevant classes
+and types</a>
+</h2>
+<h3 class="topic">
+<a href="#6fk6kq0f5qqcveadp0apt1eafe" name="301quj5rmefs3hglcaae8ekaef">&nbsp;hpx::threads::policies::detail::affinity_data</a>
+</h3>
+<h3 class="topic">
+<a name="609l0hvlpclvchap03jqs67vk0">&nbsp;&nbsp;&#13;
+structure that holds the information &#13;
+related to thread affinity selection&#13;
+for the shepherd thread of this instance&#13;
+</a>
+</h3>
+<h3 class="topic">
+<a name="5mtfhfds4v3eu5f4ef7v6oia02">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="1nsv489s0sveq96vu2a8sll0j6">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_threads_</a>
+</h3>
+<h3 class="topic">
+<a name="1gf73vmbhnk9k3albo76g29fvn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of processing units managed</a>
+</h3>
+<h3 class="topic">
+<a name="6u6974qos2irctot5f0d2kohpe">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t pu_offset_</a>
+</h3>
+<h3 class="topic">
+<a name="2s5nkotcucnrighid00em3nh3t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;offset of the first processing unit to use </a>
+</h3>
+<h3 class="topic">
+<a name="3t3rmq3rjkpp8135v45e0ms1fm">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t pu_step_</a>
+</h3>
+<h3 class="topic">
+<a name="6rco7l44j136t5k3etsesba4d0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;step between used processing units</a>
+</h3>
+<h3 class="topic">
+<a name="1gdkk8452pq99cc03v9bqhjhk6">&nbsp;&nbsp;&nbsp;&nbsp;std::string affinity_domain_</a>
+</h3>
+<h3 class="topic">
+<a name="73r9ng7nu9hn8mn3f4jsmg15l4">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;mask_type&gt; affinity_masks_</a>
+</h3>
+<p class="topicImage">
+<img height="296" src="7-topology_files/76hljn171kvu28b3ksvi6785k3" width="512"></p>
+<h3 class="topic">
+<a name="5uaehg4d6egudaq8b50mcrue2v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size of vector = num_threads_, which is the number of PUs managed by the class</a>
+</h3>
+<h3 class="topic">
+<a name="72o7k5c4gji60kla9epabqjdlc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;each element = bitmask of size num_system_pus (initialized from hardware_concurrency())</a>
+</h3>
+<h3 class="topic">
+<a name="29ns1nubaj2qhke0h81cn10t8e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;examples</a>
+</h3>
+<h3 class="topic">
+<a name="1uidgo2hbqdi4gdobb7l5b5hqu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--hpx:bind='thread:0-4=core:0.pu:0;thread:5=core:1.pu:0'</a>
+</h3>
+<h3 class="topic">
+<a name="3mhl6nar4ogunp92fiil1ldirb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;locality: 0
+   0: PU L#0(P#0), Core L#0(P#0), Socket L#0(P#0), Node L#0(P#0)
+   1: PU L#0(P#0), Core L#0(P#0), Socket L#0(P#0), Node L#0(P#0)
+   2: PU L#0(P#0), Core L#0(P#0), Socket L#0(P#0), Node L#0(P#0)
+   3: PU L#0(P#0), Core L#0(P#0), Socket L#0(P#0), Node L#0(P#0)
+   4: PU L#0(P#0), Core L#0(P#0), Socket L#0(P#0), Node L#0(P#0)
+   5: PU L#2(P#1), Core L#1(P#1), Socket L#0(P#0), Node L#0(P#0)</a>
+</h3>
+<h3 class="topic">
+<a name="33jf3h9hveu7i1qlva9cvate9n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;affinity masks        : 
+                        00000001
+                        00000001
+                        00000001
+                        00000001
+                        00000001
+                        00000100</a>
+</h3>
+<h3 class="topic">
+<a name="6abqfc75c4k3ma3hmc1r99sr0t">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;std::size_T&gt; pu_nums_</a>
+</h3>
+<h3 class="topic">
+<a name="4jj7tm6sc81liufu5c5vncmv2k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector of PU numbers for each thread
+i.e. pu_nums_[3] is the PU number (that is: index) that OS thread 3 has</a>
+</h3>
+<h3 class="topic">
+<a name="6v08lq9ko1o57r5nsn8fsovga0">&nbsp;&nbsp;&nbsp;&nbsp;mask_type no_affinity_</a>
+</h3>
+<h3 class="topic">
+<a name="30r58drn4muikj52ldhktc3djc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mask of processing units which have no affinity</a>
+</h3>
+<h3 class="topic">
+<a name="74op3d0kjagtnrqh0ufpsujbin">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="1ht4l15q2l8d8rsvtd5rjd7vkl">&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="0o2ib6dgo4okfurc87b4t9bebs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;affinity_data(std::size_t num_threads)</a>
+</h3>
+<h3 class="topic">
+<a name="64k0loeedidjos1aanjoe74oji">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;super basic, 
+doesn't do anything special</a>
+</h3>
+<h3 class="topic">
+<a name="2ibq371msgqnhi00irjn2ker34">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t init(init_affinity_data const&amp; data, topology const&amp; topology)</a>
+</h3>
+<h3 class="topic">
+<a href="#581faviog74ep5o9ffvbrvenom" name="56eulp1d8tlra61bnsnfj5ld0k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;called from scheduler_base::init(...)</a>
+</h3>
+<h3 class="topic">
+<a name="3sc9iopkv3lfd6lkbnbr4b182s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initializes the data members</a>
+</h3>
+<h3 class="topic">
+<a href="#68e23aiu9bm2qrjj59c0ece9lo" name="5t5dr7o1rkv6sjml3kkuqlcq7j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parses the affinity options</a>
+</h3>
+<h3 class="topic">
+<a name="5vms2qu7vfgpve377dffenvveo">&nbsp;&nbsp;&nbsp;&nbsp;mask_cref_type get_pu_mask(
+    topology const&amp; topology,
+    std::size_t num_thread, 
+    bool numa_sensitive)</a>
+</h3>
+<h3 class="topic">
+<a name="59k1v8dnlpeuvot8nov6i5vg3i">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_pu_num(std::size_t num_thread) const</a>
+</h3>
+<h3 class="topic">
+<a name="5oj6qifc1b05rlhbtnv4b1meev">&nbsp;&nbsp;&nbsp;&nbsp;void add_punit(
+    std::size_t virt_core, 
+    std::size_t thread_num,
+    topology const&amp; topology)</a>
+</h3>
+<h3 class="topic">
+<a name="48d6k19c9tfllpf4idivuvvcp8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add a PU after initialisation</a>
+</h3>
+<h3 class="topic">
+<a name="3scaupjv897defsr20qg7m2brr">&nbsp;&nbsp;&nbsp;&nbsp;        void init_cached_pu_nums(std::size_t hardware_concurrency,
+                topology const&amp; topology);</a>
+</h3>
+<h3 class="topic">
+<a name="33ntcrpnekm2egpe1ee6892v1q">&nbsp;&nbsp;&nbsp;&nbsp;        std::size_t get_pu_num(std::size_t num_thread,
+            std::size_t hardware_concurrency) const;</a>
+</h3>
+<h3 class="topic">
+<a href="#0n927vtrgu2rgbdgbagnnd4q3c" name="60hqb63f2p4luui5doh661ton2">&nbsp;hpx::threads::policies::init_affinity_data</a>
+</h3>
+<h3 class="topic">
+<a name="2fd8b0gcrh33uhelie6ur4djsd">&nbsp;&nbsp;
+encapsulates variables
+pertaining to the initilization of the affinity data. 
+These values come from the cmd line
+
+assembles all cmd-line values for affinity_data initialization
+</a>
+</h3>
+<h3 class="topic">
+<a name="0itkmtj1qf0eo9vavagq5cd9je">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="59ura6etl7vuo8p4h3gqqs49pg">&nbsp;&nbsp;&nbsp;&nbsp;        std::size_t used_cores_;</a>
+</h3>
+<h3 class="topic">
+<a name="769sc8acllet19q65njmq7946s">&nbsp;&nbsp;&nbsp;&nbsp;        std::size_t pu_offset_;</a>
+</h3>
+<h3 class="topic">
+<a name="50ggk9rbbljlm3avd422t7qb0e">&nbsp;&nbsp;&nbsp;&nbsp;        std::size_t pu_step_;</a>
+</h3>
+<h3 class="topic">
+<a name="670qe685segve9cn1br7b07epk">&nbsp;&nbsp;&nbsp;&nbsp;        std::string affinity_domain_;</a>
+</h3>
+<h3 class="topic">
+<a name="5ptp3jh957mqaktmlljtavqdmk">&nbsp;&nbsp;&nbsp;&nbsp;        std::string affinity_desc_;</a>
+</h3>
+<h3 class="topic">
+<a name="6jthpg94i3lodf0vgm7pi4sjjl">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="2981hjeqibf0h0ffep6bt9ouh5">&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="1qotqqh1f1jbg4gkfmpvqfsu4m">&nbsp;&nbsp;&nbsp;&nbsp;c'est tout</a>
+</h3>
+<h3 class="topic">
+<a name="7uff0kbk9lfgrgdsh6fm0ec2q9">&nbsp;bitmasks for threads</a>
+</h3>
+<div class="notesContainer">
+<p>in file cpu_mask.hpp</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="62ucqiflb2l35ek0fbfevv1h3n">&nbsp;&nbsp;if HPX has less than 64 threads</a>
+</h3>
+<h3 class="topic">
+<a name="2nm9g8rskm57tu4eeji2j7kiii">&nbsp;&nbsp;&nbsp;typedef std::uint64_t hpx::threads::mask_type</a>
+</h3>
+<h3 class="topic">
+<a name="26cs19pqodcca5ivkqaoi20pqi">&nbsp;&nbsp;&nbsp;typedef std::uint64_t hpx::threads::mask_cref_type</a>
+</h3>
+<h3 class="topic">
+<a name="17d09en9kusf3qikuqpa4oirpo">&nbsp;&nbsp;if HPX has max CPU count</a>
+</h3>
+<h3 class="topic">
+<a name="1ivj788cv1lg1cr99dhkj2mrau">&nbsp;&nbsp;&nbsp;    typedef std::bitset&lt;HPX_HAVE_MAX_CPU_COUNT&gt; mask_type;</a>
+</h3>
+<h3 class="topic">
+<a name="0m9l79k39hn3h5nlsbusodmgi7">&nbsp;&nbsp;&nbsp;    typedef std::bitset&lt;HPX_HAVE_MAX_CPU_COUNT&gt; const&amp; mask_cref_type;</a>
+</h3>
+<h3 class="topic">
+<a name="0927mjl80fadgb0iuhgjkm3qji">&nbsp;&nbsp;otherwise</a>
+</h3>
+<h3 class="topic">
+<a name="1088qhm2tbg0g6po09700mge6h">&nbsp;&nbsp;&nbsp;    typedef boost::dynamic_bitset&lt;std::uint64_t&gt; mask_type;</a>
+</h3>
+<h3 class="topic">
+<a name="70eqkfc9kd4ri202j5sss6f1kb">&nbsp;&nbsp;&nbsp;    typedef boost::dynamic_bitset&lt;std::uint64_t&gt; const&amp; mask_cref_type;</a>
+</h3>
+<h3 class="topic">
+<a name="0km1v2lhlmkpnkd202d1482u0h">&nbsp;&nbsp;GENERAL IDEA</a>
+</h3>
+<h3 class="topic">
+<a name="70lshreftbt5jn3p21os1623q8">&nbsp;&nbsp;&nbsp;mask_[thread_num] = 1</a>
+</h3>
+<h3 class="topic">
+<a name="0m5p520ahgvs8cac1ekaroj55q">&nbsp;&nbsp;&nbsp;that is </a>
+</h3>
+<h3 class="topic">
+<a name="67fk6nipu5kinqhea2ivcrhsdc">&nbsp;&nbsp;functions</a>
+</h3>
+<p class="summary">(<a href="#62ucqiflb2l35ek0fbfevv1h3n">if HPX has less than 64 threads</a>, <a href="#17d09en9kusf3qikuqpa4oirpo">if HPX has max CPU count</a>, <a href="#0927mjl80fadgb0iuhgjkm3qji">otherwise</a>)</p>
+<h3 class="topic">
+<a name="38o04i187t6cgg11rodtp6pdt5">&nbsp;&nbsp;&nbsp;arithmetic</a>
+</h3>
+<h3 class="topic">
+<a name="3lmkj52qsv7qh6fp0q5euopttd">&nbsp;&nbsp;&nbsp;&nbsp;inline bool any(mask_cref_type mask)
+        return mask != 0;</a>
+</h3>
+<h3 class="topic">
+<a name="1v1uhkospeep70g71s50kg08c0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns true if any of the bits are ==1</a>
+</h3>
+<h3 class="topic">
+<a name="3t43vnnn8b2i909lahe1s9aaa7">&nbsp;&nbsp;&nbsp;&nbsp;    inline mask_type not_(mask_cref_type mask)
+    {
+        return ~mask;
+    }</a>
+</h3>
+<h3 class="topic">
+<a name="7cipsoktsme6bkjsme9pirbb58">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the "inverse" of the mask</a>
+</h3>
+<h3 class="topic">
+<a name="3qop7k9tk6gbcah7f97q2pvieg">&nbsp;&nbsp;&nbsp;&nbsp;bit_or</a>
+</h3>
+<h3 class="topic">
+<a name="66fgn3re1vk60sk02av2aebsun">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t)</a>
+</h3>
+<h3 class="topic">
+<a name="1trst92jaj9em628uq9ebbu1rp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return true if at least one of the masks has a bit set</a>
+</h3>
+<h3 class="topic">
+<a name="38iq17gebf86r9vu7o9kvfs376">&nbsp;&nbsp;&nbsp;&nbsp;bit_and</a>
+</h3>
+<h3 class="topic">
+<a name="3urbp2vtteehcemjuca6a3uj36">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)</a>
+</h3>
+<h3 class="topic">
+<a name="206ndh8fsr8tft577k1j8kis7s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return true if at least one bit is set in both masks</a>
+</h3>
+<h3 class="topic">
+<a name="061ntdl2qp960jnil0eu6r19ra">&nbsp;&nbsp;&nbsp;set</a>
+</h3>
+<h3 class="topic">
+<a name="0k9lfftlufumfdt31fg8digm8j">&nbsp;&nbsp;&nbsp;&nbsp;inline void set(mask_type &amp;mask, std::size_t idx)</a>
+</h3>
+<h3 class="topic">
+<a name="1hnt50nae0dm6vfq3e38pimft1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the bit number idx of the mask to 1</a>
+</h3>
+<h3 class="topic">
+<a name="3qtbuf6k13oq5jdnr1nr9ddp97">&nbsp;&nbsp;&nbsp;&nbsp;resize</a>
+</h3>
+<h3 class="topic">
+<a name="3jhc16grpsnp3fit3vnhei1k67">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inline void resize(mask_type&amp; mask, std::size_t s)</a>
+</h3>
+<h3 class="topic">
+<a name="2uv7ikff9qk0urp2ute06ckdre">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;resizes the bitmask to size s</a>
+</h3>
+<h3 class="topic">
+<a name="6f1ils61as13esuevd5q2rjba9">&nbsp;&nbsp;&nbsp;queries</a>
+</h3>
+<h3 class="topic">
+<a name="40bcdigt6uh9ikl9kltv3p85h9">&nbsp;&nbsp;&nbsp;&nbsp;test</a>
+</h3>
+<h3 class="topic">
+<a name="31rlspu4q2u7i3ssmlap4sjmbr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inline bool test(mask_cref_type mask, std::size_t idx)</a>
+</h3>
+<h3 class="topic">
+<a name="7j9ohl74cu9ceiqqf2m5h63ltu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns true if bit number idx == 1</a>
+</h3>
+<h3 class="topic">
+<a name="6msgghshghjcirnpi1cblkm6os">&nbsp;&nbsp;&nbsp;&nbsp;size</a>
+</h3>
+<h3 class="topic">
+<a name="504g8e4t47koca83uct8hfl2gp">&nbsp;&nbsp;&nbsp;&nbsp;equal</a>
+</h3>
+<h3 class="topic">
+<a name="7fuo7ijjr8rc3v00pnrj8ned5v">&nbsp;&nbsp;&nbsp;&nbsp;count</a>
+</h3>
+<h3 class="topic">
+<a name="618pcfsfn65sj6b076vqnm3d2u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inline std::size_t count(mask_cref_type mask)</a>
+</h3>
+<h3 class="topic">
+<a name="02o8m4povg2h13r8sfq82lt6js">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns the number of bits sets</a>
+</h3>
+<h3 class="topic">
+<a name="36hsseum8tsbshji0796afm2ch">&nbsp;&nbsp;&nbsp;find_first</a>
+</h3>
+<h2 class="topic">
+<a name="7jtqdefrc8t67toor3031480tt">hpx::threads::noop_topology</a>
+</h2>
+<p class="relationships">See Also: <a href="#0k424984tiqt34r38490p8c0fv">hpx::threads::topology (is derived from)</a>
+</p>
+<h3 class="topic">
+<a name="2g910lf5gr3pv1r5iubiq9bhqt">&nbsp;noop means "no-operation"
+This class returns -1 or empty_mask, in all the get-functions
+basically does nothing</a>
+</h3>
+</body>
+</html>

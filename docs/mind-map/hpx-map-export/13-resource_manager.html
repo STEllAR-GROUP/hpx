@@ -1,0 +1,713 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>(virtual) 
+Resource Manager</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="575o02d903h274ft9dgtakir0b">(virtual) 
+Resource Manager</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="13-resource_manager_files/images/(virtual)  Resource Manager.jpg"></div>
+<div class="notesContainer">
+<p>GSoC 2015: Nidhi Makhijan</p>
+</div>
+<h2 class="topic">
+<a name="570eakb2j3igjlrpn91qght8h2">hpx::threads::resource_manager</a>
+</h2>
+<h3 class="topic">
+<a name="7ct36epufkrivg2eice6o39fi8">&nbsp;
+Responsibilities
+
+1. initial allocation: 
+Allocating resources to executors when executors are created
+
+2. Dynamic migration: 
+Monitoring utilization of resources by executors
+dynamically migrating resources between them (not implemented yet)
+</a>
+</h3>
+<h3 class="topic">
+<a name="56eitoqk8c09fqnk323466f848">&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="0pgs3lkb578qi36ltl7t1icmq8">&nbsp;&nbsp;&nbsp;mutable mutex_type mtx_</a>
+</h3>
+<h3 class="topic">
+<a name="4o8f8sibabuhn1g2skvt8emnkp">&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::size_t&gt; next_cookie_</a>
+</h3>
+<h3 class="topic">
+<a name="7tneppbmbtnqkjmik6v4cftue5">&nbsp;&nbsp;&nbsp;&nbsp;initialized to 0 in constructor</a>
+</h3>
+<h3 class="topic">
+<a name="4pundfn9daj2eq7o6e0hd8dvrr">&nbsp;&nbsp;&nbsp;std::vector&lt;punit_data&gt; punits_</a>
+</h3>
+<h3 class="topic">
+<a name="34b9o19618a7f3v005121eom3d">&nbsp;&nbsp;&nbsp;&nbsp;size initialized to get_os_thread_count</a>
+</h3>
+<h3 class="topic">
+<a name="2lqah362rr6m062r761o4h4r6k">&nbsp;&nbsp;&nbsp;&nbsp;vector of struct holding a size_t which indicates 
+how many schedulers use a particular PU</a>
+</h3>
+<h3 class="topic">
+<a name="7kjk3d9c2qmfcmrq5c64dio0ir">&nbsp;&nbsp;&nbsp;threads::topology const&amp; topology_</a>
+</h3>
+<h3 class="topic">
+<a name="1dopvhdl6a2a5cqn8p6hsi9rva">&nbsp;&nbsp;&nbsp;std::map&lt;std::size_t, proxy_data&gt; proxies_</a>
+</h3>
+<h3 class="topic">
+<a name="366n1g9q5uckuierev9qga8kq9">&nbsp;&nbsp;&nbsp;&nbsp;map cookie numbers to struct storing information about the allocation of virtual processing units for each scheduler proxy</a>
+</h3>
+<h3 class="topic">
+<a name="6ipmjnuf8khpmd4ni7h4liukke">&nbsp;&nbsp;&nbsp;std::map&lt;std::size_t, static_allocation_data&gt; proxies_static_allocation_data;</a>
+</h3>
+<h3 class="topic">
+<a name="072510o3n409fob9khqlqunc95">&nbsp;&nbsp;&nbsp;&nbsp;maps __???___ to static_allocation_data</a>
+</h3>
+<h3 class="topic">
+<a name="6e5hd4vgrh19rl2rj26210es3v">&nbsp;&nbsp;&nbsp;static std::size_t const release_borrowed_cores = std::size_t(-1)</a>
+</h3>
+<h3 class="topic">
+<a name="1pg5qsut1plp8d0n36tkfd9qkb">&nbsp;&nbsp;&nbsp;static std::size_t const release_cores_to_min = std::size_t(-2);</a>
+</h3>
+<h3 class="topic">
+<a name="7ruekrfav208u9s2m1613funsc">&nbsp;&nbsp;member functions
+(public)</a>
+</h3>
+<h3 class="topic">
+<a name="7jkg194r8rmri0hmv8333p0aa8">&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="09r2hdousve2bg6b4r0oioreuv">&nbsp;&nbsp;&nbsp;&nbsp;resource_manager()</a>
+</h3>
+<h3 class="topic">
+<a name="1t516q5lffn8cm04eflev647na">&nbsp;&nbsp;&nbsp;std::size_t initial_allocation(
+    detail::manage_executor* proxy, 
+    error_code&amp; ec);</a>
+</h3>
+<h3 class="topic">
+<a name="5mab6dl1iitnqbp1rdj7ptker6">&nbsp;&nbsp;&nbsp;&nbsp;request an initial resource allocation</a>
+</h3>
+<h3 class="topic">
+<a name="5c6fvumhb8h8gfljtiepae2kc7">&nbsp;&nbsp;&nbsp;&nbsp;detail::manage_executor is a proxy for the executor that called this function
+and is instantiated on the fly in the executor's constructor </a>
+</h3>
+<h3 class="topic">
+<a name="0ecq1rlp2h6ko3k867k5vakats">&nbsp;&nbsp;&nbsp;&nbsp;returns a std::size_t cookie_ which is stored as a data member by executor
+And is used by the resource manager to identify the executor</a>
+</h3>
+<h3 class="topic">
+<a name="246bcn08esf4c61kobuvo1i6bt">&nbsp;&nbsp;&nbsp;&nbsp;calleg, e.g. in the constructor of this_thread_executor</a>
+</h3>
+<h3 class="topic">
+<a name="4c9irneklrah5adaf2gocg7ncr">&nbsp;&nbsp;&nbsp;&nbsp;what does it do</a>
+</h3>
+<h3 class="topic">
+<a name="6470lhhak43qq8i0itr0vgsigr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;make sure the argument is not a nullptr</a>
+</h3>
+<h3 class="topic">
+<a name="48istvjernaprg8gignuh8fjgc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ask the executor for its policies</a>
+</h3>
+<h3 class="topic">
+<a name="3vm2sjqeusi4t01l9emrgnpiru">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;determine min_punits and max_punits</a>
+</h3>
+<h3 class="topic">
+<a name="7ipno162norijgl2881qdsot9d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I don't actually know what this is for. Now it just sets both to 1</a>
+</h3>
+<h3 class="topic">
+<a name="4u7mrtosv14rokcaocvpcgphli">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lock the resource manager</a>
+</h3>
+<h3 class="topic">
+<a name="6a197c7cdh45fa78gfgel6hphq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call</a>
+</h3>
+<h3 class="topic">
+<a name="4qomsi1derijqkvua2cq7u7ms7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allocate_virt_cores</a>
+</h3>
+<p class="relationships">See Also: <a href="#3pmv08a65neuqmq8fub51egp6b">std::vector&lt;coreids_type&gt; allocate_virt_cores(
+    detail::manage_executor* proxy,
+    std::size_t min_punits, 
+    std::size_t max_punits, error_code&amp; ec)</a>
+</p>
+<h3 class="topic">
+<a name="55tc7la9lbmt7mq2c6lccpa6hj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if failed, returns -1</a>
+</h3>
+<h3 class="topic">
+<a name="66oncr9a9f0ra0bg8v1d8d52j4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;store result in std::vector&lt;std::pair&lt;size_t, sie_t&gt; &gt; cores</a>
+</h3>
+<h3 class="topic">
+<a name="1fptjaiogocfhjoc8h4dblsvse">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;increment next_cookie_</a>
+</h3>
+<h3 class="topic">
+<a name="63v7qmrea3fl5s9n1db76giurj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert new element into data member proxies_</a>
+</h3>
+<h3 class="topic">
+<a name="53ccvbko07j1p9bue59dqm99lv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cookie</a>
+</h3>
+<h3 class="topic">
+<a name="09a9at55bk877tp6a6e8c6bf5a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_data</a>
+</h3>
+<h3 class="topic">
+<a name="2lgls9b90sebb39s7ulikimfr2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;executor-proxy</a>
+</h3>
+<h3 class="topic">
+<a name="3578gktc0p8qs168rptal42d65">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector of pairs of cores returned by allocate_virt_cores</a>
+</h3>
+<h3 class="topic">
+<a name="19dkqtfcav6so8cou8bj7fpea4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the cookie number at which it has registered the executor</a>
+</h3>
+<h3 class="topic">
+<a name="0o5u1nl4gnn06iuhecsbhladm2">&nbsp;&nbsp;&nbsp;void stop_executor(std::size_t cookie, error_code&amp; ec = throws);</a>
+</h3>
+<h3 class="topic">
+<a name="1elbkf2gcf9a033hr2f5so7fs9">&nbsp;&nbsp;&nbsp;&nbsp;stops the executor identified by the given cookie</a>
+</h3>
+<h3 class="topic">
+<a name="5ih078gkln3k18dn776q4el7hk">&nbsp;&nbsp;&nbsp;&nbsp;will invoke remove_processing_unit for each of the virtual cores allocated to the executor identified by cookie</a>
+</h3>
+<h3 class="topic">
+<a name="2n9g64vsvsg17mcaegjkdaode7">&nbsp;&nbsp;&nbsp;void detach(std::size_t cookie, error_code&amp; ec = throws)</a>
+</h3>
+<h3 class="topic">
+<a name="4nvunc716qva5h8ielr22385d1">&nbsp;&nbsp;&nbsp;&nbsp;detach the executor identified by the given cookie</a>
+</h3>
+<h3 class="topic">
+<a name="0be7lqam4il6al6qt18v57qtqg">&nbsp;&nbsp;&nbsp;&nbsp;this releases the manage_thread_executor proxy</a>
+</h3>
+<h3 class="topic">
+<a name="7t9vkflf2hlqkhjlcig50p83h3">&nbsp;&nbsp;&nbsp;static resource_manager&amp; get();</a>
+</h3>
+<h3 class="topic">
+<a name="1rvqqaado0v7oo4e3arhr42dee">&nbsp;&nbsp;&nbsp;&nbsp;return the singleton resource manager instance</a>
+</h3>
+<h3 class="topic">
+<a name="1e5etvu4pvdf6ge63ij9703h84">&nbsp;&nbsp;&nbsp;&nbsp;call using resource_manager::get();</a>
+</h3>
+<h3 class="topic">
+<a name="1ahh31872tlneuva6sq5naaste">&nbsp;&nbsp;&nbsp;called in destructor of this_thread_executor and thread_pool_executor</a>
+</h3>
+<p class="summary">(<a href="#0o5u1nl4gnn06iuhecsbhladm2">void stop_executor(std::size_t cookie, error_code&amp; ec = throws);</a>, <a href="#2n9g64vsvsg17mcaegjkdaode7">void detach(std::size_t cookie, error_code&amp; ec = throws)</a>, <a href="#7t9vkflf2hlqkhjlcig50p83h3">static resource_manager&amp; get();</a>)</p>
+<h3 class="topic">
+<a name="7frfk1dlcpocq8lmtm9vj8b1ft">&nbsp;&nbsp;member functions
+(protected)</a>
+</h3>
+<h3 class="topic">
+<a name="3pmv08a65neuqmq8fub51egp6b">&nbsp;&nbsp;&nbsp;std::vector&lt;coreids_type&gt; allocate_virt_cores(
+    detail::manage_executor* proxy,
+    std::size_t min_punits, 
+    std::size_t max_punits, error_code&amp; ec)</a>
+</h3>
+<p class="relationships">See Also: <a href="#4qomsi1derijqkvua2cq7u7ms7">allocate_virt_cores</a>
+</p>
+<h3 class="topic">
+<a name="7mjmq41tg56vfrio6pepr4ahns">&nbsp;&nbsp;&nbsp;&nbsp;allocate virtual cores</a>
+</h3>
+<h3 class="topic">
+<a name="0bkvdb63fup8cksbtc75t5j2bm">&nbsp;&nbsp;&nbsp;&nbsp;returns a vector of coreids_type</a>
+</h3>
+<h3 class="topic">
+<a name="3vh1cjaln4vitt6t6gbedra5g5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector of pairs of size_ts</a>
+</h3>
+<h3 class="topic">
+<a name="2m9d4h1bescbbektqju6ghfav9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapping of physical PUs onto logical PUs</a>
+</h3>
+<h3 class="topic">
+<a name="0unp0gp40f5ohqc2iqg8pounhv">&nbsp;&nbsp;&nbsp;&nbsp;called by initial_allocation</a>
+</h3>
+<h3 class="topic">
+<a name="4872mvo9n8ho63j2hmett1bbkl">&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="1pgh5mb0te238v39di1o2nn50n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instanciate array of available processing units
+(which is a vector of punit_status)</a>
+</h3>
+<h3 class="topic">
+<a name="72vqsomag2jo5ma8dqmvmcvaa3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size = punits_.size()</a>
+</h3>
+<h3 class="topic">
+<a name="4d969krkvouf7um1dju0rqk3jg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = punit_status::unassigned</a>
+</h3>
+<h3 class="topic">
+<a name="1q3454irf5c6m4ptt28a0esmjh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;find all available processing units with zero use count
+(ie no extra scheduler is running on it)
+(this sets some elements of available_processing_units to "reserved")</a>
+</h3>
+<h3 class="topic">
+<a name="5avg3qgp8b201rl7o80jbfs785">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call</a>
+</h3>
+<h3 class="topic">
+<a name="3p5c99aa62sufg2pqbubi77u40">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reserve_processing_units</a>
+</h3>
+<p class="relationships">See Also: <a href="#2jvva1nohv2ngmnvsp5dc1s9e8">std::size_t reserve_processing_units(
+    std::size_t use_count, 
+    std::size_t desired, 
+    std::vector&lt;punit_status&gt;&amp; avalable_punits);</a>
+</p>
+<h3 class="topic">
+<a name="3imb1slpucrd4frq0ig19c8dcd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if the number of available PUs with use_count 0 is &lt; max_punits</a>
+</h3>
+<h3 class="topic">
+<a name="0ui76hn6faute4pnvqoll7sjmf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of cores found is insufficient: 
+we have to share PUs</a>
+</h3>
+<h3 class="topic">
+<a name="4ujhh6ehn2hb3k6shf37vfe8dk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUs found: inform scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="5q7fv6b0cf5ps2a9e9ce4pgg3t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loop on available_punits</a>
+</h3>
+<h3 class="topic">
+<a name="1pa39a2ddjknd95kbusia233he">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if the element is "reserved"</a>
+</h3>
+<h3 class="topic">
+<a name="3is4cud94cnsd3opln35dpi5bs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add PU to the executor-proxy by calling</a>
+</h3>
+<h3 class="topic">
+<a name="13bh9mtbbutl2e2n3ccqobmnm9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy-&gt;add_processing_unit(punit, i, ec)</a>
+</h3>
+<h3 class="topic">
+<a name="40fcv2mja56vu786v9o0f1abpm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add pair 
+- index in available_punits
+- punit
+to core_ids</a>
+</h3>
+<h3 class="topic">
+<a name="4f5ujuoprvvquprd426d82p7s6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;increment punit</a>
+</h3>
+<h3 class="topic">
+<a name="5i2j41bhsgpatm9ep6j6q5q3g0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;increment use_count_ of element of punit_</a>
+</h3>
+<h3 class="topic">
+<a name="45a2i7mp10canig7in69d4q1kg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if we've done so for max_punit, break</a>
+</h3>
+<h3 class="topic">
+<a name="7astgg5pdm0urdaf0k1oh17ian">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle errors</a>
+</h3>
+<h3 class="topic">
+<a name="31salaqpi10fslbbklrgb8ako5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return core_ids</a>
+</h3>
+<h3 class="topic">
+<a name="4spqme2ursv9tkeqe5b8a48jur">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;which is a std::vector&lt;coreids_type&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="2ifiphmt4b6rgusgroqio6s1jj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coreids_type is a pair of std::size_t mapping physical cores to virtual cores</a>
+</h3>
+<h3 class="topic">
+<a name="2jvva1nohv2ngmnvsp5dc1s9e8">&nbsp;&nbsp;&nbsp;std::size_t reserve_processing_units(
+    std::size_t use_count, 
+    std::size_t desired, 
+    std::vector&lt;punit_status&gt;&amp; avalable_punits);</a>
+</h3>
+<p class="relationships">See Also: <a href="#3p5c99aa62sufg2pqbubi77u40">reserve_processing_units</a>
+</p>
+<h3 class="topic">
+<a name="6s9vp52mmlp3k2skhioes14coc">&nbsp;&nbsp;&nbsp;&nbsp;reserve the virtual cores for the scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="1c3iov0u15e4mql9cbm5f2usm9">&nbsp;&nbsp;&nbsp;&nbsp;Find 'desired' amount of processing units which have the given use count
+(use count is the number of schedulers associated with a given processing unit).</a>
+</h3>
+<h3 class="topic">
+<a name="2mjt4bc9kookbkeuornigqut4o">&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="2pi52bs7ik6th9rb2n2mvj926j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loop on elements of punits_</a>
+</h3>
+<h3 class="topic">
+<a name="3dgjv5bb3jsttttul29t2h4gb5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if the use_count_ of that punit_ == use_count given as argument</a>
+</h3>
+<h3 class="topic">
+<a name="4v8evjhe218mj9589eripnogue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;give "reserved" status to that element in the available_punits parameter</a>
+</h3>
+<h3 class="topic">
+<a name="4v0pvvq0u3sjuolo2l21fns7jg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;increment the "available" counter, keeping track of the number of PUs I found</a>
+</h3>
+<h3 class="topic">
+<a name="6ohpa2hc8fbrggtcejjactdpmp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break if i've found "desired" number of elements</a>
+</h3>
+<h3 class="topic">
+<a name="61g48dk1i119jlg6k2hc7ievjd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the number of PUs found with use_count corresponding to argument</a>
+</h3>
+<h3 class="topic">
+<a name="3iii1r4t7nf924dmal8tph6l8c">&nbsp;&nbsp;&nbsp;std::size_t reserve_at_higher_use_count(
+    std::sie_t desired,
+    std::vector&lt;punit_status&gt;&amp; available_punits);</a>
+</h3>
+<h3 class="topic">
+<a name="3qbj1illdsqlm4kjq0jpd3efa6">&nbsp;&nbsp;&nbsp;&nbsp;reserve virtual cores for scheduler at higher use count</a>
+</h3>
+<h3 class="topic">
+<a name="7fr6l8rt661jva9r6cihjhdiku">&nbsp;&nbsp;member functions
+(private)</a>
+</h3>
+<h3 class="topic">
+<a name="651o8j6keugbed72fejqk6k3h4">&nbsp;&nbsp;&nbsp;std::size_t preprocess_static_allocation(std::size_t min_punits, std::size_t max_punits)</a>
+</h3>
+<h3 class="topic">
+<a name="336s0ru9bd82gkgp640svnatd6">&nbsp;&nbsp;&nbsp;bool release_scheduler_resources(
+    allocation_data_map_type::iterator it, 
+    std::size_t number_to_free, 
+    std::vector&lt;punit_status&gt;&amp; available_punits)</a>
+</h3>
+<h3 class="topic">
+<a name="3jf3ird8vqne65rcj51923ajhb">&nbsp;&nbsp;&nbsp;&nbsp;release cores from scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="7p2l7ap04mj3bo80hurnlah64s">&nbsp;&nbsp;&nbsp;std::size_t release_cores_on_existing_schedulers(
+    std::size_t number_to_free, 
+    std::vector&lt;punit_status&gt;&amp; available_punits,
+    std::size_t new_allocation) </a>
+</h3>
+<h3 class="topic">
+<a name="57gs6cbdfos27s7mbj8fg7o0sf">&nbsp;&nbsp;&nbsp;&nbsp;release cores from all schedulers</a>
+</h3>
+<h3 class="topic">
+<a name="3evrt5n0qpdr65uhbme7ssq2hd">&nbsp;&nbsp;&nbsp;&nbsp;calls release_scheduler_resources</a>
+</h3>
+<h3 class="topic">
+<a name="2o5sv7ldq5ioutekr5f87e23m2">&nbsp;&nbsp;&nbsp;        std::size_t redistribute_cores_among_all(std::size_t reserved,
+            std::size_t min_punits, std::size_t max_punits,
+            std::vector&lt;punit_status&gt;&amp; available_punits,
+            std::size_t new_allocation);</a>
+</h3>
+<h3 class="topic">
+<a name="4ketcbebvj59h17aekhohfagvs">&nbsp;&nbsp;&nbsp;&nbsp;distribute cores to schedulers 
+proportional to max_punits of the schedulers</a>
+</h3>
+<h3 class="topic">
+<a name="6ill1b976phk7dr8d607497ih6">&nbsp;&nbsp;&nbsp;        void roundup_scaled_allocations(
+            allocation_data_map_type &amp;scaled_static_allocation_data,
+            std::size_t total_allocated);</a>
+</h3>
+<h2 class="topic">
+<a name="6h6go8924j9ikp1elhu30g6kio">classes that are connected</a>
+</h2>
+<h3 class="topic">
+<a name="1l4fkm36ibnjogsbe95fkc3764">&nbsp;struct executor_statistics</a>
+</h3>
+<h3 class="topic">
+<a name="4tijv9669qh10vfuesa1928m8i">&nbsp;&nbsp;data structure which stores statistics collected by an executor instance</a>
+</h3>
+<h3 class="topic">
+<a name="7lev53jbnmder1fkbk9qoomfhp">&nbsp;class executor_id</a>
+</h3>
+<h3 class="topic">
+<a name="08dtmlgrd2j92hv38chbscd08g">&nbsp;enum hpx::threads::detail::executor_parameter</a>
+</h3>
+<h3 class="topic">
+<a name="2oic92e5hes1h9edggll28reah">&nbsp;struct hpx::threads::detail::manage_executor</a>
+</h3>
+<p class="relationships">See Also: <a href="#7rs74qhlc1fb9q9v99rkmfenbl">class hpx::threads::executors::detail::manage_thread_executor&lt;ExecutorImpl&gt; (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="1h6jlab5q0j8h17gl0mjt32tk2">&nbsp;&nbsp;
+abstract class
+used by resource_manager as a proxy to interact with the executor
+</a>
+</h3>
+<h3 class="topic">
+<a name="7rs74qhlc1fb9q9v99rkmfenbl">&nbsp;class hpx::threads::executors::detail::manage_thread_executor&lt;ExecutorImpl&gt;</a>
+</h3>
+<p class="relationships">See Also: <a href="#2oic92e5hes1h9edggll28reah">struct hpx::threads::detail::manage_executor (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="6gb9outaqdrh1p2ob5kp0a5k84">&nbsp;&nbsp;
+interface between resource manager and executors
+</a>
+</h3>
+<h3 class="topic">
+<a name="2e5hcracgjij54fe7cln9jccqj">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="5d3rkqegn4nr68rk9qt7dfm8ja">&nbsp;&nbsp;&nbsp;&nbsp;ExecutorImpl&amp; sched_</a>
+</h3>
+<h3 class="topic">
+<a name="0jnl0n2efpfimvnd17nc52v98g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this is an executor, not a scheduler!</a>
+</h3>
+<h3 class="topic">
+<a name="16huiu5uhctaoqo1uh1tsgkpai">&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="73qt1iqe5lae3j56dmje2g0s4e">&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="5dtnnkrt4qr9hskiuu9bq523hk">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t get_policy_element(
+    threads::detail::executor_parameter p, 
+    error_code&amp; ec)</a>
+</h3>
+<h3 class="topic">
+<a name="59ftmqqgtnkq7d1iqh19em431n">&nbsp;&nbsp;&nbsp;&nbsp;void get_statistics(executor_statistics&amp; stats, error_code&amp; ec) const</a>
+</h3>
+<h3 class="topic">
+<a name="28bilgil9oori79ijr8j2ms6ns">&nbsp;&nbsp;&nbsp;&nbsp;void add_processing_unit(
+    std::size_t virt_core, std::size_t thread_num,
+    error_code&amp; ec)</a>
+</h3>
+<h3 class="topic">
+<a name="14hn5qvcni25bqtbohfu68k7hg">&nbsp;&nbsp;&nbsp;&nbsp;void remove_processing_unit(std::size_t thread_num, error_code&amp; ec)</a>
+</h3>
+<h3 class="topic">
+<a name="0grhoarh825ua6vtshia50dbvk">&nbsp;&nbsp;&nbsp;&nbsp;calls the corresponding member function of the executor</a>
+</h3>
+<p class="summary">(<a href="#5dtnnkrt4qr9hskiuu9bq523hk">std::size_t get_policy_element(
+    threads::detail::executor_parameter p, 
+    error_code&amp; ec)</a>, <a href="#59ftmqqgtnkq7d1iqh19em431n">void get_statistics(executor_statistics&amp; stats, error_code&amp; ec) const</a>, <a href="#28bilgil9oori79ijr8j2ms6ns">void add_processing_unit(
+    std::size_t virt_core, std::size_t thread_num,
+    error_code&amp; ec)</a>, <a href="#14hn5qvcni25bqtbohfu68k7hg">void remove_processing_unit(std::size_t thread_num, error_code&amp; ec)</a>)</p>
+<h3 class="topic">
+<a name="5ijeudtsqnmgp2vg3ugi24gfhk">&nbsp;enum class hpx::threads::punit_status</a>
+</h3>
+<h3 class="topic">
+<a name="3043slupqu9a84u4e8ptcu62f4">&nbsp;&nbsp;status of a given PU</a>
+</h3>
+<h3 class="topic">
+<a name="7hik3ai3jiumg613ivlcdvsi3h">&nbsp;&nbsp;&nbsp;unassigned = 0</a>
+</h3>
+<h3 class="topic">
+<a name="22lsvfuc0uhod0hbtrgvh0dton">&nbsp;&nbsp;&nbsp;reserved = 1</a>
+</h3>
+<h3 class="topic">
+<a name="12g3g8mjfkiqi626l97tc2m8lp">&nbsp;&nbsp;&nbsp;assigned = 2</a>
+</h3>
+<h3 class="topic">
+<a name="112ebkeoefio1eoomo6ee9e4ea">&nbsp;resource_manager::</a>
+</h3>
+<h3 class="topic">
+<a name="5e11ptoqc7nm7c83fne5kjulhi">&nbsp;&nbsp;struct hpx::threads::resource_manager::punit_data</a>
+</h3>
+<h3 class="topic">
+<a name="30ifreo9ep46q1cmflvtrpbf4j">&nbsp;&nbsp;&nbsp;
+store information about the physical processing units available to this resource manager
+</a>
+</h3>
+<h3 class="topic">
+<a name="4jcnqag7k6hvrt0t9tp0gdb5u5">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t use_count_</a>
+</h3>
+<h3 class="topic">
+<a name="1ncjrgnqngp1jpga5obp3s4hep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of schedulers using this core</a>
+</h3>
+<h3 class="topic">
+<a name="746bpcbblphvhfu1e6sdqg6l22">&nbsp;&nbsp;struct hpx::threads::resource_manager::proxy_data</a>
+</h3>
+<h3 class="topic">
+<a name="1gtl937oouvgffdf8j3527l7kn">&nbsp;&nbsp;&nbsp;
+store information about the PU allocation
+for each of the scheduler proxies
+attached to this resource manager
+</a>
+</h3>
+<h3 class="topic">
+<a name="25k640sn96se3o0al3ds03sk2m">&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="5dbv6pv2eigu7ai5eagm51o9s2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;detail::manage_executor&gt; proxy</a>
+</h3>
+<h3 class="topic">
+<a name="3fujg2jtn7qenbdqk2g9vsbsrp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hold on to proxy</a>
+</h3>
+<h3 class="topic">
+<a name="30jm6og5g734bprhjqn2d06jua">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;coreids_type&gt; core_ids</a>
+</h3>
+<p class="relationships">See Also: <a href="#5hepdf2j1mvko2ocaa7j6o7bmr">typedef std::pair&lt;std::size_t, std::size_t&gt; coreids_type</a>
+</p>
+<h3 class="topic">
+<a name="5ia68lih0u4fvbf6obe9bag7m5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map physical punit ids to logical ones</a>
+</h3>
+<h3 class="topic">
+<a name="6gdodlu23oe6jr6n083vbgq2t1">&nbsp;&nbsp;&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="3erqrur6n9vfjcqohcu4557c3q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="6r15v579757lk410quac5bcp60">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;copy constructor</a>
+</h3>
+<h3 class="topic">
+<a name="4p5rlvoj3nj7bvj1obar2r07vr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;move constructor</a>
+</h3>
+<h3 class="topic">
+<a name="1et0q44sb9o1eopvv2rrfrn8oh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operator= </a>
+</h3>
+<h3 class="topic">
+<a name="1s0ddeecouu8p6n63s1vbdnhlo">&nbsp;&nbsp;struct hpx::threads::resource_manager::allocation_data</a>
+</h3>
+<p class="relationships">See Also: <a href="#4vtvtmadc0uttvc45gosbn179g">struct hpx::threads::resource_manager::static_allocation_data (is derived from)</a>
+</p>
+<h3 class="topic">
+<a name="6ftk26veeqo2vl8uor9hj5pl6i">&nbsp;&nbsp;&nbsp;
+store information during static and dynamic allocation
+</a>
+</h3>
+<h3 class="topic">
+<a name="7mb2qfqbkbv4h0mm98kkn5th5q">&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="4krv9h82q3emi4i7qi5a91lb3k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;detail::manage_executor&gt; proxy_;</a>
+</h3>
+<h3 class="topic">
+<a name="3noqrlr6vt9etv926g33hg351l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scheduler proxy this allocation data is for</a>
+</h3>
+<h3 class="topic">
+<a name="59546e1f32aivovva2iquhe3u8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t allocation</a>
+</h3>
+<h3 class="topic">
+<a name="065dsrfokjag5f6sqp4ao33ge2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Additional allocation to give to a scheduler after proportional allocation decisions are made.</a>
+</h3>
+<h3 class="topic">
+<a name="0eup1dsoa50hgjuj0se8hfpdvo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double scaled_allocation_</a>
+</h3>
+<h3 class="topic">
+<a name="7slj2jfql782jgolc3hdpuil6b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scaled allocation value during proportional allocation.</a>
+</h3>
+<h3 class="topic">
+<a name="0nicd4mln6qqcuarqrmph6vh20">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_borrowed_cores_;</a>
+</h3>
+<h3 class="topic">
+<a name="2710qkb8hra81vb23tsenjdoea">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;borrowed cores held by scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="7a56dueen5gpe05lig5g022a1n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_owned_cores_;</a>
+</h3>
+<h3 class="topic">
+<a name="785j3hcujlcd2pl45trk44ij1b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;owned cores held by scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="04oltjcsaa4r1on7qkebim0i0p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t min_proxy_cores_;</a>
+</h3>
+<h3 class="topic">
+<a name="3l5kjmpppclmv9fou3ub4h5fcr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;min cores required by scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="5lkoagr8are4i6g6vmc3e4egjm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t max_proxy_cores_;</a>
+</h3>
+<h3 class="topic">
+<a name="4ofnmthok648cc34lo8hgniivf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max cores required by scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="4vtvtmadc0uttvc45gosbn179g">&nbsp;&nbsp;struct hpx::threads::resource_manager::static_allocation_data</a>
+</h3>
+<p class="relationships">See Also: <a href="#1s0ddeecouu8p6n63s1vbdnhlo">struct hpx::threads::resource_manager::allocation_data (is derived from)</a>
+</p>
+<h3 class="topic">
+<a name="4dg1tiaql2ucnpteg9bnghalm2">&nbsp;&nbsp;&nbsp;
+store information during static allocation?
+</a>
+</h3>
+<h3 class="topic">
+<a name="1rilokfn9lpj1odmnbvqk3qrf1">&nbsp;&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="58ct543vak14vufhbl2e08b7qv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double adjusted_desired_</a>
+</h3>
+<h3 class="topic">
+<a name="2kl0rtq30lm91dmjqtvg4re8i6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A field used during static allocation to decide on an allocation
+proportional to each scheduler's desired value.</a>
+</h3>
+<h3 class="topic">
+<a name="6dc33i68vnhd30r01bq8bkl5d0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::size_t num_cores_stolen_</a>
+</h3>
+<h3 class="topic">
+<a name="49tdmpkuf5u5ur1001dqaur448">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keeps track of stolen cores during static allocation</a>
+</h3>
+<h3 class="topic">
+<a name="7m2gbs5p20ovqr5tv9emj3kome">&nbsp;typedefs</a>
+</h3>
+<h3 class="topic">
+<a name="6fn5vlb7m29tp30fqars6fdpeu">&nbsp;&nbsp;typedef lcos::local::spinlock mutex_type;</a>
+</h3>
+<h3 class="topic">
+<a name="5hepdf2j1mvko2ocaa7j6o7bmr">&nbsp;&nbsp;typedef std::pair&lt;std::size_t, std::size_t&gt; coreids_type</a>
+</h3>
+<p class="relationships">See Also: <a href="#30jm6og5g734bprhjqn2d06jua">std::vector&lt;coreids_type&gt; core_ids</a>
+</p>
+<h3 class="topic">
+<a name="7e7hbtaf2gq3pnoui02c9n36hn">&nbsp;&nbsp;&nbsp;mapping of physical cores onto virtual cores</a>
+</h3>
+<h2 class="topic">
+<a name="4vs17adrh3v8ggbacshl9jgbt9">physical PUs</a>
+</h2>
+<p class="relationships">See Also: <a href="#33mrlctpvvfqk67apghb06shjt">topology (knows about)</a>, <a href="#343hi6j4j6hnfa0kto5cpva3td">coreids_type</a>
+</p>
+<h2 class="topic">
+<a name="7vud839lfu7uc2iqd7hmpa76b3">virtual PUs</a>
+</h2>
+<p class="relationships">See Also: <a href="#343hi6j4j6hnfa0kto5cpva3td">coreids_type</a>
+</p>
+<h2 class="topic">
+<a name="7ngdho8nlbfd1nr9g4uehn2pr9">executors</a>
+</h2>
+<div class="notesContainer">
+<p>this_thread_executor or thread_pool_executor</p>
+</div>
+<p class="relationships">See Also: <a href="#0qqcljojl3ss7m51ulp9895a9e">manage_thread_executor (is templated on and holds a )</a>
+</p>
+<h3 class="topic">
+<a name="7kh6kt4cb0lpebv0ranja1u93n">&nbsp;cookie</a>
+</h3>
+<p class="relationships">See Also: <a href="#6pt6bcgo06vf9guq21ktqsf3mm">proxies_, maps (maps)</a>
+</p>
+<h3 class="topic">
+<a name="004uf1fdmvngk0cnlr6h500fd2">&nbsp;scheduler</a>
+</h3>
+<h2 class="topic">
+<a name="4q6fkma4jin7dcfot4dttqoglt">resource manager</a>
+</h2>
+<h3 class="topic">
+<a name="3b233277sjemtorttb4v49uga7">&nbsp;topology</a>
+</h3>
+<p class="relationships">See Also: <a href="#33mrlctpvvfqk67apghb06shjt">topology (owns a reference to
+but never actually uses! )</a>
+</p>
+<h3 class="topic">
+<a name="5m2mirq57ev621nrl0ti5gdmkh">&nbsp;vector&lt;punit_data&gt; punits_</a>
+</h3>
+<h3 class="topic">
+<a name="6pt6bcgo06vf9guq21ktqsf3mm">&nbsp;proxies_, maps</a>
+</h3>
+<p class="relationships">See Also: <a href="#7kh6kt4cb0lpebv0ranja1u93n">cookie (maps)</a>, <a href="#692hqa2brubffru2bovncu65di">proxy_data (maps)</a>
+</p>
+<h3 class="topic">
+<a name="2u3eula4cdfssjq8423ghfarr5">&nbsp;proxies_static_allocation_data, maps</a>
+</h3>
+<p class="relationships">See Also: <a href="#2s17j50pn06olcgna8gcth4igh">static_allocation_data</a>
+</p>
+<h2 class="topic">
+<a name="692hqa2brubffru2bovncu65di">proxy_data</a>
+</h2>
+<p class="relationships">See Also: <a href="#1hiheip0ukdtppiveidvp5um9g">detail::manage_executor (holds a pointer to a )</a>, <a href="#6pt6bcgo06vf9guq21ktqsf3mm">proxies_, maps (maps)</a>, <a href="#343hi6j4j6hnfa0kto5cpva3td">coreids_type (holds a vector of)</a>
+</p>
+<h2 class="topic">
+<a name="1hiheip0ukdtppiveidvp5um9g">detail::manage_executor</a>
+</h2>
+<p class="relationships">See Also: <a href="#692hqa2brubffru2bovncu65di">proxy_data (holds a pointer to a )</a>, <a href="#2s17j50pn06olcgna8gcth4igh">static_allocation_data (holds a pointer to a)</a>
+</p>
+<h3 class="topic">
+<a name="0qqcljojl3ss7m51ulp9895a9e">&nbsp;manage_thread_executor</a>
+</h3>
+<p class="relationships">See Also: <a href="#7ngdho8nlbfd1nr9g4uehn2pr9">executors (is templated on and holds a )</a>
+</p>
+<h2 class="topic">
+<a name="33mrlctpvvfqk67apghb06shjt">topology</a>
+</h2>
+<p class="relationships">See Also: <a href="#3b233277sjemtorttb4v49uga7">topology (owns a reference to
+but never actually uses! )</a>, <a href="#4vs17adrh3v8ggbacshl9jgbt9">physical PUs (knows about)</a>
+</p>
+<h2 class="topic">
+<a name="2s17j50pn06olcgna8gcth4igh">static_allocation_data</a>
+</h2>
+<p class="relationships">See Also: <a href="#1hiheip0ukdtppiveidvp5um9g">detail::manage_executor (holds a pointer to a)</a>, <a href="#2u3eula4cdfssjq8423ghfarr5">proxies_static_allocation_data, maps</a>
+</p>
+<h2 class="topic">
+<a name="343hi6j4j6hnfa0kto5cpva3td">coreids_type</a>
+</h2>
+<div class="notesContainer">
+<p></p>
+<p>std::pair&lt;std::size_t, std::size_t&gt; coreids_type</p>
+</div>
+<p class="relationships">See Also: <a href="#692hqa2brubffru2bovncu65di">proxy_data (holds a vector of)</a>, <a href="#4vs17adrh3v8ggbacshl9jgbt9">physical PUs</a>, <a href="#7vud839lfu7uc2iqd7hmpa76b3">virtual PUs</a>
+</p>
+</body>
+</html>

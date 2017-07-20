@@ -1,0 +1,575 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>scheduler_base</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/schedulers.html" name="4fqpt6i25goulksmvhr8fscljr">scheduler_base</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="9-scheduler_files/images/scheduler_base.jpg"></div>
+<p align="center" class="topicImage">
+<img height="612" src="9-scheduler_files/6u41vjk5vhbi5qstt9eekiked0.png" width="938"></p>
+<div class="notesContainer">
+<p>is a data member of thread_pool. Its constructor is called in the constructor of runtime_imp</p>
+</div>
+<p class="relationships">See Also: <a href="#0rgss3afmf9urnpbrubcc0mnum">
+defines the interface to be implemented 
+by all scheduler policies
+
+hpx::threads::policies::scheduler_base
+
+non-copyable
+
+abstract
+
+the derived classes hold one or several thread_queues, one way or another
+</a>
+</p>
+<h2 class="topic">
+<a name="2tcupe32079tf9motafkgvtv63">derived classes</a>
+</h2>
+<h3 class="topic">
+<a name="6gfe81ji5t7p0k8h0eeab03prk">&nbsp;With distinction 
+between priorities</a>
+</h3>
+<h3 class="topic">
+<a name="1enqkso9oveqsgq4plvgg0b8na">&nbsp;&nbsp;local_priority_queue_scheduler</a>
+</h3>
+<p class="topicImage">
+<img height="721" src="9-scheduler_files/3edobiiscas01adf2tosjnh02t" width="1030"></p>
+<div class="notesContainer">
+<p>default or invoke using: </p>
+<p>--hpx:queuing=local-priority-fifo (or -qlo) </p>
+</div>
+<p class="relationships">See Also: <a href="#459h9oh8kjcti9eqvbnq3auo57">periodic_priority_queue_scheduler</a>, <a href="#52r3pi5j4l1smeb1tstps3eomr">static_priority_queue_scheduler</a>
+</p>
+<h3 class="topic">
+<a name="5gu5b9m95icm6pi32bkidekae1">&nbsp;&nbsp;&nbsp;Maintains exactly one queue of work items (threads) per OS thread
+where this OS thread pulls its next work from. </a>
+</h3>
+<h3 class="topic">
+<a name="31gec2osmmlfquqnkrvqvf3n1m">&nbsp;&nbsp;&nbsp;Additionally, it maintains separate queues:</a>
+</h3>
+<h3 class="topic">
+<a name="11r924c1u3sqog5u3mc0k4rsbg">&nbsp;&nbsp;&nbsp;&nbsp;several high priority queues</a>
+</h3>
+<p class="relationships">See Also: <a href="#0ev1ii8ooobufsro5v62d6mj73">--hpx:high-priority-threads (set the
+number)</a>
+</p>
+<h3 class="topic">
+<a name="1idk4g1nkunl902ae95kio04uc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUs pull work of their high-priority-thread first, and only when this one is empty do they pull work from their normal-priority-queue. </a>
+</h3>
+<h3 class="topic">
+<a name="137mb5b85a6ok4a439rnb1kgpd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If a PU doesn't have a high-priority-queue, it pulls work of its normal priority queue before stealing from other PUs high-prriority queues</a>
+</h3>
+<h3 class="topic">
+<a name="2q75t0m5t1a8dtciook6k2g2jo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Work is stolen from high-priority queues first</a>
+</h3>
+<h3 class="topic">
+<a name="3f18fvoeng5s81d1c226nepe05">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by default, number of high priority queues = number of OS threads
+Or specify, using --hpx:high-priority-threads</a>
+</h3>
+<h3 class="topic">
+<a name="27d0bfdcinnqtet1min32grgp8">&nbsp;&nbsp;&nbsp;&nbsp;one low priority queue</a>
+</h3>
+<h3 class="topic">
+<a name="317mf4j6jb5s0ki0u6irse106b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;low priority threads are executed by the last OS thread 
+whenever no other work is available</a>
+</h3>
+<h3 class="topic">
+<a name="3f5fplb1nvkndsbepj30indk7q">&nbsp;&nbsp;&nbsp;options</a>
+</h3>
+<h3 class="topic">
+<a name="2s27ie3r3eph3h1gde6ubsepqn">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:numa-sensitive</a>
+</h3>
+<h3 class="topic">
+<a name="1b2jta8fq269d38lcrta5sek5l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;turn on NUMA sensitivity</a>
+</h3>
+<h3 class="topic">
+<a name="0o19ah5te3jkosrmnghemrfvhn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;then stealing is done from the queues associated with the same NUMA domain first&#13;
+Only after can work be stolen from other NUMA domains</a>
+</h3>
+<h3 class="topic">
+<a name="0ev1ii8ooobufsro5v62d6mj73">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:high-priority-threads</a>
+</h3>
+<p class="relationships">See Also: <a href="#11r924c1u3sqog5u3mc0k4rsbg">several high priority queues (set the
+number)</a>
+</p>
+<h3 class="topic">
+<a name="25qf3n7mc0c0g6jgoquvfjble4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;choose the number of high priority queues
+(default: number of OS-threads)</a>
+</h3>
+<h3 class="topic">
+<a name="6av7bg4f6vsksii2b1cnu3il8t">&nbsp;&nbsp;&nbsp;&nbsp;hpx:queueing=local_priority_lifo</a>
+</h3>
+<h3 class="topic">
+<a name="2ecpsgejhvl9gtnr6l993m38o5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Two possible underlying queueing policies</a>
+</h3>
+<h3 class="topic">
+<a name="1ppmr3achgeq8sm4m1l083kmpo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FIFO: first in first out (default)</a>
+</h3>
+<h3 class="topic">
+<a name="05uv02gbti0ef31ne8k42ia8sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIFO: last in first out&#13;
+(activate this one using --hpx:queuing=local-priority-lifo</a>
+</h3>
+<h3 class="topic">
+<a name="6atf3l3cts1i5ug4ppajc78na2">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="0kog1bb6t0llk6hkuv1sf69mfh">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t max_queue_thread_count</a>
+</h3>
+<h3 class="topic">
+<a name="7s68hstcea2g4urtilcht0a0of">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;thread_queue_type*&gt; queues_</a>
+</h3>
+<p class="relationships">See Also: <a href="#3tngm5mqo114251vegmb589auv">typedef thread_queue&lt;
+            Mutex, 
+            PendingQueuing, 
+            StagedQueuing, 
+            TerminatedQueuing&gt; thread_queue_type;</a>
+</p>
+<h3 class="topic">
+<a name="3m3mnq6tda1kaves97c3t92nvd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector of high-priority work-queues</a>
+</h3>
+<h3 class="topic">
+<a name="76qa5lq861hitfej530v0bi5ab">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;thread_queue_type*&gt; high_priority_queues_</a>
+</h3>
+<p class="relationships">See Also: <a href="#3tngm5mqo114251vegmb589auv">typedef thread_queue&lt;
+            Mutex, 
+            PendingQueuing, 
+            StagedQueuing, 
+            TerminatedQueuing&gt; thread_queue_type;</a>
+</p>
+<h3 class="topic">
+<a name="7pnaln7p8s7un4ceb2gbidk5sp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector of normal-priority work-queues</a>
+</h3>
+<h3 class="topic">
+<a name="5ihi4aeue4ft85js0dtick506r">&nbsp;&nbsp;&nbsp;&nbsp;thread_queue_type low_priority_queue_</a>
+</h3>
+<p class="relationships">See Also: <a href="#3tngm5mqo114251vegmb589auv">typedef thread_queue&lt;
+            Mutex, 
+            PendingQueuing, 
+            StagedQueuing, 
+            TerminatedQueuing&gt; thread_queue_type;</a>
+</p>
+<h3 class="topic">
+<a name="63c8gr7lmm745j7kn2mq7do3dq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector of low-priority work-queues</a>
+</h3>
+<h3 class="topic">
+<a name="0u87armej3co4hkto8f2bf9cbu">&nbsp;&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::size_t&gt; curr_queue_</a>
+</h3>
+<h3 class="topic">
+<a name="6arvjsmt9t84b8qa3l1q5es18s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;an index indicating the current queue in the vector of queues</a>
+</h3>
+<h3 class="topic">
+<a name="7qpo3p8p2i80h78terqtmhh2n1">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t numa_sensitive_</a>
+</h3>
+<h3 class="topic">
+<a name="2q9058pe20hn19ilb00f8vlv4t">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;std::vector&lt;std::size_t&gt; &gt; victim_threads_</a>
+</h3>
+<h3 class="topic">
+<a name="5c861dhv1pf4ild46bl9tcmb4r">&nbsp;&nbsp;abp_priority_queue</a>
+</h3>
+<p class="topicImage">
+<img height="632" src="9-scheduler_files/4jigepflbfbvbp0mmbot0ed6g0" width="1025"></p>
+<h3 class="topic">
+<a name="5f9s6ef2kht8vu6nvv4osn0oud">&nbsp;&nbsp;&nbsp;Priority ABP policy maintains a double ended lock free queue for each OS thread. &#13;
+By default the number of high priority queues is equal to the number of OS threads; &#13;
+the number of high priority queues can be specified on the command line using --hpx:high-priority-threads. </a>
+</h3>
+<h3 class="topic">
+<a name="79ghhglhgtuqlhtaoeckboim9c">&nbsp;&nbsp;&nbsp;High priority threads are executed by the first OS threads before any other work is executed. When a queue is empty work will be taken from high priority queues first. &#13;
+There is one low priority queue from which threads will be scheduled only when there is no other work. </a>
+</h3>
+<h3 class="topic">
+<a name="0f56ncl7cchiuf28afnr6qsqjp">&nbsp;&nbsp;&nbsp;For this scheduling policy there is an option to turn on NUMA sensitivity using the command line option --hpx:numa-sensitive. When NUMA sensitivity is turned on work stealing is done from queues associated with the same NUMA domain first, only after that work is stolen from other NUMA domains. </a>
+</h3>
+<h3 class="topic">
+<a name="52r3pi5j4l1smeb1tstps3eomr">&nbsp;&nbsp;static_priority_queue_scheduler</a>
+</h3>
+<p class="topicImage">
+<img height="690" src="9-scheduler_files/7eimj6qh0nl23omf38l5ugak7j" width="1030"></p>
+<div class="notesContainer">
+<p>invoke using: --hpx:queuing=static-priority (or -qs)</p>
+<p></p>
+<p>flag to turn on for build: HPX_THREAD_SCHEDULERS=all or HPX_THREAD_SCHEDULERS=static-priority</p>
+</div>
+<p class="relationships">See Also: <a href="#1enqkso9oveqsgq4plvgg0b8na">local_priority_queue_scheduler</a>
+</p>
+<h3 class="topic">
+<a name="2rqhiq5qavts0fga3arfndioqh">&nbsp;&nbsp;&nbsp;Same as local_priority_queue_scheduler, but without any work-stealing</a>
+</h3>
+<h3 class="topic">
+<a name="03cmbcv5n2jch7147e84ouig20">&nbsp;&nbsp;&nbsp;options</a>
+</h3>
+<h3 class="topic">
+<a name="4432q06p4l2u3m1e431jhpbooh">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:high-priority-threads</a>
+</h3>
+<h3 class="topic">
+<a name="6vota4uia5516pm75l5kk0diij">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;choose the number of high priority queues
+(default: number of OS-threads)</a>
+</h3>
+<h3 class="topic">
+<a name="459h9oh8kjcti9eqvbnq3auo57">&nbsp;&nbsp;periodic_priority_queue_scheduler</a>
+</h3>
+<div class="notesContainer">
+<p>invoke using: --hpx:queuing=periodic-priority (or -qpe)</p>
+<p>    flag to turn on for build: HPX_THREAD_SCHEDULERS=all or HPX_THREAD_SCHEDULERS=periodic-priority</p>
+</div>
+<p class="relationships">See Also: <a href="#1enqkso9oveqsgq4plvgg0b8na">local_priority_queue_scheduler</a>
+</p>
+<h3 class="topic">
+<a name="05vqvo5pv8ioq1f4thrdog6bq7">&nbsp;&nbsp;&nbsp;Same as local priority queue scheduler, but 
+a periodic maintenance redistributes work 
+and is responsible that every OS-thread has enough work</a>
+</h3>
+<h3 class="topic">
+<a name="63cm2ou685haelko4fumnl3s6n">&nbsp;Without distinction
+between priorities</a>
+</h3>
+<h3 class="topic">
+<a name="71inf0ok785voro6j4e7bfp990">&nbsp;&nbsp;local_queue_scheduler</a>
+</h3>
+<p class="topicImage">
+<img height="700" src="9-scheduler_files/6jtti5fe2n95fmnfieivn309gb" width="842"></p>
+<div class="notesContainer">
+<p>invoke using: --hpx:queuing=local (or -ql)</p>
+<p>    flag to turn on for build: HPX_THREAD_SCHEDULERS=all or HPX_THREAD_SCHEDULERS=local</p>
+</div>
+<p class="relationships">See Also: <a href="#59vdqidgsueljc04ithugcumqh">static_queue_scheduler (derived from)</a>, <a href="#0pc74t8l52j1oujt0lg45mq10o">throttle_queue_scheduler (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="1j80dtdn1eii85vbmie5ae1323">&nbsp;&nbsp;&nbsp;Maintains exactly one queue of work items (threads) per OS thread
+where this OS thread pulls its next work form.
+Work stealing implemented.</a>
+</h3>
+<h3 class="topic">
+<a name="6h8fn3k9g1gidom4a17vgilh9f">&nbsp;&nbsp;&nbsp;options</a>
+</h3>
+<h3 class="topic">
+<a name="0et87qh9mf4jjl0jpu8h5967uj">&nbsp;&nbsp;&nbsp;&nbsp;hpx:pu-offset</a>
+</h3>
+<h3 class="topic">
+<a name="39t09nm4mn9irj4ntujv4qciqi">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;choose the first porcessing unit this instance of HPX should run on (default: 0)</a>
+</h3>
+<h3 class="topic">
+<a name="2qec4os3dq1oucrnq9bvuvkkb8">&nbsp;&nbsp;&nbsp;datamembers</a>
+</h3>
+<h3 class="topic">
+<a name="2u60rmdb4blnagia89r47ad5cf">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t max_queue_thread_count</a>
+</h3>
+<h3 class="topic">
+<a name="2jmndv8dbud198pj9h1sa9bcl8">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;thread_queue_type*&gt; queues_</a>
+</h3>
+<p class="relationships">See Also: <a href="#3tngm5mqo114251vegmb589auv">typedef thread_queue&lt;
+            Mutex, 
+            PendingQueuing, 
+            StagedQueuing, 
+            TerminatedQueuing&gt; thread_queue_type;</a>
+</p>
+<h3 class="topic">
+<a name="0556jc2a9qhj270fq636sm9076">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector containing the work queues (1/OS-thread)</a>
+</h3>
+<h3 class="topic">
+<a name="08r6vub111ijsjb32un8ea1lo0">&nbsp;&nbsp;&nbsp;&nbsp;boost::atomic&lt;std::size_t&gt; curr_queue_</a>
+</h3>
+<h3 class="topic">
+<a name="67r1s94gg30rjviotc2fs8icch">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;an index indicating the current queue in the vector of queues</a>
+</h3>
+<h3 class="topic">
+<a name="6tvkrba983auhudnurso2t866j">&nbsp;&nbsp;&nbsp;&nbsp;std::size_t numa_sensitive_</a>
+</h3>
+<h3 class="topic">
+<a name="53pljv9ddpq38eneolu2euhoq0">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;mask_type&gt; numa_domain_masks_</a>
+</h3>
+<h3 class="topic">
+<a name="0960lu926gb4dartru9ahql5o1">&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;mask_type&gt; outside_numa_domain_masks</a>
+</h3>
+<h3 class="topic">
+<a name="59vdqidgsueljc04ithugcumqh">&nbsp;&nbsp;static_queue_scheduler</a>
+</h3>
+<div class="notesContainer">
+<p>invoke using: --hpx:queuing=static</p>
+<p>    flag to turn on for build: HPX_THREAD_SCHEDULERS=all or HPX_THREAD_SCHEDULERS=static</p>
+</div>
+<p class="relationships">See Also: <a href="#71inf0ok785voro6j4e7bfp990">local_queue_scheduler (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="0plv4bto4909c12m65ron3hm6o">&nbsp;&nbsp;&nbsp;same as local_queue_scheduler, 
+but without any work-stealing</a>
+</h3>
+<h3 class="topic">
+<a name="40te3ldc9eesvafr1gcicukp6b">&nbsp;&nbsp;&nbsp;options</a>
+</h3>
+<h3 class="topic">
+<a name="3bgj4nj8smrai8l5dm93196r06">&nbsp;&nbsp;&nbsp;&nbsp;hpx:pu-offset</a>
+</h3>
+<h3 class="topic">
+<a name="5kd4mio3nauah09nqisjgcut3l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;choose the first porcessing unit this instance of HPX should run on (default: 0)</a>
+</h3>
+<h3 class="topic">
+<a name="0pc74t8l52j1oujt0lg45mq10o">&nbsp;&nbsp;throttle_queue_scheduler</a>
+</h3>
+<div class="notesContainer">
+<p>invoke using: --hpx:queuing=abp-priority</p>
+<p></p>
+<p>flag to turn on for build: HPX_THREAD_SCHEDULERS=all or HPX_THREAD_SCHEDULERS=abp-priority</p>
+</div>
+<p class="relationships">See Also: <a href="#71inf0ok785voro6j4e7bfp990">local_queue_scheduler (derived from)</a>
+</p>
+<h3 class="topic">
+<a name="3rvubgh7pnv2em2m2odblo5td0">&nbsp;&nbsp;&nbsp;is not mentionned in documentations. 
+-has something to do with energy consumption</a>
+</h3>
+<h3 class="topic">
+<a name="4bs4u749tmubpadjcb5pmrvc9e">&nbsp;hierarchy
+system</a>
+</h3>
+<h3 class="topic">
+<a name="4raf7qd69nt60f8h39eqmduhha">&nbsp;&nbsp;hierarchy_scheduler</a>
+</h3>
+<p class="topicImage">
+<img height="672" src="9-scheduler_files/1cko3s65uueqa3ekqm16bcpv5e" width="899"></p>
+<div class="notesContainer">
+<p>invoke using: --hpx:queuing=hierarchy (or -qh)</p>
+<p>flag to turn on for build: HPX_THREAD_SCHEDULERS=all or HPX_THREAD_SCHEDULERS=hierarchy</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="65msa070vrk0egc0mt5b7lq7i8">&nbsp;&nbsp;&nbsp;Maintains a tree of queues of work items (threads).
+Every one of the OS threads walks that tree to obtain new work.</a>
+</h3>
+<h3 class="topic">
+<a name="05p1fl5vf89f2d0alsdvaudk46">&nbsp;&nbsp;&nbsp;Work stealing is done from the parent queue in that tree.</a>
+</h3>
+<p class="labelsAndMarkers">
+<span class="label">Work stealing is done from the parent queue in that tree.</span>
+</p>
+<h3 class="topic">
+<a name="7rst8hdaaiks359ke5ppif5t7g">&nbsp;&nbsp;&nbsp;options</a>
+</h3>
+<h3 class="topic">
+<a name="5lje7k9dfr5i85cc94ncdt1j7k">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:hierarchy-arity </a>
+</h3>
+<h3 class="topic">
+<a name="0mg5a8v6huv4bousvlh5fdhirp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;specify the arity of the thread queue tree (default is 2). </a>
+</h3>
+<h3 class="topic">
+<a name="7c1vh958eduihu8fdpftv8leof">&nbsp;&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="22ou8k5a3nnfntn4gaa8buj4e0">&nbsp;&nbsp;&nbsp;&nbsp;bool numa_sensitive_</a>
+</h3>
+<h3 class="topic">
+<a name="7hbd6bo9flkf94ld6j2asrg9n9">&nbsp;&nbsp;&nbsp;&nbsp;tree_type tree</a>
+</h3>
+<p class="relationships">See Also: <a href="#0tvonaeb246gs8jpoi3ml8t92u">typedef std::vector&lt;thread_queue_type*&gt; level_type;
+typedef std::vector&lt;level_type&gt; tree_type;</a>
+</p>
+<h2 class="topic">
+<a name="3tngm5mqo114251vegmb589auv">typedef thread_queue&lt;
+            Mutex, 
+            PendingQueuing, 
+            StagedQueuing, 
+            TerminatedQueuing&gt; thread_queue_type;</a>
+</h2>
+<p class="relationships">See Also: <a href="#2jmndv8dbud198pj9h1sa9bcl8">std::vector&lt;thread_queue_type*&gt; queues_</a>, <a href="#7s68hstcea2g4urtilcht0a0of">std::vector&lt;thread_queue_type*&gt; queues_</a>, <a href="#76qa5lq861hitfej530v0bi5ab">std::vector&lt;thread_queue_type*&gt; high_priority_queues_</a>, <a href="#5ihi4aeue4ft85js0dtick506r">thread_queue_type low_priority_queue_</a>, <a href="#0tvonaeb246gs8jpoi3ml8t92u">typedef std::vector&lt;thread_queue_type*&gt; level_type;
+typedef std::vector&lt;level_type&gt; tree_type;</a>
+</p>
+<h2 class="topic">
+<a name="0tvonaeb246gs8jpoi3ml8t92u">typedef std::vector&lt;thread_queue_type*&gt; level_type;
+typedef std::vector&lt;level_type&gt; tree_type;</a>
+</h2>
+<p class="relationships">See Also: <a href="#7hbd6bo9flkf94ld6j2asrg9n9">tree_type tree</a>, <a href="#3tngm5mqo114251vegmb589auv">typedef thread_queue&lt;
+            Mutex, 
+            PendingQueuing, 
+            StagedQueuing, 
+            TerminatedQueuing&gt; thread_queue_type;</a>
+</p>
+<h2 class="topic">
+<a name="0rgss3afmf9urnpbrubcc0mnum">
+defines the interface to be implemented 
+by all scheduler policies
+
+hpx::threads::policies::scheduler_base
+
+non-copyable
+
+abstract
+
+the derived classes hold one or several thread_queues, one way or another
+</a>
+</h2>
+<p class="relationships">See Also: <a href="#4fqpt6i25goulksmvhr8fscljr">scheduler_base</a>
+</p>
+<h3 class="topic">
+<a name="2u1b4e389kpet5gj2gu39l3gtv">&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="2551ogtgbotn4e1bkn862e69s8">&nbsp;&nbsp;topology const&amp; topology_</a>
+</h3>
+<h3 class="topic">
+<a name="5lp0ochtr43kpa4uumejdmjd48">&nbsp;&nbsp;&nbsp;cf topology.hpp
+A class that allows to 
+- query information about the hardware topology 
+- set thread affinities
+- allocate ressources</a>
+</h3>
+<h3 class="topic">
+<a href="#301quj5rmefs3hglcaae8ekaef" name="3lgbi6elfuvn1mtd42n7rhacnj">&nbsp;&nbsp;detail::affinity_data affinity_data_</a>
+</h3>
+<h3 class="topic">
+<a name="5okc05h8h42n20c1c6og5026ck">&nbsp;&nbsp;&nbsp;information related to thread affinity selection</a>
+</h3>
+<h3 class="topic">
+<a name="7rlt2gh8sthqd159oo3gu77044">&nbsp;&nbsp;boost::atomic&lt;scheduler_mode&gt; mode_</a>
+</h3>
+<h3 class="topic">
+<a name="0hcvnq570g1ob5c4eiun8394ig">&nbsp;&nbsp;&nbsp;enum hpx::threads::policies::scheduler_mode</a>
+</h3>
+<h3 class="topic">
+<a name="3rl7i0m5lmkpnidplodu2kqvvu">&nbsp;&nbsp;&nbsp;&nbsp;nothing_special = 0</a>
+</h3>
+<h3 class="topic">
+<a name="7tpk8e7odv6v51hldu5cvddtlo">&nbsp;&nbsp;&nbsp;&nbsp;do_background_work = 0x1</a>
+</h3>
+<h3 class="topic">
+<a name="3d7i258n5tr2nfmotc2bic01bt">&nbsp;&nbsp;&nbsp;&nbsp;reduce_thread_priority = 0x02</a>
+</h3>
+<h3 class="topic">
+<a name="6dc61ipsrvu5g0hkqbne5rkk08">&nbsp;&nbsp;&nbsp;&nbsp;delay_exit = 0x04</a>
+</h3>
+<h3 class="topic">
+<a name="4sa64fhq239nq5f471if9om1u0">&nbsp;&nbsp;&nbsp;&nbsp;fast_idle_mode = 0x08</a>
+</h3>
+<h3 class="topic">
+<a name="38l2m9ilh167v99rnj3689m0r5">&nbsp;&nbsp;boost:mutex mtx_</a>
+</h3>
+<h3 class="topic">
+<a name="58gcr0cso9fbqf44ibnqmneu8c">&nbsp;&nbsp;boost:condition_variable cond_</a>
+</h3>
+<h3 class="topic">
+<a name="68k9e9g5ek8r1lsjhdah6ohfo8">&nbsp;&nbsp;boost&lt;atomic&lt;std::uint32_t&gt; wait_count_</a>
+</h3>
+<h3 class="topic">
+<a name="440k1gqtp1uu3fglbbb8p52al1">&nbsp;&nbsp;std::vector&lt;boost:atomic&lt;hpx::state&gt; &gt; states_</a>
+</h3>
+<h3 class="topic">
+<a name="3ojdpauf0ki1irs3gjvphea85t">&nbsp;&nbsp;&nbsp;represents the state of the spawned OS threads</a>
+</h3>
+<h3 class="topic">
+<a name="7or0hm9cp74gq8lo6ma03n34nj">&nbsp;&nbsp;char const* description_</a>
+</h3>
+<h3 class="topic">
+<a name="0t8neqqmt6tdl3th52tebfq7uv">&nbsp;&nbsp;std::shared_ptr&lt;coroutines::detail::tss_storage&gt; thread_data_</a>
+</h3>
+<h3 class="topic">
+<a name="0vani15ak4hskjr0dnksqd9mt6">&nbsp;&nbsp;only if HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF&#13;
+(ie support for suspension on idle queues)</a>
+</h3>
+<p class="summary">(<a href="#38l2m9ilh167v99rnj3689m0r5">boost:mutex mtx_</a>, <a href="#58gcr0cso9fbqf44ibnqmneu8c">boost:condition_variable cond_</a>, <a href="#68k9e9g5ek8r1lsjhdah6ohfo8">boost&lt;atomic&lt;std::uint32_t&gt; wait_count_</a>)</p>
+<h3 class="topic">
+<a name="1acl4fknsolaacmu1e30klofki">&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="4skkhmtanfpru9mkoinek12fol">&nbsp;&nbsp;cstr</a>
+</h3>
+<h3 class="topic">
+<a name="5qnct6mudc3jbn5s6oop4anhu3">&nbsp;&nbsp;&nbsp;        scheduler_base(std::size_t num_threads,
+                char const* description = "",
+                scheduler_mode mode = nothing_special)
+          : topology_(get_topology())
+          , affinity_data_(num_threads)
+          , mode_(mode)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+          , wait_count_(0)
+#endif
+          , states_(num_threads)
+          , description_(description)
+        {
+            for (std::size_t i = 0; i != num_threads; ++i)
+                states_[i].store(state_initialized);
+        }</a>
+</h3>
+<h3 class="topic">
+<a name="4bu029puf3hnf6m0pgqo3dhrkv">&nbsp;&nbsp;&nbsp;&nbsp;all derived classes are built using a init_parameter_type, 
+with a struct defined at the top of their file</a>
+</h3>
+<h3 class="topic">
+<a name="370702foe04odselavp2gtpord">&nbsp;&nbsp;destr</a>
+</h3>
+<h3 class="topic">
+<a href="#301quj5rmefs3hglcaae8ekaef" name="15f1u8b139g38cdd79a9et6bdn">&nbsp;&nbsp;get
+(from affinity_data)</a>
+</h3>
+<h3 class="topic">
+<a name="1cmk2ojus89j8qsgqtkal7017p">&nbsp;&nbsp;&nbsp;threads::mask_cref_type get_pu_pask(
+    topology const&amp; topology,
+    std::size_t num_thread) const</a>
+</h3>
+<h3 class="topic">
+<a name="0veoqa8gnbuk9s77mve9mqfrkj">&nbsp;&nbsp;&nbsp;std::size_t pet_pu_num(std::size_t num_thread) const</a>
+</h3>
+<h3 class="topic">
+<a name="1dt3phvu62m12rd9rpilnuta5p">&nbsp;&nbsp;&nbsp;void add_punit(std::size_t virt_core, std::size_t thread_num)</a>
+</h3>
+<h3 class="topic">
+<a href="#17fa1dsq0gs3ieufordnrg0eif" name="581faviog74ep5o9ffvbrvenom">&nbsp;&nbsp;&nbsp;std::size_t init(
+	init_affinity_data const&amp; data, 
+	topology const&amp; topology)</a>
+</h3>
+<div class="notesContainer">
+<p>called by thread_pool&lt;Scheduler&gt;::ini</p>
+</div>
+<h3 class="topic">
+<a name="6k7gu3dd9e4oipuai4huqbvr53">&nbsp;&nbsp;&nbsp;&nbsp;returns the number of used cores</a>
+</h3>
+<h3 class="topic">
+<a name="01uqekn568edmbiu5tdjgh4aap">&nbsp;&nbsp;&nbsp;call corresponding function from class affinity_data</a>
+</h3>
+<p class="summary">(<a href="#1cmk2ojus89j8qsgqtkal7017p">threads::mask_cref_type get_pu_pask(
+    topology const&amp; topology,
+    std::size_t num_thread) const</a>, <a href="#0veoqa8gnbuk9s77mve9mqfrkj">std::size_t pet_pu_num(std::size_t num_thread) const</a>, <a href="#1dt3phvu62m12rd9rpilnuta5p">void add_punit(std::size_t virt_core, std::size_t thread_num)</a>, <a href="#581faviog74ep5o9ffvbrvenom">std::size_t init(
+	init_affinity_data const&amp; data, 
+	topology const&amp; topology)</a>)</p>
+<h3 class="topic">
+<a name="01fknbl39iufdbipo9guq90nv5">&nbsp;&nbsp;void idle_callback(std::size t)</a>
+</h3>
+<h3 class="topic">
+<a name="6j365agh33ofvdnsspjh37ck56">&nbsp;&nbsp;bool background_callback(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="4gm7m7f1uuctr700jlhogoao56">&nbsp;&nbsp;void do_some_work(std::size_t num_thread)</a>
+</h3>
+<h3 class="topic">
+<a name="4vfts6n9o1opcf73k6287amoc7">&nbsp;&nbsp;&nbsp;This function gets called by the thread-manager &#13;
+whenever new work has been added, &#13;
+allowing the scheduler to reactivate &#13;
+one or more possibly idling OS threads</a>
+</h3>
+<h3 class="topic">
+<a name="1cviiv9fl7mv4q637hsts3uru0">&nbsp;&nbsp;&nbsp;calls cond_.notify_all() or cond_.notify_one()</a>
+</h3>
+<h3 class="topic">
+<a name="7mbol9vs2l5fs7clpln57t6mk4">&nbsp;&nbsp;access and manipulate states of OS threads</a>
+</h3>
+<h3 class="topic">
+<a name="37vd14tt37cgj4sg1kp4npmep7">&nbsp;&nbsp;scheduler_mode get_scheduler_mode() const</a>
+</h3>
+<h3 class="topic">
+<a name="74p58mbkg0ec4mka20930tf1of">&nbsp;&nbsp;void set_scheduler_mode(scheduler_mode mode)</a>
+</h3>
+<h3 class="topic">
+<a name="36mak3fre36cg1so784pgu1ccj">&nbsp;&nbsp;more gets .... </a>
+</h3>
+<h3 class="topic">
+<a name="29dgj86h4qkc4ccf4fg00r9e08">&nbsp;&nbsp;virtual functions that manage threads</a>
+</h3>
+<h3 class="topic">
+<a name="330sgt1t07aj2fg6bnid639di2">&nbsp;&nbsp;stuff that has to do with tss</a>
+</h3>
+</body>
+</html>

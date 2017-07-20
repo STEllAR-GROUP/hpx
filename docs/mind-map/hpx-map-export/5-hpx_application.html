@@ -1,0 +1,1546 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>How to write an 
+HPX application ?</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="457o8akvev9tc20hml96poc4th">How to write an 
+HPX application ?</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="5-hpx_application_files/images/How to write an  HPX application  .jpg"></div>
+<h2 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applications.html" name="79nl9agbgiqudf8l48a602v7q1">structure of 
+HPX source code</a>
+</h2>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applications.html#hpx.manual.applications.flexible" name="54abbnggl8b2mvg2hrqccpg9fs">&nbsp;The most flexible way:
+Supply your own HPX entry point 
+while avoiding to block the main thread</a>
+</h3>
+<h3 class="topic">
+<a name="6qjv3tgsto00f2ie70schsvq1i">&nbsp;&nbsp;
+#include &lt;hpx/hpx_start.hpp&gt;
+
+int hpx_main(int argc, char* argv[])
+{
+    // Any HPX application logic goes here...
+    return hpx::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    // Initialize HPX, run hpx_main.
+    hpx::start(argc, argv);
+
+    // ...Execute other code here...
+
+    // Wait for hpx::finalize being called.
+    return hpx::stop();
+}
+</a>
+</h3>
+<h3 class="topic">
+<a name="4q6oj1iihljsmain97tomis3im">&nbsp;&nbsp;&nbsp;include</a>
+</h3>
+<h3 class="topic">
+<a name="1c0dverpnh084jvj9lc8avd8le">&nbsp;&nbsp;&nbsp;&nbsp;#include &lt;hpx/hpx.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="5dne51butef6lg3j4dcuksq8ut">&nbsp;&nbsp;&nbsp;&nbsp;#include &lt;hpx/hpx_start.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="1n7artoflpiv9064p4ohlspgvv">&nbsp;&nbsp;&nbsp;int hpx_main(boost::program_options::variables_map&amp; vm)</a>
+</h3>
+<h3 class="topic">
+<a name="22k9ci2t94sv3edmvhqkra47gr">&nbsp;&nbsp;&nbsp;&nbsp;will be invoked as main entry point to HPX application 
+on the console locality only</a>
+</h3>
+<h3 class="topic">
+<a name="17s3eee070vjp6akbtubqd2haf">&nbsp;&nbsp;&nbsp;&nbsp;will be invoked as first thread of my application</a>
+</h3>
+<h3 class="topic">
+<a name="4275n0h36c08v89aqf3m5r4dhr">&nbsp;&nbsp;&nbsp;&nbsp;all HPX API functions can be used form within this function</a>
+</h3>
+<h3 class="topic">
+<a name="3s9u8pncoj5gp122j9u7mefbg0">&nbsp;&nbsp;&nbsp;&nbsp;different signatures possible: </a>
+</h3>
+<h3 class="topic">
+<a name="0pora57heucmb1qnj299r02ise">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int hpx_main()</a>
+</h3>
+<h3 class="topic">
+<a name="2mjgmi7hqa7cspn94j6f263025">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int hpx_main(int argc, char* argv[]);</a>
+</h3>
+<h3 class="topic">
+<a name="657kqf2g5ljmuvla88c9pair4h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int hpx_main(boost::program_options::variables_map&amp; vm)</a>
+</h3>
+<h3 class="topic">
+<a name="6t5phs5vj1tj7ljq325qimfouk">&nbsp;&nbsp;&nbsp;&nbsp;return hpx::finalize();</a>
+</h3>
+<h3 class="topic">
+<a name="4v6uujm4hro6q8u0kume0semrj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;has to be called on one of the HPX localities in order to signal that 
+- all the work has been scheduled 
+- and the runtime system should be stopped after the scheduled work has been executed</a>
+</h3>
+<h3 class="topic">
+<a name="150nkci6ecv7jqipbg4gmr3sag">&nbsp;&nbsp;&nbsp;int main(int argc, char* argv[])</a>
+</h3>
+<h3 class="topic">
+<a name="5ebn28tg36ntfi2ra1p3vena93">&nbsp;&nbsp;&nbsp;&nbsp;initialize the runtime system</a>
+</h3>
+<h3 class="topic">
+<a name="7q056u72kb9qk505n1gfabtktr">&nbsp;&nbsp;&nbsp;&nbsp;and pass command line arguments to the program</a>
+</h3>
+<h3 class="topic">
+<a name="6opton7k4qonci1tq2rn2b4e8q">&nbsp;&nbsp;&nbsp;&nbsp;you can't use any of the HPX API functions other than hpx::stop from inside the main function</a>
+</h3>
+<h3 class="topic">
+<a name="7sv7kic28i7vjgar35lvrlnidh">&nbsp;&nbsp;&nbsp;&nbsp;hpx::start(argc,argv);</a>
+</h3>
+<h3 class="topic">
+<a name="0md58rsiupveviqcd9738kot4a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the thread executing hpx::start(...) will NOT block wiating for the runtime to exit, 
+but will return immediately</a>
+</h3>
+<h3 class="topic">
+<a name="0vja9284j5krifbmjc25apf2ki">&nbsp;&nbsp;&nbsp;&nbsp;return hpx::stop();</a>
+</h3>
+<h3 class="topic">
+<a name="7lhnfm4ftgvshpvo82rr3o1sak">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;can be used to wait for the HPX runtime system to exit </a>
+</h3>
+<h3 class="topic">
+<a name="1ajq8isoiiqcjk4d2g3m94n7rr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;should be at least used as last function called in main.</a>
+</h3>
+<h3 class="topic">
+<a name="0o9dooaepm43ag31ucctm3nroo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the value returned from hpx_main will be returned from hpx::stop after the runtime system has stopped.</a>
+</h3>
+<h3 class="topic">
+<a name="1oati6mvdk6u2nvk3sb2rjfrp5">&nbsp;&nbsp;Useful for applications where the main thread is used for special operations (eg GUI)</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applications.html#hpx.manual.applications.medium" name="5joe8trlgmdk8p5agjeolb1ugp">&nbsp;Balanced use case
+Supply your own HPX entry point
+while blocking the main thread</a>
+</h3>
+<h3 class="topic">
+<a name="1pgbo8eau71ce3d2navioae37v">&nbsp;&nbsp;#include &lt;hpx/hpx.hpp&gt;
+#include &lt;hpx/hpx_init.hpp&gt;
+
+int hpx_main(int argc, char* argv[])
+{
+    // Any HPX application logic goes here...
+    return hpx::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    // Initialize HPX, run hpx_main as the first HPX thread, and
+    // wait for hpx::finalize to be called.
+    return hpx::init(argc, argv);
+}
+</a>
+</h3>
+<h3 class="topic">
+<a name="0iu0ne8a5ftbvs60i2pq7gir8o">&nbsp;&nbsp;&nbsp;include</a>
+</h3>
+<h3 class="topic">
+<a name="3idona3tsbaso65236sn6qput4">&nbsp;&nbsp;&nbsp;&nbsp;#include &lt;hpx/hpx.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="0glgnpkjhqflmrqp9q3f7aj7dd">&nbsp;&nbsp;&nbsp;&nbsp;#include &lt;hpx/hpx_init.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="7pee0i3bpu2ghfbm3s7d0uctq1">&nbsp;&nbsp;&nbsp;int hpx_main()</a>
+</h3>
+<h3 class="topic">
+<a name="502l6urqodbkjdh2ph70uvnqpm">&nbsp;&nbsp;&nbsp;&nbsp;this function will be invoked as main entry point of HPX application 
+on the console locality only</a>
+</h3>
+<h3 class="topic">
+<a name="1qn8sdnpupatj57moapqjdjugv">&nbsp;&nbsp;&nbsp;&nbsp;by default, executed on main locality only.
+It is possible to force execution on all localities
+(--hpx:run-hpx-main)</a>
+</h3>
+<p class="relationships">See Also: <a href="#5urt7hutptruo1cq02f4emgcts">--hpx:run-hpx-main</a>
+</p>
+<h3 class="topic">
+<a name="287d4u58n64nn2b8nc2fat00mt">&nbsp;&nbsp;&nbsp;&nbsp;This function will be invoked as first HPX thread of my application</a>
+</h3>
+<h3 class="topic">
+<a name="3l9rp9stlbnh9taum41prtm120">&nbsp;&nbsp;&nbsp;&nbsp;All HPX API functions can be used form within this function</a>
+</h3>
+<h3 class="topic">
+<a name="513ber97a4qe4edb2fgmqldtue">&nbsp;&nbsp;&nbsp;&nbsp;different signatures possible: </a>
+</h3>
+<h3 class="topic">
+<a name="1thbdejtnoer3kge9meiaoeqkj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int hpx_main()</a>
+</h3>
+<h3 class="topic">
+<a name="6ptrrgs2eo7dvh1ej5rmfp49ar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int hpx_main(int argc, char* argv[]);</a>
+</h3>
+<h3 class="topic">
+<a name="7qp40gqi5kp8i6m28ecn1sja0e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int hpx_main(boost::program_options::variables_map&amp; vm)</a>
+</h3>
+<h3 class="topic">
+<a name="1gpskl55vtrl4t1oqcjpt79r19">&nbsp;&nbsp;&nbsp;&nbsp;content</a>
+</h3>
+<h3 class="topic">
+<a name="38ed15o3i0qfq79udks0l7d0df">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do whatever you have to do ...</a>
+</h3>
+<h3 class="topic">
+<a name="3ujl9qvvaa1tag68tgg777das0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return hpx::finalize(); </a>
+</h3>
+<h3 class="topic">
+<a name="0m9hoogc24pts8pbc3q3b72oh4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tells hpx to shutdown</a>
+</h3>
+<h3 class="topic">
+<a name="5c8jr72spbs7grpsdosh5sv8ot">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;waits for all activity (system-wide) to cease</a>
+</h3>
+<h3 class="topic">
+<a name="783v94am4icbaktagr9gr6mmed">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;releases main threads waiting inside hpx::init()</a>
+</h3>
+<h3 class="topic">
+<a name="1m8utnadsc9gfs5fd2o912v7vf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;can be called on any locality</a>
+</h3>
+<h3 class="topic">
+<a name="4mms5cat8qg0ckortf4ag255j5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;signals that all the work has been scheduled and the runtime system should be stopped after the scheduled work has been executed</a>
+</h3>
+<h3 class="topic">
+<a name="5gjk83c2cperrguaqqk8l18vl6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first invocation triggers the exit</a>
+</h3>
+<h3 class="topic">
+<a name="1a3s754f7ftl3okoa3lb545fe2">&nbsp;&nbsp;&nbsp;int main(int argc, char* argv[])</a>
+</h3>
+<h3 class="topic">
+<a name="1usnokhbs843ql49mi7oeqg3us">&nbsp;&nbsp;&nbsp;&nbsp;initializes HPX
+runs HPX_main as the first HPX thread
+waits for hpx::finalize to be called</a>
+</h3>
+<h3 class="topic">
+<a name="467ita38iqimr031hh5l9cj3dt">&nbsp;&nbsp;&nbsp;&nbsp;// at the end:
+return hpx::init(argc, argv); </a>
+</h3>
+<h3 class="topic">
+<a name="0qros5usjpihamthvo7hc35lau">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the thread executing the function hpx::init will block 
+waiting for the runtime system to exit</a>
+</h3>
+<h3 class="topic">
+<a name="0h787hd82tk79vi0rmumv1f4vq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The value returned from hpx_main will be returnedby hpx::init after the runtime system has stopped</a>
+</h3>
+<h3 class="topic">
+<a name="1k52u3cvos5fc41a5abhfg27ao">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;other possibilities: </a>
+</h3>
+<h3 class="topic">
+<a name="06nddvs27oevsbsccu6db6nkfk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hpx::init(desc_commandline, argc, argv)</a>
+</h3>
+<h3 class="topic">
+<a name="79lnrbtdtj7ni3rfj6uo7ti6eg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in hpx_init.hpp, .cpp and hpx_init_impl.hpp (with various overloads)</a>
+</h3>
+<h3 class="topic">
+<a name="3ek52410f8fb3jmma2pr4gtbil">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starts the runtime system (ie initializes HPX)</a>
+</h3>
+<h3 class="topic">
+<a name="1cmnf0k57skpmdqmuq49r28qec">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by default: invokes hpx_main() as first thread</a>
+</h3>
+<h3 class="topic">
+<a name="6jd8gikou8adl28m285bim58nv">&nbsp;&nbsp;allows to
+- decide which version of hpx::init to call
+- pass additional configuration parameters while initializing the HPX runtime system</a>
+</h3>
+<h3 class="topic">
+<a name="404rgj4odnod75s0t2skh4ul1m">&nbsp;&nbsp;with command line options: </a>
+</h3>
+<h3 class="topic">
+<a name="2is1qsm32nrsddtkpk18e8g7kb">&nbsp;&nbsp;&nbsp;#include &lt;hpx/hpx.hpp&gt;
+#include &lt;hpx/hpx_init.hpp&gt;
+#include &lt;boost/format.hpp&gt;
+
+
+int hpx_main(boost::program_options::variables_map&amp; vm)
+{
+  // extract cmd line arg
+  std::uint64_t option_value = vm["my_option"].as&lt;std::uint64_t&gt;();
+
+  // body of main
+
+  return hpx::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    boost::program_options::options_description
+        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+
+    desc_commandline.add_options() //! how to use: --my_option 10
+            ("my_option",
+             boost::program_options::value&lt;std::uint64_t&gt;()-&gt;default_value(0),
+            "sets blahblah for blahblah");
+
+    return hpx::init(desc_commandline, argc, argv);
+}</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/applications.html#hpx.manual.applications.minimal" name="1srfblpb5947dushfhci45lle9">&nbsp;Minimally invasive: 
+re-use main() as main HPX entry point
+(with a dirty trick)</a>
+</h3>
+<h3 class="topic">
+<a name="0sen87an5mobk09v0gh42iu76l">&nbsp;&nbsp;
+#include &lt;hpx/hpx_main.hpp&gt;
+
+int main(int argc, char* argv[])
+{
+    return 0;
+}
+</a>
+</h3>
+<h3 class="topic">
+<a name="0ccjfori8trgtj8bg2oi0jddiu">&nbsp;&nbsp;&nbsp;include</a>
+</h3>
+<h3 class="topic">
+<a name="7ouiipsednncgec72mobdfg2hi">&nbsp;&nbsp;&nbsp;&nbsp;#include &lt;hpx/hpx.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="3h3unqrjrpaj1sgugncf4ai4go">&nbsp;&nbsp;&nbsp;&nbsp;#include &lt;hpx/hpx_main.hpp&gt;</a>
+</h3>
+<h3 class="topic">
+<a name="5vga22c31mvo5ga0m9efsmfe20">&nbsp;&nbsp;&nbsp;int main(int argc, char* argv[])</a>
+</h3>
+<h3 class="topic">
+<a name="1sk1mmn6f3n2mbda4repuslvid">&nbsp;&nbsp;&nbsp;&nbsp;then HPX will invoke the main() as its first HPX thread. </a>
+</h3>
+<h3 class="topic">
+<a name="6vsornmgs761r9ia3fr5i605bb">&nbsp;&nbsp;&nbsp;&nbsp;the runtime system will be initialized behind the scenes before main() is executed
+and will automatically stop after main() has returned.</a>
+</h3>
+<h3 class="topic">
+<a name="0ncgtvihfl1ba01jh6pqigcl7r">&nbsp;&nbsp;&nbsp;&nbsp;All HPX API functions can be used from within this function</a>
+</h3>
+<h3 class="topic">
+<a name="6p5msm7jfjr3k0ngg73t0jhups">&nbsp;&nbsp;&nbsp;&nbsp;could also expose the simple signature int main()</a>
+</h3>
+<h3 class="topic">
+<a name="7sr7mk1ec1j0nhih3l6ejrppnn">&nbsp;&nbsp;&nbsp;no need for an hpx::init() nor an int hpx_main()</a>
+</h3>
+<h3 class="topic">
+<a name="64io1od8a59r9nn1li0ld5gkmr">&nbsp;&nbsp;To achieve this seamless integration, the header file hpx/hpx_main.hpp defines a macro
+#define main hpx_startup::user_main
+which could result in unexpected behavior.</a>
+</h3>
+<h2 class="topic">
+<a name="52hov7u3812r253capquei894j">CMakeLists.txt</a>
+</h2>
+<h3 class="topic">
+<a name="1c59d974rmq6ghpelahsts4r6u">&nbsp;general settings</a>
+</h3>
+<h3 class="topic">
+<a name="16bfvre8qku30fjruuq47o9l3d">&nbsp;&nbsp;cmake_minimum_required(VERSION 2.8)</a>
+</h3>
+<h3 class="topic">
+<a name="10vh1objnn548p41n6c4533do1">&nbsp;&nbsp;&nbsp;I can add FATAL_ERROR after version number</a>
+</h3>
+<h3 class="topic">
+<a name="5oq4s0cvv8nnh22npms57c7ud1">&nbsp;&nbsp;project(mycoolproject CXX)</a>
+</h3>
+<h3 class="topic">
+<a name="3ki8lgaf53170mn1lgl4bk2079">&nbsp;compiler settings</a>
+</h3>
+<h3 class="topic">
+<a name="6j2tgo3ajoatouo7b8qjcbvbbs">&nbsp;&nbsp;set(CXX g++ -5)</a>
+</h3>
+<h3 class="topic">
+<a name="4u1gcl9lhufs8l793lfiifbfiu">&nbsp;&nbsp;set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")</a>
+</h3>
+<h3 class="topic">
+<a name="43ljmoacmr75m31k9nd37vpsan">&nbsp;directory settings</a>
+</h3>
+<h3 class="topic">
+<a name="73d2rjnnf8igjumtt2uraiqt5j">&nbsp;&nbsp;set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin/)</a>
+</h3>
+<h3 class="topic">
+<a name="7agp2so9nv0fqve9d4ilsj6ef4">&nbsp;&nbsp;&nbsp;put binaries in bin/</a>
+</h3>
+<h3 class="topic">
+<a name="701at2mkisc6j4hs4am4orqr02">&nbsp;&nbsp;include_directories(myproj)</a>
+</h3>
+<h3 class="topic">
+<a name="5ughkaf7fo0t4049747r0n6ojm">&nbsp;&nbsp;&nbsp;fetch headers from myproj/</a>
+</h3>
+<h3 class="topic">
+<a name="04ibu04vi59ml75jmptsih8vl6">&nbsp;inclusions</a>
+</h3>
+<h3 class="topic">
+<a name="6952j8sbot84m42k6c7qpt9hq0">&nbsp;&nbsp;find_package(HPX)</a>
+</h3>
+<p class="relationships">See Also: <a href="#5vpun5q62u46vgonurk6eh3nma">used by find_package(HPX)</a>
+</p>
+<h3 class="topic">
+<a name="0j01bk6r56vrpecrolj60ngvqd">&nbsp;&nbsp;or find_package(HPX REQUIRED)</a>
+</h3>
+<h3 class="topic">
+<a name="38l7umcuhg87e5p7u5m41ragmg">&nbsp;adding an HPX component</a>
+</h3>
+<h3 class="topic">
+<a name="545tg98qibji21aq83sjssr0bf">&nbsp;&nbsp;add_hpx_component(my_component
+    SOURCES my_component.cpp
+    HEADERS my_component.hpp
+    COMPONENT_DEPENDENCIES iostreams
+)</a>
+</h3>
+<h3 class="topic">
+<a name="0d9s0jl7l0sp4iqe609a3omht0">&nbsp;&nbsp;&nbsp;SOURCES: The source files for that component</a>
+</h3>
+<h3 class="topic">
+<a name="54jac0d32fbemu7rvkvqius1ud">&nbsp;&nbsp;&nbsp;HEADERS: The header files for that component</a>
+</h3>
+<h3 class="topic">
+<a name="5t49bijgmitl3481mcl6skeuor">&nbsp;&nbsp;&nbsp;DEPENDENCIES: Other libraries or targets this component depends on</a>
+</h3>
+<h3 class="topic">
+<a name="6ie2rnqadhh142g5i63i0p7gft">&nbsp;&nbsp;&nbsp;COMPONENT_DEPENDENCIES: The components this component depends on</a>
+</h3>
+<h3 class="topic">
+<a name="4jtgo7f3bvlu664721ukr44p78">&nbsp;&nbsp;&nbsp;PLUGIN: Treat this component as a plugin-able library</a>
+</h3>
+<h3 class="topic">
+<a name="20vo9gcn7mg1635l4p13ncp2g7">&nbsp;&nbsp;&nbsp;COMPILE_FLAGS: Additional compiler flags</a>
+</h3>
+<h3 class="topic">
+<a name="1rg9amrb8vjravtpl1d50rq67k">&nbsp;&nbsp;&nbsp;LINK_FLAGS: Additional linker flags</a>
+</h3>
+<h3 class="topic">
+<a name="6oc5ipt1718smk3ossqsngncjb">&nbsp;&nbsp;&nbsp;FOLDER: Add the headers and source files to this Source Group folder</a>
+</h3>
+<h3 class="topic">
+<a name="3ocmasal38agts6bl15t0fa327">&nbsp;&nbsp;&nbsp;EXCLUDE_FROM_ALL: Do not build this component as part of the all target</a>
+</h3>
+<h3 class="topic">
+<a name="6lid92ph1lm9ggkq2p8fmrdhgm">&nbsp;adding an executable</a>
+</h3>
+<h3 class="topic">
+<a name="4umb2ffden8ra11qvlh8vc2oii">&nbsp;&nbsp;add_hpx_executable(myprojmain
+    ESSENTIAL
+    SOURCES blahblah.cpp
+    HEADERS blahblah.hpp
+    COMPONENT_DEPENDENCIES iostreams
+)</a>
+</h3>
+<h3 class="topic">
+<a name="26ni6ef14badijarb526q5ish5">&nbsp;&nbsp;&nbsp;ESSENTIAL: I think it is made to add this target to "all" ... 
+not quite sure</a>
+</h3>
+<h3 class="topic">
+<a name="0obua7l32hd8e7dp76btkc6n0e">&nbsp;&nbsp;&nbsp;SOURCES: source files</a>
+</h3>
+<h3 class="topic">
+<a name="4er5mo9rhkkbitubbm61plc7jv">&nbsp;&nbsp;&nbsp;HEADERS: header files</a>
+</h3>
+<h3 class="topic">
+<a name="73ovi9b4ubc463s9to4282jlvk">&nbsp;&nbsp;&nbsp;COMPONENT_DEPENDENCIES the component this component depends on</a>
+</h3>
+<h2 class="topic">
+<a name="77mpasoshi0dihic1290034q6t">how to analyze 
+the performance? </a>
+</h2>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/performance_counters.html" name="0hi1lts3ga0nhu2hb4dumvrpss">&nbsp;performance counters</a>
+</h3>
+<h3 class="topic">
+<a name="6q68vhughnm216cbus4e96n9nl">&nbsp;&nbsp;what is it?</a>
+</h3>
+<h3 class="topic">
+<a name="28pv3d6g3caa6osqqb4dcgc2bv">&nbsp;&nbsp;&nbsp;Performance Counters in HPX are used to provide information as to how well the runtime system or an application is performing.
+Performance Counters are HPX parallel processes which expose a predefined interface. HPX exposes special API functions that allow one to create, manage, read the counter data, and release instances of Performance Counters. Performance Counter instances are accessed by name, and these names have a predefined structure which is described in the section Performance Counter Names. The advantage of this is that any Performance Counter can be accessed remotely (from a different locality) or locally (from the same locality). Moreover, since all counters expose their data using the same API, any code consuming counter data can be utilized to access arbitrary system information with minimal effort.</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/init/commandline.html" name="68ql3ovlltl5143lrgn52ubvov">&nbsp;&nbsp;command line options</a>
+</h3>
+<p class="relationships">See Also: <a href="#6291ru1mkab37845gcpctqptrm">performance</a>
+</p>
+<h3 class="topic">
+<a name="20i1bm7su83l4qefm2tl93er9j">&nbsp;&nbsp;&nbsp;--hpx:print-counter</a>
+</h3>
+<h3 class="topic">
+<a name="35n0hu8qhc4sipajchhactplo5">&nbsp;&nbsp;&nbsp;&nbsp;print the specified performance counter 
+either repeatedly and/or at the times 
+specified by --hpx:print-counter-at 
+(see also option --hpx:print-counter-interval)</a>
+</h3>
+<h3 class="topic">
+<a name="29jtuk7taq1qbk94tahfsr2oqe">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:print-counter /threads{locality#0/worker-thread#0}/idle-rate</a>
+</h3>
+<h3 class="topic">
+<a name="1nnartiuo96uck739kp3q7544n">&nbsp;&nbsp;&nbsp;--hpx:print-counter-reset</a>
+</h3>
+<h3 class="topic">
+<a name="62l07395dtnn8atrbv9nb5bqmo">&nbsp;&nbsp;&nbsp;&nbsp;print the specified performance counter 
+either repeatedly and/or at the times 
+specified by --hpx:print-counter-at, 
+reset the counter after the value is queried. 
+(see also option --hpx:print-counter-interval)</a>
+</h3>
+<h3 class="topic">
+<a name="0r11a5kji0g5da146ptkdsdpe7">&nbsp;&nbsp;&nbsp;--hpx:print-counter-interval</a>
+</h3>
+<h3 class="topic">
+<a name="53ksh34anp170ebl41o89e3ka5">&nbsp;&nbsp;&nbsp;&nbsp;print the performance counter(s) specified with --hpx:print-counter 
+repeatedly after the time interval (specified in milliseconds), 
+(default: 0, which means print once at shutdown)</a>
+</h3>
+<h3 class="topic">
+<a name="61u944kqblbmbf8ivkg6upgoqh">&nbsp;&nbsp;&nbsp;--hpx:print-counter-destination</a>
+</h3>
+<h3 class="topic">
+<a name="7kke7pd34vthi1ntf5frtq05de">&nbsp;&nbsp;&nbsp;&nbsp;print the performance counter(s) specified with --hpx:print-counter 
+to the given file (default: console)</a>
+</h3>
+<h3 class="topic">
+<a name="1b2n8be63blt4fotof93k8ldoo">&nbsp;&nbsp;&nbsp;--hpx:list-counters</a>
+</h3>
+<p class="relationships">See Also: <a href="#33o6uo6jas8h9puco6h32dl9jg">what names are available? (get them with )</a>
+</p>
+<h3 class="topic">
+<a name="2ko6nef6fod2nje4hs922b4i0h">&nbsp;&nbsp;&nbsp;&nbsp;list the names of all registered performance counters, 
+possible values: minimal (prints counter name skeletons), 
+full (prints all available counter names)</a>
+</h3>
+<h3 class="topic">
+<a name="1ipe1ufqbl7cemgb3df29e5ock">&nbsp;&nbsp;&nbsp;--hpx:list-counter-infos</a>
+</h3>
+<p class="relationships">See Also: <a href="#33o6uo6jas8h9puco6h32dl9jg">what names are available? (get their description with)</a>
+</p>
+<h3 class="topic">
+<a name="3jjl2e1chucd9l7ijddr1d4eih">&nbsp;&nbsp;&nbsp;&nbsp;list the description of all registered performance counters, 
+possible values: minimal (prints info for counter name skeletons), 
+'full' (prints all available counter infos)</a>
+</h3>
+<h3 class="topic">
+<a name="01v3fc4c01cl35sihgg08u91g4">&nbsp;&nbsp;&nbsp;--hpx:print-counter-format</a>
+</h3>
+<h3 class="topic">
+<a name="4ovqjcsevbe823ua04ndobudl2">&nbsp;&nbsp;&nbsp;&nbsp;print the performance counter(s) specified with --hpx:print-counter, 
+possible formats in csv format with header or without any header 
+(see option --hpx:no-csv-header), 
+possible values: csv (prints counter values in CSV format with full names as header), 
+csv-short (prints counter values in CSV format with shortnames 
+provided with --hpx:print-counter as --hpx:print-counter shortname,full-countername)</a>
+</h3>
+<h3 class="topic">
+<a name="4o3hvq7113h4jfbdiocihrlogt">&nbsp;&nbsp;&nbsp;--hpx:no-csv-header</a>
+</h3>
+<h3 class="topic">
+<a name="0rq9svg7gj09cfm1ct5dm2ev1j">&nbsp;&nbsp;&nbsp;&nbsp;print the performance counter(s) specified with --hpx:print-counter 
+and csv or csv-short format specified with --hpx:print-counter-format 
+without header</a>
+</h3>
+<h3 class="topic">
+<a name="2anoh56g23ctermp8s47kf08al">&nbsp;&nbsp;&nbsp;--hpx:printer-counter-at arg</a>
+</h3>
+<h3 class="topic">
+<a name="7cfaei0iej9d240ftqjsrinlv5">&nbsp;&nbsp;&nbsp;&nbsp;print the performance counter(s) specified with --hpx:print-counter 
+(or --hpx:print-counter-reset) 
+at the given point in time, 
+possible argument values: startup, shutdown (default), noshutdown</a>
+</h3>
+<h3 class="topic">
+<a name="1v3mf5q0ub973j0cr78ph7i86b">&nbsp;&nbsp;&nbsp;--hpx:reset-counters</a>
+</h3>
+<h3 class="topic">
+<a name="0be0kacaud1epvhcqknlsmqto0">&nbsp;&nbsp;&nbsp;&nbsp;reset all performance counter(s) specified with --hpx:print-counter after they have been evaluated</a>
+</h3>
+<h3 class="topic">
+<a name="7j7907uc7es0vkh3sbk7u4dkbk">&nbsp;&nbsp;&nbsp;--hpx:print-counter-at</a>
+</h3>
+<h3 class="topic">
+<a name="0d5e3f8etju3jc46mti9ub6q7m">&nbsp;&nbsp;&nbsp;&nbsp;print the performance counter(s) specified with --hpx:print-counter 
+(or --hpx:print-counter-reset) 
+at the given point in time, 
+possible argument are values: 'startup', 'shutdown' (default), 'noshutdown'.</a>
+</h3>
+<h3 class="topic">
+<a name="5l61h0urrt063urtrdve07bk0h">&nbsp;&nbsp;&nbsp;--hpx:print-counters-locally</a>
+</h3>
+<h3 class="topic">
+<a name="4ucoaicsf54e1mv8skt2m1ajrp">&nbsp;&nbsp;&nbsp;&nbsp;Each locality prints only its own local counters. 
+If this is used with --hpx-print-counter-destination=&lt;file&gt;, 
+the code will append a ".&lt;locality_id&gt;"` 
+to the file name in order to avoid clashes between localities.</a>
+</h3>
+<h3 class="topic">
+<a name="19qodc8ambn5snmgtlq4fg5ogm">&nbsp;&nbsp;names</a>
+</h3>
+<h3 class="topic">
+<a name="7pljfsniotf3e8gqb7ooes0i28">&nbsp;&nbsp;&nbsp;All Performance Counter instances have a name uniquely identifying this instance. 
+This name can be used to access the counter, retrieve all related meta data, and to query the counter data</a>
+</h3>
+<h3 class="topic">
+<a name="67mt8124d0drn47eu9f3n16nu7">&nbsp;&nbsp;&nbsp;general form:</a>
+</h3>
+<h3 class="topic">
+<a name="3i6p2cdihc27ecbdlido2k65r4">&nbsp;&nbsp;&nbsp;&nbsp;/objectname{full_instancename}/countername@parameters</a>
+</h3>
+<h3 class="topic">
+<a name="2pbmib55pvubj0g1ld8dht9kqm">&nbsp;&nbsp;&nbsp;&nbsp;where full instance name can be another counter name or a string formatted as </a>
+</h3>
+<h3 class="topic">
+<a name="7d2uofnsm5iohpe5d1u4un7skj">&nbsp;&nbsp;&nbsp;&nbsp;parentinstancename#parentindex/instancename#instanceindex</a>
+</h3>
+<h3 class="topic">
+<a name="41s3ma8sjsotro9onk4nedejoi">&nbsp;&nbsp;&nbsp;&nbsp;if an index is not specified, HPX will assume a default of -1</a>
+</h3>
+<h3 class="topic">
+<a name="33o6uo6jas8h9puco6h32dl9jg">&nbsp;&nbsp;&nbsp;what names are available?</a>
+</h3>
+<p class="relationships">See Also: <a href="#1b2n8be63blt4fotof93k8ldoo">--hpx:list-counters (get them with )</a>, <a href="#1ipe1ufqbl7cemgb3df29e5ock">--hpx:list-counter-infos (get their description with)</a>
+</p>
+<h3 class="topic">
+<a name="1gqd0f27ut0ase9cbiocc1capv">&nbsp;&nbsp;&nbsp;&nbsp;List of available counter instances
+(replace '*' below with the appropriate sequence number)</a>
+</h3>
+<h3 class="topic">
+<a name="34phaotq8ed153b5742subjobt">&nbsp;&nbsp;&nbsp;&nbsp;agas</a>
+</h3>
+<h3 class="topic">
+<a name="1ger2j0mugfd4khkih12tn4gcj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/component/count</a>
+</h3>
+<h3 class="topic">
+<a name="4g3alueld54btu44g7k1lp9j1j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/component/time</a>
+</h3>
+<h3 class="topic">
+<a name="4s7uv9ravh7u6kbidm6f7tbpn8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/allocate</a>
+</h3>
+<h3 class="topic">
+<a name="0t8gm7ma4sfbpecdaopeu5gmht">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/begin_migration</a>
+</h3>
+<h3 class="topic">
+<a name="33m6bdnlatf9i64fh9movd858n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/bind</a>
+</h3>
+<h3 class="topic">
+<a name="2kar2a0ui12g3b6k71iutgjq4p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/bind_gid</a>
+</h3>
+<h3 class="topic">
+<a name="68fvg5op8n85p9thaichcuh6l4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/bind_name</a>
+</h3>
+<h3 class="topic">
+<a name="0ks8252qf142omutkrq2eg44u3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/bind_prefix</a>
+</h3>
+<h3 class="topic">
+<a name="740u076abrv8negues8la3kfj3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/entries</a>
+</h3>
+<h3 class="topic">
+<a name="2eb89pd5g2au57cf3s2iqsdpjh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/erase_entry</a>
+</h3>
+<h3 class="topic">
+<a name="132q0q9de49j1acprlmv3vgbeu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/evictions</a>
+</h3>
+<h3 class="topic">
+<a name="47o9pr19di0nitcj3890065h10">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/get_entry</a>
+</h3>
+<h3 class="topic">
+<a name="63vh6sto52p622vhqblon42avd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/hits</a>
+</h3>
+<h3 class="topic">
+<a name="2plk571gf2igft5i7ljid5j9fh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/insertions</a>
+</h3>
+<h3 class="topic">
+<a name="2ov910qhesosv521s3l9l9getc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/misses</a>
+</h3>
+<h3 class="topic">
+<a name="7ihbo345ek0hd60up8oh3ip71i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/update_entry</a>
+</h3>
+<h3 class="topic">
+<a name="2bu3bgvgo33mrcn9rg9kvv7o4d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/decrement_credit</a>
+</h3>
+<h3 class="topic">
+<a name="4j8vod8l4k7p7qnmshhrlm5d2k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/end_migration</a>
+</h3>
+<h3 class="topic">
+<a name="2md7dbhvhsl7gd9ot9iva4s6hs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/free</a>
+</h3>
+<h3 class="topic">
+<a name="0i7b5pmcka8va93nrut893356b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/get_component_typename</a>
+</h3>
+<h3 class="topic">
+<a name="09u1oo7mogssep6b1ch8rdjbk2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/increment_credit</a>
+</h3>
+<h3 class="topic">
+<a name="2ocaedbq0hl882b7gt5dkqb0fm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/iterate_names</a>
+</h3>
+<h3 class="topic">
+<a name="29mnk1i22iu4mq8spa8naaj1cb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/iterate_types</a>
+</h3>
+<h3 class="topic">
+<a name="74uvq6vd19knditgm4i11mlbf5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/localities</a>
+</h3>
+<h3 class="topic">
+<a name="6bgppfasghm4s9iha9oo20k32c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/num_localities</a>
+</h3>
+<h3 class="topic">
+<a name="279264elheun4qfj668oahdpc8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/num_localities_type</a>
+</h3>
+<h3 class="topic">
+<a name="4t2lmalj524ke7fd2j2tukrr10">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/num_threads</a>
+</h3>
+<h3 class="topic">
+<a name="56sme535d78tg3q9rrdrt0m3sn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/on_symbol_namespace_event</a>
+</h3>
+<h3 class="topic">
+<a name="4uhj6bi3thv1i3a4lj2ndjl5pr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/resolve</a>
+</h3>
+<h3 class="topic">
+<a name="1r4l4gje14li7d81j7b8nuo4a8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/resolve_gid</a>
+</h3>
+<h3 class="topic">
+<a name="01ev1lrt32q3440upjv8fg8olj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/resolve_id</a>
+</h3>
+<h3 class="topic">
+<a name="6ktmgbo3h9ig8g47lgpuc982ed">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/resolve_locality</a>
+</h3>
+<h3 class="topic">
+<a name="6euqucov4f26rfkc6vdsmcuem2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/route</a>
+</h3>
+<h3 class="topic">
+<a name="2jqoh6sph86iap67q3vstb3qqc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/unbind</a>
+</h3>
+<h3 class="topic">
+<a name="319d3dmq820i8jdh7qat5ssdfj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/unbind_gid</a>
+</h3>
+<h3 class="topic">
+<a name="1cij9015sjau0064aotevtpv8d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/count/unbind_name</a>
+</h3>
+<h3 class="topic">
+<a name="79ku6blgmgha1bs3rca2kegt6f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/locality/count</a>
+</h3>
+<h3 class="topic">
+<a name="7an4v4tunkv4dger9u37ql1fqu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/locality/time</a>
+</h3>
+<h3 class="topic">
+<a name="7ab5ocsktts98cs0gmm79f4av4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/primary/count</a>
+</h3>
+<h3 class="topic">
+<a name="5aok7pfqos6tig85kro97iea63">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/primary/time</a>
+</h3>
+<h3 class="topic">
+<a name="5s7tj3mald32bpcevjvcvnfgui">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/symbol/count</a>
+</h3>
+<h3 class="topic">
+<a name="4ufvt7eiqucgrpc6426hh2io75">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/symbol/time</a>
+</h3>
+<h3 class="topic">
+<a name="09hugti6pc5babmsfplb30sn3q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/allocate</a>
+</h3>
+<h3 class="topic">
+<a name="4bl0nis0ercii0mfgmlpkj2jub">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/begin_migration</a>
+</h3>
+<h3 class="topic">
+<a name="2jtcvr0f8108rtdc0frohkid1g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/bind</a>
+</h3>
+<h3 class="topic">
+<a name="2bv2h7ut70h90ucrkorf11laes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/bind_gid</a>
+</h3>
+<h3 class="topic">
+<a name="3cphovgqujob0f6ol1l9r2bcra">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/bind_name</a>
+</h3>
+<h3 class="topic">
+<a name="2cdj1go4qkj3jlpp8gvpnk4lqn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/bind_prefix</a>
+</h3>
+<h3 class="topic">
+<a name="7r6jcurhet259h8asomn21k69p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/cache/erase_entry</a>
+</h3>
+<h3 class="topic">
+<a name="0gspv2lj9fm3idkbvstab9eofa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/cache/get_entry</a>
+</h3>
+<h3 class="topic">
+<a name="7un2c5sb5kae2ap3u69tqr06b0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/cache/insert_entry</a>
+</h3>
+<h3 class="topic">
+<a name="5b36lq968e9fjnq0t6a80jpeah">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/cache/update_entry</a>
+</h3>
+<h3 class="topic">
+<a name="23qj605i8n1mg2at8dgjaadnvp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/decrement_credit</a>
+</h3>
+<h3 class="topic">
+<a name="28pgmv5s68g3sphngr4ufr91nn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/end_migration</a>
+</h3>
+<h3 class="topic">
+<a name="7di1ki11mrr46lkq66cm9quf86">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/free</a>
+</h3>
+<h3 class="topic">
+<a name="54c9v7ajh176u34uv1i00qlneh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/get_component_typename</a>
+</h3>
+<h3 class="topic">
+<a name="7lfmreb4uoldqhre9sel2bc3be">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/increment_credit</a>
+</h3>
+<h3 class="topic">
+<a name="4hntd5rd402mp8a4ehj7f3hu7d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/iterate_names</a>
+</h3>
+<h3 class="topic">
+<a name="57unh33ovi8deb4p1v3vgbg04r">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/iterate_types</a>
+</h3>
+<h3 class="topic">
+<a name="3leb4pkae34n980qmhj67t4mqs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/localities</a>
+</h3>
+<h3 class="topic">
+<a name="11mhm3hb1d2ufl5k0l6h230ofb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/num_localities</a>
+</h3>
+<h3 class="topic">
+<a name="686n1ikd0knb54dgibfi9qr2br">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/num_localities_type</a>
+</h3>
+<h3 class="topic">
+<a name="6nnl98jquf24lqkkr1m6ngh2nn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/num_threads</a>
+</h3>
+<h3 class="topic">
+<a name="4qnkeq6p6rsdaaqukb506sc77h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/on_symbol_namespace_event</a>
+</h3>
+<h3 class="topic">
+<a name="0iip78rnkota2lj4tlc532k56l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/resolve</a>
+</h3>
+<h3 class="topic">
+<a name="0aqq8oni5oeuss17bhm90mstvr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/resolve_gid</a>
+</h3>
+<h3 class="topic">
+<a name="3com6n5204v12nbavhke8p3v21">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/resolve_id</a>
+</h3>
+<h3 class="topic">
+<a name="6gq7r8otshk8o3sc16fgdmuoh8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/resolve_locality</a>
+</h3>
+<h3 class="topic">
+<a name="2lm2itmc50n5g0eal44ftveh78">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/route</a>
+</h3>
+<h3 class="topic">
+<a name="5k906uk2lcccahgl5h3ijrgfv7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/count/cache/insert_entry</a>
+</h3>
+<h3 class="topic">
+<a name="4hnmtlvojegt68lm83ddagpkdo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/unbind</a>
+</h3>
+<h3 class="topic">
+<a name="0k4ppgc7etfnvfeel6mada5cmv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#*/total}/time/unbind_gid</a>
+</h3>
+<h3 class="topic">
+<a name="5opgdh1r2t35770mq7vp9jn0li">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/agas{locality#0/total}/time/unbind_name</a>
+</h3>
+<h3 class="topic">
+<a name="320udvjkm3m6nb7q298n4bpnrf">&nbsp;&nbsp;&nbsp;&nbsp;arithmetics</a>
+</h3>
+<h3 class="topic">
+<a name="5lvirc8ou9r3n9r4j53s6ghl28">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/arithmetics/add</a>
+</h3>
+<h3 class="topic">
+<a name="54tbg4oj8madrdrhevv6liv9hn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/arithmetics/divide</a>
+</h3>
+<h3 class="topic">
+<a name="28o92ed70g5q2ulnc8e20f8ug3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/arithmetics/multiply</a>
+</h3>
+<h3 class="topic">
+<a name="7j5gb0qefuh883c0g65rhqot10">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/arithmetics/subtract</a>
+</h3>
+<h3 class="topic">
+<a name="449o0clcpq7jma68lvd85vlhuu">&nbsp;&nbsp;&nbsp;&nbsp;communication</a>
+</h3>
+<h3 class="topic">
+<a name="7sr0f4igc5r4v3dhqbveouv6v3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coalescing</a>
+</h3>
+<h3 class="topic">
+<a name="2h8ku7g1tbng20l9tg0np93kja">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/coalescing{locality#*/total}/count/average-parcels-per-message</a>
+</h3>
+<h3 class="topic">
+<a name="428ltf160hl1iocejb8dtcqg5b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/coalescing{locality#*/total}/count/messages</a>
+</h3>
+<h3 class="topic">
+<a name="7bod3e9ev5thed5f37vjfkrat5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/coalescing{locality#*/total}/count/parcels</a>
+</h3>
+<h3 class="topic">
+<a name="6q0f8sasnivoq8ck6h4t5dcjoc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/coalescing{locality#*/total}/time/between-parcels-average</a>
+</h3>
+<h3 class="topic">
+<a name="31mtbj2dr4o1kq8erjq9e0068j">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/coalescing{locality#*/total}/time/between-parcels-histogram</a>
+</h3>
+<h3 class="topic">
+<a name="3d3rhc527slvscgritn978a522">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data</a>
+</h3>
+<h3 class="topic">
+<a name="0nge1pr9jpp07privd3dd7b8l2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/data{locality#*/total}/count/tcp/sent</a>
+</h3>
+<h3 class="topic">
+<a name="1pktktp61mh21p7nk2p1cg2li6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/data{locality#*/total}/time/tcp/received</a>
+</h3>
+<h3 class="topic">
+<a name="24uvlh0ti7gjbctvpjiamrlpka">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/data{locality#*/total}/time/tcp/sent</a>
+</h3>
+<h3 class="topic">
+<a name="2hird8roslbb4m23pmrlg6q6or">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/data{locality#*/total}/count/tcp/received</a>
+</h3>
+<h3 class="topic">
+<a name="3liukhpmm1182rmg2j5q6vh1av">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;messages</a>
+</h3>
+<h3 class="topic">
+<a name="2ov02vdbmaukhm3aafv7vcguat">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/messages{locality#*/total}/count/tcp/received</a>
+</h3>
+<h3 class="topic">
+<a name="0864jmkiu4809tr1jrr4bdk72d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/messages{locality#*/total}/count/tcp/sent</a>
+</h3>
+<h3 class="topic">
+<a name="0adk4pfg8savnvarqf1nom0383">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parcelport</a>
+</h3>
+<h3 class="topic">
+<a name="5io7kjg0pm1l7i1pft8b4oa54l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcelport{locality#*/total}/count/tcp/cache-hits</a>
+</h3>
+<h3 class="topic">
+<a name="5kukffrqqnligjbt58uadsu07m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcelport{locality#*/total}/count/tcp/cache-insertions</a>
+</h3>
+<h3 class="topic">
+<a name="7qlnv8r01u7l8mbot1284ici8p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcelport{locality#*/total}/count/tcp/cache-misses</a>
+</h3>
+<h3 class="topic">
+<a name="5n2ckaiuu8ur1mm5o4fq0orgot">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcelport{locality#*/total}/count/tcp/cache-reclaims</a>
+</h3>
+<h3 class="topic">
+<a name="5r8u52a24a1bh03aarvmfg3i85">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcelport{locality#*/total}/count/tcp/cache-evictions</a>
+</h3>
+<h3 class="topic">
+<a name="096s79ria7c4s9an8r8v813ki4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parcels</a>
+</h3>
+<h3 class="topic">
+<a name="56kgo0o7sueksjpttc74ri8bjd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcels{locality#*/total}/count/routed</a>
+</h3>
+<h3 class="topic">
+<a name="5jfh9d3aqojc5ue3p2tr9o4c9m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcels{locality#*/total}/count/tcp/received</a>
+</h3>
+<h3 class="topic">
+<a name="5uoh9064husodt9spqe3g9cl7q">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcels{locality#*/total}/count/tcp/sent</a>
+</h3>
+<h3 class="topic">
+<a name="2knljao02kpej4cbusv5vfd02v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcels{locality#*/total}/time/tcp/buffer_allocate/received</a>
+</h3>
+<h3 class="topic">
+<a name="6q11d7gruvocnnfgr2hi82grtg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcels{locality#*/total}/time/tcp/buffer_allocate/sent</a>
+</h3>
+<h3 class="topic">
+<a name="4stekkqad5t6bsqdmisjj45ghu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parcel queue</a>
+</h3>
+<h3 class="topic">
+<a name="16v65u92pev064pt6mnufcdf0g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcelqueue{locality#*/total}/length/receive</a>
+</h3>
+<h3 class="topic">
+<a name="6io8ghv2omit74pbiaif3lsf75">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/parcelqueue{locality#*/total}/length/send</a>
+</h3>
+<h3 class="topic">
+<a name="52bcge1ut2hnpmne4fkd36ao73">&nbsp;&nbsp;&nbsp;&nbsp;runtime</a>
+</h3>
+<h3 class="topic">
+<a name="2fol5qk3heo0ds937j6rul26f3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/count/action-invocation</a>
+</h3>
+<h3 class="topic">
+<a name="51ja9h06p4rj561s4njskng7af">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/count/component</a>
+</h3>
+<h3 class="topic">
+<a name="01hefhr8cpjtteoqj5j05rd881">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/count/remote-action-invocation</a>
+</h3>
+<h3 class="topic">
+<a name="2cfdnlv2ltuk3ao1c1lb5flun1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/io/read_bytes_issued</a>
+</h3>
+<h3 class="topic">
+<a name="79bue4jctbu4kqv1far6bscdqc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/io/read_bytes_transferred</a>
+</h3>
+<h3 class="topic">
+<a name="0t4g299b338lb495c70090i3tb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/io/read_syscalls</a>
+</h3>
+<h3 class="topic">
+<a name="4t69u1rf77dbiap41j1blg2t0a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/io/write_bytes_cancelled</a>
+</h3>
+<h3 class="topic">
+<a name="34ef5nu9u8i62h1qlil760ftcb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/io/write_bytes_issued</a>
+</h3>
+<h3 class="topic">
+<a name="67qbit9ckuoebram7491r5i1bo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/io/write_bytes_transferred</a>
+</h3>
+<h3 class="topic">
+<a name="65klo6kphuqre6qhrpgkl5rc3m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/io/write_syscalls</a>
+</h3>
+<h3 class="topic">
+<a name="53fss1j54rtb8l0dh2q94v4dhp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/memory/resident</a>
+</h3>
+<h3 class="topic">
+<a name="5o9ir4u6dgkd9qo0tj34vbjvb2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/memory/total</a>
+</h3>
+<h3 class="topic">
+<a name="45op555ouv62u3ik4e06dnafe5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/memory/virtual</a>
+</h3>
+<h3 class="topic">
+<a name="08imqctct1vdfp2sn6i61esl34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/runtime{locality#*/total}/uptime</a>
+</h3>
+<h3 class="topic">
+<a name="2hm6r4693gg1idtbal813f3ba1">&nbsp;&nbsp;&nbsp;&nbsp;scheduler</a>
+</h3>
+<h3 class="topic">
+<a name="2lrkklvqq6qv7d97pm6d8lk7bg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/scheduler{locality#*/total}/busy-loop-count/instantaneous</a>
+</h3>
+<h3 class="topic">
+<a name="018k6tqnpgu12e46a1rl3khg4k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/scheduler{locality#*/worker-thread#*}/busy-loop-count/instantaneous</a>
+</h3>
+<h3 class="topic">
+<a name="4ijjbnset7pg4q7mbu11ltrlgh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/scheduler{locality#*/total}/idle-loop-count/instantaneous</a>
+</h3>
+<h3 class="topic">
+<a name="13a25t98ug8rp9ll7e010j6fu6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/scheduler{locality#*/worker-thread#*}/idle-loop-count/instantaneous</a>
+</h3>
+<h3 class="topic">
+<a name="47j0igsp6igdkhs2r5m5qm8ec1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/scheduler{locality#*/total}/utilization/instantaneous</a>
+</h3>
+<h3 class="topic">
+<a name="2oh4kjr0697qd965l09ftt0hp1">&nbsp;&nbsp;&nbsp;&nbsp;serialize</a>
+</h3>
+<h3 class="topic">
+<a name="2gdi2g1q14tqsdlpjc1pr013ac">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/serialize{locality#*/total}/count/tcp/received</a>
+</h3>
+<h3 class="topic">
+<a name="6nvkgsl2r8jm10koq45nfccenb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/serialize{locality#*/total}/count/tcp/sent</a>
+</h3>
+<h3 class="topic">
+<a name="6sbp8dl3sse7clvoalvde8vf0f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/serialize{locality#*/total}/time/tcp/received</a>
+</h3>
+<h3 class="topic">
+<a name="77pt2dnnfcdo575alcmdsf307e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/serialize{locality#*/total}/time/tcp/sent</a>
+</h3>
+<h3 class="topic">
+<a name="3fh4cj7opsfa6aluqdd1qv9p3u">&nbsp;&nbsp;&nbsp;&nbsp;statistics</a>
+</h3>
+<h3 class="topic">
+<a name="388mrbt55jv73f4f0gbrtq81ca">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/statistics/average</a>
+</h3>
+<h3 class="topic">
+<a name="109qn9hcs34f1qone3t7re0oj1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/statistics/max</a>
+</h3>
+<h3 class="topic">
+<a name="2b4rocqkbk78re932dg2v7r23g">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/statistics/median</a>
+</h3>
+<h3 class="topic">
+<a name="2s3ovrp57dtdschg6u8ls2p8fo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/statistics/min</a>
+</h3>
+<h3 class="topic">
+<a name="0ldcg2recdvck5hgcgsets0a65">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/statistics/rolling_average</a>
+</h3>
+<h3 class="topic">
+<a name="31i5lcgmsakg55jangjlqrqadk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/statistics/stddev</a>
+</h3>
+<h3 class="topic">
+<a name="317cvvrt31r5r8s62ajk84pj6c">&nbsp;&nbsp;&nbsp;&nbsp;thread queue</a>
+</h3>
+<h3 class="topic">
+<a name="64p8i1p9511oniktiri7803eo2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threadqueue{locality#*/total}/length</a>
+</h3>
+<h3 class="topic">
+<a name="2r7hrc4ce3on3806kuh1v1eh7u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threadqueue{locality#*/worker-thread#*}/length</a>
+</h3>
+<h3 class="topic">
+<a name="7b62qmmjr7r4pfoc643p5feos6">&nbsp;&nbsp;&nbsp;&nbsp;threads</a>
+</h3>
+<h3 class="topic">
+<a name="255uppi83grgr5d6tpd7mk8k6l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count</a>
+</h3>
+<h3 class="topic">
+<a name="4ked27dvdvu7eg6gsk2s7c9q7f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/cumulative</a>
+</h3>
+<h3 class="topic">
+<a name="2dsaq175olapq6jqglm4jdvsab">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns the overall number of executed (retired) HPX-threads for the referenced locality</a>
+</h3>
+<h3 class="topic">
+<a name="2lcdsm6rd1pdr5v9n6cgbn6lsv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/cumulative</a>
+</h3>
+<h3 class="topic">
+<a name="7p2avlni1rs2ccl1dl3k1sjhsq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/cumulative-phases</a>
+</h3>
+<h3 class="topic">
+<a name="72kk07qgc2ngl6nj7ch39vsh75">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/cumulative-phases</a>
+</h3>
+<h3 class="topic">
+<a name="2hr260ovj4mtqbfbhh43sl7791">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instantaneous</a>
+</h3>
+<h3 class="topic">
+<a name="1e9bv7td6gh3r0unl63a7h6sam">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/instantaneous/active</a>
+</h3>
+<h3 class="topic">
+<a name="30h1628r94bhl369647707pag2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/instantaneous/active</a>
+</h3>
+<h3 class="topic">
+<a name="2vqv9or2j5i97fggfnutj4rob5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/instantaneous/all</a>
+</h3>
+<h3 class="topic">
+<a name="06idrdd2s7g33jj1cddfqd56af">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/instantaneous/all</a>
+</h3>
+<h3 class="topic">
+<a name="5d6vad63i1equ0nih32ibabq9c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/instantaneous/pending</a>
+</h3>
+<h3 class="topic">
+<a name="3nd2vq559l3pej9mudgab722no">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/instantaneous/pending</a>
+</h3>
+<h3 class="topic">
+<a name="77greuj33n23rdopfnq00n61dj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/instantaneous/staged</a>
+</h3>
+<h3 class="topic">
+<a name="5plvnlh2d6figo9t5jhq58ea5c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/instantaneous/staged</a>
+</h3>
+<h3 class="topic">
+<a name="7f63n35l9dc7pjg98vqamvl7sa">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/instantaneous/suspended</a>
+</h3>
+<h3 class="topic">
+<a name="19pke44aj7342013uddkbn17g9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/instantaneous/suspended</a>
+</h3>
+<h3 class="topic">
+<a name="1pc37j1fl5cjs9m2j2pt290bnr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/instantaneous/terminated</a>
+</h3>
+<h3 class="topic">
+<a name="7nn3tnp03dkhjmukj2b1l5mo1f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/instantaneous/terminated</a>
+</h3>
+<h3 class="topic">
+<a name="2hngnc382q61cbkbd12makcfmr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/objects</a>
+</h3>
+<h3 class="topic">
+<a name="554l4dglbtg950t6q3tg9oe513">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/allocator#*}/count/objects</a>
+</h3>
+<h3 class="topic">
+<a name="2if30g7mhdst7fnbe9n48j0lpf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/pending-accesses</a>
+</h3>
+<h3 class="topic">
+<a name="4cupshne4sgs10q56rgm2gc6i9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/pending-accesses</a>
+</h3>
+<h3 class="topic">
+<a name="3fm5566it3aqofgt12vh7ivlss">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/pending-misses</a>
+</h3>
+<h3 class="topic">
+<a name="2m0p1rmvkorea128k2k6d1ms4e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/pending-misses</a>
+</h3>
+<h3 class="topic">
+<a name="3d3mftpm1d9t8g1icvvm45e9m2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/stack-recycles</a>
+</h3>
+<h3 class="topic">
+<a name="457m7mpf4o78fr87bcis71u06a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/stack-unbinds</a>
+</h3>
+<h3 class="topic">
+<a name="171402hr4b1419dbp6mgdtrpkf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stealing</a>
+</h3>
+<h3 class="topic">
+<a name="7bv00ecjm50du02nld8fvvg2q9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/stolen-from-pending</a>
+</h3>
+<h3 class="topic">
+<a name="09ktjtlspj5ekf07vavk5pc0mh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/stolen-from-pending</a>
+</h3>
+<h3 class="topic">
+<a name="1go0hmal7qov3fg4h92dq2jgrg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/stolen-from-staged</a>
+</h3>
+<h3 class="topic">
+<a name="4mlmgernmg7e3ni1acptu0le19">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/stolen-from-staged</a>
+</h3>
+<h3 class="topic">
+<a name="2g9j7jjc4c9alh1s3ffn9m0g6t">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/stolen-to-pending</a>
+</h3>
+<h3 class="topic">
+<a name="738l1lv8mejk74u4ncn4sha2fo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/stolen-to-pending</a>
+</h3>
+<h3 class="topic">
+<a name="0qrpqav28u4rqr19mp59kagsbc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/count/stolen-to-staged</a>
+</h3>
+<h3 class="topic">
+<a name="0p9borve7mbeacaoeeeooh8bda">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/count/stolen-to-staged</a>
+</h3>
+<h3 class="topic">
+<a name="5ish82jik3gulb8c33snihlb9h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/idle-rate</a>
+</h3>
+<h3 class="topic">
+<a name="7mqdlpr7osboue7qm3m3rahq2h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/idle-rate</a>
+</h3>
+<h3 class="topic">
+<a name="0fuit2n8tmm0cetqgrvbe2pt34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time</a>
+</h3>
+<h3 class="topic">
+<a name="2d3deamlmqqrlu3gju0su0jrbl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/time/average</a>
+</h3>
+<h3 class="topic">
+<a name="3u1c75k1us6meq6vpbs13oa9vv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/time/average</a>
+</h3>
+<h3 class="topic">
+<a name="41kjkmvoisvi8b0bvs4pgdv834">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/time/average-overhead</a>
+</h3>
+<h3 class="topic">
+<a name="0t5jhiabao4qhgl8dqq40mdbeq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/time/average-overhead</a>
+</h3>
+<h3 class="topic">
+<a name="0entrg5ji0born32herbfrlt4l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/time/average-phase</a>
+</h3>
+<h3 class="topic">
+<a name="317uc0i47jicvt34q8g95q8j6u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/time/average-phase</a>
+</h3>
+<h3 class="topic">
+<a name="01agi1p9jud9cvns8g6fd109fs">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/time/average-phase-overhead</a>
+</h3>
+<h3 class="topic">
+<a name="4g9leqrroc58apf29n8l432fne">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/time/average-phase-overhead</a>
+</h3>
+<h3 class="topic">
+<a name="3r0jh54ur7uefljjce7mcsp2rt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/time/cumulative</a>
+</h3>
+<h3 class="topic">
+<a name="280h147jf2oql77ispoq035dot">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/time/cumulative</a>
+</h3>
+<h3 class="topic">
+<a name="1hj13tiolhp344k7n96k271opj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/time/cumulative-overhead</a>
+</h3>
+<h3 class="topic">
+<a name="7mhjurnsn290mmpd49ttgqkrf1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/time/cumulative-overhead</a>
+</h3>
+<h3 class="topic">
+<a name="7fndn8dtcjmmus18s3somc97bn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/total}/time/overall</a>
+</h3>
+<h3 class="topic">
+<a name="30mdl36q0h0akvsusmlqsr1meh">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/threads{locality#*/worker-thread#*}/time/overall</a>
+</h3>
+<h3 class="topic">
+<a name="0g21u3lk7kenum3j23kj01ic1g">&nbsp;&nbsp;how to use? 
+examples</a>
+</h3>
+<h3 class="topic">
+<a name="0sbjp1gvjsgchpnk0f4gv3mdf2">&nbsp;&nbsp;&nbsp;
+--hpx:print-counter /threads{locality#0/worker-thread#0}/idle-rate
+</a>
+</h3>
+<h3 class="topic">
+<a name="08guleq5d4ehc0iufbbec1itqs">&nbsp;generate trace files</a>
+</h3>
+<h3 class="topic">
+<a name="0m9df2aie1mah2gghq4437cv6f">&nbsp;&nbsp;Build HPX with
+(in hpx-build)
+(or actually probs better with RelWithDebInfo)</a>
+</h3>
+<h3 class="topic">
+<a name="6r2fqdhqd8cilkd3op8on2b528">&nbsp;&nbsp;&nbsp;cmake \
+-DBOOST_ROOT=/usr/local/boost_1_63_0/ \
+-DHPX_WITH_HWLOC=ON \
+-DHWLOC_ROOT=/usr/local/include/hwloc \
+-DHPX_WITH_APEX=ON \
+-DAPEX_WITH_OTF2=ON \
+-DOTF2_ROOT=/usr/local/otf2-2.0/ \
+-DHPX_WITH_MALLOC=jemalloc \
+-DCMAKE_BUILD_TYPE=Debug \
+-DHPX_WITH_TESTS=OFF \
+-DHPX_WITH_EXAMPLES=OFF \
+-DHPX_WITH_THREAD_IDLE_RATES=ON \
+~/Documents/CSCS/hpx</a>
+</h3>
+<h3 class="topic">
+<a name="0e7b7287l0bcd7ov5m007qps7g">&nbsp;&nbsp;Environment variables</a>
+</h3>
+<h3 class="topic">
+<a name="53l2oj1t4t0updmmuq48g4fpjg">&nbsp;&nbsp;&nbsp;export APEX_OTF2=1
+export APEX_PROFILE=1
+export APEX_SCREEN_OUTPUT=1</a>
+</h3>
+<h3 class="topic">
+<a name="0n7v4vg6l1ltmu8kd5jmsbvns1">&nbsp;&nbsp;Build application with</a>
+</h3>
+<h3 class="topic">
+<a name="0dgn6dlp8tmd23rhfha2ob6054">&nbsp;&nbsp;&nbsp;cmake \
+-DBOOST_ROOT=/usr/local/boost_1_63_0/ \
+-DHPX_WITH_HWLOC=ON \
+-DHWLOC_ROOT=/usr/local/include/hwloc \
+-DHPX_WITH_APEX=ON \
+-DAPEX_WITH_OTF2=ON \
+-DOTF2_ROOT=/usr/local/otf2-2.0/ \
+-DHPX_WITH_MALLOC=jemalloc \
+-DCMAKE_BUILD_TYPE=Debug \
+-DHPX_WITH_THREAD_IDLE_RATES=ON \
+-DHPX_DIR=~/Documents/CSCS/hpx-build/lib/cmake/HPX/</a>
+</h3>
+<h3 class="topic">
+<a name="0qgeivn6m8ckna55aiip337cni">&nbsp;&nbsp;Run program as usual</a>
+</h3>
+<h3 class="topic">
+<a name="6sqhd67r1vct9hiji9m12djg4f">&nbsp;&nbsp;&nbsp;the trace files generated will appear in OTF2_archive/APEX.otf2</a>
+</h3>
+<h3 class="topic">
+<a name="2h9301ngqrdi3mjhjg2pgc30ed">&nbsp;&nbsp;&nbsp;think of renaming or deleting the folder between runs, 
+otherwise APEX can't write in it</a>
+</h3>
+<h3 class="topic">
+<a href="https://www.vampir.eu/" name="35jr0j6fh4h2sspppb0bj01pk7">&nbsp;&nbsp;Open the .otf2 file using e.g. Vampir
+(https://www.vampir.eu/)</a>
+</h3>
+<h3 class="topic">
+<a name="6c8109lutkbr6u721f3ia8bei0">&nbsp;&nbsp;TIP: annotating functions</a>
+</h3>
+<h3 class="topic">
+<a name="0i06rbj5cghiauj51pcn27tj7u">&nbsp;&nbsp;&nbsp;examples</a>
+</h3>
+<h3 class="topic">
+<a name="7f6he5crh8661inslmhb8b923g">&nbsp;&nbsp;&nbsp;&nbsp;	hpx::future&lt;void&gt; p2e_fut = setup.then(
+            hpx::util::annotated_function(
+            [](hpx::future&lt;void&gt; fv)
+            {
+	            p2e(...,...);
+	  }, "p2e"));</a>
+</h3>
+<h3 class="topic">
+<a name="6voerrpbcs6ckbfmpsjqon4bmr">&nbsp;&nbsp;&nbsp;&nbsp;    hpx::async(hpx::launch::sync,
+               hpx::util::annotated_function(
+                       [&amp;]() {
+                           tree_fut = builder-&gt;build_tree_hpx(0);
+                       },"build_tree_rec_0"
+               ));</a>
+</h3>
+<h2 class="topic">
+<a name="7iv5fv72noogul78mhcfkua526">how to run an
+HPX application?</a>
+</h2>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/init/commandline.html" name="706ffpji3e2dfr222c3ahhg34g">&nbsp;command line
+options</a>
+</h3>
+<h3 class="topic">
+<a name="30n3kv90qqaqqu1bmf64bulk4h">&nbsp;&nbsp;general</a>
+</h3>
+<h3 class="topic">
+<a name="5pa8c7uao8icb08gf0v4pqi7cu">&nbsp;&nbsp;&nbsp;--hpx:version</a>
+</h3>
+<h3 class="topic">
+<a name="4og8ci5k4aupvkinfc05rjalvs">&nbsp;&nbsp;&nbsp;--hpx:help</a>
+</h3>
+<h3 class="topic">
+<a name="14akigh7p1k77h8pecvsgcks7g">&nbsp;&nbsp;&nbsp;&nbsp;get the list of options by invoking
+./app -h</a>
+</h3>
+<h3 class="topic">
+<a name="2g7emhrb7hgdi7nbe09q4df7jf">&nbsp;&nbsp;&nbsp;--hpx:info</a>
+</h3>
+<h3 class="topic">
+<a name="3fe41d3s8nn86vfghtub68s4qo">&nbsp;&nbsp;number of ...</a>
+</h3>
+<h3 class="topic">
+<a name="0dph12d5inqbolhd4cs6ng71io">&nbsp;&nbsp;&nbsp;--hpx:threads N</a>
+</h3>
+<h3 class="topic">
+<a name="7rvm2aksn81r9fh61gquughrq4">&nbsp;&nbsp;&nbsp;&nbsp;number of OS threads
+value: N or "all"</a>
+</h3>
+<h3 class="topic">
+<a name="5blct5vk99uk4j7hj102pijtau">&nbsp;&nbsp;&nbsp;--hpx:cores</a>
+</h3>
+<h3 class="topic">
+<a name="5urt7hutptruo1cq02f4emgcts">&nbsp;&nbsp;--hpx:run-hpx-main</a>
+</h3>
+<p class="relationships">See Also: <a href="#1qn8sdnpupatj57moapqjdjugv">by default, executed on main locality only.
+It is possible to force execution on all localities
+(--hpx:run-hpx-main)</a>
+</p>
+<h3 class="topic">
+<a name="6rmjqdfpeerlelasbn6p0ps77p">&nbsp;&nbsp;&nbsp;force execution on ALL localities</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/init/commandline.html" name="6291ru1mkab37845gcpctqptrm">&nbsp;&nbsp;performance</a>
+</h3>
+<p class="relationships">See Also: <a href="#68ql3ovlltl5143lrgn52ubvov">command line options</a>
+</p>
+<h3 class="topic">
+<a name="509hgs870bo1knoi1lkdkt73kc">&nbsp;&nbsp;&nbsp;--hpx:list-counters</a>
+</h3>
+<h3 class="topic">
+<a name="54opmo4tpqhik29ojd344e9rg5">&nbsp;&nbsp;&nbsp;--hpx:list-counter-infos</a>
+</h3>
+<h3 class="topic">
+<a name="6hr0gfu1jltpf5evdr0cfi2ed6">&nbsp;&nbsp;&nbsp;--hpx:print-counter</a>
+</h3>
+<h3 class="topic">
+<a name="0mk4aapc789rq1e8rndadvsl6h">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:print-counter /threads{locality#0/worker-thread#0}/idle-rate</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/init/commandline/details.html" name="4rgqlvltfp4260mivkj6thqv9g">&nbsp;&nbsp;--hpx:bind</a>
+</h3>
+<h3 class="topic">
+<a name="2th04nnqlg2btijnij3en2mtee">&nbsp;&nbsp;&nbsp;specify the affinity of the HPX worker threads with the underlying PUs</a>
+</h3>
+<h3 class="topic">
+<a name="7sc0trp0biat0r2c3oldsodr3k">&nbsp;&nbsp;&nbsp;is interpreted in parse_affinity_options</a>
+</h3>
+<h3 class="topic">
+<a name="6jie5mi3ka1rc5o9vahgfcoque">&nbsp;&nbsp;&nbsp;names</a>
+</h3>
+<h3 class="topic">
+<a name="29mtp5g1i7pbgdbuuei7tbeq95">&nbsp;&nbsp;&nbsp;&nbsp;types</a>
+</h3>
+<h3 class="topic">
+<a name="36i28n62dj8ilmgl0hl5nf41as">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread</a>
+</h3>
+<h3 class="topic">
+<a name="59qfsas894jf5fh8mn7j0rdbku">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;socket</a>
+</h3>
+<h3 class="topic">
+<a name="0njvlp2j1f79cjdvsc4d2n7o1o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numanode</a>
+</h3>
+<h3 class="topic">
+<a name="4n063sudtv6sah1s30iursev0k">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;core</a>
+</h3>
+<h3 class="topic">
+<a name="3t4e5e6j2je6r6dm3ljnloaa5c">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pu</a>
+</h3>
+<h3 class="topic">
+<a name="33sgfohrlak2807upsemk9htit">&nbsp;&nbsp;&nbsp;&nbsp;distributions</a>
+</h3>
+<p class="topicImage">
+<img height="183" src="5-hpx_application_files/1v0920c0r1v46skifq7j8f97vv" width="400"></p>
+<h3 class="topic">
+<a name="5i3llhjchr0pjiut2pi72fhpl6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;compact</a>
+</h3>
+<h3 class="topic">
+<a name="4u5ur32r9kkn5ejq50ro3dthlp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scatter</a>
+</h3>
+<h3 class="topic">
+<a name="7q8dnv6cbsdn4ubfl6l4fi3tj0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;balanced</a>
+</h3>
+<h3 class="topic">
+<a name="78hkba0300nel7rebmo3106jau">&nbsp;&nbsp;&nbsp;&nbsp;all</a>
+</h3>
+<h3 class="topic">
+<a name="0754ialo1h9ttujmunukooq3re">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;special affinity consisting in the entire current topology</a>
+</h3>
+<h3 class="topic">
+<a name="063gab4p8p5t7fafujdbfqob60">&nbsp;&nbsp;&nbsp;examples</a>
+</h3>
+<h3 class="topic">
+<a name="3pe2bgcsvhcauf88q51lb66ul3">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:bind='thread:0-4=core:0.pu:0;thread:5=core:1.pu:0'</a>
+</h3>
+<h3 class="topic">
+<a name="7fecf090elncfv8osskld1a49r">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:bind=thread:0-3=core:0-3.pu:0</a>
+</h3>
+<h3 class="topic">
+<a name="23eqejcq2310235kjrpt76qpjj">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0: PU L#0(P#0), Core L#0, Socket L#0, Node L#0(P#0)
+1: PU L#2(P#2), Core L#1, Socket L#0, Node L#0(P#0)
+2: PU L#4(P#4), Core L#2, Socket L#0, Node L#0(P#0)
+3: PU L#6(P#6), Core L#3, Socket L#0, Node L#0(P#0)</a>
+</h3>
+<h3 class="topic">
+<a name="1ij6n5orbld28t08hkfjbmtqjr">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:bind=threads:0-3=socket:0.core:1.pu:1</a>
+</h3>
+<h3 class="topic">
+<a name="1egl4a4veovsusani41ava1ru0">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:bind=none</a>
+</h3>
+<h3 class="topic">
+<a name="3h2tlv9eh2a5ih84jqlkd73keq">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;disable all binding of any threads to a particular core</a>
+</h3>
+<h3 class="topic">
+<a name="2kbmgdmdmecqu41a99cun3fml0">&nbsp;&nbsp;-Ihpx.stacks.small_size=0x40000</a>
+</h3>
+<h3 class="topic">
+<a name="70e10hlvfro51vtccad27nl75a">&nbsp;&nbsp;&nbsp;increase the stack size HPX allocates for each task 
+(can be useful for sync calls or recursive calls with a lot of data)</a>
+</h3>
+<h3 class="topic">
+<a name="5519a74m834rfipsuak455j28f">&nbsp;&nbsp;&nbsp;to use if:
+Warning! empty profiler stack!
+Aborted (core dumped)</a>
+</h3>
+<h3 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/schedulers.html" name="6arj79sk1husng3416sb241i2c">&nbsp;&nbsp;--hpx:queuing</a>
+</h3>
+<h3 class="topic">
+<a name="351dg34sbs8u2odak24sgl3sji">&nbsp;&nbsp;&nbsp;with distinction 
+between priorities</a>
+</h3>
+<h3 class="topic">
+<a name="0caqpc7jpg2i2kaefb47kh15ia">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:queuing=local-priority-fifo (or -qlo)</a>
+</h3>
+<h3 class="topic">
+<a name="5corh7ijmoses3u11c10kll3gl">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:queuing=static-priority (or -qs) </a>
+</h3>
+<h3 class="topic">
+<a name="4ov6gq87f34c2i5ve7c5bq109e">&nbsp;&nbsp;&nbsp;&nbsp;ABP scheduling</a>
+</h3>
+<h3 class="topic">
+<a name="75aactv0mkj6lbmpghhusv9355">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--hpx:queuing=abp-priority</a>
+</h3>
+<h3 class="topic">
+<a name="7kmhej3n7n6cmaivqofk36qs2r">&nbsp;&nbsp;&nbsp;&nbsp;periodic maintenance</a>
+</h3>
+<h3 class="topic">
+<a name="2fhiv5hpn1o7ul792du96d1i19">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --hpx:queuing=periodic-priority </a>
+</h3>
+<h3 class="topic">
+<a name="5p8jctge22rlkhm70f78aqsf59">&nbsp;&nbsp;&nbsp;without distinction 
+between priorities</a>
+</h3>
+<h3 class="topic">
+<a name="3vfd36k4u9pudd619a8r2k6gec">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:queuing=local (or -ql)</a>
+</h3>
+<h3 class="topic">
+<a name="0kgcrven95pcdmu5qpkh3d8v90">&nbsp;&nbsp;&nbsp;&nbsp;--hpx:queuing=static</a>
+</h3>
+<h3 class="topic">
+<a name="6s1eobdqiuiisvo92397j5a6ig">&nbsp;&nbsp;&nbsp;hierarchy</a>
+</h3>
+<h3 class="topic">
+<a name="270pov3v0g2gid18h6b5vplc69">&nbsp;&nbsp;&nbsp;&nbsp; --hpx:queuing=hierarchy (or -qh) </a>
+</h3>
+<h3 class="topic">
+<a name="122bjmc3a9a6cg75rulnblap87">&nbsp;run it using ...</a>
+</h3>
+<h3 class="topic">
+<a name="191v0aliodemv1rbk0ap5ac816">&nbsp;&nbsp;SLURM</a>
+</h3>
+<h3 class="topic">
+<a name="70kbo82ouiq1k10por76j06d53">&nbsp;&nbsp;PBS</a>
+</h3>
+<h3 class="topic">
+<a name="52oslqi0iqob3mh2gmr5argdcj">&nbsp;&nbsp;MPI</a>
+</h3>
+<h2 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/cmake_variables.html" name="7qn1dk966fucqc0o37fb0khe26">build application</a>
+</h2>
+<h3 class="topic">
+<a name="1hq76cvngl3s1ngn7drvpmo1kb">&nbsp;cmake</a>
+</h3>
+<h3 class="topic">
+<a name="175ioer6kjct8a8an3ptuo0sms">&nbsp;./</a>
+</h3>
+<h3 class="topic">
+<a name="364eigs880po44ensr5ad8okjf">&nbsp;-DHPX_WITH_MALLOC=jemalloc</a>
+</h3>
+<h3 class="topic">
+<a name="3jutake7fkem5s0c6v6m9l1c6a">&nbsp;-DHPX_DIR=path/to/hpx-build/lib/cmake/HPX/</a>
+</h3>
+<h3 class="topic">
+<a name="3778isj422llp87tlot5huohie">&nbsp;&nbsp;point to directory containing HPXConfig.cmake</a>
+</h3>
+<h3 class="topic">
+<a name="5vpun5q62u46vgonurk6eh3nma">&nbsp;&nbsp;used by find_package(HPX)</a>
+</h3>
+<p class="relationships">See Also: <a href="#6952j8sbot84m42k6c7qpt9hq0">find_package(HPX)</a>
+</p>
+<h3 class="topic">
+<a name="3fimsfqt2elu5134bhsi6ttb6q">&nbsp;-DCMAKE_BUILD_TYPE=...</a>
+</h3>
+<h3 class="topic">
+<a name="1s19e82hnqvqhffapjmefcer6l">&nbsp;&nbsp;Debug</a>
+</h3>
+<h3 class="topic">
+<a name="2bgnpmi6m9s8rocmquh7tj4pt3">&nbsp;&nbsp;Release</a>
+</h3>
+<h3 class="topic">
+<a name="7kqblan9n1g2gtusn34trqkjma">&nbsp;&nbsp;RelWithDebugInfo</a>
+</h3>
+<h3 class="topic">
+<a name="6r98u00ks8rcjapggk7iosenjg">&nbsp;-DCMAKE_PREFIX_PATH=$HPX_LOCATION ...</a>
+</h3>
+<h3 class="topic">
+<a name="21mdgd1v31k9h9l7j9qdpjsj5s">&nbsp;&nbsp;I haven't used this up to now but who knows</a>
+</h3>
+<h3 class="topic">
+<a name="4ngk4gbt4uhop09hgi6hdaig4d">&nbsp;&nbsp;set to root directory of HPX build or install location</a>
+</h3>
+<h3 class="topic">
+<a name="2kd1h7ajai508v18onpmufpcsb">&nbsp;make</a>
+</h3>
+<h2 class="topic">
+<a href="http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/cmake_variables.html" name="07u87h6lrpufh3s6njdj2s7btk">build HPX</a>
+</h2>
+</body>
+</html>

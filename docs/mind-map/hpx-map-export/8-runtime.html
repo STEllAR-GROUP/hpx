@@ -1,0 +1,952 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>runtime</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="10qhs5aaor5icaevmshi07ofe6">runtime</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="8-runtime_files/images/runtime.jpg"></div>
+<p class="relationships">See Also: <a href="#43ln7ib2cfhlcjujjr9bgjkt48">template &lt;typename SchedulingPolicy&gt;
+class hpx::runtime_impl (is derived
+from)</a>
+</p>
+<h2 class="topic">
+<a name="0jhv2rb87nfkr4s3cckmcja9fh">abstract base class</a>
+</h2>
+<h3 class="topic">
+<a name="6pp4ss1dlf7qg6cgsjksrjpeie">&nbsp;data members (private)</a>
+</h3>
+<h3 class="topic">
+<a name="6c2laind0jjlinnhhiahuuc8in">&nbsp;&nbsp;util::reinit_helper reinit_;</a>
+</h3>
+<h3 class="topic">
+<a name="482igs7hg9g6ri6pgthndecsp7">&nbsp;&nbsp;typedef std::vector&lt;util::function_nonser&lt;void()&gt; &gt; on_exit_type;
+on_exit_type on_exit_functions_;</a>
+</h3>
+<h3 class="topic">
+<a name="3n6r6d1d46mmik9slaqmmtt35c">&nbsp;&nbsp;&nbsp;list of functions to call on exit</a>
+</h3>
+<h3 class="topic">
+<a name="5b9pmg27vndpbgs9am54m37lir">&nbsp;&nbsp;mutable boost:mutex mtx_;</a>
+</h3>
+<h3 class="topic">
+<a name="7e1t69m2jpv1g2le6qim3so33t">&nbsp;&nbsp;util::runtime_configuration ini_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#7vrm4fmd18bpinkslem9jgl8d3">hpx::util::runtime_configuration</a>
+</p>
+<h3 class="topic">
+<a name="0mos5m57597jtj6683e9627q22">&nbsp;&nbsp;pointers to 
+performance
+counters</a>
+</h3>
+<h3 class="topic">
+<a name="4ssob5c8obsvomas9o8s640iem">&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;performance_counters::registry&gt; counters_</a>
+</h3>
+<h3 class="topic">
+<a name="3f6tvp8n274sup7t6uokvp2pth">&nbsp;&nbsp;&nbsp;std::shared_ptr&lt;util::query_counters&gt; active_counters_;</a>
+</h3>
+<h3 class="topic">
+<a name="06odnlfsehtum5tatj7pibmmgg">&nbsp;&nbsp;instance counters</a>
+</h3>
+<h3 class="topic">
+<a name="5kp85cmglf3n8q6b00dlmcfbgg">&nbsp;&nbsp;&nbsp;long instance_number_</a>
+</h3>
+<h3 class="topic">
+<a name="1vc1fhqq33htm3bumbs5c578hs">&nbsp;&nbsp;&nbsp;&nbsp;instance number (like an index) corresponding to *this</a>
+</h3>
+<h3 class="topic">
+<a name="5ief3rctid1m6smt3q1ogaj13m">&nbsp;&nbsp;&nbsp;static boost::atomic&lt;int&gt; instance_number_counter</a>
+</h3>
+<h3 class="topic">
+<a name="3idascm0fj8mjjp6tvu3btv8rf">&nbsp;&nbsp;&nbsp;&nbsp;counter for total number of runtime instances</a>
+</h3>
+<h3 class="topic">
+<a href="#3rj5hl8vh8b17hf96le2pjlig2" name="4eicerfonv8hkui265b45mn6aq">&nbsp;&nbsp;boost::scoped_ptr&lt;util::thread_mapper&gt; thread_support_</a>
+</h3>
+<h3 class="topic">
+<a name="2r1nqpaefuufn7jpvr15orphac">&nbsp;&nbsp;&nbsp;certain components (such as PAPI) require all threads to be
+registered with the library</a>
+</h3>
+<h3 class="topic">
+<a name="20u1e1fd8ak1vsnhtfl70tnccs">&nbsp;&nbsp;store information
+about topology</a>
+</h3>
+<h3 class="topic">
+<a name="6eqb3hg4o9e1cih5hpfvfhg63l">&nbsp;&nbsp;&nbsp;threads::policies::init_affinity_data affinity_init_</a>
+</h3>
+<h3 class="topic">
+<a name="0jvfm83p0sddqbg7fhiktjpgpc">&nbsp;&nbsp;&nbsp;threads::topology&amp; topology_</a>
+</h3>
+<h3 class="topic">
+<a name="1fq5soh4jacut3fjveetstj1ds">&nbsp;&nbsp;&nbsp;typedef std::map&lt;std::string, std::uint32_t&gt; used_cores_map_type;
+used_cores_map_type used_cores_map_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#7ngvs9s5kltl37qe78qahfc6a3">core assignments</a>
+</p>
+<h3 class="topic">
+<a name="17cv7ob9346lgehfkm7t9qh0ec">&nbsp;&nbsp;&nbsp;&nbsp;maps locality_base names (strings)
+to numbers of used cores (ints)</a>
+</h3>
+<h3 class="topic">
+<a name="7p55o64g19rj3ci381d2v0e4aj">&nbsp;&nbsp;boost::atomic&lt;state&gt; state_;</a>
+</h3>
+<p class="relationships">See Also: <a href="#6kmk06oa81ggfppd9qdn0rs50o">enum hpx::state</a>
+</p>
+<h3 class="topic">
+<a name="7f1tnihsdjvt2gecn3kd5gu8og">&nbsp;&nbsp;boost::scoped_ptr&lt;components::server::memory&gt; memory_</a>
+</h3>
+<h3 class="topic">
+<a name="1or1p03an7q4pb9kn02j8d5v31">&nbsp;&nbsp;boost:scoped_ptr&lt;components::server::runtime_support&gt; runtime_support</a>
+</h3>
+<h3 class="topic">
+<a name="5k5vqg42tlfdercaj2d13rom7q">&nbsp;data members (public)</a>
+</h3>
+<h3 class="topic">
+<a name="0epu70ron0vecg49rpnrqhu1vn">&nbsp;&nbsp;struct tls_tag</a>
+</h3>
+<h3 class="topic">
+<a name="0fsqf5ft1e9nugld1tcb76tgad">&nbsp;&nbsp;static util::thread_specific_ptr&lt;runtime*, tls_tag&gt; runtime</a>
+</h3>
+<h3 class="topic">
+<a name="1hd2mk3v7kfm679rksggbqm4rq">&nbsp;&nbsp;static util::threads_specific_ptr&lt;std::string, tls_tag&gt; thread_name_</a>
+</h3>
+<p class="relationships">See Also: <a href="#6nfpe5v0dedcl2j1luj40lrv4o">static std::string get_thread_name()</a>
+</p>
+<h3 class="topic">
+<a name="3j1r6u1sqpfuugmaoui96g6lnk">&nbsp;&nbsp;static util::thread_specific_ptr&lt;std::uint64_t, tls_tag&gt; uptime_</a>
+</h3>
+<h3 class="topic">
+<a name="3b48tml4e529kvk2esph2rfqij">&nbsp;functions</a>
+</h3>
+<h3 class="topic">
+<a name="51cr4dg4q4k1v3e28vdmaan4lb">&nbsp;&nbsp;bool keep_factory_alive(components::component_type type)</a>
+</h3>
+<h3 class="topic">
+<a name="0pm1rt2fv25333oina7so4vreu">&nbsp;&nbsp;&nbsp;Keep the factory object alive which is responsible for the given component type. 
+This a purely internal function allowing to work around certain library specific problems 
+related to dynamic loading of external libraries.</a>
+</h3>
+<h3 class="topic">
+<a name="1h0lqdt9256hffovl229brenjq">&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="5dal4oe9g5p45h8cg2u6nhbo9k">&nbsp;&nbsp;state get_state() const;</a>
+</h3>
+<h3 class="topic">
+<a name="0g41kehec5ed2k3ngdfqnept2j">&nbsp;&nbsp;void set_state(state s)</a>
+</h3>
+<h3 class="topic">
+<a name="1dj2mh6r2vau4152fdcgtqcdff">&nbsp;&nbsp;constructor</a>
+</h3>
+<h3 class="topic">
+<a name="7s48nmracegelttl5oraan0jlh">&nbsp;&nbsp;&nbsp;runtime(
+    util::runtime_configuration &amp; rtcfg,
+    threads::policies::init_affinity_data const&amp; ai
+);</a>
+</h3>
+<h3 class="topic">
+<a name="5h7cgipevlg6tfffctf5poapbp">&nbsp;&nbsp;&nbsp;&nbsp;calls</a>
+</h3>
+<h3 class="topic">
+<a name="0a2qfk93vijpc1utsprtmjvkmo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets RP and topology from RP</a>
+</h3>
+<h3 class="topic">
+<a href="#03psgeq4264adp2duc4u1l4gaq" name="78i6cvbfgctr13k6bukada2l17">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;threads::create_topology();</a>
+</h3>
+<h3 class="topic">
+<a name="11ai4oninvrhpka6jnftsjaio2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;runtime::init_tss()</a>
+</h3>
+<h3 class="topic">
+<a name="4k33kjb9t5ero8dfv9h0a67jmr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialize the thread specific storage</a>
+</h3>
+<h3 class="topic">
+<a name="3ti4t00vc5hfkgbvtd95haepk3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;counter.reset</a>
+</h3>
+<h3 class="topic">
+<a name="09d2kphb0a1oh3l13fsfmkp1dd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::reinit_construct()</a>
+</h3>
+<h3 class="topic">
+<a name="1c6a2u64589h20fj6dhqq8kfdn">&nbsp;&nbsp;destructor</a>
+</h3>
+<h3 class="topic">
+<a name="5ie42db1bbih4uf2ud8592qdl3">&nbsp;&nbsp;void on_exit(util::function_nonser&lt;void()&gt; const&amp; f);</a>
+</h3>
+<h3 class="topic">
+<a name="4ku17mfbe5d9jmhm4sndf2taj1">&nbsp;&nbsp;&nbsp;manage list of functions to call on exit</a>
+</h3>
+<h3 class="topic">
+<a name="4c1rrh5s496mptdfmejoattk2h">&nbsp;&nbsp;start and stop</a>
+</h3>
+<h3 class="topic">
+<a name="7bqfh1hh3a2gqjghiacgr86r75">&nbsp;&nbsp;&nbsp;void starting() </a>
+</h3>
+<p class="relationships">See Also: <a href="#60b3uadfgk927en8ngc0j76dpc">call runtime::starting()</a>
+</p>
+<h3 class="topic">
+<a name="5arnj6ebjm3vao02rkogmpbi71">&nbsp;&nbsp;&nbsp;&nbsp;set state_ to "pre-main"</a>
+</h3>
+<h3 class="topic">
+<a name="5uepm851qme87vrr6o51pv8nm2">&nbsp;&nbsp;&nbsp;void stopping()</a>
+</h3>
+<h3 class="topic">
+<a name="5feaiq70qrkh9h8u8ju8qcbre2">&nbsp;&nbsp;&nbsp;&nbsp;set state to "state_stopped"</a>
+</h3>
+<h3 class="topic">
+<a name="3bjlsn8rsfp57is50ducot0fbn">&nbsp;&nbsp;&nbsp;&nbsp;call all registered on_exit functions</a>
+</h3>
+<h3 class="topic">
+<a name="2nqgtf1eas36bf82annvjoqsp0">&nbsp;&nbsp;&nbsp;bool stopped() const;</a>
+</h3>
+<h3 class="topic">
+<a name="563hcgbdc73d1rjvb61nojvgog">&nbsp;&nbsp;get</a>
+</h3>
+<h3 class="topic">
+<a name="7e988vh7k00j0jgri5talbo0np">&nbsp;&nbsp;&nbsp;util::runtime_configutation get_config()</a>
+</h3>
+<h3 class="topic">
+<a name="7o1uj5jmihurrnsg7k74bd26b6">&nbsp;&nbsp;&nbsp;std::size_t get_instance_number() const</a>
+</h3>
+<h3 class="topic">
+<a name="6nfpe5v0dedcl2j1luj40lrv4o">&nbsp;&nbsp;&nbsp;static std::string get_thread_name()</a>
+</h3>
+<p class="relationships">See Also: <a href="#1hd2mk3v7kfm679rksggbqm4rq">static util::threads_specific_ptr&lt;std::string, tls_tag&gt; thread_name_</a>
+</p>
+<h3 class="topic">
+<a name="1rc1pbc7v5comt5sg17tk8rpq0">&nbsp;&nbsp;&nbsp;&nbsp;return the name of the calling thread</a>
+</h3>
+<h3 class="topic">
+<a name="06svaltedqapisfd0lk4cdij8n">&nbsp;&nbsp;&nbsp;static std::uint64_t get_system_uptime</a>
+</h3>
+<h3 class="topic">
+<a name="0vjb5j43ji7vvvr97paqaq6srl">&nbsp;&nbsp;&nbsp;&nbsp;return system uptime measure on the thread executing this call</a>
+</h3>
+<h3 class="topic">
+<a name="46gsk3e7k3qr8k80lkfguaku2v">&nbsp;&nbsp;&nbsp;performance_counters::registry&amp; get_counter_registry();</a>
+</h3>
+<h3 class="topic">
+<a name="592ia9nru64e0boavjhulpva1t">&nbsp;&nbsp;&nbsp;&nbsp;allow access to the registry counter instance</a>
+</h3>
+<h3 class="topic">
+<a name="7lvuigb3gr4croe3nc29g9jbq5">&nbsp;&nbsp;&nbsp;util::thread_mapper&amp; get_thread_mapper();</a>
+</h3>
+<h3 class="topic">
+<a name="5fcvlc2ku41l7buem5dqg37tfv">&nbsp;&nbsp;&nbsp;&nbsp;return a reference to the internal PAPI thread manager</a>
+</h3>
+<h3 class="topic">
+<a name="03t8f3oq8akd6qlkr9nucouaos">&nbsp;&nbsp;&nbsp;threads::topology const&amp; get_topology() const</a>
+</h3>
+<h3 class="topic">
+<a name="2t6acnj3n17d92pjsu3358uj89">&nbsp;&nbsp;&nbsp;resource::resource_partitioner get_resource_partitioner_ptr() const</a>
+</h3>
+<h3 class="topic">
+<a name="7ngvs9s5kltl37qe78qahfc6a3">&nbsp;&nbsp;core assignments</a>
+</h3>
+<p class="relationships">See Also: <a href="#1fq5soh4jacut3fjveetstj1ds">typedef std::map&lt;std::string, std::uint32_t&gt; used_cores_map_type;
+used_cores_map_type used_cores_map_;</a>
+</p>
+<h3 class="topic">
+<a name="5i654g4d61nd4hmqjjrljknjt7">&nbsp;&nbsp;&nbsp;std::uint32_t assign_cores(
+    std::string const&amp; locality_basename,
+    std::uint32_t num_threads)</a>
+</h3>
+<h3 class="topic">
+<a name="1aofcjav0s39900somfhcqjhhm">&nbsp;&nbsp;&nbsp;&nbsp;num_threads_ is the number of cores needed</a>
+</h3>
+<h3 class="topic">
+<a name="49fa4gp2c9tr9eoemn05079oth">&nbsp;&nbsp;&nbsp;std::uint32_t assign_cores()</a>
+</h3>
+<h3 class="topic">
+<a name="3o1opggu8l8tgq6mkfclea6bfr">&nbsp;&nbsp;&nbsp;&nbsp;calls get_thread_manager().init(affinity_init_)</a>
+</h3>
+<h3 class="topic">
+<a name="0n47cflbu9nq12nj23abuia3sk">&nbsp;&nbsp;void register_counter_types</a>
+</h3>
+<h3 class="topic">
+<a name="4b4n0da6m0h5nb7d3ho4gnr8vp">&nbsp;&nbsp;&nbsp;install all performance counters
+related to this runtime instance</a>
+</h3>
+<h3 class="topic">
+<a name="39linemoir1vt5pe8s5nd2vviu">&nbsp;&nbsp;bunch of abstract virtual functions ... </a>
+</h3>
+<h3 class="topic">
+<a name="4c874omapigpkiugq1a8of5jit">&nbsp;&nbsp;Management API for active performance counters</a>
+</h3>
+<h3 class="topic">
+<a name="18qee496va9gp513kijd3ddpi6">&nbsp;&nbsp;void init_tss();</a>
+</h3>
+<h3 class="topic">
+<a name="0vuoklo6maurp79u5dh2temv0m">&nbsp;&nbsp;void deinit_tss();</a>
+</h3>
+<h2 class="topic">
+<a name="43ln7ib2cfhlcjujjr9bgjkt48">template &lt;typename SchedulingPolicy&gt;
+class hpx::runtime_impl</a>
+</h2>
+<p class="relationships">See Also: <a href="#10qhs5aaor5icaevmshi07ofe6">runtime (is derived
+from)</a>
+</p>
+<h3 class="topic">
+<a name="7isdji89p22tk54fl97givnadt">&nbsp;
+encapsulates the HPX runtime system
+makes sure all required parts of the HPX runtime system 
+are properly initialized
+</a>
+</h3>
+<h3 class="topic">
+<a name="0eduvtjtpg07p1va0snh8jokl1">&nbsp;&nbsp;data members</a>
+</h3>
+<h3 class="topic">
+<a name="1irt406j4g4ohm1hadtpjsqen0">&nbsp;&nbsp;&nbsp;util::unique_id_ranges id_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="65kvsc77d8cgfrqt6h4f2al884">&nbsp;&nbsp;&nbsp;&nbsp;The unique_id_ranges class is a type responsible for generating
+unique ids for components, parcels, threads etc.</a>
+</h3>
+<h3 class="topic">
+<a name="6f7am1t29cn63oak9nff4sq02a">&nbsp;&nbsp;&nbsp;runtime_mode mode_</a>
+</h3>
+<p class="relationships">See Also: <a href="#383saqnifma12st4dpv950d298">enum hpx::runtime_mode</a>
+</p>
+<h3 class="topic">
+<a name="6ep6ne66tbepu9m4k5reut5l1r">&nbsp;&nbsp;&nbsp;int result_</a>
+</h3>
+<h3 class="topic">
+<a name="6anu46kjk2n42asp4k3jp9h3bn">&nbsp;&nbsp;&nbsp;std::size_t num_threads_</a>
+</h3>
+<h3 class="topic">
+<a name="579222tkvlr9eqpcpn6oik29gr">&nbsp;&nbsp;&nbsp;&nbsp;number of OS threads</a>
+</h3>
+<h3 class="topic">
+<a name="5pf4hb04be73unf5qtigl2tl5p">&nbsp;&nbsp;&nbsp;service pools</a>
+</h3>
+<h3 class="topic">
+<a name="26ulobvidp3h5raetmrrghujas">&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool main_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="2mh1pf6kkgc59o15psejbejg0m">&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool io_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="5epqfdctm9f54etjme20kl8g4c">&nbsp;&nbsp;&nbsp;&nbsp;util::io_service_pool timer_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="28q5u52cqf8b8evf98f1hrol5o">&nbsp;&nbsp;&nbsp;notification_policy_type notifier_</a>
+</h3>
+<h3 class="topic">
+<a href="#6t46ltndb0evubmqbjnk2jfjhj" name="23i1u4n5qnbt3tof5jokrlalia">&nbsp;&nbsp;&nbsp;boost::scoped_ptr&lt;hpx::threads::threadmanager_base&gt; thread_manager_</a>
+</h3>
+<h3 class="topic">
+<a name="1voganb0pdeq1urcpe2rjictta">&nbsp;&nbsp;&nbsp;parcelset::parcelhandler parcel_handler_</a>
+</h3>
+<h3 class="topic">
+<a name="7bs0069ci16j4evsdebjj33kvh">&nbsp;&nbsp;&nbsp;naming::resolver_client agas_client:</a>
+</h3>
+<h3 class="topic">
+<a name="6r5hithue7otq34enhhqv9f3cg">&nbsp;&nbsp;&nbsp;applier::applier applier_</a>
+</h3>
+<h3 class="topic">
+<a name="4u08o19k34trncff9gb0pus71b">&nbsp;&nbsp;&nbsp;boost::signals2::scoped_connection default_error_sink_</a>
+</h3>
+<h3 class="topic">
+<a name="0fhtr8845f0bgenspcqek20pt5">&nbsp;&nbsp;&nbsp;boost::mutex mtx_</a>
+</h3>
+<h3 class="topic">
+<a name="7bk020jvc9n6nrr1aobv186rrh">&nbsp;&nbsp;&nbsp;boost::exception_ptr exception_</a>
+</h3>
+<h3 class="topic">
+<a name="54bl82r1srph1jfgauc55vunvu">&nbsp;&nbsp;member functions</a>
+</h3>
+<h3 class="topic">
+<a name="3ktspg3j32rvllnhsontc75o5d">&nbsp;&nbsp;&nbsp;constructor</a>
+</h3>
+<p class="relationships">See Also: <a href="#383saqnifma12st4dpv950d298">enum hpx::runtime_mode</a>
+</p>
+<h3 class="topic">
+<a name="5kg15ppodio14qpqfanqmbafbv">&nbsp;&nbsp;&nbsp;destructor</a>
+</h3>
+<h3 class="topic">
+<a name="3d33jvbkkl090dvqglptfe04uc">&nbsp;&nbsp;&nbsp;&nbsp;makes sure all HPX runtime services are properly shut down
+before exiting</a>
+</h3>
+<h3 class="topic">
+<a name="1f5hir5pmrvo3t45gf1qtb4h87">&nbsp;&nbsp;&nbsp;start
+and
+stop</a>
+</h3>
+<h3 class="topic">
+<a name="11vf1vs9urvqabqpdd7dikmhcn">&nbsp;&nbsp;&nbsp;&nbsp;int start(
+    util::function_nonser&lt;hpx_main_function_type&gt; const&amp; func,
+    bool blocking = false);</a>
+</h3>
+<p class="relationships">See Also: <a href="#5dfpt64shec23r2rer5767qvmm">start(func); // start the main thread function</a>
+</p>
+<h3 class="topic">
+<a name="3d7bfirq1802ehlbee4mech1d0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start the runtime system</a>
+</h3>
+<h3 class="topic">
+<a name="2ajrom0npfp4fhj7gs6furvmpu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;func</a>
+</h3>
+<h3 class="topic">
+<a name="23jdotjdvfk9353u4fs5edakb9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Main function of an HPX application.</a>
+</h3>
+<h3 class="topic">
+<a name="3c69mosdm66teouov1rfvhkn7o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It will be scheduled for execution by the thread_manager as soon as the runtime has been initialized.</a>
+</h3>
+<h3 class="topic">
+<a name="19mdlekeb75vc75kt8beerfo4f">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This function is expected to expose an interface as defined by the typedef hpx_main_function_type</a>
+</h3>
+<p class="relationships">See Also: <a href="#45b84r95cl98g6r7nrvf37ssa4">typedef int hpx_main_function_type();</a>
+</p>
+<h3 class="topic">
+<a name="01ouqa4ur0k0963ac4tt2p6kgb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;blocking</a>
+</h3>
+<h3 class="topic">
+<a name="5nsotd15va87art09sddv6tjq4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control whether this call blocks until the runtime system has been stopped.</a>
+</h3>
+<h3 class="topic">
+<a name="4rhhdkriue58m5m8176mnsfp9e">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if true: a "wait" will be called internally</a>
+</h3>
+<h3 class="topic">
+<a name="0tn1nanvj4e84iqc4upj0j42f4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns</a>
+</h3>
+<h3 class="topic">
+<a name="52iou520veqha3tim19810e0h6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if blocking is true: this function will return the value returned as result of the function given by parameter func</a>
+</h3>
+<h3 class="topic">
+<a name="4qcnqhi7uepg9ehtro3h68e3p5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;otherwise: returns 0</a>
+</h3>
+<h3 class="topic">
+<a name="6is7u0fi3bkr23v95r35iugg88">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<p class="relationships">See Also: <a href="#0s9a1rk7r7u9iag8i8coq44l4j">int start (bool blocking = false) (same but with an 
+empty_main)</a>
+</p>
+<h3 class="topic">
+<a name="06r0md3btm5i7svc05tqkti0vp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;util::apex_init(); // initialize instrumentation system</a>
+</h3>
+<h3 class="topic">
+<a name="29s46dnq74pmfv74po0a3b456n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boots localities with &lt;data member&gt; num_threads_</a>
+</h3>
+<h3 class="topic">
+<a name="1t2gng0lqoqg9b2tamlnptkf86">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;runtime_support_-&gt;run(); // start runtime support services</a>
+</h3>
+<h3 class="topic">
+<a name="71p85tq1o1kj71rbggn4r7cc7a">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;io_pool_.run(false); // start the io_pool</a>
+</h3>
+<h3 class="topic">
+<a href="#6k34kc2q9q4jm8p1hmr92fl76j" name="0l3qdjhf7ucuektbp1kvgs18pr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_manager_-&gt;run(num_threads_); // start the thread_manager </a>
+</h3>
+<h3 class="topic">
+<a name="316ib4hj2h9e0kc8jj24nra7qd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where real HPX work etc. gets done</a>
+</h3>
+<h3 class="topic">
+<a name="2btdo0fobbau7m98l17lkh6rkr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;invoke AGAS v2 notifications</a>
+</h3>
+<h3 class="topic">
+<a name="7c84qbdvc8kg6hqf1stu50oqa4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;register the &lt;parameter&gt; func, given main function, with the thread_manager</a>
+</h3>
+<h3 class="topic">
+<a name="60b3uadfgk927en8ngc0j76dpc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call runtime::starting()</a>
+</h3>
+<p class="relationships">See Also: <a href="#7bqfh1hh3a2gqjghiacgr86r75">void starting() </a>
+</p>
+<h3 class="topic">
+<a name="5u3arfbokvdkq88kjgta3pd81f">&nbsp;&nbsp;&nbsp;&nbsp;static void default_errorsink(std::string const&amp;)</a>
+</h3>
+<h3 class="topic">
+<a name="58sfioi3hapce4u3vatgc2o800">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;has something to do with error logs</a>
+</h3>
+<h3 class="topic">
+<a name="53ms0ovim3d4v16ulmjk3em15u">&nbsp;&nbsp;&nbsp;&nbsp;threads::thread_result_type run_helper(
+    util::function_nonser&lt;runtime::hpx_main_function_type&gt; func, 
+    int&amp; result);</a>
+</h3>
+<h3 class="topic">
+<a name="0as1v4dk6cou0f3akdikhrsqkc">&nbsp;&nbsp;&nbsp;&nbsp;void wait_helper(
+    boost::mutex&amp; mtx, 
+    boost::condition_variable&amp; cond, 
+    bool&amp; running)</a>
+</h3>
+<h3 class="topic">
+<a href="#7kmlv6va0velppn5138nsbn01g" name="3u05e8h1iit8s981s78k7b12uc">&nbsp;&nbsp;&nbsp;&nbsp;explicit runtime_impl(
+			util::runtime_configuration &amp; rtcfg,
+            runtime_mode locality_mode = runtime_mode_console,
+            std::size_t num_threads = 1,
+            init_scheduler_type const&amp; init = init_scheduler_type(),
+            threads::policies::init_affinity_data const&amp; affinity_init 
+					= threads::policies::init_affinity_data()
+);</a>
+</h3>
+<div class="notesContainer">
+<p>init_scheduler_type is typedefe'd to scheduling_policy_type::init_parameter_type</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="21vvmq3hqi8u2adi43l68vbs37">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;runtime(rtcfg, init_affinity)</a>
+</h3>
+<h3 class="topic">
+<a name="647t3khqf6pbb8bolngh4rlfpl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;locality_mode</a>
+</h3>
+<h3 class="topic">
+<a name="3u4rr9husqqma3ch8cs2697sss">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the mode this instance should be executed in</a>
+</h3>
+<h3 class="topic">
+<a name="7uqp854jjl695pj9qg9q3bq4m6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;num_threads</a>
+</h3>
+<h3 class="topic">
+<a name="23il8o2djistctskf20qioc1g9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the initial number of threads to be started by the thread-manager</a>
+</h3>
+<h3 class="topic">
+<a name="2batk6u4bolc5jf6ug8sror13p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="79bfdg7207v6rcu3mvld8b66os">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;io_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="6rracom51ccn3viqqgeboepg91">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;timer_pool_</a>
+</h3>
+<h3 class="topic">
+<a name="0r480rrh3gap9aptb4plikprl5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scheduler_(init)</a>
+</h3>
+<h3 class="topic">
+<a name="3lmh2j8f6tls4ivh99hjnf074m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;notifier</a>
+</h3>
+<h3 class="topic">
+<a name="2p7krsc01vo0ih056u6egrmk27">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thread_manager_</a>
+</h3>
+<h3 class="topic">
+<a name="7idkninsi20rn5lc8ed27es04p">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oarcel_handler_</a>
+</h3>
+<h3 class="topic">
+<a name="3m2tkkg693bp90c5mnakhhk7sb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;agas_client_</a>
+</h3>
+<h3 class="topic">
+<a name="5v2rvf78vc6k2b3j5qd78vpgtg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;applier_</a>
+</h3>
+<h3 class="topic">
+<a name="0rsmfnobd2m5mou841hvnjhm50">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialize result to 0</a>
+</h3>
+<h3 class="topic">
+<a name="2vs83pmg5uf01puht8effg9u2b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;binds main thread, io-thread and timer thread to corresponding pools</a>
+</h3>
+<h3 class="topic">
+<a name="22lhciq7uqfb0i0v540ln3i7ph">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialize a notifier using get_notification_policy("worker-thread")</a>
+</h3>
+<h3 class="topic">
+<a name="772q1jbfrsi4pk7ebiqi0657db">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialize a thread manager using</a>
+</h3>
+<h3 class="topic">
+<a name="5rj95e05imo62223qeofmbb9ua">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;timer_pool</a>
+</h3>
+<h3 class="topic">
+<a name="419drc963a7m1utgeh5mi19m9n">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scheduler_</a>
+</h3>
+<h3 class="topic">
+<a name="5ali14rvniebk6va61g0cnkjnk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;notifier_</a>
+</h3>
+<h3 class="topic">
+<a name="79uo0jai7khgdqivalsbenq40m">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of threads</a>
+</h3>
+<h3 class="topic">
+<a name="07kcoqs1ek9bndk6br164smo07">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialize parcel manager</a>
+</h3>
+<h3 class="topic">
+<a name="0s9a1rk7r7u9iag8i8coq44l4j">&nbsp;&nbsp;&nbsp;&nbsp;int start (bool blocking = false)</a>
+</h3>
+<p class="relationships">See Also: <a href="#6is7u0fi3bkr23v95r35iugg88">what does it do?  (same but with an 
+empty_main)</a>
+</p>
+<h3 class="topic">
+<a name="03e8g5me6q5mpughsd2c46a1pa">&nbsp;&nbsp;&nbsp;&nbsp;int wait()</a>
+</h3>
+<h3 class="topic">
+<a name="0b217e70rpho810am5ovr30s9i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait for the shutdown action to be executed</a>
+</h3>
+<h3 class="topic">
+<a name="4jtuqk41mi524nsnutbb9jtgr5">&nbsp;&nbsp;&nbsp;&nbsp;void stop(bool blocking = true)</a>
+</h3>
+<h3 class="topic">
+<a name="26te6n2b2s5bts1ie6lg89scb5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initiate termination of runtime</a>
+</h3>
+<h3 class="topic">
+<a name="5hhg6jri35nl34dkbf05hvg4en">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parameter</a>
+</h3>
+<h3 class="topic">
+<a name="0li7irkmgomci5ga3qsuismli0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;blocking </a>
+</h3>
+<h3 class="topic">
+<a name="3ucvlat40vq4nkiicltfutqq8v">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allows to control whether this call blocks until the runtime system has been fully stopped. 
+If this parameter is \a false then this call will initiate the stop action but will return immediately. 
+Use a second call to stop with this parameter set to \a true to wait for all internal work to be completed.</a>
+</h3>
+<h3 class="topic">
+<a name="0kvifoe3lkeh7eq8q6ucv51trn">&nbsp;&nbsp;&nbsp;&nbsp;void stopped(bool blocking, boost::condition_variable&amp; cond, boost::mutex&amp; mtx);</a>
+</h3>
+<h3 class="topic">
+<a name="5gchj04s8e2kmkfbjn366v4r0s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stop the runtime system, 
+wait for termination </a>
+</h3>
+<h3 class="topic">
+<a name="5h8bm1n4c69dl8ej5ngh3ru1so">&nbsp;&nbsp;&nbsp;run</a>
+</h3>
+<h3 class="topic">
+<a href="#7opk2s5h4tsu0a1qj7jbvo5089" name="0gtq2dc1n3ku134h5rakgq10ul">&nbsp;&nbsp;&nbsp;&nbsp;int run(util::function_nonser&lt;hpx_main_function_type&gt; const&amp; func);</a>
+</h3>
+<p class="relationships">See Also: <a href="#2nca93v25ng8crtvq8f4g08bcn">int run();</a>
+</p>
+<h3 class="topic">
+<a name="5inl6h7rcsvd4q5bg0bi7u27o9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run the HPX runtime system
+use the given function for the main thread, 
+and block waiting for all threads to finish</a>
+</h3>
+<h3 class="topic">
+<a name="7t03nkrr0r5ukr37hh95lfhr1i">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what does it do? </a>
+</h3>
+<h3 class="topic">
+<a name="5dfpt64shec23r2rer5767qvmm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start(func); // start the main thread function</a>
+</h3>
+<p class="relationships">See Also: <a href="#11vf1vs9urvqabqpdd7dikmhcn">int start(
+    util::function_nonser&lt;hpx_main_function_type&gt; const&amp; func,
+    bool blocking = false);</a>
+</p>
+<h3 class="topic">
+<a name="78hip9kgq277dpsoo8mov8apk1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait(); // wait for everything to finish</a>
+</h3>
+<h3 class="topic">
+<a name="4f2oh62cp1cl19cbmfokar3388">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stop();</a>
+</h3>
+<h3 class="topic">
+<a name="6m44fgcc9mve88jn8to0cajja7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parcel_handler_.stop();</a>
+</h3>
+<h3 class="topic">
+<a name="0mlhbb51suvguiokhd1hjdeqed">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rethrow_exception();</a>
+</h3>
+<p class="relationships">See Also: <a href="#7dlnipbm9s2daqdjrf2stohs09">void rethrow_exception();</a>
+</p>
+<h3 class="topic">
+<a name="71tocrqnsbnaa34nj5eeb8un3u">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return result_;</a>
+</h3>
+<h3 class="topic">
+<a href="#659dkejniebk8qgaeun8713fma" name="2nca93v25ng8crtvq8f4g08bcn">&nbsp;&nbsp;&nbsp;&nbsp;int run();</a>
+</h3>
+<p class="relationships">See Also: <a href="#0gtq2dc1n3ku134h5rakgq10ul">int run(util::function_nonser&lt;hpx_main_function_type&gt; const&amp; func);</a>
+</p>
+<h3 class="topic">
+<a name="5n221pkunleq914sc55jtaqp69">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If no function is supplied, the runtime system will simply wait for the shutdown action without explicitly executing any main thread.</a>
+</h3>
+<h3 class="topic">
+<a name="1o1u9jv5op87g8pvtlvq30k0ee">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns 0</a>
+</h3>
+<h3 class="topic">
+<a name="0p62305cu4kg2t7n8p4eld7a7j">&nbsp;&nbsp;&nbsp;errors</a>
+</h3>
+<h3 class="topic">
+<a name="7n8636vlmi0jmkqpcojp01celi">&nbsp;&nbsp;&nbsp;&nbsp;void report_error(std::size_t num_thread,
+            boost::exception_ptr const&amp; e);</a>
+</h3>
+<h3 class="topic">
+<a name="2ue3oa4g3i18od8ui332osle46">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report a non-recoverable error to the runtime system</a>
+</h3>
+<h3 class="topic">
+<a name="51j4vjlb16v0lqg2if23ed7usg">&nbsp;&nbsp;&nbsp;&nbsp;void report_error(boost::exception_ptr const&amp; e);</a>
+</h3>
+<h3 class="topic">
+<a name="7dlnipbm9s2daqdjrf2stohs09">&nbsp;&nbsp;&nbsp;&nbsp;void rethrow_exception();</a>
+</h3>
+<p class="relationships">See Also: <a href="#0mlhbb51suvguiokhd1hjdeqed">rethrow_exception();</a>
+</p>
+<h3 class="topic">
+<a name="4sddpochbi68crlm822542iars">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rethrow any stored exception (to be called after stop())</a>
+</h3>
+<h3 class="topic">
+<a name="661i7vaeul536p31s298eurv12">&nbsp;&nbsp;&nbsp;get</a>
+</h3>
+<h3 class="topic">
+<a name="0un8nkk411m1r97pv415d7tbic">&nbsp;&nbsp;&nbsp;&nbsp;naming::resolver_client&amp; get_agas_client();</a>
+</h3>
+<h3 class="topic">
+<a name="7qqqe6ha0qsqi11d6a3l51c24d">&nbsp;&nbsp;&nbsp;&nbsp;parcelset::parcelhandler const&amp; get_parcel_handler() const</a>
+</h3>
+<h3 class="topic">
+<a name="5jf86sufthkicbgnh5cl49afmk">&nbsp;&nbsp;&nbsp;&nbsp;hpx::threads::threadmanager_base&amp; get_thread_manager()</a>
+</h3>
+<h3 class="topic">
+<a name="1eleqp0pf76hi51nrdadfjrrst">&nbsp;&nbsp;&nbsp;&nbsp;applier::applier&amp; get_applier()</a>
+</h3>
+<h3 class="topic">
+<a name="5r5jaceim8b19q6efd84of6iea">&nbsp;&nbsp;&nbsp;&nbsp;parcelset::endpoints_type const&amp; endpoints() const</a>
+</h3>
+<p class="relationships">See Also: <a href="#79nu4var2n0o53tjf46q8thb1d">returns a string of locality endpoints</a>
+</p>
+<h3 class="topic">
+<a name="0tvcm8qevdl14rdrhi64c2i96r">&nbsp;&nbsp;&nbsp;&nbsp;std::string here()</a>
+</h3>
+<h3 class="topic">
+<a name="79nu4var2n0o53tjf46q8thb1d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns a string of locality endpoints</a>
+</h3>
+<p class="relationships">See Also: <a href="#5r5jaceim8b19q6efd84of6iea">parcelset::endpoints_type const&amp; endpoints() const</a>
+</p>
+<h3 class="topic">
+<a name="0jradfbtt1l6v5dlemkrc2q77i">&nbsp;&nbsp;&nbsp;&nbsp;std::int64_t get_executed_threads(std::size_ num = std::size_t(-1)</a>
+</h3>
+<h3 class="topic">
+<a name="65p8k1u96gcgd6o8ohfb8cifsb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return the number of executed HPX threads</a>
+</h3>
+<h3 class="topic">
+<a name="3i3cnsjqpr7k4no5il4ojbsri2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;num is the index of the OS thread we want the count for. 
+If num = -1, the function will return the overall number of threads</a>
+</h3>
+<h3 class="topic">
+<a name="1b25ropdj8qvi8298i2iqqevmn">&nbsp;&nbsp;&nbsp;&nbsp;std::uint64_t get_runtime_support_lva() const</a>
+</h3>
+<h3 class="topic">
+<a name="1ho7ct0qlugp42e66et8l8m18a">&nbsp;&nbsp;&nbsp;&nbsp;std::uint64_t get_memory_lva() const</a>
+</h3>
+<h3 class="topic">
+<a name="6abar0ja3gdvus95gbnjllfiif">&nbsp;&nbsp;&nbsp;&nbsp;naming::gid_type get_next_id(std::size_t count = 1)</a>
+</h3>
+<h3 class="topic">
+<a name="2onahdmjom96coihflikq3a01e">&nbsp;&nbsp;&nbsp;&nbsp;util::unique_id_ranges&amp; get_id_pool()</a>
+</h3>
+<h3 class="topic">
+<a name="56j4krehdl6ijf9nm2j21vq1h6">&nbsp;&nbsp;&nbsp;&nbsp;hpx::util::io_service_pool* get_thread_pool(char const* name)</a>
+</h3>
+<h3 class="topic">
+<a name="45u750qtq607c8g09hbsr8obcd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Access one of the internal thread pools (io_service instances)
+HPX is using to perform specific tasks. 
+The three possible values for the argument \p name are 
+---"main_pool", "io_pool", "parcel_pool", and "timer_pool". 
+For any other argument value the function will return zero.</a>
+</h3>
+<h3 class="topic">
+<a name="4nc2k8o7fmcm7s195rd9os364f">&nbsp;&nbsp;&nbsp;&nbsp;notification_policy_type get_notification_policy(char const* prefix)</a>
+</h3>
+<h3 class="topic">
+<a name="3ale838gl4d7b40qemh92m0f63">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generate a new notification policy instance for the given thread name prefix</a>
+</h3>
+<h3 class="topic">
+<a name="68l6t8d0r9kfv4se2ti872m09f">&nbsp;&nbsp;&nbsp;add special functions
+to be executed 
+before/after hpx_main</a>
+</h3>
+<h3 class="topic">
+<a name="2c6mor25h4f017vphagcee41a6">&nbsp;&nbsp;&nbsp;&nbsp;void add_pre_startup_function(startup_function_type f);</a>
+</h3>
+<h3 class="topic">
+<a name="1otnree3ih6nlbbjbavia0h7tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add a function to be executed inside a HPX thread before hpx_main
+but guaranteed to be executed before any startup function registered
+with \a add_startup_function.</a>
+</h3>
+<h3 class="topic">
+<a name="46sc0hnn5l55mkh4gln2c974ug">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The function 'f' will be called from inside a HPX thread before hpx_main is executed. 
+This is very useful to setup the runtime environment of the application
+(install performance counters, etc.)</a>
+</h3>
+<h3 class="topic">
+<a name="1sguedc64us14o51qo7qiuekg9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The difference to a startup function is that all pre-startup functions 
+will be (system-wide) executed before any startup function.</a>
+</h3>
+<h3 class="topic">
+<a name="04c2t1n0dhljbl2ptabkushgh1">&nbsp;&nbsp;&nbsp;&nbsp;void add_startup_function(startup_function_type f);</a>
+</h3>
+<h3 class="topic">
+<a name="7rdqie6gl6vfd3eka72f2hq2hg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add a function to be executed inside a HPX thread before hpx_main</a>
+</h3>
+<h3 class="topic">
+<a name="699157stqjnjmo8h7p7inrb9pe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The function 'f' will be called from inside a HPX thread before hpx_main is executed. 
+This is very useful to setup the runtime environment of the application
+(install performance counters, etc.)</a>
+</h3>
+<h3 class="topic">
+<a name="7h7j1bbrn7mjcsf2dhv7dm0sm1">&nbsp;&nbsp;&nbsp;&nbsp;void add_pre_shutdown_function(shutdown_function_type f);</a>
+</h3>
+<h3 class="topic">
+<a name="393ra8cca97se85fua1kt184gb">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add a function to be executed inside a HPX thread during hpx::finalize, 
+but guaranteed before any of the shutdown functions is executed.</a>
+</h3>
+<h3 class="topic">
+<a name="3cg47ihh6unmuhovgit6qeult5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The function 'f' will be called from inside a HPX thread while hpx::finalize is executed. 
+This is very useful to tear down the runtime environment of the application 
+(uninstall performance counters, etc.)</a>
+</h3>
+<h3 class="topic">
+<a name="4fgajuvaidfe1hnhpk7d5kvlfk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The difference to a shutdown function is that all pre-shutdown functions 
+will be (system-wide) executed before any shutdown function.</a>
+</h3>
+<h3 class="topic">
+<a name="0idddqibn8pfe95coiuq04ks3j">&nbsp;&nbsp;&nbsp;&nbsp;void add_shutdown_function(shutdown_function_type f);</a>
+</h3>
+<h3 class="topic">
+<a name="3oopaelnuldtede59hh3qkbdh0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add a function to be executed inside a HPX thread during hpx::finalize</a>
+</h3>
+<h3 class="topic">
+<a name="2qnlc8tmpnk7oni0g38d9nn4uv">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The function 'f' will be called from inside a HPX thread while hpx::finalize is executed. 
+This is very useful to tear down the runtime environment of the application 
+(uninstall performance counters, etc.)</a>
+</h3>
+<h3 class="topic">
+<a name="3np4po2k6d574n0t4vohmpm812">&nbsp;&nbsp;&nbsp;bool keep_factory_alive(components::component_type type)</a>
+</h3>
+<h3 class="topic">
+<a name="0e2si5cg6shvl9d05gp6iut99r">&nbsp;&nbsp;&nbsp;&nbsp;Keep the factory object alive which is responsible for the given component type. 
+This a purely internal function allowing to work around certain library specific problems related to dynamic loading of external libraries.</a>
+</h3>
+<h3 class="topic">
+<a name="3f4ts9d0r249o5dj2tkq79e189">&nbsp;&nbsp;&nbsp;thread 
+registration</a>
+</h3>
+<h3 class="topic">
+<a name="6fh3e9a4mjl07a4eurcb9tnd1u">&nbsp;&nbsp;&nbsp;&nbsp;bool register_thread(
+    char const* name, 
+    std::size_t num = 0,
+    bool service_thread = true, 
+    error_code&amp; ec = throws);</a>
+</h3>
+<h3 class="topic">
+<a name="2smsm8f0f3v9p2k2j0slb9f1kr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;register an external OS thread with HPX</a>
+</h3>
+<h3 class="topic">
+<a name="4hfd45rj9d15uslguptqe3q1vf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calls init_tss_ex</a>
+</h3>
+<h3 class="topic">
+<a name="6ab6o2ilta4t4k7k7hthjgqjb3">&nbsp;&nbsp;&nbsp;&nbsp;bool unregister_thread(); </a>
+</h3>
+<h3 class="topic">
+<a name="0qsv06mc26ut2ir1hjlai5k9e3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unregister an external OS-thread with HPX</a>
+</h3>
+<h3 class="topic">
+<a name="2s2u77h5opbj3ipucbpu3h5cl0">&nbsp;&nbsp;&nbsp;private
+functions</a>
+</h3>
+<h3 class="topic">
+<a name="48r3e7jfo2obgm3tprh3qdq66c">&nbsp;&nbsp;&nbsp;&nbsp;void deinit_tss();</a>
+</h3>
+<h3 class="topic">
+<a name="27hv5bnl58p4i29qn7lkg8c5so">&nbsp;&nbsp;&nbsp;&nbsp;void init_tss_ex(
+    std::string const&amp; locality, 
+    char const* context, std::size_t num, 
+    char const* postfix, bool service_
+    thread, error_code&amp; ec);</a>
+</h3>
+<h3 class="topic">
+<a name="6892bj2g1biiauv3foshs7upo1">&nbsp;&nbsp;&nbsp;&nbsp;void init_tss(
+    char const* context, 
+    std::size_t num, 
+    char const* postfix, 
+    bool service_thread);</a>
+</h3>
+<h2 class="topic">
+<a name="6kmk06oa81ggfppd9qdn0rs50o">enum hpx::state</a>
+</h2>
+<p class="relationships">See Also: <a href="#7p55o64g19rj3ci381d2v0e4aj">boost::atomic&lt;state&gt; state_;</a>
+</p>
+<h3 class="topic">
+<a name="0v8fkimfmdllld736rvq03p2kl">&nbsp;state_invalid = -1,</a>
+</h3>
+<h3 class="topic">
+<a name="55bc9712dgmmsfr78te0vi1osf">&nbsp;state_initialized = 0,</a>
+</h3>
+<h3 class="topic">
+<a name="3160eus4m4ojkdu1gdro240p2j">&nbsp;first_valid_runtime_state = state_initialized,</a>
+</h3>
+<h3 class="topic">
+<a name="65ek4ntd6r2jkd4f609p7posu7">&nbsp;state_pre_startup = 1,</a>
+</h3>
+<h3 class="topic">
+<a name="6n5153traoi4t17alakbs9qv73">&nbsp;state_startup = 2,</a>
+</h3>
+<h3 class="topic">
+<a name="5vrb7u55h8hruqns42m4m73ldv">&nbsp;state_pre_main = 3,</a>
+</h3>
+<h3 class="topic">
+<a name="6vok12sqtkkbfpmlp8km9joupd">&nbsp;state_starting = 4,</a>
+</h3>
+<h3 class="topic">
+<a name="16k2gb5in8geq58lql2uq2ce6o">&nbsp;state_running = 5,</a>
+</h3>
+<h3 class="topic">
+<a name="56nrq3deiia946puc9biccqm8g">&nbsp;state_suspended = 6,</a>
+</h3>
+<h3 class="topic">
+<a name="33bor0kbsqjlkovvofiqmh8pdi">&nbsp;state_pre_shutdown = 7,</a>
+</h3>
+<h3 class="topic">
+<a name="3d4p1br2uslpur61d6hjmmp7l2">&nbsp;state_shutdown = 8,</a>
+</h3>
+<h3 class="topic">
+<a name="1g6uguaq5bnvdou4ruogvvm2tm">&nbsp;state_stopping = 9,</a>
+</h3>
+<h3 class="topic">
+<a name="09bcglt55jrckkqk8f6kek228d">&nbsp;state_terminating = 10,</a>
+</h3>
+<h3 class="topic">
+<a name="0t5hjj0n2ggvanrko11dr2nmgq">&nbsp;state_stopped = 11,</a>
+</h3>
+<h3 class="topic">
+<a name="368ce603cf4n9krcjmgfaam9a4">&nbsp;last_valid_runtime_state = state_stopped</a>
+</h3>
+<h2 class="topic">
+<a name="0eonkevdr6ngivfnqtcn0ju7ni">hpx::util::section</a>
+</h2>
+<h3 class="topic">
+<a name="7vrm4fmd18bpinkslem9jgl8d3">&nbsp;hpx::util::runtime_configuration</a>
+</h3>
+<p class="relationships">See Also: <a href="#7e1t69m2jpv1g2le6qim3so33t">util::runtime_configuration ini_;</a>
+</p>
+<h3 class="topic">
+<a name="5q0p2csq3adfkool3dktr69uhu">&nbsp;&nbsp;is a wrapper for the runtime configuration data allowing to extract configuration information in a more convenient way.</a>
+</h3>
+<h2 class="topic">
+<a name="383saqnifma12st4dpv950d298">enum hpx::runtime_mode</a>
+</h2>
+<p class="relationships">See Also: <a href="#6f7am1t29cn63oak9nff4sq02a">runtime_mode mode_</a>, <a href="#3ktspg3j32rvllnhsontc75o5d">constructor</a>
+</p>
+<h3 class="topic">
+<a name="1en4nhi8bqj4743cmk0l630pqa">&nbsp;a HPX runtime can be executed in two modes: 
+- console mode
+- worker mode</a>
+</h3>
+<h3 class="topic">
+<a name="654201b4ntc89fhm4g36bnbku9">&nbsp;&nbsp;runtime_mode_invalid = -1</a>
+</h3>
+<h3 class="topic">
+<a name="29vq47rmjbogh0v6nlvbfgp286">&nbsp;&nbsp;runtime_mode_console = 0</a>
+</h3>
+<h3 class="topic">
+<a name="2gjrd6lm56lvldnes7gu7cnk9o">&nbsp;&nbsp;&nbsp;the runtime is the console locality</a>
+</h3>
+<h3 class="topic">
+<a name="1u726majvhk3q64ltfjsniu6k3">&nbsp;&nbsp;runtime_mode_worker = 1</a>
+</h3>
+<h3 class="topic">
+<a name="6monk41q5g6hv0q33r3k7hish5">&nbsp;&nbsp;&nbsp;the runtime is a worker locality</a>
+</h3>
+<h3 class="topic">
+<a name="0k83te8vecp169melm6ogi1qpa">&nbsp;&nbsp;runtime_mode_connect = 2</a>
+</h3>
+<h3 class="topic">
+<a name="1ralvh751artuliupjpoh9qrvs">&nbsp;&nbsp;&nbsp;the runtime is a worker locality connecting late</a>
+</h3>
+<h3 class="topic">
+<a name="19ti78ma8k9c2ovgsbv3ud9eu0">&nbsp;&nbsp;runtime_mode_default = 3</a>
+</h3>
+<h3 class="topic">
+<a name="7h13r8tc3vhftjrrl52tnubl7n">&nbsp;&nbsp;&nbsp;the runtime mode will be determined based on the command line arguments</a>
+</h3>
+<h3 class="topic">
+<a name="5bsqikmmc8a0a0f7314nn5frun">&nbsp;&nbsp;runtime_mode_last</a>
+</h3>
+<h2 class="topic">
+<a name="45b84r95cl98g6r7nrvf37ssa4">typedef int hpx_main_function_type();</a>
+</h2>
+<p class="relationships">See Also: <a href="#19mdlekeb75vc75kt8beerfo4f">This function is expected to expose an interface as defined by the typedef hpx_main_function_type</a>
+</p>
+<h3 class="topic">
+<a name="0uqjidvm7m8mp3sojh062g1n6j">&nbsp;The \a hpx_main_function_type is the default function type usable
+as the main HPX thread function.</a>
+</h3>
+</body>
+</html>
