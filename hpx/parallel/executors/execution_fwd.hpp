@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-#ifdef HPX_HAVE_CXX14_AUTO
+// #ifdef HPX_HAVE_CXX14_AUTO
         // forward declare customization point implementations
         template <>
         struct customization_point<post_tag>
@@ -133,7 +133,6 @@ namespace hpx { namespace parallel { namespace execution
             auto operator()(Executor && exec, F && f, Shape const& shape,
                 Future& predecessor, Ts &&... ts) const;
         };
-#endif
 
         // Helper facility to avoid ODR violations
         template <typename T>
@@ -144,6 +143,7 @@ namespace hpx { namespace parallel { namespace execution
 
         template <typename T>
         T const static_const<T>::value = T{};
+// #endif
     }
     /// \endcond
 

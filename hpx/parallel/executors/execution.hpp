@@ -1,5 +1,4 @@
 //  Copyright (c) 2017 Hartmut Kaiser
-//  Copyright (c) 2017 Google
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,11 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
-#ifdef HPX_HAVE_CXX14_AUTO
-#include <hpx/parallel/executors/customization_point.hpp>
-#endif
 
-#include <hpx/config/defines.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -50,6 +45,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace execution
 {
+
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -278,24 +274,6 @@ namespace hpx { namespace parallel { namespace execution
         struct async_execute_not_callable;
 
         ///////////////////////////////////////////////////////////////////////
-        // async_bulk_execute dispatch point
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE auto
-        async_bulk_execute(Executor && exec, F && f, Shape const& shape,
-                Ts &&... ts)
-        ->  decltype(async_bulk_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...
-            ))
-        {
-            return async_bulk_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         // default implementation of the async_execute() customization point
         template <typename Executor, typename F, typename ... Ts>
         HPX_FORCEINLINE auto
@@ -353,6 +331,15 @@ namespace hpx { namespace parallel { namespace execution
                     typename std::decay<Executor>::type
                 >::call(std::forward<Executor>(exec), std::forward<F>(f),
                     std::forward<Ts>(ts)...);
+        }
+
+        template <typename Executor, typename F, typename ... Ts>
+        HPX_FORCEINLINE
+        auto customization_point<async_execute_tag>::operator()(
+            Executor && exec, F && f, Ts &&... ts) const
+        {
+            return async_execute(std::forward<Executor>(exec),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -489,6 +476,15 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<Ts>(ts)...);
         }
 
+        template <typename Executor, typename F, typename ... Ts>
+        HPX_FORCEINLINE
+        auto customization_point<sync_execute_tag>::operator()(
+            Executor && exec, F && f, Ts &&... ts) const
+        {
+            return sync_execute(std::forward<Executor>(exec),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // then_execute()
 
@@ -573,6 +569,15 @@ namespace hpx { namespace parallel { namespace execution
                     typename std::decay<Executor>::type
                 >::call(std::forward<Executor>(exec), std::forward<F>(f),
                     predecessor, std::forward<Ts>(ts)...);
+        }
+
+        template <typename Executor, typename F, typename Future, typename ... Ts>
+        HPX_FORCEINLINE
+        auto customization_point<then_execute_tag>::operator()(
+            Executor && exec, F && f, Future& predecessor, Ts &&... ts) const
+        {
+            return then_execute(std::forward<Executor>(exec),
+                std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -691,227 +696,14 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<Ts>(ts)...);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // sync_bulk_execute dispatch point
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE auto
-        sync_bulk_execute(Executor && exec, F && f, Shape const& shape,
-                Ts &&... ts)
-        ->  decltype(sync_bulk_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...
-            ))
-        {
-            return sync_bulk_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // then_bulk_execute dispatch point
-        template <typename Executor, typename F, typename Shape,
-            typename Future, typename ... Ts>
-        HPX_FORCEINLINE auto
-        then_bulk_execute(Executor && exec, F && f, Shape const& shape,
-                Future& predecessor, Ts &&... ts)
-        ->  decltype(then_bulk_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, predecessor, std::forward<Ts>(ts)...
-            ))
-        {
-            return then_bulk_execute_fn_helper<
-                    typename std::decay<Executor>::type
-                >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, predecessor, std::forward<Ts>(ts)...);
-        }
-
-    }
-    /// \endcond
-
-    /// \cond NOINTERNAL
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // customization points
-        // declare customization point implementations
-
-#ifdef HPX_HAVE_CXX14_AUTO
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<async_execute_tag>::operator()(
-            Executor && exec, F && f, Ts &&... ts) const
-#else
-        template <>
-        struct customization_point<async_execute_tag>
-        {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Ts &&... ts) const
-                -> decltype(async_execute(std::forward<Executor>(exec),
-                                          std::forward<F>(f), std::forward<Ts>(ts)...))
-#endif
-            {
-                return async_execute(std::forward<Executor>(exec),
-                                     std::forward<F>(f), std::forward<Ts>(ts)...);
-            }
-#ifndef HPX_HAVE_CXX14_AUTO
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX14_AUTO
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<sync_execute_tag>::operator()(
-            Executor && exec, F && f, Ts &&... ts) const
-#else
-        template <>
-        struct customization_point<sync_execute_tag>
-        {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Ts &&... ts) const
-                -> decltype(sync_execute(std::forward<Executor>(exec),
-                                    std::forward<F>(f), std::forward<Ts>(ts)...))
-#endif
-            {
-                return sync_execute(std::forward<Executor>(exec),
-                                    std::forward<F>(f), std::forward<Ts>(ts)...);
-            }
-#ifndef HPX_HAVE_CXX14_AUTO
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX14_AUTO
-        template <typename Executor, typename F, typename Future, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<then_execute_tag>::operator()(
-            Executor && exec, F && f, Future& predecessor, Ts &&... ts) const
-#else
-        template <>
-        struct customization_point<then_execute_tag>
-        {
-            template <typename Executor, typename F, typename Future,
-                typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Future& predecessor,
-                Ts &&... ts) const
-                -> decltype(then_execute(std::forward<Executor>(exec),
-                                    std::forward<F>(f), predecessor, std::forward<Ts>(ts)...))
-#endif
-            {
-                return then_execute(std::forward<Executor>(exec),
-                                    std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
-            }
-#ifndef HPX_HAVE_CXX14_AUTO
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX14_AUTO
         template <typename Executor, typename F, typename ... Ts>
         HPX_FORCEINLINE
         auto customization_point<post_tag>::operator()(
             Executor && exec, F && f, Ts &&... ts) const
-#else
-        template <>
-        struct customization_point<post_tag>
         {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Ts &&... ts) const
-                -> decltype(post(std::forward<Executor>(exec), std::forward<F>(f),
-                            std::forward<Ts>(ts)...))
-#endif
-            {
-                return post(std::forward<Executor>(exec), std::forward<F>(f),
-                            std::forward<Ts>(ts)...);
-            }
-#ifndef HPX_HAVE_CXX14_AUTO
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX14_AUTO
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<async_bulk_execute_tag>::operator()(
-            Executor && exec, F && f, Shape const& shape, Ts &&... ts) const
-#else
-        template <>
-        struct customization_point<async_bulk_execute_tag>
-        {
-            template <typename Executor, typename F, typename Shape,
-                typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Shape const& shape,
-                            Ts &&... ts) const
-                -> decltype(async_bulk_execute(
-                                std::forward<Executor>(exec),
-                                std::forward<F>(f), shape, std::forward<Ts>(ts)...))
-#endif
-            {
-                return async_bulk_execute(
-                    std::forward<Executor>(exec),
-                    std::forward<F>(f), shape, std::forward<Ts>(ts)...);
-            }
-#ifndef HPX_HAVE_CXX14_AUTO
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX14_AUTO
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<sync_bulk_execute_tag>::operator()(
-            Executor && exec, F && f, Shape const& shape, Ts &&... ts) const
-#else
-        template <>
-        struct customization_point<sync_bulk_execute_tag>
-        {
-            template <typename Executor, typename F, typename Shape,
-                typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Shape const& shape,
-                            Ts &&... ts) const
-                -> decltype(sync_bulk_execute(std::forward<Executor>(exec),
-                                              std::forward<F>(f), shape, std::forward<Ts>(ts)...))
-#endif
-            {
-                return sync_bulk_execute(std::forward<Executor>(exec),
-                                         std::forward<F>(f), shape, std::forward<Ts>(ts)...);
-            }
-#ifndef HPX_HAVE_CXX14_AUTO
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX14_AUTO
-        template <typename Executor, typename F, typename Shape,
-            typename Future, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<then_bulk_execute_tag>::operator()(
-            Executor && exec, F && f, Shape const& shape, Future& predecessor,
-            Ts &&... ts) const
-#else
-        template <>
-        struct customization_point<then_bulk_execute_tag>
-        {
-            template <typename Executor, typename F, typename Shape,
-                typename Future, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Shape const& shape,
-                Future& predecessor, Ts &&... ts) const
-            -> decltype(then_bulk_execute(std::forward<Executor>(exec),
-                                          std::forward<F>(f), shape, predecessor,
-                                          std::forward<Ts>(ts)...))
-#endif
-            {
-                return then_bulk_execute(std::forward<Executor>(exec),
-                                         std::forward<F>(f), shape, predecessor,
-                                         std::forward<Ts>(ts)...);
-            }
-#ifndef HPX_HAVE_CXX14_AUTO
-        };
-#endif
+            return post(std::forward<Executor>(exec), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+        }
     }
     /// \endcond
 
@@ -1135,164 +927,6 @@ namespace hpx { namespace parallel { namespace execution
                 >::value,
                 Ts...>
         {};
-
-        template <typename Executor>
-        struct sync_bulk_execute_fn_helper<Executor,
-            typename std::enable_if<
-                hpx::traits::is_bulk_one_way_executor<Executor>::value
-            >::type>
-        {
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename ... Ts>
-            HPX_FORCEINLINE static auto
-            call(BulkExecutor && exec, F && f, Shape const& shape,
-                    Ts &&... ts)
-            ->  decltype(sync_bulk_execute_dispatch(
-                    0, std::forward<BulkExecutor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...
-                ))
-            {
-                return sync_bulk_execute_dispatch(0,
-                    std::forward<BulkExecutor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...);
-            }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        // then_bulk_execute()
-
-        template <typename F, typename Shape, typename Future, typename ... Ts>
-        struct then_bulk_function_result
-        {
-            typedef typename
-                    boost::range_const_iterator<Shape>::type
-                iterator_type;
-            typedef typename
-                    std::iterator_traits<iterator_type>::value_type
-                value_type;
-            typedef typename
-                    hpx::util::detail::invoke_deferred_result<
-                        F, value_type, Future, Ts...
-                    >::type
-                type;
-        };
-
-        template <typename F, typename Shape, typename Future, bool IsVoid,
-            typename ... Ts>
-        struct then_bulk_execute_result_impl;
-
-        template <typename F, typename Shape, typename Future, typename ... Ts>
-        struct then_bulk_execute_result_impl<F, Shape, Future, false, Ts...>
-        {
-            typedef std::vector<
-                    typename then_bulk_function_result<
-                        F, Shape, Future, Ts...
-                    >::type
-                > type;
-        };
-
-        template <typename F, typename Shape, typename Future, typename ... Ts>
-        struct then_bulk_execute_result_impl<F, Shape, Future, true, Ts...>
-        {
-            typedef void type;
-        };
-
-        template <typename F, typename Shape, typename Future, typename ... Ts>
-        struct then_bulk_execute_result
-          : then_bulk_execute_result_impl<F, Shape, Future,
-                std::is_void<
-                    typename then_bulk_function_result<
-                        F, Shape, Future, Ts...
-                    >::type
-                >::value,
-                Ts...>
-        {};
-
-    }
-    /// \endcond
-
-}}}
-
-#ifndef HPX_HAVE_CXX14_AUTO
-#include <hpx/parallel/executors/customization_point.hpp>
-#endif
-
-namespace hpx { namespace parallel { namespace execution
-{
-    namespace detail {
-        template <typename Executor>
-        struct async_bulk_execute_fn_helper<Executor,
-            typename std::enable_if<
-               (hpx::traits::is_one_way_executor<Executor>::value ||
-                    hpx::traits::is_two_way_executor<Executor>::value) &&
-               !hpx::traits::is_bulk_two_way_executor<Executor>::value
-            >::type>
-        {
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename ... Ts>
-            static auto
-            call_impl(hpx::traits::detail::wrap_int,
-                    BulkExecutor && exec, F && f, Shape const& shape,
-                    Ts &&... ts)
-            ->  std::vector<typename hpx::traits::executor_future<
-                        Executor,
-                        typename bulk_function_result<F, Shape, Ts...>::type,
-                        Ts...
-                    >::type>
-            {
-                std::vector<typename hpx::traits::executor_future<
-                        Executor,
-                        typename bulk_function_result<F, Shape, Ts...>::type,
-                        Ts...
-                    >::type> results;
-
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-                results.reserve(
-                    std::distance(boost::begin(shape), boost::end(shape)));
-#else
-                results.reserve(boost::size(shape));
-#endif
-
-                for (auto const& elem: shape)
-                {
-                    results.push_back(
-                        execution::async_execute(exec, f, elem, ts...)
-                    );
-                }
-
-                return results;
-            }
-
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename ... Ts>
-            HPX_FORCEINLINE static auto
-            call_impl(int,
-                    BulkExecutor && exec, F && f, Shape const& shape,
-                    Ts &&... ts)
-            ->  decltype(exec.async_bulk_execute(
-                    std::forward<F>(f), shape, std::forward<Ts>(ts)...
-                ))
-            {
-                return exec.async_bulk_execute(std::forward<F>(f), shape,
-                    std::forward<Ts>(ts)...);
-            }
-
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename ... Ts>
-            HPX_FORCEINLINE static auto
-            call(BulkExecutor && exec, F && f, Shape const& shape,
-                    Ts &&... ts)
-            ->  decltype(call_impl(
-                    0, std::forward<BulkExecutor>(exec), std::forward<F>(f),
-                    shape, std::forward<Ts>(ts)...
-                ))
-            {
-                return call_impl(0, std::forward<BulkExecutor>(exec),
-                    std::forward<F>(f), shape, std::forward<Ts>(ts)...);
-            }
-        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor>
@@ -1636,24 +1270,6 @@ namespace hpx { namespace parallel { namespace execution
                 predecessor, hpx::util::get<Is>(args)...);
         }
 
-        template <typename Executor, typename F, typename Shape,
-            typename Future, std::size_t ... Is, typename ... Ts>
-        HPX_FORCEINLINE auto
-        fused_async_bulk_execute(Executor && exec,
-                F && f, Shape const& shape, Future& predecessor,
-                hpx::util::detail::pack_c<std::size_t, Is...>,
-                hpx::util::tuple<Ts...> const& args)
-        ->  decltype(execution::async_bulk_execute(
-                std::forward<Executor>(exec), std::forward<F>(f), shape,
-                predecessor, hpx::util::get<Is>(args)...
-            ))
-        {
-            return execution::async_bulk_execute(
-                std::forward<Executor>(exec), std::forward<F>(f),
-                shape, predecessor, hpx::util::get<Is>(args)...);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename Executor>
         struct bulk_then_execute_fn_helper<Executor,
             typename std::enable_if<
@@ -1925,7 +1541,10 @@ namespace hpx { namespace parallel { namespace execution
                 std::forward<Ts>(ts)...);
         }
     }
+    /// \endcond
 }}}
+
+
 
 #endif
 
