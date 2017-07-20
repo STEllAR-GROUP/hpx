@@ -9,6 +9,8 @@
 
 #include <boost/atomic.hpp>
 
+#include <string>
+
 boost::atomic<bool> invoked_callback(false);
 
 void config_entry_callback()
