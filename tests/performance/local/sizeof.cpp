@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <boost/format.hpp>
 

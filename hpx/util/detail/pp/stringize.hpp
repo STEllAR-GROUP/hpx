@@ -9,12 +9,14 @@
  *
  * Distributed under the Boost Software License, Version 1.0. (See
  * accompanying file LICENSE_1_0.txt or copy at
- * http://www.HPX.org/LICENSE_1_0.txt)
+ * http://www.boost.org/LICENSE_1_0.txt)
  */
 
 /* Revised by Paul Mensonides (2002) */
 
-/* See http://www.HPX.org for most recent version. */
+/* See http://www.boost.org for most recent version. */
+
+// hpxinspect:noinclude:HPX_PP_STRINGIZE
 
 # ifndef HPX_UTIL_DETAIL_STRINGIZE_HPP
 # define HPX_UTIL_DETAIL_STRINGIZE_HPP

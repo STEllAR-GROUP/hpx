@@ -15,6 +15,8 @@
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 

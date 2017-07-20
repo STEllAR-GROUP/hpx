@@ -14,6 +14,7 @@
 #include <hpx/util/cache/entries/lfu_entry.hpp>
 #include <hpx/util/cache/local_cache.hpp>
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/histogram.hpp>
 
 #include <boost/program_options.hpp>

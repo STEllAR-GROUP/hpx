@@ -14,6 +14,10 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <cstddef>
 #include <exception>

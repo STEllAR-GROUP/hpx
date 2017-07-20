@@ -6,7 +6,9 @@
 #ifndef HPX_UTIL_DETAIL_PP_NARG_HPP_INCLUDED
 #define HPX_UTIL_DETAIL_PP_NARG_HPP_INCLUDED
 
-#define HPX_PP_EXPAND(x) x
+// hpxinspect:noinclude:HPX_PP_NARGS
+
+#include <hpx/util/detail/pp/expand.hpp>
 
 #define HPX_PP_NARGS(...)                                                     \
     HPX_PP_EXPAND(HPX_UTIL_PP_ARGN_(__VA_ARGS__,                              \

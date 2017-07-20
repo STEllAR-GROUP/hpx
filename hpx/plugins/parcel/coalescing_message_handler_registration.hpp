@@ -18,6 +18,9 @@
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 
 #include <cstddef>
 

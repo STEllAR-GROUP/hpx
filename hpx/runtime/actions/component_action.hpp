@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/unused.hpp>

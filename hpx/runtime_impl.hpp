@@ -144,7 +144,8 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, compat::condition_variable& cond, compat::mutex& mtx);
+        void stopped(bool blocking, compat::condition_variable& cond,
+            compat::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///

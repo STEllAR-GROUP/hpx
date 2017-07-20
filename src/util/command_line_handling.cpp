@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>

@@ -12,6 +12,7 @@
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 #include <hpx/util/plugin/virtual_constructor.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 
 #include <map>
 #include <string>

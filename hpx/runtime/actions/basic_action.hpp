@@ -36,6 +36,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/pack.hpp>

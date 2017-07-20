@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,8 @@
 
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+
+#include <hpx/util/detail/pp/cat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server

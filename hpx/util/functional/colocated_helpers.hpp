@@ -175,8 +175,9 @@ namespace hpx { namespace util { namespace functional
     functional::detail::apply_continuation_impl<Bound, hpx::util::unused_type>
     apply_continuation(Bound && bound)
     {
-        return functional::detail::apply_continuation_impl<Bound, hpx::util::unused_type>(
-            std::forward<Bound>(bound));
+        return functional::detail::apply_continuation_impl<
+                Bound, hpx::util::unused_type
+            >(std::forward<Bound>(bound));
     }
 
     template <typename Bound, typename Continuation>
@@ -317,8 +318,9 @@ namespace hpx { namespace util { namespace functional
     functional::detail::async_continuation_impl<Bound, hpx::util::unused_type>
     async_continuation(Bound && bound)
     {
-        return functional::detail::async_continuation_impl<Bound, hpx::util::unused_type>(
-            std::forward<Bound>(bound));
+        return functional::detail::async_continuation_impl<
+                Bound, hpx::util::unused_type
+            >(std::forward<Bound>(bound));
     }
 
     template <typename Bound, typename Continuation>

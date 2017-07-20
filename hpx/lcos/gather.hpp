@@ -205,6 +205,7 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/unused.hpp>
 

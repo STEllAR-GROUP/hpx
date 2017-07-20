@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_guard.hpp>

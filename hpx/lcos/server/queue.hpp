@@ -18,7 +18,10 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <exception>
 #include <memory>

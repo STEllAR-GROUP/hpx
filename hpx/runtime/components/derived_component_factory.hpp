@@ -17,6 +17,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/ini.hpp>

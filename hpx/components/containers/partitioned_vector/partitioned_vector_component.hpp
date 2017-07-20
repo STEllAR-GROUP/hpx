@@ -25,6 +25,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>

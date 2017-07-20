@@ -7,8 +7,11 @@
 //                     http://www.boost.org/LICENSE_1_0.txt
 //==============================================================================
 // modified to fit HPX macro nameing scheme
-#ifndef HPX_PP_DETAIL_STRIP_HPP_INCLUDED
-#define HPX_PP_DETAIL_STRIP_HPP_INCLUDED
+
+// hpxinspect:noinclude:HPX_PP_STRIP_PARENS
+
+#ifndef HPX_PP_DETAIL_STRIP_PARENS_HPP_INCLUDED
+#define HPX_PP_DETAIL_STRIP_PARENS_HPP_INCLUDED
 
 #include <hpx/util/detail/pp/cat.hpp>
 
