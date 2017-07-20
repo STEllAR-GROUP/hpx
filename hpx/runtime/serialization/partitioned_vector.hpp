@@ -12,6 +12,8 @@
 
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/include/partitioned_vector.hpp>
+
+#include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/is_partitioned.hpp>
 
 namespace hpx { namespace serialization
