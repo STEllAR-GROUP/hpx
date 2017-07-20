@@ -19,6 +19,7 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/first_argument.hpp>
+#include <hpx/util/jenkins_hash.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -108,7 +109,7 @@ namespace hpx { namespace lcos
 
                     table_it = barriers_.insert({images,
                         std::make_shared<barrier_type>(
-                            name_ + "_barrier" + suffix,
+                            name_ + "_barrier_" + std::to_string(hash_(suffix)),
                             images.size(),
                             rank)}).first;
                 }
@@ -159,7 +160,7 @@ namespace hpx { namespace lcos
             // Is current image in the input list?
             if(image_it != images.end())
             {
-                // Does the barrier for the input list exist?
+                // Does the barrier for the input list non-exist?
                 if(table_it == barriers_.end())
                 {
                     std::size_t rank = std::distance(images.begin(),image_it);
@@ -170,7 +171,7 @@ namespace hpx { namespace lcos
 
                     table_it = barriers_.insert({images,
                         std::make_shared<barrier_type>(
-                            name_ + "_barrier" + suffix,
+                            name_ + "_barrier_" + std::to_string(hash_(suffix)),
                             images.size(),
                             rank)}).first;
                 }
@@ -199,7 +200,7 @@ namespace hpx { namespace lcos
             Iterator begin, Iterator end) const
         {
             std::set<std::size_t> images(begin,end);
-            return sync_images(images);
+            return sync_images(policy,images);
         }
 
         template<typename ... I>
@@ -220,6 +221,7 @@ namespace hpx { namespace lcos
         std::size_t images_per_locality_;
         std::size_t num_images_;
         std::size_t image_id_;
+        hpx::util::jenkins_hash hash_;
 
         // Note : barrier is stored as a pointer because hpx::lcos::barrier
         // default constructor does not exist (Needed by
