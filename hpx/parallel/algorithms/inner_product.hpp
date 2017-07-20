@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -32,16 +33,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the first source iterators used
+    /// \tparam FwdIter1     The type of the first source iterators used
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an input iterator.
-    /// \tparam InIter2     The type of the second source iterators used
+    /// \tparam FwdIter2     The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     /// \param policy       The execution policy to use for the scheduling of
@@ -68,18 +65,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a T otherwise.
     ///
     /// \note This function is deprecated and is replaced by the binary version
     ///       of \a transform_reduce.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename T>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
-    inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, T init)
+    inner_product(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, T init)
     {
         return transform_reduce(
             std::forward<ExPolicy>(policy), first1, last1, first2,
@@ -97,16 +94,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter1     The type of the first source iterators used
+    /// \tparam FwdIter1    The type of the first source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an input iterator.
-    /// \tparam InIter2     The type of the second source iterators used
+    ///                     requirements of an forward iterator.
+    /// \tparam FwdIter2    The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     requirements of an forward iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     /// \tparam Op1         The type of the binary function object used for
@@ -166,19 +159,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a T otherwise.
     ///
     /// \note This function is deprecated and is replaced by the binary version
     ///       of \a transform_reduce.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename T,
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
         typename Op1, typename Op2>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
-    inner_product(ExPolicy&& policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, T init, Op1 && op1, Op2 && op2)
+    inner_product(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, T init, Op1 && op1, Op2 && op2)
     {
         return transform_reduce(
             std::forward<ExPolicy>(policy), first1, last1, first2,

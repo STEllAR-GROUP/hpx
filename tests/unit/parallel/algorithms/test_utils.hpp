@@ -12,6 +12,7 @@
 #include <boost/atomic.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <numeric>
 #include <random>
 #include <vector>
@@ -212,15 +213,15 @@ namespace test
     inline std::vector<std::size_t> iota(std::size_t size, std::size_t start)
     {
         std::vector<std::size_t> c(size);
-        std::iota(boost::begin(c), boost::end(c), start);
+        std::iota(std::begin(c), std::end(c), start);
         return c;
     }
 
     inline std::vector<std::size_t> random_iota(std::size_t size)
     {
         std::vector<std::size_t> c(size);
-        std::iota(boost::begin(c), boost::end(c), 0);
-        std::random_shuffle(boost::begin(c), boost::end(c));
+        std::iota(std::begin(c), std::end(c), 0);
+        std::random_shuffle(std::begin(c), std::end(c));
         return c;
     }
 
@@ -228,15 +229,15 @@ namespace test
     inline std::vector<T> random_iota(std::size_t size)
     {
         std::vector<T> c(size);
-        std::iota(boost::begin(c), boost::end(c), 0);
-        std::random_shuffle(boost::begin(c), boost::end(c));
+        std::iota(std::begin(c), std::end(c), 0);
+        std::random_shuffle(std::begin(c), std::end(c));
         return c;
     }
 
     inline std::vector<std::size_t> random_fill(std::size_t size)
     {
         std::vector<std::size_t> c(size);
-        std::generate(boost::begin(c), boost::end(c), std::rand);
+        std::generate(std::begin(c), std::end(c), std::rand);
         return c;
     }
 
@@ -244,7 +245,7 @@ namespace test
     inline void make_ready(std::vector<hpx::promise<std::size_t> >& p,
         std::vector<std::size_t>& idx)
     {
-        std::for_each(boost::begin(idx), boost::end(idx),
+        std::for_each(std::begin(idx), std::end(idx),
             [&p](std::size_t i)
             {
                 p[i].set_value(i);
@@ -255,7 +256,7 @@ namespace test
         std::vector<hpx::promise<std::size_t> >& p)
     {
         std::vector<hpx::future<std::size_t> > f;
-        std::transform(boost::begin(p), boost::end(p), std::back_inserter(f),
+        std::transform(std::begin(p), std::end(p), std::back_inserter(f),
             [](hpx::promise<std::size_t>& pr)
             {
                 return pr.get_future();

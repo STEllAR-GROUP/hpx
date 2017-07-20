@@ -584,6 +584,57 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
+
+            // arithmetics mean counter
+            { "/arithmetics/mean", performance_counters::counter_aggregating,
+              "returns the average value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/mean@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics variance counter
+            { "/arithmetics/variance", performance_counters::counter_aggregating,
+              "returns the standard deviation of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/variance@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics median counter
+            { "/arithmetics/median", performance_counters::counter_aggregating,
+              "returns the median of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/median@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics min counter
+            { "/arithmetics/min", performance_counters::counter_aggregating,
+              "returns the minimum value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/min@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics max counter
+            { "/arithmetics/max", performance_counters::counter_aggregating,
+              "returns the maximum value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/max@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
         };
         performance_counters::install_counter_types(
             arithmetic_counter_types,

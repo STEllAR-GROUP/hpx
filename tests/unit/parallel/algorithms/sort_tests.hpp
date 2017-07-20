@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <numeric>
 #include <random>
@@ -24,7 +25,6 @@
 #include <hpx/include/parallel_sort.hpp>
 #include <hpx/util/lightweight_test.hpp>
 //
-#include <boost/range/functions.hpp>
 #include <boost/format.hpp>
 //
 #include "test_utils.hpp"
@@ -540,7 +540,7 @@ void test_sort2(ExPolicy && policy, T)
 
     // Fill vector with increasing values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -564,7 +564,7 @@ void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
 
     // Fill vector with increasing values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -588,7 +588,7 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
 
     // Fill vector with random values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
-    std::iota(boost::begin(c), boost::end(c), T(0));
+    std::iota(std::begin(c), std::end(c), T(0));
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking

@@ -14,6 +14,7 @@
 #error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
+#include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
@@ -26,13 +27,9 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 105100
+#if BOOST_VERSION < 105500
 // Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than 1.51.0
-#endif
-
-#if BOOST_VERSION == 105400
-#include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
+#error HPX cannot be compiled with a Boost version earlier than 1.55.0
 #endif
 
 #if BOOST_VERSION < 105600

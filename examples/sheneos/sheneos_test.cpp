@@ -1,16 +1,10 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/actions.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/util/bind.hpp>
-
-#include <boost/dynamic_bitset.hpp>
+#include <hpx/hpx.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -21,6 +15,9 @@
 #include <vector>
 
 #include "sheneos/interpolator.hpp"
+
+#include <boost/dynamic_bitset.hpp>
+#include <boost/program_options.hpp>
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
 
@@ -90,15 +87,12 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
 
     // Create the three-dimensional future grid.
     std::vector<hpx::lcos::future<std::vector<double> > > tests;
-    for (std::size_t i = 0; i < sequence_ye.size(); ++i)
+    for (std::size_t const& ii : sequence_ye)
     {
-        std::size_t const& ii = sequence_ye[i];
-        for (std::size_t j = 0; j < sequence_temp.size(); ++j)
+        for (std::size_t const& jj : sequence_temp)
         {
-            std::size_t const& jj = sequence_temp[j];
-            for (std::size_t k = 0; k < sequence_rho.size(); ++k)
+            for (std::size_t const& kk : sequence_rho)
             {
-                std::size_t const& kk = sequence_rho[k];
                 tests.push_back(shen.interpolate_async(
                     values_ye[ii], values_temp[jj], values_rho[kk]));
             }
@@ -181,15 +175,12 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     values.reserve(num_ye_points * num_temp_points * num_rho_points);
 
     std::vector<hpx::lcos::future<std::vector<double> > > tests;
-    for (std::size_t i = 0; i < sequence_ye.size(); ++i)
+    for (std::size_t const& ii : sequence_ye)
     {
-        std::size_t const& ii = sequence_ye[i];
-        for (std::size_t j = 0; j < sequence_temp.size(); ++j)
+        for (std::size_t const& jj : sequence_temp)
         {
-            std::size_t const& jj = sequence_temp[j];
-            for (std::size_t k = 0; k < sequence_rho.size(); ++k)
+            for (std::size_t const& kk : sequence_rho)
             {
-                std::size_t const& kk = sequence_rho[k];
                 values.push_back(sheneos::sheneos_coord(
                     values_ye[ii], values_temp[jj], values_rho[kk]));
             }
@@ -198,7 +189,8 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
 
     // Execute bulk operation
     hpx::lcos::future<std::vector<double> > bulk_one_tests =
-        shen.interpolate_one_bulk_async(values, sheneos::server::partition3d::logpress);
+        shen.interpolate_one_bulk_async(values,
+            sheneos::server::partition3d::logpress);
 
     std::vector<double> results = hpx::util::unwrapped(bulk_one_tests);
 }
@@ -276,15 +268,12 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     values.reserve(num_ye_points * num_temp_points * num_rho_points);
 
     std::vector<hpx::lcos::future<std::vector<double> > > tests;
-    for (std::size_t i = 0; i < sequence_ye.size(); ++i)
+    for (std::size_t const& ii : sequence_ye)
     {
-        std::size_t const& ii = sequence_ye[i];
-        for (std::size_t j = 0; j < sequence_temp.size(); ++j)
+        for (std::size_t const& jj : sequence_temp)
         {
-            std::size_t const& jj = sequence_temp[j];
-            for (std::size_t k = 0; k < sequence_rho.size(); ++k)
+            for (std::size_t const& kk : sequence_rho)
             {
-                std::size_t const& kk = sequence_rho[k];
                 values.push_back(sheneos::sheneos_coord(
                     values_ye[ii], values_temp[jj], values_rho[kk]));
             }
@@ -340,21 +329,13 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Create a distributed interpolation object with the name
         // shen_symbolic_name. The interpolation object will have
         // num_partitions partitions
-        sheneos::interpolator shen;
-        shen.create(datafilename, shen_symbolic_name, num_partitions);
+        sheneos::interpolator shen(datafilename, shen_symbolic_name, num_partitions);
 
         std::cout << "Created interpolator: " << t.elapsed() << " [s]"
                   << std::endl;
 
-        // Get the component type of the test_action. A plain action is actually
-        // a component action of the special plain_function component.
-        using hpx::components::server::plain_function;
-        hpx::components::component_type type =
-            plain_function<test_action>::get_component_type();
-
         // Get a list of all localities that support the test action.
-        std::vector<hpx::naming::id_type> locality_ids =
-            hpx::find_all_localities(type);
+        std::vector<hpx::id_type> locality_ids = hpx::find_all_localities();
 
         t.restart();
 

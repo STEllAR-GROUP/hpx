@@ -17,24 +17,25 @@ int hpx_main()
 {
     auto overall_start_time = std::chrono::high_resolution_clock::now();
 
-    while(true)
+    while (true)
     {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         // run for 3 seconds max
-        std::chrono::duration<double> overall_dif = start_time - overall_start_time;
+        std::chrono::duration<double> overall_dif =
+            start_time - overall_start_time;
         if (overall_dif.count() > 3.0)
             break;
 
-        auto f = hpx::async([](){});
+        auto f = hpx::async([]() {});
 
         if (f.wait_for(std::chrono::seconds(1)) ==
-                hpx::lcos::future_status::timeout)
+            hpx::lcos::future_status::timeout)
         {
             auto now = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> dif = now - start_time;
 
-            HPX_TEST_LTE(1.0, dif.count());
+            HPX_TEST_LTE(dif.count(), 1.0);
             break;
         }
         else

@@ -368,8 +368,8 @@ to the original invocation site:
     action1_type act1;     // define an instance of 'action1_type'
     action2_type act2;     // define an instance of 'action2_type'
     hpx::future<int> f =
-        hpx::async_continue(act1, hpx::find_here(), 42,
-            hpx::make_continuation(act2));
+        hpx::async_continue(act1, hpx::make_continuation(act2),
+            hpx::find_here(), 42);
     hpx::cout << f.get() << "\n";   // will print: 86 ((42 + 1) * 2)
 
 By default, the continuation is executed on the same locality as
@@ -382,8 +382,8 @@ the continuation should be executed, the code above has to be written as:
     action1_type act1;     // define an instance of 'action1_type'
     action2_type act2;     // define an instance of 'action2_type'
     hpx::future<int> f =
-        hpx::async_continue(act1, hpx::find_here(), 42,
-            hpx::make_continuation(act2, hpx::find_here()));
+        hpx::async_continue(act1, hpx::make_continuation(act2, hpx::find_here()),
+            hpx::find_here(), 42);
     hpx::cout << f.get() << "\n";   // will print: 86 ((42 + 1) * 2)
 
 Similarly, it is possible to chain more than 2 operations:
@@ -391,9 +391,9 @@ Similarly, it is possible to chain more than 2 operations:
     action1_type act1;     // define an instance of 'action1_type'
     action2_type act2;     // define an instance of 'action2_type'
     hpx::future<int> f =
-        hpx::async_continue(act1, hpx::find_here(), 42,
-            hpx::make_continuation(act2,
-                hpx::make_continuation(act1)));
+        hpx::async_continue(act1,
+            hpx::make_continuation(act2, hpx::make_continuation(act1)),
+            hpx::find_here(), 42);
     hpx::cout << f.get() << "\n";   // will print: 87 ((42 + 1) * 2 + 1)
 
 The function `hpx::make_continuation` creates a special function object
@@ -456,7 +456,7 @@ executed:
         void some_function_with_error(int arg)
         {
             if (arg < 0) {
-                ``[macroref HPX_THROW_EXCEPTION `HPX_THROW_EXCEPTION`]``(bad_argument, "some_function_with_error",
+                ``[macroref HPX_THROW_EXCEPTION `HPX_THROW_EXCEPTION`]``(bad_parameter, "some_function_with_error",
                     "some really bad error happened");
             }
             // do something else...

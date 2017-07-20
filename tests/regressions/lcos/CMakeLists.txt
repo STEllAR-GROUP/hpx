@@ -12,6 +12,7 @@ set(tests
     async_unwrap_1037
     barrier_hang
     call_promise_get_gid_more_than_once
+    channel_register_as_2722
     dataflow_791
     dataflow_action_2008
     dataflow_const_functor_773

@@ -10,10 +10,9 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <iterator>
 #include <numeric>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 namespace compat = hpx::compat;
 
@@ -56,7 +55,7 @@ void test_bulk_sync(Executor& exec)
     compat::thread::id tid = compat::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -73,7 +72,7 @@ void test_bulk_async(Executor& exec)
     compat::thread::id tid = compat::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;

@@ -12,15 +12,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_range.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/minmax.hpp>
-#include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -95,7 +93,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
+        hpx::traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             ExPolicy, F,
@@ -103,13 +101,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, typename traits::range_traits<Rng>::iterator_type
+        ExPolicy, typename hpx::traits::range_traits<Rng>::iterator_type
     >::type
     min_element(ExPolicy && policy, Rng && rng, F && f = F(),
         Proj && proj = Proj())
     {
         return min_element(std::forward<ExPolicy>(policy),
-            boost::begin(rng), boost::end(rng),
+            hpx::util::begin(rng), hpx::util::end(rng),
             std::forward<F>(f), std::forward<Proj>(proj));
     }
 
@@ -182,7 +180,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
+        hpx::traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             ExPolicy, F,
@@ -190,13 +188,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, typename traits::range_traits<Rng>::iterator_type
+        ExPolicy, typename hpx::traits::range_traits<Rng>::iterator_type
     >::type
     max_element(ExPolicy && policy, Rng && rng, F && f = F(),
         Proj && proj = Proj())
     {
         return max_element(std::forward<ExPolicy>(policy),
-            boost::begin(rng), boost::end(rng),
+            hpx::util::begin(rng), hpx::util::end(rng),
             std::forward<F>(f), std::forward<Proj>(proj));
     }
 
@@ -282,7 +280,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typename F = detail::less,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
+        hpx::traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             ExPolicy, F,
@@ -292,14 +290,14 @@ namespace hpx { namespace parallel { inline namespace v1
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<
-            tag::min(typename traits::range_traits<Rng>::iterator_type),
-            tag::max(typename traits::range_traits<Rng>::iterator_type)>
+            tag::min(typename hpx::traits::range_traits<Rng>::iterator_type),
+            tag::max(typename hpx::traits::range_traits<Rng>::iterator_type)>
     >::type
     minmax_element(ExPolicy && policy, Rng && rng, F && f = F(),
         Proj && proj = Proj())
     {
         return minmax_element(std::forward<ExPolicy>(policy),
-            boost::begin(rng), boost::end(rng),
+            hpx::util::begin(rng), hpx::util::end(rng),
             std::forward<F>(f), std::forward<Proj>(proj));
     }
 

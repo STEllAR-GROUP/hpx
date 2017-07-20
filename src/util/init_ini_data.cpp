@@ -20,7 +20,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>

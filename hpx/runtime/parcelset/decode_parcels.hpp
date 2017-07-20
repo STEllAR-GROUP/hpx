@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/exception_info.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -253,7 +254,7 @@ namespace hpx { namespace parcelset
                 // We have to repackage all exceptions thrown by the
                 // serialization library as otherwise we will loose the
                 // e.what() description of the problem, due to slicing.
-                throw boost::enable_error_info(
+                hpx::throw_with_info(
                     hpx::exception(serialization_error, e.what()));
             }
         }

@@ -11,14 +11,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_range.hpp>
+#include <hpx/util/range.hpp>
 
 #include <hpx/parallel/algorithms/generate.hpp>
-#include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -76,14 +74,14 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename Rng, typename F,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value)>
+        hpx::traits::is_range<Rng>::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, typename traits::range_iterator<Rng>::type
+        ExPolicy, typename hpx::traits::range_iterator<Rng>::type
     >::type
     generate(ExPolicy && policy, Rng && rng, F && f)
     {
         return generate(std::forward<ExPolicy>(policy),
-            boost::begin(rng), boost::end(rng), std::forward<F>(f));
+            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f));
     }
 }}}
 

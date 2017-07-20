@@ -1,13 +1,9 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
-
-#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <string>
@@ -18,6 +14,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace interpolate1d { namespace server
 {
+    partition::mutex_type partition::mtx_{};
+
     partition::partition()
       : min_value_(0), max_value_(0), delta_(0)
     {}
@@ -25,6 +23,8 @@ namespace interpolate1d { namespace server
     void partition::init(std::string datafilename, dimension const& dim,
         std::size_t num_nodes)
     {
+        std::lock_guard<mutex_type> l(mtx_);
+
         // store all parameters
         dim_ = dim;
 
@@ -48,7 +48,7 @@ namespace interpolate1d { namespace server
     }
 
     // do the actual interpolation
-    double partition::interpolate(double value)
+    double partition::interpolate(double value) const
     {
         if (value < min_value_ || value > max_value_) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition::interpolate",

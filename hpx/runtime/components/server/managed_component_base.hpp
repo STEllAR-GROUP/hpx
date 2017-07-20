@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -257,6 +257,14 @@ namespace hpx { namespace components
             // If this assertion is triggered then this component instance is
             // being migrated even if the component type has not been enabled
             // to support migration.
+            HPX_ASSERT(false);
+        }
+
+        void on_migrated()
+        {
+            // If this assertion is triggered then this component instance is being
+            // migrated even if the component type has not been enabled to support
+            // migration.
             HPX_ASSERT(false);
         }
 
@@ -621,7 +629,7 @@ namespace hpx { namespace components
 
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
-            util::unique_function_nonser<void(void*)> const& ctor);
+            util::unique_function_nonser<void(void*)> const& ctor, void** p);
 
         template <typename Component_, typename ...Ts>
         friend naming::gid_type server::create_with_args(Ts&&... ts);

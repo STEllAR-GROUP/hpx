@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { namespace execution
             typename std::enable_if<
                 hpx::traits::is_one_way_executor<Executor>::value ||
                 hpx::traits::is_two_way_executor<Executor>::value ||
-                hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+                hpx::traits::is_never_blocking_one_way_executor<Executor>::value
             >::type>
         {
             template <typename AnyExecutor, typename Parameters>
@@ -116,7 +116,7 @@ namespace hpx { namespace parallel { namespace execution
             typename std::enable_if<
                 hpx::traits::is_one_way_executor<Executor>::value ||
                 hpx::traits::is_two_way_executor<Executor>::value ||
-                hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+                hpx::traits::is_never_blocking_one_way_executor<Executor>::value
             >::type>
         {
             template <typename AnyExecutor>
@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { namespace execution
             typename std::enable_if<
                 hpx::traits::is_one_way_executor<Executor>::value ||
                 hpx::traits::is_two_way_executor<Executor>::value ||
-                hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+                hpx::traits::is_never_blocking_one_way_executor<Executor>::value
             >::type>
         {
             template <typename AnyExecutor>
@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { namespace execution
             typename std::enable_if<
                 hpx::traits::is_one_way_executor<Executor>::value ||
                 hpx::traits::is_two_way_executor<Executor>::value ||
-                hpx::traits::is_non_blocking_one_way_executor<Executor>::value
+                hpx::traits::is_never_blocking_one_way_executor<Executor>::value
             >::type>
         {
             template <typename AnyExecutor, typename Mode>

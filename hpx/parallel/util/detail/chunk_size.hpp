@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/iterator_range.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
@@ -21,8 +22,6 @@
 #include <cstddef>
 #include <type_traits>
 #include <vector>
-
-#include <boost/range/iterator_range.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail
@@ -55,7 +54,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter, typename Stride>
         // requires traits::is_future<Future>
-    boost::iterator_range<parallel::util::detail::chunk_size_iterator<FwdIter> >
+    hpx::util::iterator_range<parallel::util::detail::chunk_size_iterator<FwdIter> >
     get_bulk_iteration_shape(
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
         FwdIter& begin, std::size_t& count, Stride s, std::false_type)
@@ -122,7 +121,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         iterator shape_begin(begin, chunk_size, count);
         iterator shape_end(last, chunk_size);
 
-        return boost::make_iterator_range(shape_begin, shape_end);
+        return hpx::util::make_iterator_range(shape_begin, shape_end);
     }
 
     template <typename ExPolicy, typename Future, typename F1,
@@ -209,7 +208,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter, typename Stride>
         // requires traits::is_future<Future>
-    boost::iterator_range<
+    hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>
     >
     get_bulk_iteration_shape_idx(
@@ -280,7 +279,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         iterator shape_begin(begin, chunk_size, count, base_idx);
         iterator shape_end(last, chunk_size);
 
-        return boost::make_iterator_range(shape_begin, shape_end);
+        return hpx::util::make_iterator_range(shape_begin, shape_end);
     }
 
     template <typename ExPolicy, typename Future, typename F1,
