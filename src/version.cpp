@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/config/config_strings.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 // Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
@@ -145,83 +146,10 @@ namespace hpx
     {
         std::ostringstream strm;
 
-#if defined(HPX_HAVE_NATIVE_TLS)
-        strm << "  HPX_HAVE_NATIVE_TLS=ON\n";
-#else
-        strm << "  HPX_HAVE_NATIVE_TLS=OFF\n";
-#endif
-#if defined(HPX_HAVE_STACKTRACES)
-        strm << "  HPX_HAVE_STACKTRACES=ON\n";
-#else
-        strm << "  HPX_HAVE_STACKTRACES=OFF\n";
-#endif
-#if defined(HPX_HAVE_COMPRESSION_BZIP2)
-        strm << "  HPX_HAVE_COMPRESSION_BZIP2=ON\n";
-#else
-        strm << "  HPX_HAVE_COMPRESSION_BZIP2=OFF\n";
-#endif
-#if defined(HPX_HAVE_COMPRESSION_SNAPPY)
-        strm << "  HPX_HAVE_COMPRESSION_SNAPPY=ON\n";
-#else
-        strm << "  HPX_HAVE_COMPRESSION_SNAPPY=OFF\n";
-#endif
-#if defined(HPX_HAVE_COMPRESSION_ZLIB)
-        strm << "  HPX_HAVE_COMPRESSION_ZLIB=ON\n";
-#else
-        strm << "  HPX_HAVE_COMPRESSION_ZLIB=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCEL_COALESCING)
-        strm << "  HPX_HAVE_PARCEL_COALESCING=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCEL_COALESCING=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_TCP)
-        strm << "  HPX_HAVE_PARCELPORT_TCP=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_TCP=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-        strm << "  HPX_HAVE_PARCELPORT_MPI=ON (" << mpi_version() << ")\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_MPI=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_VERBS)
-        strm << "  HPX_HAVE_PARCELPORT_VERBS=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_VERBS=OFF\n";
-#endif
-#if defined(HPX_HAVE_VERIFY_LOCKS)
-        strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
-#else
-        strm << "  HPX_HAVE_VERIFY_LOCKS=OFF\n";
-#endif
-#if defined(HPX_HAVE_HWLOC)
-        strm << "  HPX_HAVE_HWLOC=ON\n";
-#else
-        strm << "  HPX_HAVE_HWLOC=OFF\n";
-#endif
-#if HPX_HAVE_ITTNOTIFY != 0
-        strm << "  HPX_HAVE_ITTNOTIFY=ON\n";
-#else
-        strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";
-#endif
-#if defined(HPX_MSVC)
-#if defined(HPX_HAVE_FIBER_BASED_COROUTINES)
-        strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=ON\n";
-#else
-        strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=OFF\n";
-#endif
-#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
-        strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=ON\n";
-#else
-        strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=OFF\n";
-#endif
-#endif
-#if defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
-        strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=ON\n";
-#else
-        strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=OFF\n";
-#endif
+        char const* const* p = hpx::config_strings;
+        while (*p)
+            strm << "  " << *p++ << "\n";
+        strm << "\n";
 
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS="
@@ -234,10 +162,6 @@ namespace hpx
 #if defined(HPX_AGAS_LOCAL_CACHE_SIZE)
         strm << "  HPX_AGAS_LOCAL_CACHE_SIZE="
              << HPX_AGAS_LOCAL_CACHE_SIZE << "\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
-        strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="
-             << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
 #if defined(HPX_HAVE_MALLOC)
         strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
