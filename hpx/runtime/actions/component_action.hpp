@@ -13,11 +13,10 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/unused.hpp>
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstdlib>
 #include <sstream>
@@ -157,8 +156,8 @@ namespace hpx { namespace actions
 
 /// \cond NOINTERNAL
 #define HPX_DEFINE_COMPONENT_ACTION_(...)                                     \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DEFINE_COMPONENT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)           \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DEFINE_COMPONENT_ACTION_, HPX_PP_NARGS(__VA_ARGS__)               \
     )(__VA_ARGS__))                                                           \
     /**/
 
@@ -168,7 +167,7 @@ namespace hpx { namespace actions
     /**/
 #define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                        \
     HPX_DEFINE_COMPONENT_ACTION_3(component, func,                            \
-        BOOST_PP_CAT(func, _action))                                          \
+        HPX_PP_CAT(func, _action))                                            \
     /**/
 /// \endcond
 
@@ -178,9 +177,9 @@ namespace hpx { namespace actions
     /**/
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_(...)                              \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_DEFINE_COMPONENT_DIRECT_ACTION_,                                  \
-            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+            HPX_PP_NARGS(__VA_ARGS__)                                         \
     )(__VA_ARGS__))                                                           \
     /**/
 
@@ -191,7 +190,7 @@ namespace hpx { namespace actions
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                 \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func,                     \
-        BOOST_PP_CAT(func, _action))                                          \
+        HPX_PP_CAT(func, _action))                                            \
     /**/
 /// \endcond
 

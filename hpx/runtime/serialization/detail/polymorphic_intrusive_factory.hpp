@@ -11,9 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/jenkins_hash.hpp>
-
-#include <boost/preprocessor/stringize.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -148,12 +147,12 @@ namespace hpx { namespace serialization { namespace detail
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC(Class)                                  \
-  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, BOOST_PP_STRINGIZE(Class))   \
+  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, HPX_PP_STRINGIZE(Class))     \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(Class)                         \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                           \
-      Class, BOOST_PP_STRINGIZE(Class))                                       \
+      Class, HPX_PP_STRINGIZE(Class))                                         \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(Class)                         \

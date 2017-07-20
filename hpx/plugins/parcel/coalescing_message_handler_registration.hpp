@@ -16,9 +16,8 @@
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/traits/action_message_handler.hpp>
-
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <cstddef>
 
@@ -69,26 +68,26 @@ namespace hpx { namespace parcelset
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_(...)                  \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_,                      \
-            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+            HPX_PP_NARGS(__VA_ARGS__)                                         \
     )(__VA_ARGS__))                                                           \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_1(action_type)         \
     HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_4(action_type,             \
-        BOOST_PP_STRINGIZE(action_type), std::size_t(-1), std::size_t(-1))    \
+        HPX_PP_STRINGIZE(action_type), std::size_t(-1), std::size_t(-1))      \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_2(action_type, num)    \
     HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_3(action_type,             \
-        BOOST_PP_STRINGIZE(action_type), num, std::size_t(-1))                \
+        HPX_PP_STRINGIZE(action_type), num, std::size_t(-1))                  \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_3(                     \
         action_type, num, interval)                                           \
     HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_3(action_type,             \
-        BOOST_PP_STRINGIZE(action_type), num, interval)                       \
+        HPX_PP_STRINGIZE(action_type), num, interval)                         \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_4(                     \
@@ -115,26 +114,26 @@ namespace hpx { namespace parcelset
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_(...)                   \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_,                       \
-            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+            HPX_PP_NARGS(__VA_ARGS__)                                         \
     )(__VA_ARGS__))                                                           \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_1(action_type)          \
     HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_4(action_type,              \
-        BOOST_PP_STRINGIZE(action_type), std::size_t(-1), std::size_t(-1))    \
+        HPX_PP_STRINGIZE(action_type), std::size_t(-1), std::size_t(-1))      \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_2(action_type, num)     \
     HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_3(action_type,              \
-        BOOST_PP_STRINGIZE(action_type), num, std::size_t(-1))                \
+        HPX_PP_STRINGIZE(action_type), num, std::size_t(-1))                  \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_3(                      \
         action_type, num, interval)                                           \
     HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_3(action_type,              \
-        BOOST_PP_STRINGIZE(action_type), num, interval)                       \
+        HPX_PP_STRINGIZE(action_type), num, interval)                         \
 /**/
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_4(                      \

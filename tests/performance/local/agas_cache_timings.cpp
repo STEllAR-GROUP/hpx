@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ("cache_size", value<std::size_t>(),
          "initial cache size (default: "
-         BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) ")")
+         HPX_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) ")")
         ("num_entries,n", value<std::size_t>(),
          "number of items to insert into cache (default: 1000)")
         ;

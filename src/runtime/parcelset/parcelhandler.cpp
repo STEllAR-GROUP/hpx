@@ -1567,17 +1567,17 @@ namespace hpx { namespace parcelset
             "[hpx.parcel]",
             "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_PARCEL_SERVER_PORT:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+                HPX_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
             "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
             "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
             "max_connections_per_locality = "
                 "${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
             "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
             "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else

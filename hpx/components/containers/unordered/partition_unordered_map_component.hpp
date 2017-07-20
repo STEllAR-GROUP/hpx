@@ -29,8 +29,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-
-#include <boost/preprocessor/cat.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -329,8 +328,8 @@ namespace hpx { namespace server
     HPX_REGISTER_UNORDERED_MAP_DECLARATION_(__VA_ARGS__)                      \
 /**/
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_(...)                          \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_UNORDERED_MAP_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_UNORDERED_MAP_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)    \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -348,48 +347,48 @@ namespace hpx { namespace server
 
 #define HPX_REGISTER_UNORDERED_MAP_DECLARATION_5(key, type, hash, equal, name)\
     typedef ::hpx::server::partition_unordered_map<key, type, hash, equal>    \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__);                      \
+        HPX_PP_CAT(partition_unordered_map, __LINE__);                        \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_value_action,    \
-        BOOST_PP_CAT(__unordered_map_get_value_action_, name));               \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::get_value_action,      \
+        HPX_PP_CAT(__unordered_map_get_value_action_, name));                 \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_values_action,   \
-        BOOST_PP_CAT(__unordered_map_get_values_action_, name));              \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::get_values_action,     \
+        HPX_PP_CAT(__unordered_map_get_values_action_, name));                \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_value_action,    \
-        BOOST_PP_CAT(__unordered_map_set_value_action_, name));               \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::set_value_action,      \
+        HPX_PP_CAT(__unordered_map_set_value_action_, name));                 \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_values_action,   \
-        BOOST_PP_CAT(__unordered_map_set_values_action_, name));              \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::set_values_action,     \
+        HPX_PP_CAT(__unordered_map_set_values_action_, name));                \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
-        BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::size_action,           \
+        HPX_PP_CAT(__unordered_map_size_action_, name));                      \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::erase_action,        \
-        BOOST_PP_CAT(__unordered_map_erase_action_, name));                   \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::erase_action,          \
+        HPX_PP_CAT(__unordered_map_erase_action_, name));                     \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_copied_data_action,\
-        BOOST_PP_CAT(__unordered_map_get_copied_data_action_, name));         \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::get_copied_data_action,\
+        HPX_PP_CAT(__unordered_map_get_copied_data_action_, name));           \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_copied_data_action,\
-        BOOST_PP_CAT(__unordered_map_set_copied_data_action_, name));         \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::set_copied_data_action,\
+        HPX_PP_CAT(__unordered_map_set_copied_data_action_, name));           \
     typedef std::plus<std::size_t>                                            \
-        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
-    typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
-        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+        HPX_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);          \
+    typedef HPX_PP_CAT(partition_unordered_map, __LINE__)::size_action        \
+        HPX_PP_CAT(HPX_PP_CAT(partition_unordered_map, size_action),          \
             __LINE__);                                                        \
     HPX_REGISTER_REDUCE_ACTION_DECLARATION(                                   \
-        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+        HPX_PP_CAT(HPX_PP_CAT(partition_unordered_map, size_action),          \
             __LINE__),                                                        \
-        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__));       \
+        HPX_PP_CAT(partition_unordered_map_size_reduceop, __LINE__));         \
 /**/
 
 #define HPX_REGISTER_UNORDERED_MAP(...)                                       \
     HPX_REGISTER_UNORDERED_MAP_(__VA_ARGS__)                                  \
 /**/
 #define HPX_REGISTER_UNORDERED_MAP_(...)                                      \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_UNORDERED_MAP_, HPX_UTIL_PP_NARG(__VA_ARGS__)            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_UNORDERED_MAP_, HPX_PP_NARGS(__VA_ARGS__)                \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -407,44 +406,44 @@ namespace hpx { namespace server
 
 #define HPX_REGISTER_UNORDERED_MAP_5(key, type, hash, equal, name)            \
     typedef ::hpx::server::partition_unordered_map<key, type, hash, equal>    \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__);                      \
+        HPX_PP_CAT(partition_unordered_map, __LINE__);                        \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_value_action,    \
-        BOOST_PP_CAT(__unordered_map_get_value_action_, name));               \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::get_value_action,      \
+        HPX_PP_CAT(__unordered_map_get_value_action_, name));                 \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_values_action,   \
-        BOOST_PP_CAT(__unordered_map_get_values_action_, name));              \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::get_values_action,     \
+        HPX_PP_CAT(__unordered_map_get_values_action_, name));                \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_value_action,    \
-        BOOST_PP_CAT(__unordered_map_set_value_action_, name));               \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::set_value_action,      \
+        HPX_PP_CAT(__unordered_map_set_value_action_, name));                 \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_values_action,   \
-        BOOST_PP_CAT(__unordered_map_set_values_action_, name));              \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::set_values_action,     \
+        HPX_PP_CAT(__unordered_map_set_values_action_, name));                \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action,         \
-        BOOST_PP_CAT(__unordered_map_size_action_, name));                    \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::size_action,           \
+        HPX_PP_CAT(__unordered_map_size_action_, name));                      \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::erase_action,        \
-        BOOST_PP_CAT(__unordered_map_erase_action_, name));                   \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::erase_action,          \
+        HPX_PP_CAT(__unordered_map_erase_action_, name));                     \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::get_copied_data_action,\
-        BOOST_PP_CAT(__unordered_map_get_copied_data_action_, name));         \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::get_copied_data_action,\
+        HPX_PP_CAT(__unordered_map_get_copied_data_action_, name));           \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)::set_copied_data_action,\
-        BOOST_PP_CAT(__unordered_map_set_copied_data_action_, name));         \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)::set_copied_data_action,\
+        HPX_PP_CAT(__unordered_map_set_copied_data_action_, name));           \
     typedef std::plus<std::size_t>                                            \
-        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);        \
-    typedef BOOST_PP_CAT(partition_unordered_map, __LINE__)::size_action      \
-        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+        HPX_PP_CAT(partition_unordered_map_size_reduceop, __LINE__);          \
+    typedef HPX_PP_CAT(partition_unordered_map, __LINE__)::size_action        \
+        HPX_PP_CAT(HPX_PP_CAT(partition_unordered_map, size_action),          \
             __LINE__);                                                        \
     HPX_REGISTER_REDUCE_ACTION(                                               \
-        BOOST_PP_CAT(BOOST_PP_CAT(partition_unordered_map, size_action),      \
+        HPX_PP_CAT(HPX_PP_CAT(partition_unordered_map, size_action),          \
             __LINE__),                                                        \
-        BOOST_PP_CAT(partition_unordered_map_size_reduceop, __LINE__));       \
+        HPX_PP_CAT(partition_unordered_map_size_reduceop, __LINE__));         \
     typedef ::hpx::components::simple_component<                              \
-        BOOST_PP_CAT(partition_unordered_map, __LINE__)                       \
-    > BOOST_PP_CAT(__unordered_map_, name);                                   \
-    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(__unordered_map_, name))              \
+        HPX_PP_CAT(partition_unordered_map, __LINE__)                         \
+    > HPX_PP_CAT(__unordered_map_, name);                                     \
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(__unordered_map_, name))                \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////

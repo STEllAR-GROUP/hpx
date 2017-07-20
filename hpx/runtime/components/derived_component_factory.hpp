@@ -16,11 +16,10 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/ini.hpp>
-
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <cstddef>
 #include <string>
@@ -271,8 +270,8 @@ namespace hpx { namespace components
 /**/
 
 #define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_(...)                          \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_DERIVED_COMPONENT_FACTORY_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_DERIVED_COMPONENT_FACTORY_, HPX_PP_NARGS(__VA_ARGS__)    \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_3(ComponentType, componentname,\
@@ -302,9 +301,9 @@ namespace hpx { namespace components
 /**/
 
 #define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_(...)                  \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_,                      \
-            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+            HPX_PP_NARGS(__VA_ARGS__)                                         \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_3(ComponentType,       \

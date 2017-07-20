@@ -331,7 +331,7 @@ namespace hpx { namespace util
                 if (threads > HPX_HAVE_MAX_CPU_COUNT)
                 {
                     throw hpx::detail::command_line_error("Requested more than "
-                        BOOST_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
+                        HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
                         "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }

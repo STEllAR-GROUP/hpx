@@ -24,10 +24,9 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unique_function.hpp>
-
-#include <boost/preprocessor/stringize.hpp>
 
 #include <exception>
 #include <type_traits>

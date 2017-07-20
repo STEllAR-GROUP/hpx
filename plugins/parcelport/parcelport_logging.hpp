@@ -246,7 +246,8 @@ namespace detail {
 // ------------------------------------------------------------------
 
 #  define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)  \
-    case elem : return BOOST_PP_STRINGIZE(elem);
+    case elem : return HPX_PP_STRINGIZE(elem);                                \
+/**/
 
 #  define DEFINE_ENUM_WITH_STRING_CONVERSIONS(name, enumerators)              \
     enum name {                                                               \
@@ -260,8 +261,9 @@ namespace detail {
                 name,                                                         \
                 enumerators                                                   \
             )                                                                 \
-            default: return "[Unknown " BOOST_PP_STRINGIZE(name) "]";         \
+            default: return "[Unknown " HPX_PP_STRINGIZE(name) "]";           \
         }                                                                     \
-    }
+    }                                                                         \
+/**/
 
 #endif

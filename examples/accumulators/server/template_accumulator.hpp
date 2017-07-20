@@ -88,34 +88,34 @@ namespace examples { namespace server
 #define REGISTER_TEMPLATE_ACCUMULATOR_DECLARATION(type)                       \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         examples::server::template_accumulator<type>::reset_action,           \
-        BOOST_PP_CAT(__template_accumulator_reset_action_, type));            \
+        HPX_PP_CAT(__template_accumulator_reset_action_, type));              \
                                                                               \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         examples::server::template_accumulator<type>::add_action,             \
-        BOOST_PP_CAT(__template_accumulator_add_action_, type));              \
+        HPX_PP_CAT(__template_accumulator_add_action_, type));                \
                                                                               \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         examples::server::template_accumulator<type>::query_action,           \
-        BOOST_PP_CAT(__template_accumulator_query_action_, type));            \
+        HPX_PP_CAT(__template_accumulator_query_action_, type));              \
 /**/
 
 #define REGISTER_TEMPLATE_ACCUMULATOR(type)                                   \
     HPX_REGISTER_ACTION(                                                      \
         examples::server::template_accumulator<type>::reset_action,           \
-        BOOST_PP_CAT(__template_accumulator_reset_action_, type));            \
+        HPX_PP_CAT(__template_accumulator_reset_action_, type));              \
                                                                               \
     HPX_REGISTER_ACTION(                                                      \
         examples::server::template_accumulator<type>::add_action,             \
-        BOOST_PP_CAT(__template_accumulator_add_action_, type));              \
+        HPX_PP_CAT(__template_accumulator_add_action_, type));                \
                                                                               \
     HPX_REGISTER_ACTION(                                                      \
         examples::server::template_accumulator<type>::query_action,           \
-        BOOST_PP_CAT(__template_accumulator_query_action_, type));            \
+        HPX_PP_CAT(__template_accumulator_query_action_, type));              \
                                                                               \
     typedef ::hpx::components::component<                                     \
         examples::server::template_accumulator<type>                          \
-    > BOOST_PP_CAT(__template_accumulator_, type);                            \
-    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(__template_accumulator_, type))       \
+    > HPX_PP_CAT(__template_accumulator_, type);                              \
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(__template_accumulator_, type))         \
 /**/
 
 #endif

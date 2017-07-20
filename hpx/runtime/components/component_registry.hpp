@@ -13,7 +13,9 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/find_prefix.hpp>
 
 #include <hpx/traits/component_config_data.hpp>
@@ -21,8 +23,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <string>
 #include <vector>
@@ -109,8 +109,8 @@ namespace hpx { namespace components
     /**/
 
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_(...)                         \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_, HPX_PP_NARGS(__VA_ARGS__)   \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -137,9 +137,9 @@ namespace hpx { namespace components
     /**/
 
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_(...)                 \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_,                     \
-            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+            HPX_PP_NARGS(__VA_ARGS__)                                         \
     )(__VA_ARGS__))                                                           \
 /**/
 
