@@ -373,7 +373,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
             segment_iterator sit = traits::segment(first1);
             segment_iterator send = traits::segment(last1);
-            FwdIter1 output = first1;
+
+            FwdIter1 output = last1;
 
             std::vector<seq_value_type> sequence(first2, last2);
 
@@ -385,9 +386,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     find_return<local_iterator_type> out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, sequence, op, beg
+                        algo, policy, std::true_type(), beg, end, sequence, op
                     );
-                    output=traits::compose(send, out.seq_first);
                 }
             }
             else
@@ -401,9 +401,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, sequence, op, beg
+                        algo, policy, std::true_type(), beg, end, sequence, op
                     );
-                    if(out.seq_first != end)
+                    if(out.seq_first != end && out.partial_position == sequence.size())
                         output=traits::compose(sit, out.seq_first);
                 }
 
@@ -412,14 +412,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     beg = traits::begin(sit);
                     end = traits::end(sit);
-                    out.seq_first = traits::begin(send);
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, sequence,
-                            op, out.seq_first, out.partial_position
+                            op, out.partial_position
                         );
-                        if(out.seq_first != end)
+                        if(out.seq_first != end && out.partial_position == sequence.size())
                             output=traits::compose(sit,out.seq_first);
                     }
                 }
@@ -431,9 +430,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, sequence,
-                        op, out.seq_first, out.partial_position
+                        op, out.partial_position
                     );
-                    if(out.seq_first != end)
+                    if(out.seq_first != end && out.partial_position == sequence.size())
                         output=traits::compose(sit,out.seq_first);
                 }
             }
@@ -705,7 +704,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     beg = traits::begin(sit);
                     end = traits::end(sit);
-                    out.seq_last = traits::begin(send);
+                    out.seq_last = traits::end(sit);
                     if (beg != end && !found)
                     {
                         out = dispatch(traits::get_id(sit),

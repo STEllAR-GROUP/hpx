@@ -25,16 +25,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             typename Pred>
         static find_return<FwdIter1>
         sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
-            SeqVec sequence, Pred && op,
-            FwdIter1 start, unsigned int g_cursor = 0)
+            SeqVec sequence, Pred && op, unsigned int g_cursor = 0)
         {
-            unsigned int cursor = g_cursor;
+            unsigned int cursor = g_cursor, found_cursor = 0;
             bool found = false;
-            unsigned int found_cursor = 0;
-            FwdIter1 found_start = start;
+            FwdIter1 found_start, start;
             while(last1 != first1)
             {
-                if(hpx::util::invoke(op, *first1, sequence[cursor]))
+                if(cursor != sequence.size() && hpx::util::invoke(op, *first1, sequence[cursor]))
                 {
                     if(cursor == 0)
                         start = first1;
@@ -66,7 +64,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             }
             find_return<FwdIter1> ret = {std::move(start), cursor,
                 std::move(last1), 0};
-            return ret;
+            return std::move(ret);
         }
 
         template <typename ExPolicy, typename FwdIter1, typename SeqVec,

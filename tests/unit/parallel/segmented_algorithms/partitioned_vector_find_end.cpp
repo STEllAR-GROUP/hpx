@@ -59,7 +59,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     std::vector<T> sequence = {(T)1,(T)2,(T)3,(T)4};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 38);
-    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 38);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 38);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 38);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -67,7 +67,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)4,(T)5,(T)1,(T)2};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 3);
-    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 3);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 3);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 3);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -75,7 +75,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)2,(T)3,(T)3,(T)5};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 6);
-    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 6);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 6);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 6);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -83,7 +83,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)2,(T)3,(T)2,(T)1};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 13);
-    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 13);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 13);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 13);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -91,7 +91,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)3,(T)2,(T)1,(T)1};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 35);
-    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 35);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 35);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 35);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -99,7 +99,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)5,(T)6};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 22);
-    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 22);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 22);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 22);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
@@ -107,7 +107,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)3,(T)4,(T)2,(T)3,(T)2,(T)1};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 11);
-    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 11);
+    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 11);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 11);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
