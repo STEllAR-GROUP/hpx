@@ -119,18 +119,7 @@ namespace hpx
 
     public:
         exception_info() noexcept
-          : _file(nullptr), _line(0), _function(nullptr)
-          , _data(nullptr)
-        {}
-
-        exception_info(char const* file, int line) noexcept
-          : _file(file), _line(line), _function(nullptr)
-          , _data(nullptr)
-        {}
-
-        exception_info(char const* file, int line, char const* function) noexcept
-          : _file(file), _line(line), _function(function)
-          , _data(nullptr)
+          : _data(nullptr)
         {}
 
         exception_info(exception_info const& other) noexcept = default;
@@ -140,21 +129,6 @@ namespace hpx
         exception_info& operator=(exception_info&& other) noexcept = default;
 
         virtual ~exception_info() = default;
-
-        char const* file_name() const noexcept
-        {
-            return _file;
-        }
-
-        int line() const noexcept
-        {
-            return _line;
-        }
-
-        char const* function_name() const noexcept
-        {
-            return _function;
-        }
 
         template <typename ...Tags, typename ...Types>
         exception_info& set(error_info<Tags, Types>&&... tagged_values)
@@ -177,9 +151,6 @@ namespace hpx
         }
 
     private:
-        char const* _file;
-        unsigned int _line;
-        char const* _function;
         node_ptr _data;
     };
 
