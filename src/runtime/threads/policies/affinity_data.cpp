@@ -182,13 +182,13 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return (std::max)(num_unique_cores, max_cores);
     }
 
-    mask_cref_type affinity_data::get_pu_mask(std::size_t num_thread, bool numa_sensitive) const
+    mask_cref_type affinity_data::get_pu_mask(std::size_t global_thread_num, bool numa_sensitive) const
     {
         // get a topology instance
         topology const& topology = get_resource_partitioner().get_topology();
 
         // --hpx:bind=none disables all affinity
-        if (threads::test(no_affinity_, num_thread))
+        if (threads::test(no_affinity_, global_thread_num))
         {
             static mask_type m = get_empty_machine_mask();
             return m;
@@ -196,10 +196,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         // if we have individual, predefined affinity masks, return those
         if (!affinity_masks_.empty())
-            return affinity_masks_[num_thread];
+            return affinity_masks_[global_thread_num];
 
         // otherwise return mask based on affinity domain
-        std::size_t pu_num = get_pu_num(num_thread);
+        std::size_t pu_num = get_pu_num(global_thread_num);
         if (0 == std::string("pu").find(affinity_domain_)) {
             // The affinity domain is 'processing unit', just convert the
             // pu-number into a bit-mask.

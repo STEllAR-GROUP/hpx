@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
@@ -52,6 +53,7 @@ namespace detail
           , thread_offset_(thread_offset)
         {
             timestamp_scale_ = 1.0;
+            sched_->set_parent_pool(this);
         }
 
         virtual ~thread_pool_impl()
@@ -111,11 +113,11 @@ namespace detail
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        void init(std::size_t num_threads,
+        void init(std::size_t pool_threads,
             std::size_t threads_offset)
         {
             resize(used_processing_units_, threads::hardware_concurrency());
-            for (std::size_t i = 0; i != num_threads; ++i)
+            for (std::size_t i = 0; i != pool_threads; ++i)
                 used_processing_units_ |= get_resource_partitioner().get_affinity_data()->get_pu_mask(threads_offset+i, sched_->numa_sensitive());
         }
 
@@ -230,7 +232,7 @@ namespace detail
         ///////////////////////////////////////////////////////////////////////////
         bool run(
             std::unique_lock<compat::mutex>& l,
-            compat::barrier& startup, std::size_t num_threads)
+            compat::barrier& startup, std::size_t pool_threads)
         {
             HPX_ASSERT(l.owns_lock());
 
@@ -240,9 +242,9 @@ namespace detail
                 << threads::hardware_concurrency();
             LTM_(info)    //-V128
                 << "thread_pool::run: " << id_.name_ << " creating "
-                << num_threads << " OS thread(s)";    //-V128
+                << pool_threads << " OS thread(s)";    //-V128
 
-            if (0 == num_threads) {
+            if (0 == pool_threads) {
                 HPX_THROW_EXCEPTION(bad_parameter, "thread_pool::run",
                     "number of threads is zero");
             }
@@ -251,18 +253,18 @@ namespace detail
                 sched_->has_reached_state(state_running))
                 return true;    // do nothing if already running
 
-            executed_threads_.resize(num_threads);
-            executed_thread_phases_.resize(num_threads);
+            executed_threads_.resize(pool_threads);
+            executed_thread_phases_.resize(pool_threads);
 
-            tfunc_times_.resize(num_threads);
-            exec_times_.resize(num_threads);
+            tfunc_times_.resize(pool_threads);
+            exec_times_.resize(pool_threads);
 
-            idle_loop_counts_.resize(num_threads);
-            busy_loop_counts_.resize(num_threads);
+            idle_loop_counts_.resize(pool_threads);
+            busy_loop_counts_.resize(pool_threads);
 
-            reset_tfunc_times_.resize(num_threads);
+            reset_tfunc_times_.resize(pool_threads);
 
-            tasks_active_.resize(num_threads);
+            tasks_active_.resize(pool_threads);
 
             // scale timestamps to nanoseconds
             std::uint64_t base_timestamp = util::hardware::timestamp();
@@ -284,44 +286,44 @@ namespace detail
             // timestamps/values of last reset operation for various
             // performance
             // counters
-            reset_executed_threads_.resize(num_threads);
-            reset_executed_thread_phases_.resize(num_threads);
+            reset_executed_threads_.resize(pool_threads);
+            reset_executed_thread_phases_.resize(pool_threads);
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
             // timestamps/values of last reset operation for various
             // performance
             // counters
-            reset_thread_duration_.resize(num_threads);
-            reset_thread_duration_times_.resize(num_threads);
+            reset_thread_duration_.resize(pool_threads);
+            reset_thread_duration_times_.resize(pool_threads);
 
-            reset_thread_overhead_.resize(num_threads);
-            reset_thread_overhead_times_.resize(num_threads);
-            reset_thread_overhead_times_total_.resize(num_threads);
+            reset_thread_overhead_.resize(pool_threads);
+            reset_thread_overhead_times_.resize(pool_threads);
+            reset_thread_overhead_times_total_.resize(pool_threads);
 
-            reset_thread_phase_duration_.resize(num_threads);
-            reset_thread_phase_duration_times_.resize(num_threads);
+            reset_thread_phase_duration_.resize(pool_threads);
+            reset_thread_phase_duration_times_.resize(pool_threads);
 
-            reset_thread_phase_overhead_.resize(num_threads);
-            reset_thread_phase_overhead_times_.resize(num_threads);
-            reset_thread_phase_overhead_times_total_.resize(num_threads);
+            reset_thread_phase_overhead_.resize(pool_threads);
+            reset_thread_phase_overhead_times_.resize(pool_threads);
+            reset_thread_phase_overhead_times_total_.resize(pool_threads);
 
-            reset_cumulative_thread_duration_.resize(num_threads);
+            reset_cumulative_thread_duration_.resize(pool_threads);
 
-            reset_cumulative_thread_overhead_.resize(num_threads);
-            reset_cumulative_thread_overhead_total_.resize(num_threads);
+            reset_cumulative_thread_overhead_.resize(pool_threads);
+            reset_cumulative_thread_overhead_total_.resize(pool_threads);
 #endif
 #endif
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
-            reset_idle_rate_time_.resize(num_threads);
-            reset_idle_rate_time_total_.resize(num_threads);
+            reset_idle_rate_time_.resize(pool_threads);
+            reset_idle_rate_time_total_.resize(pool_threads);
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-            reset_creation_idle_rate_time_.resize(num_threads);
-            reset_creation_idle_rate_time_total_.resize(num_threads);
+            reset_creation_idle_rate_time_.resize(pool_threads);
+            reset_creation_idle_rate_time_total_.resize(pool_threads);
 
-            reset_cleanup_idle_rate_time_.resize(num_threads);
-            reset_cleanup_idle_rate_time_total_.resize(num_threads);
+            reset_cleanup_idle_rate_time_.resize(pool_threads);
+            reset_cleanup_idle_rate_time_total_.resize(pool_threads);
 #endif
 #endif
 
@@ -335,20 +337,21 @@ namespace detail
 
                 topology const &topology_ = get_topology();
 
-                for(std::size_t thread_num_(0); thread_num_ < num_threads; thread_num_++)
+                for(std::size_t thread_num_(0); thread_num_ < pool_threads; thread_num_++)
                 {
-                    std::size_t thread_num = thread_offset_ + thread_num_;
+                    std::size_t global_thread_num = thread_offset_ + thread_num_;
                     threads::mask_cref_type mask =
-                            get_resource_partitioner().get_pu_mask(thread_num, sched_->numa_sensitive());
+                            get_resource_partitioner().get_pu_mask(global_thread_num, sched_->numa_sensitive());
                     // thread_num ordering: 1. threads of default pool
                     //                      2. threads of first special pool
                     //                      3. etc.
                     // get_pu_mask expects index according to ordering of masks in affinity_data::affinity_masks_
                     // which is in order of occupied PU
 
+
                     LTM_(info) //-V128
                             << "thread_pool::run: " << id_.name_
-                            << " create OS thread " << thread_num //-V128 //! BOTH?
+                            << " create OS thread " << global_thread_num //-V128 //! BOTH?
                         << ": will run on processing units within this "
                            "mask: "
 #if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || \
@@ -360,7 +363,7 @@ namespace detail
 
                     // create a new thread
                     threads_.push_back(compat::thread(
-                        &thread_pool::thread_func, this, thread_num,
+                        &thread_pool::thread_func, this, global_thread_num,
                         std::ref(topology_), std::ref(startup)));
 
                     // set the new threads affinity (on Windows systems)
@@ -373,7 +376,7 @@ namespace detail
                                 << "thread_pool::run: "
                                 << id_.name_ << " setting thread affinity "
                                                 "on OS thread "    //-V128
-                                << thread_num
+                                << pool_threads
                                 << " failed with: " << ec.get_message();
                         }
                     }
@@ -382,7 +385,7 @@ namespace detail
                             << "thread_pool::run: "
                             << id_.name_ << " setting thread affinity on "
                                             "OS thread "    //-V128
-                            << thread_num << " was explicitly disabled.";
+                            << pool_threads << " was explicitly disabled.";
                     }
                 }
 
@@ -394,7 +397,7 @@ namespace detail
 
                 // trigger the barrier
                 if (startup_.get() != nullptr) {
-                    while (num_threads-- != 0)
+                    while (pool_threads-- != 0)
                         startup_->wait();
                 }
 
@@ -409,10 +412,10 @@ namespace detail
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads)
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t pool_threads)
         {
-            compat::barrier startup(num_threads+1);
-            bool ret = run(l, startup, num_threads);
+            compat::barrier startup(pool_threads+1);
+            bool ret = run(l, startup, pool_threads);
             startup.wait();
             return ret;
         }
@@ -492,18 +495,18 @@ namespace detail
 
         ///////////////////////////////////////////////////////////////////////////
 
-        compat::thread &get_os_thread_handle(std::size_t num_thread)
+        compat::thread &get_os_thread_handle(std::size_t global_thread_num)
         {
-            std::size_t num_thread_local = num_thread - thread_offset_;
+            std::size_t num_thread_local = global_thread_num - thread_offset_;
             HPX_ASSERT(num_thread_local < threads_.size());
             return threads_[num_thread_local];
         }
 
-        void thread_func(std::size_t num_thread, topology const &topology,
+        void thread_func(std::size_t global_thread_num, topology const &topology,
             compat::barrier &startup)
         {
             // Set the affinity for the current thread.
-            threads::mask_cref_type mask = get_resource_partitioner().get_pu_mask(num_thread, sched_->numa_sensitive());
+            threads::mask_cref_type mask = get_resource_partitioner().get_pu_mask(global_thread_num, sched_->numa_sensitive());
 
             if (LHPX_ENABLED(debug))
                 topology.write_to_log();
@@ -516,7 +519,7 @@ namespace detail
                         << "thread_pool::thread_func: "
                         << id_.name_ << " setting thread affinity on OS "
                                         "thread "    //-V128
-                        << num_thread
+                        << global_thread_num
                         << " failed with: " << ec.get_message();
                 }
             }
@@ -524,7 +527,7 @@ namespace detail
                 LTM_(debug)    //-V128
                     << "thread_pool::thread_func: " << id_.name_
                     << " setting thread affinity on OS thread "    //-V128
-                    << num_thread << " was explicitly disabled.";
+                    << global_thread_num << " was explicitly disabled.";
             }
 
             // Setting priority of worker threads to a lower priority, this
@@ -539,13 +542,13 @@ namespace detail
                         << "thread_pool::thread_func: "
                         << id_.name_ << " reducing thread priority on OS "
                                         "thread "    //-V128
-                        << num_thread
+                        << global_thread_num
                         << " failed with: " << ec.get_message();
                 }
             }
 
             // manage the number of this thread in its TSS
-            init_tss_helper<Scheduler> tss_helper(*this, num_thread);
+            init_tss_helper<Scheduler> tss_helper(*this, global_thread_num);
 
             // wait for all threads to start up before before starting HPX
             // work
@@ -554,7 +557,7 @@ namespace detail
             {
                 LTM_(info)    //-V128
                     << "thread_pool::thread_func: " << id_.name_
-                    << " starting OS thread: " << num_thread;    //-V128
+                    << " starting OS thread: " << global_thread_num;    //-V128
 
                 try {
                     try {
@@ -566,61 +569,59 @@ namespace detail
 
                         // run main Scheduler loop until terminated
                         detail::scheduling_counters counters(
-                            executed_threads_[num_thread],
-                            executed_thread_phases_[num_thread],
-                            tfunc_times_[num_thread],
-                            exec_times_[num_thread],
-                            idle_loop_counts_[num_thread],
-                            busy_loop_counts_[num_thread],
-                            tasks_active_[num_thread]);
+                            executed_threads_[global_thread_num],
+                            executed_thread_phases_[global_thread_num],
+                            tfunc_times_[global_thread_num],
+                            exec_times_[global_thread_num],
+                            idle_loop_counts_[global_thread_num],
+                            busy_loop_counts_[global_thread_num],
+                            tasks_active_[global_thread_num]);
 
                         detail::scheduling_callbacks callbacks(
                             util::bind(    //-V107
                                 &policies::scheduler_base::idle_callback,
-                                sched_, num_thread),
+                                sched_, global_thread_num),
                             detail::scheduling_callbacks::callback_type());
 
                         if (mode_ & policies::do_background_work) {
                             callbacks.background_ = util::bind(    //-V107
                                 &policies::scheduler_base::
                                     background_callback,
-                                sched_, num_thread);
+                                sched_, global_thread_num);
                         }
 
                         sched_->set_scheduler_mode(mode_);
                         detail::scheduling_loop(
-                            num_thread - thread_offset_, *sched_, counters, callbacks);
+                            global_thread_num - thread_offset_, *sched_, counters, callbacks);
 
-                        // the OS thread is allowed to exit only if no more
-                        // HPX
-                        // threads exist or if some other thread has
-                        // terminated
+                        // the OS thread is allowed to exit only if no more HPX
+                        // threads exist or if some other thread has terminated
                         HPX_ASSERT(
                             !sched_->Scheduler::get_thread_count(unknown,
-                                thread_priority_default, num_thread - thread_offset_) ||
-                            sched_->get_state(num_thread - thread_offset_) ==
+                                thread_priority_default, global_thread_num - thread_offset_) ||
+                            sched_->get_state(global_thread_num - thread_offset_) ==
                                 state_terminating);
                     }
                     catch (hpx::exception const &e) {
                         LFATAL_    //-V128
                             << "thread_pool::thread_func: " << id_.name_
-                            << " thread_num:" << num_thread    //-V128
+                            << " thread_num:" << global_thread_num    //-V128
                             << " : caught hpx::exception: " << e.what()
                             << ", aborted thread execution";
 
                         report_error(
-                            num_thread, std::current_exception());
+                            global_thread_num, std::current_exception());
                         return;
                     }
                     catch (boost::system::system_error const &e) {
                         LFATAL_    //-V128
                             << "thread_pool::thread_func: " << id_.name_
-                            << " thread_num:" << num_thread    //-V128
+                            << " thread_num:" << global_thread_num    //-V128
                             << " : caught boost::system::system_error: "
                             << e.what() << ", aborted thread execution";
 
                         report_error(
-                            num_thread, std::current_exception());
+                            global_thread_num, std::current_exception());
                         return;
                     }
                     catch (std::exception const &e) {
@@ -632,20 +633,20 @@ namespace detail
                 catch (...) {
                     LFATAL_    //-V128
                         << "thread_pool::thread_func: " << id_.name_
-                        << " thread_num:" << num_thread    //-V128
+                        << " thread_num:" << global_thread_num    //-V128
                         << " : caught unexpected "         //-V128
                            "exception, aborted thread execution";
 
-                    report_error(num_thread, std::current_exception());
+                    report_error(global_thread_num, std::current_exception());
                     return;
                 }
 
                 LTM_(info)    //-V128
                     << "thread_pool::thread_func: " << id_.name_
-                    << " thread_num: " << num_thread
+                    << " thread_num: " << global_thread_num
                     << " : ending OS thread, "    //-V128
                        "executed "
-                    << executed_threads_[num_thread] << " HPX threads";
+                    << executed_threads_[global_thread_num] << " HPX threads";
             }
         }
 

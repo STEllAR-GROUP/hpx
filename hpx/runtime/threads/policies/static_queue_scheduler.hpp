@@ -11,7 +11,6 @@
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/compat/mutex.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>

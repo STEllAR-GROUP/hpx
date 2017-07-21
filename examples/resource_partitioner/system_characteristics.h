@@ -32,7 +32,6 @@ void print_system_characteristics(){
     hpx::util::runtime_configuration cfg            = rt->get_config();
     const hpx::threads::topology &topo              = rt->get_topology();
     hpx::threads::threadmanager_base &thrd_manager  = rt->get_thread_manager();
-    //hpx::threads::policies::detail::affinity_data * affdat_ptr = rt->get_affinity_data();  //! only in my local version of HPX
 
     // -------------------------------------- //
     //      print runtime characteristics     //

@@ -183,7 +183,6 @@ namespace hpx {
             "pending_boost"
             };
         }
-    }
 
     char const* get_thread_state_name(thread_state_enum state)
     {
@@ -602,38 +601,10 @@ namespace hpx {
 
                 case 8 : // throttle = 8
                 {
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    std::string affinity_domain = hpx::detail::get_affinity_domain(cfg_);
-                    std::string affinity_desc;
-                    std::size_t numa_sensitive =
-                            hpx::detail::get_affinity_description(cfg_, affinity_desc);
-
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::throttle_queue_scheduler<>
-                            local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, 1000, numa_sensitive,
-                            "core-throttle_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
-
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
-
-#else
                     throw hpx::detail::command_line_error("Command line option "
                         "--hpx:queuing=throttle "
                         "is not configured in this build. Please rebuild with "
                         "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle -DHPX_WITH_APEX'.");
-#endif
                     break;
                 }
             }
