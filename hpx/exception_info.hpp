@@ -211,32 +211,46 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename E>
-    exception_info const* get_exception_info(E const& e)
-    {
-        return dynamic_cast<exception_info const*>(std::addressof(e));
-    }
-
-    template <typename E>
     exception_info* get_exception_info(E& e)
     {
         return dynamic_cast<exception_info*>(std::addressof(e));
     }
 
-    inline exception_info const* get_exception_info(std::exception_ptr const& p)
+    template <typename E>
+    exception_info const* get_exception_info(E const& e)
+    {
+        return dynamic_cast<exception_info const*>(std::addressof(e));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename E, typename F>
+    auto invoke_with_exception_info(E const& e, F&& f)
+      -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
+    {
+        return std::forward<F>(f)(
+            dynamic_cast<exception_info const*>(std::addressof(e)));
+    }
+
+    template <typename F>
+    auto invoke_with_exception_info(std::exception_ptr const& p, F&& f)
+      -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
     {
         try
         {
             if (p) std::rethrow_exception(p);
         } catch (exception_info const& xi) {
-            return &xi;
+            return std::forward<F>(f)(&xi);
         } catch (...) {
         }
-        return nullptr;
+        return std::forward<F>(f)(nullptr);
     }
 
-    inline exception_info const* get_exception_info(hpx::error_code const& ec)
+    template <typename F>
+    auto invoke_with_exception_info(hpx::error_code const& ec, F&& f)
+      -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
     {
-        return get_exception_info(detail::access_exception(ec));
+        return invoke_with_exception_info(
+            detail::access_exception(ec), std::forward<F>(f));
     }
 }
 
