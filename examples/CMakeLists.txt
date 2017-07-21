@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Dylan Stark
 #
@@ -6,7 +6,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    1d_hydro
     1d_stencil
     accumulators
     allgather
