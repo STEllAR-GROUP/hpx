@@ -497,11 +497,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <
-            typename ExPolicy, typename InIter1, typename InIter2,
+        template <typename ExPolicy, typename InIter1, typename InIter2,
             typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<
-            ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             hpx::util::tagged_tuple<
                 tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
             >
@@ -544,11 +542,9 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <
-            typename ExPolicy, typename InIter1, typename InIter2,
+        template <typename ExPolicy, typename InIter1, typename InIter2,
             typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<
-            ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             hpx::util::tagged_tuple<
                 tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
             >
@@ -790,11 +786,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <
-            typename ExPolicy, typename InIter1, typename InIter2,
+        template <typename ExPolicy, typename InIter1, typename InIter2,
             typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<
-            ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             hpx::util::tagged_tuple<
                 tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
             >
@@ -835,11 +829,9 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <
-            typename ExPolicy, typename InIter1, typename InIter2,
+        template <typename ExPolicy, typename InIter1, typename InIter2,
             typename OutIter, typename F, typename Proj1, typename Proj2>
-        typename util::detail::algorithm_result<
-            ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             hpx::util::tagged_tuple<
                 tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
             >

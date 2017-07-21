@@ -209,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 (hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Requires at least forward iterator.");
             static_assert(
-                (hpx::traits::is_input_iterator<FwdIter2>::value),
+                (hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;

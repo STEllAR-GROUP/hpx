@@ -547,13 +547,11 @@ namespace hpx { namespace parallel { namespace util
     accumulate(Iter first, Iter last, Reduce && r, Conv && conv = Conv())
     {
         T val = hpx::util::invoke(conv, *first);
-        auto iter = first;
-        iter++;
-        while(last != iter)
+        while(last != first)
         {
-            val = hpx::util::invoke(r, val, *iter);
-            iter++;
-        };
+            val = hpx::util::invoke(r, val, *first);
+            first++;
+        }
         return val;
     }
 }}}

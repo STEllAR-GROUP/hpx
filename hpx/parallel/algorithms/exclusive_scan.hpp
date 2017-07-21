@@ -6,8 +6,8 @@
 
 /// \file parallel/algorithms/exclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_EXCLUSIVE_SCAN_JUN_21_2017_1236PM)
-#define HPX_PARALLEL_ALGORITHM_EXCLUSIVE_SCAN_JUN_21_2017_1236PM
+#if !defined(HPX_PARALLEL_ALGORITHM_EXCLUSIVE_SCAN_DEC_30_2014_1236PM)
+#define HPX_PARALLEL_ALGORITHM_EXCLUSIVE_SCAN_DEC_30_2014_1236PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>

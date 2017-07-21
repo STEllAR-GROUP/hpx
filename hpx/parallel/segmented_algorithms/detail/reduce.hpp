@@ -53,10 +53,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     return util::accumulate_n(++part_begin, --part_size,
                         std::move(val), r);
                 },
-                hpx::util::unwrapped([r](std::vector<T> && results)
+                hpx::util::unwrapped([r](std::vector<T> && results) -> T
                 {
-                    auto rfirst = std::begin(results);
-                    auto rlast = std::end(results);
+                    auto rfirst = hpx::util::begin(results);
+                    auto rlast = hpx::util::end(results);
                     return util::accumulate<T>(rfirst, rlast, r);
                 }));
         }
@@ -79,7 +79,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             typedef typename std::iterator_traits<InIter>::reference
                 reference;
             return util::accumulate<T>(first, last,
-                [=](T const& res, reference next)
+                [=](T const& res, reference next) -> T
                 {
                     return hpx::util::invoke(r, res,
                         hpx::util::invoke(conv, next));
@@ -107,16 +107,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         std::move(val),
                         // MSVC14 bails out if r and conv are captured by
                         // reference
-                        [=](T const& res, reference next)
+                        [=](T const& res, reference next) -> T
                         {
                             return hpx::util::invoke(r, res,
                                 hpx::util::invoke(conv, next));
                         });
                 },
-                hpx::util::unwrapped([r](std::vector<T> && results)
+                hpx::util::unwrapped([r](std::vector<T> && results) -> T
                 {
-                    auto rfirst = std::begin(results);
-                    auto rlast = std::end(results);
+                    auto rfirst = hpx::util::begin(results);
+                    auto rlast = hpx::util::end(results);
                     return util::accumulate<T>(rfirst, rlast, r);
                 }));
         }
