@@ -111,21 +111,25 @@ namespace hpx { namespace lcos
         }
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         ValueType get_value_sync()
         {
             return get_value(launch::sync);
         }
 
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void set_value_sync(RemoteType const& val)
         {
             set_value(launch::sync, val);
         }
 
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void set_value_sync(RemoteType && val) //-V659
         {
             set_value(launch::sync, std::move(val));
         }
 
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void abort_pending_sync()
         {
             abort_pending(launch::sync);
