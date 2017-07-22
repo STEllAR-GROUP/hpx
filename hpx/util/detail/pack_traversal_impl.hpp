@@ -45,14 +45,48 @@ namespace util {
                     return std::move(boxed_);
                 }
             };
+            template <>
+            class spread_box<>
+            {
+            public:
+                explicit spread_box()
+                {
+                }
+                explicit spread_box(tuple<>)
+                {
+                }
 
-            /// Deduces to a true_type if the fiven type is a flat tuple
+                tuple<> unbox()
+                {
+                    return tuple<>{};
+                }
+            };
+
+            /// Returns an empty spread box which represents an empty
+            /// mapped object.
+            inline spread_box<> empty_spread()
+            {
+                return spread_box<>{};
+            }
+
+            /// Deduces to a true_type if the given type is a spread marker
             template <typename T>
             struct is_spread : std::false_type
             {
             };
             template <typename... T>
             struct is_spread<spread_box<T...>> : std::true_type
+            {
+            };
+
+            /// Deduces to a true_type if the given type is an empty
+            /// spread marker
+            template <typename T>
+            struct is_empty_spread : std::false_type
+            {
+            };
+            template <>
+            struct is_empty_spread<spread_box<>> : std::true_type
             {
             };
 
@@ -92,7 +126,7 @@ namespace util {
             template <typename T>
             tuple<T> undecorate(T&& type)
             {
-                return {std::forward<T>(type)};
+                return tuple<T>{std::forward<T>(type)};
             }
             template <typename... T>
             auto undecorate(spread_box<T...> type) -> decltype(type.unbox())
@@ -100,9 +134,66 @@ namespace util {
                 return type.unbox();
             }
 
-            /// A tag for mapping the arguments to a tuple
-            struct functional_tupelize_tag
+            /// A callable object which maps its content back to a
+            /// tuple like type.
+            template <typename EmptyType, template <typename...> class Type>
+            struct tupelizer_base
             {
+                // We overload with one argument here so Clang and GCC don't
+                // have any issues with overloading against zero arguments.
+                template <typename First, typename... T>
+                Type<First, T...> operator()(First&& first, T&&... args) const
+                {
+                    return Type<First, T...>{
+                        std::forward<First>(first), std::forward<T>(args)...};
+                }
+
+                // Specifically return the empty object which can be different
+                // from a tuple.
+                EmptyType operator()() const
+                {
+                    return EmptyType{};
+                }
+            };
+
+            /// A callable object which maps its content back to a tuple.
+            template <template <typename...> class Type = tuple>
+            using tupelizer_of_t = tupelizer_base<tuple<>, Type>;
+
+            /// A callable object which maps its content back to a tuple like
+            /// type if it wasn't empty. For empty types arguments an empty
+            /// spread box is returned instead. This is useful to propagate
+            /// empty mappings back to the caller.
+            template <template <typename...> class Type = tuple>
+            using flat_tupelizer_of_t = tupelizer_base<spread_box<>, Type>;
+
+            /// A callable object which maps its content back to an
+            /// array like type.
+            /// This transform can only be used for (flat) mappings which
+            /// return an empty mapping back to the caller.
+            template <template <typename, std::size_t> class Type>
+            struct flat_arraylizer
+            {
+                /// Deduces to the array type when the array is instantiated
+                /// with the given arguments.
+                template <typename First, typename... Rest>
+                using array_type_of_t =
+                    Type<typename std::decay<First>::type, 1 + sizeof...(Rest)>;
+
+                // We overload with one argument here so Clang and GCC don't
+                // have any issues with overloading against zero arguments.
+                template <typename First, typename... T>
+                auto operator()(First&& first, T&&... args) const
+                    -> array_type_of_t<First, T...>
+                {
+                    return array_type_of_t<First, T...>{
+                        {std::forward<First>(first), std::forward<T>(args)...}};
+                }
+
+                auto operator()() const -> decltype(empty_spread())
+                {
+                    return empty_spread();
+                }
             };
 
             /// Use the recursive instantiation for a variadic pack which
@@ -110,19 +201,10 @@ namespace util {
             template <typename C, typename... T>
             auto apply_spread_impl(std::true_type, C&& callable, T&&... args)
                 -> decltype(invoke_fused(std::forward<C>(callable),
-                    tuple_cat(undecorate(std::forward<T>(args))...)))
+                    util::tuple_cat(undecorate(std::forward<T>(args))...)))
             {
                 return invoke_fused(std::forward<C>(callable),
-                    tuple_cat(undecorate(std::forward<T>(args))...));
-            }
-            template <typename... T>
-            auto apply_spread_impl(
-                std::true_type, functional_tupelize_tag, T&&... args)
-                -> decltype(tuple_cat(undecorate(std::forward<T>(args))...))
-            {
-                // Optimized version to prevent useless tuple
-                // unpacking and re-assembling
-                return tuple_cat(undecorate(std::forward<T>(args))...);
+                    util::tuple_cat(undecorate(std::forward<T>(args))...));
             }
 
             /// Use the linear instantiation for variadic packs which don't
@@ -133,15 +215,6 @@ namespace util {
             {
                 return hpx::util::invoke(
                     std::forward<C>(callable), std::forward<T>(args)...);
-            }
-            template <typename... T>
-            tuple<T...> apply_spread_impl(
-                std::false_type, functional_tupelize_tag, T&&... args)
-
-            {
-                // Optimized version to prevent useless tuple
-                // unpacking and re-assembling
-                return tuple<T...>{std::forward<T>(args)...};
             }
 
             /// Deduces to a true_type if any of the given types marks
@@ -165,10 +238,35 @@ namespace util {
             /// that spread return values are inserted into the current pack.
             template <typename... T>
             auto tupelize(T&&... args) -> decltype(
-                map_spread(functional_tupelize_tag{}, std::forward<T>(args)...))
+                map_spread(tupelizer_of_t<>{}, std::forward<T>(args)...))
+            {
+                return map_spread(tupelizer_of_t<>{}, std::forward<T>(args)...);
+            }
+
+            /// Converts the given variadic arguments into a tuple in a way
+            /// that spread return values are inserted into the current pack.
+            /// If the arguments were mapped to zero arguments, the empty
+            /// mapping is propagated backwards to the caller.
+            template <template <typename...> class Type, typename... T>
+            auto flat_tupelize_to(T&&... args) -> decltype(map_spread(
+                flat_tupelizer_of_t<Type>{}, std::forward<T>(args)...))
             {
                 return map_spread(
-                    functional_tupelize_tag{}, std::forward<T>(args)...);
+                    flat_tupelizer_of_t<Type>{}, std::forward<T>(args)...);
+            }
+
+            /// Converts the given variadic arguments into an array in a way
+            /// that spread return values are inserted into the current pack.
+            /// Through this the size of the array like type might change.
+            /// If the arguments were mapped to zero arguments, the empty
+            /// mapping is propagated backwards to the caller.
+            template <template <typename, std::size_t> class Type,
+                typename... T>
+            auto flat_arraylize_to(T&&... args) -> decltype(
+                map_spread(flat_arraylizer<Type>{}, std::forward<T>(args)...))
+            {
+                return map_spread(
+                    flat_arraylizer<Type>{}, std::forward<T>(args)...);
             }
 
             /// Converts an empty tuple to void
@@ -407,9 +505,42 @@ namespace util {
                 spreading::unpacked_of_t<typename invoke_result<Mapping,
                     element_of_t<Container>>::type>>;
 
+            /// Deduces to a true_type if the mapping maps to zero elements.
+            template <typename T, typename M>
+            using is_empty_mapped =
+                spreading::is_empty_spread<typename std::decay<
+                    typename invoke_result<M, element_of_t<T>>::type>::type>;
+
+            /// We are allowed to reuse the container if we map to the same
+            /// type we are accepting and when we have
+            /// the full ownership of the container.
+            template <typename T, typename M>
+            using can_reuse = std::integral_constant<bool,
+                std::is_same<element_of_t<T>,
+                    mapped_type_from_t<T, M>>::value &&
+                    std::is_rvalue_reference<T&&>::value>;
+
+            /// Categorizes a mapping of a homogeneous container
+            ///
+            /// \tparam IsEmptyMapped Identifies whether the mapping maps to
+            ///         to zero arguments.
+            /// \tparam CanReuse Identifies whether the container can be
+            ///         re-used through the mapping.
+            template <bool IsEmptyMapped, bool CanReuse>
+            struct container_category_tag
+            {
+            };
+
+            /// Categorizes the given container through a container_category_tag
+            template <typename T, typename M>
+            using container_category_of_t =
+                container_category_tag<is_empty_mapped<T, M>::value,
+                    can_reuse<T, M>::value>;
+
             /// We create a new container, which may hold the resulting type
             template <typename M, typename T>
-            auto remap_container(std::false_type, M&& mapper, T&& container)
+            auto remap_container(
+                container_category_tag<false, false>, M&& mapper, T&& container)
                 -> decltype(
                     rebind_container<mapped_type_from_t<T, M>>(container))
             {
@@ -445,8 +576,8 @@ namespace util {
             /// The remapper optimized for the case that we map to the same
             /// type we accepted such as int -> int.
             template <typename M, typename T>
-            auto remap_container(std::true_type, M&& mapper, T&& container) ->
-                typename std::decay<T>::type
+            auto remap_container(container_category_tag<false, true>,
+                M&& mapper, T&& container) -> typename std::decay<T>::type
             {
                 for (auto&& val :
                     container_accessor_of(std::forward<T>(container)))
@@ -457,14 +588,22 @@ namespace util {
                 return std::forward<T>(container);
             }
 
-            /// We are allowed to reuse the container if we map to the same
-            /// type we are accepting and when we have
-            /// the full ownership of the container.
-            template <typename T, typename M>
-            using can_reuse = std::integral_constant<bool,
-                std::is_same<element_of_t<T>,
-                    mapped_type_from_t<T, M>>::value &&
-                    std::is_rvalue_reference<T&&>::value>;
+            /// Remap the container to zero arguments
+            template <typename M, typename T>
+            auto remap_container(
+                container_category_tag<true, false>, M&& mapper, T&& container)
+                -> decltype(spreading::empty_spread())
+            {
+                for (auto&& val :
+                    container_accessor_of(std::forward<T>(container)))
+                {
+                    // Don't save the empty mapping for each invocation
+                    // of the mapper.
+                    std::forward<M>(mapper)(std::forward<decltype(val)>(val));
+                }
+                // Return one instance of an empty mapping for the container
+                return spreading::empty_spread();
+            }
 
             /// Remaps the content of the given container with type T,
             /// to a container of the same type which may contain
@@ -478,10 +617,10 @@ namespace util {
 #endif
                 >
             auto remap(strategy_remap_tag, T&& container, M&& mapper)
-                -> decltype(remap_container(can_reuse<T, M>{},
+                -> decltype(remap_container(container_category_of_t<T, M>{},
                     std::forward<M>(mapper), std::forward<T>(container)))
             {
-                return remap_container(can_reuse<T, M>{},
+                return remap_container(container_category_of_t<T, M>{},
                     std::forward<M>(mapper), std::forward<T>(container));
             }
 
@@ -528,24 +667,15 @@ namespace util {
 #endif
                 >
             {
-                struct materializer
-                {
-                    template <typename... Args>
-                    Base<Args...> operator()(Args&&... args) const
-                    {
-                        return Base<Args...>{std::forward<Args>(args)...};
-                    }
-                };
-
                 M mapper_;
 
                 template <typename... Args>
                 auto operator()(Args&&... args)
-                    -> decltype(spreading::map_spread(materializer{},
+                    -> decltype(spreading::flat_tupelize_to<Base>(
                         std::declval<M>()(std::forward<Args>(args))...))
                 {
-                    return spreading::map_spread(
-                        materializer{}, mapper_(std::forward<Args>(args))...);
+                    return spreading::flat_tupelize_to<Base>(
+                        mapper_(std::forward<Args>(args))...);
                 }
             };
             template <typename M, template <typename...> class Base,
@@ -588,15 +718,11 @@ namespace util {
 
                 template <typename... Args>
                 auto operator()(Args&&... args)
-                    -> Base<decltype(spreading::unpack(std::declval<
-                                typename invoke_result<M, OldArg>::type>())),
-                        Size>
+                    -> decltype(spreading::flat_arraylize_to<Base>(
+                        mapper_(std::forward<Args>(args))...))
                 {
-                    return Base<
-                        decltype(spreading::unpack(std::declval<
-                            typename invoke_result<M, OldArg>::type>())),
-                        Size>{{spreading::unpack(
-                        mapper_(std::forward<Args>(args)))...}};
+                    return spreading::flat_arraylize_to<Base>(
+                        mapper_(std::forward<Args>(args))...);
                 }
             };
             template <typename M, template <typename, std::size_t> class Base,
