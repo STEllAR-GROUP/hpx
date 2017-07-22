@@ -15,6 +15,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -353,6 +354,22 @@ void tuple_cat_test()
         auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f, 1, 2.f);
 
         HPX_TEST((res == expected));
+    }
+
+    // Cat move only types
+    {
+        auto t0 = hpx::util::make_tuple(std::unique_ptr<int>(new int(0)));
+        auto t1 = hpx::util::make_tuple(std::unique_ptr<int>(new int(1)));
+        auto t2 = hpx::util::make_tuple(std::unique_ptr<int>(new int(2)));
+
+        hpx::util::tuple<std::unique_ptr<int>, std::unique_ptr<int>,
+            std::unique_ptr<int>>
+            result = hpx::util::tuple_cat(
+                std::move(t0), std::move(t1), std::move(t2));
+
+        HPX_TEST_EQ((*hpx::util::get<0>(result)), 0);
+        HPX_TEST_EQ((*hpx::util::get<1>(result)), 1);
+        HPX_TEST_EQ((*hpx::util::get<2>(result)), 2);
     }
 }
 

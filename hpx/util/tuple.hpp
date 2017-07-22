@@ -580,6 +580,12 @@ namespace hpx { namespace util
         {
             return tuple._impl.template get<I>();
         }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
+        get(tuple<Ts...>&& tuple) noexcept
+        {
+            return std::move(tuple._impl.template get<I>());
+        }
     };
 
     template <typename T0, typename T1>
@@ -597,6 +603,12 @@ namespace hpx { namespace util
         get(std::pair<T0, T1> const& tuple) noexcept
         {
             return tuple.first;
+        }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
+        get(std::pair<T0, T1>&& tuple) noexcept
+        {
+            return std::move(tuple.first);
         }
     };
 
@@ -616,6 +628,12 @@ namespace hpx { namespace util
         {
             return tuple.second;
         }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
+        get(std::pair<T0, T1>&& tuple) noexcept
+        {
+            return std::move(tuple.second);
+        }
     };
 
     template <std::size_t I, typename Type, std::size_t Size>
@@ -633,6 +651,12 @@ namespace hpx { namespace util
         get(boost::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
+        }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
+        get(boost::array<Type, Size>&& tuple) noexcept
+        {
+            return std::move(tuple[I]);
         }
     };
 
@@ -652,6 +676,12 @@ namespace hpx { namespace util
         get(std::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
+        }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
+        get(std::array<Type, Size>&& tuple) noexcept
+        {
+            return std::move(tuple[I]);
         }
     };
 #endif
