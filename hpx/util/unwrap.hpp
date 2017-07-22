@@ -63,11 +63,9 @@ namespace util {
     ///
     template <typename... Args>
     auto unwrap(Args&&... args)
-        -> decltype(detail::unwrap_depth_impl<1U>(detail::new_unwrap_config{},
-            std::forward<Args>(args)...))
+        -> decltype(detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...))
     {
-        return detail::unwrap_depth_impl<1U>(
-            detail::new_unwrap_config{}, std::forward<Args>(args)...);
+        return detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...);
     }
 
     /// An alterntive version of hpx::util::unwrap(), which unwraps the given
@@ -80,12 +78,10 @@ namespace util {
     ///
     template <std::size_t Depth, typename... Args>
     auto unwrap_n(Args&&... args) -> decltype(
-        detail::unwrap_depth_impl<Depth>(detail::new_unwrap_config{},
-            std::forward<Args>(args)...))
+        detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...))
     {
         static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
-        return detail::unwrap_depth_impl<Depth>(
-            detail::new_unwrap_config{}, std::forward<Args>(args)...);
+        return detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...);
     }
 
     /// An alterntive version of hpx::util::unwrap(), which unwraps the given
@@ -96,11 +92,9 @@ namespace util {
     ///
     template <typename... Args>
     auto unwrap_all(Args&&... args)
-        -> decltype(detail::unwrap_depth_impl<0U>(detail::new_unwrap_config{},
-            std::forward<Args>(args)...))
+        -> decltype(detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...))
     {
-        return detail::unwrap_depth_impl<0U>(
-            detail::new_unwrap_config{}, std::forward<Args>(args)...);
+        return detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...);
     }
 
     /// Returns a callable object which unwraps its arguments upon
@@ -123,11 +117,10 @@ namespace util {
     ///
     template <typename T>
     auto unwrapping(T&& callable) -> decltype(
-        detail::functional_unwrap_depth_impl<1U>(detail::new_unwrap_config{},
-            std::forward<T>(callable)))
+        detail::functional_unwrap_depth_impl<1U>(std::forward<T>(callable)))
     {
         return detail::functional_unwrap_depth_impl<1U>(
-            detail::new_unwrap_config{}, std::forward<T>(callable));
+            std::forward<T>(callable));
     }
 
     /// Returns a callable object which unwraps its arguments upon
@@ -138,12 +131,11 @@ namespace util {
     ///
     template <std::size_t Depth, typename T>
     auto unwrapping_n(T&& callable) -> decltype(
-        detail::functional_unwrap_depth_impl<Depth>(detail::new_unwrap_config{},
-            std::forward<T>(callable)))
+        detail::functional_unwrap_depth_impl<Depth>(std::forward<T>(callable)))
     {
         static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
         return detail::functional_unwrap_depth_impl<Depth>(
-            detail::new_unwrap_config{}, std::forward<T>(callable));
+            std::forward<T>(callable));
     }
 
     /// Returns a callable object which unwraps its arguments upon
@@ -154,11 +146,10 @@ namespace util {
     ///
     template <typename T>
     auto unwrapping_all(T&& callable) -> decltype(
-        detail::functional_unwrap_depth_impl<0U>(detail::new_unwrap_config{},
-            std::forward<T>(callable)))
+        detail::functional_unwrap_depth_impl<0U>(std::forward<T>(callable)))
     {
         return detail::functional_unwrap_depth_impl<0U>(
-            detail::new_unwrap_config{}, std::forward<T>(callable));
+            std::forward<T>(callable));
     }
 }    // end namespace util
 }    // end namespace hpx

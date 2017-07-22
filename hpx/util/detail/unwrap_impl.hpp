@@ -22,42 +22,6 @@
 namespace hpx {
 namespace util {
     namespace detail {
-        /// This struct defines a configurateable environment in order
-        /// to adapt the unwrapping behaviour.
-        ///
-        /// The old unwrap (unwrapped) allowed futures to be instanted
-        /// with void whereas the new one doesn't.
-        ///
-        /// The old unwrap (unwrapped) also unwraps the first occuring future
-        /// independently a single value or multiple ones were passed to it.
-        /// This behaviour is inconsistent and was removed in the
-        /// new implementation.
-        ///
-        /// \note If the old implementation of unwrapped gets removed all
-        ///       the configuration mechanis here can be removed while
-        ///       preserving the behaviour of the new implementations
-        ///       configuration.
-        ///
-        template <bool AllowsVoidFutures, bool UnwrapTopLevelTuples>
-        struct unwrap_config
-        {
-            static HPX_CONSTEXPR_OR_CONST bool allows_void_futures =
-                AllowsVoidFutures;
-
-            static HPX_CONSTEXPR_OR_CONST bool unwrap_top_level_tuples =
-                UnwrapTopLevelTuples;
-        };
-
-        /// The old unwrapped implementation
-        using old_unwrap_config = unwrap_config<true, true>;
-        /// The new unwrap implementation
-        using new_unwrap_config = unwrap_config<false, false>;
-
-        /// A tag which may replace void results when unwrapping
-        struct unwrapped_void_tag
-        {
-        };
-
         /// Deduces to a true_type if the given future is instantiated with
         /// a non void type.
         template <typename T>
@@ -73,20 +37,6 @@ namespace util {
                 std::is_void<
                     typename traits::future_traits<T>::result_type>::value>;
 
-        /// Return an unknown type (unwrapped_void_tag) when unwrapping
-        /// futures instantiated with void to work around the issue that
-        /// we can't represent void otherwise in a variadic argument pack.
-        template <typename Config, typename T>
-        unwrapped_void_tag void_or_assert(T&& future)
-        {
-            static_assert(
-                Config::allows_void_futures && std::is_same<T, T>::value,
-                "Unwrapping future<void> or shared_future<void> is "
-                "forbidden! Use hpx::lcos::wait_all instead!");
-            std::forward<T>(future).get();
-            return {};
-        }
-
         /// A mapper that maps futures to its representing type
         ///
         /// The mapper does unwrap futures nested inside futures until
@@ -95,7 +45,7 @@ namespace util {
         /// - Depth >  1 -> Depth remaining
         /// - Depth == 1 -> One depth remaining
         /// - Depth == 0 -> Unlimited depths
-        template <std::size_t Depth, typename Config>
+        template <std::size_t Depth>
         struct future_unwrap_until_depth
         {
             /// This piece of code can't be refactored out using
@@ -104,25 +54,25 @@ namespace util {
             template <typename T,
                 typename std::enable_if<is_void_future<
                     typename std::decay<T>::type>::value>::type* = nullptr>
-            auto operator()(T&& future) const
-                -> decltype(void_or_assert<Config>(std::forward<T>(future)))
+            auto operator()(T&& future) const -> decltype(spread_this())
             {
-                return void_or_assert<Config>(std::forward<T>(future));
+                std::forward<T>(future).get();
+                return spread_this();
             }
 
             template <typename T,
                 typename std::enable_if<is_non_void_future<
                     typename std::decay<T>::type>::value>::type* = nullptr>
-            auto operator()(T&& future) const -> decltype(
-                map_pack(future_unwrap_until_depth<Depth - 1, Config>{},
+            auto operator()(T&& future) const
+                -> decltype(map_pack(future_unwrap_until_depth<Depth - 1>{},
                     std::forward<T>(future).get()))
             {
-                return map_pack(future_unwrap_until_depth<Depth - 1, Config>{},
+                return map_pack(future_unwrap_until_depth<Depth - 1>{},
                     std::forward<T>(future).get());
             }
         };
-        template <typename Config>
-        struct future_unwrap_until_depth<1U, Config>
+        template <>
+        struct future_unwrap_until_depth<1U>
         {
             /// This piece of code can't be refactored out using
             /// inheritance and `using Base::operator()` because this
@@ -130,10 +80,10 @@ namespace util {
             template <typename T,
                 typename std::enable_if<is_void_future<
                     typename std::decay<T>::type>::value>::type* = nullptr>
-            auto operator()(T&& future) const
-                -> decltype(void_or_assert<Config>(std::forward<T>(future)))
+            auto operator()(T&& future) const -> decltype(spread_this())
             {
-                return void_or_assert<Config>(std::forward<T>(future));
+                std::forward<T>(future).get();
+                return spread_this();
             }
 
             template <typename T,
@@ -145,8 +95,8 @@ namespace util {
                 return std::forward<T>(future).get();
             }
         };
-        template <typename Config>
-        struct future_unwrap_until_depth<0U, Config>
+        template <>
+        struct future_unwrap_until_depth<0U>
         {
             /// This piece of code can't be refactored out using
             /// inheritance and `using Base::operator()` because this
@@ -154,10 +104,10 @@ namespace util {
             template <typename T,
                 typename std::enable_if<is_void_future<
                     typename std::decay<T>::type>::value>::type* = nullptr>
-            auto operator()(T&& future) const
-                -> decltype(void_or_assert<Config>(std::forward<T>(future)))
+            auto operator()(T&& future) const -> decltype(spread_this())
             {
-                return void_or_assert<Config>(std::forward<T>(future));
+                std::forward<T>(future).get();
+                return spread_this();
             }
 
             template <typename T,
@@ -173,12 +123,13 @@ namespace util {
 
         /// Unwraps the futures contained in the given pack args
         /// until the depth Depth.
-        template <std::size_t Depth, typename Config, typename... Args>
-        auto unwrap_depth_impl(Config, Args&&... args)
-            -> decltype(map_pack(future_unwrap_until_depth<Depth, Config>{},
+        /// This is the main entry function for immediate unwraps.
+        template <std::size_t Depth, typename... Args>
+        auto unwrap_depth_impl(Args&&... args)
+            -> decltype(map_pack(future_unwrap_until_depth<Depth>{},
                 std::forward<Args>(args)...))
         {
-            return map_pack(future_unwrap_until_depth<Depth, Config>{},
+            return map_pack(future_unwrap_until_depth<Depth>{},
                 std::forward<Args>(args)...);
         }
 
@@ -186,7 +137,7 @@ namespace util {
         /// tag dispatching a function because it does semantical checks before
         /// matching the tag, which leads to false errors.
         template <bool IsFusedInvoke>
-        struct invoke_wrapped_impl
+        struct invoke_wrapped_invocation_select
         {
             /// Invoke the callable with the tuple argument through invoke_fused
             template <typename C, typename T>
@@ -200,7 +151,7 @@ namespace util {
             }
         };
         template <>
-        struct invoke_wrapped_impl<false /*IsFusedInvoke*/>
+        struct invoke_wrapped_invocation_select<false /*IsFusedInvoke*/>
         {
             /// Invoke the callable with the plain argument through invoke,
             /// also when the result is a tuple like type, when we received
@@ -214,34 +165,68 @@ namespace util {
             }
         };
 
-        /// Indicates whether we should invoke the result through invoke_fused:
-        /// - We called the function with multiple arguments.
-        /// - The result is a tuple like type and UnwrapTopLevelTuples is set.
-        template <bool HadMultipleArguments, bool UnwrapTopLevelTuples,
-            typename Result>
-        using should_fuse_invoke = std::integral_constant<bool,
-            HadMultipleArguments ||
-                (UnwrapTopLevelTuples &&
-                    traits::is_tuple_like<
-                        typename std::decay<Result>::type>::value)>;
-
-        /// map_pack may return a tuple or a plain type, choose the
-        /// corresponding invocation function accordingly.
-        template <bool HadMultipleArguments, typename Config, typename C,
-            typename T>
-        auto invoke_wrapped(Config, C&& callable, T&& unwrapped) -> decltype(
-            invoke_wrapped_impl<should_fuse_invoke<HadMultipleArguments,
-                Config::unwrap_top_level_tuples, T>::value>::
-                apply(std::forward<C>(callable), std::forward<T>(unwrapped)))
+        /// Invokes the callable object with the result:
+        /// - If the result is a tuple-like type `invoke_fused` is used
+        /// - Otherwise `invoke` is used
+        template <bool HadMultipleArguments, typename C, typename T>
+        auto dispatch_wrapped_invocation_select(C&& callable, T&& unwrapped)
+            -> decltype(
+                invoke_wrapped_invocation_select<(HadMultipleArguments &&
+                    traits::is_tuple_like<typename std::decay<T>::type>::
+                        value)>::apply(std::forward<C>(callable),
+                    std::forward<T>(unwrapped)))
         {
-            return invoke_wrapped_impl<should_fuse_invoke<HadMultipleArguments,
-                Config::unwrap_top_level_tuples, T>::value>::
+            return invoke_wrapped_invocation_select<(HadMultipleArguments &&
+                traits::is_tuple_like<typename std::decay<T>::type>::value)>::
                 apply(std::forward<C>(callable), std::forward<T>(unwrapped));
+        }
+
+        /// Helper for routing non void result types to the corresponding
+        /// callable object.
+        template <std::size_t Depth, typename Result>
+        struct invoke_wrapped_decorate_select
+        {
+            template <typename C, typename... Args>
+            static auto apply(C&& callable, Args&&... args) -> decltype(
+                dispatch_wrapped_invocation_select<(sizeof...(args) > 1)>(
+                    std::forward<C>(callable),
+                    unwrap_depth_impl<Depth>(std::forward<Args>(args)...)))
+            {
+                return dispatch_wrapped_invocation_select<(
+                    sizeof...(args) > 1)>(std::forward<C>(callable),
+                    unwrap_depth_impl<Depth>(std::forward<Args>(args)...));
+            }
+        };
+        template <std::size_t Depth>
+        struct invoke_wrapped_decorate_select<Depth, void>
+        {
+            template <typename C, typename... Args>
+            static auto apply(C&& callable, Args&&... args)
+                -> decltype(std::forward<C>(callable)())
+            {
+                unwrap_depth_impl<Depth>(std::forward<Args>(args)...);
+                return std::forward<C>(callable)();
+            }
+        };
+
+        /// map_pack may return a tuple, a plain type or void choose the
+        /// corresponding invocation function accordingly.
+        template <std::size_t Depth, typename C, typename... Args>
+        auto invoke_wrapped(C&& callable, Args&&... args)
+            -> decltype(invoke_wrapped_decorate_select<Depth,
+                decltype(unwrap_depth_impl<Depth>(std::forward<Args>(
+                    args)...))>::apply(std::forward<C>(callable),
+                std::forward<Args>(args)...))
+        {
+            return invoke_wrapped_decorate_select<Depth,
+                decltype(unwrap_depth_impl<Depth>(std::forward<Args>(
+                    args)...))>::apply(std::forward<C>(callable),
+                std::forward<Args>(args)...);
         }
 
         /// Implements the callable object which is returned by n invocation
         /// to hpx::util::unwrap and similar functions.
-        template <typename Config, typename T, std::size_t Depth>
+        template <typename T, std::size_t Depth>
         class functional_unwrap_impl
         {
             /// The wrapped callable object
@@ -255,37 +240,31 @@ namespace util {
 
             template <typename... Args>
             auto operator()(Args&&... args)
-                -> decltype(invoke_wrapped<(sizeof...(args) > 1)>(Config{},
-                    std::declval<T&>(),
-                    unwrap_depth_impl<Depth>(Config{},
-                        std::forward<Args>(args)...)))
+                -> decltype(invoke_wrapped<Depth>(std::declval<T&>(),
+                    std::forward<Args>(args)...))
             {
-                return invoke_wrapped<(sizeof...(args) > 1)>(Config{}, wrapped_,
-                    unwrap_depth_impl<Depth>(
-                        Config{}, std::forward<Args>(args)...));
+                return invoke_wrapped<Depth>(
+                    wrapped_, std::forward<Args>(args)...);
             }
 
             template <typename... Args>
             auto operator()(Args&&... args) const
-                -> decltype(invoke_wrapped(Config{}, std::declval<T const&>(),
-                    unwrap_depth_impl<Depth>(Config{},
-                        std::forward<Args>(args)...)))
+                -> decltype(invoke_wrapped<Depth>(std::declval<T const&>(),
+                    std::forward<Args>(args)...))
             {
-                return invoke_wrapped(Config{}, wrapped_,
-                    unwrap_depth_impl<Depth>(
-                        Config{}, std::forward<Args>(args)...));
+                return invoke_wrapped<Depth>(
+                    wrapped_, std::forward<Args>(args)...);
             }
         };
 
         /// Returns a callable object which unwraps the futures
         /// contained in the given pack args until the depth Depth.
-        template <std::size_t Depth, typename Config, typename T>
-        auto functional_unwrap_depth_impl(Config, T&& callable)
-            -> functional_unwrap_impl<Config, typename std::decay<T>::type,
-                Depth>
+        template <std::size_t Depth, typename T>
+        auto functional_unwrap_depth_impl(T&& callable)
+            -> functional_unwrap_impl<typename std::decay<T>::type, Depth>
         {
-            return functional_unwrap_impl<Config, typename std::decay<T>::type,
-                Depth>(std::forward<T>(callable));
+            return functional_unwrap_impl<typename std::decay<T>::type, Depth>(
+                std::forward<T>(callable));
         }
     }
 }    // end namespace util
