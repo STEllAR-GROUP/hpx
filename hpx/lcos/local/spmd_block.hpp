@@ -8,6 +8,7 @@
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/barrier.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/traits/is_iterator.hpp>

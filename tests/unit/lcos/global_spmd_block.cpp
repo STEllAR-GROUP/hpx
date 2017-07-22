@@ -13,6 +13,7 @@
 #include <array>
 #include <cstddef>
 #include <utility>
+#include <vector>
 
 std::size_t images_per_locality = 7;
 std::size_t iterations = 20;
