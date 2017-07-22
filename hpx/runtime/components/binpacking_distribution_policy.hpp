@@ -252,7 +252,7 @@ namespace hpx { namespace components
         ///
         /// \param locs     [in] The list of localities the new instance should
         ///                 represent
-        /// \param counter_name  [in] The name of the performance counter which
+        /// \param perf_counter_name  [in] The name of the performance counter which
         ///                      should be used as the distribution criteria
         ///                      (by default the overall number of existing
         ///                      instances of the given component type will be
@@ -260,7 +260,7 @@ namespace hpx { namespace components
         ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> const& locs,
-            char const* counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name = default_binpacking_counter_name) const
         {
 #if defined(HPX_DEBUG)
             for (id_type const& loc: locs)
@@ -268,7 +268,7 @@ namespace hpx { namespace components
                 HPX_ASSERT(naming::is_locality(loc));
             }
 #endif
-            return binpacking_distribution_policy(locs, counter_name);
+            return binpacking_distribution_policy(locs, perf_counter_name);
         }
 
         /// Create a new \a default_distribution policy representing the given
@@ -276,7 +276,7 @@ namespace hpx { namespace components
         ///
         /// \param locs     [in] The list of localities the new instance should
         ///                 represent
-        /// \param counter_name  [in] The name of the performance counter which
+        /// \param perf_counter_name  [in] The name of the performance counter which
         ///                      should be used as the distribution criteria
         ///                      (by default the overall number of existing
         ///                      instances of the given component type will be
@@ -284,7 +284,7 @@ namespace hpx { namespace components
         ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> && locs,
-            char const* counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name = default_binpacking_counter_name) const
         {
 #if defined(HPX_DEBUG)
             for (id_type const& loc: locs)
@@ -292,7 +292,8 @@ namespace hpx { namespace components
                 HPX_ASSERT(naming::is_locality(loc));
             }
 #endif
-            return binpacking_distribution_policy(std::move(locs), counter_name);
+            return binpacking_distribution_policy(std::move(locs),
+                perf_counter_name);
         }
 
         /// Create a new \a default_distribution policy representing the given
@@ -300,17 +301,17 @@ namespace hpx { namespace components
         ///
         /// \param loc     [in] The locality the new instance should
         ///                 represent
-        /// \param counter_name  [in] The name of the performance counter which
+        /// \param perf_counter_name  [in] The name of the performance counter which
         ///                      should be used as the distribution criteria
         ///                      (by default the overall number of existing
         ///                      instances of the given component type will be
         ///                      used).
         ///
         binpacking_distribution_policy operator()(id_type const& loc,
-            char const* counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name = default_binpacking_counter_name) const
         {
             HPX_ASSERT(naming::is_locality(loc));
-            return binpacking_distribution_policy(loc, counter_name);
+            return binpacking_distribution_policy(loc, perf_counter_name);
         }
 
         /// Create one object on one of the localities associated by
@@ -432,20 +433,20 @@ namespace hpx { namespace components
     protected:
         /// \cond NOINTERNAL
         binpacking_distribution_policy(std::vector<id_type> const& localities,
-                char const* counter_name)
+                char const* perf_counter_name)
           : localities_(localities),
-            counter_name_(counter_name)
+            counter_name_(perf_counter_name)
         {}
 
         binpacking_distribution_policy(std::vector<id_type> && localities,
-                char const* counter_name)
+                char const* perf_counter_name)
           : localities_(std::move(localities)),
-            counter_name_(counter_name)
+            counter_name_(perf_counter_name)
         {}
 
         binpacking_distribution_policy(id_type const& locality,
-                char const* counter_name)
-          : counter_name_(counter_name)
+                char const* perf_counter_name)
+          : counter_name_(perf_counter_name)
         {
             localities_.push_back(locality);
         }
