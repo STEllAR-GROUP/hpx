@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#define HPX_NO_DEPRECATE_UNWRAPPED
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/actions.hpp>
@@ -262,28 +264,6 @@ int hpx_main(
                 futures.push_back(hpx::make_ready_future(42));
 
             HPX_TEST_EQ(unwrapped(&accumulate)(futures), 42 * 64);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // Functional wrapper, tuple of future
-        {
-            hpx::util::tuple<future<int>, future<int> > tuple =
-                hpx::util::forward_as_tuple(
-                    hpx::make_ready_future(42), hpx::make_ready_future(42));
-
-            HPX_TEST_EQ(unwrapped(&add)(tuple), 42 + 42);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // Functional wrapper, future of tuple of future
-        {
-            hpx::future<
-                hpx::util::tuple<future<int>, future<int> >
-            > tuple_future =
-                hpx::make_ready_future(hpx::util::make_tuple(
-                    hpx::make_ready_future(42), hpx::make_ready_future(42)));
-
-            HPX_TEST_EQ(unwrapped2(&add)(tuple_future), 42 + 42);
         }
     }
 
