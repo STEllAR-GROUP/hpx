@@ -421,8 +421,10 @@ namespace hpx { namespace threads { namespace coroutines
             std::ptrdiff_t m_stack_size;
             void* m_stack;
 
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
             struct sigaction action;
             stack_t segv_stack;
+#endif
         };
 
         typedef x86_linux_context_impl context_impl;

@@ -12,6 +12,7 @@ set(tests
     iarchive_1237
     protect_with_nullary_pfo
     serialize_buffer_1069
+    set_config_entry_deadlock
     tuple_serialization_803
     unwrapped_1528
     use_all_cores_2262
