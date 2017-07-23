@@ -19,7 +19,11 @@ foreach(example_program ${example_programs})
   add_hpx_executable(${example_program}
                      SOURCES ${sources}
                      ${${example_program}_FLAGS}
-                     FOLDER "Examples/FutureReduce")
+                     FOLDER "Examples/ResourcePartitioner")
+
+  if(MSVC)
+    add_definitions(-D_USE_MATH_DEFINES)
+  endif()
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.resource_partitioner.${example_program})

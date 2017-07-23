@@ -17,14 +17,6 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
-//
-#include <bitset>
-//
-#if defined(HPX_HAVE_MAX_CPU_COUNT)
-typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> bitset_type;
-#else
-typedef std::bitset<32> bitset_type;
-#endif
 
 namespace hpx { namespace threads
 {
@@ -34,21 +26,20 @@ namespace hpx { namespace threads
         template <typename Scheduler>
         struct init_tss_helper;
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
         class thread_pool_impl : public thread_pool
         {
         public:
-            ///////////////////////////////////////////////////////////////////////////
-
-            thread_pool_impl(Scheduler *sched,
+            ///////////////////////////////////////////////////////////////////
+            thread_pool_impl(std::unique_ptr<Scheduler> sched,
                 threads::policies::callback_notifier &notifier,
                 std::size_t index, char const *pool_name,
                 policies::scheduler_mode m =
                     policies::scheduler_mode::nothing_special,
                 std::size_t thread_offset = 0)
               : thread_pool(notifier, index, pool_name, m)
-              , sched_(sched)
+              , sched_(std::move(sched))
               , thread_offset_(thread_offset)
             {
                 timestamp_scale_ = 1.0;
@@ -68,7 +59,6 @@ namespace hpx { namespace threads
                     }
                     threads_.clear();
                 }
-                delete sched_;
             }
 
             void print_pool()
@@ -77,12 +67,17 @@ namespace hpx { namespace threads
                           << "] with scheduler " << sched_->get_scheduler_name()
                           << "\n"
                           << "is running on PUs : \n";
-                std::cout << bitset_type(used_processing_units_) << "\n";
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || \
+    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
+                std::cout << std::hex << "0x" << used_processing_units_ << '\n';
+#else
+                std::cout << "0b" << used_processing_units_ << '\n';
+#endif
             }
 
             threads::policies::scheduler_base *get_scheduler() const
             {
-                return sched_;
+                return sched_.get();
             }
 
             ///////////////////////////////////////////////////////////////////
@@ -155,8 +150,8 @@ namespace hpx { namespace threads
                     return;
                 }
 
-                detail::create_thread(sched_, data, id, initial_state, run_now,
-                    ec);    //-V601
+                detail::create_thread(sched_.get(), data, id, initial_state, 
+                    run_now, ec);    //-V601
             }
 
             void create_work(thread_init_data &data,
@@ -172,7 +167,7 @@ namespace hpx { namespace threads
                     return;
                 }
 
-                detail::create_work(sched_, data, initial_state, ec);    //-V601
+                detail::create_work(sched_.get(), data, initial_state, ec);    //-V601
             }
 
             thread_id_type set_state(util::steady_time_point const &abs_time,
@@ -239,8 +234,7 @@ namespace hpx { namespace threads
                         "number of threads is zero");
                 }
 
-                if (!threads_.empty() ||
-                    sched_->has_reached_state(state_running))
+                if (!threads_.empty() || sched_->has_reached_state(state_running))
                     return true;    // do nothing if already running
 
                 executed_threads_.resize(pool_threads);
@@ -337,13 +331,13 @@ namespace hpx { namespace threads
                     threads::mask_cref_type mask =
                         get_resource_partitioner().get_pu_mask(
                             global_thread_num, sched_->numa_sensitive());
+
                     // thread_num ordering: 1. threads of default pool
                     //                      2. threads of first special pool
                     //                      3. etc.
                     // get_pu_mask expects index according to ordering of masks
                     // in affinity_data::affinity_masks_
                     // which is in order of occupied PU
-
                     LTM_(info)    //-V128
                         << "thread_pool::run: " << id_.name_
                         << " create OS thread "
@@ -470,7 +464,7 @@ namespace hpx { namespace threads
                 if (!threads_.empty())
                 {
                     // set state to stopping
-                    sched_->set_all_states(state_stopping);
+                    sched_->Scheduler::set_all_states(state_stopping);
 
                     // make sure we're not waiting
                     sched_->Scheduler::do_some_work(std::size_t(-1));
@@ -596,7 +590,7 @@ namespace hpx { namespace threads
                             detail::scheduling_callbacks callbacks(
                                 util::bind(    //-V107
                                     &policies::scheduler_base::idle_callback,
-                                    sched_, global_thread_num),
+                                    std::ref(sched_), global_thread_num),
                                 detail::scheduling_callbacks::callback_type());
 
                             if (mode_ & policies::do_background_work)
@@ -604,7 +598,7 @@ namespace hpx { namespace threads
                                 callbacks.background_ = util::bind(    //-V107
                                     &policies::scheduler_base::
                                         background_callback,
-                                    sched_, global_thread_num);
+                                    std::ref(sched_), global_thread_num);
                             }
 
                             sched_->set_scheduler_mode(mode_);
@@ -762,7 +756,6 @@ namespace hpx { namespace threads
             }
 #endif
 #endif
-
             std::int64_t get_queue_length(std::size_t num_thread) const
             {
                 return sched_->Scheduler::get_queue_length(num_thread);
@@ -831,16 +824,16 @@ namespace hpx { namespace threads
 
         private:
             // hold the used scheduler
-            Scheduler *sched_;
+            std::unique_ptr<Scheduler> sched_;
             std::size_t
-                thread_offset_;    // is equal to the accumulated number of threads in all pools preceding this pool
-                // in the thread indexation. That means, that in order to know the global index
-                // of a thread it owns, the pool has to compute:
+                thread_offset_;    // is equal to the accumulated number of
+                                   // threads in all pools preceding this pool
+                // in the thread indexation. That means, that in order to know
+                // the global index of a thread it owns, the pool has to compute:
                 // global index = thread_offset_ + local index.
         };
 
         ///////////////////////////////////////////////////////////////////////////
-
         template <typename Scheduler>
         struct init_tss_helper
         {

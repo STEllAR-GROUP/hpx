@@ -140,10 +140,11 @@ namespace resource {
     };
 
     using scheduler_function =
-        std::function<hpx::threads::detail::thread_pool *(
-            hpx::threads::policies::callback_notifier &notifier,
-            std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, char const *pool_name)>;
+        util::function_nonser<
+            std::unique_ptr<hpx::threads::detail::thread_pool>(
+                hpx::threads::policies::callback_notifier&,
+                std::size_t, std::size_t, std::size_t, char const *
+            )>;
 
     // scheduler assigned to thread_pool
     // choose same names as in command-line options except with _ instead of -
@@ -174,14 +175,14 @@ namespace resource {
 
         friend class resource_partitioner;
 
-        static std::size_t
-            num_threads_overall;    // counter ... overall, in all the thread pools
+        // counter ... overall, in all the thread pools
+        static std::size_t num_threads_overall;
 
     private:
         init_pool_data(const std::string &name,
             scheduling_policy = scheduling_policy::unspecified);
 
-        init_pool_data(const std::string &name, scheduler_function create_func);
+        init_pool_data(std::string const& name, scheduler_function create_func);
 
         std::string pool_name_;
         scheduling_policy scheduling_policy_;

@@ -188,15 +188,17 @@ namespace resource {
     }
 
     init_pool_data::init_pool_data(const std::string &name,
-        scheduler_function create_func)
+            scheduler_function create_func)
       : pool_name_(name)
       , scheduling_policy_(user_defined)
       , num_threads_(0)
-      , create_function_(create_func)
+      , create_function_(std::move(create_func))
     {
         if (name.empty())
-            throw std::invalid_argument("cannot instantiate a thread pool with "
-                                        "empty string as a name.");
+        {
+            throw std::invalid_argument(
+                "cannot instantiate a thread pool with empty string as a name.");
+        }
     }
 
     // mechanism for adding resources
@@ -588,7 +590,7 @@ namespace resource {
         if (name == "default")
         {
             initial_thread_pools_[0] =
-                init_pool_data("default", scheduler_creation);
+                init_pool_data("default", std::move(scheduler_creation));
             return;
         }
 
@@ -604,7 +606,7 @@ namespace resource {
         }
 
         initial_thread_pools_.push_back(
-            init_pool_data(name, scheduler_creation));
+            init_pool_data(name, std::move(scheduler_creation)));
     }
 
     // ----------------------------------------------------------------------
@@ -814,7 +816,7 @@ namespace resource {
         return cfg_.parse_terminate_;
     }
 
-    const scheduler_function &resource_partitioner::get_pool_creator(
+    scheduler_function const& resource_partitioner::get_pool_creator(
         size_t index) const
     {
         if (index >= initial_thread_pools_.size())

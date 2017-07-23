@@ -71,9 +71,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 "OS-threads");
             return;
         }
-        scheduler_ = new Scheduler(num_punits);
+
+        std::unique_ptr<Scheduler> scheduler(new Scheduler(num_punits));
+        scheduler_ = scheduler.get();
+
         pool_.reset(new threads::detail::thread_pool_impl<Scheduler>(
-            scheduler_, notifier_, 0, executor_name_.c_str()));
+            std::move(scheduler), notifier_, 0, executor_name_.c_str()));
 
         std::unique_lock<mutex_type> lk(mtx_);
         pool_->init(num_threads_, 0);

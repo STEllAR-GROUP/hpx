@@ -323,7 +323,7 @@ namespace hpx { namespace threads
             {
             case resource::unspecified:
             {
-                const auto& pool_func = rp.get_pool_creator(i);
+                auto const& pool_func = rp.get_pool_creator(i);
                 std::unique_ptr<detail::thread_pool> pool(pool_func(notifier,
                     num_threads_in_pool, thread_offset, i, name.c_str()));
                 pools_.push_back(std::move(pool));
@@ -351,14 +351,14 @@ namespace hpx { namespace threads
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     1000, numa_sensitive, "core-local_queue_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -395,14 +395,14 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
                     "core-local_priority_queue_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -432,14 +432,14 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
                     "core-local_priority_queue_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -468,14 +468,14 @@ namespace hpx { namespace threads
                     local_sched_type;
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     1000, numa_sensitive, "core-static_queue_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -515,14 +515,14 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, numa_sensitive,
                     "core-static_priority_queue_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -558,14 +558,14 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, cfg_.numa_sensitive_,
                     "core-abp_fifo_priority_queue_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -599,14 +599,14 @@ namespace hpx { namespace threads
                     arity = cfg_.vm_["hpx:hierarchy-arity"].as<std::size_t>();
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     arity, 1000, 0, "core-hierarchy_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -640,14 +640,14 @@ namespace hpx { namespace threads
                 local_sched_type::init_parameter_type init(num_threads_in_pool,
                     num_high_priority_queues, 1000, cfg_.numa_sensitive_,
                     "core-periodic_priority_queue_scheduler");
-                threads::policies::scheduler_base* sched =
-                    new local_sched_type(init);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
 
                 // instantiate the pool
                 std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
                             local_sched_type
-                        >(static_cast<local_sched_type*>(sched),
+                        >(std::move(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
@@ -688,10 +688,6 @@ namespace hpx { namespace threads
 
     threadmanager_impl::~threadmanager_impl()
     {
-//         for (auto pool_iter : pools_)
-//         {
-//             delete pool_iter;
-//         }
     }
 
     void threadmanager_impl::init()
