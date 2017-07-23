@@ -313,15 +313,17 @@ namespace hpx { namespace threads
             if (i == 0)
             {
                 if (name != "default")
+                {
                     throw std::invalid_argument("Trying to instantiate pool " +
                         name +
                         " as first thread pool, but first thread pool must be "
                         "named default");
+                }
             }
 
             switch (sched_type)
             {
-            case resource::unspecified:
+            case resource::user_defined:
             {
                 auto const& pool_func = rp.get_pool_creator(i);
                 std::unique_ptr<detail::thread_pool> pool(pool_func(notifier,
@@ -329,7 +331,7 @@ namespace hpx { namespace threads
                 pools_.push_back(std::move(pool));
                 break;
             }
-            case resource::user_defined:
+            case resource::unspecified:
             {
                 throw std::invalid_argument(
                     "cannot instantiate a thread-manager if the thread-pool" +
@@ -678,8 +680,8 @@ namespace hpx { namespace threads
         // fill the thread-lookup table
         for (auto& pool_iter : pools_)
         {
-            size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
-            for (size_t i(0); i < nt; i++)
+            std::size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
+            for (std::size_t i(0); i < nt; i++)
             {
                 threads_lookup_.push_back(pool_iter->get_pool_id());
             }
