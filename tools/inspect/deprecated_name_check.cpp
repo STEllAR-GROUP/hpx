@@ -85,6 +85,10 @@ namespace boost
       { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
       { "(\\bNULL\\b)", "nullptr" },
+      // Boost preprocessor macros
+      { "\\b(BOOST_PP_CAT)\\b", "HPX_PP_CAT" },
+      { "\\b(BOOST_PP_STRINGIZE)\\b", "HPX_PP_STRINGIZE" },
+      { "\\b(BOOST_STRINGIZE)\\b", "HPX_PP_STRINGIZE(HPX_PP_EXPAND())" },
       { nullptr, nullptr }
     };
 

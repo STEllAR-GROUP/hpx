@@ -8,12 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters.hpp>
-
+#include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstdint>
 #include <string>

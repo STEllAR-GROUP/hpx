@@ -5,10 +5,11 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <boost/format.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -22,8 +23,8 @@ using hpx::find_here;
 using hpx::cout;
 using hpx::flush;
 
-#define HPX_SIZEOF(type)                                                \
-    (boost::format(fmter) % BOOST_PP_STRINGIZE(type) % sizeof(type))    \
+#define HPX_SIZEOF(type)                                                      \
+    (boost::format(fmter) % HPX_PP_STRINGIZE(type) % sizeof(type))            \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
