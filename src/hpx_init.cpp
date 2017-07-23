@@ -570,10 +570,7 @@ namespace hpx
             return 0;
         }
 
-
-
         ///////////////////////////////////////////////////////////////////////
-
         HPX_EXPORT int run_or_start(
             util::function_nonser<
                 int(boost::program_options::variables_map& vm)
@@ -618,14 +615,17 @@ namespace hpx
                 // Construct resource partitioner if this has not been done yet
                 // and get a handle to it
                 // (if the command-line parsing has not yet been done, do it now)
-                auto &rp = hpx::get_resource_partitioner(desc_cmdline, argc, argv, std::move(ini_config), mode, false);
+                auto& rp = hpx::get_resource_partitioner(desc_cmdline, argc,
+                    argv, std::move(ini_config), mode, false);
 
-                // give the command_line_handling object the options the user may have passed as arguments of hpx_init(...)
+                // give the command_line_handling object the options the user
+                // may have passed as arguments of hpx_init(...)
                 rp.set_hpx_init_options(f);
 
                 // check whether HPX should be exited at this point
                 // (if the program options contain --hpx:help or --hpx:version)
-                if (rp.terminate_after_parse()) {
+                if (rp.terminate_after_parse())
+                {
                     if (result > 0)
                         result = 0;
                     return result;
@@ -635,8 +635,10 @@ namespace hpx
                 rp.configure_pools();
 
                 // initialize logging
-                util::detail::init_logging(rp.get_command_line_switches().rtcfg_,
-                                           rp.get_command_line_switches().rtcfg_.mode_ == runtime_mode_console);
+                util::detail::init_logging(
+                    rp.get_command_line_switches().rtcfg_,
+                    rp.get_command_line_switches().rtcfg_.mode_ ==
+                        runtime_mode_console);
 
                 util::apex_wrapper_init apex(argc, argv);
 
@@ -646,10 +648,11 @@ namespace hpx
                 // Build and configure this runtime instance.
                 typedef hpx::runtime_impl runtime_type;
                 std::unique_ptr<hpx::runtime> rt(
-                        new runtime_type(rp.get_command_line_switches().rtcfg_));
+                    new runtime_type(rp.get_command_line_switches().rtcfg_));
 
-                result = run_or_start(blocking, std::move(rt), rp.get_command_line_switches(),
-                                    std::move(startup), std::move(shutdown));
+                result = run_or_start(blocking, std::move(rt),
+                    rp.get_command_line_switches(), std::move(startup),
+                    std::move(shutdown));
             }
             catch (detail::command_line_error const& e) {
                 std::cerr << "{env}: " << hpx::detail::get_execution_environment();

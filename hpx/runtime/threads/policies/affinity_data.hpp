@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -70,5 +72,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
     };
 }}}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif /*HPX_RUNTIME_THREADS_POLICIES_AFFINITY_DATA_HPP*/

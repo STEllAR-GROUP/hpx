@@ -60,39 +60,45 @@ namespace hpx {
 
         // helper functions testing option compatibility
         void ensure_high_priority_compatibility(
-                boost::program_options::variables_map const& vm)
+            boost::program_options::variables_map const& vm)
         {
-            if (vm.count("hpx:high-priority-threads")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:high-priority-threads, valid for "
-                                                         "--hpx:queuing=local-priority and "
-                                                         "--hpx:queuing=abp-priority only");
+            if (vm.count("hpx:high-priority-threads"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:high-priority-threads, valid for "
+                    "--hpx:queuing=local-priority and "
+                    "--hpx:queuing=abp-priority only");
             }
         }
 
         void ensure_numa_sensitivity_compatibility(
-                boost::program_options::variables_map const& vm)
+            boost::program_options::variables_map const& vm)
         {
-            if (vm.count("hpx:numa-sensitive")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:numa-sensitive, valid for "
-                                                         "--hpx:queuing=local, --hpx:queuing=local-priority, or "
-                                                         "--hpx:queuing=abp-priority only");
+            if (vm.count("hpx:numa-sensitive"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:numa-sensitive, valid for "
+                    "--hpx:queuing=local, --hpx:queuing=local-priority, or "
+                    "--hpx:queuing=abp-priority only");
             }
         }
 
         void ensure_hierarchy_arity_compatibility(
-                boost::program_options::variables_map const& vm)
+            boost::program_options::variables_map const& vm)
         {
-            if (vm.count("hpx:hierarchy-arity")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:hierarchy-arity, valid for "
-                                                         "--hpx:queuing=hierarchy only.");
+            if (vm.count("hpx:hierarchy-arity"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:hierarchy-arity, valid for "
+                    "--hpx:queuing=hierarchy only.");
             }
         }
 
         void ensure_queuing_option_compatibility(
-                boost::program_options::variables_map const& vm)
+            boost::program_options::variables_map const& vm)
         {
             ensure_high_priority_compatibility(vm);
             ensure_numa_sensitivity_compatibility(vm);
@@ -100,89 +106,96 @@ namespace hpx {
         }
 
         void ensure_hwloc_compatibility(
-                boost::program_options::variables_map const& vm)
+            boost::program_options::variables_map const& vm)
         {
 #if defined(HPX_HAVE_HWLOC)
             // pu control is available for HWLOC only
-            if (vm.count("hpx:pu-offset")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:pu-offset, valid for --hpx:queuing=priority or "
-                                                         "--hpx:queuing=local-priority only.");
+            if (vm.count("hpx:pu-offset"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:pu-offset, valid for --hpx:queuing=priority or "
+                    "--hpx:queuing=local-priority only.");
             }
-            if (vm.count("hpx:pu-step")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:pu-step, valid for --hpx:queuing=abp-priority, "
-                                                         "--hpx:queuing=periodic-priority, or "
-                                                         "--hpx:queuing=local-priority only.");
+            if (vm.count("hpx:pu-step"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:pu-step, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
 #endif
 #if defined(HPX_HAVE_HWLOC)
             // affinity control is available for HWLOC only
-            if (vm.count("hpx:affinity")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:affinity, valid for --hpx:queuing=abp-priority, "
-                                                         "--hpx:queuing=periodic-priority, or "
-                                                         "--hpx:queuing=local-priority only.");
+            if (vm.count("hpx:affinity"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:affinity, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
-            if (vm.count("hpx:bind")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:bind, valid for --hpx:queuing=abp-priority, "
-                                                         "--hpx:queuing=periodic-priority, or "
-                                                         "--hpx:queuing=local-priority only.");
+            if (vm.count("hpx:bind"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:bind, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
-            if (vm.count("hpx:print-bind")) {
-                throw detail::command_line_error("Invalid command line option "
-                                                         "--hpx:print-bind, valid for --hpx:queuing=abp-priority, "
-                                                         "--hpx:queuing=periodic-priority, or "
-                                                         "--hpx:queuing=local-priority only.");
+            if (vm.count("hpx:print-bind"))
+            {
+                throw detail::command_line_error(
+                    "Invalid command line option "
+                    "--hpx:print-bind, valid for --hpx:queuing=abp-priority, "
+                    "--hpx:queuing=periodic-priority, or "
+                    "--hpx:queuing=local-priority only.");
             }
 #endif
         }
 
-
         ///////////////////////////////////////////////////////////////////////
-
         std::size_t get_num_high_priority_queues(
-                util::command_line_handling const& cfg, std::size_t num_threads)
+            util::command_line_handling const& cfg, std::size_t num_threads)
         {
             std::size_t num_high_priority_queues = num_threads;
-            if (cfg.vm_.count("hpx:high-priority-threads")) {
+            if (cfg.vm_.count("hpx:high-priority-threads"))
+            {
                 num_high_priority_queues =
-                        cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
+                    cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
                 if (num_high_priority_queues > num_threads)
                 {
                     throw detail::command_line_error(
-                            "Invalid command line option: "
-                                    "number of high priority threads ("
-                                    "--hpx:high-priority-threads), should not be larger "
-                                    "than number of threads (--hpx:threads)");
+                        "Invalid command line option: "
+                        "number of high priority threads ("
+                        "--hpx:high-priority-threads), should not be larger "
+                        "than number of threads (--hpx:threads)");
                 }
             }
             return num_high_priority_queues;
         }
-
-
     } // namespace detail
+}
 
-
-    namespace threads
+namespace hpx { namespace threads
+{
+    ///////////////////////////////////////////////////////////////////////
+    namespace strings
     {
-        ///////////////////////////////////////////////////////////////////////////
-        namespace strings
+        char const* const thread_state_names[] =
         {
-            char const* const thread_state_names[] =
-            {
-            "unknown",
-            "active",
-            "pending",
-            "suspended",
-            "depleted",
-            "terminated",
-            "staged",
-            "pending_do_not_schedule",
-            "pending_boost"
-            };
-        }
+        "unknown",
+        "active",
+        "pending",
+        "suspended",
+        "depleted",
+        "terminated",
+        "staged",
+        "pending_do_not_schedule",
+        "pending_boost"
+        };
+    }
 
     char const* get_thread_state_name(thread_state_enum state)
     {
@@ -196,7 +209,7 @@ namespace hpx {
         return get_thread_state_name(state.state());
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     namespace strings
     {
         char const* const thread_state_ex_names[] =
@@ -216,7 +229,7 @@ namespace hpx {
         return strings::thread_state_ex_names[state_ex];
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     namespace strings
     {
         char const* const thread_priority_names[] =
@@ -232,19 +245,17 @@ namespace hpx {
 
     char const* get_thread_priority_name(thread_priority priority)
     {
-        if (priority < thread_priority_default || priority > thread_priority_high)
+        if (priority < thread_priority_default ||
+            priority > thread_priority_high)
+        {
             return "unknown";
+        }
         return strings::thread_priority_names[priority];
     }
 
-    namespace strings
-    {
-        char const* const stack_size_names[] =
-        {
-            "small",
-            "medium",
-            "large",
-            "huge",
+    namespace strings {
+        char const* const stack_size_names[] = {
+            "small", "medium", "large", "huge",
         };
     }
 
@@ -266,7 +277,7 @@ namespace hpx {
         if (size < thread_stacksize_small || size > thread_stacksize_huge)
             return "custom";
 
-        return strings::stack_size_names[size-1];
+        return strings::stack_size_names[size - 1];
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -280,7 +291,7 @@ namespace hpx {
         set_state_logger_("threadmanager_impl::set_state"),
         notifier_(notifier)
     {
-        auto &rp = hpx::get_resource_partitioner();
+        auto& rp = hpx::get_resource_partitioner();
         rp.set_threadmanager(this);
         size_t num_pools = rp.get_num_pools();
         util::command_line_handling cfg_ = rp.get_command_line_switches();
@@ -288,329 +299,368 @@ namespace hpx {
         std::size_t thread_offset = 0;
 
         // instantiate the pools
-        for (size_t i(0); i<num_pools; i++) {
-
+        for (size_t i(0); i < num_pools; i++)
+        {
             name = rp.get_pool_name(i);
             resource::scheduling_policy sched_type = rp.which_scheduler(name);
             std::size_t num_threads_in_pool = rp.get_num_threads(i);
 
             // make sure the first thread-pool that gets instantiated is the default one
-            if (i == 0){
+            if (i == 0)
+            {
                 if (name != "default")
-                    throw std::invalid_argument("Trying to instantiate pool " + name +
-                    " as first thread pool, but first thread pool must be named default");
+                    throw std::invalid_argument("Trying to instantiate pool " +
+                        name +
+                        " as first thread pool, but first thread pool must be "
+                        "named default");
             }
 
-            switch (sched_type) {
-                case -2 : // user supplied
-                {
-                    const auto &pool_func = rp.get_pool_creator(i);
-                    detail::thread_pool* pool = pool_func(
-                        notifier,
-                        num_threads_in_pool, thread_offset,
-                        i, name.c_str()
-                    );
-                    pools_.push_back(pool);
-                    break;
-                }
-                case -1 : // unspecified = -1
-                {
-                    throw std::invalid_argument("cannot instantiate a thread-manager if the thread-pool"
-                                                + name + " has an unspecified scheduler type");
-                }
-                case 0 : // local = 0
-                {
+            switch (sched_type)
+            {
+            case -2:    // user supplied
+            {
+                const auto& pool_func = rp.get_pool_creator(i);
+                detail::thread_pool* pool = pool_func(notifier,
+                    num_threads_in_pool, thread_offset, i, name.c_str());
+                pools_.push_back(pool);
+                break;
+            }
+            case -1:    // unspecified = -1
+            {
+                throw std::invalid_argument(
+                    "cannot instantiate a thread-manager if the thread-pool" +
+                    name + " has an unspecified scheduler type");
+            }
+            case 0:    // local = 0
+            {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    std::string affinity_desc;
-                    std::size_t numa_sensitive =
-                            hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
 
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::local_queue_scheduler<>
-                            local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, 1000, numa_sensitive,
-                            "core-local_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the scheduler
+                typedef hpx::threads::policies::local_queue_scheduler<>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    1000, numa_sensitive, "core-local_queue_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
 #else
-                    throw detail::command_line_error("Command line option "
-                        "--hpx:queuing=local "
-                        "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local'.");
+                throw detail::command_line_error(
+                    "Command line option "
+                    "--hpx:queuing=local "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local'.");
 #endif
-                    break;
-                }
+                break;
+            }
 
-                case 1 : // local_priority_fifo = 1
-                {
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
-                    std::string affinity_desc;
-                    std::size_t numa_sensitive =
-                            hpx::detail::get_affinity_description(cfg_, affinity_desc);
+            case 1:    // local_priority_fifo = 1
+            {
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                std::size_t num_high_priority_queues =
+                    hpx::detail::get_num_high_priority_queues(
+                        cfg_, rp.get_num_threads(name));
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
 
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::local_priority_queue_scheduler<
-                            compat::mutex, hpx::threads::policies::lockfree_fifo
-                    > local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, num_high_priority_queues, 1000,
-                            numa_sensitive, "core-local_priority_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the scheduler
+                typedef hpx::threads::policies::local_priority_queue_scheduler<
+                    compat::mutex, hpx::threads::policies::lockfree_fifo>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    num_high_priority_queues, 1000, numa_sensitive,
+                    "core-local_priority_queue_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
-                    break;
-                }
+                break;
+            }
 
-                case 2 : // local_priority_lifo = 2
-                {
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
-                    std::string affinity_desc;
-                    std::size_t numa_sensitive =
-                            hpx::detail::get_affinity_description(cfg_, affinity_desc);
+            case 2:    // local_priority_lifo = 2
+            {
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                std::size_t num_high_priority_queues =
+                    hpx::detail::get_num_high_priority_queues(
+                        cfg_, rp.get_num_threads(name));
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
 
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::local_priority_queue_scheduler<
-                            compat::mutex, hpx::threads::policies::lockfree_lifo
-                    > local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, num_high_priority_queues, 1000,
-                            numa_sensitive, "core-local_priority_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the scheduler
+                typedef hpx::threads::policies::local_priority_queue_scheduler<
+                    compat::mutex, hpx::threads::policies::lockfree_lifo>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    num_high_priority_queues, 1000, numa_sensitive,
+                    "core-local_priority_queue_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
-                    break;
-                }
+                break;
+            }
 
-
-                case 3 : // static_ = 3
-                {
+            case 3:    // static_ = 3
+            {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    std::string affinity_domain = hpx::detail::get_affinity_domain(cfg_);
-                    std::string affinity_desc;
-                    std::size_t numa_sensitive =
-                            hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                std::string affinity_domain =
+                    hpx::detail::get_affinity_domain(cfg_);
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
 
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::static_queue_scheduler<>
-                            local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, 1000, numa_sensitive,
-                            "core-static_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the scheduler
+                typedef hpx::threads::policies::static_queue_scheduler<>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    1000, numa_sensitive, "core-static_queue_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
 #else
-                    throw detail::command_line_error("Command line option "
-                        "--hpx:queuing=static "
-                        "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static'.");
+                throw detail::command_line_error(
+                    "Command line option "
+                    "--hpx:queuing=static "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static'.");
 #endif
-                    break;
-                }
+                break;
+            }
 
-
-                case 4 : // static_priority = 4
-                {
+            case 4:    // static_priority = 4
+            {
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
-                    std::string affinity_domain = hpx::detail::get_affinity_domain(cfg_);
-                    std::string affinity_desc;
-                    std::size_t numa_sensitive =
-                            hpx::detail::get_affinity_description(cfg_, affinity_desc);
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                std::size_t num_high_priority_queues =
+                    hpx::detail::get_num_high_priority_queues(
+                        cfg_, rp.get_num_threads(name));
+                std::string affinity_domain =
+                    hpx::detail::get_affinity_domain(cfg_);
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
 
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::static_priority_queue_scheduler<>
-                            local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, num_high_priority_queues,
-                            1000, numa_sensitive,
-                            "core-static_priority_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the scheduler
+                typedef hpx::threads::policies::
+                    static_priority_queue_scheduler<>
+                        local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    num_high_priority_queues, 1000, numa_sensitive,
+                    "core-static_priority_queue_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
 #else
-                    throw detail::command_line_error("Command line option "
-                        "--hpx:queuing=static-priority "
-                        "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static-priority'.");
+                throw detail::command_line_error(
+                    "Command line option "
+                    "--hpx:queuing=static-priority "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static-priority'.");
 #endif
-                    break;
-                }
+                break;
+            }
 
-
-                case 5 : // abp_priority = 5
-                {
+            case 5:    // abp_priority = 5
+            {
 #if defined(HPX_HAVE_ABP_SCHEDULER)
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
-                    std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
+                std::size_t num_high_priority_queues =
+                    hpx::detail::get_num_high_priority_queues(
+                        cfg_, rp.get_num_threads(name));
 
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::local_priority_queue_scheduler<
-                            compat::mutex, hpx::threads::policies::lockfree_fifo
-                    > local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, num_high_priority_queues, 1000,
-                            cfg_.numa_sensitive_, "core-abp_fifo_priority_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the scheduler
+                typedef hpx::threads::policies::local_priority_queue_scheduler<
+                    compat::mutex, hpx::threads::policies::lockfree_fifo>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    num_high_priority_queues, 1000, cfg_.numa_sensitive_,
+                    "core-abp_fifo_priority_queue_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
 #else
-                    throw detail::command_line_error("Command line option "
-                        "--hpx:queuing=abp-priority "
-                        "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
+                throw detail::command_line_error(
+                    "Command line option "
+                    "--hpx:queuing=abp-priority "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
 #endif
-                    break;
-                }
+                break;
+            }
 
-
-                case 6 : // hierarchy = 6
-                {
+            case 6:    // hierarchy = 6
+            {
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_high_priority_compatibility(
-                            cfg_.vm_);
-                    hpx::detail::ensure_numa_sensitivity_compatibility(cfg_.vm_);
-                    hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
+                hpx::detail::ensure_numa_sensitivity_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
 
-                    // instantiate the pool
-                    typedef hpx::threads::policies::hierarchy_scheduler<> local_sched_type;
-                    std::size_t arity = 2;
-                    if (cfg_.vm_.count("hpx:hierarchy-arity"))
-                        arity = cfg_.vm_["hpx:hierarchy-arity"].as<std::size_t>();
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, arity,
-                            1000, 0, "core-hierarchy_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the pool
+                typedef hpx::threads::policies::hierarchy_scheduler<>
+                    local_sched_type;
+                std::size_t arity = 2;
+                if (cfg_.vm_.count("hpx:hierarchy-arity"))
+                    arity = cfg_.vm_["hpx:hierarchy-arity"].as<std::size_t>();
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    arity, 1000, 0, "core-hierarchy_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
 #else
-                    throw detail::command_line_error("Command line option "
-                        "--hpx:queuing=hierarchy "
-                        "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_WITH_THREAD_SCHEDULERS=hierarchy'.");
+                throw detail::command_line_error(
+                    "Command line option "
+                    "--hpx:queuing=hierarchy "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=hierarchy'.");
 #endif
-                    break;
-                }
+                break;
+            }
 
+            case 7:    // periodic_priority = 7
+            {
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
+                std::size_t num_high_priority_queues =
+                    hpx::detail::get_num_high_priority_queues(
+                        cfg_, rp.get_num_threads(name));
 
-                case 7 : // periodic_priority = 7
-                {
-                    // set parameters for scheduler and pool instantiation and perform compatibility checks
-                    hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
-                    hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
-                    std::size_t num_high_priority_queues =
-                            hpx::detail::get_num_high_priority_queues(cfg_, rp.get_num_threads(name));
+                // instantiate the scheduler
+                typedef hpx::threads::policies::
+                    periodic_priority_queue_scheduler<>
+                        local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    num_high_priority_queues, 1000, cfg_.numa_sensitive_,
+                    "core-periodic_priority_queue_scheduler");
+                threads::policies::scheduler_base* sched =
+                    new local_sched_type(init);
 
-                    // instantiate the scheduler
-                    typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
-                            local_sched_type;
-                    local_sched_type::init_parameter_type init(
-                            num_threads_in_pool, num_high_priority_queues,
-                            1000, cfg_.numa_sensitive_, "core-periodic_priority_queue_scheduler");
-                    threads::policies::scheduler_base* sched = new local_sched_type(init);
+                // instantiate the pool
+                detail::thread_pool* pool =
+                    new hpx::threads::detail::thread_pool_impl<
+                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                        notifier, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset);
+                pools_.push_back(pool);
 
-                    // instantiate the pool
-                    detail::thread_pool* pool = new hpx::threads::detail::thread_pool_impl<local_sched_type>(
-                            static_cast<local_sched_type *>(sched), notifier, i, name.c_str(),
-                            policies::scheduler_mode(
-                                    policies::do_background_work | policies::reduce_thread_priority |
-                                    policies::delay_exit),
-                            thread_offset);
-                    pools_.push_back(pool);
+                break;
+            }
 
-                    break;
-                }
-
-
-                case 8 : // throttle = 8
-                {
-                    throw hpx::detail::command_line_error("Command line option "
-                        "--hpx:queuing=throttle "
-                        "is not configured in this build. Please rebuild with "
-                        "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle -DHPX_WITH_APEX'.");
-                    break;
-                }
+            case 8:    // throttle = 8
+            {
+                throw hpx::detail::command_line_error(
+                    "Command line option "
+                    "--hpx:queuing=throttle "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle "
+                    "-DHPX_WITH_APEX'.");
+                break;
+            }
             }
             // update the thread_offset for the next pool
             thread_offset += num_threads_in_pool;
-
         }
 
         // fill the thread-lookup table
@@ -636,8 +686,10 @@ namespace hpx {
         std::size_t threads_offset = 0;
 
         // initialize all pools
-        for(auto& pool_iter : pools_) {
-            std::size_t num_threads_in_pool = rp.get_num_threads(pool_iter->get_pool_name());
+        for (auto& pool_iter : pools_)
+        {
+            std::size_t num_threads_in_pool =
+                rp.get_num_threads(pool_iter->get_pool_name());
             pool_iter->init(num_threads_in_pool, threads_offset);
             threads_offset += num_threads_in_pool;
         }
@@ -682,49 +734,57 @@ namespace hpx {
                 + pool_name + "\". \n");
     }
 */
-    threadmanager_impl::pool_type threadmanager_impl::get_pool(std::string pool_name) const
+    threadmanager_impl::pool_type threadmanager_impl::get_pool(
+        std::string pool_name) const
     {
         // if the given pool_name is default, we don't need to look for it
-        if(pool_name == "default"){
+        if (pool_name == "default")
+        {
             return default_pool();
         }
 
         auto pool = std::find_if(
-                // don't start at begin() since the first one is the default, start one further
-                ++pools_.begin(), pools_.end(),
-                [&pool_name](pool_type itp) -> bool {
-                    return (itp->get_pool_name() == pool_name);}
-        );
+            // don't start at begin() since the first one is the default,
+            // start one further
+            ++pools_.begin(), pools_.end(),
+            [&pool_name](pool_type itp) -> bool {
+                return (itp->get_pool_name() == pool_name);
+            });
 
-        if(pool != pools_.end()){
+        if (pool != pools_.end())
+        {
             return *pool;
         }
 
         throw std::invalid_argument(
-                "the resource partitioner does not own a thread pool named \""
-                + pool_name + "\". \n");
+            "the resource partitioner does not own a thread pool named \"" +
+            pool_name + "\". \n");
         //! FIXME Add names of available pools?
     }
-    threadmanager_impl::pool_type threadmanager_impl::get_pool(detail::pool_id_type pool_id) const
+
+    threadmanager_impl::pool_type threadmanager_impl::get_pool(
+        detail::pool_id_type pool_id) const
     {
         return get_pool(pool_id.name_);
     }
-    threadmanager_impl::pool_type threadmanager_impl::get_pool(std::size_t thread_index) const
+
+    threadmanager_impl::pool_type threadmanager_impl::get_pool(
+        std::size_t thread_index) const
     {
         return get_pool(threads_lookup_[thread_index]);
     }
 
-
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t threadmanager_impl::
-        get_thread_count(thread_state_enum state, thread_priority priority,
-            std::size_t num_thread, bool reset) const
+    std::int64_t threadmanager_impl::get_thread_count(thread_state_enum state,
+        thread_priority priority, std::size_t num_thread, bool reset) const
     {
         std::int64_t total_count = 0;
         std::lock_guard<mutex_type> lk(mtx_);
 
-        for(auto& pool_iter : pools_){
-            total_count += pool_iter->get_thread_count(state, priority, num_thread, reset);
+        for (auto& pool_iter : pools_)
+        {
+            total_count +=
+                pool_iter->get_thread_count(state, priority, num_thread, reset);
         }
 
         return total_count;
@@ -1797,8 +1857,8 @@ namespace hpx {
 
         // reset the startup barrier for controlling startup
         HPX_ASSERT(startup_.get() == nullptr);
-        startup_.reset(new compat::barrier(
-                static_cast<unsigned>(num_threads + 1)));
+        startup_.reset(
+            new compat::barrier(static_cast<unsigned>(num_threads + 1)));
 
         // the main thread needs to have a unique thread_num
 
@@ -1809,8 +1869,10 @@ namespace hpx {
         LTM_(info) << "run: running timer pool";
         timer_pool_.run(false);
 
-        for(auto& pool_iter : pools_) {
-            std::size_t num_threads_in_pool = rp.get_num_threads(pool_iter->get_pool_name());
+        for (auto& pool_iter : pools_)
+        {
+            std::size_t num_threads_in_pool =
+                rp.get_num_threads(pool_iter->get_pool_name());
             if (pool_iter->get_os_thread_count() != 0 ||
                 pool_iter->has_reached_state(state_running))
             {
@@ -1827,7 +1889,8 @@ namespace hpx {
         startup_->wait();
 
         // set all states of all schedulers to "running"
-        for(auto& pool_iter : pools_) {
+        for (auto& pool_iter : pools_)
+        {
             pool_iter->get_scheduler()->set_all_states(state_running);
         }
 
@@ -1840,38 +1903,42 @@ namespace hpx {
         LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")";
 
         std::unique_lock<mutex_type> lk(mtx_);
-        for(auto& pool_iter : pools_) {
+        for (auto& pool_iter : pools_)
+        {
             pool_iter->stop(lk, blocking);
         }
         deinit_tss();
 
         LTM_(info) << "stop: stopping timer pool";
-        timer_pool_.stop();             // stop timer pool as well
-        if (blocking) {
+        timer_pool_.stop();    // stop timer pool as well
+        if (blocking)
+        {
             timer_pool_.join();
             timer_pool_.clear();
         }
     }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-    std::int64_t threadmanager_impl::
-        get_executed_threads(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_executed_threads(
+        std::size_t num, bool reset)
     {
         std::int64_t result = 0;
 
-        for(auto& pool_iter : pools_) {
+        for (auto& pool_iter : pools_)
+        {
             result += pool_iter->get_executed_threads(num, reset);
         }
 
         return result;
     }
 
-    std::int64_t threadmanager_impl::
-        get_executed_thread_phases(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_executed_thread_phases(
+        std::size_t num, bool reset)
     {
         std::int64_t result = 0;
 
-        for(auto& pool_iter : pools_) {
+        for (auto& pool_iter : pools_)
+        {
             result += pool_iter->get_executed_thread_phases(num, reset);
         }
 
@@ -1879,49 +1946,50 @@ namespace hpx {
     }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-    std::int64_t threadmanager_impl::
-        get_thread_phase_duration(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_thread_phase_duration(
+        std::size_t num, bool reset)
     {
         return pool_->get_thread_phase_duration(num, reset);
     }
 
-    std::int64_t threadmanager_impl::
-        get_thread_duration(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_thread_duration(
+        std::size_t num, bool reset)
     {
         return pool_->get_thread_duration(num, reset);
     }
 
-    std::int64_t threadmanager_impl::
-        get_thread_phase_overhead(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_thread_phase_overhead(
+        std::size_t num, bool reset)
     {
         return pool_->get_thread_phase_overhead(num, reset);
     }
 
-    std::int64_t threadmanager_impl::
-        get_thread_overhead(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_thread_overhead(
+        std::size_t num, bool reset)
     {
         return pool_->get_thread_overhead(num, reset);
     }
 
-    std::int64_t threadmanager_impl::
-        get_cumulative_thread_duration(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_cumulative_thread_duration(
+        std::size_t num, bool reset)
     {
         return pool_->get_cumulative_thread_duration(num, reset);
     }
 
-    std::int64_t threadmanager_impl::
-        get_cumulative_thread_overhead(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_cumulative_thread_overhead(
+        std::size_t num, bool reset)
     {
         return pool_->get_cumulative_thread_overhead(num, reset);
     }
 #endif
 #endif
 
-    std::int64_t threadmanager_impl::
-        get_cumulative_duration(std::size_t num, bool reset)
+    std::int64_t threadmanager_impl::get_cumulative_duration(
+        std::size_t num, bool reset)
     {
         std::int64_t result = 0;
-        for(auto& pool_iter : pools_) {
+        for (auto& pool_iter : pools_)
+        {
             result += pool_iter->get_cumulative_duration(num, reset);
         }
         return result;
@@ -1934,15 +2002,14 @@ namespace hpx {
         return pool_->avg_idle_rate(reset);
     }
 
-    std::int64_t threadmanager_impl::
-        avg_idle_rate(std::size_t num_thread, bool reset)
+    std::int64_t threadmanager_impl::avg_idle_rate(
+        std::size_t num_thread, bool reset)
     {
         return pool_->avg_idle_rate(num_thread, reset);
     }
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-    std::int64_t threadmanager_impl::
-        avg_creation_idle_rate(bool reset)
+    std::int64_t threadmanager_impl::avg_creation_idle_rate(bool reset)
     {
         return pool_->avg_creation_idle_rate(reset);
     }
