@@ -54,7 +54,7 @@ namespace hpx { namespace threads
 
     public:
         typedef threads::policies::callback_notifier notification_policy_type;
-        typedef detail::thread_pool* pool_type;
+        typedef std::unique_ptr<detail::thread_pool> pool_type;
         typedef threads::policies::scheduler_base* scheduler_type;
         typedef std::vector<pool_type> pool_vector;
 #ifdef HPX_HAVE_TIMER_POOL
@@ -71,11 +71,12 @@ namespace hpx { namespace threads
         void print_pools();
 
         // Get functions
-        pool_type default_pool() const;
+        detail::thread_pool& default_pool() const;
         scheduler_type default_scheduler() const;
-        pool_type get_pool(std::string pool_name) const;
-        pool_type get_pool(detail::pool_id_type pool_id) const;
-        pool_type get_pool(std::size_t thread_index) const;
+
+        detail::thread_pool& get_pool(std::string const& pool_name) const;
+        detail::thread_pool& get_pool(detail::pool_id_type pool_id) const;
+        detail::thread_pool& get_pool(std::size_t thread_index) const;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
@@ -213,8 +214,8 @@ namespace hpx { namespace threads
         {
             std::lock_guard<mutex_type> lk(mtx_);
             detail::pool_id_type myid = threads_lookup_[num_thread];
-            pool_type mypool = get_pool(myid);
-            return mypool->get_os_thread_handle(num_thread);
+            detail::thread_pool& pool = get_pool(myid);
+            return pool.get_os_thread_handle(num_thread);
         }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
@@ -232,7 +233,7 @@ namespace hpx { namespace threads
         /// available
         void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
-            default_pool()->do_some_work(num_thread);
+            default_pool().do_some_work(num_thread);
         }
 
         /// API functions forwarding to notification policy
@@ -240,7 +241,8 @@ namespace hpx { namespace threads
         {
             // propagate the error reporting to all pools, which in turn
             // will propagate to schedulers
-            for(auto& pool_iter : pools_){
+            for (auto& pool_iter : pools_)
+            {
                 pool_iter->report_error(num_thread, e);
             }
         }
@@ -250,7 +252,7 @@ namespace hpx { namespace threads
         {
             if (get_self_ptr() == nullptr)
                 return std::size_t(-1);
-            return default_pool()->get_worker_thread_num();
+            return default_pool().get_worker_thread_num();
         }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS

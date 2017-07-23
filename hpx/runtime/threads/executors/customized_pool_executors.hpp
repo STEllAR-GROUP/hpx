@@ -28,7 +28,6 @@ namespace hpx { namespace threads { namespace executors
         {
         public:
             customized_pool_executor(const std::string& pool_name);
-            ~customized_pool_executor();
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
@@ -70,7 +69,7 @@ namespace hpx { namespace threads { namespace executors
                 closure_type func);
 
         private:
-            typedef hpx::threads::detail::thread_pool* pool_type;
+            typedef hpx::threads::detail::thread_pool& pool_type;
             typedef hpx::threads::policies::scheduler_base* scheduler_type;
 
             // the scheduler used by this executor
@@ -81,7 +80,7 @@ namespace hpx { namespace threads { namespace executors
             typedef compat::mutex mutex_type;
             mutable mutex_type mtx_;
         };
-    }    // namespace detail
+    }   // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT customized_pool_executor : public scheduled_executor

@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -36,14 +37,13 @@ namespace hpx {
 
 namespace detail
 {
-        std::string get_affinity_domain(util::command_line_handling const& cfg);
-        std::size_t get_affinity_description(util::command_line_handling const& cfg,
-            std::string& affinity_desc);
+    std::string get_affinity_domain(util::command_line_handling const& cfg);
+    std::size_t get_affinity_description(util::command_line_handling const& cfg,
+        std::string& affinity_desc);
 }
 
 namespace threads
 {
-
     struct register_thread_tag {};
     struct register_work_tag {};
     struct set_state_tag {};
@@ -67,18 +67,20 @@ namespace threads
         virtual void print_pools() = 0;
 
         // Get functions
-        typedef detail::thread_pool* pool_type;
+        typedef std::unique_ptr<detail::thread_pool> pool_type;
         typedef threads::policies::scheduler_base* scheduler_type;
-        virtual pool_type get_pool(std::string pool_name) const = 0;
-        virtual pool_type get_pool(std::size_t thread_index) const = 0;
+
+        virtual detail::thread_pool& get_pool(
+            std::string const& pool_name) const = 0;
+        virtual detail::thread_pool& get_pool(
+            std::size_t thread_index) const = 0;
 
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;
 
         /// \brief return the number of HPX-threads with the given state
         virtual std::int64_t get_thread_count(
-            thread_state_enum
-            = unknown,
+            thread_state_enum = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;

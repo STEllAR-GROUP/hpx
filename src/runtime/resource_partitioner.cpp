@@ -5,21 +5,16 @@
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-//
-#include <bitset>
-
-#if defined(HPX_HAVE_MAX_CPU_COUNT)
-typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> bitset_type;
-#else
-typedef std::bitset<32> bitset_type;
-#endif
 
 namespace hpx {
 
+struct resource_partitioner_tag {};
+
 resource::resource_partitioner &get_resource_partitioner()
 {
-    util::static_<resource::resource_partitioner, std::false_type> rp;
+    util::static_<resource::resource_partitioner, resource_partitioner_tag> rp;
 
     if (!rp.get().cmd_line_parsed())
     {
@@ -111,10 +106,10 @@ resource::resource_partitioner &get_resource_partitioner(
     char **argv, std::vector<std::string> ini_config, runtime_mode mode,
     bool check)
 {
-    util::static_<resource::resource_partitioner, std::false_type> rp_;
+    util::static_<resource::resource_partitioner, resource_partitioner_tag> rp_;
     auto &rp = rp_.get();
 
-    if (rp.cmd_line_parsed() == true)
+    if (rp.cmd_line_parsed())
     {
         if (check)
         {
@@ -237,48 +232,55 @@ namespace resource {
         std::string sched;
         switch (scheduling_policy_)
         {
-        case -1:
+        case resource::unspecified:
             sched = "unspecified";
             break;
-        case -2:
+        case resource::user_defined:
             sched = "user supplied";
             break;
-        case 0:
+        case resource::local:
             sched = "local";
             break;
-        case 1:
+        case resource::local_priority_fifo:
             sched = "local_priority_fifo";
             break;
-        case 2:
+        case resource::local_priority_lifo:
             sched = "local_priority_lifo";
             break;
-        case 3:
+        case resource::static_:
             sched = "static";
             break;
-        case 4:
+        case resource::static_priority:
             sched = "static_priority";
             break;
-        case 5:
+        case resource::abp_priority:
             sched = "abp_priority";
             break;
-        case 6:
+        case resource::hierarchy:
             sched = "hierarchy";
             break;
-        case 7:
+        case resource::periodic_priority:
             sched = "periodic_priority";
             break;
-        case 8:
+        case resource::throttle:
             sched = "throttle";
             break;
         }
-        std::cout << "\"" << sched << "\" "
-                  << "is running on PUs : \n";
-        for (size_t i(0); i < assigned_pus_.size(); i++)
-            std::cout << bitset_type(assigned_pus_[i]) << "\n";
-    }
+
+        std::cout << "\"" << sched << "\" is running on PUs : \n";
+
+        for (unsigned long long assigned_pu : assigned_pus_)
+        {
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || \
+    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
+            std::cout << std::hex << "0x" << assigned_pu << '\n';
+#else
+            std::cout << "0b" << assigned_pu << '\n';
+#endif
+        }
+}
 
     ////////////////////////////////////////////////////////////////////////
-
     resource_partitioner::resource_partitioner()
       : thread_manager_(nullptr)
       , topology_(threads::create_topology())
@@ -316,18 +318,16 @@ namespace resource {
     void resource_partitioner::fill_topology_vectors()
     {
         std::size_t pid = 0;
-        std::size_t N = topology_.get_number_of_numa_nodes();
-        if (N == 0)
-            N = topology_.get_number_of_sockets();
-        numa_domains_.reserve(N);
+        std::size_t num_numa_nodes = topology_.get_number_of_numa_nodes();
+        if (num_numa_nodes == 0)
+            num_numa_nodes = topology_.get_number_of_sockets();
+        numa_domains_.reserve(num_numa_nodes);
 
         // loop on the numa-domains
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < num_numa_nodes; ++i)
         {
             numa_domains_.push_back(numa_domain());    // add a numa domain
-            numa_domain &nd =
-                numa_domains_
-                    .back();    // get a handle to the numa-domain just added
+            numa_domain &nd = numa_domains_.back();    // numa-domain just added
             nd.id_ = i;         // set its index
             nd.cores_.reserve(topology_.get_number_of_numa_node_cores(i));
 
@@ -335,7 +335,7 @@ namespace resource {
 
             // loop on the cores
             for (std::size_t j = 0;
-                 j < topology_.get_number_of_numa_node_cores(i); ++j)
+                 j != topology_.get_number_of_numa_node_cores(i); ++j)
             {
                 nd.cores_.push_back(core());
                 core &c = nd.cores_.back();
@@ -346,7 +346,7 @@ namespace resource {
                 bool core_contains_exposed_pus = false;
 
                 // loop on the processing units
-                for (std::size_t k = 0; k < topology_.get_number_of_core_pus(j);
+                for (std::size_t k = 0; k != topology_.get_number_of_core_pus(j);
                      ++k)
                 {
                     if (pu_exposed(pid))
@@ -383,9 +383,9 @@ namespace resource {
         }
     }
 
-    // This function is called in hpx_init, before the instantiation of the runtime
-    // It takes care of configuring some internal parameters of the resource partitioner
-    // related to the pools
+    // This function is called in hpx_init, before the instantiation of the
+    // runtime It takes care of configuring some internal parameters of the
+    // resource partitioner related to the pools
     // -1 assigns all free resources to the default pool
     // -2 checks whether there are empty pools
     void resource_partitioner::setup_pools()

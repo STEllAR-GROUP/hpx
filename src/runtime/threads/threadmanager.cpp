@@ -321,21 +321,21 @@ namespace hpx { namespace threads
 
             switch (sched_type)
             {
-            case -2:    // user supplied
+            case resource::unspecified:
             {
                 const auto& pool_func = rp.get_pool_creator(i);
-                detail::thread_pool* pool = pool_func(notifier,
-                    num_threads_in_pool, thread_offset, i, name.c_str());
-                pools_.push_back(pool);
+                std::unique_ptr<detail::thread_pool> pool(pool_func(notifier,
+                    num_threads_in_pool, thread_offset, i, name.c_str()));
+                pools_.push_back(std::move(pool));
                 break;
             }
-            case -1:    // unspecified = -1
+            case resource::user_defined:
             {
                 throw std::invalid_argument(
                     "cannot instantiate a thread-manager if the thread-pool" +
                     name + " has an unspecified scheduler type");
             }
-            case 0:    // local = 0
+            case resource::local:
             {
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
@@ -355,15 +355,16 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 
 #else
                 throw detail::command_line_error(
@@ -375,7 +376,7 @@ namespace hpx { namespace threads
                 break;
             }
 
-            case 1:    // local_priority_fifo = 1
+            case resource::local_priority_fifo:
             {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
@@ -398,20 +399,21 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 
                 break;
             }
 
-            case 2:    // local_priority_lifo = 2
+            case resource::local_priority_lifo:
             {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
@@ -434,20 +436,21 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 
                 break;
             }
 
-            case 3:    // static_ = 3
+            case resource::static_:
             {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
@@ -469,15 +472,16 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 
 #else
                 throw detail::command_line_error(
@@ -489,7 +493,7 @@ namespace hpx { namespace threads
                 break;
             }
 
-            case 4:    // static_priority = 4
+            case resource::static_priority:
             {
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
@@ -515,15 +519,16 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 
 #else
                 throw detail::command_line_error(
@@ -535,7 +540,7 @@ namespace hpx { namespace threads
                 break;
             }
 
-            case 5:    // abp_priority = 5
+            case resource::abp_priority:
             {
 #if defined(HPX_HAVE_ABP_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
@@ -557,16 +562,16 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
-
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 #else
                 throw detail::command_line_error(
                     "Command line option "
@@ -577,7 +582,7 @@ namespace hpx { namespace threads
                 break;
             }
 
-            case 6:    // hierarchy = 6
+            case resource::hierarchy:
             {
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
@@ -598,16 +603,16 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
-
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 #else
                 throw detail::command_line_error(
                     "Command line option "
@@ -618,7 +623,7 @@ namespace hpx { namespace threads
                 break;
             }
 
-            case 7:    // periodic_priority = 7
+            case resource::periodic_priority:
             {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
@@ -639,27 +644,30 @@ namespace hpx { namespace threads
                     new local_sched_type(init);
 
                 // instantiate the pool
-                detail::thread_pool* pool =
+                std::unique_ptr<detail::thread_pool> pool(
                     new hpx::threads::detail::thread_pool_impl<
-                        local_sched_type>(static_cast<local_sched_type*>(sched),
+                            local_sched_type
+                        >(static_cast<local_sched_type*>(sched),
                         notifier, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
-                        thread_offset);
-                pools_.push_back(pool);
+                        thread_offset));
+                pools_.push_back(std::move(pool));
 
                 break;
             }
 
-            case 8:    // throttle = 8
+            case resource::throttle:
             {
+#if !defined(HPX_HAVE_THROTTLING_SCHEDULER)
                 throw hpx::detail::command_line_error(
                     "Command line option "
                     "--hpx:queuing=throttle "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle "
                     "-DHPX_WITH_APEX'.");
+#endif
                 break;
             }
             }
@@ -668,20 +676,22 @@ namespace hpx { namespace threads
         }
 
         // fill the thread-lookup table
-        for (auto& pool_iter : pools_) {
+        for (auto& pool_iter : pools_)
+        {
             size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
-            for (size_t i(0); i < nt; i++) {
+            for (size_t i(0); i < nt; i++)
+            {
                 threads_lookup_.push_back(pool_iter->get_pool_id());
             }
         }
-
     }
 
     threadmanager_impl::~threadmanager_impl()
     {
-        for(auto pool_iter : pools_){
-            delete pool_iter;
-        }
+//         for (auto pool_iter : pools_)
+//         {
+//             delete pool_iter;
+//         }
     }
 
     void threadmanager_impl::init()
@@ -690,7 +700,7 @@ namespace hpx { namespace threads
         std::size_t threads_offset = 0;
 
         // initialize all pools
-        for (auto& pool_iter : pools_)
+        for (auto && pool_iter : pools_)
         {
             std::size_t num_threads_in_pool =
                 rp.get_num_threads(pool_iter->get_pool_name());
@@ -703,14 +713,16 @@ namespace hpx { namespace threads
     {
         std::cout << "The threadmanager owns "
                   << pools_.size() << " pool(s) : \n";
-        for(auto pool_iter : pools_){
+        for (auto && pool_iter : pools_)
+        {
             pool_iter->print_pool();
         }
     }
 
-    threadmanager_impl::pool_type threadmanager_impl::default_pool() const
+    detail::thread_pool& threadmanager_impl::default_pool() const
     {
-        return pools_[0];
+        HPX_ASSERT(!pools_.empty());
+        return *pools_[0];
     }
 
 /*
@@ -738,8 +750,8 @@ namespace hpx { namespace threads
                 + pool_name + "\". \n");
     }
 */
-    threadmanager_impl::pool_type threadmanager_impl::get_pool(
-        std::string pool_name) const
+    detail::thread_pool& threadmanager_impl::get_pool(
+        std::string const& pool_name) const
     {
         // if the given pool_name is default, we don't need to look for it
         if (pool_name == "default")
@@ -747,17 +759,18 @@ namespace hpx { namespace threads
             return default_pool();
         }
 
+        // don't start at begin() since the first one is the default,
+        // start one further
         auto pool = std::find_if(
-            // don't start at begin() since the first one is the default,
-            // start one further
             ++pools_.begin(), pools_.end(),
-            [&pool_name](pool_type itp) -> bool {
+            [&pool_name](pool_type const& itp) -> bool
+            {
                 return (itp->get_pool_name() == pool_name);
             });
 
         if (pool != pools_.end())
         {
-            return *pool;
+            return **pool;
         }
 
         throw std::invalid_argument(
@@ -766,13 +779,13 @@ namespace hpx { namespace threads
         //! FIXME Add names of available pools?
     }
 
-    threadmanager_impl::pool_type threadmanager_impl::get_pool(
+    detail::thread_pool& threadmanager_impl::get_pool(
         detail::pool_id_type pool_id) const
     {
         return get_pool(pool_id.name_);
     }
 
-    threadmanager_impl::pool_type threadmanager_impl::get_pool(
+    detail::thread_pool& threadmanager_impl::get_pool(
         std::size_t thread_index) const
     {
         return get_pool(threads_lookup_[thread_index]);
@@ -845,7 +858,7 @@ namespace hpx { namespace threads
             thread_state_enum initial_state, bool run_now, error_code& ec)
     {
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
-        default_pool()->create_thread(data, id, initial_state, run_now, ec);
+        default_pool().create_thread(data, id, initial_state, run_now, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -853,7 +866,7 @@ namespace hpx { namespace threads
         thread_init_data& data, thread_state_enum initial_state, error_code& ec)
     {
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
-        default_pool()->create_work(data, initial_state, ec);
+        default_pool().create_work(data, initial_state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

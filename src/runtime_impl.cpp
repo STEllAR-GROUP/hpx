@@ -771,6 +771,9 @@ namespace hpx {
         if (0 == std::strncmp(name, "main", 4)) //-V112
             return &main_pool_;
 
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "runtime_impl::get_thread_pool",
+            std::string("unknown thread pool requested: ") + name);
         return nullptr;
     }
 

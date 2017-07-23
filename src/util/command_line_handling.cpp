@@ -1082,8 +1082,8 @@ namespace hpx { namespace util
         std::size_t num_threads)
     {
         threads::topology& top = threads::create_topology();
-        runtime & rt = get_runtime();
-        auto &rp = hpx::get_resource_partitioner();
+        runtime& rt = get_runtime();
+        auto& rp = hpx::get_resource_partitioner();
         {
             std::ostringstream strm;    // make sure all output is kept together
 
@@ -1093,11 +1093,13 @@ namespace hpx { namespace util
             {
                 // print the mask for the current PU
                 threads::mask_cref_type pu_mask = rp.get_pu_mask(i, false);
-                std::string pool_name = rt.get_thread_manager().get_pool(i)->get_pool_name();
+                std::string pool_name =
+                    rt.get_thread_manager().get_pool(i).get_pool_name();
 
                 if (!threads::any(pu_mask))
                 {
-                    strm << std::setw(4) << i << ": thread binding disabled" //-V112
+                    strm << std::setw(4) << i
+                         << ": thread binding disabled"    //-V112
                          << std::endl;
                 }
                 else
@@ -1109,9 +1111,10 @@ namespace hpx { namespace util
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                compat::thread& blob = rt.get_thread_manager().get_os_thread_handle(i);
+                compat::thread& blob =
+                    rt.get_thread_manager().get_os_thread_handle(i);
                 threads::mask_type boundcpu = top.get_cpubind_mask(blob, ec);
-/*                threads::mask_type boundcpu = top.get_cpubind_mask(
+                /* threads::mask_type boundcpu = top.get_cpubind_mask(
                     rt.get_thread_manager().get_os_thread_handle(i), ec);*/
 
                 // The masks reported by HPX must be the same as the ones
@@ -1121,11 +1124,11 @@ namespace hpx { namespace util
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "handle_print_bind",
-                        boost::str(
-                            boost::format("unexpected mismatch between "
-                                "locality %1%: binding reported from HWLOC(%2%) "
-                                " and HPX(%3%) on thread %4%"
-                            ) % hpx::get_locality_id() % boundcpu % pu_mask % i));
+                        boost::str(boost::format(
+                            "unexpected mismatch between locality %1%: binding "
+                            "reported from HWLOC(%2%) and HPX(%3%) on "
+                            "thread %4%"
+                        ) % hpx::get_locality_id() % boundcpu % pu_mask % i));
                 }
             }
 
