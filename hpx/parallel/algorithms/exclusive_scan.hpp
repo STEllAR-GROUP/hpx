@@ -150,16 +150,20 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, conv](zip_iterator part_begin, std::size_t part_size) -> T
+                    [op, conv, last](zip_iterator part_begin,
+                        std::size_t part_size) -> T
                     {
                         T part_init = hpx::util::invoke(conv, get<0>(*part_begin++));
 
                         auto iters = part_begin.get_iterator_tuple();
-                        return sequential_exclusive_scan_n(
-                            get<0>(iters),
-                            part_size - 1,
-                            get<1>(iters),
-                            part_init, op, conv);
+                        if(get<0>(iters) != last)
+                            return sequential_exclusive_scan_n(
+                                get<0>(iters),
+                                part_size - 1,
+                                get<1>(iters),
+                                part_init, op, conv);
+                        else
+                            return part_init;
                     },
                     // step 2 propagates the partition results from left
                     // to right

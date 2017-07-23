@@ -54,13 +54,15 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename traits1::local_iterator local_iterator_type1;
             typedef typename traits2::segment_iterator segment_iterator2;
             typedef typename traits2::local_iterator local_iterator_type2;
+
             typedef util::detail::algorithm_result<ExPolicy,
-                std::pair<SegIter, OutIter>
-            > result;
+                    std::pair<SegIter, OutIter>
+                > result;
 
             segment_iterator1 sit = traits1::segment(first);
             segment_iterator1 send = traits1::segment(last);
             segment_iterator2 sdest =  traits2::segment(dest);
+
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -132,9 +134,10 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename traits1::local_iterator local_iterator_type1;
             typedef typename traits2::segment_iterator segment_iterator2;
             typedef typename traits2::local_iterator local_iterator_type2;
+
             typedef util::detail::algorithm_result<ExPolicy,
-                std::pair<SegIter, OutIter>
-            > result;
+                    std::pair<SegIter, OutIter>
+                > result;
 
             typedef std::integral_constant<bool,
                     !hpx::traits::is_forward_iterator<SegIter>::value
@@ -144,8 +147,12 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator1 send = traits1::segment(last);
             segment_iterator2 sdest =  traits2::segment(dest);
 
-            std::vector<future<std::pair<local_iterator_type1,
-             local_iterator_type2> > > segments;
+            typedef std::vector<future<
+                    std::pair<
+                        local_iterator_type1, local_iterator_type2
+                    >
+                > > segment_type;
+            segment_type segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -209,8 +216,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    [=](std::vector<future<std::pair<local_iterator_type1,
-                    local_iterator_type2> > > && r) -> std::pair<SegIter, OutIter>
+                    [=](segment_type && r) -> std::pair<SegIter, OutIter>
                     {
                         // handle any remote exceptions, will throw on error
                         std::list<std::exception_ptr> errors;
@@ -239,8 +245,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     ExPolicy
                 > is_seq;
             typedef util::detail::algorithm_result<ExPolicy,
-                hpx::util::tagged_pair<tag::in(SegIter), tag::out(OutIter)>
+                    hpx::util::tagged_pair<tag::in(SegIter), tag::out(OutIter)>
                 > result;
+
             if (first == last)
             {
                 return result::get(std::make_pair(std::move(last),
@@ -294,11 +301,14 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename traits2::local_iterator local_iterator_type2;
             typedef typename traits3::segment_iterator segment_iterator3;
             typedef typename traits3::local_iterator local_iterator_type3;
+
             typedef util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<InIter1,InIter2,OutIter>
-            > result;
+                    hpx::util::tuple<InIter1,InIter2,OutIter>
+                > result;
+
             auto last2 = first2;
             detail::advance(last2,std::distance(first1,last1));
+
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits2::segment(first2);
@@ -392,23 +402,31 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename traits2::local_iterator local_iterator_type2;
             typedef typename traits3::segment_iterator segment_iterator3;
             typedef typename traits3::local_iterator local_iterator_type3;
+
             typedef util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<InIter1,InIter2,OutIter>
-            > result;
+                    hpx::util::tuple<InIter1,InIter2,OutIter>
+                > result;
+
             typedef std::integral_constant<bool,
                     !hpx::traits::is_forward_iterator<InIter1>::value ||
                     !hpx::traits::is_forward_iterator<InIter2>::value
                 > forced_seq;
+
             auto last2 = first2;
             detail::advance(last2,std::distance(first1,last1));
+
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits2::segment(first2);
             segment_iterator2 send2 = traits2::segment(last2);
             segment_iterator3 sdest =  traits3::segment(dest);
 
-            std::vector<future<hpx::util::tuple<local_iterator_type1,
-                local_iterator_type2, local_iterator_type3> > > segments;
+            typedef std::vector<future<
+                    hpx::util::tuple<
+                        local_iterator_type1, local_iterator_type2, local_iterator_type3
+                    >
+                > > segment_type;
+            segment_type segments;
             segments.reserve(std::distance(sit1, send1));
 
             if (sit1 == send1)
@@ -476,9 +494,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    [=](std::vector<hpx::future<hpx::util::tuple<
-                        local_iterator_type1, local_iterator_type2,
-                        local_iterator_type3> > > && r)
+                    [=](segment_type && r)
                          -> hpx::util::tuple<InIter1, InIter2, OutIter>
                     {
                         // handle any remote exceptions, will throw on error
@@ -512,11 +528,14 @@ namespace hpx { namespace parallel { inline namespace v1
                     ExPolicy
                 > is_seq;
             typedef util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<
-                tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
-            > result;
+                    hpx::util::tagged_tuple<
+                        tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+                    >
+                > result;
+
             auto last2 = first2;
             detail::advance(last2,std::distance(first1,last1));
+
             if (first1 == last1)
             {
                 return result::get(hpx::util::make_tuple<InIter1, InIter2,
@@ -576,14 +595,17 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename traits2::local_iterator local_iterator_type2;
             typedef typename traits3::segment_iterator segment_iterator3;
             typedef typename traits3::local_iterator local_iterator_type3;
+
             typedef util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<InIter1,InIter2,OutIter>
-            > result;
+                    hpx::util::tuple<InIter1,InIter2,OutIter>
+                > result;
+
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits2::segment(first2);
             segment_iterator2 send2 = traits2::segment(last2);
             segment_iterator3 sdest =  traits3::segment(dest);
+
             if (sit1 == send1 && sit2 == send2)
             {
                 // all elements are on the same partition
@@ -678,21 +700,28 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename traits2::local_iterator local_iterator_type2;
             typedef typename traits3::segment_iterator segment_iterator3;
             typedef typename traits3::local_iterator local_iterator_type3;
+
             typedef util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<InIter1,InIter2,OutIter>
-            > result;
+                    hpx::util::tuple<InIter1,InIter2,OutIter>
+                > result;
+
             typedef std::integral_constant<bool,
                     !hpx::traits::is_forward_iterator<InIter1>::value ||
                     !hpx::traits::is_forward_iterator<InIter2>::value
                 > forced_seq;
+
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits2::segment(first2);
             segment_iterator2 send2 = traits2::segment(last2);
             segment_iterator3 sdest =  traits3::segment(dest);
 
-            std::vector<future<hpx::util::tuple<local_iterator_type1,
-                local_iterator_type2, local_iterator_type3> > > segments;
+            typedef std::vector<future<
+                    hpx::util::tuple<
+                        local_iterator_type1, local_iterator_type2, local_iterator_type3
+                    >
+                > > segment_type;
+            segment_type segments;
             segments.reserve(std::distance(sit1, send1));
 
             if (sit1 == send1 && sit2 == send2)
@@ -765,9 +794,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    [=](std::vector<hpx::future<hpx::util::tuple<
-                        local_iterator_type1, local_iterator_type2,
-                        local_iterator_type3> > > && r)
+                    [=](segment_type && r)
                          -> hpx::util::tuple<InIter1, InIter2, OutIter>
                     {
                         // handle any remote exceptions, will throw on error
@@ -802,9 +829,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     ExPolicy
                 > is_seq;
             typedef util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<
-                tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)>
-            > result;
+                    hpx::util::tagged_tuple<
+                        tag::in1(InIter1), tag::in2(InIter2), tag::out(OutIter)
+                    >
+                > result;
+
             if (first1 == last1)
             {
                 return result::get(hpx::util::make_tuple<InIter1, InIter2,
@@ -818,11 +847,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 iterator2_traits;
             typedef hpx::traits::segmented_iterator_traits<OutIter>
                 iterator3_traits;
+
             return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
-                segmented_transform(transform_binary2<hpx::util::tuple<
-                typename iterator1_traits::local_iterator,
-                typename iterator2_traits::local_iterator,
-                typename iterator3_traits::local_iterator> >(),
+                    segmented_transform(transform_binary2<hpx::util::tuple<
+                        typename iterator1_traits::local_iterator,
+                        typename iterator2_traits::local_iterator,
+                        typename iterator3_traits::local_iterator
+                    > >(),
                 std::forward<ExPolicy>(policy), first1, last1, first2, last2,
                 dest, std::forward<F>(f), std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2), is_seq()));

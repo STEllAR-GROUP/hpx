@@ -651,7 +651,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     hpx::dataflow(
                         policy.executor(),
                         hpx::util::unwrapped(
-                            [=, &op, &conv](T last_value, T)
+                            [=, &op, &conv](T last_value, T) -> void
                             {
                                 dispatch(traits_out::get_id(out_it),
                                     segmented_scan_void<Algo>(),
