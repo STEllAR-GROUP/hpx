@@ -204,10 +204,10 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/unused.hpp>
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -510,22 +510,22 @@ namespace hpx { namespace lcos
     /**/
 
 #define HPX_REGISTER_GATHER_DECLARATION_(...)                                 \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_GATHER_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_GATHER_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)           \
     )(__VA_ARGS__))                                                           \
     /**/
 
 #define HPX_REGISTER_GATHER_DECLARATION_1(type)                               \
-    HPX_REGISTER_GATHER_DECLARATION_2(type, BOOST_PP_CAT(type, _gather))      \
+    HPX_REGISTER_GATHER_DECLARATION_2(type, HPX_PP_CAT(type, _gather))        \
     /**/
 
 #define HPX_REGISTER_GATHER_DECLARATION_2(type, name)                         \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::lcos::detail::gather_server<type>::get_result_action,            \
-        BOOST_PP_CAT(gather_get_result_action_, name));                       \
+        HPX_PP_CAT(gather_get_result_action_, name));                         \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::lcos::detail::gather_server<type>::set_result_action,            \
-        BOOST_PP_CAT(set_result_action_, name))                               \
+        HPX_PP_CAT(set_result_action_, name))                                 \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -534,26 +534,26 @@ namespace hpx { namespace lcos
     /**/
 
 #define HPX_REGISTER_GATHER_(...)                                             \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_GATHER_, HPX_UTIL_PP_NARG(__VA_ARGS__)                   \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_GATHER_, HPX_PP_NARGS(__VA_ARGS__)                       \
     )(__VA_ARGS__))                                                           \
     /**/
 
 #define HPX_REGISTER_GATHER_1(type)                                           \
-    HPX_REGISTER_GATHER_2(type, BOOST_PP_CAT(type, _gather))                  \
+    HPX_REGISTER_GATHER_2(type, HPX_PP_CAT(type, _gather))                    \
     /**/
 
 #define HPX_REGISTER_GATHER_2(type, name)                                     \
     HPX_REGISTER_ACTION(                                                      \
         hpx::lcos::detail::gather_server<type>::get_result_action,            \
-        BOOST_PP_CAT(gather_get_result_action_, name));                       \
+        HPX_PP_CAT(gather_get_result_action_, name));                         \
     HPX_REGISTER_ACTION(                                                      \
         hpx::lcos::detail::gather_server<type>::set_result_action,            \
-        BOOST_PP_CAT(set_result_action_, name));                              \
+        HPX_PP_CAT(set_result_action_, name));                                \
     typedef hpx::components::simple_component<                                \
         hpx::lcos::detail::gather_server<type>                                \
-    > BOOST_PP_CAT(gather_, name);                                            \
-    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(gather_, name))                       \
+    > HPX_PP_CAT(gather_, name);                                              \
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(gather_, name))                         \
     /**/
 
 #endif // DOXYGEN

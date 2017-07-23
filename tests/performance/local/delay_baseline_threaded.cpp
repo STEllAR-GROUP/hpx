@@ -11,7 +11,9 @@
 #include <hpx/compat/thread.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <chrono>
 #include <cstdint>
+#include <ctime>
 #include <functional>
 #include <iostream>
 #include <stdexcept>
@@ -19,7 +21,6 @@
 #include <vector>
 
 #include <boost/format.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/program_options.hpp>
 
 char const* benchmark_name = "Delay Baseline";
@@ -45,12 +46,14 @@ bool header = true;
 ///////////////////////////////////////////////////////////////////////////////
 std::string format_build_date(std::string timestamp)
 {
-    boost::gregorian::date d = boost::gregorian::from_us_string(timestamp);
+    std::chrono::time_point<std::chrono::system_clock> now =
+        std::chrono::system_clock::now();
 
-    char const* fmt = "%02i-%02i-%04i";
+    std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
-    return boost::str(boost::format(fmt)
-                     % d.month().as_number() % d.day() % d.year());
+    std::string ts = std::ctime(&current_time);
+    ts.resize(ts.size()-1);     // remove trailing '\n'
+    return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

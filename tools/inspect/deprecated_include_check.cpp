@@ -41,6 +41,8 @@ namespace boost
       { "boost/exception_ptr\\.hpp", "exception" },
       { "boost/range/iterator_range\\.hpp", "hpx/util/iterator_range.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
+      { "boost/preprocessor/cat\\.hpp", "hpx/util/detail/pp/cat.hpp" },
+      { "boost/preprocessor/stringize\\.hpp", "hpx/util/detail/pp/stringize.hpp" },
       { nullptr, nullptr }
     };
 

@@ -421,9 +421,9 @@ namespace hpx
     template <typename E>
     std::string diagnostic_information(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return diagnostic_information(*xi);
-        return std::string("<unknown>");
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? diagnostic_information(*xi) : std::string("<unknown>");
+        });
     }
     /// \endcond
 
@@ -464,9 +464,9 @@ namespace hpx
     template <typename E>
     std::string get_error_what(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_what(*xi);
-        return std::string("<unknown>");
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_what(*xi) : std::string("<unknown>");
+        });
     }
 
     inline std::string get_error_what(hpx::error_code const& e)
@@ -519,9 +519,9 @@ namespace hpx
     template <typename E>
     std::uint32_t get_error_locality_id(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_locality_id(*xi);
-        return naming::invalid_locality_id;
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_locality_id(*xi) : naming::invalid_locality_id;
+        });
     }
     /// \endcond
 
@@ -597,9 +597,9 @@ namespace hpx
     template <typename E>
     std::string get_error_host_name(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_host_name(*xi);
-        return std::string();
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_host_name(*xi) : std::string();
+        });
     }
     /// \endcond
 
@@ -638,9 +638,9 @@ namespace hpx
     template <typename E>
     std::int64_t get_error_process_id(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_process_id(*xi);
-        return -1;
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_process_id(*xi) : -1;
+        });
     }
     /// \endcond
 
@@ -679,9 +679,9 @@ namespace hpx
     template <typename E>
     std::string get_error_env(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_env(*xi);
-        return "<unknown>";
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_env(*xi) : std::string("<unknown>");
+        });
     }
     /// \endcond
 
@@ -719,9 +719,9 @@ namespace hpx
     template <typename E>
     std::string get_error_function_name(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_function_name(*xi);
-        return std::string();
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_function_name(*xi) : std::string();
+        });
     }
     /// \endcond
 
@@ -759,9 +759,9 @@ namespace hpx
     template <typename E>
     std::string get_error_backtrace(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_backtrace(*xi);
-        return std::string();
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_backtrace(*xi) : std::string();
+        });
     }
     /// \endcond
 
@@ -801,9 +801,9 @@ namespace hpx
     template <typename E>
     std::string get_error_file_name(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_file_name(*xi);
-        return "<unknown>";
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_file_name(*xi) : std::string("<unknown>");
+        });
     }
     /// \endcond
 
@@ -842,9 +842,9 @@ namespace hpx
     template <typename E>
     long get_error_line_number(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_line_number(*xi);
-        return -1;
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_line_number(*xi) : -1;
+        });
     }
     /// \endcond
 
@@ -884,9 +884,9 @@ namespace hpx
     template <typename E>
     std::size_t get_error_os_thread(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_os_thread(*xi);
-        return std::size_t(-1);
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_os_thread(*xi) : std::size_t(-1);
+        });
     }
     /// \endcond
 
@@ -926,9 +926,9 @@ namespace hpx
     template <typename E>
     std::size_t get_error_thread_id(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_thread_id(*xi);
-        return std::size_t(-1);
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_thread_id(*xi) : std::size_t(-1);
+        });
     }
     /// \endcond
 
@@ -967,9 +967,9 @@ namespace hpx
     template <typename E>
     std::string get_error_thread_description(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_thread_description(*xi);
-        return std::string();
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_thread_description(*xi) : std::string();
+        });
     }
     /// \endcond
 
@@ -1008,9 +1008,9 @@ namespace hpx
     template <typename E>
     std::string get_error_config(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_config(*xi);
-        return std::string();
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_config(*xi) : std::string();
+        });
     }
     /// \endcond
 
@@ -1049,9 +1049,9 @@ namespace hpx
     template <typename E>
     std::string get_error_state(E const& e)
     {
-        if (exception_info const* xi = get_exception_info(e))
-            return get_error_state(*xi);
-        return std::string();
+        return invoke_with_exception_info(e, [](exception_info const* xi) {
+            return xi ? get_error_state(*xi) : std::string();
+        });
     }
     /// \endcond
 
