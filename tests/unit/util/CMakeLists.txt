@@ -15,6 +15,7 @@ set(tests
     range
     tagged
     tuple
+    unwrap
     unwrapped
    )
 
