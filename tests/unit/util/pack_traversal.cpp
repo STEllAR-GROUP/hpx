@@ -21,9 +21,16 @@
 #include <array>
 #endif
 
-using namespace hpx;
-using namespace hpx::util;
-using namespace hpx::util::detail;
+using hpx::util::tuple;
+using hpx::util::get;
+using hpx::util::make_tuple;
+using hpx::util::map_pack;
+using hpx::util::spread_this;
+using hpx::util::traverse_pack;
+using hpx::traits::future_traits;
+using hpx::traits::is_future;
+using hpx::lcos::future;
+using hpx::lcos::make_ready_future;
 
 struct all_map_float
 {
@@ -53,7 +60,7 @@ struct all_map
     }
 };
 
-static void testMixedTraversal()
+static void test_mixed_traversal()
 {
     {
         auto res = map_pack(all_map_float{},
@@ -131,18 +138,15 @@ static void testMixedTraversal()
 struct my_unwrapper
 {
     template <typename T,
-        typename std::enable_if<traits::is_future<T>::value>::type* = nullptr>
-    auto operator()(T future) const ->
-        typename traits::future_traits<T>::result_type
+        typename std::enable_if<is_future<T>::value>::type* = nullptr>
+    auto operator()(T future) const -> typename future_traits<T>::result_type
     {
         return future.get();
     }
 };
 
-static void testMixedEarlyUnwrapped()
+static void test_mixed_early_unwrapped()
 {
-    using namespace hpx::lcos;
-
     {
         auto res = map_pack(my_unwrapper{},    // ...
             0, 1, make_ready_future(3),
@@ -207,11 +211,11 @@ struct my_allocator
     }
 };
 
-static void testMixedContainerRemap()
+static void test_mixed_container_remap()
 {
     // Traits
     {
-        using namespace container_remapping;
+        using hpx::util::detail::container_remapping::has_push_back;
         HPX_TEST_EQ((has_push_back<std::vector<int>, int>::value), true);
         HPX_TEST_EQ((has_push_back<int, int>::value), false);
     }
@@ -278,7 +282,7 @@ struct my_int_mapper
     }
 };
 
-static void testMixedFallThrough()
+static void test_mixed_fall_through()
 {
     traverse_pack(my_int_mapper{}, int(0),
         std::vector<hpx::util::tuple<float, float>>{
@@ -386,7 +390,7 @@ public:
     }
 };
 
-static void testStrategicTraverse()
+static void test_strategic_traverse()
 {
     // Every element in the pack is visited
     {
@@ -532,7 +536,7 @@ static void testStrategicTraverse()
     }
 }
 
-static void testStrategicContainerTraverse()
+static void test_strategic_container_traverse()
 {
     // Every element in the container is visited
     // - Plain container
@@ -667,7 +671,7 @@ static void testStrategicContainerTraverse()
     }
 }
 
-static void testStrategicTupleLikeTraverse()
+static void test_strategic_tuple_like_traverse()
 {
     // Every element in the tuple like type is visited
     {
@@ -768,7 +772,7 @@ struct zero_mapper
     }
 };
 
-static void testSpreadTraverse()
+static void test_spread_traverse()
 {
     // 1:2 mappings (multiple arguments)
     {
@@ -786,7 +790,7 @@ static void testSpreadTraverse()
     }
 }
 
-static void testSpreadContainerTraverse()
+static void test_spread_container_traverse()
 {
     // 1:2 mappings (multiple arguments)
     {
@@ -806,7 +810,7 @@ static void testSpreadContainerTraverse()
     }
 }
 
-static void testSpreadTupleLikeTraverse()
+static void test_spread_tuple_like_traverse()
 {
     // 1:2 mappings (multiple arguments)
     {
@@ -848,18 +852,18 @@ static void testSpreadTupleLikeTraverse()
 
 int main(int, char**)
 {
-    testMixedTraversal();
-    testMixedEarlyUnwrapped();
-    testMixedContainerRemap();
-    testMixedFallThrough();
+    test_mixed_traversal();
+    test_mixed_early_unwrapped();
+    test_mixed_container_remap();
+    test_mixed_fall_through();
 
-    testStrategicTraverse();
-    testStrategicContainerTraverse();
-    testStrategicTupleLikeTraverse();
+    test_strategic_traverse();
+    test_strategic_container_traverse();
+    test_strategic_tuple_like_traverse();
 
-    testSpreadTraverse();
-    testSpreadContainerTraverse();
-    testSpreadTupleLikeTraverse();
+    test_spread_traverse();
+    test_spread_container_traverse();
+    test_spread_tuple_like_traverse();
 
     return hpx::util::report_errors();
 }
