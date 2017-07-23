@@ -199,13 +199,13 @@ namespace hpx { namespace threads
         std::size_t get_os_thread_count() const
         {
             std::lock_guard<mutex_type> lk(mtx_);
-            std::size_t total;
-            for(auto& pool_iter : pools_){
+            std::size_t total = 0;
+            for (auto& pool_iter : pools_)
+            {
                 total += pool_iter->get_os_thread_count();
             }
             return total;
         }
-
 
         compat::thread& get_os_thread_handle(std::size_t num_thread)
         {
@@ -216,9 +216,9 @@ namespace hpx { namespace threads
         }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-        /// Get percent maintenance time in main thread-manager loop.
-        std::int64_t avg_idle_rate(bool reset);
-        std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
+//         /// Get percent maintenance time in main thread-manager loop.
+//         std::int64_t avg_idle_rate(bool reset);
+//         std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         std::int64_t avg_creation_idle_rate(bool reset);
@@ -258,18 +258,18 @@ namespace hpx { namespace threads
             std::size_t num = std::size_t(-1), bool reset = false);
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-        std::int64_t get_thread_phase_duration(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_thread_duration(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_thread_phase_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_thread_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_cumulative_thread_duration(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_cumulative_thread_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false);
+//         std::int64_t get_thread_phase_duration(
+//             std::size_t num = std::size_t(-1), bool reset = false);
+//         std::int64_t get_thread_duration(
+//             std::size_t num = std::size_t(-1), bool reset = false);
+//         std::int64_t get_thread_phase_overhead(
+//             std::size_t num = std::size_t(-1), bool reset = false);
+//         std::int64_t get_thread_overhead(
+//             std::size_t num = std::size_t(-1), bool reset = false);
+//         std::int64_t get_cumulative_thread_duration(
+//             std::size_t num = std::size_t(-1), bool reset = false);
+//         std::int64_t get_cumulative_thread_overhead(
+//             std::size_t num = std::size_t(-1), bool reset = false);
 #endif
 #endif
 
@@ -297,16 +297,18 @@ namespace hpx { namespace threads
         template <typename Scheduler>
         void register_counter_types();
 
-
         /// Returns the mask identifying all processing units used by this
         /// thread manager.
         mask_type get_used_processing_units() const
         {
             mask_type total_used_processing_punits = mask_type();
-            threads::resize(total_used_processing_punits, hardware_concurrency());
+            threads::resize(
+                total_used_processing_punits, hardware_concurrency());
 
-            for(auto& pool_iter : pools_) {
-                total_used_processing_punits |= pool_iter->get_used_processing_units();
+            for (auto& pool_iter : pools_)
+            {
+                total_used_processing_punits |=
+                    pool_iter->get_used_processing_units();
             }
 
             return total_used_processing_punits;
@@ -314,15 +316,17 @@ namespace hpx { namespace threads
 
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
-            for(auto& pool_iter : pools_){
+            for (auto& pool_iter : pools_)
+            {
                 pool_iter->set_scheduler_mode(mode);
             }
         }
 
         void reset_thread_distribution()
         {
-            for(auto& pool_iter : pools_){
-                pool_iter->reset_thread_distribution();;
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->reset_thread_distribution();
             }
         }
 
@@ -335,7 +339,6 @@ namespace hpx { namespace threads
         {
             detail::thread_num_tss_.deinit_tss();
         }
-
 
     private:
         // counter creator functions
@@ -371,8 +374,10 @@ namespace hpx { namespace threads
     private:
         mutable mutex_type mtx_; // mutex protecting the members
 
-        std::size_t num_threads_; // specified by the user in command line, or 1 by default
-        // represents the total number of OS threads, irrespective of how many are in which pool.
+        // specified by the user in command line, or 1 by default
+        // represents the total number of OS threads, irrespective of how many
+        // are in which pool.
+        std::size_t num_threads_;
 
         std::vector<detail::pool_id_type> threads_lookup_;
 

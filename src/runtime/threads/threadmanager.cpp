@@ -1946,41 +1946,41 @@ namespace hpx { namespace threads
     }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-    std::int64_t threadmanager_impl::get_thread_phase_duration(
-        std::size_t num, bool reset)
-    {
-        return pool_->get_thread_phase_duration(num, reset);
-    }
-
-    std::int64_t threadmanager_impl::get_thread_duration(
-        std::size_t num, bool reset)
-    {
-        return pool_->get_thread_duration(num, reset);
-    }
-
-    std::int64_t threadmanager_impl::get_thread_phase_overhead(
-        std::size_t num, bool reset)
-    {
-        return pool_->get_thread_phase_overhead(num, reset);
-    }
-
-    std::int64_t threadmanager_impl::get_thread_overhead(
-        std::size_t num, bool reset)
-    {
-        return pool_->get_thread_overhead(num, reset);
-    }
-
-    std::int64_t threadmanager_impl::get_cumulative_thread_duration(
-        std::size_t num, bool reset)
-    {
-        return pool_->get_cumulative_thread_duration(num, reset);
-    }
-
-    std::int64_t threadmanager_impl::get_cumulative_thread_overhead(
-        std::size_t num, bool reset)
-    {
-        return pool_->get_cumulative_thread_overhead(num, reset);
-    }
+//     std::int64_t threadmanager_impl::get_thread_phase_duration(
+//         std::size_t num, bool reset)
+//     {
+//         return pool_->get_thread_phase_duration(num, reset);
+//     }
+//
+//     std::int64_t threadmanager_impl::get_thread_duration(
+//         std::size_t num, bool reset)
+//     {
+//         return pool_->get_thread_duration(num, reset);
+//     }
+//
+//     std::int64_t threadmanager_impl::get_thread_phase_overhead(
+//         std::size_t num, bool reset)
+//     {
+//         return pool_->get_thread_phase_overhead(num, reset);
+//     }
+//
+//     std::int64_t threadmanager_impl::get_thread_overhead(
+//         std::size_t num, bool reset)
+//     {
+//         return pool_->get_thread_overhead(num, reset);
+//     }
+//
+//     std::int64_t threadmanager_impl::get_cumulative_thread_duration(
+//         std::size_t num, bool reset)
+//     {
+//         return pool_->get_cumulative_thread_duration(num, reset);
+//     }
+//
+//     std::int64_t threadmanager_impl::get_cumulative_thread_overhead(
+//         std::size_t num, bool reset)
+//     {
+//         return pool_->get_cumulative_thread_overhead(num, reset);
+//     }
 #endif
 #endif
 
@@ -1996,29 +1996,29 @@ namespace hpx { namespace threads
     }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-    ///////////////////////////////////////////////////////////////////////////
-    std::int64_t threadmanager_impl::avg_idle_rate(bool reset)
-    {
-        return pool_->avg_idle_rate(reset);
-    }
-
-    std::int64_t threadmanager_impl::avg_idle_rate(
-        std::size_t num_thread, bool reset)
-    {
-        return pool_->avg_idle_rate(num_thread, reset);
-    }
-
-#if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-    std::int64_t threadmanager_impl::avg_creation_idle_rate(bool reset)
-    {
-        return pool_->avg_creation_idle_rate(reset);
-    }
-
-    std::int64_t threadmanager_impl::avg_cleanup_idle_rate(bool reset)
-    {
-        return pool_->avg_cleanup_idle_rate(reset);
-    }
-#endif
+//     ///////////////////////////////////////////////////////////////////////////
+//     std::int64_t threadmanager_impl::avg_idle_rate(bool reset)
+//     {
+//         return pool_->avg_idle_rate(reset);
+//     }
+//
+//     std::int64_t threadmanager_impl::avg_idle_rate(
+//         std::size_t num_thread, bool reset)
+//     {
+//         return pool_->avg_idle_rate(num_thread, reset);
+//     }
+//
+// #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
+//     std::int64_t threadmanager_impl::avg_creation_idle_rate(bool reset)
+//     {
+//         return pool_->avg_creation_idle_rate(reset);
+//     }
+//
+//     std::int64_t threadmanager_impl::avg_cleanup_idle_rate(bool reset)
+//     {
+//         return pool_->avg_cleanup_idle_rate(reset);
+//     }
+// #endif
 #endif
 } // namespace threads
 } // namespace hpx

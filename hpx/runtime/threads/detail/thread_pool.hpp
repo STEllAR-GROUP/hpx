@@ -71,31 +71,38 @@ namespace hpx { namespace threads { namespace detail
     class HPX_EXPORT thread_pool
     {
     public:
-        thread_pool(
-            threads::policies::callback_notifier& notifier, std::size_t index,
-            char const* pool_name, policies::scheduler_mode m = policies::nothing_special);
+        thread_pool(threads::policies::callback_notifier& notifier,
+            std::size_t index, char const* pool_name,
+            policies::scheduler_mode m = policies::nothing_special);
 
         virtual ~thread_pool();
 
         virtual void print_pool() = 0;
 
-        pool_id_type get_pool_id(){
+        pool_id_type get_pool_id()
+        {
             return id_;
         }
 
-        virtual void init(std::size_t num_threads, std::size_t threads_offset) = 0;
+        virtual void init(
+            std::size_t num_threads, std::size_t threads_offset) = 0;
 
-        virtual bool run(std::unique_lock<compat::mutex>& l, compat::barrier& startup, std::size_t num_threads) = 0;
-        virtual bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads) = 0;
+        virtual bool run(std::unique_lock<compat::mutex>& l,
+            compat::barrier& startup, std::size_t num_threads) = 0;
+        virtual bool run(
+            std::unique_lock<compat::mutex>& l, std::size_t num_threads) = 0;
         void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
 
-        virtual void stop_locked(std::unique_lock<lcos::local::no_mutex>& l, bool blocking = true) = 0;
-        virtual void stop_locked(std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
+        virtual void stop_locked(std::unique_lock<lcos::local::no_mutex>& l,
+            bool blocking = true) = 0;
+        virtual void stop_locked(
+            std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 
         std::size_t get_worker_thread_num() const;
         virtual std::size_t get_os_thread_count() const = 0;
 
-        virtual compat::thread& get_os_thread_handle(std::size_t num_thread) = 0;
+        virtual compat::thread& get_os_thread_handle(
+            std::size_t num_thread) = 0;
 
         virtual void create_thread(thread_init_data& data, thread_id_type& id,
             thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
@@ -157,17 +164,24 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
 #if defined(HPX_HAVE_THREAD_STEALING_COUNTS)
-        virtual std::int64_t get_num_pending_misses(std::size_t num, bool reset) = 0;
-        virtual std::int64_t get_num_pending_accesses(std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_pending_misses(
+            std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_pending_accesses(
+            std::size_t num, bool reset) = 0;
 
-        virtual std::int64_t get_num_stolen_from_pending(std::size_t num, bool reset) = 0;
-        virtual std::int64_t get_num_stolen_to_pending(std::size_t num, bool reset) = 0;
-        virtual std::int64_t get_num_stolen_from_staged(std::size_t num, bool reset) = 0;
-        virtual std::int64_t get_num_stolen_to_staged(std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_from_pending(
+            std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_to_pending(
+            std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_from_staged(
+            std::size_t num, bool reset) = 0;
+        virtual std::int64_t get_num_stolen_to_staged(
+            std::size_t num, bool reset) = 0;
 #endif
 
         virtual std::int64_t get_thread_count(thread_state_enum state,
-            thread_priority priority, std::size_t num_thread, bool reset) const = 0;
+            thread_priority priority, std::size_t num_thread,
+            bool reset) const = 0;
 
         std::int64_t get_scheduler_utilization() const;
 
@@ -181,7 +195,8 @@ namespace hpx { namespace threads { namespace detail
 
         virtual void reset_thread_distribution() = 0;
 
-        virtual void set_scheduler_mode(threads::policies::scheduler_mode mode)= 0;
+        virtual void set_scheduler_mode(
+            threads::policies::scheduler_mode mode) = 0;
 
         //
         virtual void abort_all_suspended_threads() = 0;
@@ -196,13 +211,13 @@ namespace hpx { namespace threads { namespace detail
 
         virtual std::size_t get_thread_offset() const = 0;
 
-        virtual void report_error(std::size_t num, std::exception_ptr const& e) = 0;
+        virtual void report_error(
+            std::size_t num, std::exception_ptr const& e) = 0;
+
+        virtual void thread_func(std::size_t num_thread,
+            topology const& topology, compat::barrier& startup) = 0;
 
     protected:
-
-        virtual  void thread_func(std::size_t num_thread, topology const& topology,
-            compat::barrier& startup) = 0;
-
         double timestamp_scale_;    // scale timestamps to nanoseconds
 
 //! FIXME should I leave them here or move them to thread_pool_impl?

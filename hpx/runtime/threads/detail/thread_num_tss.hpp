@@ -11,6 +11,8 @@
 
 #include <cstddef>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -53,5 +55,7 @@ namespace hpx { namespace threads { namespace detail
         std::size_t thread_num_;
     };
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
