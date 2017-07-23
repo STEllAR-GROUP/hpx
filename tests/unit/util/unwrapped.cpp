@@ -287,9 +287,7 @@ int hpx_main(
         }
     }
 
-    finalize();
-
-    return report_errors();
+    return finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -307,6 +305,11 @@ int main(
     };
 
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv, cfg);
+    if (int result = init(cmdline, argc, argv, cfg))
+    {
+        return result;
+    }
+    // Report errors after HPX was finished
+    return report_errors();
 }
 
