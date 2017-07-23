@@ -5,6 +5,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/partitioned_vector.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
