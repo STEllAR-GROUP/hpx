@@ -59,7 +59,7 @@ void find_end_tests(std::vector<hpx::id_type> &localities)
 
     std::vector<T> sequence = {(T)1,(T)2,(T)3,(T)4};
     test_find_end(hpx::parallel::execution::seq, xvalues, sequence, 38);
-    // test_find_end(hpx::parallel::execution::par, xvalues, sequence, 38);
+    test_find_end(hpx::parallel::execution::par, xvalues, sequence, 38);
     test_find_end_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 38);
     // test_find_end_async(hpx::parallel::execution::par(hpx::parallel::execution::task),

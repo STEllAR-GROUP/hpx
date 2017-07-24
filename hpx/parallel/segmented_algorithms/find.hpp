@@ -396,6 +396,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 local_iterator_type beg = traits::local(first1);
                 local_iterator_type end = traits::end(sit);
                 find_return<local_iterator_type> out;
+                FwdIter1 partial_out;
+                bool partial_found = false;
                 out.seq_first = traits::local(last1);
 
                 if (beg != end)
@@ -404,9 +406,17 @@ namespace hpx { namespace parallel { inline namespace v1
                         algo, policy, std::true_type(), beg, end, sequence, op
                     );
                     if(out.seq_first != end && out.partial_position == sequence.size())
+                    {
+                        out.partial_position = 0;
                         output=traits::compose(sit, out.seq_first);
+                    }
+                    if (out.partial_position != out.last_position)
+                    {
+                        partial_out = traits::compose(sit, out.seq_last);
+                        partial_found = true;
+                        out.partial_position = out.last_position;
+                    }
                 }
-
                 // handle all of the full partitions
                 for (++sit; sit != send; ++sit)
                 {
@@ -419,7 +429,24 @@ namespace hpx { namespace parallel { inline namespace v1
                             op, out.partial_position
                         );
                         if(out.seq_first != end && out.partial_position == sequence.size())
-                            output=traits::compose(sit,out.seq_first);
+                        {
+                            out.partial_position = 0;
+                            output=traits::compose(sit, out.seq_first);
+                        }
+                        else if(partial_found && out.partial_position == sequence.size())
+                        {
+                            output = partial_out;
+                        }
+                        else
+                        {
+                            partial_found = false;
+                        }
+                        if (out.partial_position != out.last_position)
+                        {
+                            partial_out = traits::compose(sit, out.seq_last);
+                            partial_found = true;
+                            out.partial_position = out.last_position;
+                        }
                     }
                 }
 
@@ -433,7 +460,14 @@ namespace hpx { namespace parallel { inline namespace v1
                         op, out.partial_position
                     );
                     if(out.seq_first != end && out.partial_position == sequence.size())
-                        output=traits::compose(sit,out.seq_first);
+                    {
+                        out.partial_position = 0;
+                        output=traits::compose(sit, out.seq_first);
+                    }
+                    else if(partial_found && out.partial_position == sequence.size())
+                    {
+                        output = partial_out;
+                    }
                 }
             }
             return result::get(std::move(output));

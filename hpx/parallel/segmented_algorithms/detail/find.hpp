@@ -28,43 +28,45 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             SeqVec sequence, Pred && op, unsigned int g_cursor = 0)
         {
             unsigned int cursor = g_cursor, found_cursor = 0;
-            bool found = false;
-            FwdIter1 found_start, start;
+            FwdIter1 found_start = last1, start = last1;
             while(last1 != first1)
             {
-                if(cursor != sequence.size() && hpx::util::invoke(op, *first1, sequence[cursor]))
+                // test if sequence matches for current cursor and iter position
+                if(cursor != sequence.size() &&
+                    hpx::util::invoke(op, *first1, sequence[cursor]))
                 {
+                    // if beginning of sequence set start
                     if(cursor == 0)
                         start = first1;
                     cursor++;
+                    // if complete sequence found, then store result and continue search
                     if(cursor == sequence.size())
                     {
                         found_cursor = cursor;
                         cursor = 0;
-                        found = true;
                         found_start = start;
                     }
-
                 }
+                // if iter does not match current sequence position then check
+                    // with beginning
                 else if(hpx::util::invoke(op, *first1, sequence[0]))
                 {
                     start = first1;
                     cursor = 1;
                 }
+                //otherwise start search again
                 else
                 {
+                    start = last1;
                     cursor = 0;
                 }
                 first1++;
             };
-            if(found)
-            {
-                cursor = found_cursor;
-                start = found_start;
-            }
-            find_return<FwdIter1> ret = {std::move(start), cursor,
-                std::move(last1), 0};
-            return std::move(ret);
+            // return consists of positions of complete sequence if found and
+                // partial sequence at the beginning
+
+            return std::move(find_return<FwdIter1>{std::move(found_start), found_cursor,
+                std::move(start), cursor});
         }
 
         template <typename ExPolicy, typename FwdIter1, typename SeqVec,
@@ -102,6 +104,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     [=](FwdIter1 it, std::size_t part_size,
                         std::size_t base_idx) mutable
                     {
+                        // loop within a thread to see if complete sequence present.
                         FwdIter1 curr = it;
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
@@ -136,11 +139,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         difference_type find_end_res = tok.get_data();
                         if (find_end_res != count)
                         {
+                            // complete sequence is present
                             std::advance(seq_start, find_end_res);
                             partial_position = sequence.size();
                         }
                         else
                         {
+                            // complete sequence is not present so search for
+                                // partial sequence at the beginning.
                             FwdIter1 curr = first1;
                             std::size_t index = 0;
                             while(!hpx::util::invoke(op, *curr, sequence[index]))
@@ -168,13 +174,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 seq_start = last1;
                             }
                         }
-                        FwdIter1 curr = last1 - 1;
+                        //Also search for partial sequence at the end
+                        FwdIter1 curr = std::prev(last1);
                         std::size_t index = 0;
                         for(; std::distance(first1, curr) != 0; curr--)
                         {
                             if(hpx::util::invoke(op, *curr, sequence[index]))
                                 break;
-                            if(std::distance(curr, last1)>diff)
+                            if(std::distance(curr, last1) > diff)
                             {
                                 curr = last1;
                                 break;
@@ -194,11 +201,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             if(seq_last != last1)
                                 last_position = index-1;
                         }
-                        find_return<FwdIter1> ret = {std::move(seq_start),
-                            partial_position, std::move(seq_last), last_position};
+                        // return both results
                         printf("Combine partition difference_type = %ld partial_position = %ld last_position = %ld\n", find_end_res,
                             partial_position, last_position);
-                        return ret;
+                        return find_return<FwdIter1>{std::move(seq_start),
+                            partial_position, std::move(seq_last), last_position};
                     });
         }
     };
@@ -227,9 +234,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     cursor++;
                     if(cursor == sequence.size())
                     {
-                        find_return<FwdIter1> ret = {std::move(last1),
+                        return find_return<FwdIter1>{std::move(last1),
                             0, std::move(start), (unsigned int) sequence.size()};
-                        return ret;
                     }
                 }
                 else if(op(*first1, sequence[0]))
@@ -243,9 +249,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 }
                 first1++;
             };
-            find_return<FwdIter1> ret = {std::move(last1), 0,
+            return find_return<FwdIter1>{std::move(last1), 0,
                 std::move(start), cursor};
-            return ret;
         }
 
         template <typename ExPolicy, typename FwdIter1, typename SeqVec,
@@ -324,13 +329,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         }
                         else
                         {
-                            FwdIter1 curr = last1 - 1;
+                            FwdIter1 curr = std::prev(last1);
                             std::size_t index = 0;
                             for(; std::distance(first1, curr) != 0; curr--)
                             {
                                 if(hpx::util::invoke(op, *curr, sequence[index]))
                                     break;
-                                if(std::distance(curr, last1)>diff)
+                                if(std::distance(curr, last1) > diff)
                                 {
                                     curr = last1;
                                     break;
@@ -377,11 +382,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             partial_position = 0;
                             seq_start = last1;
                         }
-                        find_return<FwdIter1> ret = {std::move(seq_start),
-                            partial_position, std::move(seq_last), last_position};
                         printf("Combine partition difference_type = %ld prefix = %ld partial_position = %ld last_position = %ld\n",
                             find_first_of_res, std::distance(first1, seq_start), partial_position, last_position);
-                        return ret;
+                        return find_return<FwdIter1>{std::move(seq_start),
+                            partial_position, std::move(seq_last), last_position};
                     });
         }
     };
