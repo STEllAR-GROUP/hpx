@@ -70,26 +70,6 @@ void print_system_characteristics()
 
     //! -------------------------------------- topology
     topo.print_hwloc(std::cout);
-    /*    std::cout << "[Topology]\n"
-              << "number of sockets     : " << topo.get_number_of_sockets() << "\n"
-              << "number of numa nodes  : " << topo.get_number_of_numa_nodes() << "\n"
-              << "number of cores       : " << topo.get_number_of_cores() << "\n"
-              << "number of PUs         : " << topo.get_number_of_pus() << "\n"
-              << "hardware concurrency  : " << hpx::threads::hardware_concurrency() << hpx::flush << "\n\n";
-*/
-    //! -------------------------------------- topology (masks)
-    /*    std::cout << "[Topology] masks :\n"
-              << "machine               : " << bitset_type(topo.get_machine_affinity_mask()) << "\n";*/
-
-    /*    std::cout << "[Topology]\n"
-              << "vector of socket numbers : \n";
-    print_vector(topo.get_socket_numbers_());
-    std::cout << "vector of numa-node numbers : \n";
-    print_vector(topo.get_numa_node_numbers_());
-    std::cout << "vector of core numbers : \n";
-    print_vector(topo.get_core_numbers_());
-    std::cout << "vector of PU numbers : \n";
-    print_vector(topo.get_pu_numbers_());*/
 }
 
 #endif    //RM_EXPERIMENT_SYSTEM_CHARACTERISTICS_H_H

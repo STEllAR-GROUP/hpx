@@ -119,11 +119,16 @@ int hpx_main(boost::program_options::variables_map& vm)
     hpx::future<void> future_1 = hpx::async(mpi_executor, &do_stuff, 5, true);
 
     hpx::future<void> future_2 = future_1.then(
-        mpi_executor, [](hpx::future<void>&& f) { do_stuff(5, true); });
+        mpi_executor,
+        [](hpx::future<void>&& f)
+        {
+            do_stuff(5, true);
+        });
 
     hpx::future<void> future_3 = future_2.then(mpi_executor,
         [mpi_executor, high_priority_executor, async_count](
-            hpx::future<void>&& f) mutable {
+            hpx::future<void>&& f) mutable
+        {
             hpx::future<void> future_4, future_5;
             for (int i = 0; i < async_count; i++)
             {
@@ -151,8 +156,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     // test a parallel algorithm on custom pool with high priority
     hpx::parallel::static_chunk_size fixed(1);
     hpx::parallel::for_loop_strided(
-        hpx::parallel::execution::par.with(fixed).on(high_priority_executor), 0,
-        loop_count, 1,
+        hpx::parallel::execution::par
+            .with(fixed)
+            .on(high_priority_executor),
+        0, loop_count, 1,
         [&](std::size_t i)
         {
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
@@ -169,7 +176,9 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // test a parallel algorithm on custom pool with normal priority
     hpx::parallel::for_loop_strided(
-        hpx::parallel::execution::par.with(fixed).on(normal_priority_executor),
+        hpx::parallel::execution::par
+            .with(fixed)
+            .on(normal_priority_executor),
         0, loop_count, 1,
         [&](std::size_t i)
         {
@@ -188,7 +197,9 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // test a parallel algorithm on mpi_executor
     hpx::parallel::for_loop_strided(
-        hpx::parallel::execution::par.with(fixed).on(mpi_executor),
+        hpx::parallel::execution::par
+            .with(fixed)
+            .on(mpi_executor),
         0, loop_count, 1,
         [&](std::size_t i)
         {
@@ -210,8 +221,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // test a parallel algorithm on custom pool with high priority
     hpx::parallel::for_loop_strided(
-        hpx::parallel::execution::par.with(high_priority_async_policy)
-            .with(fixed)
+        hpx::parallel::execution::par
+            .with(fixed/*, high_priority_async_policy*/)
             .on(mpi_executor),
         0, loop_count, 1,
         [&](std::size_t i)
