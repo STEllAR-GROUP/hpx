@@ -51,7 +51,7 @@ void do_stuff(std::size_t n, bool printout)
 {
     if (printout)
         hpx::cout << "[do stuff] " << n << "\n";
-    for (int i(0); i < n; ++i)
+    for (std::size_t i(0); i < n; ++i)
     {
         double f = std::sin(2 * M_PI * i / n);
         if (printout)
@@ -130,7 +130,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             hpx::future<void>&& f) mutable
         {
             hpx::future<void> future_4, future_5;
-            for (int i = 0; i < async_count; i++)
+            for (std::size_t i = 0; i < async_count; i++)
             {
                 if (i % 2 == 0)
                 {
@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
 
             std::unique_ptr<high_priority_sched> scheduler(
                 new high_priority_sched(num_threads, 1,
-                    "shared-priority-scheduler"));
+                    false, false, "shared-priority-scheduler"));
 
             auto mode = scheduler_mode(scheduler_mode::do_background_work |
                 scheduler_mode::delay_exit);
@@ -329,7 +329,7 @@ int main(int argc, char* argv[])
                           << std::endl;
                 std::unique_ptr<high_priority_sched> scheduler(
                     new high_priority_sched(num_threads, 1,
-                        "shared-priority-scheduler"));
+                        false, false, "shared-priority-scheduler"));
 
                 auto mode = scheduler_mode(scheduler_mode::delay_exit);
 

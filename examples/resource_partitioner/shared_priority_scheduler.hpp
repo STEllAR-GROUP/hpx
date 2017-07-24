@@ -119,6 +119,8 @@ namespace threads {
 
             shared_priority_scheduler(std::size_t num_worker_queues,
                 std::size_t num_high_priority_queues_,
+                bool numa_sensitive,
+                bool numa_pinned,
                 char const* description,
                 int max_tasks = max_thread_count)
               : scheduler_base(num_worker_queues, description)
@@ -128,13 +130,14 @@ namespace threads {
               , low_priority_queue_(max_tasks)
               , curr_queue_(0)
               , curr_hp_queue_(0)
-              , numa_sensitive_(false)
+              , numa_sensitive_(numa_sensitive)
+              , numa_pinned_(numa_pinned)
               , initialized(false)
             {
                 LOG_CUSTOM_MSG("Constructing scheduler with num queues "
                     << decnumber(num_worker_queues));
-                victim_threads_.clear();
-                victim_threads_.resize(num_worker_queues);
+                victim_queues_.clear();
+                victim_queues_.resize(num_worker_queues);
                 //
                 BOOST_ASSERT(num_worker_queues != 0);
                 for (std::size_t i = 0; i < num_worker_queues; ++i)
@@ -437,9 +440,44 @@ namespace threads {
                 return empty;
             }
 
-            inline std::size_t global_to_local_thread_num(std::size_t n)
+            inline std::size_t global_to_local_thread_index(std::size_t n)
             {
                 return n - this->parent_pool->get_thread_offset();
+            }
+
+            inline std::size_t local_to_global_thread_index(std::size_t n)
+            {
+                return n + this->parent_pool->get_thread_offset();
+            }
+
+            std::size_t num_domains(const std::vector<std::size_t> &ts)
+            {
+                auto const& topo = hpx::threads::get_topology();
+                std::set<std::size_t> domains;
+                for (auto local_id : ts) {
+                    std::size_t global_id = local_to_global_thread_index(local_id);
+                    domains.insert(topo.get_numa_node_number(global_id));
+                }
+                return domains.size();
+            }
+
+            // either threads in same domain, or not in same domain
+            // depending on the predicate
+            std::vector<std::size_t> domain_threads(
+                std::size_t t, const std::vector<std::size_t> &ts,
+                std::function<bool(std::size_t, std::size_t)> pred)
+            {
+                std::vector<std::size_t> result;
+                auto const& topo = hpx::threads::get_topology();
+                std::size_t global_index = local_to_global_thread_index(t);
+                std::size_t numa = topo.get_numa_node_number(global_index);
+                for (auto local_id : ts) {
+                    std::size_t global_id = local_to_global_thread_index(local_id);
+                    if (pred(numa,topo.get_numa_node_number(global_id))) {
+                        result.push_back(local_id);
+                    }
+                }
+                return result;
             }
 
             ///////////////////////////////////////////////////////////////////////
@@ -455,7 +493,7 @@ namespace threads {
                 {
                     std::size_t t = threads::detail::thread_num_tss_
                                         .get_worker_thread_num();
-                    pool_queue_num = global_to_local_thread_num(t);
+                    pool_queue_num = global_to_local_thread_index(t);
                 }
 
                 // now create the thread
@@ -520,23 +558,17 @@ namespace threads {
                 bool result = high_priority_queue->get_next_thread(thrd);
                 // if, not how about an HP task from somewhere else?
 
-                if (!result)
-                    for (std::size_t i = 0; i < high_priority_queues_.size();
-                         ++i)
-                    {
-                        if (i != tq)
-                        {
-                            high_priority_queue = high_priority_queues_[i];
-                            if (high_priority_queue
-                                    ->get_pending_queue_length() > 1)
-                            {
-                                result = high_priority_queue->get_next_thread(
-                                    thrd, false, true);
-                                if (result)
-                                    break;
-                            }
+                if (!result) {
+                    for (std::size_t i : hp_victim_queues_[pool_queue_num]) {
+                        high_priority_queue = high_priority_queues_[i];
+                        if (high_priority_queue->get_pending_queue_length() > 1) {
+                            result = high_priority_queue->get_next_thread(
+                                thrd, false, true);
+                            if (result)
+                                break;
                         }
                     }
+                }
 
                 // counter for access queries
                 high_priority_queue->increment_num_pending_accesses();
@@ -588,7 +620,7 @@ namespace threads {
 
                 // if we didn't get a task from the requested thread queue
                 // try stealing from another
-                for (std::size_t idx : victim_threads_[pool_queue_num])
+                for (std::size_t idx : victim_queues_[pool_queue_num])
                 {
                     HPX_ASSERT(idx != pool_queue_num);
 
@@ -630,7 +662,7 @@ namespace threads {
                 {
                     std::size_t t = threads::detail::thread_num_tss_
                                         .get_worker_thread_num();
-                    pool_queue_num = global_to_local_thread_num(t);
+                    pool_queue_num = global_to_local_thread_index(t);
                 }
 
                 if (priority == thread_priority_high ||
@@ -931,7 +963,7 @@ namespace threads {
                 }
 
                 // try all the threads we might steal from
-                for (std::size_t idx : victim_threads_[pool_queue_num])
+                for (std::size_t idx : victim_queues_[pool_queue_num])
                 {
                     HPX_ASSERT(idx != pool_queue_num);
 
@@ -963,15 +995,15 @@ namespace threads {
             {
                 LOG_CUSTOM_MSG("start thread with local thread num "
                     << decnumber(pool_queue_num));
-                /*
-            // forward this call to all queues etc.
-            if (pool_queue_num == queues_.size() - 1)
-                high_priority_queue_.on_start_thread(pool_queue_num);
+/*
+                // forward this call to all queues etc.
+                if (pool_queue_num == queues_.size() - 1)
+                    high_priority_queue_.on_start_thread(pool_queue_num);
 
-            if (pool_queue_num == queues_.size() - 1)
-                low_priority_queue_.on_start_thread(pool_queue_num);
+                if (pool_queue_num == queues_.size() - 1)
+                    low_priority_queue_.on_start_thread(pool_queue_num);
 
-            queues_[pool_queue_num]->on_start_thread(pool_queue_num);
+                queues_[pool_queue_num]->on_start_thread(pool_queue_num);
 */
                 // int pool_offset = get_resource_partitioner().
 
@@ -982,28 +1014,69 @@ namespace threads {
                 if (!initialized)
                 {
                     initialized = true;
-                    //
                     std::size_t num_queues = queues_.size();
-                    for (std::size_t i = 0; i < num_queues; ++i)
+                    std::size_t   hpq_size = high_priority_queues_.size();
+                    // init hp queues with default zero queue/domain
+                    hp_queue_lookup_.resize(num_queues, 0);
+                    hp_domain_.resize(num_queues, 0);
+                    hp_victim_queues_.resize(num_queues);
+                    // generate thread ids for this pool
+                    std::vector<std::size_t> ts(num_queues);
+                    std::iota(ts.begin(), ts.end(), 0);
+                    // how many domains are we using
+                    std::size_t nd = num_domains(ts);
+                    // assign HP queues to domains
+                    double s = double(hpq_size);
+                    for (std::size_t i = 0; i < hpq_size; ++i)
                     {
-                        victim_threads_[i].clear();
-                        victim_threads_[i].reserve(num_queues - 1);
-                        for (std::size_t j = 0; j < num_queues; ++j)
-                        {
-                            std::size_t v = (j + i) % num_queues;
-                            if (i != v)
-                            {
-                                victim_threads_[i].push_back(v);
-                            }
-                        }
+                        hp_domain_[i] = static_cast<std::size_t>(0.5 + (nd-1.0)*i/s);
                     }
 
-                    hp_queue_lookup_.resize(num_queues, 0);
-                    double s = double(high_priority_queues_.size());
+                    // for each queue/thread
                     for (std::size_t i = 0; i < num_queues; ++i)
                     {
-                        hp_queue_lookup_[i] =
-                            static_cast<int>(i * s / num_queues);
+                        // fill a vector with all thread ids except 'itself'
+                        // offset so that not each queue steals in a staggered pattern
+                        // and don't all hit pu=0 first for example
+                        std::vector<std::size_t> thread_ids;
+                        for (std::size_t j=0; j<num_queues; ++j) {
+                            std::size_t pu = (i + j) % num_queues;
+                            if (pu!=i) thread_ids.push_back(pu);
+                        }
+                        std::vector<std::size_t> same = domain_threads(i, thread_ids,
+                            std::equal_to<std::size_t>());
+                        std::vector<std::size_t> diff = domain_threads(i, thread_ids,
+                            std::not_equal_to<std::size_t>());
+
+                        // always steal from queues on the same numa domain first
+                        victim_queues_[i] = same;
+                        // if we are not numa sensitive, steal from other domains
+                        if (!numa_sensitive_) {
+                            victim_queues_[i].insert(victim_queues_[i].end(),
+                                diff.begin(), diff.end());
+                        }
+
+                        // which HP queue do we use for this thread?
+                        double s = double(hpq_size-1);
+                        if (!numa_sensitive_) {
+                            // no numa check - just take from any HP queue
+                            hp_queue_lookup_[i] =
+                                static_cast<int>(0.5 + i*s/num_queues);
+                            // hp tasks can be stolen from any hp queue
+                            for (std::size_t q=1; q<hpq_size; ++q) {
+                                hp_victim_queues_[i].push_back(
+                                    (hp_queue_lookup_[i]+q) % hpq_size);
+                            }
+                        }
+                        else {
+                            hp_queue_lookup_[i] =
+                                static_cast<int>(0.5 + i*s/num_queues);
+                            std::size_t qpd = hpq_size/nd;
+                            for (std::size_t q=1; q<qpd; ++q) {
+                                hp_victim_queues_[i].push_back(
+                                  qpd*(i*nd/num_queues) + (hp_queue_lookup_[i]+q) % qpd);
+                            }
+                        }
                     }
                 }
             }
@@ -1040,10 +1113,13 @@ namespace threads {
             boost::atomic<std::size_t> curr_queue_;
             boost::atomic<std::size_t> curr_hp_queue_;
             std::size_t numa_sensitive_;
+            std::size_t numa_pinned_;
             std::size_t threads_per_hp_queue_;
 
-            std::vector<std::vector<std::size_t>> victim_threads_;
+            std::vector<std::vector<std::size_t>> victim_queues_;
+            std::vector<std::vector<std::size_t>> hp_victim_queues_;
             std::vector<std::size_t> hp_queue_lookup_;
+            std::vector<std::size_t> hp_domain_;
             hpx::lcos::local::spinlock init_mutex;
             bool initialized;
         };
