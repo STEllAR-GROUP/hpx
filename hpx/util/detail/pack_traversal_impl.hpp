@@ -864,7 +864,7 @@ namespace util {
 
             /// Invokes the real mapper with the given element
             template <typename T>
-            auto invoke(T&& element)
+            auto invoke_mapper(T&& element)
                 -> decltype(std::declval<mapping_helper>().mapper_(
                     std::forward<T>(element)))
             {
@@ -874,12 +874,12 @@ namespace util {
             /// SFINAE helper for plain elements not satisfying the tuple like
             /// or container requirements.
             ///
-            /// We use the proxy function invoke here,
+            /// We use the proxy function invoke_mapper here,
             /// because some compilers (MSVC) tend to instantiate the invocation
             /// before matching the tag, which leads to build failures.
             template <typename T>
             auto match(container_match_tag<false, false>, T&& element)
-                -> decltype(std::declval<mapping_helper>().invoke(
+                -> decltype(std::declval<mapping_helper>().invoke_mapper(
                     std::forward<T>(element)));
 
             /// SFINAE helper for elements satisfying the container
@@ -915,17 +915,17 @@ namespace util {
             /// Match plain elements not satisfying the tuple like or
             /// container requirements.
             ///
-            /// We use the proxy function invoke here,
+            /// We use the proxy function invoke_mapper here,
             /// because some compilers (MSVC) tend to instantiate the invocation
             /// before matching the tag, which leads to build failures.
             template <typename T>
             auto try_match(container_match_tag<false, false>, T&& element)
-                -> decltype(std::declval<mapping_helper>().invoke(
+                -> decltype(std::declval<mapping_helper>().invoke_mapper(
                     std::forward<T>(element)))
             {
                 // T could be any non container or non tuple like type here,
                 // take int or hpx::future<int> as an example.
-                return invoke(std::forward<T>(element));
+                return invoke_mapper(std::forward<T>(element));
             }
 
             /// Match elements satisfying the container requirements,

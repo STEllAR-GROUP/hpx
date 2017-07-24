@@ -7,6 +7,7 @@
 #define HPX_UTIL_PACK_TRAVERSAL_HPP
 
 #include <hpx/util/detail/pack_traversal_impl.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -72,7 +73,7 @@ namespace util {
         T&&... args)
     {
         return detail::spreading::spread_box<typename std::decay<T>::type...>(
-            make_tuple(std::forward<T>(args)...));
+            util::make_tuple(std::forward<T>(args)...));
     }
 
     /// Traverses the pack with the given visitor.
