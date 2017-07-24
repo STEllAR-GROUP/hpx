@@ -8,6 +8,8 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
+#include <iosfwd>
+
 namespace hpx {
 
 struct resource_partitioner_tag {};
@@ -228,9 +230,9 @@ namespace resource {
             assigned_pus_.push_back(pu_mask);
     }
 
-    void init_pool_data::print_pool() const
+    void init_pool_data::print_pool(std::ostream& os) const
     {
-        std::cout << "[pool \"" << pool_name_ << "\"] with scheduler ";
+        os << "[pool \"" << pool_name_ << "\"] with scheduler ";
         std::string sched;
         switch (scheduling_policy_)
         {
@@ -269,18 +271,13 @@ namespace resource {
             break;
         }
 
-        std::cout << "\"" << sched << "\" is running on PUs : \n";
+        os << "\"" << sched << "\" is running on PUs : \n";
 
         for (unsigned long long assigned_pu : assigned_pus_)
         {
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || \
-    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
-            std::cout << std::hex << "0x" << assigned_pu << '\n';
-#else
-            std::cout << "0b" << assigned_pu << '\n';
-#endif
+            os << std::hex << HPX_CPU_MASK_PREFIX << assigned_pu << '\n';
         }
-}
+    }
 
     ////////////////////////////////////////////////////////////////////////
     resource_partitioner::resource_partitioner()
@@ -903,13 +900,14 @@ namespace resource {
             "the resource partitioner does not own a default pool \n");
     }
 
-    void resource_partitioner::print_init_pool_data() const
-    {    //! make this prettier
-        std::cout << "the resource partitioner owns "
-                  << initial_thread_pools_.size() << " pool(s) : \n";
+    void resource_partitioner::print_init_pool_data(std::ostream& os) const
+    {
+        //! make this prettier
+        os << "the resource partitioner owns "
+           << initial_thread_pools_.size() << " pool(s) : \n";
         for (auto itp : initial_thread_pools_)
         {
-            itp.print_pool();
+            itp.print_pool(os);
         }
     }
 

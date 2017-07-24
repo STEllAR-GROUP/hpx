@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iosfwd>
 #include <memory>
 #include <mutex>
 #include <numeric>
@@ -68,7 +69,7 @@ namespace hpx { namespace threads
         void init();
 
         //! FIXME move to private and add --hpx:printpools cmd line option
-        void print_pools();
+        void print_pools(std::ostream&);
 
         // Get functions
         detail::thread_pool& default_pool() const;

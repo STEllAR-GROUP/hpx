@@ -18,6 +18,8 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <iosfwd>
+
 namespace hpx { namespace threads
 {
     namespace detail
@@ -61,18 +63,14 @@ namespace hpx { namespace threads
                 }
             }
 
-            void print_pool()
+            void print_pool(std::ostream& os)
             {
-                std::cout << "[pool \"" << id_.name_ << "\", #" << id_.index_
-                          << "] with scheduler " << sched_->get_scheduler_name()
-                          << "\n"
-                          << "is running on PUs : \n";
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || \
-    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
-                std::cout << std::hex << "0x" << used_processing_units_ << '\n';
-#else
-                std::cout << "0b" << used_processing_units_ << '\n';
-#endif
+                os << "[pool \"" << id_.name_ << "\", #" << id_.index_
+                   << "] with scheduler " << sched_->get_scheduler_name()
+                   << "\n"
+                   << "is running on PUs : \n";
+                os << std::hex << HPX_CPU_MASK_PREFIX
+                   << used_processing_units_ << '\n';
             }
 
             threads::policies::scheduler_base *get_scheduler() const
@@ -150,7 +148,7 @@ namespace hpx { namespace threads
                     return;
                 }
 
-                detail::create_thread(sched_.get(), data, id, initial_state, 
+                detail::create_thread(sched_.get(), data, id, initial_state,
                     run_now, ec);    //-V601
             }
 
@@ -344,12 +342,7 @@ namespace hpx { namespace threads
                         << global_thread_num    //-V128 //! BOTH?
                         << ": will run on processing units within this "
                            "mask: "
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                 \
-    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
-                        << std::hex << "0x" << mask;
-#else
-                        << "0b" << mask;
-#endif
+                        << std::hex << HPX_CPU_MASK_PREFIX << mask;
 
                     // create a new thread
                     threads_.push_back(compat::thread(&thread_pool::thread_func,

@@ -209,9 +209,7 @@ namespace hpx { namespace threads
         /// Free memory that was previously allocated by allocate
         virtual void deallocate(void* addr, std::size_t len) const = 0;
 
-        //! FIXME shoshijak: for developping purposes. To be deleted
-        virtual void print_hwloc() const = 0;
-
+        virtual void print_hwloc(std::ostream&) const = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();

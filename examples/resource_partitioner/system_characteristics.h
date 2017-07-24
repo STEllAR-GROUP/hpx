@@ -37,7 +37,7 @@ void print_system_characteristics()
 
     //! -------------------------------------- thread_manager
     std::cout << "[Thread manager]\n"
-              << "worker thread number  : "
+              << "worker thread number  : " << std::dec
               << thrd_manager.get_worker_thread_num() << "\n\n";
 
     //! -------------------------------------- runtime_configuration
@@ -69,7 +69,7 @@ void print_system_characteristics()
     }*/
 
     //! -------------------------------------- topology
-    topo.print_hwloc();
+    topo.print_hwloc(std::cout);
     /*    std::cout << "[Topology]\n"
               << "number of sockets     : " << topo.get_number_of_sockets() << "\n"
               << "number of numa nodes  : " << topo.get_number_of_numa_nodes() << "\n"

@@ -25,6 +25,7 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <iosfwd>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -171,7 +172,7 @@ namespace resource {
         // mechanism for adding resources (zero-based index)
         void add_resource(std::size_t pu_index, std::size_t num_threads);
 
-        void print_pool() const;
+        void print_pool(std::ostream&) const;
 
         friend class resource_partitioner;
 
@@ -209,7 +210,7 @@ namespace resource {
 
         bool pu_exposed(std::size_t pid);
 
-        void print_init_pool_data() const;
+        void print_init_pool_data(std::ostream&) const;
 
         // create a thread_pool
         void create_thread_pool(const std::string &name,

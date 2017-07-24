@@ -105,12 +105,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     // print partition characteristics
     std::cout << "\n\n[hpx_main] print resource_partitioner characteristics : "
               << "\n";
-    rpart.print_init_pool_data();
+    rpart.print_init_pool_data(std::cout);
 
     // print partition characteristics
     std::cout << "\n\n[hpx_main] print thread-manager pools : "
               << "\n";
-    hpx::threads::get_thread_manager().print_pools();
+    hpx::threads::get_thread_manager().print_pools(std::cout);
 
     // print system characteristics
     print_system_characteristics();

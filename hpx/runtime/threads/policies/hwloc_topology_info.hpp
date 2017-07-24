@@ -188,10 +188,11 @@ namespace hpx { namespace threads
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const;
 
-        //! FIXME shoshijak: for developping purposes. To be deleted
-        void print_vector(std::vector<std::size_t> const& v) const;
-        void print_mask_vector(std::vector<mask_type> const& v) const;
-        void print_hwloc() const;
+        void print_vector(
+            std::ostream& os, std::vector<std::size_t> const& v) const;
+        void print_mask_vector(
+            std::ostream& os, std::vector<mask_type> const& v) const;
+        void print_hwloc(std::ostream&) const;
 
     private:
         static mask_type empty_mask;

@@ -236,6 +236,8 @@ public:
     {
         ::operator delete(addr/*, len*/);
     }
+
+    void print_hwloc(std::ostream&) const {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////

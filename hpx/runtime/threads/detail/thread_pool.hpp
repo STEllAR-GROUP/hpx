@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iosfwd>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -77,7 +78,7 @@ namespace hpx { namespace threads { namespace detail
 
         virtual ~thread_pool();
 
-        virtual void print_pool() = 0;
+        virtual void print_pool(std::ostream&) = 0;
 
         pool_id_type get_pool_id()
         {

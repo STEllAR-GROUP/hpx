@@ -36,6 +36,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iosfwd>
 #include <mutex>
 #include <numeric>
 #include <sstream>
@@ -707,13 +708,14 @@ namespace hpx { namespace threads
         }
     }
 
-    void threadmanager_impl::print_pools()
+    void threadmanager_impl::print_pools(std::ostream& os)
     {
-        std::cout << "The threadmanager owns "
-                  << pools_.size() << " pool(s) : \n";
+        os << "The thread-manager owns "
+           << pools_.size() << " pool(s) : \n";
+
         for (auto && pool_iter : pools_)
         {
-            pool_iter->print_pool();
+            pool_iter->print_pool(os);
         }
     }
 

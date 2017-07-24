@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iosfwd>
 #include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -64,7 +65,7 @@ namespace threads
         virtual void init() = 0;
 
         //! FIXME put in private and add --hpx:print_pools command-line option
-        virtual void print_pools() = 0;
+        virtual void print_pools(std::ostream&) = 0;
 
         // Get functions
         typedef std::unique_ptr<detail::thread_pool> pool_type;
