@@ -202,7 +202,7 @@ struct stepper
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
     {
         using hpx::dataflow;
-        using hpx::util::unwrapped;
+        using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
@@ -220,7 +220,7 @@ struct stepper
             }
         );
 
-        auto Op = unwrapped(&stepper::heat_part);
+        auto Op = unwrapping(&stepper::heat_part);
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)
