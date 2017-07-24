@@ -240,7 +240,7 @@ namespace hpx { namespace util
             "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
             "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
             "max_terminated_threads = ${HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS:"
-                BOOST_STRINGIZE(HPX_HAVE_SCHEDULER_MAX_TERMINATED_THREADS) "}",
+              HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_SCHEDULER_MAX_TERMINATED_THREADS)) "}",
 
             "[hpx.commandline]",
             // enable aliasing

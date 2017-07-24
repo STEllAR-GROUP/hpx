@@ -28,7 +28,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -125,7 +124,7 @@ namespace hpx { namespace threads { namespace policies
             static int max_terminated_threads =
                 boost::lexical_cast<int>(hpx::get_config_entry(
                     "hpx.thread_queue.max_terminated_threads",
-                    std::to_string(HPX_HAVE_SCHEDULER_MAX_TERMINATED_THREADS)));
+                    std::to_string(HPX_SCHEDULER_MAX_TERMINATED_THREADS)));
             return max_terminated_threads;
         }
     }
