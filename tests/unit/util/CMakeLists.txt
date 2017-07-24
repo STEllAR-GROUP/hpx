@@ -16,7 +16,6 @@ set(tests
     tagged
     tuple
     unwrap
-    unwrapped
    )
 
 if(HPX_WITH_CXX11_STD_INITIALIZER_LIST)

@@ -948,6 +948,14 @@ if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
   hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
 endif()
 
+# HPX_WITH_UNWRAPPED_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
+    "Enable the deprecated unwrapped function (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################

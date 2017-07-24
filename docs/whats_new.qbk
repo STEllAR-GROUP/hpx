@@ -55,6 +55,12 @@ particular order):
   minimal Visual Studio version we now test on is Visual Studio 2015.5.
 * We have dropped support for the Boost V1.51-V1.54. The minimal version of
   Boost we now test is Boost V1.55.
+* We have dropped support for the `hpx::util::unwrapped` API.
+  `hpx::util::unwrapped` will stay functional to some degree,
+  until it finally gets removed in a later version of HPX.
+  The functional usage of `hpx::util::unwrapped` should be
+  changed to the new `hpx::util::unwrapping` function whereas
+  the immediate usage should be replaced to `hpx::util::unwrap`.
 
 [heading Bug Fixes (Closed Tickets)]
 

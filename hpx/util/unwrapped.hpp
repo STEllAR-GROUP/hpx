@@ -9,6 +9,11 @@
 #define HPX_UTIL_UNWRAPPED_HPP
 
 #include <hpx/config.hpp>
+
+// hpx::util::unwrapped was deprecated in V1.1.0 and thus will be
+// removed in a later version of HPX.
+#if defined(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
+
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
@@ -127,12 +132,9 @@ namespace util {
     ///             as soon as we allowed to route non future types through.
     ///
     template <typename... Args>
-    // This will be enabled once the old implementation is deprecated:
-    // #if !defined(HPX_NO_DEPRECATE_UNWRAPPED)
-    //     HPX_DEPRECATED("hpx::util::unwrapped was replaced by "
-    //                    "hpx::util::unwrap and hpx::util::unwrapping "
-    //                    "and might be removed in a later version of HPX!")
-    // #endif    // HPX_NO_DEPRECATE_UNWRAPPED
+    HPX_DEPRECATED("hpx::util::unwrapped was replaced by "
+                   "hpx::util::unwrap and hpx::util::unwrapping "
+                   "and might be removed in a later version of HPX!")
     auto unwrapped(Args&&... args) -> decltype(detail::proxy_new_unwrapped<
         detail::is_functional_unwrap<Args...>::value,
         1U>::proxy(std::forward<Args>(args)...))
@@ -152,12 +154,9 @@ namespace util {
     /// See hpx::util::unwrapped() for details.
     ///
     template <typename... Args>
-    // This will be enabled once the old implementation is deprecated:
-    // #if !defined(HPX_NO_DEPRECATE_UNWRAPPED)
-    //     HPX_DEPRECATED("hpx::util::unwrapped2 was replaced by "
-    // "hpx::util::unwrap_n<2> and hpx::util::unwrapping_n<2> "
-    // "and might be removed in a later version of HPX!")
-    // #endif    // HPX_NO_DEPRECATE_UNWRAPPED
+    HPX_DEPRECATED("hpx::util::unwrapped2 was replaced by "
+                   "hpx::util::unwrap_n<2> and hpx::util::unwrapping_n<2> "
+                   "and might be removed in a later version of HPX!")
     auto unwrapped2(Args&&... args) -> decltype(detail::proxy_new_unwrapped<
         detail::is_functional_unwrap<Args...>::value,
         2U>::proxy(std::forward<Args>(args)...))
@@ -169,4 +168,5 @@ namespace util {
 }    // end namespace util
 }    // end namespace hpx
 
-#endif
+#endif    // HPX_HAVE_UNWRAPPED_COMPATIBILITY
+#endif    // HPX_UTIL_UNWRAPPED_HPP
