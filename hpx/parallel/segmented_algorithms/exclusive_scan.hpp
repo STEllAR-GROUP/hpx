@@ -117,25 +117,27 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // sequential segmented OutIter implementation
         template <typename ExPolicy, typename SegIter, typename OutIter,
-            typename T, typename Op>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan_seq(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::true_type, Conv && conv)
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
             return segmented_scan_seq<
                 exclusive_scan<typename traits_out::local_raw_iterator>>(
                 std::forward<ExPolicy>(policy),
                 first, last, dest, init, std::forward<Op>(op),
-                std::true_type());
+                std::true_type(), std::forward<Conv>(conv));
         }
 
         // sequential non segmented OutIter implementation
         template <typename ExPolicy, typename SegIter, typename OutIter,
-            typename T, typename Op>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan_seq(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::false_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::false_type, Conv && conv)
         {
             typedef std::vector<T> vector_type;
 
@@ -157,29 +159,29 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // parallel segmented OutIter implementation
         template <typename ExPolicy, typename SegIter, typename OutIter,
-            typename T, typename Op>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan_par(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::true_type, Conv && conv)
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
-
             return segmented_scan_par<
                 exclusive_scan<typename traits_out::local_raw_iterator>>(
                 std::forward<ExPolicy>(policy),
                 first, last, dest, init, std::forward<Op>(op),
-                std::true_type());
+                std::true_type(), std::forward<Conv>(conv));
         }
 
         // parallel non-segmented OutIter implementation
         template <typename ExPolicy, typename SegIter, typename OutIter,
-            typename T, typename Op>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan_par(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::false_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::false_type, Conv && conv)
         {
             typedef std::vector<T> vector_type;
-
             return segmented_scan_par_non<
                 segmented_exclusive_scan_vector<vector_type>>(
                     std::forward<ExPolicy>(policy),
@@ -196,10 +198,11 @@ namespace hpx { namespace parallel { inline namespace v1
         ///////////////////////////////////////////////////////////////////////
         // sequential remote implementation
         template <typename ExPolicy, typename SegIter, typename OutIter,
-            typename T, typename Op>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::true_type, Conv && conv)
         {
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
@@ -210,24 +213,25 @@ namespace hpx { namespace parallel { inline namespace v1
                 return segmented_exclusive_scan_seq(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, init, std::forward<Op>(op),
-                    is_out_seg());
+                    is_out_seg(), std::forward<Conv>(conv));
             }
             else
             {
                 return segmented_exclusive_scan_seq(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, init, std::forward<Op>(op),
-                    std::false_type());
+                    std::false_type(), std::forward<Conv>(conv));
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
         // parallel remote implementation
         template <typename ExPolicy, typename SegIter, typename OutIter,
-            typename T, typename Op>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_exclusive_scan(ExPolicy && policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::false_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::false_type, Conv && conv)
         {
             typedef typename hpx::traits::segmented_iterator_traits<OutIter>
                 ::is_segmented_iterator is_out_seg;
@@ -237,24 +241,24 @@ namespace hpx { namespace parallel { inline namespace v1
                 return segmented_exclusive_scan_par(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, init, std::forward<Op>(op),
-                    is_out_seg());
+                    is_out_seg(), std::forward<Conv>(conv));
             }
             else
             {
                 return segmented_exclusive_scan_par(
                     std::forward<ExPolicy>(policy),
                     first, last, dest, init, std::forward<Op>(op),
-                    std::false_type());
+                    std::false_type(), std::forward<Conv>(conv));
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename OutIter, typename T,
-            typename Op>
+            typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T const& init, Op && op, std::true_type)
+            T const& init, Op && op, std::true_type, Conv && conv)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
@@ -266,16 +270,17 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return segmented_exclusive_scan(
                 std::forward<ExPolicy>(policy),
-                first, last, dest, init, std::forward<Op>(op), is_seq());
+                first, last, dest, init, std::forward<Op>(op),
+                is_seq(),std::forward<Conv>(conv));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename OutIter, typename T,
-            typename Op>
+            typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         exclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            T const& init, Op && op, std::true_type);
+            T const& init, Op && op, std::true_type, Conv && conv);
 
 
         /// \endcond

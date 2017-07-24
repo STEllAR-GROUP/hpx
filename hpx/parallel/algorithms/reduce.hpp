@@ -81,6 +81,44 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
+        // Non Segmented Reduce
+        template <typename ExPolicy, typename FwdIter, typename T, typename F>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, T>::type
+        >::type
+        reduce_(ExPolicy&& policy, FwdIter first, FwdIter last
+            , T init, F && f, std::false_type)
+        {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            static_assert(
+                (hpx::traits::is_input_iterator<FwdIter>::value),
+                "Requires at least input iterator.");
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
+                > is_seq;
+#else
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least forward iterator.");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+            return detail::reduce<T>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::move(init), std::forward<F>(f));
+        }
+
+        // Forward Declaration of Segmented Reduce
+        template <typename ExPolicy, typename FwdIter, typename T, typename F>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, T>::type
+        >::type
+        reduce_(ExPolicy&& policy, FwdIter first, FwdIter last
+            , T init, F && f, std::true_type);
     }
 
     /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + (last - first) - 1)).
@@ -160,26 +198,11 @@ namespace hpx { namespace parallel { inline namespace v1
     >::type
     reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init, F && f)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
-        return detail::reduce<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::move(init), std::forward<F>(f));
+        return detail::reduce_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::move(init), std::forward<F>(f), is_segmented());
     }
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -242,26 +265,11 @@ namespace hpx { namespace parallel { inline namespace v1
     >::type
     reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
 
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
-        return detail::reduce<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::move(init), std::plus<T>());
+        return detail::reduce_(
+            std::forward<ExPolicy>(policy), first, last,
+            std::move(init), std::plus<T>(),is_segmented());
     }
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
@@ -327,28 +335,13 @@ namespace hpx { namespace parallel { inline namespace v1
     >::type
     reduce(ExPolicy&& policy, FwdIter first, FwdIter last)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
         typedef typename std::iterator_traits<FwdIter>::value_type value_type;
 
-        return detail::reduce<value_type>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, value_type(), std::plus<value_type>());
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+
+        return detail::reduce_(
+            std::forward<ExPolicy>(policy), first, last,
+            value_type(), std::plus<value_type>(), is_segmented());
     }
 }}}
 

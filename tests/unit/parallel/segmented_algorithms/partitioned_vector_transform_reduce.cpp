@@ -14,7 +14,7 @@
 #include <iterator>
 
 #include <cstddef>
-
+#include <vector>
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
@@ -42,7 +42,7 @@ T test_transform_reduce(ExPolicy && policy,
         hpx::parallel::transform_reduce(policy,
             make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
             make_zip_iterator(std::end(xvalues), std::end(yvalues)),
-            T(0), std::plus<T>(), multiply()
+            T(1), std::plus<T>(), multiply()
         );
 }
 
@@ -57,7 +57,7 @@ test_transform_reduce_async(ExPolicy && policy,
         hpx::parallel::transform_reduce(policy,
             make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
             make_zip_iterator(std::end(xvalues), std::end(yvalues)),
-            T(0), std::plus<T>(), multiply()
+            T(1), std::plus<T>(), multiply()
         );
 }
 
@@ -68,39 +68,36 @@ void transform_reduce_tests(std::size_t num,
 {
     HPX_TEST_EQ(
         test_transform_reduce(hpx::parallel::execution::seq, xvalues, yvalues),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_transform_reduce(hpx::parallel::execution::par, xvalues, yvalues),
-        T(num));
+        T(num + 1));
 
     HPX_TEST_EQ(
         test_transform_reduce_async(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
-        T(num));
+        T(num + 1));
     HPX_TEST_EQ(
         test_transform_reduce_async(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
             xvalues, yvalues).get(),
-        T(num));
+        T(num + 1));
 }
 
 template <typename T>
-void transform_reduce_tests()
+void transform_reduce_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 10007;
-
     {
-        hpx::partitioned_vector<T> xvalues(num, T(1));
-        hpx::partitioned_vector<T> yvalues(num, T(1));
-
+        hpx::partitioned_vector<T> xvalues(num,T(1));
+        hpx::partitioned_vector<T> yvalues(num,T(1));
         transform_reduce_tests(num, xvalues, yvalues);
     }
 
     {
-        hpx::partitioned_vector<T> xvalues(num, T(1), hpx::container_layout(2));
-        hpx::partitioned_vector<T> yvalues(num, T(1), hpx::container_layout(2));
-
+        hpx::partitioned_vector<T> xvalues(num,T(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<T> yvalues(num,T(1),hpx::container_layout(localities));
         transform_reduce_tests(num, xvalues, yvalues);
     }
 }
@@ -108,9 +105,8 @@ void transform_reduce_tests()
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    transform_reduce_tests<int>();
-    transform_reduce_tests<double>();
-
-    return 0;
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    transform_reduce_tests<int>(localities);
+    transform_reduce_tests<double>(localities);
+    return hpx::util::report_errors();
 }
-

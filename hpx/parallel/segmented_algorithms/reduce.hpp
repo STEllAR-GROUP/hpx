@@ -1,17 +1,17 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2017 Ajai V George
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_TRANSFORM_REDUCE_DEC_17_2014_1157AM)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHM_TRANSFORM_REDUCE_DEC_17_2014_1157AM
+#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_REDUCE_JUN_21_2017_1157AM)
+#define HPX_PARALLEL_SEGMENTED_ALGORITHM_REDUCE_JUN_21_2017_1157AM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/reduce.hpp>
@@ -30,7 +30,7 @@
 namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
-    // segmented_transform_reduce
+    // segmented_reduce
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -38,11 +38,11 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
-            typename T, typename Reduce, typename Convert>
+            typename T, typename Reduce>
         static typename util::detail::algorithm_result<ExPolicy, T>::type
-        segmented_transform_reduce(Algo && algo, ExPolicy const& policy,
+        segmented_reduce(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, T && init,
-            Reduce && red_op, Convert && conv_op, std::true_type)
+            Reduce && red_op, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, red_op, conv_op));
+                            std::true_type(), beg, end, red_op));
                 }
             }
             else {
@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, red_op, conv_op)
+                            std::true_type(), beg, end, red_op)
                     );
                 }
 
@@ -87,7 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         overall_result = hpx::util::invoke(red_op, overall_result,
                             dispatch(traits::get_id(sit), algo, policy,
-                                std::true_type(), beg, end, red_op, conv_op)
+                                std::true_type(), beg, end, red_op)
                         );
                     }
                 }
@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, red_op, conv_op)
+                            std::true_type(), beg, end, red_op)
                     );
                 }
             }
@@ -109,11 +109,11 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
-            typename T, typename Reduce, typename Convert>
+            typename T, typename Reduce>
         static typename util::detail::algorithm_result<ExPolicy, T>::type
-        segmented_transform_reduce(Algo && algo, ExPolicy const& policy,
+        segmented_reduce(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, T && init,
-            Reduce && red_op, Convert && conv_op, std::false_type)
+            Reduce && red_op, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -140,7 +140,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, red_op, conv_op)
+                            beg, end, red_op)
                     );
                 }
             }
@@ -153,7 +153,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, red_op, conv_op)
+                            beg, end, red_op)
                     );
                 }
 
@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         segments.push_back(
                             dispatch_async(traits::get_id(sit),
                                 algo, policy, forced_seq(),
-                                beg, end, red_op, conv_op)
+                                beg, end, red_op)
                         );
                     }
                 }
@@ -180,7 +180,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     segments.push_back(
                         dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, red_op, conv_op)
+                            beg, end, red_op)
                     );
                 }
             }
@@ -200,7 +200,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             r.begin(), r.end(), init,
                             [=](T const& val, shared_future<T>& curr)
                             {
-                                return red_op(val, curr.get());
+                                return hpx::util::invoke(red_op, val, curr.get());
                             });
                     },
                     std::move(segments)));
@@ -208,13 +208,13 @@ namespace hpx { namespace parallel { inline namespace v1
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <typename ExPolicy, typename InIter, typename T, typename Reduce,
-            typename Convert>
-        typename util::detail::algorithm_result<
-            ExPolicy, typename hpx::util::decay<T>::type
+        template <typename ExPolicy, typename InIter, typename T, typename F>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
-            Reduce && red_op, Convert && conv_op, std::true_type)
+        reduce_(ExPolicy&& policy, InIter first, InIter last,
+            T init, F && f, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
@@ -228,21 +228,20 @@ namespace hpx { namespace parallel { inline namespace v1
                     >::get(std::forward<T>(init));
             }
 
-            return segmented_transform_reduce(
-                seg_transform_reduce<init_type>(),
+            return segmented_reduce(
+                seg_reduce<init_type>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op), is_seq());
+                std::forward<T>(init), std::forward<F>(f), is_seq());
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename T, typename Reduce,
-            typename Convert>
-        typename util::detail::algorithm_result<
-            ExPolicy, typename hpx::util::decay<T>::type
+        template <typename ExPolicy, typename InIter, typename T, typename F>
+        inline typename std::enable_if<
+            execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
-            Reduce && red_op, Convert && conv_op, std::false_type);
+        reduce_(ExPolicy&& policy, InIter first, InIter last
+            , T init, F && f, std::false_type);
 
         /// \endcond
     }
