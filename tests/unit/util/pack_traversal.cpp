@@ -145,7 +145,7 @@ struct my_unwrapper
     }
 };
 
-static void test_mixed_early_unwrapped()
+static void test_mixed_early_unwrapping()
 {
     {
         auto res = map_pack(my_unwrapper{},    // ...
@@ -853,7 +853,7 @@ static void test_spread_tuple_like_traverse()
 int main(int, char**)
 {
     test_mixed_traversal();
-    test_mixed_early_unwrapped();
+    test_mixed_early_unwrapping();
     test_mixed_container_remap();
     test_mixed_fall_through();
 
