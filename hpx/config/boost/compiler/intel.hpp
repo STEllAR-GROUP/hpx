@@ -12,6 +12,8 @@
 
 //  See http://www.boost.org for most recent version.
 
+// hpxinspect:nodeprecatedname:BOOST_STRINGIZE
+
 // make sure header testing does not throw errors
 #if defined(__INTEL_COMPILER)
 

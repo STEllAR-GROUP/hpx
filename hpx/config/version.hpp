@@ -12,8 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 
-#include <boost/preprocessor/cat.hpp>
 #include <boost/version.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,15 +48,15 @@
 // The version check enforces the major and minor version numbers to match for
 // every compilation unit to be compiled.
 #define HPX_CHECK_VERSION                                                     \
-    BOOST_PP_CAT(hpx_check_version_,                                          \
-        BOOST_PP_CAT(HPX_VERSION_MAJOR,                                       \
-            BOOST_PP_CAT(_, HPX_VERSION_MINOR)))                              \
+    HPX_PP_CAT(hpx_check_version_,                                            \
+        HPX_PP_CAT(HPX_VERSION_MAJOR,                                         \
+            HPX_PP_CAT(_, HPX_VERSION_MINOR)))                                \
     /**/
 
 // The version check enforces the major and minor version numbers to match for
 // every compilation unit to be compiled.
 #define HPX_CHECK_BOOST_VERSION                                               \
-    BOOST_PP_CAT(hpx_check_boost_version_, BOOST_VERSION)                     \
+    HPX_PP_CAT(hpx_check_boost_version_, BOOST_VERSION)                       \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -14,6 +14,7 @@
 //
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 //
 #include <hpx/config/parcelport_defines.hpp>
 //
@@ -166,7 +167,8 @@ namespace detail {
 #endif
 
 #  define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)  \
-    case elem : return BOOST_PP_STRINGIZE(elem);
+    case elem : return HPX_PP_STRINGIZE(elem);                                \
+/**/
 
 #  define DEFINE_ENUM_WITH_STRING_CONVERSIONS(name, enumerators)              \
     enum name {                                                               \
@@ -182,9 +184,10 @@ namespace detail {
                 name,                                                         \
                 enumerators                                                   \
             )                                                                 \
-            default: return "[Unknown " BOOST_PP_STRINGIZE(name) "]";         \
+            default: return "[Unknown " HPX_PP_STRINGIZE(name) "]";           \
         }                                                                     \
-    }
+    }                                                                         \
+/**/
 
     // example of usage
     // DEFINE_ENUM_WITH_STRING_CONVERSIONS(test_type, (test1)(test2)(test3))

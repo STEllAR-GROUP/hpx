@@ -36,8 +36,8 @@
 #include <boost/exception/detail/attribute_noreturn.hpp>
 #endif
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 // On Windows, make sure winsock.h is not included even if windows.h is
@@ -326,7 +326,7 @@
 #endif
 
 #if defined(HPX_DEBUG)
-#  define HPX_MANGLE_NAME(n)     BOOST_PP_CAT(n, d)
+#  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, d)
 #  define HPX_MANGLE_STRING(n)   n + "d"
 #else
 #  define HPX_MANGLE_NAME(n)     n
@@ -339,7 +339,7 @@
 #endif
 
 #if !defined(HPX_COMPONENT_STRING)
-#  define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
+#  define HPX_COMPONENT_STRING HPX_PP_STRINGIZE(HPX_COMPONENT_NAME)
 #endif
 
 #if !defined(HPX_PLUGIN_COMPONENT_PREFIX)
@@ -356,7 +356,7 @@
 #endif
 
 #if !defined(HPX_PLUGIN_STRING)
-#  define HPX_PLUGIN_STRING BOOST_PP_STRINGIZE(HPX_PLUGIN_NAME)
+#  define HPX_PLUGIN_STRING HPX_PP_STRINGIZE(HPX_PLUGIN_NAME)
 #endif
 
 #if !defined(HPX_PLUGIN_PLUGIN_PREFIX)
@@ -366,7 +366,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_APPLICATION_STRING)
 #  if defined(HPX_APPLICATION_NAME)
-#    define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)
+#    define HPX_APPLICATION_STRING HPX_PP_STRINGIZE(HPX_APPLICATION_NAME)
 #  else
 #    define HPX_APPLICATION_STRING "unknown HPX application"
 #  endif

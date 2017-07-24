@@ -52,38 +52,20 @@ namespace hpx { namespace serialization
             std::rethrow_exception(ep);
         }
         catch (exception_info const& xi) {
-            char const* func = xi.function_name();
-            if (func) {
-                throw_function_ = *func;
-            }
-            else {
-                std::string const* s =
-                    xi.get<hpx::detail::throw_function>();
-                if (s)
-                    throw_function_ = *s;
-            }
+            std::string const* function =
+                xi.get<hpx::detail::throw_function>();
+            if (function)
+                throw_function_ = *function;
 
-            char const* file = xi.file_name();
-            if (file) {
+            std::string const* file =
+                xi.get<hpx::detail::throw_file>();
+            if (file)
                 throw_file_ = *file;
-            }
-            else {
-                std::string const* s =
-                    xi.get<hpx::detail::throw_file>();
-                if (s)
-                    throw_file_ = *s;
-            }
 
-            int line = xi.line();
-            if (line) {
-                throw_line_ = line;
-            }
-            else {
-                long const* l =
-                    xi.get<hpx::detail::throw_line>();
-                if (l)
-                    throw_line_ = *l;
-            }
+            long const* line =
+                xi.get<hpx::detail::throw_line>();
+            if (line)
+                throw_line_ = *line;
 
             std::uint32_t const* locality =
                 xi.get<hpx::detail::throw_locality>();

@@ -38,7 +38,8 @@ namespace hpx { namespace serialization
     {
         chunk_data    data_; // index or pointer
         std::size_t   size_; // size of the serialization_chunk starting index_/pos_
-        std::uint64_t rkey_; // optional RDMA remote key for parcelport put/get operations
+        std::uint64_t rkey_; // optional RDMA remote key for parcelport put/get
+                             // operations
         std::uint8_t  type_; // chunk_type
     };
 

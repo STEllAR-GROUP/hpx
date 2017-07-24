@@ -18,13 +18,13 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 #include <boost/format.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <cstdint>
 #include <sstream>
@@ -277,7 +277,7 @@ namespace hpx
 
     std::string build_type()
     {
-        return BOOST_PP_STRINGIZE(HPX_BUILD_TYPE);
+        return HPX_PP_STRINGIZE(HPX_BUILD_TYPE);
     }
 
     std::string build_date_time()
@@ -308,7 +308,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    char const HPX_CHECK_VERSION[] = BOOST_PP_STRINGIZE(HPX_CHECK_VERSION);
-    char const HPX_CHECK_BOOST_VERSION[] = BOOST_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
+    char const HPX_CHECK_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
+    char const HPX_CHECK_BOOST_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
 }
 

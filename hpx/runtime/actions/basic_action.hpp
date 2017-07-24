@@ -35,7 +35,10 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/logging.hpp>
@@ -46,8 +49,6 @@
 #endif
 
 #include <boost/atomic.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -813,13 +814,13 @@ namespace hpx { namespace serialization
     /**/
 
 #define HPX_DECLARE_ACTION_(...)                                              \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DECLARE_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                    \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DECLARE_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                        \
     )(__VA_ARGS__))                                                           \
     /**/
 
 #define HPX_DECLARE_ACTION_1(func)                                            \
-    HPX_DECLARE_ACTION_2(func, BOOST_PP_CAT(func, _action))                   \
+    HPX_DECLARE_ACTION_2(func, HPX_PP_CAT(func, _action))                     \
     /**/
 
 #define HPX_DECLARE_ACTION_2(func, name) struct name;                         \
@@ -837,7 +838,7 @@ namespace hpx { namespace serialization
         template<> HPX_ALWAYS_EXPORT                                          \
         util::itt::string_handle const& get_action_name_itt< action>()        \
         {                                                                     \
-            static util::itt::string_handle sh(BOOST_PP_STRINGIZE(actionname)); \
+            static util::itt::string_handle sh(HPX_PP_STRINGIZE(actionname)); \
             return sh;                                                        \
         }                                                                     \
     }}}                                                                       \
@@ -852,14 +853,14 @@ namespace hpx { namespace serialization
         template<> HPX_ALWAYS_EXPORT                                          \
         char const* get_action_name< action>()                                \
         {                                                                     \
-            return BOOST_PP_STRINGIZE(actionname);                            \
+            return HPX_PP_STRINGIZE(actionname);                              \
         }                                                                     \
     }}}                                                                       \
 /**/
 
 #define HPX_REGISTER_ACTION_(...)                                             \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                   \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                       \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_ACTION_1(action)                                         \
@@ -920,8 +921,8 @@ namespace hpx { namespace serialization
 /**/
 
 #define HPX_REGISTER_ACTION_DECLARATION_(...)                                 \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_ACTION_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_ACTION_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)           \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_1(action)                             \
@@ -957,14 +958,14 @@ namespace hpx { namespace serialization
 /**/
 // This macro is deprecated. It expands to an inline function which will emit a
 // warning.
-#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                    \
-    HPX_DEPRECATED("HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "    \
-                   "removed in the next release")                              \
-    static inline void BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();   \
-    void BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)()                  \
-    {                                                                          \
-        BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();                  \
-    }                                                                          \
+#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                   \
+    HPX_DEPRECATED("HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "   \
+                   "removed in the next release")                             \
+    static inline void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();    \
+    void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)()                   \
+    {                                                                         \
+        HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();                   \
+    }                                                                         \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////

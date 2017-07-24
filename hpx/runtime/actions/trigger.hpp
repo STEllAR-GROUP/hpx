@@ -105,7 +105,8 @@ namespace hpx { namespace actions {
 
         // Overload when return type is "void" aka util::unused_type
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::true_type, typed_continuation<Result, RemoteResult>&& cont,
+        void trigger_impl(std::true_type,
+            typed_continuation<Result, RemoteResult>&& cont,
             F&& f, Ts&&... vs)
         {
             try {

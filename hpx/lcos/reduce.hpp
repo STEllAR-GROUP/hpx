@@ -89,11 +89,11 @@ namespace hpx { namespace lcos
 #include <hpx/util/assert.hpp>
 #include <hpx/util/calculate_fanout.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -480,8 +480,8 @@ namespace hpx { namespace lcos
     HPX_REGISTER_REDUCE_ACTION_DECLARATION_(__VA_ARGS__)                      \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_DECLARATION_(...)                          \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_REDUCE_ACTION_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_REDUCE_ACTION_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)    \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -489,14 +489,14 @@ namespace hpx { namespace lcos
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
-      , BOOST_PP_CAT(BOOST_PP_CAT(reduce_, Action), ReduceOp)                 \
+      , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_DECLARATION_3(Action, ReduceOp, Name)      \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
-      , BOOST_PP_CAT(reduce_, Name)                                           \
+      , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
 
@@ -505,8 +505,8 @@ namespace hpx { namespace lcos
     HPX_REGISTER_REDUCE_ACTION_(__VA_ARGS__)                                  \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_(...)                                      \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_REDUCE_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_REDUCE_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -514,14 +514,14 @@ namespace hpx { namespace lcos
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
-      , BOOST_PP_CAT(BOOST_PP_CAT(reduce_, Action), ReduceOp)                 \
+      , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_3(Action, ReduceOp, Name)                  \
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
-      , BOOST_PP_CAT(reduce_, Name)                                           \
+      , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
 
@@ -530,9 +530,9 @@ namespace hpx { namespace lcos
     HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)           \
 /**/
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_(...)               \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_,                   \
-            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+            HPX_PP_NARGS(__VA_ARGS__)                                         \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -541,7 +541,7 @@ namespace hpx { namespace lcos
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \
-      , BOOST_PP_CAT(BOOST_PP_CAT(reduce_, Action), ReduceOp)                 \
+      , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION_3(Action, ReduceOp, Name) \
@@ -549,7 +549,7 @@ namespace hpx { namespace lcos
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \
-      , BOOST_PP_CAT(reduce_, Name)                                           \
+      , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
 
@@ -558,8 +558,8 @@ namespace hpx { namespace lcos
     HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_(__VA_ARGS__)                       \
 /**/
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_(...)                           \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__) \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_, HPX_PP_NARGS(__VA_ARGS__)     \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -568,7 +568,7 @@ namespace hpx { namespace lcos
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \
-      , BOOST_PP_CAT(BOOST_PP_CAT(reduce_, Action), ReduceOp)                 \
+      , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_3(Action, ReduceOp, Name)       \
@@ -576,7 +576,7 @@ namespace hpx { namespace lcos
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \
-      , BOOST_PP_CAT(reduce_, Name)                                           \
+      , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
 
