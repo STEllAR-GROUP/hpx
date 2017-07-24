@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT MSVC)
+if((NOT MSVC) OR HPX_WITH_VCPKG)
   set(boost_library_dependencies ${Boost_LIBRARIES})
 endif()
 
@@ -25,9 +25,9 @@ set(benchmarks
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_DATAPAR_BOOST_SIMD)
   set(benchmarks
       ${benchmarks}
-      transform_reduce_binary
+      transform_reduce_binary_scaling
      )
-  set(transform_reduce_binary_FLAGS DEPENDENCIES iostreams_component)
+  set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)

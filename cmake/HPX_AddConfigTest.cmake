@@ -1,5 +1,6 @@
-# Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2017 Denis Blank
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,7 +26,7 @@ macro(add_hpx_config_test variable)
   endif()
 
   if(NOT DEFINED ${variable})
-    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests")
+    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests")
 
     string(TOLOWER "${variable}" variable_lc)
     if(${variable}_FILE)
@@ -36,18 +37,18 @@ macro(add_hpx_config_test variable)
       endif()
     else()
       set(test_source
-          "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp")
+          "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp")
       file(WRITE "${test_source}"
            "${${variable}_SOURCE}\n")
     endif()
-    set(test_binary ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc})
+    set(test_binary ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc})
 
     get_directory_property(CONFIG_TEST_INCLUDE_DIRS INCLUDE_DIRECTORIES)
     get_directory_property(CONFIG_TEST_LINK_DIRS LINK_DIRECTORIES)
     set(COMPILE_DEFINITIONS_TMP)
     set(CONFIG_TEST_COMPILE_DEFINITIONS)
     get_directory_property(COMPILE_DEFINITIONS_TMP COMPILE_DEFINITIONS)
-    foreach(def ${COMPILE_DEFINITIONS_TMP})
+    foreach(def IN LISTS COMPILE_DEFINITIONS_TMP ${variable}_COMPILE_DEFINITIONS)
       set(CONFIG_TEST_COMPILE_DEFINITIONS "${CONFIG_TEST_COMPILE_DEFINITIONS} -D${def}")
     endforeach()
     get_property(HPX_TARGET_COMPILE_OPTIONS_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
@@ -57,16 +58,15 @@ macro(add_hpx_config_test variable)
       endif()
     endforeach()
 
-    set(CONFIG_TEST_INCLUDE_DIRS ${CONFIG_TEST_INCLUDE_DIRS} ${${variable}_INCLUDE_DIRS})
-    set(CONFIG_TEST_LINK_DIRS ${CONFIG_TEST_LINK_DIRS} ${${variable}_LINK_DIRS})
+    set(CONFIG_TEST_INCLUDE_DIRS ${CONFIG_TEST_INCLUDE_DIRS} ${${variable}_INCLUDE_DIRECTORIES})
+    set(CONFIG_TEST_LINK_DIRS ${CONFIG_TEST_LINK_DIRS} ${${variable}_LINK_DIRECTORIES})
 
-    set(CONFIG_TEST_COMPILE_DEFINITIONS ${CONFIG_TEST_COMPILE_DEFINITIONS} ${${variable}_COMPILE_DEFINITIONS})
     set(CONFIG_TEST_LINK_LIBRARIES ${HPX_LIBRARIES} ${${variable}_LIBRARIES})
 
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
         try_run(${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
-          ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
+          ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
           ${test_source}
           CMAKE_FLAGS
             "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
@@ -85,7 +85,7 @@ macro(add_hpx_config_test variable)
       endif()
     else()
       try_compile(${variable}_RESULT
-        ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
+        ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
         ${test_source}
         CMAKE_FLAGS
           "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
@@ -125,6 +125,58 @@ macro(add_hpx_config_test variable)
   elseif(${variable}_REQUIRED)
     hpx_warn("Test failed, detailed output:\n\n${${variable}_OUTPUT}")
     hpx_error(${${variable}_REQUIRED})
+  endif()
+endmacro()
+
+# Makes it possible to provide a feature test that is able to
+# test the compiler to build parts of HPX directly when the given definition
+# is defined.
+macro(add_hpx_in_framework_config_test variable)
+  # Generate the config only if the test wasn't executed yet
+  if(NOT DEFINED ${variable})
+    # Location to generate the config headers to
+    set(${variable}_GENERATED_DIR
+      "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/header-${variable}")
+    generate_config_defines_header(${${variable}_GENERATED_DIR})
+  endif()
+
+  set(options)
+  set(one_value_args)
+  set(multi_value_args DEFINITIONS INCLUDE_DIRECTORIES COMPILE_DEFINITIONS)
+  cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  # We call the generic feature test method while modifying some
+  # existing parsed arguments in order to alter the INCLUDE_DIRECTORIES
+  # and the COMPILE_DEFINITIONS.
+  # It's important here not to link the config test against an executable
+  # because otherwise this will result in unresolved references to the
+  # HPX library, that wasn't built as of now.
+  add_hpx_config_test(${variable}
+                      ${${variable}_UNPARSED_ARGUMENTS}
+                      DEFINITIONS
+                        ${${variable}_DEFINITIONS}
+                      COMPILE_DEFINITIONS
+                        ${${variable}_COMPILE_DEFINITIONS}
+                        # We add the definitions we test to the
+                        # existing compile definitions.
+                        ${${variable}_DEFINITIONS}
+                        # Add HPX_NO_VERSION_CHECK to make header only
+                        # parts of HPX available without requiring to link
+                        # against the HPX sources.
+                        # We can remove this workaround as soon as CMake 3.6
+                        # is the minimal required version and supports:
+                        # CMAKE_TRY_COMPILE_TARGET_TYPE = STATIC_LIBRARY
+                        # when using try_compile to not to throw errors
+                        # on unresolved symbols.
+                        HPX_NO_VERSION_CHECK
+                      INCLUDE_DIRECTORIES
+                        ${${variable}_INCLUDE_DIRECTORIES}
+                        # We add the generated headers to the include dirs
+                        ${${variable}_GENERATED_DIR})
+
+  if(DEFINED ${variable}_GENERATED_DIR)
+    # Cleanup the generated header
+    file(REMOVE_RECURSE "${${variable}_GENERATED_DIR}")
   endif()
 endmacro()
 
@@ -179,6 +231,13 @@ endmacro()
 macro(hpx_check_for_cxx11_sfinae_expression)
   add_hpx_config_test(HPX_WITH_CXX11_SFINAE_EXPRESSION
     SOURCE cmake/tests/cxx11_sfinae_expression.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_sfinae_expression_complete)
+  add_hpx_in_framework_config_test(HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
+    SOURCE cmake/tests/cxx11_sfinae_expression_complete.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -339,6 +398,13 @@ macro(hpx_check_for_cxx11_std_cstdint)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_exception_ptr)
+  add_hpx_config_test(HPX_WITH_CXX11_EXCEPTION_PTR
+    SOURCE cmake/tests/cxx11_std_exception_ptr.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_initializer_list)
   add_hpx_config_test(HPX_WITH_CXX11_STD_INITIALIZER_LIST
     SOURCE cmake/tests/cxx11_std_initializer_list.cpp
@@ -374,6 +440,13 @@ macro(hpx_check_for_cxx11_std_lock_guard)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_range_access)
+  add_hpx_config_test(HPX_WITH_CXX11_RANGE_ACCESS
+    SOURCE cmake/tests/cxx11_std_range_access.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_reference_wrapper)
   add_hpx_config_test(HPX_WITH_CXX11_REFERENCE_WRAPPER
     SOURCE cmake/tests/cxx11_std_reference_wrapper.cpp
@@ -384,6 +457,13 @@ endmacro()
 macro(hpx_check_for_cxx11_std_shared_ptr)
   add_hpx_config_test(HPX_WITH_CXX11_SHARED_PTR
     SOURCE cmake/tests/cxx11_std_shared_ptr.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_shuffle)
+  add_hpx_config_test(HPX_WITH_CXX11_SHUFFLE
+    SOURCE cmake/tests/cxx11_std_shuffle.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -473,9 +553,31 @@ macro(hpx_check_for_cxx14_std_result_of_sfinae)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx14_variable_templates)
+  add_hpx_config_test(HPX_WITH_CXX14_VARIABLE_TEMPLATES
+    SOURCE cmake/tests/cxx14_variable_templates.cpp
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_variable_templates)
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
     SOURCE cmake/tests/libfun_std_experimental_optional.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx17_fold_expressions)
+  add_hpx_config_test(HPX_WITH_CXX17_FOLD_EXPRESSIONS
+    SOURCE cmake/tests/cxx17_fold_expressions.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx17_fallthrough_attribute)
+  add_hpx_config_test(HPX_WITH_CXX17_FALLTHROUGH_ATTRIBUTE
+    SOURCE cmake/tests/cxx17_fallthrough_attribute.cpp
     FILE ${ARGN})
 endmacro()
 

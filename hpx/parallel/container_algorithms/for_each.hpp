@@ -10,14 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_range.hpp>
+#include <hpx/util/range.hpp>
 
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -98,18 +96,18 @@ namespace hpx { namespace parallel { inline namespace v1
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
+        hpx::traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, typename traits::range_iterator<Rng>::type
+        ExPolicy, typename hpx::traits::range_iterator<Rng>::type
     >::type
     for_each(ExPolicy && policy, Rng && rng, F && f, Proj && proj = Proj())
     {
         return for_each(std::forward<ExPolicy>(policy),
-            boost::begin(rng), boost::end(rng), std::forward<F>(f),
+            hpx::util::begin(rng), hpx::util::end(rng), std::forward<F>(f),
             std::forward<Proj>(proj));
     }
 }}}

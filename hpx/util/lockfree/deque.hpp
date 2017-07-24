@@ -143,7 +143,7 @@ template <typename T,
           >
 struct deque
 {
-  private:
+  public:
     HPX_NON_COPYABLE(deque);
 
   public:

@@ -8,8 +8,6 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -126,7 +124,7 @@ struct test_timed_async_executor2 : hpx::parallel::timed_executor_tag
     typedef hpx::parallel::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
+    hpx::future<typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
         return hpx::async(hpx::launch::async, std::forward<F>(f),
@@ -134,7 +132,7 @@ struct test_timed_async_executor2 : hpx::parallel::timed_executor_tag
     }
 
     template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
+    hpx::future<typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_execute_at(hpx::util::steady_time_point const& abs_time, F && f,
         Ts &&... ts)
     {
@@ -149,7 +147,7 @@ struct test_timed_async_executor1 : test_timed_async_executor2
     typedef hpx::parallel::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     execute_at(hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
     {
         hpx::this_thread::sleep_until(abs_time);
@@ -163,7 +161,7 @@ struct test_timed_async_executor3 : test_timed_async_executor1
     typedef hpx::parallel::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    void apply_execute(hpx::util::steady_time_point const& abs_time, F && f,
+    void post(hpx::util::steady_time_point const& abs_time, F && f,
         Ts &&... ts)
     {
         hpx::this_thread::sleep_until(abs_time);

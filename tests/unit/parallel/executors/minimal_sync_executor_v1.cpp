@@ -12,13 +12,12 @@
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id sync_test(int passed_through)
@@ -77,7 +76,7 @@ void test_bulk_sync(Executor& exec)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -94,7 +93,7 @@ void test_bulk_async(Executor& exec)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -134,7 +133,7 @@ struct test_sync_executor2 : hpx::parallel::executor_tag
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    hpx::future<typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type>
+    hpx::future<typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
         return hpx::async(hpx::launch::sync, std::forward<F>(f),
@@ -152,7 +151,7 @@ struct test_sync_executor1 : test_sync_executor2
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     execute(F && f, Ts &&... ts)
     {
         return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -195,7 +194,7 @@ struct test_sync_executor5 : test_sync_executor1  // derive from sync execute
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    void apply_execute(F && f, Ts &&... ts)
+    void post(F && f, Ts &&... ts)
     {
         this->execute(std::forward<F>(f), std::forward<Ts>(ts)...);
     }

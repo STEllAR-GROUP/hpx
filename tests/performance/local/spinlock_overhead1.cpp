@@ -58,8 +58,6 @@ namespace test
 {
     struct local_spinlock
     {
-        HPX_NON_COPYABLE(local_spinlock);
-
     private:
         std::uint64_t v_;
 
@@ -103,6 +101,9 @@ namespace test
         {
             HPX_ITT_SYNC_CREATE(this, "test::local_spinlock", "");
         }
+
+        local_spinlock(local_spinlock const&) = delete;
+        local_spinlock& operator=(local_spinlock const&) = delete;
 
         ~local_spinlock()
         {

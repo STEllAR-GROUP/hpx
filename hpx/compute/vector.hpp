@@ -154,7 +154,7 @@ namespace hpx { namespace compute
             }
             catch(...) {
                 // make sure no exception escapes this destructor
-                hpx::report_error(boost::current_exception());
+                hpx::report_error(std::current_exception());
             }
 #endif
         }

@@ -12,7 +12,7 @@ endif()
 
 function(hpx_setup_target target)
   # retrieve arguments
-  set(options EXPORT NOHPX_INIT INSTALL NOLIBS PLUGIN)
+  set(options EXPORT NOHPX_INIT INSTALL NOLIBS PLUGIN NONAMEPREFIX)
   set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX)
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -132,7 +132,9 @@ function(hpx_setup_target target)
         VERSION ${HPX_LIBRARY_VERSION}
         SOVERSION ${HPX_SOVERSION})
     endif()
-    hpx_set_lib_name(${target} ${name})
+    if(NOT target_NONAMEPREFIX)
+      hpx_set_lib_name(${target} ${name})
+    endif()
     set_target_properties(${target}
       PROPERTIES
       # create *nix style library versions + symbolic links
@@ -159,7 +161,9 @@ function(hpx_setup_target target)
         VERSION ${HPX_LIBRARY_VERSION}
         SOVERSION ${HPX_SOVERSION})
     endif()
-    hpx_set_lib_name(${target} ${name})
+    if(NOT target_NONAMEPREFIX)
+      hpx_set_lib_name(${target} ${name})
+    endif()
     set_target_properties(${target}
       PROPERTIES
       # create *nix style library versions + symbolic links

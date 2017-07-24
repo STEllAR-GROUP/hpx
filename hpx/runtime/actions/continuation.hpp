@@ -24,12 +24,11 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/exception_ptr.hpp>
-#include <boost/preprocessor/stringize.hpp>
-
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -58,8 +57,8 @@ namespace hpx { namespace actions
         continuation& operator=(continuation&& o);
 
         //
-        void trigger_error(boost::exception_ptr const& e);
-        void trigger_error(boost::exception_ptr && e);
+        void trigger_error(std::exception_ptr const& e);
+        void trigger_error(std::exception_ptr && e);
 
         // serialization support
         void serialize(hpx::serialization::input_archive& ar, unsigned);
@@ -92,8 +91,6 @@ namespace hpx { namespace actions
     struct typed_continuation<Result, Result> : continuation
     {
     private:
-        HPX_MOVABLE_ONLY(typed_continuation);
-
         typedef util::unique_function<
                 void(naming::id_type, Result)
             > function_type;
@@ -215,8 +212,6 @@ namespace hpx { namespace actions
     struct typed_continuation : typed_continuation<RemoteResult>
     {
     private:
-        HPX_MOVABLE_ONLY(typed_continuation);
-
         typedef typed_continuation<RemoteResult> base_type;
         typedef util::unique_function<
                 void(naming::id_type, RemoteResult)
@@ -327,8 +322,6 @@ namespace hpx { namespace actions
     struct typed_continuation<void, util::unused_type> : continuation
     {
     private:
-        HPX_MOVABLE_ONLY(typed_continuation);
-
         typedef util::unique_function<void(naming::id_type)> function_type;
 
     public:

@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/range.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -19,8 +20,6 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/util/unused.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -46,8 +45,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                Pred && pred)
+            sequential(ExPolicy, FwdIter first, FwdIter last, Pred && pred)
             {
                 return std::is_sorted(first, last, std::forward<Pred>(pred));
             }
@@ -76,7 +74,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         FwdIter trail = part_begin++;
                         util::loop_n<ExPolicy>(
                             part_begin, part_size - 1,
-                            [&trail, &tok, &pred](FwdIter it)
+                            [&trail, &tok, &pred](FwdIter it) -> void
                             {
                                 if (hpx::util::invoke(pred, *it, *trail++))
                                 {
@@ -90,7 +88,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         if (!tok.was_cancelled() && trail != last)
                         {
-                            return !pred(*trail, *i);
+                            return !hpx::util::invoke(pred, *trail, *i);
                         }
                         return !tok.was_cancelled();
                     };
@@ -101,8 +99,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     [](std::vector<hpx::future<bool> > && results)
                     {
                         return std::all_of(
-                            boost::begin(results), boost::end(results),
-                            [](hpx::future<bool>& val)
+                            hpx::util::begin(results), hpx::util::end(results),
+                            [](hpx::future<bool>& val) -> bool
                             {
                                 return val.get();
                             });
@@ -181,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
@@ -203,11 +201,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template<typename ExPolicy, typename Pred>
             static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                Pred && pred)
+            sequential(ExPolicy, FwdIter first, FwdIter last, Pred && pred)
             {
-                return std::is_sorted_until(first, last,
-                    std::forward<Pred>(pred));
+                return std::is_sorted_until(first, last, std::forward<Pred>(pred));
             }
 
             template <typename ExPolicy, typename Pred>
@@ -228,20 +224,21 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (count <= 1)
                     return result::get(std::move(last));
 
-
                 util::cancellation_token<difference_type> tok(count);
                 return util::partitioner<ExPolicy, FwdIter, void>::
                 call_with_index(
                     std::forward<ExPolicy>(policy), first, count, 1,
                     [tok, pred, last](FwdIter part_begin, std::size_t part_size,
-                        std::size_t base_idx) mutable
+                        std::size_t base_idx) mutable -> void
                     {
                         FwdIter trail = part_begin++;
                         util::loop_idx_n(++base_idx, part_begin,
                             part_size - 1, tok,
-                            [&trail, &tok, &pred](reference& v, std::size_t ind)
+                            [&trail, &tok, &pred](
+                                reference& v, std::size_t ind
+                            ) -> void
                             {
-                                if (pred(v, *trail++))
+                                if (hpx::util::invoke(pred, v, *trail++))
                                 {
                                     tok.cancel(ind);
                                 }
@@ -254,7 +251,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         if (!tok.was_cancelled(base_idx + part_size)
                             && trail != last)
                         {
-                            if (pred(*trail, *i))
+                            if (hpx::util::invoke(pred, *trail, *i))
                             {
                                 tok.cancel(base_idx + part_size);
                             }
@@ -341,7 +338,7 @@ namespace hpx { namespace parallel { inline namespace v1
             (hpx::traits::is_forward_iterator<FwdIter>::value),
             "Requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_sorted_until<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

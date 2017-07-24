@@ -21,6 +21,10 @@
 #include <type_traits>
 #include <utility>
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
+
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4520) // multiple default constructors specified
@@ -532,6 +536,13 @@ namespace hpx { namespace util
       : boost::integral_constant<std::size_t, Size>
     {};
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    template <typename Type, std::size_t Size>
+    struct tuple_size<std::array<Type, Size> >
+      : boost::integral_constant<std::size_t, Size>
+    {};
+#endif
+
     // template <size_t I, class Tuple>
     // class tuple_element
     template <std::size_t I, typename T>
@@ -624,6 +635,26 @@ namespace hpx { namespace util
             return tuple[I];
         }
     };
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    template <std::size_t I, typename Type, std::size_t Size>
+    struct tuple_element<I, std::array<Type, Size> >
+    {
+        typedef Type type;
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&
+        get(std::array<Type, Size>& tuple) noexcept
+        {
+            return tuple[I];
+        }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&
+        get(std::array<Type, Size> const& tuple) noexcept
+        {
+            return tuple[I];
+        }
+    };
+#endif
 
     // 20.4.2.6, element access
 

@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -31,12 +30,12 @@ void test_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::copy_if(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
             [](std::size_t v) {
                 return throw std::bad_alloc(), v != 0;
             });
@@ -61,15 +60,15 @@ void test_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         auto f =
             hpx::parallel::copy_if(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
-                boost::begin(d),
+                iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(d),
                 [](std::size_t v) {
                     return throw std::bad_alloc(), v != 0;
                 });
@@ -119,7 +118,9 @@ void copy_if_bad_alloc_test()
 {
     test_copy_if_bad_alloc<std::random_access_iterator_tag>();
     test_copy_if_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_copy_if_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

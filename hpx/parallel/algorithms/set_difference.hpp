@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,16 +31,16 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename OutIter>
+        template <typename FwdIter>
         struct set_difference
-          : public detail::algorithm<set_difference<OutIter>, OutIter>
+          : public detail::algorithm<set_difference<FwdIter>, FwdIter>
         {
             set_difference()
               : set_difference::algorithm("set_difference")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename F>
+                typename OutIter, typename F>
             static OutIter
             sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, OutIter dest, F && f)
@@ -52,10 +52,10 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename RanIter1, typename RanIter2,
                 typename F>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, FwdIter
             >::type
             parallel(ExPolicy && policy, RanIter1 first1, RanIter1 last1,
-                RanIter2 first2, RanIter2 last2, OutIter dest, F && f)
+                RanIter2 first2, RanIter2 last2, FwdIter dest, F && f)
             {
                 typedef typename std::iterator_traits<RanIter1>::difference_type
                     difference_type1;
@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (first1 == last1)
                 {
                     typedef util::detail::algorithm_result<
-                            ExPolicy, OutIter
+                            ExPolicy, FwdIter
                         > result;
                     return result::get(std::move(dest));
                 }
@@ -73,24 +73,25 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (first2 == last2)
                 {
                     return util::detail::convert_to_result(
-                        detail::copy<std::pair<RanIter1, OutIter> >()
+                        detail::copy<std::pair<RanIter1, FwdIter> >()
                             .call(
                                 std::forward<ExPolicy>(policy),
                                 std::false_type(), first1, last1, dest
                             ),
-                            [](std::pair<RanIter1, OutIter> const& p) -> OutIter
+                            [](std::pair<RanIter1, FwdIter> const& p) -> FwdIter
                             {
                                 return p.second;
                             });
                 }
 
-                typedef typename set_operations_buffer<OutIter>::type buffer_type;
+                typedef typename set_operations_buffer<FwdIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
                 return set_operation(std::forward<ExPolicy>(policy),
                     first1, last1, first2, last2, dest, std::forward<F>(f),
                     // calculate approximate destination index
                     [](difference_type1 idx1, difference_type2 idx2)
+                    ->  difference_type1
                     {
                         return idx1;
                     },
@@ -98,6 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [](RanIter1 part_first1, RanIter1 part_last1,
                         RanIter2 part_first2, RanIter2 part_last2,
                         buffer_type* dest, func_type const& f)
+                    ->  buffer_type*
                     {
                         return std::set_difference(part_first1, part_last1,
                             part_first2, part_last2, dest, f);
@@ -128,10 +130,15 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter1    The type of the source iterators used (deduced)
+    ///                     representing the first sequence.
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used (deduced)
+    ///                     representing the first sequence.
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter3    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -178,43 +185,54 @@ namespace hpx { namespace parallel { inline namespace v1
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a set_difference algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a set_difference algorithm returns a \a hpx::future<FwdIter3>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
+    ///           returns \a FwdIter3 otherwise.
     ///           The \a set_difference algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename Pred = detail::less>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename FwdIter3, typename Pred = detail::less>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type
     >::type
-    set_difference(ExPolicy && policy, InIter1 first1, InIter1 last1,
-        InIter2 first2, InIter2 last2, OutIter dest, Pred && op = Pred())
+    set_difference(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred && op = Pred())
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter1>::value),
+            (hpx::traits::is_input_iterator<FwdIter1>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<InIter2>::value),
+            (hpx::traits::is_input_iterator<FwdIter2>::value),
             "Requires at least input iterator.");
         static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_input_iterator<OutIter>::value),
+            (hpx::traits::is_output_iterator<FwdIter3>::value ||
+                hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least output iterator.");
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Requires at least forward iterator.");
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter3>::value),
+            "Requires at least forward iterator.");
+#endif
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_random_access_iterator<InIter1>::value ||
-               !hpx::traits::is_random_access_iterator<InIter2>::value ||
-               !hpx::traits::is_random_access_iterator<OutIter>::value
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
+               !hpx::traits::is_random_access_iterator<FwdIter2>::value
             > is_seq;
 
-        return detail::set_difference<OutIter>().call(
+        return detail::set_difference<FwdIter3>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, dest, std::forward<Pred>(op));
     }

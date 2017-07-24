@@ -26,11 +26,11 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -208,9 +208,9 @@ namespace hpx
         virtual std::uint64_t get_memory_lva() const = 0;
 
         virtual void report_error(std::size_t num_thread,
-            boost::exception_ptr const& e) = 0;
+            std::exception_ptr const& e) = 0;
 
-        virtual void report_error(boost::exception_ptr const& e) = 0;
+        virtual void report_error(std::exception_ptr const& e) = 0;
 
         virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
 

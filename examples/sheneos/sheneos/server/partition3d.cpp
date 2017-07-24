@@ -1,18 +1,16 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
-
-#include <hpx/util/assert.hpp>
 
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -20,7 +18,14 @@
 #include "partition3d.hpp"
 #include "../read_values.hpp"
 
+#include <boost/scoped_array.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
+namespace sheneos
+{
+    mutex_type mtx_{};
+}
+
 namespace sheneos { namespace server
 {
     partition3d::partition3d()
@@ -49,7 +54,8 @@ namespace sheneos { namespace server
 
         // Read the full data range.
         values.reset(new double[dim_[d].count_]);
-        extract_data(datafilename, name, values.get(), dim.offset_, dim_[d].count_);
+        extract_data(datafilename, name, values.get(), dim.offset_,
+            dim_[d].count_);
 
         // Extract range (without ghost-zones).
         min_value_[d] = values[0];
@@ -70,6 +76,8 @@ namespace sheneos { namespace server
     void partition3d::init(std::string const& datafilename,
         dimension const& dimx, dimension const& dimy, dimension const& dimz)
     {
+        std::lock_guard<mutex_type> l(mtx_);
+
         init_dimension(datafilename, dimension::ye, dimx, "ye", ye_values_);
         init_dimension(datafilename, dimension::temp, dimy, "logtemp", logtemp_values_);
         init_dimension(datafilename, dimension::rho, dimz, "logrho", logrho_values_);
@@ -105,9 +113,10 @@ namespace sheneos { namespace server
     }
 
     inline std::size_t
-    partition3d::get_index(dimension::type d, double value)
+    partition3d::get_index(dimension::type d, double value) const
     {
-        if (value < min_value_[d] || value > max_value_[d]) {
+        if (value < min_value_[d] || value > max_value_[d])
+        {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "sheneos::partition3d::get_index",
                 "argument out of range");
@@ -141,7 +150,7 @@ namespace sheneos { namespace server
     ///////////////////////////////////////////////////////////////////////////
     inline double partition3d::tl_interpolate(double* values,
         std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
-        double delta_ye, double delta_logtemp, double delta_logrho)
+        double delta_ye, double delta_logtemp, double delta_logrho) const
     {
         double value000 = values[index(idx_x,   idx_y,   idx_z,   dim_)];
         double value001 = values[index(idx_x,   idx_y,   idx_z+1, dim_)];
@@ -168,7 +177,7 @@ namespace sheneos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<double> partition3d::interpolate(double ye, double temp,
-        double rho, std::uint32_t eosvalues)
+        double rho, std::uint32_t eosvalues) const
     {
         double logrho = std::log10(rho);
         double logtemp = std::log10(temp);
@@ -251,7 +260,7 @@ namespace sheneos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     double partition3d::interpolate_one(double ye, double temp,
-        double rho, std::uint32_t eosvalue)
+        double rho, std::uint32_t eosvalue) const
     {
         double logrho = std::log10(rho);
         double logtemp = std::log10(temp);
@@ -332,13 +341,13 @@ namespace sheneos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     inline double partition3d::interpolate_one(sheneos_coord const& c,
-        std::uint32_t eosvalue)
+        std::uint32_t eosvalue) const
     {
         return interpolate_one(c.ye_, c.temp_, c.rho_, eosvalue);
     }
 
     inline std::vector<double> partition3d::interpolate(
-        sheneos_coord const& c, std::uint32_t eosvalues)
+        sheneos_coord const& c, std::uint32_t eosvalues) const
     {
         return interpolate(c.ye_, c.temp_, c.rho_, eosvalues);
     }
@@ -346,17 +355,15 @@ namespace sheneos { namespace server
     ///////////////////////////////////////////////////////////////////////////
     std::vector<double>
     partition3d::interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
-        std::uint32_t eosvalue)
+        std::uint32_t eosvalue) const
     {
         std::vector<double> result;
         result.reserve(coords.size());
 
         // interpolate as requested
-        std::vector<sheneos_coord>::const_iterator end = coords.end();
-        for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
-            it != end; ++it)
+        for (auto const& c : coords)
         {
-            result.push_back(interpolate_one(*it, eosvalue));
+            result.push_back(interpolate_one(c, eosvalue));
         }
 
         return result;
@@ -365,17 +372,15 @@ namespace sheneos { namespace server
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::vector<double> >
     partition3d::interpolate_bulk(std::vector<sheneos_coord> const& coords,
-        std::uint32_t eosvalues)
+        std::uint32_t eosvalues) const
     {
         std::vector<std::vector<double> > result;
         result.reserve(coords.size());
 
         // interpolate as requested
-        std::vector<sheneos_coord>::const_iterator end = coords.end();
-        for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
-            it != end; ++it)
+        for (auto const& c : coords)
         {
-            result.push_back(std::move(interpolate(*it, eosvalues)));
+            result.push_back(std::move(interpolate(c, eosvalues)));
         }
 
         return result;

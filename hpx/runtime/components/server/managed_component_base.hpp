@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -161,6 +161,7 @@ namespace hpx { namespace components
     class managed_component_base
       : public traits::detail::managed_component_tag
     {
+    public:
         HPX_NON_COPYABLE(managed_component_base);
 
     private:
@@ -259,6 +260,14 @@ namespace hpx { namespace components
             HPX_ASSERT(false);
         }
 
+        void on_migrated()
+        {
+            // If this assertion is triggered then this component instance is being
+            // migrated even if the component type has not been enabled to support
+            // migration.
+            HPX_ASSERT(false);
+        }
+
     protected:
         template <typename>
         friend struct detail_adl_barrier::init;
@@ -294,9 +303,10 @@ namespace hpx { namespace components
             static heap_type& get_heap()
             {
                 // ensure thread-safe initialization
-                util::reinitializable_static<
-                    heap_type, wrapper_heap_tag
-                > heap(components::get_component_type<Component>());
+                static components::component_type t =
+                    components::get_component_type<Component>();
+
+                util::reinitializable_static<heap_type, wrapper_heap_tag> heap(t);
                 return heap.get();
             }
 
@@ -351,6 +361,7 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component
     {
+    public:
         HPX_NON_COPYABLE(managed_component);
 
     public:
@@ -618,7 +629,7 @@ namespace hpx { namespace components
 
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
-            util::unique_function_nonser<void(void*)> const& ctor);
+            util::unique_function_nonser<void(void*)> const& ctor, void** p);
 
         template <typename Component_, typename ...Ts>
         friend naming::gid_type server::create_with_args(Ts&&... ts);

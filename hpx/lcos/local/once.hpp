@@ -22,7 +22,7 @@ namespace hpx { namespace lcos { namespace local
 {
     struct once_flag
     {
-    private:
+    public:
         HPX_NON_COPYABLE(once_flag);
 
     public:

@@ -149,8 +149,6 @@ public:
 private:
     std::unique_ptr<double[]> data_;
     std::size_t size_;
-
-    HPX_MOVABLE_ONLY(partition_data);
 };
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
@@ -215,8 +213,7 @@ struct stepper
         std::size_t b = 0;
         auto range = boost::irange(b, np);
         using hpx::parallel::execution::par;
-        hpx::parallel::for_each(par,
-            boost::begin(range), boost::end(range),
+        hpx::parallel::for_each(par, std::begin(range), std::end(range),
             [&U, nx](std::size_t i)
             {
                 U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));

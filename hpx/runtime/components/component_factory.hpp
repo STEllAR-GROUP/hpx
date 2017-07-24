@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,11 +50,11 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unique_function.hpp>
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <string>
@@ -214,17 +214,19 @@ namespace hpx { namespace components
         /// \param assign_gid [in] The GID to assign to the newly created object.
         /// \param ctor       [in] The constructor function to call in order to
         ///                   initialize the newly allocated object.
+        /// \param p          [in] Used to return the address of the newly
+        ///                   created object (if non-zero)
         ///
         /// \return   Returns the GID of the first newly created component
         ///           instance (this is the same as assign_gid, if successful).
         naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            util::unique_function_nonser<void(void*)> const& ctor)
+            util::unique_function_nonser<void(void*)> const& ctor, void **p)
         {
             if (isenabled_)
             {
                 naming::gid_type id =
-                    server::create<Component>(assign_gid, ctor);
+                    server::create<Component>(assign_gid, ctor, p);
                 if (id)
                     ++refcnt_;
                 return id;
@@ -295,8 +297,8 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_(...)                          \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_, HPX_PP_NARGS(__VA_ARGS__)    \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_1(ComponentType)               \
@@ -351,9 +353,9 @@ namespace hpx { namespace components
 
 
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_(...)                  \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_,                      \
-            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+            HPX_PP_NARGS(__VA_ARGS__)                                         \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_1(ComponentType)       \

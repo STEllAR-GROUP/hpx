@@ -87,8 +87,6 @@ namespace hpx { namespace util { namespace cache
             Func f_;    // user supplied UpdatePolicy
         };
 
-        HPX_MOVABLE_ONLY(local_cache);
-
     public:
         typedef Key key_type;
         typedef Entry entry_type;

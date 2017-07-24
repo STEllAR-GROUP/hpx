@@ -11,6 +11,7 @@
 #include <hpx/util_fwd.hpp>
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
@@ -31,12 +32,15 @@
 
 namespace hpx { namespace util
 {
+    /// \cond NOINTERNAL
     namespace detail
     {
         template <typename T, typename Enable = void>
         struct unwrap_impl;
 
         ///////////////////////////////////////////////////////////////////////
+        // Implements first level future unwrapping for
+        // - `hpx::lcos::(shared_)?future<T>`
         template <typename T>
         struct unwrap_impl<
             T,
@@ -82,6 +86,7 @@ namespace hpx { namespace util
         };
 #endif
 
+        // Ranges (begin() and end()) of futures
         template <typename T>
         struct unwrap_impl<
             T,
@@ -111,6 +116,7 @@ namespace hpx { namespace util
                 return result;
             }
 
+            // Edge case for void futures
             template <typename Range>
             static type call(Range& range, /*is_void=*/std::true_type)
             {
@@ -120,6 +126,7 @@ namespace hpx { namespace util
                 }
             }
 
+            // Tag dispatch trampoline
             template <typename Range>
             static type call(Range&& range)
             {
@@ -266,8 +273,8 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename std::enable_if<traits::is_future<TD>::value>::type
-        > : util::detail::fused_result_of<
-                F(typename unwrap_impl<util::tuple<TD> >::type)
+        > : util::detail::invoke_fused_result<
+                F, typename unwrap_impl<util::tuple<TD> >::type
             >
         {};
 
@@ -277,11 +284,11 @@ namespace hpx { namespace util
             typename std::enable_if<traits::is_future_range<TD>::value>::type
         > : std::conditional<
                 unwrap_impl<TD>::is_void::value
-              , util::detail::fused_result_of<
-                    F(util::tuple<>)
+              , util::detail::invoke_fused_result<
+                    F, util::tuple<>
                 >
-              , util::detail::fused_result_of<
-                    F(util::tuple<typename unwrap_impl<TD>::type>)
+              , util::detail::invoke_fused_result<
+                    F, util::tuple<typename unwrap_impl<TD>::type>
                 >
             >::type
         {};
@@ -290,8 +297,8 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename std::enable_if<traits::is_future_tuple<TD>::value>::type
-        > : util::detail::fused_result_of<
-                F(typename unwrap_impl<TD>::type)
+        > : util::detail::invoke_fused_result<
+                F, typename unwrap_impl<TD>::type
             >
         {};
 
@@ -328,7 +335,7 @@ namespace hpx { namespace util
 
             template <typename Delayed = unwrapped_impl>
             HPX_FORCEINLINE
-            typename util::result_of<Delayed()>::type
+            typename util::invoke_result<Delayed>::type
             operator()()
             {
                 return util::invoke_fused(f_,
@@ -425,6 +432,9 @@ namespace hpx { namespace util
         template <typename Pack, typename Enable = void>
         struct unwrap_dispatch;
 
+        // - hpx::lcos::(shared_)?future<T>
+        // - Range (begin(), end()) of futures
+        // - hpx::util::tuple<future<T>...>
         template <typename T>
         struct unwrap_dispatch<util::detail::pack<T>,
             typename std::enable_if<
@@ -444,6 +454,7 @@ namespace hpx { namespace util
             }
         };
 
+        // Delayed function unwrapping: returns a callable object which unwraps
         template <typename T>
         struct unwrap_dispatch<util::detail::pack<T>,
             typename std::enable_if<
@@ -458,11 +469,14 @@ namespace hpx { namespace util
             static unwrapped_impl<typename decay<F>::type>
             call(F && f)
             {
+                // Return the callable object which performs the unwrap upon
+                // invocation
                 typedef unwrapped_impl<typename decay<F>::type> impl_type;
                 return impl_type(std::forward<F>(f));
             }
         };
 
+        // Unwraps a hpx::util::tuple which conatains futures
         template <typename ... Ts>
         struct unwrap_dispatch<util::detail::pack<Ts...>,
             typename std::enable_if<
@@ -495,20 +509,67 @@ namespace hpx { namespace util
                     util::detail::pack<typename std::decay<Ts>::type...>
                 >::type type;
         };
-    }
+    } // end namespace detail
+    /// \endcond
 
-    ///////////////////////////////////////////////////////////////////////////
+    /// A multi-usable helper function for retrieving the actual result of
+    /// any hpx::lcos::future which is wrapped in an arbitrary way.
+    ///
+    /// unwrapped supports multiple applications, the underlying
+    /// implementation is chosen based on the given arguments:
+    ///
+    /// - For a single callable object as argument,
+    ///   the **deferred form** is used, which makes the function to return a
+    ///   callable object that unwraps the input and passes it to the
+    ///   given callable object upon invocation:
+    ///   ```cpp
+    ///   auto add = [](int left, int right) {
+    ///       return left + right;
+    ///   };
+    ///   auto unwrapper = hpx:util:::unwrapped(add);
+    ///   hpx::util::tuple<hpx::future<int>, hpx::future<int>> tuple = ...;
+    ///   int result = unwrapper(tuple);
+    ///   ```
+    ///   The `unwrapper` object could be used to connect the `add` function
+    ///   to the continuation handler of a hpx::future.
+    ///
+    /// - For any other input, the **immediate form** is used,
+    ///   which unwraps the given pack of arguments,
+    ///   so that any hpx::lcos::future object is replaced by
+    ///   its future result type in the pack:
+    ///       - `hpx::future<int>` -> `int`
+    ///       - `hpx::future<std::vector<float>>` -> `std::vector<float>`
+    ///       - `std::vector<future<float>>` -> `std::vector<float>`
+    ///
+    /// \param ts the argument pack that determines the used implementation
+    ///
+    /// \returns Depending on the chosen implementation the return type is
+    ///          either a hpx::util::tuple containing unwrapped hpx::futures
+    ///          when the *immediate form* is used.
+    ///          If the *deferred form* is used, the function returns a
+    ///          callable object, which unwrapps and forwards its arguments
+    ///          when called, as desribed above.
+    ///
+    /// \throws std::exception like object in case the immediate application is
+    ///         used and if any of the given hpx::lcos::future objects were
+    ///         resolved through an exception.
+    ///         See hpx::lcos::future::get() for details.
+    ///
     template <typename ... Ts>
     typename detail::unwrap_dispatch_result<Ts...>::type
     unwrapped(Ts &&... ts)
     {
+        // Select the underlying implementation
         typedef detail::unwrap_dispatch<
                 util::detail::pack<typename std::decay<Ts>::type...>
             > impl_type;
         return impl_type::call(std::forward<Ts>(ts)...);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    /// Provides an additional implementation of unwrapped which
+    /// unwraps nested hpx::futures within a two-level depth.
+    ///
+    /// See hpx::util::unwrapped() for details.
     template <typename Future>
     typename util::lazy_enable_if<
         traits::is_future<typename decay<Future>::type>::value
@@ -522,6 +583,7 @@ namespace hpx { namespace util
         return unwrapped(unwrapped(std::forward<Future>(f)));
     }
 
+    /// \copydoc unwrapped2
     template <typename F>
     typename std::enable_if<
         !traits::is_future<typename decay<F>::type>::value

@@ -13,9 +13,8 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>
@@ -60,7 +59,7 @@ namespace hpx { namespace parallel { inline namespace v1
             std::true_type)
         {
             typedef typename util::detail::algorithm_result<
-                ExPolicy, void
+                ExPolicy
             >::type result_type;
 
             return hpx::util::void_guard<result_type>(),

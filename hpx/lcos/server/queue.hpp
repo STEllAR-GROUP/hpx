@@ -7,6 +7,8 @@
 #define HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -16,10 +18,12 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/get_remote_result.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -92,7 +96,7 @@ namespace hpx { namespace lcos { namespace server
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception(boost::exception_ptr const& /*e*/)
+        void set_exception(std::exception_ptr const& /*e*/)
         {
             std::unique_lock<mutex_type> l(mtx_);
             cond_.abort_all(std::move(l));
@@ -159,8 +163,8 @@ namespace hpx { namespace lcos { namespace server
     HPX_REGISTER_QUEUE_DECLARATION_(__VA_ARGS__)                              \
 /**/
 #define HPX_REGISTER_QUEUE_DECLARATION_(...)                                  \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_QUEUE_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)        \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_QUEUE_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)            \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -169,15 +173,15 @@ namespace hpx { namespace lcos { namespace server
 /**/
 #define HPX_REGISTER_QUEUE_DECLARATION_2(type, name)                          \
     typedef ::hpx::lcos::server::queue<type>                                  \
-        BOOST_PP_CAT(__queue_, BOOST_PP_CAT(type, name));                     \
+        HPX_PP_CAT(__queue_, HPX_PP_CAT(type, name));                         \
 /**/
 
 #define HPX_REGISTER_QUEUE(...)                                               \
     HPX_REGISTER_QUEUE_(__VA_ARGS__)                                          \
 /**/
 #define HPX_REGISTER_QUEUE_(...)                                              \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_QUEUE_, HPX_UTIL_PP_NARG(__VA_ARGS__)                    \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_QUEUE_, HPX_PP_NARGS(__VA_ARGS__)                        \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -186,15 +190,16 @@ namespace hpx { namespace lcos { namespace server
 /**/
 #define HPX_REGISTER_QUEUE_2(type, name)                                      \
     typedef ::hpx::lcos::server::queue<type>                                  \
-        BOOST_PP_CAT(__queue_, BOOST_PP_CAT(type, name));                     \
+        HPX_PP_CAT(__queue_, HPX_PP_CAT(type, name));                         \
     typedef ::hpx::components::managed_component<                             \
-            BOOST_PP_CAT(__queue_, BOOST_PP_CAT(type, name))                  \
-        > BOOST_PP_CAT(__queue_component_, name);                             \
+            HPX_PP_CAT(__queue_, HPX_PP_CAT(type, name))                      \
+        > HPX_PP_CAT(__queue_component_, name);                               \
     HPX_REGISTER_DERIVED_COMPONENT_FACTORY(                                   \
-        BOOST_PP_CAT(__queue_component_, name),                               \
-        BOOST_PP_CAT(__queue_component_, name),                               \
-        BOOST_PP_STRINGIZE(BOOST_PP_CAT(__base_lco_with_value_queue_, name))) \
+        HPX_PP_CAT(__queue_component_, name),                                 \
+        HPX_PP_CAT(__queue_component_, name),                                 \
+        HPX_PP_STRINGIZE(HPX_PP_CAT(__base_lco_with_value_queue_, name)))     \
 /**/
 
+#endif
 #endif
 

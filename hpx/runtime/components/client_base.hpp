@@ -23,9 +23,9 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -469,7 +469,7 @@ namespace hpx { namespace components
         //   - Blocks until the future is ready.
         // Returns: The stored exception_ptr if has_exception(), a null
         //          pointer otherwise.
-        boost::exception_ptr get_exception_ptr() const
+        std::exception_ptr get_exception_ptr() const
         {
             if (!shared_state_)
             {
@@ -480,7 +480,7 @@ namespace hpx { namespace components
 
             error_code ec(lightweight);
             this->shared_state_->get_result(ec);
-            if (!ec) return boost::exception_ptr();
+            if (!ec) return std::exception_ptr();
             return hpx::detail::access_exception(ec);
         }
 
@@ -510,7 +510,7 @@ namespace hpx { namespace components
             }
 
             typedef
-                typename hpx::util::result_of<F(Derived)>::type
+                typename hpx::util::invoke_result<F, Derived>::type
                 continuation_result_type;
             typedef
                 typename hpx::traits::detail::shared_state_ptr<result_type>::type
@@ -526,7 +526,7 @@ namespace hpx { namespace components
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        static void register_as_helper(Derived && f,
+        static void register_as_helper(client_base const& f,
             std::string const& symbolic_name)
         {
             hpx::agas::register_name(launch::sync, symbolic_name, f.get());

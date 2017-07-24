@@ -32,7 +32,6 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -46,6 +45,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -294,7 +294,7 @@ namespace hpx { namespace detail
             qc->start();
         }
         catch (...) {
-            std::cerr << hpx::diagnostic_information(boost::current_exception())
+            std::cerr << hpx::diagnostic_information(std::current_exception())
                 << std::flush;
             hpx::terminate();
         }
@@ -1107,8 +1107,7 @@ namespace hpx
             shutdown_function_type shutdown, hpx::runtime_mode mode,
             bool blocking)
         {
-            int result = 0;
-#ifndef HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS
+#if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif
 
@@ -1128,6 +1127,8 @@ namespace hpx
             unsetenv("LC_IDENTIFICATION");
             unsetenv("LC_ALL");
 #endif
+
+            int result = 0;
             try {
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)

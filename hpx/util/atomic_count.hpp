@@ -15,6 +15,7 @@ namespace hpx { namespace util
 {
     class atomic_count
     {
+    public:
         HPX_NON_COPYABLE(atomic_count);
 
     public:

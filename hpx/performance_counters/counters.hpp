@@ -710,6 +710,11 @@ namespace hpx { namespace performance_counters
         HPX_EXPORT naming::gid_type arithmetics_counter_creator(
             counter_info const&, error_code&);
 
+        // Creation function for extended aggregating performance counters; to
+        // be registered with the counter types.
+        HPX_EXPORT naming::gid_type arithmetics_counter_extended_creator(
+            counter_info const&, error_code&);
+
         // Creation function for uptime counters.
         HPX_EXPORT naming::gid_type uptime_counter_creator(
             counter_info const&, error_code&);
@@ -729,6 +734,13 @@ namespace hpx { namespace performance_counters
         // \brief Create a new arithmetics performance counter instance based on
         //        the given base counter names
         HPX_EXPORT naming::gid_type create_arithmetics_counter(
+            counter_info const& info,
+            std::vector<std::string> const& base_counter_names,
+            error_code& ec = throws);
+
+        // \brief Create a new extended arithmetics performance counter instance
+        //        based on the given base counter names
+        HPX_EXPORT naming::gid_type create_arithmetics_counter_extended(
             counter_info const& info,
             std::vector<std::string> const& base_counter_names,
             error_code& ec = throws);

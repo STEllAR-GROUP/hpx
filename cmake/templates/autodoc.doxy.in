@@ -13,4 +13,5 @@ XML_OUTPUT = @doxygen_output_file@
 OUTPUT_DIRECTORY = @doxygen_output_dir@
 GENERATE_LATEX = NO
 INPUT = @doxygen_inputs@
+EXCLUDE_SYMBOLS = detail
 

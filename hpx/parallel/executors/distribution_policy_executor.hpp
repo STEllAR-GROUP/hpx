@@ -32,9 +32,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename F, typename ... Ts>
         struct distribution_policy_execute_result_impl<F, false, Ts...>
         {
-            typedef typename hpx::util::detail::deferred_result_of<
-                    F(Ts...)
-                >::type type;
+            typedef typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
+                type;
         };
 
         template <typename Action, typename ... Ts>
@@ -71,12 +70,12 @@ namespace hpx { namespace parallel { namespace execution
             "distribution_policy_executor needs to be instantiated with a "
                 "distribution policy type");
 
-        // apply_execute implementations
+        // post implementations
         template <typename F, typename ... Ts>
         typename std::enable_if<
             !hpx::traits::is_action<F>::value
         >::type
-        apply_execute_impl(F && f, Ts && ... ts) const
+        post_impl(F && f, Ts && ... ts) const
         {
             typedef components::server::invoke_function_action<F> action_type;
             policy_.template apply<action_type>(threads::thread_priority_default,
@@ -87,7 +86,7 @@ namespace hpx { namespace parallel { namespace execution
         typename std::enable_if<
             hpx::traits::is_action<Action>::value
         >::type
-        apply_execute_impl(Action && act, Ts && ... ts) const
+        post_impl(Action && act, Ts && ... ts) const
         {
             policy_.template apply<Action>(threads::thread_priority_default,
                 std::forward<Ts>(ts)...);
@@ -152,9 +151,9 @@ namespace hpx { namespace parallel { namespace execution
         typedef parallel_execution_tag execution_category;
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts) const
+        void post(F && f, Ts &&... ts) const
         {
-            return apply_execute_impl(std::forward<F>(f),
+            return post_impl(std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
 

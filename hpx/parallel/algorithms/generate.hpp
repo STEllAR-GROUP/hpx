@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,9 +41,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : generate::algorithm("generate")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename F>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
+            template <typename ExPolicy, typename InIter, typename F>
+            static InIter
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 std::generate(first, last, std::forward<F>(f));
                 return last;
@@ -72,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1
         generate_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
@@ -164,31 +165,31 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename OutIter>
-        struct generate_n: public detail::algorithm<generate_n<OutIter>, OutIter>
+        template <typename FwdIter>
+        struct generate_n: public detail::algorithm<generate_n<FwdIter>, FwdIter>
         {
             generate_n()
-                : generate_n::algorithm("generate_n")
+              : generate_n::algorithm("generate_n")
             {}
 
-            template <typename ExPolicy, typename F>
-            static OutIter
-            sequential(ExPolicy, OutIter first, std::size_t count, F && f)
+            template <typename ExPolicy, typename InIter, typename F>
+            static FwdIter
+            sequential(ExPolicy, InIter first, std::size_t count, F && f)
             {
                 return std::generate_n(first, count, f);
             }
 
             template <typename ExPolicy, typename F>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy && policy, OutIter first, std::size_t count,
+            parallel(ExPolicy && policy, FwdIter first, std::size_t count,
                 F && f)
             {
-                typedef typename std::iterator_traits<OutIter>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 return
-                    for_each_n<OutIter>().call(
+                    for_each_n<FwdIter>().call(
                         std::forward<ExPolicy>(policy),
                         std::false_type(), first, count,
                         [f](type& v) mutable
@@ -211,9 +212,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam OutIter     The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -245,37 +246,45 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
-    ///           and returns \a OutIter otherwise.
+    ///           and returns \a FwdIter otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename OutIter, typename Size, typename F,
+    template <typename ExPolicy, typename FwdIter, typename Size, typename F,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<OutIter>::value)>
-    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    generate_n(ExPolicy && policy, OutIter first, Size count, F && f)
+        hpx::traits::is_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    generate_n(ExPolicy && policy, FwdIter first, Size count, F && f)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_output_iterator<OutIter>::value ||
-                hpx::traits::is_forward_iterator<OutIter>::value),
+            (hpx::traits::is_output_iterator<FwdIter>::value ||
+                hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least output iterator.");
+
+        typedef std::integral_constant<bool,
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter>::value
+            > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         if (detail::is_negative(count))
         {
-            return util::detail::algorithm_result<ExPolicy, OutIter>::get(
+            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
                 std::move(first));
         }
 
-        typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<OutIter>::value
-            > is_seq;
-
-        return detail::generate_n<OutIter>().call(
+        return detail::generate_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, std::size_t(count), std::forward<F>(f));
     }

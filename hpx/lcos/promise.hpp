@@ -11,8 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/promise_base.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <memory>
 #include <utility>
 #include <type_traits>
@@ -63,8 +62,6 @@ namespace lcos {
       : public detail::promise_base<
             Result, RemoteResult, detail::promise_data<Result> >
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<
                 Result, RemoteResult, detail::promise_data<Result>
            > base_type;
@@ -153,8 +150,6 @@ namespace lcos {
       : public detail::promise_base<
             void, hpx::util::unused_type, detail::promise_data<void> >
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<
                 void, hpx::util::unused_type, detail::promise_data<void>
             > base_type;

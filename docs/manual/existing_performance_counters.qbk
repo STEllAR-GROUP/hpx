@@ -1291,20 +1291,13 @@ system and application performance.
         [Returns the current average (mean) value calculated based on the values
          queried from the underlying counter (the one specified as the instance
          name).]
-        [Any parameter will be interpreted as the time interval (in
+        [Any parameter will be interpreted as a list of up to two comma separated
+         (integer) values, where the first is the time interval (in
          milliseconds) at which the underlying counter should be queried. If
-         no value is specified, the counter will assume `1000` \[ms\] as the default.]
-    ]
-    [   [`/statistics/stddev`]
-        [Any full performance counter name. The referenced performance counter
-         is queried at fixed time intervals as specified by the first parameter.]
-        [Returns the current standard deviation (stddev) value calculated based
-         on the values queried from the underlying counter (the one specified
-         as the instance name).]
-        [Any parameter will be interpreted as the time interval (in
-         milliseconds) at which the underlying counter should be queried. If
-         no value is specified, the counter will assume `1000` \[ms\] as the
-         default.]
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value can be either `0` or `1` and specifies whether the
+         underlying counter should be reset during evaluation (`1`) or not (`0`).
+         The default value is `0`.]
     ]
     [   [`/statistics/rolling_average`]
         [Any full performance counter name. The referenced performance counter
@@ -1312,13 +1305,46 @@ system and application performance.
         [Returns the current rolling average (mean) value calculated based on the values
          queried from the underlying counter (the one specified as the instance
          name).]
-        [Any parameter will be interpreted as a list of two comma separated (integer)
+        [Any parameter will be interpreted as a list of up to three comma separated (integer)
          values, where the first is the time interval (in
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume `1000` \[ms\] as the default.
          The second value will be interpreted as the size of the rolling window
          (the number of latest values to use to calculate the rolling average). The
-         default value for this is `10`.]
+         default value for this is `10`. The third value can be either `0` or `1`
+         and specifies whether the underlying counter should be reset during
+         evaluation (`1`) or not (`0`). The default value is `0`.]
+    ]
+    [   [`/statistics/stddev`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current standard deviation (stddev) value calculated based
+         on the values queried from the underlying counter (the one specified
+         as the instance name). Note that this counter will be available only
+         for Boost V1.56 and newer.]
+        [Any parameter will be interpreted as a list of up to two comma separated
+         (integer) values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value can be either `0` or `1` and specifies whether the
+         underlying counter should be reset during evaluation (`1`) or not (`0`).
+         The default value is `0`.]
+    ]
+    [   [`/statistics/rolling_stddev`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current rolling variance (stddev) value calculated based on
+         the values queried from the underlying counter (the one specified as
+         the instance name).]
+        [Any parameter will be interpreted as a list of up to three comma separated (integer)
+         values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value will be interpreted as the size of the rolling window
+         (the number of latest values to use to calculate the rolling average). The
+         default value for this is `10`. The third value can be either `0` or `1`
+         and specifies whether the underlying counter should be reset during
+         evaluation (`1`) or not (`0`). The default value is `0`.]
     ]
     [   [`/statistics/median`]
         [Any full performance counter name. The referenced performance counter
@@ -1326,9 +1352,13 @@ system and application performance.
         [Returns the current (statistically estimated) median value calculated
          based on the values queried from the underlying counter (the one
          specified as the instance name).]
-        [Any parameter will be interpreted as the time interval (in
+        [Any parameter will be interpreted as a list of up to two comma separated
+         (integer) values, where the first is the time interval (in
          milliseconds) at which the underlying counter should be queried. If
-         no value is specified, the counter will assume `1000` \[ms\] as the default.]
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value can be either `0` or `1` and specifies whether the
+         underlying counter should be reset during evaluation (`1`) or not (`0`).
+         The default value is `0`.]
     ]
     [   [`/statistics/max`]
         [Any full performance counter name. The referenced performance counter
@@ -1336,9 +1366,29 @@ system and application performance.
         [Returns the current maximum value calculated based on the values
          queried from the underlying counter (the one specified as the instance
          name).]
-        [Any parameter will be interpreted as the time interval (in
+        [Any parameter will be interpreted as a list of up to two comma separated
+         (integer) values, where the first is the time interval (in
          milliseconds) at which the underlying counter should be queried. If
-         no value is specified, the counter will assume `1000` \[ms\] as the default.]
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value can be either `0` or `1` and specifies whether the
+         underlying counter should be reset during evaluation (`1`) or not (`0`).
+         The default value is `0`.]
+    ]
+    [   [`/statistics/rolling_max`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current rolling maximum value calculated based on
+         the values queried from the underlying counter (the one specified as
+         the instance name).]
+        [Any parameter will be interpreted as a list of up to three comma separated (integer)
+         values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value will be interpreted as the size of the rolling window
+         (the number of latest values to use to calculate the rolling average). The
+         default value for this is `10`. The third value can be either `0` or `1`
+         and specifies whether the underlying counter should be reset during
+         evaluation (`1`) or not (`0`). The default value is `0`.]
     ]
     [   [`/statistics/min`]
         [Any full performance counter name. The referenced performance counter
@@ -1346,9 +1396,29 @@ system and application performance.
         [Returns the current minimum value calculated based on the values
          queried from the underlying counter (the one specified as the instance
          name).]
-        [Any parameter will be interpreted as the time interval (in
+        [Any parameter will be interpreted as a list of up to two comma separated
+         (integer) values, where the first is the time interval (in
          milliseconds) at which the underlying counter should be queried. If
-         no value is specified, the counter will assume `1000` \[ms\] as the default.]
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value can be either `0` or `1` and specifies whether the
+         underlying counter should be reset during evaluation (`1`) or not (`0`).
+         The default value is `0`.]
+    ]
+    [   [`/statistics/rolling_min`]
+        [Any full performance counter name. The referenced performance counter
+         is queried at fixed time intervals as specified by the first parameter.]
+        [Returns the current rolling minimum value calculated based on
+         the values queried from the underlying counter (the one specified as
+         the instance name).]
+        [Any parameter will be interpreted as a list of up to three comma separated (integer)
+         values, where the first is the time interval (in
+         milliseconds) at which the underlying counter should be queried. If
+         no value is specified, the counter will assume `1000` \[ms\] as the default.
+         The second value will be interpreted as the size of the rolling window
+         (the number of latest values to use to calculate the rolling average). The
+         default value for this is `10`. The third value can be either `0` or `1`
+         and specifies whether the underlying counter should be reset during
+         evaluation (`1`) or not (`0`). The default value is `0`.]
     ]
 ]
 
@@ -1385,6 +1455,51 @@ system and application performance.
     [   [`/arithmetics/divide`]
         [None]
         [Returns the result of division of the values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/mean`]
+        [None]
+        [Returns the average value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/variance`]
+        [None]
+        [Returns the standard deviation of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/median`]
+        [None]
+        [Returns the median value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/min`]
+        [None]
+        [Returns the minimum value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/max`]
+        [None]
+        [Returns the maximum value of all values queried from the
          underlying counters (the ones specified as the parameters).]
         [The parameter will be interpreted as a comma separated list of
          full performance counter names which are queried whenever

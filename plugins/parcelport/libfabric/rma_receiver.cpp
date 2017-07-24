@@ -141,7 +141,7 @@ namespace libfabric
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "calling parcel decode for complete NORMAL parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
-        decode_message_with_chunks(*pp_, std::move(buffer), 1, chunks_, num_thread);
+        decode_message_with_chunks(*pp_, std::move(buffer), 0, chunks_, num_thread);
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "parcel decode called for complete NORMAL (small) parcel");
 
@@ -463,7 +463,7 @@ namespace libfabric
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "calling parcel decode for ZEROCOPY complete parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
-        decode_message_with_chunks(*pp_, std::move(buffer), 1, chunks_, num_thread);
+        decode_message_with_chunks(*pp_, std::move(buffer), 0, chunks_, num_thread);
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
             << "parcel decode called for ZEROCOPY complete parcel");
 
@@ -515,6 +515,7 @@ namespace libfabric
         //
         memory_pool_->deallocate(header_region_);
         header_region_ = nullptr;
+        chunk_region_ = nullptr;
         header_        = nullptr;
         src_addr_      = 0 ;
         //

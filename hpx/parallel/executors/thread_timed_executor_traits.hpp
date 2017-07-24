@@ -74,9 +74,9 @@ namespace hpx { namespace parallel { inline namespace v3
         ///             given executor.
         /// \param ts... [in] Additional arguments to use to invoke \a f.
         ///
-        /// \note This calls exec.apply_execute_at(abs_time, f), if available,
+        /// \note This calls exec.post_at(abs_time, f), if available,
         ///       otherwise it emulates timed scheduling by delaying calling
-        ///       exec.apply_execute() on the underlying non-scheduled
+        ///       exec.post() on the underlying non-scheduled
         ///       execution agent while discarding the returned future.
         ///
         template <typename Executor_, typename F, typename ... Ts>
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { inline namespace v3
             sched.add_at(abs_time,
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
-                "apply_execute_at");
+                "post_at");
         }
 
         /// \brief Singleton form of asynchronous fire & forget execution agent
@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { inline namespace v3
             sched.add_after(rel_time,
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
-                "apply_execute_at");
+                "post_at");
         }
 
         /// \brief Singleton form of asynchronous execution agent creation
@@ -132,13 +132,13 @@ namespace hpx { namespace parallel { inline namespace v3
         ///
         template <typename Executor_, typename F, typename ... Ts>
         static hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute_at(Executor_ && sched,
             hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
         {
-            typedef typename hpx::util::detail::deferred_result_of<
-                    F(Ts&&...)
+            typedef typename hpx::util::detail::invoke_deferred_result<
+                    F, Ts...
                 >::type result_type;
 
             lcos::local::packaged_task<result_type(Ts...)>
@@ -170,13 +170,13 @@ namespace hpx { namespace parallel { inline namespace v3
         ///
         template <typename Executor_, typename F, typename ... Ts>
         static hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute_after(Executor_ && sched,
             hpx::util::steady_duration const& rel_time, F && f, Ts &&... ts)
         {
-            typedef typename hpx::util::detail::deferred_result_of<
-                    F(Ts&&...)
+            typedef typename hpx::util::detail::invoke_deferred_result<
+                    F, Ts...
                 >::type result_type;
 
             lcos::local::packaged_task<result_type(Ts...)>
@@ -208,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \returns f(ts...)'s result
         ///
         template <typename Executor_, typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         execute_at(Executor_ && sched,
             hpx::util::steady_time_point const& abs_time, F && f, Ts &&... ts)
         {
@@ -234,7 +234,7 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \returns f(ts...)'s result
         ///
         template <typename Executor_, typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         execute_after(Executor_ && sched,
             hpx::util::steady_duration const& rel_time, F && f, Ts &&... ts)
         {

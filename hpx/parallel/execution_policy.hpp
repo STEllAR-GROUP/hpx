@@ -1421,23 +1421,23 @@ namespace hpx { namespace parallel { namespace execution
     {
         /// \cond NOINTERNAL
         template <>
-        struct is_sequential_execution_policy<sequenced_task_policy>
+        struct is_sequenced_execution_policy<sequenced_task_policy>
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_sequential_execution_policy<
+        struct is_sequenced_execution_policy<
                 sequenced_task_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
         template <>
-        struct is_sequential_execution_policy<sequenced_policy>
+        struct is_sequenced_execution_policy<sequenced_policy>
           : std::true_type
         {};
 
         template <typename Executor, typename Parameters>
-        struct is_sequential_execution_policy<
+        struct is_sequenced_execution_policy<
                 sequenced_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
@@ -1748,7 +1748,7 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename ExPolicy>
         struct extract_launch_policy<ExPolicy,
             typename std::enable_if<
-                is_sequential_execution_policy<ExPolicy>::value
+                is_sequenced_execution_policy<ExPolicy>::value
             >::type>
         {
             static launch call() { return launch::deferred; }

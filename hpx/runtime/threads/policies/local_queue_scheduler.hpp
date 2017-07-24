@@ -23,10 +23,10 @@
 #include <hpx/util_fwd.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -502,7 +502,8 @@ namespace hpx { namespace threads { namespace policies
                 case thread_priority_low:
                 case thread_priority_normal:
                 case thread_priority_boost:
-                case thread_priority_critical:
+                case thread_priority_high:
+                case thread_priority_high_recursive:
                     return queues_[num_thread]->get_thread_count(state);
 
                 default:
@@ -523,7 +524,8 @@ namespace hpx { namespace threads { namespace policies
             case thread_priority_low:
             case thread_priority_normal:
             case thread_priority_boost:
-            case thread_priority_critical:
+            case thread_priority_high:
+            case thread_priority_high_recursive:
                 {
                     for (std::size_t i = 0; i != queues_.size(); ++i)
                         count += queues_[i]->get_thread_count(state);
@@ -788,7 +790,7 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_stop_thread(num_thread);
         }
 
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e)
+        void on_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             queues_[num_thread]->on_error(num_thread, e);
         }

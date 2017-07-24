@@ -21,6 +21,7 @@ namespace hpx { namespace components
     {
         class pinned_ptr_base
         {
+        public:
             HPX_NON_COPYABLE(pinned_ptr_base);
 
         public:
@@ -41,6 +42,7 @@ namespace hpx { namespace components
         template <typename Component>
         class pinned_ptr : public pinned_ptr_base
         {
+        public:
             HPX_NON_COPYABLE(pinned_ptr);
 
         public:
@@ -98,11 +100,6 @@ namespace hpx { namespace components
         {
             return pinned_ptr(lva, id<Component>());
         }
-
-#if !defined(HPX_INTEL_VERSION) || (HPX_INTEL_VERSION > 1400)
-        HPX_DELETE_COPY_CTOR(pinned_ptr);
-        HPX_DELETE_COPY_ASSIGN(pinned_ptr);
-#endif
 
     private:
         template <typename Component>

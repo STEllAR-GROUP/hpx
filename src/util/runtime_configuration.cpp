@@ -9,6 +9,8 @@
 #include <hpx/config/defaults.hpp>
 // TODO: move parcel ports into plugins
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
@@ -19,7 +21,6 @@
 #include <hpx/version.hpp>
 
 #include <boost/detail/endian.hpp>
-#include <boost/preprocessor/stringize.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
@@ -190,9 +191,9 @@ namespace hpx { namespace util
                 "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
             "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:"
-                BOOST_STRINGIZE(HPX_IDLE_LOOP_COUNT_MAX) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
             "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
-                BOOST_STRINGIZE(HPX_BUSY_LOOP_COUNT_MAX) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
 
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
@@ -211,24 +212,24 @@ namespace hpx { namespace util
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
-                BOOST_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_SMALL_STACK_SIZE)) "}",
             "medium_size = ${HPX_MEDIUM_STACK_SIZE:"
-                BOOST_STRINGIZE(HPX_MEDIUM_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_MEDIUM_STACK_SIZE)) "}",
             "large_size = ${HPX_LARGE_STACK_SIZE:"
-                BOOST_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_LARGE_STACK_SIZE)) "}",
             "huge_size = ${HPX_HUGE_STACK_SIZE:"
-                BOOST_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_HUGE_STACK_SIZE)) "}",
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
             "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
 #endif
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
-                BOOST_STRINGIZE(HPX_NUM_IO_POOL_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
             "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
-                BOOST_STRINGIZE(HPX_NUM_PARCEL_POOL_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
-                BOOST_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
 
             "[hpx.thread_queue]",
             "min_tasks_to_steal_pending = "
@@ -278,14 +279,15 @@ namespace hpx { namespace util
             // command_line_handling.cpp
             "address = ${HPX_AGAS_SERVER_ADDRESS}",
             "port = ${HPX_AGAS_SERVER_PORT:"
-                BOOST_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_INITIAL_IP_PORT)) "}",
             "max_pending_refcnt_requests = "
                 "${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:"
-                BOOST_STRINGIZE(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(
+                    HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS))
                 "}",
             "service_mode = hosted",
             "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
-                BOOST_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_AGAS_LOCAL_CACHE_SIZE)) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
             "use_caching = ${HPX_AGAS_USE_CACHING:1}",
 
@@ -935,25 +937,25 @@ namespace hpx { namespace util
     std::ptrdiff_t runtime_configuration::init_small_stack_size() const
     {
         return init_stack_size("small_size",
-            BOOST_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_medium_stack_size() const
     {
         return init_stack_size("medium_size",
-            BOOST_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_large_stack_size() const
     {
         return init_stack_size("large_size",
-            BOOST_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_huge_stack_size() const
     {
         return init_stack_size("huge_size",
-            BOOST_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
     }
 
     ///////////////////////////////////////////////////////////////////////////

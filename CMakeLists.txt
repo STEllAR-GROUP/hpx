@@ -5,6 +5,7 @@
 # Copyright (c)      2011 Vinay C Amatya
 # Copyright (c)      2013 Jeroen Habraken
 # Copyright (c) 2014-2016 Andreas Schaefer
+# Copyright (c) 2017      Abhimanyu Rawat
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -114,11 +115,22 @@ endif()
 
 # Adjust a couple of build-system settings, if HPX is to be built using vcpkg
 if(MSVC)
+  set(_with_vcpkg_default OFF)
+  if(VCPKG_TOOLCHAIN)
+    set(_with_vcpkg_default ON)
+  endif()
   hpx_option(HPX_WITH_VCPKG BOOL
     "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
-    OFF ADVANCED)
+    ${_with_vcpkg_default} ADVANCED)
   if(HPX_WITH_VCPKG)
     hpx_add_config_define(HPX_HAVE_VCPKG)
+  endif()
+
+  hpx_option(HPX_WITH_VS_STARTUP_PROJECT STRING
+    "Define the startup project for the HPX solution (default: ALL_BUILD)."
+    "ALL_BUILD" ADVANCED)
+  if(HPX_WITH_VS_STARTUP_PROJECT)
+    set(VS_STARTUP_PROJECT ${HPX_WITH_VS_STARTUP_PROJECT})
   endif()
 endif()
 
@@ -135,6 +147,21 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 #    set(DEFAULT_MALLOC "jemalloc")
 endif()
 
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT OFF)
+  string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UC)
+  if("${CMAKE_BUILD_TYPE_UC}" STREQUAL "DEBUG")
+    set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT ON)
+  endif()
+  hpx_option(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION
+    BOOL
+    "Enable stackoverflow detection for HPX threads/coroutines. (default: OFF, debug: ON)"
+    ${HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT} ADVANCED)
+  if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+    hpx_add_config_define(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+  endif()
+endif()
+
 hpx_option(HPX_WITH_MALLOC
   STRING
   "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
@@ -145,6 +172,11 @@ hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
+
+hpx_option(HPX_WITH_STACKOVERFLOW_DETECTION
+  BOOL
+  "Enable Stack Overflow Detection (default: OFF)"
+  OFF ADVANCED)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -380,9 +412,8 @@ hpx_option(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS BOOL
   "Disables the mechanism that produces debug output for caught signals and unhandled exceptions (default: OFF)"
   OFF
   ADVANCED)
-
 if(HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
-  add_definitions(-DHPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
+  hpx_add_config_define(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
 endif()
 
 ## Thread Manager related build options
@@ -555,7 +586,6 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
 
-
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
 
@@ -668,7 +698,7 @@ endif()
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
   if(NOT OPENMP_FOUND)
@@ -677,7 +707,7 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
   "Enable examples requiring TBB support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
   if(NOT TBB_FOUND)
@@ -686,7 +716,7 @@ if(HPX_WITH_EXAMPLES_TBB)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
   "Enable examples requiring QThreads support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
   if(NOT QTHREADS_FOUND)
@@ -695,7 +725,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
   if(NOT HDF5_FOUND)
@@ -707,7 +737,7 @@ endif()
 if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
     "Enable examples requiring Qt4 support (default: OFF)." OFF
-    CATEGORY "Tools" ADVANCED)
+    CATEGORY "Build Targets" ADVANCED)
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
     if(NOT QT4_FOUND)
@@ -858,6 +888,14 @@ if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
 endif()
 
+# HPX_WITH_QUEUE_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_QUEUE_COMPATIBILITY BOOL
+    "Enable old style queue components in API (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_QUEUE_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_QUEUE_COMPATIBILITY)
+endif()
+
 # BADBAD: This enables an overload of swap which is necessary to work around the
 #         problems caused by zip_iterator not being a real random access iterator.
 #         Dereferencing zip_iterator does not yield a true reference but
@@ -907,16 +945,24 @@ endif()
 
 # HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
 hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
-    "Enable old overloads for inclkusive_scan (default: ON)"
+    "Enable old overloads for inclusive_scan (default: ON)"
     ON ADVANCED)
 if(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INCLUSIVE_SCAN_COMPATIBILITY)
 endif()
 
+# HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT: introduced in V1.1.0
+hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
+    "Enable weaker (non-conforming) iterator requirements for parallel algorithms (default: OFF)"
+    OFF ADVANCED)
+if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+  hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
-include_directories("${PROJECT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
@@ -925,8 +971,8 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Check if the selected compiler versions are supposed to work with our codebase
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-    hpx_error("GCC 4.8 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+    hpx_error("GCC 4.9 or higher is required. Specify HPX_GCC_VERSION_CHECK=OFF to ignore this error.")
   endif()
 endif()
 
@@ -995,55 +1041,9 @@ hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS
 hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
 
-# Make sure we compile in C++11 mode (MSVC uses it automatically)
-if(NOT MSVC)
-  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    set(CXX_FLAG -std=c++11)
-  else()
-
-    # Try -std=c++14 first
-    if(HPX_WITH_CXX14 OR NOT (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-                              AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)))
-      check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
-    endif()
-
-    if(HPX_WITH_CXX14)
-      set(CXX_FLAG -std=c++14)
-      # The Intel compiler doesn't appear to have a fully functional
-      # implementation of C++14 constexpr. It's fine with our C++14 constexpr
-      # usage in HPX but chokes on Boost.
-      # FIXME: This should be replaced with a version-based check in the future
-      # when the Intel compiler is able to build Boost with -std=c++14.
-      if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-        add_definitions(-DBOOST_NO_CXX14_CONSTEXPR)
-      endif()
-    else()
-      # ... otherwise try -std=c++1y
-
-      if(HPX_WITH_CXX1Y OR NOT (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-                                AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)))
-        check_cxx_compiler_flag(-std=c++1y HPX_WITH_CXX1y)
-      endif()
-
-      if(HPX_WITH_CXX1Y)
-        set(CXX_FLAG -std=c++1y)
-      else()
-        # ... otherwise try -std=c++11
-        check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
-        if(HPX_WITH_CXX11)
-          set(CXX_FLAG -std=c++11)
-        else()
-          # ... otherwise try -std=c++0x
-          check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
-          if(HPX_WITH_CXX0X)
-            set(CXX_FLAG -std=c++0x)
-          endif()
-        endif()
-      endif()
-    endif()
-  endif()
-  hpx_add_target_compile_option(${CXX_FLAG})
-endif()
+# Make sure we compile in proper C++xx mode (MSVC uses it automatically)
+include(HPX_DetectCppDialect)
+hpx_detect_cpp_dialect()
 
 ################################################################################
 # CUDA features
@@ -1434,6 +1434,18 @@ if(HPX_WITH_HWLOC)
   hpx_add_config_define(HPX_HAVE_HWLOC)
 endif()
 
+hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION "\"${HPX_WITH_STACKOVERFLOW_DETECTION}\"")
+
+if(HPX_WITH_STACKOVERFLOW_DETECTION)
+  find_package(LibSigSegv)
+  if(NOT LIBSIGSEGV_FOUND)
+    hpx_error("LibSigSegv could not be found and HPX_WITH_STACKOVERFLOW_DETECTION=ON, please specify LIBSIGSEGV_ROOT to point to the correct location or set HPX_WITH_STACKOVERFLOW_DETECTION to OFF")
+  endif()
+  hpx_libraries(${LIBSIGSEGV_LIBRARIES})
+  include_directories(${LIBSIGSEGV_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION)
+endif()
+
 ################################################################################
 # Enable integration with Intel Amplifier
 ################################################################################
@@ -1532,7 +1544,7 @@ endif()
 if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
   if(NOT Boost_CONTEXT_FOUND)
-    hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
+    hpx_error("The usage of Boost.Context was selected but Boost.Context was not found.")
   endif()
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     if(Boost_VERSION LESS 105600)
@@ -1592,6 +1604,28 @@ hpx_add_config_define(HPX_HAVE_GIT_COMMIT "\"${HPX_WITH_GIT_COMMIT}\"")
 
 hpx_include(SetOutputPaths)
 ##############################################################################
+
+################################################################################
+# Provide a macro for generating config headers
+################################################################################
+macro(generate_config_defines_header TARGET_DIRECTORY)
+  # Generate a defines.hpp to be used in the build directory ...
+  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
+  write_config_defines_file(
+    TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+    NAMESPACE default
+    FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
+endmacro()
+
+###############################################################################
+# Perform the on framework CXX feature tests
+###############################################################################
+hpx_perform_on_framework_cxx_feature_tests()
+
+################################################################################
+# Set basic search paths for the generated HPX headers
+################################################################################
+include_directories("${CMAKE_BINARY_DIR}")
 
 ################################################################################
 # Configure compression and other plugins
@@ -1680,19 +1714,14 @@ add_plugin_modules()
 ################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
-# Generate a defines.hpp to be used in the build directory ...
-set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-write_config_defines_file(
-  TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
-  NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp")
+generate_config_defines_header(${CMAKE_BINARY_DIR})
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
 write_config_defines_file(
   TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
   NAMESPACE default
-  FILENAME "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
+  FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp")
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
@@ -1722,7 +1751,7 @@ install( # install all hpx header files
 # Install all HPX header that have been configured using various
 # cmake options
 install(
-  DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/"
+  DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
   DESTINATION include/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
@@ -1826,24 +1855,6 @@ if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
     PATTERN ".git" EXCLUDE)
 endif()
 
-if(Boost_VERSION LESS 105300)
-  # Install Boost.Atomic library for older Boost versions only
-  install(
-    DIRECTORY external/atomic/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-
-  # Install Boost.Lockfree library for older Boost versions only
-  install(
-    DIRECTORY external/lockfree/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-endif()
-
 install(
   FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
   DESTINATION share/hpx-${HPX_VERSION}
@@ -1896,6 +1907,10 @@ if(HPX_WITH_VIM_YCM)
   )
   hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
+
+################################################################################
+# print overall configuration summary
+include(HPX_PrintSummary)
 
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Dylan Stark
 #
@@ -6,7 +6,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    1d_hydro
     1d_stencil
     accumulators
     allgather
@@ -15,12 +14,10 @@ set(subdirs
     cancelable_action
     future_reduce
     heartbeat
-    interpolate1d
     jacobi
     jacobi_smp
     nqueen
     performance_counters
-    queue
     quickstart
     qt
     random_mem_access
@@ -32,8 +29,15 @@ set(subdirs
     transpose
    )
 
-if(HPX_WITH_FORTRAN)
+if(HPX_WITH_QUEUE_COMPATIBILITY)
   set(subdirs ${subdirs}
+      queue
+     )
+endif()
+
+if(HPX_WITH_EXAMPLES_HDF5)
+  set(subdirs ${subdirs}
+    interpolate1d
     sheneos
     )
 endif()

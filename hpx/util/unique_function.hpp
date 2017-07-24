@@ -39,8 +39,6 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable<R(Ts...)> vtable;
         typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
 
-        HPX_MOVABLE_ONLY(unique_function);
-
     public:
         typedef typename base_type::result_type result_type;
 
@@ -59,7 +57,7 @@ namespace hpx { namespace util
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function(F&& f)
           : base_type()
@@ -76,7 +74,7 @@ namespace hpx { namespace util
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function& operator=(F&& f)
         {

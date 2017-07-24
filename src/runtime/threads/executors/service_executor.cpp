@@ -11,13 +11,12 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/asio/basic_deadline_timer.hpp>
+#include <boost/asio/basic_waitable_timer.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -103,10 +102,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             util::bind(&thread_wrapper_helper::invoke, wfp));
     }
 
-    typedef boost::asio::basic_deadline_timer<
-        util::steady_clock
-      , util::chrono_traits<util::steady_clock>
-    > steady_clock_deadline_timer;
+    typedef boost::asio::basic_waitable_timer<util::steady_clock> deadline_timer;
 
     struct delayed_add_helper
     {
@@ -129,7 +125,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         service_executor* exec_;
         service_executor::closure_type f_;
-        steady_clock_deadline_timer timer_;
+        deadline_timer timer_;
     };
 
     // Schedule given function for execution in this executor no sooner

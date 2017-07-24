@@ -8,32 +8,11 @@
 
 #include <hpx/config.hpp>
 
-#define HPX_DELETE_COPY_CTOR(cls)                                             \
-    cls(cls const&) = delete                                                  \
-/**/
-
-#define HPX_DELETE_COPY_ASSIGN(cls)                                           \
-    cls& operator=(cls const&) = delete                                       \
-/**/
-
-#define HPX_DELETE_MOVE_CTOR(cls)                                             \
-    cls(cls&&) = delete                                                       \
-/**/
-
-#define HPX_DELETE_MOVE_ASSIGN(cls)                                           \
-    cls& operator=(cls&&) = delete                                            \
-/**/
-
 #define HPX_NON_COPYABLE(cls)                                                 \
-    HPX_DELETE_COPY_CTOR(cls);                                                \
-    HPX_DELETE_COPY_ASSIGN(cls);                                              \
-    HPX_DELETE_MOVE_CTOR(cls);                                                \
-    HPX_DELETE_MOVE_ASSIGN(cls)                                               \
-/**/
-
-#define HPX_MOVABLE_ONLY(cls)                                                 \
-    HPX_DELETE_COPY_CTOR(cls);                                                \
-    HPX_DELETE_COPY_ASSIGN(cls)                                               \
+    cls(cls const&) = delete;                                                 \
+    cls(cls&&) = delete;                                                      \
+    cls& operator=(cls const&) = delete;                                      \
+    cls& operator=(cls&&) = delete                                            \
 /**/
 
 #endif

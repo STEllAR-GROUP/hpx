@@ -15,6 +15,8 @@
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
@@ -89,6 +91,7 @@ namespace hpx { namespace serialization { namespace detail
 
     class polymorphic_nonintrusive_factory
     {
+    public:
         HPX_NON_COPYABLE(polymorphic_nonintrusive_factory);
 
     public:
@@ -225,8 +228,8 @@ namespace hpx { namespace serialization { namespace detail
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                       \
         Parameters, Template, Name)                                           \
     namespace hpx { namespace serialization { namespace detail {              \
-        HPX_UTIL_STRIP(Parameters)                                            \
-        struct HPX_ALWAYS_EXPORT get_serialization_name<HPX_UTIL_STRIP(       \
+        HPX_PP_STRIP_PARENS(Parameters)                                       \
+        struct HPX_ALWAYS_EXPORT get_serialization_name<HPX_PP_STRIP_PARENS(  \
             Template)>                                                        \
         {                                                                     \
             char const* operator()()                                          \
@@ -237,15 +240,15 @@ namespace hpx { namespace serialization { namespace detail
     }}}                                                                       \
 /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
-    HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, BOOST_PP_STRINGIZE(Class))   \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, HPX_PP_STRINGIZE(Class))     \
 /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(Parameters, Template)       \
     HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                           \
         Parameters, Template,                                                 \
-        hpx::util::type_id<HPX_UTIL_STRIP(Template) >::typeid_.type_id())     \
-    HPX_UTIL_STRIP(Parameters) hpx::serialization::detail::register_class<    \
-        HPX_UTIL_STRIP(Template)>                                             \
-        HPX_UTIL_STRIP(Template)::hpx_register_class_instance;                \
+        hpx::util::type_id<HPX_PP_STRIP_PARENS(Template) >::typeid_.type_id())\
+    HPX_PP_STRIP_PARENS(Parameters) hpx::serialization::detail::register_class< \
+        HPX_PP_STRIP_PARENS(Template)>                                        \
+        HPX_PP_STRIP_PARENS(Template)::hpx_register_class_instance;           \
 /**/
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SEMIINTRUSIVE(Template)        \
     static hpx::serialization::detail::register_class<Template>               \
@@ -261,7 +264,7 @@ namespace hpx { namespace serialization { namespace detail
 #define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(Class, Func)                \
     namespace hpx { namespace serialization { namespace detail {              \
     template<>                                                                \
-    class constructor_selector<HPX_UTIL_STRIP(Class)>                         \
+    class constructor_selector<HPX_PP_STRIP_PARENS(Class)>                    \
     {                                                                         \
     public:                                                                   \
         static Class *create(input_archive& ar)                               \
@@ -274,13 +277,13 @@ namespace hpx { namespace serialization { namespace detail
 #define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE(                   \
     Parameters, Template, Func)                                               \
     namespace hpx { namespace serialization { namespace detail {              \
-    HPX_UTIL_STRIP(Parameters)                                                \
-    class constructor_selector<HPX_UTIL_STRIP(Template)>                      \
+    HPX_PP_STRIP_PARENS(Parameters)                                           \
+    class constructor_selector<HPX_PP_STRIP_PARENS(Template)>                 \
     {                                                                         \
     public:                                                                   \
-        static HPX_UTIL_STRIP(Template) *create(input_archive& ar)            \
+        static HPX_PP_STRIP_PARENS(Template) *create(input_archive& ar)       \
         {                                                                     \
-            return Func(ar, static_cast<HPX_UTIL_STRIP(Template)*>(0));       \
+            return Func(ar, static_cast<HPX_PP_STRIP_PARENS(Template)*>(0));  \
         }                                                                     \
     };                                                                        \
     }}}                                                                       \

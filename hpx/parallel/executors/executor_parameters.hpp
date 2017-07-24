@@ -16,9 +16,9 @@
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
 #include <boost/ref.hpp>
 
 #include <cstddef>
@@ -282,11 +282,11 @@ namespace hpx { namespace parallel { inline namespace v3
 #define HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(func)                       \
     static_assert(                                                            \
         parameters_type_counter<                                              \
-            BOOST_PP_CAT(hpx::parallel::v3::detail::has_, func)<              \
+            HPX_PP_CAT(hpx::parallel::v3::detail::has_, func)<                \
                 typename hpx::util::decay_unwrap<Params>::type>::value...     \
         >::value <= 1,                                                        \
         "Passing more than one executor parameters type exposing "            \
-            BOOST_PP_STRINGIZE(func) " is not possible")                      \
+            HPX_PP_STRINGIZE(func) " is not possible")                        \
     /**/
 
         template <typename ... Params>

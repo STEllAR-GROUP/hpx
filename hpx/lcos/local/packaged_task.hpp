@@ -16,8 +16,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -30,8 +29,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R, typename ...Ts>
     class packaged_task<R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(packaged_task);
-
         typedef util::unique_function_nonser<R(Ts...)> function_type;
 
     public:
@@ -45,7 +42,7 @@ namespace hpx { namespace lcos { namespace local
             typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type
         >
         explicit packaged_task(F&& f)
@@ -58,7 +55,7 @@ namespace hpx { namespace lcos { namespace local
             typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type
         >
         explicit packaged_task(std::allocator_arg_t, Allocator const& a, F && f)
@@ -98,7 +95,6 @@ namespace hpx { namespace lcos { namespace local
             }
 
             hpx::util::annotate_function annotate(function_);
-            (void)annotate;     // suppress warning about unused variable
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 
@@ -133,7 +129,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // extension
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(std::exception_ptr const& e)
         {
             promise_.set_exception(e);
         }
@@ -147,7 +143,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 promise_.set_value(function_(std::forward<Vs>(vs)...));
             } catch(...) {
-                promise_.set_exception(boost::current_exception());
+                promise_.set_exception(std::current_exception());
             }
         }
 
@@ -159,7 +155,7 @@ namespace hpx { namespace lcos { namespace local
                 function_(std::forward<Ts>(vs)...);
                 promise_.set_value();
             } catch(...) {
-                promise_.set_exception(boost::current_exception());
+                promise_.set_exception(std::current_exception());
             }
         }
 

@@ -16,9 +16,8 @@
 
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
+#include <exception>
 
 namespace hpx { namespace lcos
 {
@@ -29,7 +28,7 @@ namespace hpx { namespace lcos
     public:
         virtual void set_event() = 0;
 
-        virtual void set_exception(boost::exception_ptr const& e);
+        virtual void set_exception(std::exception_ptr const& e);
 
         // noop by default
         virtual void connect(naming::id_type const &);
@@ -67,7 +66,7 @@ namespace hpx { namespace lcos
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception_nonvirt(boost::exception_ptr const& e);
+        void set_exception_nonvirt(std::exception_ptr const& e);
 
         /// The \a function connect_nonvirt is called whenever a
         /// \a connect_action is applied on a instance of a LCO. This function
@@ -99,7 +98,7 @@ namespace hpx { namespace lcos
         /// information from the remote site to the LCO instance specified as
         /// a continuation. This action carries 2 parameters:
         ///
-        /// \param boost::exception_ptr
+        /// \param std::exception_ptr
         ///               [in] The exception encapsulating the error to report
         ///               to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco, set_exception_nonvirt,

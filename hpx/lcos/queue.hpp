@@ -7,11 +7,12 @@
 #define HPX_LCOS_QUEUE_FEB_10_2011_1232PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
 #include <hpx/lcos/server/queue.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@ namespace hpx { namespace lcos
             typedef lcos::base_lco::set_exception_action action_type;
 
             HPX_ASSERT(this->get_id());
-            boost::exception_ptr exception =
+            std::exception_ptr exception =
                 HPX_GET_EXCEPTION(hpx::no_success, "queue::abort_pending", "");
             return hpx::async<action_type>(this->get_id(), exception);
         }
@@ -133,5 +134,6 @@ namespace hpx { namespace lcos
     };
 }}
 
+#endif
 #endif
 

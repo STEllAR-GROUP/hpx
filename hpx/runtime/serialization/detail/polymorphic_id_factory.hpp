@@ -14,9 +14,8 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/static.hpp>
-
-#include <boost/preprocessor/stringize.hpp>
 
 #include <cstdint>
 #include <map>
@@ -32,6 +31,7 @@ namespace hpx { namespace serialization {
     {
         class id_registry
         {
+        public:
             HPX_NON_COPYABLE(id_registry);
 
         public:
@@ -78,8 +78,10 @@ namespace hpx { namespace serialization {
 
         class polymorphic_id_factory
         {
+        public:
             HPX_NON_COPYABLE(polymorphic_id_factory);
 
+        private:
             typedef id_registry::ctor_t ctor_t;
             typedef id_registry::typename_to_ctor_t typename_to_ctor_t;
             typedef id_registry::typename_to_id_t typename_to_id_t;
@@ -177,15 +179,15 @@ namespace hpx { namespace serialization {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                       \
-    namespace hpx { namespace serialization { namespace detail {               \
-        template <> std::string get_constant_entry_name<Id>()                  \
-        {                                                                      \
-            return BOOST_PP_STRINGIZE(String);                                 \
-        }                                                                      \
-        template add_constant_entry<Id>                                        \
-            add_constant_entry<Id>::instance;                                  \
-    }}}                                                                        \
+#define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                      \
+    namespace hpx { namespace serialization { namespace detail {              \
+        template <> std::string get_constant_entry_name<Id>()                 \
+        {                                                                     \
+            return HPX_PP_STRINGIZE(String);                                  \
+        }                                                                     \
+        template add_constant_entry<Id>                                       \
+            add_constant_entry<Id>::instance;                                 \
+    }}}                                                                       \
 /**/
 
 #endif

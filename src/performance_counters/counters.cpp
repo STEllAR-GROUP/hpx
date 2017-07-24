@@ -702,6 +702,20 @@ namespace hpx { namespace performance_counters
             return gid;
         }
 
+        // \brief Create a new aggregating extended performance counter instance
+        //        based on given base counter name and given base time interval
+        //        (milliseconds).
+        naming::gid_type create_arithmetics_counter_extended(
+            counter_info const& info,
+            std::vector<std::string> const& base_counter_names, error_code& ec)
+        {
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().
+                create_arithmetics_counter_extended(info, base_counter_names,
+                    gid, ec);
+            return gid;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         counter_status add_counter(naming::id_type const& id,
             counter_info const& info, error_code& ec)

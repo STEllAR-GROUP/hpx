@@ -11,12 +11,12 @@
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 #include <hpx/performance_counters/counters.hpp>
 
+#include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstdint>
 #include <string>
@@ -30,6 +30,7 @@ namespace hpx { namespace parcelset { namespace detail
 {
     class HPX_EXPORT per_action_data_counter_registry
     {
+    public:
         HPX_NON_COPYABLE(per_action_data_counter_registry);
 
     public:

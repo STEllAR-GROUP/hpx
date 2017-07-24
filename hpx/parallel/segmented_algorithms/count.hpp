@@ -16,9 +16,8 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <numeric>
@@ -190,7 +189,7 @@ namespace hpx { namespace parallel { inline namespace v1
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 >is_seq;
 
@@ -376,7 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [=](std::vector<shared_future<value_type> > && r) -> value_type
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
@@ -398,7 +397,7 @@ namespace hpx { namespace parallel { inline namespace v1
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 

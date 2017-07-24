@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <type_traits>
@@ -20,7 +21,6 @@
 #include <vector>
 
 #include <boost/atomic.hpp>
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id async_test(int passed_through)
@@ -79,14 +79,14 @@ void test_bulk_sync(Executor& exec)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    hpx::parallel::execution::sync_bulk_execute(exec,
+    hpx::parallel::execution::bulk_sync_execute(exec,
         hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, &async_bulk_test, v, tid, 42);
 }
 
@@ -96,17 +96,17 @@ void test_bulk_async(Executor& exec)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42)
     ).get();
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, &async_bulk_test, v, tid, 42)
     ).get();
 }
@@ -156,7 +156,7 @@ struct test_async_executor1
     typedef hpx::parallel::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    static hpx::future<typename hpx::util::result_of<F&&(Ts&&...)>::type>
+    static hpx::future<typename hpx::util::invoke_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
         ++count_async;
@@ -178,7 +178,7 @@ struct test_async_executor2 : test_async_executor1
     typedef hpx::parallel::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    static typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     sync_execute(F && f, Ts &&... ts)
     {
         ++count_sync;
@@ -200,7 +200,7 @@ struct test_async_executor3 : test_async_executor1
     typedef hpx::parallel::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename Shape, typename ... Ts>
-    static void sync_bulk_execute(F f, Shape const& shape, Ts &&... ts)
+    static void bulk_sync_execute(F f, Shape const& shape, Ts &&... ts)
     {
         ++count_bulk_sync;
         std::vector<hpx::future<void> > results;
@@ -226,7 +226,7 @@ struct test_async_executor4 : test_async_executor1
 
     template <typename F, typename Shape, typename ... Ts>
     static std::vector<hpx::future<void> >
-    async_bulk_execute(F f, Shape const& shape, Ts &&... ts)
+    bulk_async_execute(F f, Shape const& shape, Ts &&... ts)
     {
         ++count_bulk_async;
         std::vector<hpx::future<void> > results;
@@ -256,7 +256,7 @@ struct test_async_executor5 : test_async_executor1
     typedef hpx::parallel::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    static void apply_execute(F && f, Ts &&... ts)
+    static void post(F && f, Ts &&... ts)
     {
         ++count_apply;
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -271,9 +271,48 @@ namespace hpx { namespace traits
     {};
 }}
 
+template <typename Executor,
+    typename B1, typename B2, typename B3, typename B4, typename B5>
+void static_check_executor(B1, B2, B3, B4, B5)
+{
+    using namespace hpx::traits;
+
+    static_assert(
+        has_async_execute_member<Executor>::value == B1::value,
+        "check has_async_execute_member<Executor>::value");
+    static_assert(
+        has_sync_execute_member<Executor>::value == B2::value,
+        "check has_sync_execute_member<Executor>::value");
+    static_assert(
+        has_bulk_sync_execute_member<Executor>::value == B3::value,
+        "check has_bulk_sync_execute_member<Executor>::value");
+    static_assert(
+        has_bulk_async_execute_member<Executor>::value == B4::value,
+        "check has_bulk_async_execute_member<Executor>::value");
+    static_assert(
+        has_post_member<Executor>::value == B5::value,
+        "check has_post_member<Executor>::value");
+
+    static_assert(
+        !has_then_execute_member<Executor>::value,
+        "!has_then_execute_member<Executor>::value");
+    static_assert(
+        !has_bulk_then_execute_member<Executor>::value,
+        "!has_bulk_then_execute_member<Executor>::value");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
+    std::false_type f;
+    std::true_type t;
+
+    static_check_executor<test_async_executor1>(t, f, f, f, f);
+    static_check_executor<test_async_executor2>(t, t, f, f, f);
+    static_check_executor<test_async_executor3>(t, f, t, f, f);
+    static_check_executor<test_async_executor4>(t, f, f, t, f);
+    static_check_executor<test_async_executor5>(t, f, f, f, t);
+
     test_executor<test_async_executor1>({{ 0, 0, 431, 0, 0 }});
     test_executor<test_async_executor2>({{ 0, 1, 430, 0, 0 }});
     test_executor<test_async_executor3>({{ 0, 0, 217, 2, 0 }});

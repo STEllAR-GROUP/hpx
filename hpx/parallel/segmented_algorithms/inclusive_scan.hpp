@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { inline namespace v1
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
             T const& init, Op && op, std::true_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 

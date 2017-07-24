@@ -29,6 +29,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
@@ -40,12 +41,11 @@
 #include <hpx/parallel/executors/execution.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iterator>
 #include <type_traits>
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            traits::is_future_or_future_range<Future>::value
+            traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(Future& future) const
         {
             future = Future();
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            traits::is_future_or_future_range<Future>::value
+            traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(boost::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            traits::is_future_or_future_range<Future>::value
+            traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(std::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            !traits::is_future_or_future_range<Future>::value
+            !traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(Future& future) const
         {}
     };
@@ -111,7 +111,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename F, typename Args>
     struct dataflow_return<F, Args,
         typename std::enable_if<!traits::is_action<F>::value>::type
-    > : util::detail::fused_result_of<F(Args &&)>
+    > : util::detail::invoke_fused_result<F, Args>
     {};
 
     template <typename Action, typename Args>
@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(std::move(res));
             }
             catch(...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
@@ -227,14 +227,13 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(util::unused_type());
             }
             catch(...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
         HPX_FORCEINLINE void done()
         {
             hpx::util::annotate_function annotate(func_);
-            (void)annotate;     // suppress warning about unused variable
             execute(indices_type(), is_void());
         }
 
@@ -433,8 +432,8 @@ namespace hpx { namespace lcos { namespace detail
             future_type & f_ = util::get<I>(futures_);
 
             await_range<I>(
-                boost::begin(util::unwrap_ref(f_))
-              , boost::end(util::unwrap_ref(f_))
+                util::begin(util::unwrap_ref(f_))
+              , util::end(util::unwrap_ref(f_))
             );
         }
 

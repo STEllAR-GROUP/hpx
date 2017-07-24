@@ -79,13 +79,13 @@ namespace hpx {namespace parallel { inline namespace v1
                 return partitioner::call_with_index(
                     std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
                     [=](FwdIter it, std::size_t part_size,
-                        std::size_t base_idx) mutable
+                        std::size_t base_idx) mutable -> void
                     {
                         FwdIter curr = it;
 
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
-                            [=, &tok, &curr](reference v, std::size_t i)
+                            [=, &tok, &curr](reference v, std::size_t i) -> void
                             {
                                 ++curr;
                                 if (op(v, *s_first))
@@ -206,7 +206,7 @@ namespace hpx {namespace parallel { inline namespace v1
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::search<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -262,13 +262,13 @@ namespace hpx {namespace parallel { inline namespace v1
                 return partitioner::call_with_index(
                     std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
                     [=](FwdIter it, std::size_t part_size,
-                        std::size_t base_idx) mutable
+                        std::size_t base_idx) mutable -> void
                     {
                         FwdIter curr = it;
 
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
-                            [=, &tok, &curr](reference v, std::size_t i)
+                            [=, &tok, &curr](reference v, std::size_t i) -> void
                             {
                                 ++curr;
                                 if (op(v, *s_first))
@@ -390,7 +390,7 @@ namespace hpx {namespace parallel { inline namespace v1
             (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Subsequence requires at least forward iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::search_n<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),

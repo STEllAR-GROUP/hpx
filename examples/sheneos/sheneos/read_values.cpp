@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,34 +15,36 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to HDF5.
-namespace sheneos { namespace detail
+namespace sheneos
 {
-    ///////////////////////////////////////////////////////////////////////////
-    inline void
-    read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
-        hsize_t offset, hsize_t count, double* values)
+    namespace detail
     {
-        using namespace H5;
+        ///////////////////////////////////////////////////////////////////////////
+        inline void
+        read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
+            hsize_t offset, hsize_t count, double* values)
+        {
+            using namespace H5;
 
-        // Define the hyperslab for file based data.
-        hsize_t data_offset[1] = { offset };
-        hsize_t data_count[1] = { count };
-        data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
+            // Define the hyperslab for file based data.
+            hsize_t data_offset[1] = { offset };
+            hsize_t data_count[1] = { count };
+            data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
 
-        // Memory dataspace.
-        hsize_t mem_dims[1] = { count };
-        DataSpace mem_space (1, mem_dims);
+            // Memory dataspace.
+            hsize_t mem_dims[1] = { count };
+            DataSpace mem_space (1, mem_dims);
 
-        // Define the hyperslab for data in memory.
-        hsize_t mem_offset[1] = { 0 };
-        hsize_t mem_count[1] = { count };
-        mem_space.selectHyperslab(H5S_SELECT_SET, mem_count, mem_offset);
+            // Define the hyperslab for data in memory.
+            hsize_t mem_offset[1] = { 0 };
+            hsize_t mem_count[1] = { count };
+            mem_space.selectHyperslab(H5S_SELECT_SET, mem_count, mem_offset);
 
-        // Read data to memory.
-        dataset.read(values, PredType::NATIVE_DOUBLE, mem_space, data_space);
-    }
+            // Read data to memory.
+            dataset.read(values, PredType::NATIVE_DOUBLE, mem_space, data_space);
+        }
 
-} // sheneos::detail
+    } // sheneos::detail
 
     ///////////////////////////////////////////////////////////////////////////
     void extract_data(std::string const& datafilename, char const* name,
@@ -121,38 +123,36 @@ namespace sheneos { namespace detail
         return 0;
     }
 
-namespace detail
-{
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline void
-    read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
-        dimension const& dimx, dimension const& dimy, dimension const& dimz,
-        double* values)
+    namespace detail
     {
-        using namespace H5;
+        ///////////////////////////////////////////////////////////////////////
+        inline void
+        read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
+            dimension const& dimx, dimension const& dimy, dimension const& dimz,
+            double* values)
+        {
+            using namespace H5;
 
-        // Define the hyperslab for file based data.
-        hsize_t data_offset[dimension::dim] = {
-            dimx.offset_, dimy.offset_, dimz.offset_
-        };
-        hsize_t data_count[dimension::dim] = {
-            dimx.count_, dimy.count_, dimz.count_
-        };
-        data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
+            // Define the hyperslab for file based data.
+            hsize_t data_offset[dimension::dim] = {
+                dimx.offset_, dimy.offset_, dimz.offset_
+            };
+            hsize_t data_count[dimension::dim] = {
+                dimx.count_, dimy.count_, dimz.count_
+            };
+            data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
 
-        // Memory dataspace.
-        DataSpace mem_space (dimension::dim, data_count);
+            // Memory dataspace.
+            DataSpace mem_space (dimension::dim, data_count);
 
-        // Define the hyperslab for data in memory.
-        hsize_t mem_offset[dimension::dim] = { 0, 0, 0 };
-        mem_space.selectHyperslab(H5S_SELECT_SET, data_count, mem_offset);
+            // Define the hyperslab for data in memory.
+            hsize_t mem_offset[dimension::dim] = { 0, 0, 0 };
+            mem_space.selectHyperslab(H5S_SELECT_SET, data_count, mem_offset);
 
-        // Read data to memory.
-        dataset.read(values, PredType::NATIVE_DOUBLE, mem_space, data_space);
-    }
-
-} // sheneos::detail
+            // Read data to memory.
+            dataset.read(values, PredType::NATIVE_DOUBLE, mem_space, data_space);
+        }
+    } // sheneos::detail
 
     ///////////////////////////////////////////////////////////////////////////
     void extract_data(std::string const& datafilename, char const* name,

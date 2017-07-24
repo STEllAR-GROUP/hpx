@@ -9,7 +9,6 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <array>
@@ -17,6 +16,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <functional>
+#include <iterator>
 #include <string>
 #include <utility>
 #include <type_traits>
@@ -167,7 +167,7 @@ struct test_async_executor1
 
     template <typename F, typename ... Ts>
     static hpx::future<
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     >
     async_execute(F && f, Ts &&... ts)
     {
@@ -181,7 +181,7 @@ struct test_timed_async_executor1 : test_async_executor1
 {
     template <typename F, typename ... Ts>
     static hpx::future<
-        typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     >
     async_execute_at(hpx::util::steady_time_point const& abs_time, F && f,
         Ts &&... ts)
@@ -209,7 +209,7 @@ namespace hpx { namespace traits
 struct test_timed_async_executor2 : test_async_executor1
 {
     template <typename F, typename ... Ts>
-    static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     sync_execute(F && f, Ts &&... ts)
     {
         ++count_sync;
@@ -221,7 +221,7 @@ struct test_timed_async_executor2 : test_async_executor1
 struct test_timed_async_executor3 : test_timed_async_executor2
 {
     template <typename F, typename ... Ts>
-    static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     sync_execute_at(hpx::util::steady_time_point const& abs_time,
         F && f, Ts &&... ts)
     {
@@ -248,7 +248,7 @@ namespace hpx { namespace traits
 struct test_timed_async_executor4 : test_async_executor1
 {
     template <typename F, typename ... Ts>
-    static void apply_execute(F && f, Ts &&... ts)
+    static void post(F && f, Ts &&... ts)
     {
         ++count_apply;
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -258,7 +258,7 @@ struct test_timed_async_executor4 : test_async_executor1
 struct test_timed_async_executor5 : test_timed_async_executor4
 {
     template <typename F, typename ... Ts>
-    static void apply_execute_at(hpx::util::steady_time_point const& abs_time,
+    static void post_at(hpx::util::steady_time_point const& abs_time,
         F && f, Ts &&... ts)
     {
         ++count_apply_at;

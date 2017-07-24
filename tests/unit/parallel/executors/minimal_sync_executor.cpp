@@ -8,19 +8,19 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/atomic.hpp>
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id sync_test(int passed_through)
@@ -129,29 +129,29 @@ void test_bulk_sync(Executor& exec)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
     std::vector<hpx::thread::id> ids =
-        hpx::parallel::execution::sync_bulk_execute(
+        hpx::parallel::execution::bulk_sync_execute(
             exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42);
     for (auto const& id : ids)
     {
         HPX_TEST(id == hpx::this_thread::get_id());
     }
 
-    ids = hpx::parallel::execution::sync_bulk_execute(
+    ids = hpx::parallel::execution::bulk_sync_execute(
         exec, &sync_bulk_test, v, tid, 42);
     for (auto const& id : ids)
     {
         HPX_TEST(id == hpx::this_thread::get_id());
     }
 
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, &sync_bulk_test_void, v, tid, 42);
 }
 
@@ -161,26 +161,26 @@ void test_bulk_async(Executor& exec)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42)
     ).get();
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, &sync_bulk_test, v, tid, 42)
     ).get();
 
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42)
     ).get();
     hpx::when_all(
-        hpx::parallel::execution::async_bulk_execute(
+        hpx::parallel::execution::bulk_async_execute(
             exec, &sync_bulk_test_void, v, tid, 42)
     ).get();
 }
@@ -192,12 +192,12 @@ void test_bulk_then(Executor& exec)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     std::vector<hpx::thread::id> tids =
-        hpx::parallel::execution::then_bulk_execute(
+        hpx::parallel::execution::bulk_then_execute(
             exec, &then_bulk_test, v, f, tid, 42).get();
 
     for (auto const& tid : tids)
@@ -205,7 +205,7 @@ void test_bulk_then(Executor& exec)
         HPX_TEST(tid == hpx::this_thread::get_id());
     }
 
-    hpx::parallel::execution::then_bulk_execute(
+    hpx::parallel::execution::bulk_then_execute(
         exec, &then_bulk_test_void, v, f, tid, 42).get();
 }
 
@@ -248,7 +248,7 @@ struct test_sync_executor1
     typedef hpx::parallel::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename ... Ts>
-    static typename hpx::util::detail::deferred_result_of<F(Ts&&...)>::type
+    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
     sync_execute(F && f, Ts &&... ts)
     {
         ++count_sync;
@@ -300,7 +300,7 @@ struct test_sync_executor2 : test_sync_executor1
     static typename hpx::parallel::execution::detail::bulk_execute_result<
         F, Shape, Ts...
     >::type
-    sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+    bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
     {
         ++count_bulk_sync;
 
@@ -328,9 +328,44 @@ namespace hpx { namespace traits
     {};
 }}
 
+template <typename Executor, typename B1, typename B2>
+void static_check_executor(B1, B2)
+{
+    using namespace hpx::traits;
+
+    static_assert(
+        has_sync_execute_member<Executor>::value == B1::value,
+        "check has_sync_execute_member<Executor>::value");
+    static_assert(
+        has_bulk_sync_execute_member<Executor>::value == B2::value,
+        "check has_bulk_sync_execute_member<Executor>::value");
+
+    static_assert(
+        !has_async_execute_member<Executor>::value,
+        "!has_async_execute_member<Executor>::value");
+    static_assert(
+        !has_bulk_async_execute_member<Executor>::value,
+        "!has_bulk_async_execute_member<Executor>::value");
+    static_assert(
+        !has_then_execute_member<Executor>::value,
+        "!has_then_execute_member<Executor>::value");
+    static_assert(
+        !has_bulk_then_execute_member<Executor>::value,
+        "!has_bulk_then_execute_member<Executor>::value");
+    static_assert(
+        !has_post_member<Executor>::value,
+        "!has_post_member<Executor>::value");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
+    std::false_type f;
+    std::true_type t;
+
+    static_check_executor<test_sync_executor1>(t, f);
+    static_check_executor<test_sync_executor2>(t, t);
+
     test_executor<test_sync_executor1>({{ 1078, 0 }});
     test_executor<test_sync_executor2>({{ 436, 6 }});
 

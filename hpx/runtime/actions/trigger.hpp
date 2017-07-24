@@ -39,7 +39,7 @@ namespace hpx { namespace actions {
                 }
                 catch (...) {
                     // make sure hpx::exceptions are propagated back to the client
-                    cont.trigger_error(boost::current_exception());
+                    cont.trigger_error(std::current_exception());
                 }
             }
 
@@ -54,7 +54,7 @@ namespace hpx { namespace actions {
                 }
                 catch (...) {
                     // make sure hpx::exceptions are propagated back to the client
-                    cont.trigger_error(boost::current_exception());
+                    cont.trigger_error(std::current_exception());
                 }
             }
         };
@@ -99,13 +99,14 @@ namespace hpx { namespace actions {
             }
             catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont.trigger_error(boost::current_exception());
+                cont.trigger_error(std::current_exception());
             }
         }
 
         // Overload when return type is "void" aka util::unused_type
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::true_type, typed_continuation<Result, RemoteResult>&& cont,
+        void trigger_impl(std::true_type,
+            typed_continuation<Result, RemoteResult>&& cont,
             F&& f, Ts&&... vs)
         {
             try {
@@ -114,7 +115,7 @@ namespace hpx { namespace actions {
             }
             catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont.trigger_error(boost::current_exception());
+                cont.trigger_error(std::current_exception());
             }
         }
 
@@ -133,7 +134,7 @@ namespace hpx { namespace actions {
     void trigger(typed_continuation<Result, RemoteResult>&& cont,
         F&& f, Ts&&... vs)
     {
-        typedef typename util::result_of<F(Ts...)>::type result_type;
+        typedef typename util::invoke_result<F, Ts...>::type result_type;
         traits::is_future<result_type> is_future;
 
         detail::trigger_impl_future(is_future, std::move(cont),

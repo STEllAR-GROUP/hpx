@@ -126,8 +126,6 @@ struct sub_block
     std::uint64_t size_;
     double * data_;
     mode mode_;
-
-    HPX_MOVABLE_ONLY(sub_block);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -358,7 +356,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(blocks_start, blocks_end);
-        for_each(par, boost::begin(range), boost::end(range),
+        for_each(par, std::begin(range), std::end(range),
             [&](std::uint64_t b)
             {
                 std::shared_ptr<block_component> A_ptr =
@@ -420,15 +418,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 
                             auto range = numa_ranges[domain];
 
-                            std::uint64_t block_start = *boost::begin(range);
-                            std::uint64_t block_end = *boost::end(range);
+                            std::uint64_t block_start = *std::begin(range);
+                            std::uint64_t block_end = *std::end(range);
                             std::uint64_t blocks_size = block_end - block_start;
 
                             std::vector<hpx::future<void> > block_futures;
                             block_futures.resize(blocks_size);
 
                             for_each(par.on(execs[domain]),
-                                boost::begin(range), boost::end(range),
+                                std::begin(range), std::end(range),
                                 [
                                     domain, &block_futures, num_blocks,
                                     block_start, block_order, tile_size, &A, &B
@@ -651,7 +649,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     double errsq =
         transform_reduce(
             par.on(execs[domain]),
-            boost::begin(range), boost::end(range), 0.0,
+            std::begin(range), std::end(range), 0.0,
             [](double lhs, double rhs) { return lhs + rhs; },
             [&](std::uint64_t b) -> double
             {

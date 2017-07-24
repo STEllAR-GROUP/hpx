@@ -36,10 +36,10 @@ void test_transform_reduce_binary_bad_alloc(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::transform_reduce(policy,
         decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
-            boost::begin(d), init);
+            decorated_iterator(std::end(c)),
+            std::begin(d), init);
 
         HPX_TEST(false);
     }
@@ -70,10 +70,10 @@ void test_transform_reduce_binary_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<std::size_t> f =
             hpx::parallel::transform_reduce(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
-                boost::begin(d), init);
+                decorated_iterator(std::end(c)),
+                std::begin(d), init);
 
         returned_from_algorithm = true;
 

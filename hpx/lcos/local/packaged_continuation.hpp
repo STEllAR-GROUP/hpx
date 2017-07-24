@@ -28,6 +28,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <functional>
 #include <mutex>
 #include <utility>
@@ -46,7 +47,7 @@ namespace hpx { namespace lcos { namespace detail
                 dest.set_value(src.get());
             }
             catch (...) {
-                dest.set_exception(boost::current_exception());
+                dest.set_exception(std::current_exception());
             }
         }
 
@@ -58,7 +59,7 @@ namespace hpx { namespace lcos { namespace detail
                 dest.set_value(util::unused);
             }
             catch (...) {
-                dest.set_exception(boost::current_exception());
+                dest.set_exception(std::current_exception());
             }
         }
 
@@ -82,7 +83,7 @@ namespace hpx { namespace lcos { namespace detail
             cont.set_value(func(std::move(future)));
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(std::current_exception());
         }
     }
 
@@ -95,36 +96,35 @@ namespace hpx { namespace lcos { namespace detail
             cont.set_value(util::unused);
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(std::current_exception());
         }
     }
 
     template <typename Func, typename Future, typename Continuation>
     typename std::enable_if<
         !traits::detail::is_unique_future<
-            typename util::result_of<Func(Future)>::type
+            typename util::invoke_result<Func, Future>::type
         >::value
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         typedef std::is_void<
-            typename util::result_of<Func(Future)>::type
+            typename util::invoke_result<Func, Future>::type
         > is_void;
 
         hpx::util::annotate_function annotate(func);
-        (void)annotate;     // suppress warning about unused variable
         invoke_continuation(func, future, cont, is_void());
     }
 
     template <typename Func, typename Future, typename Continuation>
     typename std::enable_if<
         traits::detail::is_unique_future<
-            typename util::result_of<Func(Future)>::type
+            typename util::invoke_result<Func, Future>::type
         >::value
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         try {
             typedef
-                typename util::result_of<Func(Future)>::type
+                typename util::invoke_result<Func, Future>::type
                 inner_future;
             typedef
                 typename traits::detail::shared_state_ptr_for<inner_future>::type
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace detail
                     std::move(inner_state), std::move(cont_)));
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(std::current_exception());
         }
      }
 
@@ -286,7 +286,7 @@ namespace hpx { namespace lcos { namespace detail
             Future future = traits::future_access<Future>::create(std::move(f));
 
             typedef std::is_void<
-                    typename util::result_of<F(Future)>::type
+                    typename util::invoke_result<F, Future>::type
                 > is_void;
             invoke_continuation(f_, future, *this, is_void());
 
@@ -494,7 +494,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             catch (...) {
                 this->started_ = true;
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
                 throw;
             }
         }
@@ -742,7 +742,7 @@ namespace hpx { namespace lcos { namespace detail
                 transfer_result<Inner>()(std::move(inner_state), this);
             }
             catch (...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
@@ -787,7 +787,7 @@ namespace hpx { namespace lcos { namespace detail
                         std::move(inner_state)));
             }
             catch (...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 

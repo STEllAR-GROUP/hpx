@@ -11,12 +11,11 @@
 #include <algorithm>
 #include <cstdlib>
 #include <numeric>
+#include <iterator>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct shared_parallel_executor
@@ -29,7 +28,7 @@ struct shared_parallel_executor
     };
 
     template <typename F, typename ... Ts>
-    hpx::shared_future<typename hpx::util::result_of<F&&(Ts &&...)>::type>
+    hpx::shared_future<typename hpx::util::invoke_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
         return hpx::async(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -82,7 +81,7 @@ void test_bulk_sync()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -100,7 +99,7 @@ void test_bulk_async()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;

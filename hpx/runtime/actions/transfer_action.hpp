@@ -31,7 +31,8 @@ namespace hpx { namespace actions
     template <typename Action>
     struct transfer_action : transfer_base_action<Action>
     {
-        HPX_MOVABLE_ONLY(transfer_action);
+    public:
+        HPX_NON_COPYABLE(transfer_action);
 
         typedef transfer_base_action<Action> base_type;
 

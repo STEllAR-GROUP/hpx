@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -36,42 +37,44 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // provide our own implementation of std::uninitialized_fill as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename FwdIter, typename T>
-        void std_uninitialized_fill(FwdIter first, FwdIter last,
-            T const& value)
+        template <typename InIter, typename T>
+        void std_uninitialized_fill(InIter first, InIter last, T const& value)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
-            FwdIter current = first;
+            InIter current = first;
             try {
-                for (/* */; current != last; ++current) {
-                    ::new (static_cast<void*>(std::addressof(*current)))
-                        value_type(value);
+                for (/* */; current != last; ++current)
+                {
+                    ::new (std::addressof(*current)) value_type(value);
                 }
             }
             catch (...) {
-                for (/* */; first != current; ++first) {
+                for (/* */; first != current; ++first)
+                {
                     (*first).~value_type();
                 }
                 throw;
             }
         }
 
-        template <typename FwdIter, typename T>
-        FwdIter sequential_uninitialized_fill_n(FwdIter first, std::size_t count,
+        template <typename InIter, typename T>
+        InIter sequential_uninitialized_fill_n(InIter first, std::size_t count,
             T const& value, util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
             return
                 util::loop_with_cleanup_n_with_token(
                     first, count, tok,
-                    [&value](FwdIter it) {
-                        ::new (&*it) value_type(value);
+                    [&value](InIter it) -> void
+                    {
+                        ::new (std::addressof(*it)) value_type(value);
                     },
-                    [](FwdIter it) {
+                    [](InIter it) -> void
+                    {
                         (*it).~value_type();
                     });
         }
@@ -126,9 +129,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_fill::algorithm("uninitialized_fill")
             {}
 
-            template <typename ExPolicy, typename Iter, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy, Iter first, Iter last, T const& value)
+            sequential(ExPolicy, InIter first, InIter last, T const& value)
             {
                 std_uninitialized_fill(first, last, value);
                 return hpx::util::unused;
@@ -160,9 +163,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     forward iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -190,22 +193,30 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a parallel_task_policy and returns nothing
     ///           otherwise.
     ///
-    template <typename ExPolicy, typename InIter, typename T>
+    template <typename ExPolicy, typename FwdIter, typename T>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy>::type
     >::type
-    uninitialized_fill(ExPolicy && policy, InIter first, InIter last,
+    uninitialized_fill(ExPolicy && policy, FwdIter first, FwdIter last,
         T const& value)
     {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<InIter>::value),
+            (hpx::traits::is_input_iterator<FwdIter>::value),
             "Required at least input iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequential_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<InIter>::value
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_forward_iterator<FwdIter>::value
             > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
         return detail::uninitialized_fill().call(
             std::forward<ExPolicy>(policy), is_seq(),
@@ -220,14 +231,14 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // provide our own implementation of std::uninitialized_fill_n as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename FwdIter, typename Size, typename T>
-        FwdIter std_uninitialized_fill_n(FwdIter first, Size count,
+        template <typename InIter, typename Size, typename T>
+        InIter std_uninitialized_fill_n(InIter first, Size count,
             T const& value)
         {
-            typedef typename std::iterator_traits<FwdIter>::value_type
+            typedef typename std::iterator_traits<InIter>::value_type
                 value_type;
 
-            FwdIter current = first;
+            InIter current = first;
             try {
                 for (/* */; count > 0; ++current, (void) --count) {
                     ::new (static_cast<void*>(std::addressof(*current)))
@@ -250,10 +261,9 @@ namespace hpx { namespace parallel { inline namespace v1
               : uninitialized_fill_n::algorithm("uninitialized_fill_n")
             {}
 
-            template <typename ExPolicy, typename FwdIter, typename T>
+            template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy, FwdIter first, std::size_t count,
-                T const& value)
+            sequential(ExPolicy, InIter first, std::size_t count, T const& value)
             {
                 std_uninitialized_fill_n(first, count, value);
                 return hpx::util::unused;
@@ -332,7 +342,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return util::detail::algorithm_result<ExPolicy>::get();
         }
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::uninitialized_fill_n().call(
             std::forward<ExPolicy>(policy), is_seq(),

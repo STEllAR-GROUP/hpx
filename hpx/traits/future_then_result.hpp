@@ -98,11 +98,11 @@ namespace hpx { namespace traits
         struct future_then_result<
             Future, F, hpx::util::detail::pack<Ts...>
           , typename hpx::util::always_void<
-                typename hpx::util::result_of<F(Future, Ts...)>::type
+                typename hpx::util::invoke_result<F, Future, Ts...>::type
             >::type
         >
         {
-            typedef typename hpx::util::result_of<F(Future, Ts...)>::type
+            typedef typename hpx::util::invoke_result<F, Future, Ts...>::type
                 cont_result;
 
             // perform unwrapping of future<future<R>>
@@ -128,10 +128,10 @@ namespace hpx { namespace traits
         struct future_then_executor_result<
                 Executor, Future, F, hpx::util::detail::pack<Ts...>
               , typename hpx::util::always_void<
-                    typename hpx::util::result_of<F(Future, Ts...)>::type
+                    typename hpx::util::invoke_result<F, Future, Ts...>::type
                 >::type>
         {
-            typedef typename hpx::util::result_of<F(Future, Ts...)>::type
+            typedef typename hpx::util::invoke_result<F, Future, Ts...>::type
                 func_result_type;
 
             typedef typename traits::executor_future<

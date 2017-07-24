@@ -21,6 +21,7 @@
 #include <boost/algorithm/string/split.hpp>
 
 #include <cstdint>
+#include <exception>
 #include <string>
 #include <utility>
 #include <vector>

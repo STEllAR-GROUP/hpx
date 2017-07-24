@@ -57,26 +57,24 @@ namespace hpx { namespace parallel { namespace execution
 
         // OneWayExecutor interface
         template <typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F && f, Ts &&... ts)
         {
             try {
                 return hpx::util::invoke(f, std::forward<Ts>(ts)...);
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
         }
 
         // TwoWayExecutor interface
         template <typename F, typename ... Ts>
         static hpx::future<
-            typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         >
         async_execute(F && f, Ts &&... ts)
         {
@@ -86,7 +84,7 @@ namespace hpx { namespace parallel { namespace execution
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename ... Ts>
-        static void apply_execute(F && f, Ts &&... ts)
+        static void post(F && f, Ts &&... ts)
         {
             sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
         }
@@ -96,7 +94,7 @@ namespace hpx { namespace parallel { namespace execution
         static std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type
         > >
-        async_bulk_execute(F && f, S const& shape, Ts &&... ts)
+        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
         {
             typedef typename
                     detail::bulk_function_result<F, S, Ts...>::type
@@ -111,12 +109,10 @@ namespace hpx { namespace parallel { namespace execution
                 }
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
 
             return std::move(results);
@@ -124,10 +120,10 @@ namespace hpx { namespace parallel { namespace execution
 
         template <typename F, typename S, typename ... Ts>
         static typename detail::bulk_execute_result<F, S, Ts...>::type
-        sync_bulk_execute(F && f, S const& shape, Ts &&... ts)
+        bulk_sync_execute(F && f, S const& shape, Ts &&... ts)
         {
             return hpx::util::unwrapped(
-                async_bulk_execute(std::forward<F>(f), shape,
+                bulk_async_execute(std::forward<F>(f), shape,
                     std::forward<Ts>(ts)...));
         }
 
@@ -189,7 +185,7 @@ namespace hpx { namespace parallel { inline namespace v3
         using base_type = parallel::execution::sequenced_executor;
 
         template <typename F, typename ... Ts>
-        static typename hpx::util::detail::deferred_result_of<F(Ts...)>::type
+        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         execute(F && f, Ts &&... ts)
         {
             return base_type::sync_execute(std::forward<F>(f),
@@ -202,7 +198,7 @@ namespace hpx { namespace parallel { inline namespace v3
         > >
         bulk_async_execute(F && f, S const& shape, Ts &&... ts)
         {
-            return base_type::async_bulk_execute(std::forward<F>(f), shape,
+            return base_type::bulk_async_execute(std::forward<F>(f), shape,
                 std::forward<Ts>(ts)...);
         }
 
@@ -210,7 +206,7 @@ namespace hpx { namespace parallel { inline namespace v3
         static typename v3::detail::bulk_execute_result<F, S, Ts...>::type
         bulk_execute(F && f, S const& shape, Ts &&... ts)
         {
-            return base_type::sync_bulk_execute(std::forward<F>(f), shape,
+            return base_type::bulk_sync_execute(std::forward<F>(f), shape,
                 std::forward<Ts>(ts)...);
         }
     };

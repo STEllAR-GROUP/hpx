@@ -40,7 +40,8 @@ namespace hpx { namespace actions
     template <typename Action>
     struct transfer_base_action : base_action
     {
-        HPX_MOVABLE_ONLY(transfer_base_action);
+    public:
+        HPX_NON_COPYABLE(transfer_base_action);
 
     public:
         typedef typename Action::component_type component_type;
