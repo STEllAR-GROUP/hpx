@@ -77,9 +77,6 @@ HPX_PLAIN_ACTION(bulk_test, bulk_test_action);
 
 int main()
 {
-    using vector_type
-        = hpx::partitioned_vector<double>;
-
     const std::size_t height = 32;
     const std::size_t width  = 4;
     const std::size_t elt_size = 4;

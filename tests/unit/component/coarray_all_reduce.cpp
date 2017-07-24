@@ -50,9 +50,6 @@ HPX_PLAIN_ACTION(bulk_test, bulk_test_action);
 
 int main()
 {
-    using vector_type
-        = hpx::partitioned_vector<double>;
-
     std::string values("values");
 
     hpx::future<void> join =
