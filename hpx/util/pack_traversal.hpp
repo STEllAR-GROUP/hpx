@@ -50,7 +50,7 @@ namespace util {
     <unspecified> map_pack(Mapper&& mapper, T&&... pack);
 }
 }
-#else // DOXYGEN
+#else    // DOXYGEN
 
 namespace hpx {
 namespace util {
@@ -69,8 +69,8 @@ namespace util {
     /// if possible. This can be used to create a mapper function used
     /// in map_pack that maps one element to an arbitrary count (1:n).
     template <typename... T>
-    detail::spreading::spread_box<typename std::decay<T>::type...> spread_this(
-        T&&... args)
+    HPX_CONSTEXPR detail::spreading::spread_box<typename std::decay<T>::type...>
+    spread_this(T&&... args)
     {
         return detail::spreading::spread_box<typename std::decay<T>::type...>(
             util::make_tuple(std::forward<T>(args)...));
@@ -92,5 +92,5 @@ namespace util {
 }    // end namespace util
 }    // end namespace hpx
 
-#endif  // DOXYGEN
-#endif  // HPX_UTIL_PACK_TRAVERSAL_HPP
+#endif    // DOXYGEN
+#endif    // HPX_UTIL_PACK_TRAVERSAL_HPP
