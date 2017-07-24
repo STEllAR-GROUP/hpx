@@ -514,7 +514,6 @@ namespace hpx { namespace parallel { inline namespace v1
                             [send,end,last1](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
-                                find_return<FwdIter1> ret;
                                 FwdIter1 it_first, it_last;
                                 if(out.seq_first != end)
                                     it_first =  traits::compose(send, out.seq_first);
@@ -524,9 +523,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     it_last =  traits::compose(send, out.seq_last);
                                 else
                                     it_last = last1;
-                                ret = {it_first, out.partial_position,
+                                return find_return<FwdIter1>{it_first, out.partial_position,
                                     it_last, out.last_position};
-                                return ret;
                             }));
                 }
             }
@@ -543,7 +541,6 @@ namespace hpx { namespace parallel { inline namespace v1
                             [sit,end,last1](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
-                                find_return<FwdIter1> ret;
                                 FwdIter1 it_first, it_last;
                                 if(out.seq_first != end)
                                     it_first =  traits::compose(sit, out.seq_first);
@@ -553,9 +550,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     it_last =  traits::compose(sit, out.seq_last);
                                 else
                                     it_last = last1;
-                                ret = {it_first, out.partial_position,
+                                return find_return<FwdIter1>{it_first, out.partial_position,
                                     it_last, out.last_position};
-                                return ret;
                             }));
                 }
                 // handle all of the full partitions
@@ -572,7 +568,6 @@ namespace hpx { namespace parallel { inline namespace v1
                                 [sit,end,last1](find_return<local_iterator_type> const& out)
                                     -> find_return<FwdIter1>
                                 {
-                                    find_return<FwdIter1> ret;
                                     FwdIter1 it_first, it_last;
                                     if(out.seq_first != end)
                                         it_first =  traits::compose(sit, out.seq_first);
@@ -582,9 +577,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                         it_last =  traits::compose(sit, out.seq_last);
                                     else
                                         it_last = last1;
-                                    ret = {it_first, out.partial_position,
+                                    return find_return<FwdIter1>{it_first, out.partial_position,
                                         it_last, out.last_position};
-                                    return ret;
                                 }));
                     }
                 }
@@ -600,7 +594,6 @@ namespace hpx { namespace parallel { inline namespace v1
                             [sit,end,last1](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
-                                find_return<FwdIter1> ret;
                                 FwdIter1 it_first, it_last;
                                 if(out.seq_first != end)
                                     it_first =  traits::compose(sit, out.seq_first);
@@ -610,9 +603,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     it_last =  traits::compose(sit, out.seq_last);
                                 else
                                     it_last = last1;
-                                ret = {it_first, out.partial_position,
+                                return find_return<FwdIter1>{it_first, out.partial_position,
                                     it_last, out.last_position};
-                                return ret;
                             }));
                 }
             }
@@ -629,12 +621,20 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         std::vector<find_return<FwdIter1>> res =
                             hpx::util::unwrapped(std::move(r));
-                        auto it = res.end() - 1;
-                        while(it!=res.begin())
+                        auto it = res.rbegin();
+                        while(it!=res.rend())
                         {
-                            if((*it).seq_first != last1)
-                                return (*it).seq_first;
-                            it--;
+                            if(it->seq_first != last1 &&
+                                it->partial_position == sequence.size())
+                            {
+                                return it->seq_first;
+                            }
+                            if (std::next(it)->last_position != sequence.size() &&
+                                std::next(it)->last_position == it->partial_position)
+                            {
+                                return std::next(it)->seq_last;
+                            }
+                            it++;
                         }
                         return res.back().seq_first;
                     },
@@ -706,7 +706,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     find_return<local_iterator_type> out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, sequence, op, beg
+                        algo, policy, std::true_type(), beg, end, sequence, op
                     );
                     output=traits::compose(send, out.seq_last);
                 }
@@ -717,19 +717,27 @@ namespace hpx { namespace parallel { inline namespace v1
                 local_iterator_type beg = traits::local(first1);
                 local_iterator_type end = traits::end(sit);
                 find_return<local_iterator_type> out;
-                out.seq_last = traits::local(last1);
-
+                FwdIter1 partial_out;
+                bool partial_found = false;
+                out.seq_first = traits::local(last1);
                 bool found = false;
 
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, sequence, op, beg
+                        algo, policy, std::true_type(), beg, end, sequence, op
                     );
-                    if(out.seq_last != end)
+                    if(out.seq_last != end && out.last_position == sequence.size())
                     {
+                        out.last_position = 0;
                         found = true;
                         output=traits::compose(sit, out.seq_last);
+                    }
+                    if (out.last_position != out.partial_position)
+                    {
+                        partial_out = traits::compose(sit, out.seq_first);
+                        partial_found = true;
+                        out.last_position = out.partial_position;
                     }
                 }
 
@@ -743,13 +751,29 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, sequence,
-                            op, out.seq_last, out.last_position
+                            op, out.last_position
                         );
-                        if(out.seq_last != end)
+                        if(out.seq_last != end && out.last_position == sequence.size())
                         {
+                            out.last_position = 0;
                             output=traits::compose(sit,out.seq_last);
                             found = true;
                             break;
+                        }
+                        else if(partial_found && out.last_position == sequence.size())
+                        {
+                            output = partial_out;
+                            found = true;
+                        }
+                        else
+                        {
+                            partial_found = false;
+                        }
+                        if (out.last_position != out.partial_position)
+                        {
+                            partial_out = traits::compose(sit, out.seq_first);
+                            partial_found = true;
+                            out.last_position = out.partial_position;
                         }
                     }
                 }
@@ -761,12 +785,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, sequence,
-                        op, out.seq_last, out.last_position
+                        op, out.last_position
                     );
-                    if(out.seq_last != end)
+                    if(out.seq_last != end && out.last_position == sequence.size())
                     {
+                        out.last_position = 0;
                         output=traits::compose(sit,out.seq_last);
                         found = true;
+                    }
+                    else if(partial_found && out.last_position == sequence.size())
+                    {
+                        found = true;
+                        output = partial_out;
                     }
                 }
             }
@@ -814,7 +844,6 @@ namespace hpx { namespace parallel { inline namespace v1
                             [send,end,last1](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
-                                find_return<FwdIter1> ret;
                                 FwdIter1 it_first, it_last;
                                 if(out.seq_first != end)
                                     it_first =  traits::compose(send, out.seq_first);
@@ -824,9 +853,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     it_last =  traits::compose(send, out.seq_last);
                                 else
                                     it_last = last1;
-                                ret = {it_first, out.partial_position,
+                                return find_return<FwdIter1>{it_first, out.partial_position,
                                     it_last, out.last_position};
-                                return ret;
                             }));
                 }
             }
@@ -843,7 +871,6 @@ namespace hpx { namespace parallel { inline namespace v1
                             [sit,end,last1](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
-                                find_return<FwdIter1> ret;
                                 FwdIter1 it_first, it_last;
                                 if(out.seq_first != end)
                                     it_first =  traits::compose(sit, out.seq_first);
@@ -853,9 +880,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     it_last =  traits::compose(sit, out.seq_last);
                                 else
                                     it_last = last1;
-                                ret = {it_first, out.partial_position,
+                                return find_return<FwdIter1>{it_first, out.partial_position,
                                     it_last, out.last_position};
-                                return ret;
                             }));
                 }
                 // handle all of the full partitions
@@ -872,7 +898,6 @@ namespace hpx { namespace parallel { inline namespace v1
                                 [sit,end,last1](find_return<local_iterator_type> const& out)
                                     -> find_return<FwdIter1>
                                 {
-                                    find_return<FwdIter1> ret;
                                     FwdIter1 it_first, it_last;
                                     if(out.seq_first != end)
                                         it_first =  traits::compose(sit, out.seq_first);
@@ -882,9 +907,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                         it_last =  traits::compose(sit, out.seq_last);
                                     else
                                         it_last = last1;
-                                    ret = {it_first, out.partial_position,
+                                    return find_return<FwdIter1>{it_first, out.partial_position,
                                         it_last, out.last_position};
-                                    return ret;
                                 }));
                     }
                 }
@@ -900,7 +924,6 @@ namespace hpx { namespace parallel { inline namespace v1
                             [sit,end,last1](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
-                                find_return<FwdIter1> ret;
                                 FwdIter1 it_first, it_last;
                                 if(out.seq_first != end)
                                     it_first =  traits::compose(sit, out.seq_first);
@@ -910,9 +933,8 @@ namespace hpx { namespace parallel { inline namespace v1
                                     it_last =  traits::compose(sit, out.seq_last);
                                 else
                                     it_last = last1;
-                                ret = {it_first, out.partial_position,
+                                return find_return<FwdIter1>{it_first, out.partial_position,
                                     it_last, out.last_position};
-                                return ret;
                             }));
                 }
             }
@@ -932,9 +954,17 @@ namespace hpx { namespace parallel { inline namespace v1
                         auto it = res.begin();
                         while(it!=res.end())
                         {
-                            if((*it).seq_last != last1)
-                                return (*it).seq_last;
-                            it--;
+                            if(it->seq_last != last1 &&
+                                it->last_position == sequence.size())
+                            {
+                                return it->seq_last;
+                            }
+                            if (std::next(it)->partial_position != sequence.size() &&
+                                std::next(it)->partial_position == it->last_position)
+                            {
+                                return it->seq_first;
+                            }
+                            it++;
                         }
                         return res.back().seq_last;
                     },
