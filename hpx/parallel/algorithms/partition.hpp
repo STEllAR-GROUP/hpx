@@ -301,11 +301,10 @@ namespace hpx { namespace parallel { inline namespace v1
     {
         /// \cond NOINTERNAL
 
-        // sequential partition with projection function for bidirectional iterator
+        // sequential partition with projection function for bidirectional iterator.
         template <typename BidirIter, typename Pred, typename Proj,
-            typename std::enable_if<
-            hpx::traits::is_bidirectional_iterator<BidirIter>::value, int
-        >::type = 0>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_bidirectional_iterator<BidirIter>::value)>
         BidirIter
         sequential_partition(BidirIter first, BidirIter last,
             Pred && pred, Proj && proj)
@@ -330,12 +329,11 @@ namespace hpx { namespace parallel { inline namespace v1
             return first;
         }
 
-        // sequential partition with projection function for forward iterator
+        // sequential partition with projection function for forward iterator.
         template <typename FwdIter, typename Pred, typename Proj,
-            typename std::enable_if<
+        HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_forward_iterator<FwdIter>::value &&
-            !hpx::traits::is_bidirectional_iterator<FwdIter>::value, int
-        >::type = 0>
+            !hpx::traits::is_bidirectional_iterator<FwdIter>::value)>
         FwdIter
         sequential_partition(FwdIter first, FwdIter last,
             Pred && pred, Proj && proj)
@@ -357,7 +355,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return first;
         }
 
-        namespace
+        struct partition_helper
         {
             template <typename FwdIter>
             struct block
@@ -380,7 +378,7 @@ namespace hpx { namespace parallel { inline namespace v1
             };
 
             template <typename Iter, typename Enable = void>
-            class block_manager {};
+            class block_manager;
 
             // block manager for random access iterator.
             template <typename RandIter>
@@ -392,7 +390,7 @@ namespace hpx { namespace parallel { inline namespace v1
             public:
                 block_manager(RandIter first, RandIter last, std::size_t block_size)
                     : first_(first), left_(0), right_(std::distance(first, last)),
-                      block_size_(block_size)
+                        block_size_(block_size)
                 {}
                 block_manager(const block_manager&) = delete;
                 block_manager& operator=(const block_manager&) = delete;
@@ -521,84 +519,111 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::int64_t left_block_no_{ -1 }, right_block_no_{ 1 };
                 hpx::lcos::local::spinlock mutex_;
             };
-        }
 
-        // The function which performs sub-partitioning.
-        template <typename FwdIter, typename Pred, typename Proj>
-        block<FwdIter>
-        partition_thread(block_manager<FwdIter>& block_manager,
-            Pred pred, Proj proj)
-        {
-            using hpx::util::invoke;
-
-            block<FwdIter> left_block, right_block;
-            
-            left_block = block_manager.get_left_block();
-            right_block = block_manager.get_right_block();
-
-            while (true)
+            // std::swap_ranges doens't support overlapped ranges in standard.
+            // But, actually general implementations of std::swap_ranges are useful
+            //     in specific cases.
+            // The problem is that tstandard doesn't guarantee that implementation.
+            // The swap_ranges_forward is the general implementation of
+            //     std::swap_ranges for guaranteeing utilizations in specific cases.
+            template <class FwdIter1, class FwdIter2>
+            static FwdIter2
+            swap_ranges_forward(FwdIter1 first, FwdIter1 last, FwdIter2 dest)
             {
-                while ( (!left_block.empty() ||
-                        !(left_block = block_manager.get_left_block()).empty()) &&
-                    invoke(pred, invoke(proj, *left_block.first)))
-                {
-                    ++left_block.first;
-                }
+                while (first != last)
+                    std::iter_swap(first++, dest++);
 
-                while ( (!right_block.empty() ||
-                        !(right_block = block_manager.get_right_block()).empty()) &&
-                    !invoke(pred, invoke(proj, *right_block.first)))
-                {
-                    ++right_block.first;
-                }
-
-                if (left_block.empty())
-                    return right_block;
-                if (right_block.empty())
-                    return left_block;
-
-                std::iter_swap(left_block.first++, right_block.first++);
+                return dest;
             }
-        }
 
-        // std::swap_ranges doens't support overlapped ranges in standard.
-        // But, actually general implementations of std::swap_ranges are useful
-        //     in specific cases.
-        // The problem is that tstandard doesn't guarantee that implementation.
-        // The swap_ranges_forward is the general implementation of std::swap_ranges
-        //     for guaranteeing utilizations in specific cases.
-        template <class FwdIter1, class FwdIter2>
-        FwdIter2
-        swap_ranges_forward(FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-        {
-            while (first != last)
-                std::iter_swap(first++, dest++);
-
-            return dest;
-        }
-
-        // Collpase remaining blocks.
-        template <typename FwdIter, typename Pred, typename Proj>
-        void
-        collapse_remaining_blocks(std::vector<block<FwdIter>>& remaining_blocks,
-            Pred& pred, Proj& proj)
-        {
-            if (remaining_blocks.empty())
-                return;
-
-            auto left_iter = std::begin(remaining_blocks);
-            auto right_iter = std::end(remaining_blocks) - 1;
-
-            if (left_iter->block_no > 0 || right_iter->block_no < 0)
-                return;
-
-            while (true)
+            // The function which performs sub-partitioning.
+            template <typename FwdIter, typename Pred, typename Proj>
+            static block<FwdIter>
+            partition_thread(block_manager<FwdIter>& block_manager,
+                Pred pred, Proj proj)
             {
                 using hpx::util::invoke;
 
-                while (invoke(pred, invoke(proj, *left_iter->first)))
+                block<FwdIter> left_block, right_block;
+            
+                left_block = block_manager.get_left_block();
+                right_block = block_manager.get_right_block();
+
+                while (true)
                 {
-                    ++left_iter->first;
+                    while ( (!left_block.empty() ||
+                            !(left_block = block_manager.get_left_block()).empty()) &&
+                        invoke(pred, invoke(proj, *left_block.first)))
+                    {
+                        ++left_block.first;
+                    }
+
+                    while ( (!right_block.empty() ||
+                            !(right_block = block_manager.get_right_block()).empty()) &&
+                        !invoke(pred, invoke(proj, *right_block.first)))
+                    {
+                        ++right_block.first;
+                    }
+
+                    if (left_block.empty())
+                        return right_block;
+                    if (right_block.empty())
+                        return left_block;
+
+                    std::iter_swap(left_block.first++, right_block.first++);
+                }
+            }
+
+            // Collapse remaining blocks.
+            template <typename FwdIter, typename Pred, typename Proj>
+            static void
+            collapse_remaining_blocks(std::vector<block<FwdIter>>& remaining_blocks,
+                Pred& pred, Proj& proj)
+            {
+                if (remaining_blocks.empty())
+                    return;
+
+                auto left_iter = std::begin(remaining_blocks);
+                auto right_iter = std::end(remaining_blocks) - 1;
+
+                if (left_iter->block_no > 0 || right_iter->block_no < 0)
+                    return;
+
+                while (true)
+                {
+                    using hpx::util::invoke;
+
+                    while (invoke(pred, invoke(proj, *left_iter->first)))
+                    {
+                        ++left_iter->first;
+                        if (left_iter->empty())
+                        {
+                            ++left_iter;
+                            if (left_iter == std::end(remaining_blocks) ||
+                                left_iter->block_no > 0)
+                                break;
+                        }
+                    }
+
+                    while (!invoke(pred, invoke(proj, *right_iter->first)))
+                    {
+                        ++right_iter->first;
+                        if (right_iter->empty())
+                        {
+                            if (right_iter == std::begin(remaining_blocks) ||
+                                (--right_iter)->block_no < 0)
+                                break;
+                        }
+                    }
+
+                    if (left_iter == std::end(remaining_blocks) ||
+                        left_iter->block_no > 0)
+                        break;
+                    if (right_iter->empty() ||
+                        right_iter->block_no < 0)
+                        break;
+
+                    std::iter_swap(left_iter->first++, right_iter->first++);
                     if (left_iter->empty())
                     {
                         ++left_iter;
@@ -606,11 +631,6 @@ namespace hpx { namespace parallel { inline namespace v1
                             left_iter->block_no > 0)
                             break;
                     }
-                }
-
-                while (!invoke(pred, invoke(proj, *right_iter->first)))
-                {
-                    ++right_iter->first;
                     if (right_iter->empty())
                     {
                         if (right_iter == std::begin(remaining_blocks) ||
@@ -619,215 +639,175 @@ namespace hpx { namespace parallel { inline namespace v1
                     }
                 }
 
-                if (left_iter == std::end(remaining_blocks) ||
-                    left_iter->block_no > 0)
-                    break;
-                if (right_iter->empty() ||
-                    right_iter->block_no < 0)
-                    break;
-
-                std::iter_swap(left_iter->first++, right_iter->first++);
-                if (left_iter->empty())
+                if (left_iter < right_iter ||
+                    (!right_iter->empty() && left_iter == right_iter))
                 {
-                    ++left_iter;
-                    if (left_iter == std::end(remaining_blocks) ||
-                        left_iter->block_no > 0)
-                        break;
-                }
-                if (right_iter->empty())
-                {
-                    if (right_iter == std::begin(remaining_blocks) ||
-                        (--right_iter)->block_no < 0)
-                        break;
-                }
-            }
+                    remaining_blocks.erase(
+                        right_iter->empty() ? right_iter : right_iter + 1,
+                        std::end(remaining_blocks));
 
-            if (left_iter < right_iter ||
-                (!right_iter->empty() && left_iter == right_iter))
-            {
-                remaining_blocks.erase(
-                    right_iter->empty() ? right_iter : right_iter + 1,
-                    std::end(remaining_blocks));
-
-                remaining_blocks.erase(
-                    std::begin(remaining_blocks), left_iter);
-            }
-            else
-            {
-                remaining_blocks.clear();
-            }
-        }
-
-        // The function which merges remaining blocks
-        //     that are placed leftside of boundary.
-        // Requires bidirectional iterator.
-        template <typename BidirIter,
-            typename std::enable_if<
-            hpx::traits::is_bidirectional_iterator<BidirIter>::value, int
-        >::type = 0>
-        block<BidirIter>
-        merge_leftside_remaining_blocks(
-            std::vector<block<BidirIter>>& remaining_blocks,
-            BidirIter boundary, BidirIter first)
-        {
-            HPX_ASSERT(!remaining_blocks.empty());
-            HPX_UNUSED(first);
-
-            auto boundary_rbegin = std::reverse_iterator<BidirIter>(boundary);
-            for (auto it = std::rbegin(remaining_blocks);
-                it != std::rend(remaining_blocks);
-                ++it)
-            {
-                auto rbegin = std::reverse_iterator<BidirIter>(it->last);
-                auto rend = std::reverse_iterator<BidirIter>(it->first);
-
-                if (boundary_rbegin == rbegin)
-                {
-                    boundary_rbegin = rend;
-                    continue;
-                }
-
-                boundary_rbegin =
-                    swap_ranges_forward(rbegin, rend, boundary_rbegin);
-            }
-
-            return { boundary_rbegin.base(), boundary };
-        }
-
-        // The function which merges remaining blocks
-        //     that are placed leftside of boundary.
-        // Requires forward iterator.
-        template <typename FwdIter,
-            typename std::enable_if<
-            hpx::traits::is_forward_iterator<FwdIter>::value &&
-            !hpx::traits::is_bidirectional_iterator<FwdIter>::value, int
-        >::type = 0>
-        block<FwdIter>
-        merge_leftside_remaining_blocks(
-            std::vector<block<FwdIter>>& remaining_blocks,
-            FwdIter boundary, FwdIter first)
-        {
-            HPX_ASSERT(!remaining_blocks.empty());
-
-            std::vector<FwdIter> dest_iters(remaining_blocks.size());
-            std::vector<std::size_t> dest_iter_indexes(remaining_blocks.size());
-            std::vector<std::size_t> remaining_block_indexes(remaining_blocks.size());
-            std::vector<std::size_t> counts(remaining_blocks.size());
-            std::size_t count_sum = 0u;
-
-            for (std::size_t i = 0; i < counts.size(); ++i)
-            {
-                counts[i] = std::distance(
-                    remaining_blocks[i].first,
-                    remaining_blocks[i].last);
-                count_sum += counts[i];
-            }
-
-            remaining_block_indexes[0] = std::distance(first, remaining_blocks[0].first);
-            for (std::size_t i = 1; i < remaining_block_indexes.size(); ++i)
-            {
-                remaining_block_indexes[i] =
-                    remaining_block_indexes[i - 1] +
-                    counts[i - 1] +
-                    std::distance(remaining_blocks[i - 1].last,
-                        remaining_blocks[i].first);
-            }
-
-            std::size_t boundary_end_index = std::distance(first, boundary);
-            std::size_t boundary_begin_index = boundary_end_index - count_sum;
-
-            dest_iters[0] = std::next(first, boundary_begin_index);
-            dest_iter_indexes[0] = boundary_begin_index;
-
-            for (std::size_t i = 0; i < dest_iters.size() - 1; ++i)
-            {
-                dest_iters[i + 1] = std::next(dest_iters[i], counts[i]);
-                dest_iter_indexes[i + 1] = dest_iter_indexes[i] + counts[i];
-            }
-
-            for (std::int64_t i = static_cast<std::int64_t>(dest_iters.size() - 1);
-                i >= 0; --i)
-            {
-                if (remaining_blocks[i].first == dest_iters[i])
-                    continue;
-
-                if (remaining_block_indexes[i] + counts[i]
-                    <= dest_iter_indexes[i])
-                {
-                    // when not overlapped.
-                    swap_ranges_forward(remaining_blocks[i].first,
-                        remaining_blocks[i].last, dest_iters[i]);
+                    remaining_blocks.erase(
+                        std::begin(remaining_blocks), left_iter);
                 }
                 else
                 {
-                    // when overlapped.
-                    swap_ranges_forward(remaining_blocks[i].first,
-                        dest_iters[i], remaining_blocks[i].last);
+                    remaining_blocks.clear();
                 }
             }
 
-            return { dest_iters[0], boundary };
-        }
-
-        // The function which merges remaining blocks into
-        //     one block which is adjacent to boundary. 
-        template <typename FwdIter>
-        block<FwdIter>
-        merge_remaining_blocks(std::vector<block<FwdIter>>& remaining_blocks,
-            FwdIter boundary, FwdIter first)
-        {
-            if (remaining_blocks.empty())
-                return { boundary, boundary };
-
-            if (remaining_blocks.front().block_no < 0)
+            // The function which merges remaining blocks that are placed 
+            //     leftside of boundary.
+            // Requires bidirectional iterator.
+            template <typename BidirIter,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_bidirectional_iterator<BidirIter>::value)>
+            static block<BidirIter>
+            merge_leftside_remaining_blocks(
+                std::vector<block<BidirIter>>& remaining_blocks,
+                BidirIter boundary, BidirIter first)
             {
-                // when blocks are placed in leftside of boundary.
-                return merge_leftside_remaining_blocks(
-                    remaining_blocks, boundary, first);
-            }
-            else
-            {
-                // when blocks are placed in rightside of boundary.
-                FwdIter boundary_end = boundary;
-                for (auto& block : remaining_blocks)
+                HPX_ASSERT(!remaining_blocks.empty());
+                HPX_UNUSED(first);
+
+                auto boundary_rbegin = std::reverse_iterator<BidirIter>(boundary);
+                for (auto it = std::rbegin(remaining_blocks);
+                    it != std::rend(remaining_blocks);
+                    ++it)
                 {
-                    if (block.first == boundary_end)
+                    auto rbegin = std::reverse_iterator<BidirIter>(it->last);
+                    auto rend = std::reverse_iterator<BidirIter>(it->first);
+
+                    if (boundary_rbegin == rbegin)
                     {
-                        boundary_end = block.last;
+                        boundary_rbegin = rend;
                         continue;
                     }
 
-                    boundary_end =
-                        swap_ranges_forward(block.first, block.last, boundary_end);
+                    boundary_rbegin =
+                        swap_ranges_forward(rbegin, rend, boundary_rbegin);
                 }
-                return { boundary, boundary_end };
+
+                return { boundary_rbegin.base(), boundary };
             }
-        }
 
-        template <typename FwdIter>
-        struct partition
-          : public detail::algorithm<partition<FwdIter>, FwdIter>
-        {
-            partition()
-              : partition::algorithm("partition")
-            {}
-
-            template <typename ExPolicy,
-                typename Pred, typename Proj = util::projection_identity>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                Pred && pred, Proj && proj)
+            // The function which merges remaining blocks that are placed
+            //     leftside of boundary.
+            // Requires forward iterator.
+            template <typename FwdIter,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_forward_iterator<FwdIter>::value &&
+                !hpx::traits::is_bidirectional_iterator<FwdIter>::value)>
+            static block<FwdIter>
+            merge_leftside_remaining_blocks(
+                std::vector<block<FwdIter>>& remaining_blocks,
+                FwdIter boundary, FwdIter first)
             {
-                return sequential_partition(first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_ASSERT(!remaining_blocks.empty());
+
+                std::vector<FwdIter> dest_iters(remaining_blocks.size());
+                std::vector<std::size_t> dest_iter_indexes(remaining_blocks.size());
+                std::vector<std::size_t> remaining_block_indexes(
+                    remaining_blocks.size());
+                std::vector<std::size_t> counts(remaining_blocks.size());
+                std::size_t count_sum = 0u;
+
+                for (std::size_t i = 0; i < counts.size(); ++i)
+                {
+                    counts[i] = std::distance(
+                        remaining_blocks[i].first,
+                        remaining_blocks[i].last);
+                    count_sum += counts[i];
+                }
+
+                remaining_block_indexes[0] = std::distance(first,
+                    remaining_blocks[0].first);
+                for (std::size_t i = 1; i < remaining_block_indexes.size(); ++i)
+                {
+                    remaining_block_indexes[i] =
+                        remaining_block_indexes[i - 1] +
+                        counts[i - 1] +
+                        std::distance(remaining_blocks[i - 1].last,
+                            remaining_blocks[i].first);
+                }
+
+                std::size_t boundary_end_index = std::distance(first, boundary);
+                std::size_t boundary_begin_index = boundary_end_index - count_sum;
+
+                dest_iters[0] = std::next(first, boundary_begin_index);
+                dest_iter_indexes[0] = boundary_begin_index;
+
+                for (std::size_t i = 0; i < dest_iters.size() - 1; ++i)
+                {
+                    dest_iters[i + 1] = std::next(dest_iters[i], counts[i]);
+                    dest_iter_indexes[i + 1] = dest_iter_indexes[i] + counts[i];
+                }
+
+                for (std::int64_t i = std::int64_t(dest_iters.size() - 1);
+                    i >= 0; --i)
+                {
+                    if (remaining_blocks[i].first == dest_iters[i])
+                        continue;
+
+                    if (remaining_block_indexes[i] + counts[i]
+                        <= dest_iter_indexes[i])
+                    {
+                        // when not overlapped.
+                        swap_ranges_forward(remaining_blocks[i].first,
+                            remaining_blocks[i].last, dest_iters[i]);
+                    }
+                    else
+                    {
+                        // when overlapped.
+                        swap_ranges_forward(remaining_blocks[i].first,
+                            dest_iters[i], remaining_blocks[i].last);
+                    }
+                }
+
+                return { dest_iters[0], boundary };
             }
 
-            template <typename ExPolicy,
-                typename Pred, typename Proj = util::projection_identity>
+            // The function which merges remaining blocks into
+            //     one block which is adjacent to boundary. 
+            template <typename FwdIter>
+            static block<FwdIter>
+            merge_remaining_blocks(std::vector<block<FwdIter>>& remaining_blocks,
+                FwdIter boundary, FwdIter first)
+            {
+                if (remaining_blocks.empty())
+                    return { boundary, boundary };
+
+                if (remaining_blocks.front().block_no < 0)
+                {
+                    // when blocks are placed in leftside of boundary.
+                    return merge_leftside_remaining_blocks(
+                        remaining_blocks, boundary, first);
+                }
+                else
+                {
+                    // when blocks are placed in rightside of boundary.
+                    FwdIter boundary_end = boundary;
+                    for (auto& block : remaining_blocks)
+                    {
+                        if (block.first == boundary_end)
+                        {
+                            boundary_end = block.last;
+                            continue;
+                        }
+
+                        boundary_end =
+                            swap_ranges_forward(block.first, block.last, boundary_end);
+                    }
+
+                    return { boundary, boundary_end };
+                }
+            }
+            
+            template <typename ExPolicy, typename FwdIter,
+                typename Pred, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
+            call(ExPolicy && policy, FwdIter first, FwdIter last,
                 Pred && pred, Proj && proj)
             {
                 typedef util::detail::algorithm_result<
@@ -883,7 +863,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     for (std::size_t i = 0; i < remaining_block_futures.size(); ++i)
                         remaining_blocks[i] = remaining_block_futures[i].get();
 
-                    // Remove blocks that are empty or adjacent to boundary.
+                    // Remove blocks that are empty.
                     FwdIter boundary = block_manager.boundary();
                     remaining_blocks.erase(std::remove_if(
                         std::begin(remaining_blocks), std::end(remaining_blocks),
@@ -893,19 +873,22 @@ namespace hpx { namespace parallel { inline namespace v1
                     }), std::end(remaining_blocks));
 
                     // Sort remaining blocks to be listed from left to right.
-                    std::sort(std::begin(remaining_blocks), std::end(remaining_blocks));
+                    std::sort(std::begin(remaining_blocks),
+                        std::end(remaining_blocks));
 
                     // Collapse remaining blocks each other.
                     collapse_remaining_blocks(remaining_blocks, pred, proj);
 
-                    // Merge remaining blocks into one block which is adjacent to boundary.
+                    // Merge remaining blocks into one block
+                    //     which is adjacent to boundary.
                     block<FwdIter> unpartitioned_block =
                         merge_remaining_blocks(remaining_blocks,
                             block_manager.boundary(), first);
 
                     // Perform sequetial partition to unpartitioned range.
                     FwdIter real_boundary = sequential_partition(
-                        unpartitioned_block.first, unpartitioned_block.last, pred, proj);
+                        unpartitioned_block.first, unpartitioned_block.last,
+                        pred, proj);
 
                     return algorithm_result::get(std::move(real_boundary));
                 }
@@ -914,6 +897,38 @@ namespace hpx { namespace parallel { inline namespace v1
                         detail::handle_exception<ExPolicy, FwdIter>::call(
                         std::current_exception()));
                 }
+            }
+        };
+
+        template <typename FwdIter>
+        struct partition
+          : public detail::algorithm<partition<FwdIter>, FwdIter>
+        {
+            partition()
+              : partition::algorithm("partition")
+            {}
+
+            template <typename ExPolicy,
+                typename Pred, typename Proj = util::projection_identity>
+            static FwdIter
+            sequential(ExPolicy, FwdIter first, FwdIter last,
+                Pred && pred, Proj && proj)
+            {
+                return sequential_partition(first, last,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+            }
+
+            template <typename ExPolicy,
+                typename Pred, typename Proj = util::projection_identity>
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
+                Pred && pred, Proj && proj)
+            {
+                return partition_helper::call(
+                    std::forward<ExPolicy>(policy), first, last,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
             }
         };
         /// \endcond
