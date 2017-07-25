@@ -37,7 +37,6 @@ void test_find_first_of(ExPolicy && policy,
     auto last = hpx::parallel::find_first_of(policy, xvalues.begin(),
         xvalues.end(), sequence.begin(), sequence.end());
     HPX_TEST_EQ(std::distance(xvalues.begin(), last),position);
-    // printf("%d\n", (int) *last);
 }
 
 template <typename ExPolicy, typename T>
@@ -47,7 +46,6 @@ void test_find_first_of_async(ExPolicy && policy,
     auto last = hpx::parallel::find_first_of(policy, xvalues.begin(),
         xvalues.end(), sequence.begin(), sequence.end()).get();
     HPX_TEST_EQ(std::distance(xvalues.begin(), last),position);
-    // printf("Async %d\n", (int) *last);
 }
 
 template <typename T>
@@ -107,11 +105,11 @@ void find_first_of_tests(std::vector<hpx::id_type> &localities)
 
     sequence = {(T)3,(T)4,(T)2,(T)3,(T)2,(T)1};
     test_find_first_of(hpx::parallel::execution::seq, xvalues, sequence, 11);
-    // test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 11);
+    test_find_first_of(hpx::parallel::execution::par, xvalues, sequence, 11);
     test_find_first_of_async(hpx::parallel::execution::seq(hpx::parallel::execution::task),
         xvalues, sequence, 11);
-    // test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
-        // xvalues, sequence, 11);
+    test_find_first_of_async(hpx::parallel::execution::par(hpx::parallel::execution::task),
+        xvalues, sequence, 11);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

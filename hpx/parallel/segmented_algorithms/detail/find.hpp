@@ -132,7 +132,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         -> find_return<FwdIter1>
                     {
                         FwdIter1 seq_start = first1, seq_last;
-                        std::size_t partial_position, last_position = sequence.size();
+                        std::size_t partial_position=0, last_position = sequence.size();
                         difference_type find_end_res = tok.get_data();
                         if (find_end_res != count && find_end_res != -1)
                         {
@@ -152,17 +152,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             };
                             partial_position = index;
                             seq_start = curr;
-                            for(; index != sequence.size(); index++)
+                            for(; index != sequence.size(); index++, curr++)
                             {
-                                if(hpx::util::invoke(op, *curr, sequence[index]))
+                                if(!hpx::util::invoke(op, *curr, sequence[index]))
                                 {
-                                    curr++;
-                                }
-                                // else if(hpx::util::invoke(op, *(--curr), sequence[index]))
-                                // {
-                                // }
-                                else
                                     break;
+                                }
                             }
                             if(index != sequence.size())
                             {
@@ -317,7 +312,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         -> find_return<FwdIter1>
                     {
                         FwdIter1 seq_last = first1, seq_start;
-                        std::size_t partial_position = sequence.size(), last_position;
+                        std::size_t partial_position = sequence.size(), last_position=0;
                         difference_type find_first_of_res = tok.get_data();
                         if(find_first_of_res != count)
                         {
@@ -346,7 +341,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     }
                                 }
                                 if(seq_last != last1)
-                                    last_position = index-1;
+                                    last_position = index;
                             }
                         }
                         FwdIter1 curr = first1;
@@ -357,17 +352,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         };
                         partial_position = index;
                         seq_start = curr;
-                        for(; index != sequence.size(); index++)
+                        for(; index != sequence.size(); index++, curr++)
                         {
-                            if(hpx::util::invoke(op, *curr, sequence[index]))
+                            if(!hpx::util::invoke(op, *curr, sequence[index]))
                             {
-                                curr++;
-                            }
-                            // else if(hpx::util::invoke(op, *(--curr), sequence[index]))
-                            // {
-                            // }
-                            else
                                 break;
+                            }
                         }
                         if(index != sequence.size())
                         {

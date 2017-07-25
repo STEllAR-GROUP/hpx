@@ -624,6 +624,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         auto it = res.rbegin();
                         while(it!=res.rend())
                         {
+                            // printf("parp %ld, next lastp %ld, curr seq_first %ld seq_last %ld\n", it->partial_position, std::next(it)->last_position, std::distance(first1, it->seq_first), std::distance(first1, it->seq_last));
                             if(it->seq_first != last1 &&
                                 it->partial_position == sequence.size())
                             {
@@ -636,7 +637,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             }
                             it++;
                         }
-                        return res.back().seq_first;
+                        return last1;
                     },
                     std::move(segments)));
         }
@@ -959,14 +960,15 @@ namespace hpx { namespace parallel { inline namespace v1
                             {
                                 return it->seq_last;
                             }
+                            // printf("lastp %ld, next parp %ld, curr seq_first %ld seq_last %ld\n", it->last_position, std::next(it)->partial_position, std::distance(first1, it->seq_first), std::distance(first1, it->seq_last));
                             if (std::next(it)->partial_position != sequence.size() &&
                                 std::next(it)->partial_position == it->last_position)
                             {
-                                return it->seq_first;
+                                return it->seq_last;
                             }
                             it++;
                         }
-                        return res.back().seq_last;
+                        return last1;
                     },
                     std::move(segments)));
         }
