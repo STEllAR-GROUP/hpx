@@ -15,14 +15,18 @@ macro(add_hpx_config_test variable)
   cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_run_msg)
-  if(${variable}_CMAKECXXFEATURE)
-    # We don't have to run our own feasture test if there is a corresponding
-    # cmake feature test and cmake reports the feature is supported on this
-    # platform.
-    list(FIND CMAKE_CXX_COMPILE_FEATURES ${${variable}_CMAKECXXFEATURE} __pos)
-    if(NOT ${__pos} EQUAL -1)
-      set(${variable} TRUE)
-      set(_run_msg "Success (cmake feature test)")
+  # Check CMake feature tests iff the user didn't override the value
+  # of this variable:
+  if(NOT DEFINED ${variable})
+    if(${variable}_CMAKECXXFEATURE)
+      # We don't have to run our own feature test if there is a corresponding
+      # cmake feature test and cmake reports the feature is supported on this
+      # platform.
+      list(FIND CMAKE_CXX_COMPILE_FEATURES ${${variable}_CMAKECXXFEATURE} __pos)
+      if(NOT ${__pos} EQUAL -1)
+        set(${variable} TRUE)
+        set(_run_msg "Success (cmake feature test)")
+      endif()
     endif()
   endif()
 
