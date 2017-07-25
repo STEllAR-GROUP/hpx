@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c)      2017 Shoshana Jakobovits
@@ -57,7 +57,7 @@ namespace hpx { namespace threads
     public:
         typedef threads::policies::callback_notifier notification_policy_type;
         typedef std::unique_ptr<detail::thread_pool> pool_type;
-        typedef threads::policies::scheduler_base* scheduler_type;
+        typedef threads::policies::scheduler_base scheduler_type;
         typedef std::vector<pool_type> pool_vector;
 
 #ifdef HPX_HAVE_TIMER_POOL
@@ -75,7 +75,7 @@ namespace hpx { namespace threads
 
         // Get functions
         detail::thread_pool& default_pool() const;
-        scheduler_type default_scheduler() const;
+        scheduler_type& default_scheduler() const;
 
         detail::thread_pool& get_pool(std::string const& pool_name) const;
         detail::thread_pool& get_pool(detail::pool_id_type pool_id) const;
@@ -172,7 +172,6 @@ namespace hpx { namespace threads
             }
 
             return result;
-//            return default_pool()->get_state();
         }
 
         /// \brief return the number of HPX-threads with the given state
@@ -221,24 +220,7 @@ namespace hpx { namespace threads
             return pool.get_os_thread_handle(num_thread);
         }
 
-#ifdef HPX_HAVE_THREAD_IDLE_RATES
-        /// Get percent maintenance time in main thread-manager loop.
-        std::int64_t avg_idle_rate(bool reset);
-        std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
-#endif
-#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        std::int64_t avg_creation_idle_rate(bool reset);
-        std::int64_t avg_cleanup_idle_rate(bool reset);
-#endif
-
     public:
-        /// this notifies the thread manager that there is some more work
-        /// available
-        void do_some_work(std::size_t num_thread = std::size_t(-1))
-        {
-            default_pool().do_some_work(num_thread);
-        }
-
         /// API functions forwarding to notification policy
 
         /// This notifies the thread manager that the passed exception has been
@@ -255,52 +237,13 @@ namespace hpx { namespace threads
             }
         }
 
-        //! FIXME understand what this actually does and fix accordingly
+        // Return the (global) sequence number of the current thread
         std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
         {
             if (get_self_ptr() == nullptr)
                 return std::size_t(-1);
-            return default_pool().get_worker_thread_num();
+            return detail::thread_num_tss_.get_worker_thread_num();
         }
-
-#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-        std::int64_t get_executed_threads(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_executed_thread_phases(
-            std::size_t num = std::size_t(-1), bool reset = false);
-
-#ifdef HPX_HAVE_THREAD_IDLE_RATES
-        std::int64_t get_thread_phase_duration(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_thread_duration(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_thread_phase_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_thread_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_cumulative_thread_duration(
-            std::size_t num = std::size_t(-1), bool reset = false);
-        std::int64_t get_cumulative_thread_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false);
-#endif
-#endif
-
-        std::int64_t get_cumulative_duration(
-            std::size_t num = std::size_t(-1), bool reset = false);
-
-    protected:
-        ///
-        template <typename C>
-        void start_periodic_maintenance(std::true_type);
-
-        template <typename C>
-        void start_periodic_maintenance(std::false_type) {}
-
-        template <typename C>
-        void periodic_maintenance_handler(std::true_type);
-
-        template <typename C>
-        void periodic_maintenance_handler(std::false_type) {}
 
     public:
         /// The function register_counter_types() is called during startup to
@@ -355,7 +298,6 @@ namespace hpx { namespace threads
         // counter creator functions
         naming::gid_type queue_length_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-        template <typename Scheduler>
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
@@ -363,22 +305,17 @@ namespace hpx { namespace threads
             performance_counters::counter_info const& info, error_code& ec);
 #endif
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        template <typename Scheduler>
         naming::gid_type thread_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-        template <typename Scheduler>
         naming::gid_type task_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 #endif
 
-        template <typename Scheduler>
         naming::gid_type scheduler_utilization_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 
-        template <typename Scheduler>
         naming::gid_type idle_loop_count_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-        template <typename Scheduler>
         naming::gid_type busy_loop_count_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 

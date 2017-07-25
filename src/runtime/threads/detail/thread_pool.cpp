@@ -1,9 +1,7 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
 
 #include <hpx/compat/thread.hpp>
 #include <hpx/compat/mutex.hpp>
@@ -15,6 +13,7 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
+#include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
@@ -38,7 +37,6 @@
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-
     thread_pool::thread_pool(
             threads::policies::callback_notifier& notifier,
             std::size_t index, char const* pool_name,
@@ -52,17 +50,13 @@ namespace hpx { namespace threads { namespace detail
         timestamp_scale_ = 1.0;
     }
 
-    thread_pool::~thread_pool(){}
-
     ///////////////////////////////////////////////////////////////////////////
-
     mask_cref_type thread_pool::get_used_processing_units() const
     {
         return used_processing_units_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-
     thread_state thread_pool::set_state(
         thread_id_type const& id, thread_state_enum new_state,
         thread_state_ex_enum new_state_ex, thread_priority priority,
@@ -84,7 +78,6 @@ namespace hpx { namespace threads { namespace detail
             std::int64_t(0)) * 100) / thread_count_.load();
     }
 
-
     ///////////////////////////////////////////////////////////////////////////
     void thread_pool::stop (
         std::unique_lock<compat::mutex>& l, bool blocking)
@@ -93,7 +86,6 @@ namespace hpx { namespace threads { namespace detail
 
         return stop_locked(l, blocking);
     }
-
 
     ///////////////////////////////////////////////////////////////////////////
     // performance counters
@@ -577,7 +569,7 @@ namespace hpx { namespace threads { namespace detail
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t thread_pool::avg_idle_rate(bool reset)
+    std::int64_t thread_pool::avg_idle_rate_all(bool reset)
     {
         std::uint64_t exec_total = std::accumulate(exec_times_.begin(),
             exec_times_.end(), std::uint64_t(0));
@@ -613,9 +605,11 @@ namespace hpx { namespace threads { namespace detail
         return std::int64_t(10000. * percent);   // 0.01 percent
     }
 
-    std::int64_t thread_pool::avg_idle_rate(
-        std::size_t num_thread, bool reset)
+    std::int64_t thread_pool::avg_idle_rate(std::size_t num_thread, bool reset)
     {
+        if (num_thread == std::size_t(-1))
+            return avg_idle_rate_all(reset);
+
         std::uint64_t exec_time = exec_times_[num_thread];
         std::uint64_t tfunc_time = tfunc_times_[num_thread];
         std::uint64_t reset_exec_time = reset_idle_rate_time_[num_thread];

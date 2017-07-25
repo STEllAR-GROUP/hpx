@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace detail
             std::size_t index, char const* pool_name,
             policies::scheduler_mode m = policies::nothing_special);
 
-        virtual ~thread_pool();
+        virtual ~thread_pool() = default;
 
         virtual void print_pool(std::ostream&) = 0;
 
@@ -124,7 +124,7 @@ namespace hpx { namespace threads { namespace detail
             return id_.name_;
         }
 
-        virtual policies::scheduler_base *get_scheduler() const = 0;
+        virtual policies::scheduler_base& get_scheduler() const = 0;
 
         mask_cref_type get_used_processing_units() const;
 
@@ -145,8 +145,7 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t get_cumulative_duration(std::size_t num, bool reset);
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
-        ///////////////////////////////////////////////////////////////////////
-        std::int64_t avg_idle_rate(bool reset);
+        std::int64_t avg_idle_rate_all(bool reset);
         std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)

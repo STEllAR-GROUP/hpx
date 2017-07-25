@@ -56,9 +56,9 @@ static void register_counter_types()
     lbt_ << "(2nd stage) pre_main: registered runtime performance "
             "counter types";
 
-//     threads::get_thread_manager().register_counter_types();
-//     lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
-//             "counter types";
+    threads::get_thread_manager().register_counter_types();
+    lbt_ << "(2nd stage) pre_main: registered thread-manager performance "
+            "counter types";
 
     applier::get_applier().get_parcel_handler().register_counter_types();
     lbt_ << "(2nd stage) pre_main: registered parcelset performance "

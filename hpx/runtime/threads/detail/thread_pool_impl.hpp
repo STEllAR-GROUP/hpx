@@ -69,9 +69,9 @@ namespace hpx { namespace threads { namespace detail
                << '\n';
         }
 
-        threads::policies::scheduler_base* get_scheduler() const
+        threads::policies::scheduler_base& get_scheduler() const
         {
-            return sched_.get();
+            return *sched_;
         }
 
         ///////////////////////////////////////////////////////////////////

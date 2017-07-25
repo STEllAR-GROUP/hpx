@@ -252,19 +252,6 @@ namespace hpx
             return strm.str();
         }
 
-        /// \brief Return the number of executed HPX threads
-        ///
-        /// \param num This parameter specifies the sequence number of the OS
-        ///            thread the number of executed HPX threads should be
-        ///            returned for. If this is std::size_t(-1) the function
-        ///            will return the overall number of executed HPX threads.
-#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-        std::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const
-        {
-            return thread_manager_->get_executed_threads(num);
-        }
-#endif
-
         std::uint64_t get_runtime_support_lva() const
         {
             return reinterpret_cast<std::uint64_t>(runtime_support_.get());
