@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -221,7 +222,7 @@ namespace hpx
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
-        hpx::threads::threadmanager_base& get_thread_manager()
+        hpx::threads::threadmanager& get_thread_manager()
         {
             return *thread_manager_;
         }
@@ -371,7 +372,7 @@ namespace hpx
         util::io_service_pool timer_pool_;
 #endif
         notification_policy_type notifier_;
-        boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
+        std::unique_ptr<hpx::threads::threadmanager> thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
         applier::applier applier_;

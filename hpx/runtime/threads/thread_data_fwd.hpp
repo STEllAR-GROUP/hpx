@@ -32,10 +32,8 @@ namespace hpx
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-    struct HPX_EXPORT threadmanager_base;
+    class HPX_EXPORT threadmanager;
     struct HPX_EXPORT topology;
-
-    class HPX_EXPORT threadmanager_impl;
 
     class HPX_EXPORT executor;
 
@@ -123,7 +121,7 @@ namespace hpx { namespace threads
     /// \cond NOINTERNAL
     // The function get_thread_manager returns a reference to the
     // current thread manager.
-    HPX_API_EXPORT threadmanager_base& get_thread_manager();
+    HPX_API_EXPORT threadmanager& get_thread_manager();
     /// \endcond
 
     /// The function \a get_thread_count returns the number of currently

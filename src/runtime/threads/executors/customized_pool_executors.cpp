@@ -5,6 +5,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 

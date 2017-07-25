@@ -1172,7 +1172,7 @@ namespace hpx { namespace parcelset
 namespace hpx { namespace threads
 {
     // shortcut for get_applier().get_thread_manager()
-    threadmanager_base& get_thread_manager()
+    threadmanager& get_thread_manager()
     {
         return get_runtime().get_thread_manager();
     }

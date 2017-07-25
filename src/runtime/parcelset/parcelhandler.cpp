@@ -98,7 +98,7 @@ namespace hpx { namespace parcelset
 
     parcelhandler::parcelhandler(
             util::runtime_configuration & cfg,
-            threads::threadmanager_base* tm,
+            threads::threadmanager* tm,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread)
       : tm_(tm),

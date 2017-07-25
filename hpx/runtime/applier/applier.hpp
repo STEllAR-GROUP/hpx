@@ -39,7 +39,7 @@ namespace hpx { namespace applier
 
     public:
         // constructor
-        applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm);
+        applier(parcelset::parcelhandler &ph, threads::threadmanager& tm);
 
         // destructor
         ~applier()
@@ -66,7 +66,7 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the thread manager this
         /// applier instance has been created with.
-        threads::threadmanager_base& get_thread_manager();
+        threads::threadmanager& get_thread_manager();
 
         /// \brief Allow access to the locality of the locality this applier
         ///        instance is associated with.
@@ -172,7 +172,7 @@ namespace hpx { namespace applier
 
     private:
         parcelset::parcelhandler& parcel_handler_;
-        threads::threadmanager_base& thread_manager_;
+        threads::threadmanager& thread_manager_;
         naming::id_type runtime_support_id_;
         naming::id_type memory_id_;
     };

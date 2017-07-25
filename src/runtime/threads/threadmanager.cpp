@@ -15,7 +15,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/threadmanager_impl.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -176,7 +176,52 @@ namespace hpx {
             }
             return num_high_priority_queues;
         }
-    } // namespace detail
+
+        ///////////////////////////////////////////////////////////////////////
+        std::string get_affinity_domain(util::command_line_handling const& cfg)
+        {
+            std::string affinity_domain("pu");
+#if defined(HPX_HAVE_HWLOC)
+            if (cfg.affinity_domain_ != "pu")
+            {
+                affinity_domain = cfg.affinity_domain_;
+                if (0 != std::string("pu").find(affinity_domain) &&
+                    0 != std::string("core").find(affinity_domain) &&
+                    0 != std::string("numa").find(affinity_domain) &&
+                    0 != std::string("machine").find(affinity_domain))
+                {
+                    throw detail::command_line_error(
+                        "Invalid command line option "
+                        "--hpx:affinity, value must be one of: pu, core, numa, "
+                        "or machine.");
+                }
+            }
+#endif
+            return affinity_domain;
+        }
+
+        std::size_t get_affinity_description(
+            util::command_line_handling const& cfg, std::string& affinity_desc)
+        {
+#if defined(HPX_HAVE_HWLOC)
+            if (cfg.affinity_bind_.empty())
+                return cfg.numa_sensitive_;
+
+            if (!(cfg.pu_offset_ == std::size_t(-1) ||
+                    cfg.pu_offset_ == std::size_t(0)) ||
+                cfg.pu_step_ != 1 || cfg.affinity_domain_ != "pu")
+            {
+                throw detail::command_line_error(
+                    "Command line option --hpx:bind "
+                    "should not be used with --hpx:pu-step, --hpx:pu-offset, "
+                    "or --hpx:affinity.");
+            }
+
+            affinity_desc = cfg.affinity_bind_;
+#endif
+            return cfg.numa_sensitive_;
+        }
+    }    // namespace detail
 }
 
 namespace hpx { namespace threads
@@ -282,7 +327,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threadmanager_impl::threadmanager_impl(
+    threadmanager::threadmanager(
 #ifdef HPX_HAVE_TIMER_POOL
             util::io_service_pool& timer_pool,
 #endif
@@ -291,9 +336,6 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_TIMER_POOL
         timer_pool_(timer_pool),
 #endif
-        thread_logger_("threadmanager_impl::register_thread"),
-        work_logger_("threadmanager_impl::register_work"),
-        set_state_logger_("threadmanager_impl::set_state"),
         notifier_(notifier)
     {
         auto& rp = hpx::get_resource_partitioner();
@@ -689,11 +731,11 @@ namespace hpx { namespace threads
         }
     }
 
-    threadmanager_impl::~threadmanager_impl()
+    threadmanager::~threadmanager()
     {
     }
 
-    void threadmanager_impl::init()
+    void threadmanager::init()
     {
         auto& rp = hpx::get_resource_partitioner();
         std::size_t threads_offset = 0;
@@ -708,7 +750,7 @@ namespace hpx { namespace threads
         }
     }
 
-    void threadmanager_impl::print_pools(std::ostream& os)
+    void threadmanager::print_pools(std::ostream& os)
     {
         os << "The thread-manager owns "
            << pools_.size() << " pool(s) : \n";
@@ -719,14 +761,14 @@ namespace hpx { namespace threads
         }
     }
 
-    detail::thread_pool& threadmanager_impl::default_pool() const
+    detail::thread_pool& threadmanager::default_pool() const
     {
         HPX_ASSERT(!pools_.empty());
         return *pools_[0];
     }
 
 /*
-    threadmanager_impl::scheduler_type threadmanager_impl::get_scheduler(std::string pool_name) const
+    threadmanager::scheduler_type threadmanager::get_scheduler(std::string pool_name) const
     {
         // if the given pool_name is default, we don't need to look for it
         if(pool_name == "default"){
@@ -750,7 +792,7 @@ namespace hpx { namespace threads
                 + pool_name + "\". \n");
     }
 */
-    detail::thread_pool& threadmanager_impl::get_pool(
+    detail::thread_pool& threadmanager::get_pool(
         std::string const& pool_name) const
     {
         // if the given pool_name is default, we don't need to look for it
@@ -779,20 +821,20 @@ namespace hpx { namespace threads
         //! FIXME Add names of available pools?
     }
 
-    detail::thread_pool& threadmanager_impl::get_pool(
+    detail::thread_pool& threadmanager::get_pool(
         detail::pool_id_type pool_id) const
     {
         return get_pool(pool_id.name_);
     }
 
-    detail::thread_pool& threadmanager_impl::get_pool(
+    detail::thread_pool& threadmanager::get_pool(
         std::size_t thread_index) const
     {
         return get_pool(threads_lookup_[thread_index]);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t threadmanager_impl::get_thread_count(thread_state_enum state,
+    std::int64_t threadmanager::get_thread_count(thread_state_enum state,
         thread_priority priority, std::size_t num_thread, bool reset) const
     {
         std::int64_t total_count = 0;
@@ -809,7 +851,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // Enumerate all matching threads
-    bool threadmanager_impl::enumerate_threads(
+    bool threadmanager::enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state) const
     {
@@ -827,7 +869,7 @@ namespace hpx { namespace threads
     // Abort all threads which are in suspended state. This will set
     // the state of all suspended threads to \a pending while
     // supplying the wait_abort extended state flag
-    void threadmanager_impl::abort_all_suspended_threads()
+    void threadmanager::abort_all_suspended_threads()
     {
         std::lock_guard<mutex_type> lk(mtx_);
         for(auto& pool_iter : pools_) {
@@ -840,7 +882,7 @@ namespace hpx { namespace threads
     // have been terminated but which are still held in the queue
     // of terminated threads. Some schedulers might not do anything
     // here.
-    bool threadmanager_impl::cleanup_terminated(bool delete_all)
+    bool threadmanager::cleanup_terminated(bool delete_all)
     {
         std::lock_guard<mutex_type> lk(mtx_);
         bool result = true;
@@ -853,19 +895,17 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void threadmanager_impl::
-        register_thread(thread_init_data& data, thread_id_type& id,
-            thread_state_enum initial_state, bool run_now, error_code& ec)
+    void threadmanager::register_thread(thread_init_data& data,
+        thread_id_type& id, thread_state_enum initial_state, bool run_now,
+        error_code& ec)
     {
-        util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
         default_pool().create_thread(data, id, initial_state, run_now, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void threadmanager_impl::register_work(
+    void threadmanager::register_work(
         thread_init_data& data, thread_state_enum initial_state, error_code& ec)
     {
-        util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
         default_pool().create_work(data, initial_state, ec);
     }
 
@@ -873,7 +913,7 @@ namespace hpx { namespace threads
     // counter creator and discovery functions
 /*
     // queue length(s) counter creation function
-    naming::gid_type threadmanager_impl::queue_length_counter_creator(
+    naming::gid_type threadmanager::queue_length_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
         // verify the validity of the counter instance name
@@ -921,7 +961,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
     // average pending thread wait time
     template <typename Scheduler>
-    naming::gid_type threadmanager_impl::
+    naming::gid_type threadmanager::
         thread_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
@@ -974,7 +1014,7 @@ namespace hpx { namespace threads
 
     // average pending task wait time
     template <typename Scheduler>
-    naming::gid_type threadmanager_impl::
+    naming::gid_type threadmanager::
         task_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
@@ -1028,7 +1068,7 @@ namespace hpx { namespace threads
 
     // scheduler utilization counter creation function
     template <typename Scheduler>
-    naming::gid_type threadmanager_impl::scheduler_utilization_counter_creator(
+    naming::gid_type threadmanager::scheduler_utilization_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
         // verify the validity of the counter instance name
@@ -1062,7 +1102,7 @@ namespace hpx { namespace threads
 
     // scheduler utilization counter creation function
     template <typename Scheduler>
-    naming::gid_type threadmanager_impl::idle_loop_count_counter_creator(
+    naming::gid_type threadmanager::idle_loop_count_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
         // verify the validity of the counter instance name
@@ -1107,7 +1147,7 @@ namespace hpx { namespace threads
 
     // scheduler utilization counter creation function
     template <typename Scheduler>
-    naming::gid_type threadmanager_impl::busy_loop_count_counter_creator(
+    naming::gid_type threadmanager::busy_loop_count_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
         // verify the validity of the counter instance name
@@ -1231,7 +1271,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     ///////////////////////////////////////////////////////////////////////////
     // idle rate counter creation function
-    naming::gid_type threadmanager_impl::
+    naming::gid_type threadmanager::
         idle_rate_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
@@ -1249,14 +1289,14 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        typedef threadmanager_impl ti;
+        typedef threadmanager ti;
 
         using util::placeholders::_1;
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
         {
             // overall counter
             using performance_counters::detail::create_raw_counter;
-            std::int64_t (threadmanager_impl::*avg_idle_rate_ptr)(
+            std::int64_t (threadmanager::*avg_idle_rate_ptr)(
                 bool
             ) = &ti::avg_idle_rate;
             util::function_nonser<std::int64_t(bool)> f =
@@ -1269,7 +1309,7 @@ namespace hpx { namespace threads
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
-            std::int64_t (threadmanager_impl::*avg_idle_rate_ptr)(
+            std::int64_t (threadmanager::*avg_idle_rate_ptr)(
                 std::size_t, bool
             ) = &ti::avg_idle_rate;
             using performance_counters::detail::create_raw_counter;
@@ -1326,7 +1366,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     // thread counts counter creation function
     template <typename Scheduler>
-    naming::gid_type threadmanager_impl::thread_counts_counter_creator(
+    naming::gid_type threadmanager::thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec)
     {
         // verify the validity of the counter instance name
@@ -1344,7 +1384,7 @@ namespace hpx { namespace threads
         };
 
         typedef detail::thread_pool_impl<Scheduler> spt;
-        typedef threadmanager_impl ti;
+        typedef threadmanager ti;
 
         using util::placeholders::_1;
 
@@ -1600,13 +1640,13 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    void threadmanager_impl::
+    void threadmanager::
         register_counter_types()
     {
         using util::placeholders::_1;
         using util::placeholders::_2;
 
-        typedef threadmanager_impl ti;
+        typedef threadmanager ti;
         performance_counters::create_counter_func counts_creator(
             util::bind(&ti::thread_counts_counter_creator<Scheduler>, this, _1, _2));
 
@@ -1866,7 +1906,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
 
-    bool threadmanager_impl::run()
+    bool threadmanager::run()
     {
         std::unique_lock<mutex_type> lk(mtx_);
         auto& rp = hpx::get_resource_partitioner();
@@ -1919,7 +1959,7 @@ namespace hpx { namespace threads
         return true;
     }
 
-    void threadmanager_impl::stop(bool blocking)
+    void threadmanager::stop(bool blocking)
     {
         LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")";
 
@@ -1942,7 +1982,7 @@ namespace hpx { namespace threads
     }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-    std::int64_t threadmanager_impl::get_executed_threads(
+    std::int64_t threadmanager::get_executed_threads(
         std::size_t num, bool reset)
     {
         std::int64_t result = 0;
@@ -1955,7 +1995,7 @@ namespace hpx { namespace threads
         return result;
     }
 
-    std::int64_t threadmanager_impl::get_executed_thread_phases(
+    std::int64_t threadmanager::get_executed_thread_phases(
         std::size_t num, bool reset)
     {
         std::int64_t result = 0;
@@ -1969,37 +2009,37 @@ namespace hpx { namespace threads
     }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-//     std::int64_t threadmanager_impl::get_thread_phase_duration(
+//     std::int64_t threadmanager::get_thread_phase_duration(
 //         std::size_t num, bool reset)
 //     {
 //         return pool_->get_thread_phase_duration(num, reset);
 //     }
 //
-//     std::int64_t threadmanager_impl::get_thread_duration(
+//     std::int64_t threadmanager::get_thread_duration(
 //         std::size_t num, bool reset)
 //     {
 //         return pool_->get_thread_duration(num, reset);
 //     }
 //
-//     std::int64_t threadmanager_impl::get_thread_phase_overhead(
+//     std::int64_t threadmanager::get_thread_phase_overhead(
 //         std::size_t num, bool reset)
 //     {
 //         return pool_->get_thread_phase_overhead(num, reset);
 //     }
 //
-//     std::int64_t threadmanager_impl::get_thread_overhead(
+//     std::int64_t threadmanager::get_thread_overhead(
 //         std::size_t num, bool reset)
 //     {
 //         return pool_->get_thread_overhead(num, reset);
 //     }
 //
-//     std::int64_t threadmanager_impl::get_cumulative_thread_duration(
+//     std::int64_t threadmanager::get_cumulative_thread_duration(
 //         std::size_t num, bool reset)
 //     {
 //         return pool_->get_cumulative_thread_duration(num, reset);
 //     }
 //
-//     std::int64_t threadmanager_impl::get_cumulative_thread_overhead(
+//     std::int64_t threadmanager::get_cumulative_thread_overhead(
 //         std::size_t num, bool reset)
 //     {
 //         return pool_->get_cumulative_thread_overhead(num, reset);
@@ -2007,7 +2047,7 @@ namespace hpx { namespace threads
 #endif
 #endif
 
-    std::int64_t threadmanager_impl::get_cumulative_duration(
+    std::int64_t threadmanager::get_cumulative_duration(
         std::size_t num, bool reset)
     {
         std::int64_t result = 0;
@@ -2020,28 +2060,47 @@ namespace hpx { namespace threads
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
 //     ///////////////////////////////////////////////////////////////////////////
-//     std::int64_t threadmanager_impl::avg_idle_rate(bool reset)
+//     std::int64_t threadmanager::avg_idle_rate(bool reset)
 //     {
 //         return pool_->avg_idle_rate(reset);
 //     }
 //
-//     std::int64_t threadmanager_impl::avg_idle_rate(
+//     std::int64_t threadmanager::avg_idle_rate(
 //         std::size_t num_thread, bool reset)
 //     {
 //         return pool_->avg_idle_rate(num_thread, reset);
 //     }
 //
 // #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-//     std::int64_t threadmanager_impl::avg_creation_idle_rate(bool reset)
+//     std::int64_t threadmanager::avg_creation_idle_rate(bool reset)
 //     {
 //         return pool_->avg_creation_idle_rate(reset);
 //     }
 //
-//     std::int64_t threadmanager_impl::avg_cleanup_idle_rate(bool reset)
+//     std::int64_t threadmanager::avg_cleanup_idle_rate(bool reset)
 //     {
 //         return pool_->avg_cleanup_idle_rate(reset);
 //     }
 // #endif
 #endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::int64_t get_thread_count(thread_state_enum state)
+    {
+        return get_thread_manager().get_thread_count(state);
+    }
+
+    std::int64_t get_thread_count(thread_priority priority,
+        thread_state_enum state)
+    {
+        return get_thread_manager().get_thread_count(state, priority);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state)
+    {
+        return get_thread_manager().enumerate_threads(f, state);
+    }
 } // namespace threads
 } // namespace hpx

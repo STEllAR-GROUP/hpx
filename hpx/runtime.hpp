@@ -191,7 +191,7 @@ namespace hpx
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
         virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
 
-        virtual threads::threadmanager_base& get_thread_manager() = 0;
+        virtual threads::threadmanager& get_thread_manager() = 0;
 
         virtual naming::resolver_client& get_agas_client() = 0;
 

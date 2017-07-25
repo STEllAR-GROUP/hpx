@@ -99,7 +99,7 @@ namespace hpx { namespace parcelset
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(
             util::runtime_configuration& cfg,
-            threads::threadmanager_base* tm,
+            threads::threadmanager* tm,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread);
 
@@ -477,7 +477,7 @@ namespace hpx { namespace parcelset
         endpoints_type endpoints_;
 
         /// the thread-manager to use (optional)
-        threads::threadmanager_base* tm_;
+        threads::threadmanager* tm_;
 
         /// Allow to use alternative parcel-ports (this is enabled only after
         /// the runtime systems of all localities are guaranteed to have

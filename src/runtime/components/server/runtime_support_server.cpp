@@ -585,7 +585,7 @@ namespace hpx { namespace components { namespace server
         //
         // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
         // it hands over the token to machine nr.i.
-        threads::threadmanager_base& tm = appl.get_thread_manager();
+        threads::threadmanager& tm = appl.get_thread_manager();
 
         for (std::size_t k = 0;
             tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
@@ -626,7 +626,7 @@ namespace hpx { namespace components { namespace server
             // While no real distributed termination detection has to be
             // performed, we should still wait for the thread-queues to drain.
             applier::applier& appl = hpx::applier::get_applier();
-            threads::threadmanager_base& tm = appl.get_thread_manager();
+            threads::threadmanager& tm = appl.get_thread_manager();
 
             for (std::size_t k = 0;
                 tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
@@ -689,7 +689,7 @@ namespace hpx { namespace components { namespace server
         // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
         // it hands over the token to machine nr.i.
         applier::applier& appl = hpx::applier::get_applier();
-        threads::threadmanager_base& tm = appl.get_thread_manager();
+        threads::threadmanager& tm = appl.get_thread_manager();
 
         for (std::size_t k = 0;
             tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
@@ -767,7 +767,7 @@ namespace hpx { namespace components { namespace server
             // While no real distributed termination detection has to be
             // performed, we should still wait for the thread-queues to drain.
             applier::applier& appl = hpx::applier::get_applier();
-            threads::threadmanager_base& tm = appl.get_thread_manager();
+            threads::threadmanager& tm = appl.get_thread_manager();
 
             for (std::size_t k = 0;
                 tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
@@ -1065,7 +1065,7 @@ namespace hpx { namespace components { namespace server
     // let thread manager clean up HPX threads
     template <typename Lock>
     inline void
-    cleanup_threads(threads::threadmanager_base& tm, Lock& l)
+    cleanup_threads(threads::threadmanager& tm, Lock& l)
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();
@@ -1092,7 +1092,7 @@ namespace hpx { namespace components { namespace server
             HPX_ASSERT(!terminated_);
 
             applier::applier& appl = hpx::applier::get_applier();
-            threads::threadmanager_base& tm = appl.get_thread_manager();
+            threads::threadmanager& tm = appl.get_thread_manager();
             naming::resolver_client& agas_client = appl.get_agas_client();
 
             util::high_resolution_timer t;

@@ -19,7 +19,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
-#include <hpx/runtime/threads/threadmanager_impl.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
@@ -146,7 +146,7 @@ namespace hpx {
             util::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
 #endif
         notifier_(runtime_impl::get_notification_policy("worker-thread")),
-        thread_manager_(new hpx::threads::threadmanager_impl(
+        thread_manager_(new hpx::threads::threadmanager(
 #ifdef HPX_HAVE_TIMER_POOL
                 timer_pool_,
 #endif

@@ -8,11 +8,10 @@
 
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
-
-#include <hpx/runtime/threads/threadmanager_impl.hpp>
 
 #include <string>
 

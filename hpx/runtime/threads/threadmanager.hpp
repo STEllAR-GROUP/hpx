@@ -1,106 +1,85 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
+//  Copyright (c)      2017 Shoshana Jakobovits
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_MAY_20_2008_845AM)
-#define HPX_THREADMANAGER_MAY_20_2008_845AM
+#if !defined(HPX_THREADMANAGER_IMPL_HPP)
+#define HPX_THREADMANAGER_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/barrier.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/backtrace.hpp>
-#include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/steady_clock.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/util/block_profiler.hpp>
+#include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/spinlock.hpp>
+
+#include <boost/atomic.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iosfwd>
 #include <memory>
+#include <mutex>
+#include <numeric>
+#include <type_traits>
+#include <vector>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-// TODO: add branch prediction and function heat
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-
-namespace detail
+namespace hpx { namespace threads
 {
-    std::string get_affinity_domain(util::command_line_handling const& cfg);
-    std::size_t get_affinity_description(util::command_line_handling const& cfg,
-        std::string& affinity_desc);
-}
-
-namespace threads
-{
-    struct register_thread_tag {};
-    struct register_work_tag {};
-    struct set_state_tag {};
-
-    class thread_init_data;
-
     ///////////////////////////////////////////////////////////////////////////
-    struct threadmanager_base
+    /// The \a thread-manager class is the central instance of management for
+    /// all (non-depleted) threads
+    class HPX_EXPORT threadmanager
     {
-    public:
-        HPX_NON_COPYABLE(threadmanager_base);
+    private:
+        // we use a simple mutex to protect the data members of the
+        // thread manager for now
+        typedef compat::mutex mutex_type;
 
     public:
-        threadmanager_base() {}
-
-        virtual ~threadmanager_base() {}
-
-        virtual void init() = 0;
-
-        //! FIXME put in private and add --hpx:print_pools command-line option
-        virtual void print_pools(std::ostream&) = 0;
-
-        // Get functions
+        typedef threads::policies::callback_notifier notification_policy_type;
         typedef std::unique_ptr<detail::thread_pool> pool_type;
         typedef threads::policies::scheduler_base* scheduler_type;
+        typedef std::vector<pool_type> pool_vector;
 
-        virtual detail::thread_pool& get_pool(
-            std::string const& pool_name) const = 0;
-        virtual detail::thread_pool& get_pool(
-            std::size_t thread_index) const = 0;
+#ifdef HPX_HAVE_TIMER_POOL
+        threadmanager(util::io_service_pool& timer_pool,
+                notification_policy_type& notifier);
+#else
+        threadmanager(notification_policy_type& notifier);
+#endif
+        ~threadmanager();
 
-        /// \brief Return whether the thread manager is still running
-        virtual state status() const = 0;
+        void init();
 
-        /// \brief return the number of HPX-threads with the given state
-        virtual std::int64_t get_thread_count(
-            thread_state_enum = unknown,
-            thread_priority priority = thread_priority_default,
-            std::size_t num_thread = std::size_t(-1),
-            bool reset = false) const = 0;
+        //! FIXME move to private and add --hpx:printpools cmd line option
+        void print_pools(std::ostream&);
 
-        // Enumerate all matching threads
-        virtual bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const = 0;
+        // Get functions
+        detail::thread_pool& default_pool() const;
+        scheduler_type default_scheduler() const;
 
-        // \brief Abort all threads which are in suspended state. This will set
-        //        the state of all suspended threads to \a pending while
-        //        supplying the wait_abort extended state flag
-        virtual void abort_all_suspended_threads() = 0;
-
-        // \brief Clean up terminated threads. This deletes all threads which
-        //        have been terminated but which are still held in the queue
-        //        of terminated threads. Some schedulers might not do anything
-        //        here.
-        virtual bool cleanup_terminated(bool delete_all = false) = 0;
+        detail::thread_pool& get_pool(std::string const& pool_name) const;
+        detail::thread_pool& get_pool(detail::pool_id_type pool_id) const;
+        detail::thread_pool& get_pool(std::size_t thread_index) const;
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
@@ -124,10 +103,9 @@ namespace threads
         ///               enumeration (thread_state#pending, or \a
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
-        virtual void
-        register_work(thread_init_data& data,
+        void register_work(thread_init_data& data,
             thread_state_enum initial_state = pending,
-            error_code& ec = throws) = 0;
+            error_code& ec = throws);
 
         /// The function \a register_thread adds a new work item to the thread
         /// manager. It creates a new \a thread, adds it to the internal
@@ -160,84 +138,269 @@ namespace threads
         ///               parameter \a run_now or the function \a
         ///               threadmanager#do_some_work is called). This parameter
         ///               is optional and defaults to \a true.
-        virtual void
-        register_thread(thread_init_data& data, thread_id_type& id,
+        void register_thread(thread_init_data& data, thread_id_type& id,
             thread_state_enum initial_state = pending,
-            bool run_now = true, error_code& ec = throws) = 0;
+            bool run_now = true, error_code& ec = throws);
 
         /// \brief  Run the thread manager's work queue. This function
-        ///         lets all threadpools instantiate their OS threads. All OS
-        ///         threads are started to execute the function \a thread_func.
+        ///         instantiates the specified number of OS threads in each
+        ///         pool. All OS threads are started to execute the function
+        ///         \a tfunc.
         ///
         /// \returns      The function returns \a true if the thread manager
         ///               has been started successfully, otherwise it returns
         ///               \a false.
-        virtual bool run() = 0;
+        bool run();
 
         /// \brief Forcefully stop the thread-manager
         ///
         /// \param blocking
         ///
-        virtual void stop (bool blocking = true) = 0;
+        void stop (bool blocking = true);
 
+        /// \brief Return whether the thread manager is still running
+        //! This returns the "minimal state", i.e. the state of the
+        //! least advanced thread pool
+        state status() const
+        {
+            hpx::state result(last_valid_runtime_state);
+
+            for (auto& pool_iter : pools_)
+            {
+                hpx::state s = pool_iter->get_state();
+                result = (std::min)(result, s);
+            }
+
+            return result;
+//            return default_pool()->get_state();
+        }
+
+        /// \brief return the number of HPX-threads with the given state
+        ///
+        /// \note This function lock the internal OS lock in the thread manager
+        std::int64_t get_thread_count(thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default,
+            std::size_t num_thread = std::size_t(-1), bool reset = false) const;
+
+        // Enumerate all matching threads
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const;
+
+        // \brief Abort all threads which are in suspended state. This will set
+        //        the state of all suspended threads to \a pending while
+        //        supplying the wait_abort extended state flag
+        void abort_all_suspended_threads();
+
+        // \brief Clean up terminated threads. This deletes all threads which
+        //        have been terminated but which are still held in the queue
+        //        of terminated threads. Some schedulers might not do anything
+        //        here.
+        bool cleanup_terminated(bool delete_all = false);
+
+        /// \brief Return the number of OS threads running in this thread-manager
+        ///
+        /// This function will return correct results only if the thread-manager
+        /// is running.
+        std::size_t get_os_thread_count() const
+        {
+            std::lock_guard<mutex_type> lk(mtx_);
+            std::size_t total = 0;
+            for (auto& pool_iter : pools_)
+            {
+                total += pool_iter->get_os_thread_count();
+            }
+            return total;
+        }
+
+        compat::thread& get_os_thread_handle(std::size_t num_thread)
+        {
+            std::lock_guard<mutex_type> lk(mtx_);
+            detail::pool_id_type myid = threads_lookup_[num_thread];
+            detail::thread_pool& pool = get_pool(myid);
+            return pool.get_os_thread_handle(num_thread);
+        }
+
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
+        /// Get percent maintenance time in main thread-manager loop.
+        std::int64_t avg_idle_rate(bool reset);
+        std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
+#endif
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+        std::int64_t avg_creation_idle_rate(bool reset);
+        std::int64_t avg_cleanup_idle_rate(bool reset);
+#endif
+
+    public:
         /// this notifies the thread manager that there is some more work
         /// available
-        virtual void do_some_work(std::size_t num_thread = std::size_t(-1)) = 0;
+        void do_some_work(std::size_t num_thread = std::size_t(-1))
+        {
+            default_pool().do_some_work(num_thread);
+        }
+
+        /// API functions forwarding to notification policy
 
         /// This notifies the thread manager that the passed exception has been
         /// raised. The exception will be routed through the notifier and the
         /// scheduler (which will result in it being passed to the runtime
         /// object, which in turn will report it to the console, etc.).
-        virtual void report_error(std::size_t, std::exception_ptr const&) = 0;
+        void report_error(std::size_t num_thread, std::exception_ptr const& e)
+        {
+            // propagate the error reporting to all pools, which in turn
+            // will propagate to schedulers
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->report_error(num_thread, e);
+            }
+        }
 
+        //! FIXME understand what this actually does and fix accordingly
+        std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
+        {
+            if (get_self_ptr() == nullptr)
+                return std::size_t(-1);
+            return default_pool().get_worker_thread_num();
+        }
+
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
+        std::int64_t get_executed_threads(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        std::int64_t get_executed_thread_phases(
+            std::size_t num = std::size_t(-1), bool reset = false);
+
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
+        std::int64_t get_thread_phase_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        std::int64_t get_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        std::int64_t get_thread_phase_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        std::int64_t get_thread_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        std::int64_t get_cumulative_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        std::int64_t get_cumulative_thread_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
+#endif
+#endif
+
+        std::int64_t get_cumulative_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+
+    protected:
+        ///
+        template <typename C>
+        void start_periodic_maintenance(std::true_type);
+
+        template <typename C>
+        void start_periodic_maintenance(std::false_type) {}
+
+        template <typename C>
+        void periodic_maintenance_handler(std::true_type);
+
+        template <typename C>
+        void periodic_maintenance_handler(std::false_type) {}
+
+    public:
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this
         /// thread-manager instance.
-//        virtual void register_counter_types() = 0;
-        void register_counter_types(){}
+        void register_counter_types();
 
-        /// Returns of the number of the processing unit the given thread
-        /// is allowed to run on
+        /// Returns the mask identifying all processing units used by this
+        /// thread manager.
+        mask_type get_used_processing_units() const
+        {
+            mask_type total_used_processing_punits = mask_type();
+            threads::resize(
+                total_used_processing_punits, hardware_concurrency());
 
-        virtual compat::thread & get_os_thread_handle(std::size_t) = 0;
+            for (auto& pool_iter : pools_)
+            {
+                total_used_processing_punits |=
+                    pool_iter->get_used_processing_units();
+            }
 
-#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
-/*        virtual std::int64_t get_executed_threads(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual std::int64_t get_executed_thread_phases(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;*/
-        std::int64_t get_executed_threads( //! FIXME
-                std::size_t num = std::size_t(-1), bool reset = false){
-            return 1;
+            return total_used_processing_punits;
         }
+
+        void set_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->set_scheduler_mode(mode);
+            }
+        }
+
+        void reset_thread_distribution()
+        {
+            for (auto& pool_iter : pools_)
+            {
+                pool_iter->reset_thread_distribution();
+            }
+        }
+
+        void init_tss(std::size_t num)
+        {
+            detail::thread_num_tss_.init_tss(num);
+        }
+
+        void deinit_tss()
+        {
+            detail::thread_num_tss_.deinit_tss();
+        }
+
+    private:
+        // counter creator functions
+        naming::gid_type queue_length_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        template <typename Scheduler>
+        naming::gid_type thread_counts_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-/*        virtual std::int64_t get_thread_phase_duration(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual std::int64_t get_thread_duration(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual std::int64_t get_thread_phase_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;
-        virtual std::int64_t get_thread_overhead(
-            std::size_t num = std::size_t(-1), bool reset = false) = 0;*/
+        naming::gid_type idle_rate_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
 #endif
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+        template <typename Scheduler>
+        naming::gid_type thread_wait_time_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        template <typename Scheduler>
+        naming::gid_type task_wait_time_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
 #endif
 
-        // Returns the mask identifying all processing units used by this
-        // thread manager.
-        virtual mask_type get_used_processing_units() const = 0;
+        template <typename Scheduler>
+        naming::gid_type scheduler_utilization_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
 
-        ///////////////////////////////////////////////////////////////////////
-        virtual std::size_t get_worker_thread_num(
-            bool* numa_sensitive = nullptr) = 0;
+        template <typename Scheduler>
+        naming::gid_type idle_loop_count_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        template <typename Scheduler>
+        naming::gid_type busy_loop_count_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
 
-        virtual void reset_thread_distribution() = 0;
+    private:
+        mutable mutex_type mtx_; // mutex protecting the members
 
-        virtual void set_scheduler_mode(threads::policies::scheduler_mode m) = 0;
+        // specified by the user in command line, or 1 by default
+        // represents the total number of OS threads, irrespective of how many
+        // are in which pool.
+        std::size_t num_threads_;
 
-        ///////////////////////////////////////////////////////////////////////////
-        virtual void init_tss(std::size_t num) = 0;
-        virtual void deinit_tss() = 0;
+        std::vector<detail::pool_id_type> threads_lookup_;
 
+#ifdef HPX_HAVE_TIMER_POOL
+        util::io_service_pool& timer_pool_;     // used for timed set_state
+#endif
+        pool_vector pools_;
+
+        notification_policy_type& notifier_;
+
+        // startup barrier
+        boost::scoped_ptr<compat::barrier> startup_;
     };
 }}
 

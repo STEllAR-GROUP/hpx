@@ -25,6 +25,7 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iosfwd>
 #include <stdexcept>
 #include <string>
@@ -38,35 +39,35 @@ namespace resource {
 
 // if the resource partitioner is accessed before the HPX runtime has started
 // then on first access, this function should be used, to ensure that command line
-// affinity binding options are honoured. Use this function signature only once
+// affinity binding options are honored. Use this function signature only once
 // and thereafter use the parameter free version.
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
-    int argc, char **argv);
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
+    int argc, char** argv);
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
     boost::program_options::options_description desc_cmdline, int argc,
-    char **argv, bool check = true);
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
-    int argc, char **argv, std::vector<std::string> ini_config);
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
-    int argc, char **argv, runtime_mode mode);
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
+    char** argv, bool check = true);
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
+    int argc, char** argv, std::vector<std::string> ini_config);
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
+    int argc, char** argv, runtime_mode mode);
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
     boost::program_options::options_description desc_cmdline, int argc,
-    char **argv, std::vector<std::string> ini_config);
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
+    char** argv, std::vector<std::string> ini_config);
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
     boost::program_options::options_description desc_cmdline, int argc,
-    char **argv, runtime_mode mode);
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
-    int argc, char **argv, std::vector<std::string> ini_config,
+    char** argv, runtime_mode mode);
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
+    int argc, char** argv, std::vector<std::string> ini_config,
     runtime_mode mode);
-extern HPX_EXPORT hpx::resource::resource_partitioner &get_resource_partitioner(
+extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
     boost::program_options::options_description desc_cmdline, int argc,
-    char **argv, std::vector<std::string> ini_config, runtime_mode mode,
+    char** argv, std::vector<std::string> ini_config, runtime_mode mode,
     bool check = true);
 
 // may be used anywhere in code and returns a reference to the
 // single, global resource partitioner
-extern HPX_EXPORT hpx::resource::resource_partitioner &
-get_resource_partitioner();
+extern HPX_EXPORT hpx::resource::resource_partitioner&
+    get_resource_partitioner();
 
 namespace resource {
 
@@ -239,8 +240,9 @@ namespace resource {
         // stuff that has to be done during hpx_init ...
         void set_scheduler(
             scheduling_policy sched, const std::string &pool_name);
-        void set_threadmanager(threads::threadmanager_base *thrd_manag);
-        threads::threadmanager_base *get_thread_manager() const;
+
+        void set_threadmanager(threads::threadmanager *thrd_manag);
+        threads::threadmanager *get_thread_manager() const;
 
         // called by constructor of scheduler_base
         threads::policies::detail::affinity_data *get_affinity_data()
@@ -254,11 +256,7 @@ namespace resource {
         void configure_pools();
 
         // called in runtime::assign_cores()
-        size_t init()
-        {
-            thread_manager_->init();
-            return cores_needed_;
-        }
+        std::size_t init();
 
         ////////////////////////////////////////////////////////////////////////
 
@@ -328,7 +326,7 @@ namespace resource {
         std::vector<init_pool_data> initial_thread_pools_;
 
         // pointer to the threadmanager instance
-        hpx::threads::threadmanager_base *thread_manager_;
+        hpx::threads::threadmanager *thread_manager_;
 
         // reference to the topology and affinity data
         threads::hwloc_topology_info &topology_;

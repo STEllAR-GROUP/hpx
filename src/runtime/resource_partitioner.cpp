@@ -8,7 +8,11 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
+#include <cstddef>
 #include <iosfwd>
+#include <string>
+#include <vector>
+#include <utility>
 
 namespace hpx {
 
@@ -293,6 +297,12 @@ namespace resource {
                 "Cannot instantiate more than one resource partitioner");
     }
 
+    std::size_t resource_partitioner::init()
+    {
+        thread_manager_->init();
+        return cores_needed_;
+    }
+
     void resource_partitioner::set_hpx_init_options(util::function_nonser<int(
             boost::program_options::variables_map &vm)> const &f)
     {
@@ -537,7 +547,7 @@ namespace resource {
     }
 
     void resource_partitioner::set_threadmanager(
-        threads::threadmanager_base *thrd_manag)
+        threads::threadmanager* thrd_manag)
     {
         thread_manager_ = thrd_manag;
     }

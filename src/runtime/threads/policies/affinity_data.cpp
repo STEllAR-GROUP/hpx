@@ -1,23 +1,31 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <string>
 
+namespace hpx { namespace detail
+{
+    std::string get_affinity_domain(util::command_line_handling const& cfg);
+    std::size_t get_affinity_description(util::command_line_handling const& cfg,
+        std::string& affinity_desc);
+}}
 
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
-
     static mask_type get_empty_machine_mask()
     {
         threads::mask_type m = threads::mask_type();
@@ -35,9 +43,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             if (pu_offset >= hpx::threads::hardware_concurrency())
             {
                 throw hpx::detail::command_line_error(
-                        "Invalid command line option "
-                                "--hpx:pu-offset, value must be smaller than number of "
-                                "available processing units.");
+                    "Invalid command line option "
+                    "--hpx:pu-offset, value must be smaller than number of "
+                    "available processing units.");
             }
         }
 #endif
@@ -53,9 +61,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
             {
                 throw hpx::detail::command_line_error(
-                        "Invalid command line option "
-                                "--hpx:pu-step, value must be non-zero and smaller than "
-                                "number of available processing units.");
+                    "Invalid command line option "
+                    "--hpx:pu-step, value must be non-zero and smaller than "
+                    "number of available processing units.");
             }
         }
 #endif
@@ -80,7 +88,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     {
         // allow only one affinity-data instance
         if(instance_number_counter_++ >= 0){
-            throw std::runtime_error("Cannot instantiate more than one affinity data instance");
+            throw std::runtime_error(
+                "Cannot instantiate more than one affinity data instance");
         }
     }
 
@@ -116,7 +125,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
 #if defined(HPX_HAVE_HWLOC)
         std::string affinity_desc;
-        std::size_t numa_sensitive = hpx::detail::get_affinity_description(cfg_, affinity_desc);
+        std::size_t numa_sensitive =
+            hpx::detail::get_affinity_description(cfg_, affinity_desc);
         if (affinity_desc == "none")
         {
             // don't use any affinity for any of the os-threads
@@ -182,7 +192,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return (std::max)(num_unique_cores, max_cores);
     }
 
-    mask_cref_type affinity_data::get_pu_mask(std::size_t global_thread_num, bool numa_sensitive) const
+    mask_cref_type affinity_data::get_pu_mask(
+        std::size_t global_thread_num, bool numa_sensitive) const
     {
         // get a topology instance
         topology const& topology = get_resource_partitioner().get_topology();
@@ -316,7 +327,4 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     }
 
     boost::atomic<int> affinity_data::instance_number_counter_(-1);
-
-
-
 }}}}

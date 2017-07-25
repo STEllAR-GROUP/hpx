@@ -22,7 +22,7 @@ void print_system_characteristics()
     hpx::runtime* rt = hpx::get_runtime_ptr();
     hpx::util::runtime_configuration cfg = rt->get_config();
     const hpx::threads::topology& topo = rt->get_topology();
-    hpx::threads::threadmanager_base& thrd_manager = rt->get_thread_manager();
+    hpx::threads::threadmanager& thrd_manager = rt->get_thread_manager();
 
     // -------------------------------------- //
     //      print runtime characteristics     //
