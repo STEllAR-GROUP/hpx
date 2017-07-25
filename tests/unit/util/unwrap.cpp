@@ -13,8 +13,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <numeric>
 #include <string>
@@ -341,14 +340,14 @@ void test_development_regressions(FutureProvider&& futurize)
 /// Most of this functionality was taken and adapted from
 /// the file: `tests/unit/util/unwrapped.cpp`.
 namespace legacy_tests {
-boost::atomic<std::size_t> void_counter;
+std::atomic<std::size_t> void_counter;
 
 static void null_thread()
 {
     ++void_counter;
 }
 
-boost::atomic<std::size_t> result_counter;
+std::atomic<std::size_t> result_counter;
 
 static bool null_result_thread()
 {
@@ -377,7 +376,7 @@ void test_legacy_requirements(FutureProvider&& futurize)
     using hpx::async;
 
     {
-        boost::atomic<std::size_t> count(0);
+        std::atomic<std::size_t> count(0);
 
         // Sync wait, single future, void return.
         {
