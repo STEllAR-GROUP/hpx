@@ -209,7 +209,7 @@ macro(hpx_check_for_cxx11_auto)
   add_hpx_config_test(HPX_WITH_CXX11_AUTO
     SOURCE cmake/tests/cxx11_auto.cpp
     FILE ${ARGN}
-    CMAKECXXFEATURE cxx11_auto_type)
+    CMAKECXXFEATURE cxx_auto_type)
 endmacro()
 
 ###############################################################################
@@ -509,14 +509,6 @@ macro(hpx_check_for_cxx11_std_unordered_set)
   add_hpx_config_test(HPX_WITH_CXX11_UNORDERED_SET
     SOURCE cmake/tests/cxx11_std_unordered_set.cpp
     FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_cxx14_auto)
-  add_hpx_config_test(HPX_WITH_CXX14_AUTO
-    SOURCE cmake/tests/cxx14_auto.cpp
-    FILE ${ARGN}
-    CMAKECXXFEATURE cxx14_auto_type)
 endmacro()
 
 ###############################################################################

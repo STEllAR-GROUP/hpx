@@ -16,7 +16,7 @@ macro(hpx_perform_cxx_feature_tests)
     REQUIRED "HPX needs support for C++11 alias templates")
 
   hpx_check_for_cxx11_auto(
-    REQUIRED "HPX needs support for C++11 auto")
+    DEFINITIONS HPX_HAVE_CXX11_AUTO)
 
   hpx_check_for_cxx11_constexpr(
     DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
@@ -139,9 +139,6 @@ macro(hpx_perform_cxx_feature_tests)
 
   if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
     # Check the availability of certain C++14 language features
-
-    hpx_check_for_cxx14_auto(
-      DEFINITIONS HPX_HAVE_CXX14_AUTO)
 
     hpx_check_for_cxx14_constexpr(
       DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)

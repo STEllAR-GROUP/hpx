@@ -27,7 +27,7 @@ namespace hpx { namespace parallel { namespace execution
         struct get_pu_mask_tag {};
         struct set_scheduler_mode_tag {};
 
-#ifdef HPX_HAVE_CXX14_AUTO
+#ifdef HPX_HAVE_CXX11_AUTO
         // forward declare customization point implementations
         template <>
         struct customization_point<processing_units_count_tag>

@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), params);
         }
 
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         template <>
         struct customization_point<processing_units_count_tag>
         {
@@ -114,12 +114,12 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename Parameters>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX14_AUTO
+#ifdef HPX_HAVE_CXX11_AUTO
             customization_point<processing_units_count_tag>::
 #endif
             operator()(
                 Executor && exec, Parameters& params) const
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
             -> decltype(processing_units_count(std::forward<Executor>(exec),
                     params))
 #endif
@@ -127,7 +127,7 @@ namespace hpx { namespace parallel { namespace execution
                 return processing_units_count(std::forward<Executor>(exec),
                     params);
             }
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         };
 #endif
 
@@ -178,7 +178,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec));
         }
 
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         template <>
         struct customization_point<has_pending_closures_tag>
         {
@@ -187,18 +187,18 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX14_AUTO
+#ifdef HPX_HAVE_CXX11_AUTO
             customization_point<has_pending_closures_tag>::
 #endif
             operator()(
                 Executor && exec) const
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
             -> decltype(has_pending_closures(std::forward<Executor>(exec)))
 #endif
             {
                 return has_pending_closures(std::forward<Executor>(exec));
             }
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         };
 #endif
         /// \endcond
@@ -253,7 +253,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), topo, thread_num);
         }
 
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         template <>
         struct customization_point<get_pu_mask_tag>
         {
@@ -262,18 +262,18 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX14_AUTO
+#ifdef HPX_HAVE_CXX11_AUTO
             customization_point<get_pu_mask_tag>::
 #endif
             operator()(
                 Executor && exec, threads::topology& topo, std::size_t thread_num) const
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
             -> decltype(get_pu_mask(std::forward<Executor>(exec), topo, thread_num))
 #endif
             {
                 return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
             }
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         };
 #endif
         /// \endcond
@@ -323,7 +323,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), mode);
         }
 
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         template <>
         struct customization_point<set_scheduler_mode_tag>
         {
@@ -332,18 +332,18 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename Mode>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX14_AUTO
+#ifdef HPX_HAVE_CXX11_AUTO
             customization_point<set_scheduler_mode_tag>::
 #endif
             operator()(
                 Executor && exec, Mode const& mode) const
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
             -> decltype(set_scheduler_mode(std::forward<Executor>(exec), mode))
 #endif
             {
                 return set_scheduler_mode(std::forward<Executor>(exec), mode);
             }
-#ifndef HPX_HAVE_CXX14_AUTO
+#ifndef HPX_HAVE_CXX11_AUTO
         };
 #endif
         /// \endcond
