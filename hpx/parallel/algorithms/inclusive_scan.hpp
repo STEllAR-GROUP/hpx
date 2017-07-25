@@ -337,6 +337,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter1>::value_type
             >::value)>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         T init, Op && op)
@@ -435,6 +436,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter1>::value_type
             >::value)>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         T init)

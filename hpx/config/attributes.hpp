@@ -8,10 +8,27 @@
 
 #include <hpx/config/defines.hpp>
 
+// handle [[fallthrough]]
 #if defined(HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
 #   define HPX_FALLTHROUGH [[fallthrough]]
 #else
 #   define HPX_FALLTHROUGH
+#endif
+
+// handle [[deprecated]]
+#if !defined(HPX_NO_DEPRECATED)
+#  define HPX_DEPRECATED_MSG \
+   "This function is deprecated and will be removed in the future."
+#  if defined(HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
+#    define HPX_DEPRECATED(x) [[deprecated(x)]]
+#  elif defined(HPX_MSVC)
+#    define HPX_DEPRECATED(x) __declspec(deprecated(x))
+#  elif defined(__GNUC__)
+#    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
+#  endif
+#  if !defined(HPX_DEPRECATED)
+#    define HPX_DEPRECATED(x)  /**/
+#  endif
 #endif
 
 #endif

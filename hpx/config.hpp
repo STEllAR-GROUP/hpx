@@ -539,25 +539,4 @@
 #define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
 
-#if defined(HPX_HAVE_SODIUM)
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB         0x0000000100000001ULL
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB         0x0000000000000005ULL
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL
-// this is made locality specific
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB  0x0000000000000006ULL
-#endif
-
-#if !defined(HPX_NO_DEPRECATED)
-#  define HPX_DEPRECATED_MSG \
-   "This function is deprecated and will be removed in the future."
-#  if defined(HPX_MSVC)
-#    define HPX_DEPRECATED(x) __declspec(deprecated(x))
-#  elif defined(__GNUC__)
-#    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
-#  endif
-#  if !defined(HPX_DEPRECATED)
-#    define HPX_DEPRECATED(x)  /**/
-#  endif
-#endif
-
 #endif

@@ -295,6 +295,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     typename std::iterator_traits<FwdIter>::value_type
                 >::type
             >::value)>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     typename util::detail::algorithm_result<ExPolicy, T>::type
     transform_reduce(ExPolicy && policy, FwdIter first, FwdIter last,
         T init, Convert && conv_op, Reduce && red_op)
