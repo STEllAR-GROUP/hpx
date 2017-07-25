@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     // if beginning of sequence set start
                     if(cursor == 0)
                         start = first1;
-                    cursor++;
+                    ++cursor;
                     // if complete sequence found, then store result and continue search
                     if(cursor == sequence.size())
                     {
@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     start = last1;
                     cursor = 0;
                 }
-                first1++;
+                ++first1;
             }
             // return consists of positions of complete sequence if found and
                 // partial sequence at the beginning
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     [=](std::vector<hpx::future<void> > &&) mutable
                         -> find_return<FwdIter1>
                     {
-                        FwdIter1 seq_start = first1, seq_last;
+                        FwdIter1 seq_start = first1, seq_last = first1;
                         std::size_t partial_position=0, last_position = sequence.size();
                         difference_type find_end_res = tok.get_data();
                         if (find_end_res != count && find_end_res != -1)
@@ -143,52 +143,54 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         else
                         {
                             // complete sequence is not present so search for
-                                // partial sequence at the beginning.
-                            FwdIter1 curr = first1;
-                            std::size_t index = sequence.size() - 1;
-                            while(!hpx::util::invoke(op, *curr, sequence[index]))
+                            // partial sequence at the beginning.
+                            std::size_t index = 1;
+                            while(index != sequence.size())
                             {
-                                index--;
-                            };
-                            partial_position = index;
-                            seq_start = curr;
-                            for(; index != sequence.size(); index++, curr++)
-                            {
-                                if(!hpx::util::invoke(op, *curr, sequence[index]))
+                                if(hpx::util::invoke(op, *first1, sequence[index]))
                                 {
-                                    break;
+                                    FwdIter1 curr = first1;
+                                    std::size_t temp_index = index;
+                                    while(curr != last1 && temp_index != sequence.size()
+                                        && hpx::util::invoke(op, *curr, sequence[temp_index]))
+                                    {
+                                        ++curr;
+                                        ++temp_index;
+                                    }
+                                    if(temp_index == sequence.size())
+                                    {
+                                        seq_start = first1;
+                                        partial_position = index;
+                                    }
                                 }
-                            }
-                            if(index != sequence.size())
-                            {
-                                partial_position = 0;
-                                seq_start = last1;
+                                ++index;
                             }
                         }
                         //Also search for partial sequence at the end
                         FwdIter1 curr = first1;
-                        std::advance(curr, count-diff);
-                        std::size_t index = 0;
-                        for(; curr != last1; curr++)
+                        std::advance(curr, count-diff+1);
+                        for(; curr != last1; ++curr)
                         {
-                            if(hpx::util::invoke(op, *curr, sequence[index]))
+                            FwdIter1 temp = curr;
+                            std::size_t index = 0;
+                            while(temp != last1 &&
+                                hpx::util::invoke(op, *temp, sequence[index]))
                             {
+                                if(index == 0)
+                                    seq_last = curr;
+                                ++temp;
+                                ++index;
+                            }
+                            if(temp == last1)
+                            {
+                                last_position = index;
                                 break;
                             }
-                        }
-                        seq_last = curr;
-                        if(curr != last1 && curr != seq_start)
-                        {
-                            for(; curr != last1; curr++, index++)
+                            else
                             {
-                                if(!hpx::util::invoke(op, *curr, sequence[index]))
-                                {
-                                    seq_last = last1;
-                                    last_position = sequence.size();
-                                }
+                                seq_last = last1;
+                                last_position = sequence.size();
                             }
-                            if(seq_last != last1)
-                                last_position = index;
                         }
                         // return both results
                         return find_return<FwdIter1>{std::move(seq_start),
@@ -219,7 +221,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 {
                     if(cursor == 0)
                         start = first1;
-                    cursor++;
+                    ++cursor;
                     if(cursor == sequence.size())
                     {
                         if(!found)
@@ -241,7 +243,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     start = last1;
                     cursor = 0;
                 }
-                first1++;
+                ++first1;
             }
             return find_return<FwdIter1>{std::move(start), cursor,
                 std::move(found_start), found_cursor};
@@ -311,7 +313,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     [=](std::vector<hpx::future<void> > &&) mutable
                         -> find_return<FwdIter1>
                     {
-                        FwdIter1 seq_last = first1, seq_start;
+                        FwdIter1 seq_last = first1, seq_start = first1;
                         std::size_t partial_position = sequence.size(), last_position=0;
                         difference_type find_first_of_res = tok.get_data();
                         if(find_first_of_res != count)
@@ -322,47 +324,51 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         else
                         {
                             FwdIter1 curr = first1;
-                            std::advance(curr, count-diff);
-                            std::size_t index = 0;
-                            for(; curr != last1; curr++)
+                            std::advance(curr, count-diff+1);
+                            for(; curr != last1; ++curr)
                             {
-                                if(hpx::util::invoke(op, *curr, sequence[index]))
-                                    break;
-                            }
-                            seq_last = curr;
-                            if(curr != last1)
-                            {
-                                for(; curr != last1; curr++, index++)
+                                FwdIter1 temp = curr;
+                                std::size_t index = 0;
+                                while(temp != last1 &&
+                                    hpx::util::invoke(op, *temp, sequence[index]))
                                 {
-                                    if(!hpx::util::invoke(op, *curr, sequence[index]))
-                                    {
-                                        seq_last = last1;
-                                        last_position = 0;
-                                    }
+                                    if(index == 0)
+                                        seq_last = curr;
+                                    ++temp;
+                                    ++index;
                                 }
-                                if(seq_last != last1)
+                                if(temp == last1)
+                                {
                                     last_position = index;
+                                    break;
+                                }
+                                else
+                                {
+                                    seq_last = last1;
+                                    last_position = sequence.size();
+                                }
                             }
                         }
-                        FwdIter1 curr = first1;
-                        std::size_t index = sequence.size() - 1;
-                        while(!hpx::util::invoke(op, *curr, sequence[index]))
+                        std::size_t index = 1;
+                        while(index != sequence.size())
                         {
-                            index--;
-                        };
-                        partial_position = index;
-                        seq_start = curr;
-                        for(; index != sequence.size(); index++, curr++)
-                        {
-                            if(!hpx::util::invoke(op, *curr, sequence[index]))
+                            if(hpx::util::invoke(op, *first1, sequence[index]))
                             {
-                                break;
+                                FwdIter1 curr = first1;
+                                std::size_t temp_index = index;
+                                while(curr != last1 && temp_index != sequence.size()
+                                    && hpx::util::invoke(op, *curr, sequence[temp_index]))
+                                {
+                                    ++curr;
+                                    ++temp_index;
+                                }
+                                if(temp_index == sequence.size())
+                                {
+                                    seq_start = first1;
+                                    partial_position = index;
+                                }
                             }
-                        }
-                        if(index != sequence.size())
-                        {
-                            partial_position = sequence.size();
-                            seq_start = last1;
+                            ++index;
                         }
                         return find_return<FwdIter1>{std::move(seq_start),
                             partial_position, std::move(seq_last), last_position};
