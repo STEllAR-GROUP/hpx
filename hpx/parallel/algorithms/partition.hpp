@@ -561,6 +561,22 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         }
 
+        // std::swap_ranges doens't support overlapped ranges in standard.
+        // But, actually general implementations of std::swap_ranges are useful
+        //     in specific cases.
+        // The problem is that tstandard doesn't guarantee that implementation.
+        // The swap_ranges_forward is the general implementation of std::swap_ranges
+        //     for guaranteeing utilizations in specific cases.
+        template <class FwdIter1, class FwdIter2>
+        FwdIter2
+        swap_ranges_forward(FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        {
+            while (first != last)
+                std::iter_swap(first++, dest++);
+
+            return dest;
+        }
+
         // Collpase remaining blocks.
         template <typename FwdIter, typename Pred, typename Proj>
         void
@@ -671,12 +687,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     continue;
                 }
 
-                // TODO: Implement my own swap_ranges because
-                //       std::swap_ranges doens't support overlapped ranges in standard.
-                //       But, in this case, std::swap_ranges works well.
-                //       But it is not guaranteed by standard.
                 boundary_rbegin =
-                    std::swap_ranges(rbegin, rend, boundary_rbegin);
+                    swap_ranges_forward(rbegin, rend, boundary_rbegin);
             }
 
             return { boundary_rbegin.base(), boundary };
@@ -743,13 +755,13 @@ namespace hpx { namespace parallel { inline namespace v1
                     <= dest_iter_indexes[i])
                 {
                     // when not overlapped.
-                    std::swap_ranges(remaining_blocks[i].first,
+                    swap_ranges_forward(remaining_blocks[i].first,
                         remaining_blocks[i].last, dest_iters[i]);
                 }
                 else
                 {
                     // when overlapped.
-                    std::swap_ranges(remaining_blocks[i].first,
+                    swap_ranges_forward(remaining_blocks[i].first,
                         dest_iters[i], remaining_blocks[i].last);
                 }
             }
@@ -785,12 +797,8 @@ namespace hpx { namespace parallel { inline namespace v1
                         continue;
                     }
 
-                    // TODO: Implement my own swap_ranges because
-                    //       std::swap_ranges doens't support overlapped ranges in standard.
-                    //       But, in this case, std::swap_ranges works well.
-                    //       But it is not guaranteed by standard.
                     boundary_end =
-                        std::swap_ranges(block.first, block.last, boundary_end);
+                        swap_ranges_forward(block.first, block.last, boundary_end);
                 }
                 return { boundary, boundary_end };
             }
