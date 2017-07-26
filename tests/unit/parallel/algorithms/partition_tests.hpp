@@ -342,7 +342,8 @@ void test_partition_heavy(ExPolicy policy, IteratorTag, DataType, Pred pred,
         16, 24, 32, 48, 64,            /* intent the number of core */
         123, 4567, 65432, 123456,      /* various size */
         961230, 170228, 3456789,       /* big size */
-        std::rand(), std::rand()       /* random size */
+        std::rand() % 10000000,        /* random size */
+        std::rand() % 10000000
     };
 
     for (auto size : size_list)
