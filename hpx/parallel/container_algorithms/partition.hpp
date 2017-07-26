@@ -27,6 +27,89 @@
 
 namespace hpx { namespace parallel { inline namespace v1
 {
+    /// Reorders the elements in the range \a rng in such a way that
+    /// all elements for which the predicate \a pred returns true precede
+    /// the elements for which the predicate \a pred returns false.
+    /// Relative order of the elements is not preserved.
+    ///
+    /// \note   Complexity: Performs at most 2 * N swaps,
+    ///         exactly N applications of the predicate and projection,
+    ///         where N = std::distance(begin(rng), end(rng)).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the sequence
+    ///                     specified by the range \a rng. This is an unary predicate
+    ///                     for partitioning the source iterators. The signature of
+    ///                     this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a partition algorithm returns a \a hpx::future<FwdIter>
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns \a FwdIter otherwise.
+    ///           The \a partition algorithm returns the iterator to
+    ///           the first element of the second group.
+    ///
+    template <typename ExPolicy, typename Rng,
+        typename Pred, typename Proj = util::projection_identity,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_range<Rng>::value &&
+        traits::is_projected_range<Proj, Rng>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, Pred, traits::projected_range<Proj, Rng>
+        >::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type
+    >::type
+    partition(ExPolicy && policy, Rng && rng, Pred && pred,
+        Proj && proj = Proj())
+    {
+        return partition(std::forward<ExPolicy>(policy),
+            hpx::util::begin(rng), hpx::util::end(rng),
+            std::forward<Pred>(pred),
+            std::forward<Proj>(proj));
+    }
+
     /// Copies the elements in the range \a rng,
     /// to two different ranges depending on the value returned by
     /// the predicate \a pred. The elements, that satisfy the predicate \a pred,
@@ -81,8 +164,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
