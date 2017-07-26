@@ -27,11 +27,14 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+const int random_fill_range = (std::min)(100000, RAND_MAX);
+
+///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
     random_fill()
         : gen(std::rand()),
-        dist(0, RAND_MAX)
+        dist(0, random_fill_range)
     {}
 
     int operator()()
@@ -171,9 +174,9 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    int base_num = vm["base_num"].as<int>();
-    if (base_num == -1)
-        base_num = std::rand();
+    int base_num = std::rand() % random_fill_range;
+    if (vm.count("base_num"))
+        base_num = vm["base_num"].as<int>();
     int test_count = vm["test_count"].as<int>();
     std::string iterator_tag_str = correct_iterator_tag_str(
         vm["iterator_tag"].as<std::string>());
@@ -181,12 +184,13 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t const os_threads = hpx::get_os_thread_count();
 
     std::cout << "-------------- Benchmark Config --------------" << std::endl;
-    std::cout << "seed         : " << seed << std::endl;
-    std::cout << "vector_size  : " << vector_size << std::endl;
-    std::cout << "base_num     : " << base_num << std::endl;
-    std::cout << "iterator_tag : " << iterator_tag_str << std::endl;
-    std::cout << "test_count   : " << test_count << std::endl;
-    std::cout << "os threads   : " << os_threads << std::endl;
+    std::cout << "seed            : " << seed << std::endl;
+    std::cout << "vector_size     : " << vector_size << std::endl;
+    std::cout << "rand_fill range : " << random_fill_range << std::endl;
+    std::cout << "base_num        : " << base_num << std::endl;
+    std::cout << "iterator_tag    : " << iterator_tag_str << std::endl;
+    std::cout << "test_count      : " << test_count << std::endl;
+    std::cout << "os threads      : " << os_threads << std::endl;
     std::cout << "----------------------------------------------\n" << std::endl;
 
     if (iterator_tag_str == "random")
@@ -216,10 +220,12 @@ int main(int argc, char* argv[])
             boost::program_options::value<std::string>()->default_value("random"),
             "the kind of iterator tag (random/bidirectional/forward)")
         ("base_num",
-            boost::program_options::value<int>()->default_value(-1),
+            boost::program_options::value<int>(),
             (boost::format(
-                "the base number for partitioning. The range is [0, %1%]"
-                " (default: random number)") % RAND_MAX).str().c_str())
+                "the base number for partitioning."
+                " The range of random_fill is [0, %1%]"
+                " (default: random number in the range [0, %2%]")
+                % random_fill_range % random_fill_range).str().c_str())
         ("test_count",
             boost::program_options::value<int>()->default_value(10),
             "number of tests to be averaged (default: 10)")
