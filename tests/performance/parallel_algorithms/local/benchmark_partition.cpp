@@ -9,6 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_partition.hpp>
 #include <hpx/include/parallel_generate.hpp>
+#include <hpx/include/parallel_copy.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -51,36 +52,45 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename InIter, typename Pred>
+template <typename OrgIter, typename FwdIter, typename Pred>
 double run_partition_benchmark_std(int test_count,
-    InIter first, InIter last, Pred pred)
+    OrgIter org_first, OrgIter org_last, FwdIter first, FwdIter last, Pred pred)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = std::uint64_t(0);
 
     for (int i = 0; i < test_count; ++i)
     {
+        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         std::partition(first, last, pred);
-    }
+        time += hpx::util::high_resolution_clock::now() - elapsed;
 
-    time = hpx::util::high_resolution_clock::now() - time;
+        // Restore [first, last) with original data.
+        hpx::parallel::copy(hpx::parallel::execution::par,
+            org_first, org_last, first);
+    }
 
     return (time * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename FwdIter, typename Pred>
+template <typename ExPolicy, typename OrgIter, typename FwdIter, typename Pred>
 double run_partition_benchmark_hpx(int test_count, ExPolicy policy,
-    FwdIter first, FwdIter last, Pred pred)
+    OrgIter org_first, OrgIter org_last, FwdIter first, FwdIter last, Pred pred)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = std::uint64_t(0);
 
     for (int i = 0; i < test_count; ++i)
     {
         using namespace hpx::parallel;
-        partition(policy, first, last, pred);
-    }
 
-    time = hpx::util::high_resolution_clock::now() - time;
+        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        partition(policy, first, last, pred);
+        time += hpx::util::high_resolution_clock::now() - elapsed;
+
+        // Restore [first, last) with original data.
+        hpx::parallel::copy(hpx::parallel::execution::par,
+            org_first, org_last, first);
+    }
 
     return (time * 1e-9) / test_count;
 }
@@ -95,13 +105,17 @@ void run_benchmark(std::size_t vector_size, int test_count, int base_num,
     typedef typename std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<int> v(vector_size);
+    std::vector<int> v(vector_size), org_v;
     iterator first = iterator(std::begin(v));
     iterator last = iterator(std::end(v));
 
     // initialize data
     using namespace hpx::parallel;
     generate(execution::par, std::begin(v), std::end(v), random_fill());
+    org_v = v;
+
+    auto org_first = std::begin(org_v);
+    auto org_last = std::end(org_v);
 
     std::cout << "* Running Benchmark..." << std::endl;
 
@@ -111,21 +125,25 @@ void run_benchmark(std::size_t vector_size, int test_count, int base_num,
 
     std::cout << "--- run_partition_benchmark_std ---" << std::endl;
     double time_std =
-        run_partition_benchmark_std(test_count, first, last, pred);
+        run_partition_benchmark_std(test_count, org_first, org_last,
+            first, last, pred);
 
     std::cout << "--- run_partition_benchmark_seq ---" << std::endl;
     double time_seq =
         run_partition_benchmark_hpx(test_count, execution::seq,
+            org_first, org_last,
             first, last, pred);
 
     std::cout << "--- run_partition_benchmark_par ---" << std::endl;
     double time_par =
         run_partition_benchmark_hpx(test_count, execution::par,
+            org_first, org_last,
             first, last, pred);
 
     std::cout << "--- run_partition_benchmark_par_unseq ---" << std::endl;
     double time_par_unseq =
         run_partition_benchmark_hpx(test_count, execution::par_unseq,
+            org_first, org_last,
             first, last, pred);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
