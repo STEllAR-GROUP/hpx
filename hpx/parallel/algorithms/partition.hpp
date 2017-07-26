@@ -824,22 +824,15 @@ namespace hpx { namespace parallel { inline namespace v1
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
 
-                typedef executor_parameter_traits<parameters_type> traits;
-
                 try {
                     if (first == last)
                         return algorithm_result::get(std::move(first));
 
-                    auto count = std::distance(first, last);
-
                     std::size_t const cores = execution::processing_units_count(
                         policy.executor(), policy.parameters());
-                    std::size_t max_chunks = traits::maximal_number_of_chunks(
-                        policy.parameters(), policy.executor(), cores, count);
 
-                    // TODO: Find good block size.
-                    const std::size_t block_size = (std::max)
-                        (std::size_t(count) / max_chunks, std::size_t(1));
+                    // TODO: Find more better block size.
+                    const std::size_t block_size = std::size_t(20000);
                     block_manager<FwdIter> block_manager(first, last, block_size);
 
                     std::vector<hpx::future<block<FwdIter>>>
