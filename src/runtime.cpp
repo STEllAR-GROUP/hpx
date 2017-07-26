@@ -109,7 +109,7 @@ namespace hpx
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include "util/stack_overflow_detection.cpp"
+#include "util/stack_overflow_detection.hpp"
 
 namespace hpx
 {
