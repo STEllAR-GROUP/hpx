@@ -240,7 +240,6 @@ namespace hpx { namespace threads
             std::size_t max_cores,
             std::vector<std::size_t>& num_pus,
             error_code& ec = throws);
-
 #endif
 
     /// \endcond

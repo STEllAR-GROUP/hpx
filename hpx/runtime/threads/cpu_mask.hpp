@@ -16,6 +16,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
             && HPX_HAVE_MAX_CPU_COUNT > 64)
@@ -213,6 +214,8 @@ namespace hpx { namespace threads
         return mask.count();
     }
 #endif
+
+    HPX_API_EXPORT std::string to_string(mask_cref_type);
     /// \endcond
 }}
 

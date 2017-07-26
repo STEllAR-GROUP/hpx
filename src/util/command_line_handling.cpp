@@ -10,6 +10,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
@@ -1122,13 +1123,18 @@ namespace hpx { namespace util
                 if (!ec && threads::any(boundcpu) &&
                     !threads::equal(boundcpu, pu_mask, num_threads))
                 {
+                    std::string boundcpu_str = threads::to_string(boundcpu);
+                    std::string pu_mask_str = threads::to_string(pu_mask);
                     HPX_THROW_EXCEPTION(invalid_status,
                         "handle_print_bind",
-                        boost::str(boost::format(
-                            "unexpected mismatch between locality %1%: binding "
-                            "reported from HWLOC(%2%) and HPX(%3%) on "
-                            "thread %4%"
-                        ) % hpx::get_locality_id() % boundcpu % pu_mask % i));
+                        boost::str(
+                            boost::format(
+                                "unexpected mismatch between locality %1%: "
+                                "binding "
+                                "reported from HWLOC(%2%) and HPX(%3%) on "
+                                "thread %4%") %
+                            hpx::get_locality_id() % boundcpu_str %
+                            pu_mask_str % i));
                 }
             }
 

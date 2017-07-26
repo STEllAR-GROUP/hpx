@@ -26,10 +26,12 @@ namespace hpx { namespace detail
 
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
-    static mask_type get_empty_machine_mask()
+    static mask_type get_full_machine_mask(std::size_t num_threads)
     {
         threads::mask_type m = threads::mask_type();
         threads::resize(m, hardware_concurrency());
+        for (std::size_t i = 0; i != num_threads; ++i)
+            threads::set(m, i);
         return m;
     }
 
@@ -56,7 +58,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     {
         std::size_t pu_step = 1;
 #if defined(HPX_HAVE_HWLOC)
-        if (cfg.pu_step_ != 1) {
+        if (cfg.pu_step_ != 1)
+        {
             pu_step = cfg.pu_step_;
             if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
             {
@@ -75,19 +78,25 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::size_t count = 0;
         for (mask_cref_type m : masks)
         {
-            if(any(m))
+            if(threads::any(m))
                 ++count;
         }
         return count;
     }
 
     affinity_data::affinity_data()
-      : num_threads_(0), pu_offset_(std::size_t(-1)), pu_step_(1), used_cores_(0),
-        affinity_domain_("pu"), affinity_masks_(), pu_nums_(),
-        no_affinity_()
+      : num_threads_(0)
+      , pu_offset_(std::size_t(-1))
+      , pu_step_(1)
+      , used_cores_(0)
+      , affinity_domain_("pu")
+      , affinity_masks_()
+      , pu_nums_()
+      , no_affinity_()
     {
         // allow only one affinity-data instance
-        if(instance_number_counter_++ >= 0){
+        if (instance_number_counter_++ >= 0)
+        {
             throw std::runtime_error(
                 "Cannot instantiate more than one affinity data instance");
         }
@@ -130,7 +139,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if (affinity_desc == "none")
         {
             // don't use any affinity for any of the os-threads
-            threads::resize(no_affinity_, num_threads_);
+            threads::resize(no_affinity_, num_system_pus);
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::set(no_affinity_, i);
         }
@@ -167,9 +176,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 #endif
 
         // correct used_cores from config data if appropriate
-        if (used_cores_ == 0) {
-            used_cores_ = std::size_t(
-                    cfg_.rtcfg_.get_first_used_core());
+        if (used_cores_ == 0)
+        {
+            used_cores_ = std::size_t(cfg_.rtcfg_.get_first_used_core());
         }
 
         pu_offset_ %= num_system_pus;
@@ -177,7 +186,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         std::vector<std::size_t> cores;
         cores.reserve(num_threads_);
-        for(std::size_t i = 0; i != num_threads_; ++i)
+        for (std::size_t i = 0; i != num_threads_; ++i)
         {
             std::size_t add_me = topo.get_core_number(get_pu_num(i));
             cores.push_back(add_me);
@@ -201,7 +210,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, global_thread_num))
         {
-            static mask_type m = get_empty_machine_mask();
+            static mask_type m = get_full_machine_mask(num_threads_);
             return m;
         }
 
@@ -211,18 +220,21 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         // otherwise return mask based on affinity domain
         std::size_t pu_num = get_pu_num(global_thread_num);
-        if (0 == std::string("pu").find(affinity_domain_)) {
+        if (0 == std::string("pu").find(affinity_domain_))
+        {
             // The affinity domain is 'processing unit', just convert the
             // pu-number into a bit-mask.
             return topology.get_thread_affinity_mask(pu_num, numa_sensitive);
         }
-        if (0 == std::string("core").find(affinity_domain_)) {
+        if (0 == std::string("core").find(affinity_domain_))
+        {
             // The affinity domain is 'core', return a bit mask corresponding
             // to all processing units of the core containing the given
             // pu_num.
             return topology.get_core_affinity_mask(pu_num, numa_sensitive);
         }
-        if (0 == std::string("numa").find(affinity_domain_)) {
+        if (0 == std::string("numa").find(affinity_domain_))
+        {
             // The affinity domain is 'numa', return a bit mask corresponding
             // to all processing units of the NUMA domain containing the
             // given pu_num.
@@ -235,27 +247,44 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return topology.get_machine_affinity_mask();
     }
 
-    mask_type affinity_data::get_used_pus_mask() const
+    mask_type affinity_data::get_used_pus_mask(std::size_t pu_num) const
     {
-        mask_type ret(0);
+        mask_type ret = mask_type();
+        threads::resize(ret, hardware_concurrency());
 
-        for(auto pu_mask : affinity_masks_)
+        // --hpx:bind=none disables all affinity
+        if (threads::test(no_affinity_, pu_num))
+        {
+            threads::set(ret, pu_num);
+            return ret;
+        }
+
+        for(mask_cref_type pu_mask : affinity_masks_)
             ret |= pu_mask;
 
         return ret;
     }
 
-    std::size_t affinity_data::get_thread_occupancy(std::size_t pid) const
+    std::size_t affinity_data::get_thread_occupancy(std::size_t pu_num) const
     {
         std::size_t count = 0;
-        mask_type pu_mask = 0;
-        threads::set(pu_mask, pid);
-
-        for(auto affinity_mask : affinity_masks_){
-            if (threads::any(pu_mask & affinity_mask))
-                count ++;
+        if (threads::test(no_affinity_, pu_num))
+        {
+            ++count;
         }
+        else
+        {
+            mask_type pu_mask = mask_type();
 
+            threads::resize(pu_mask, hardware_concurrency());
+            threads::set(pu_mask, pu_num);
+
+            for (mask_cref_type affinity_mask : affinity_masks_)
+            {
+                if (threads::any(pu_mask & affinity_mask))
+                    ++count;
+            }
+        }
         return count;
     }
 

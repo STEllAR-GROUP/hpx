@@ -226,7 +226,7 @@ namespace resource {
         num_threads_overall += num_threads;
 
         // Add pu mask to internal data structure
-        threads::mask_type pu_mask = 0;
+        threads::mask_type pu_mask = threads::mask_type();
         threads::set(pu_mask, pu_index);
 
         // Add one mask for each OS-thread
@@ -316,11 +316,12 @@ namespace resource {
         return cfg_.call(desc_cmdline, argc, argv);
     }
 
-    bool resource_partitioner::pu_exposed(std::size_t pid)
+    bool resource_partitioner::pu_exposed(std::size_t pu_num)
     {
-        threads::mask_type pu_mask(0);
-        threads::set(pu_mask, pid);
-        threads::mask_type comp = affinity_data_.get_used_pus_mask();
+        threads::mask_type pu_mask = threads::mask_type();
+        threads::set(pu_mask, pu_num);
+
+        threads::mask_type comp = affinity_data_.get_used_pus_mask(pu_num);
         return threads::any(comp & pu_mask);
     }
 
@@ -368,13 +369,15 @@ namespace resource {
                         p.thread_occupancy_ =
                             affinity_data_.get_thread_occupancy(pid);
                         if (p.thread_occupancy_ == 0)
-                            throw std::runtime_error("PU #" +
-                                std::to_string(pid) +
+                        {
+                            throw std::runtime_error(
+                                "PU #" + std::to_string(pid) +
                                 " has thread occupancy 0");
+                        }
                         p.thread_occupancy_count_ = p.thread_occupancy_;
                         core_contains_exposed_pus = true;
                     }
-                    pid++;
+                    ++pid;
                 }
 
                 if (core_contains_exposed_pus)
@@ -417,9 +420,9 @@ namespace resource {
         // @TODO allow empty pools
         if (get_pool("default").num_threads_ == 0)
         {
-            throw std::runtime_error("Default pool has no threads assigned"
-                                     "Please rerun with --hpx:threads=X "
-                                     "and check the pool thread assignment");
+            throw std::runtime_error(
+                "Default pool has no threads assigned. Please rerun with "
+                "--hpx:threads=X and check the pool thread assignment");
         }
 
         // Check whether any of the pools defined up to now are empty
@@ -485,7 +488,7 @@ namespace resource {
 
         // set this scheduler on the pools that do not have a specified scheduler yet
         std::size_t npools(initial_thread_pools_.size());
-        for (size_t i(0); i < npools; i++)
+        for (std::size_t i = 0; i != npools; ++i)
         {
             if (initial_thread_pools_[i].scheduling_policy_ == unspecified)
             {
@@ -528,7 +531,7 @@ namespace resource {
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
 
-        for (size_t i(0); i < num_thread_pools; i++)
+        for (std::size_t i = 0; i != num_thread_pools; i++)
         {
             if (initial_thread_pools_[i].assigned_pus_.size() == 0)
             {
@@ -856,9 +859,9 @@ namespace resource {
     init_pool_data const& resource_partitioner::get_pool(
         std::string const& pool_name) const
     {
-        auto pool = std::find_if(initial_thread_pools_.begin(),
-            initial_thread_pools_.end(),
-            [&pool_name](init_pool_data itp) -> bool
+        auto pool = std::find_if(
+            initial_thread_pools_.begin(), initial_thread_pools_.end(),
+            [&pool_name](init_pool_data const& itp) -> bool
             {
                 return (itp.pool_name_ == pool_name);
             });
@@ -875,9 +878,9 @@ namespace resource {
 
     init_pool_data& resource_partitioner::get_pool(std::string const& pool_name)
     {
-        auto pool = std::find_if(initial_thread_pools_.begin(),
-            initial_thread_pools_.end(),
-            [&pool_name](init_pool_data itp) -> bool
+        auto pool = std::find_if(
+            initial_thread_pools_.begin(), initial_thread_pools_.end(),
+            [&pool_name](init_pool_data const& itp) -> bool
             {
                 return (itp.pool_name_ == pool_name);
             });
@@ -894,9 +897,9 @@ namespace resource {
 
     init_pool_data& resource_partitioner::get_default_pool()
     {
-        auto pool = std::find_if(initial_thread_pools_.begin(),
-            initial_thread_pools_.end(),
-            [](init_pool_data itp) -> bool
+        auto pool = std::find_if(
+            initial_thread_pools_.begin(), initial_thread_pools_.end(),
+            [](init_pool_data const& itp) -> bool
             {
                 return (itp.pool_name_ == "default");
             });
