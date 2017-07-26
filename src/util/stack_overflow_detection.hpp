@@ -55,7 +55,7 @@ prepare_alternate_stack (void)
 // to count the number of stack overflows occured in the implementation
 volatile int pass = 0;
 
-void
+static void
 stackoverflow_handler_continuation (void *arg1, void *arg2, void *arg3)
 {
   int arg = (int) (long) arg1;
@@ -63,7 +63,7 @@ stackoverflow_handler_continuation (void *arg1, void *arg2, void *arg3)
 }
 
 // handler for stack overflow
-void
+static void
 stackoverflow_handler (int emergency, stackoverflow_context_t scp)
 {
   pass++;
@@ -79,7 +79,7 @@ stackoverflow_handler (int emergency, stackoverflow_context_t scp)
 }
 
 // handler for general segmentation fault 
-int
+static int
 sigsegv_handler (void *address, int emergency)
 {
 
@@ -95,7 +95,7 @@ sigsegv_handler (void *address, int emergency)
 }
 
 // stack overflow detection API starts from here
-void stack_overflow_detection()
+static void stack_overflow_detection()
 {
   // alternate stack to handle the stack overflow
   prepare_alternate_stack ();
