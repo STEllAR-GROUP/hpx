@@ -145,6 +145,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             // complete sequence is not present so search for
                             // partial sequence at the beginning.
                             std::size_t index = 1;
+                            //loop till suffix of sequence at beginning found
                             while(index != sequence.size())
                             {
                                 if(hpx::util::invoke(op, *first1, sequence[index]))
@@ -169,6 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         //Also search for partial sequence at the end
                         FwdIter1 curr = first1;
                         std::advance(curr, count-diff+1);
+                        //loop till prefix of sequence at end found
                         for(; curr != last1; ++curr)
                         {
                             FwdIter1 temp = curr;
@@ -217,13 +219,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             bool found = false;
             while(last1 != first1)
             {
+                // test if sequence matches for current cursor and iter position
                 if(hpx::util::invoke(op, *first1, sequence[cursor]))
                 {
+                    // if beginning of sequence set start
                     if(cursor == 0)
                         start = first1;
                     ++cursor;
+                    // if complete sequence found, then store result and continue search
                     if(cursor == sequence.size())
                     {
+                        //only if sequence not previously found
                         if(!found)
                         {
                             found = true;
@@ -233,11 +239,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         cursor = 0;
                     }
                 }
+                // if iter does not match current sequence position then check
+                    // with beginning
                 else if(hpx::util::invoke(op, *first1, sequence[0]))
                 {
                     start = first1;
                     cursor = 1;
                 }
+                //otherwise start search again
                 else
                 {
                     start = last1;
@@ -245,6 +254,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 }
                 ++first1;
             }
+            // return consists of positions of complete sequence if found and
+                // partial sequence at the beginning
             return find_return<FwdIter1>{std::move(start), cursor,
                 std::move(found_start), found_cursor};
         }
@@ -281,6 +292,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     [=](FwdIter1 it,
                         std::size_t part_size, std::size_t base_idx) mutable
                     {
+                        // loop within a thread to see if complete sequence present.
                         FwdIter1 curr = it;
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
@@ -318,13 +330,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         difference_type find_first_of_res = tok.get_data();
                         if(find_first_of_res != count)
                         {
+                            // complete sequence is not present so search for
+                            // partial sequence at the beginning.
                             std::advance(seq_last, find_first_of_res);
                             last_position = sequence.size();
                         }
                         else
                         {
+                            // complete sequence is not present so search for
+                            // partial sequence at the end.
                             FwdIter1 curr = first1;
                             std::advance(curr, count-diff+1);
+                            //loop till prefix of sequence at end found
                             for(; curr != last1; ++curr)
                             {
                                 FwdIter1 temp = curr;
@@ -349,7 +366,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 }
                             }
                         }
+                        //Also search for partial sequence at the beginning
                         std::size_t index = 1;
+                        //loop till suffix of sequence at beginning found
                         while(index != sequence.size())
                         {
                             if(hpx::util::invoke(op, *first1, sequence[index]))

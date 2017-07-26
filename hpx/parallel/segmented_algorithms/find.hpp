@@ -405,11 +405,13 @@ namespace hpx { namespace parallel { inline namespace v1
                     out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, sequence, op
                     );
+                    //if complete sequence found the store that
                     if(out.seq_first != end && out.partial_position == sequence.size())
                     {
                         out.partial_position = 0;
                         output=traits::compose(sit, out.seq_first);
                     }
+                    // if partial sequence found then store that for next segment
                     if (out.partial_position != out.last_position)
                     {
                         partial_out = traits::compose(sit, out.seq_last);
@@ -428,19 +430,23 @@ namespace hpx { namespace parallel { inline namespace v1
                             algo, policy, std::true_type(), beg, end, sequence,
                             op, out.partial_position
                         );
+                        //if complete sequence found the store that
                         if(out.seq_first != end && out.partial_position == sequence.size())
                         {
                             out.partial_position = 0;
                             output=traits::compose(sit, out.seq_first);
                         }
+                        //if earlier partial sequence found completely then store that
                         else if(partial_found && out.partial_position == sequence.size())
                         {
                             output = partial_out;
                         }
+                        //else discard partial sequence
                         else
                         {
                             partial_found = false;
                         }
+                        //check if new partial sequence found
                         if (out.partial_position != out.last_position)
                         {
                             partial_out = traits::compose(sit, out.seq_last);
@@ -459,11 +465,13 @@ namespace hpx { namespace parallel { inline namespace v1
                         algo, policy, std::true_type(), beg, end, sequence,
                         op, out.partial_position
                     );
+                    //if complete sequence found the store that
                     if(out.seq_first != end && out.partial_position == sequence.size())
                     {
                         out.partial_position = 0;
                         output=traits::compose(sit, out.seq_first);
                     }
+                    //check if previous partial sequence completely found now
                     else if(partial_found && out.partial_position == sequence.size())
                     {
                         output = partial_out;
@@ -621,14 +629,17 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         std::vector<find_return<FwdIter1>> res =
                             hpx::util::unwrapped(std::move(r));
+                        // iterate from the end usinga reverse iterator
                         auto it = res.rbegin();
                         while(it!=res.rend())
                         {
+                            //if complete sequence found the store that
                             if(it->seq_first != last1 &&
                                 it->partial_position == sequence.size())
                             {
                                 return it->seq_first;
                             }
+                            //if partial sequence found in the segment behind it
                             if (std::next(it)->last_position != sequence.size() &&
                                 std::next(it)->last_position == it->partial_position)
                             {
@@ -727,12 +738,14 @@ namespace hpx { namespace parallel { inline namespace v1
                     out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, sequence, op
                     );
+                    //if complete sequence found the store that
                     if(out.seq_last != end && out.last_position == sequence.size())
                     {
                         out.last_position = 0;
                         found = true;
                         output=traits::compose(sit, out.seq_last);
                     }
+                    //keep track of partial sequence if found
                     if (out.last_position != out.partial_position)
                     {
                         partial_out = traits::compose(sit, out.seq_first);
@@ -747,12 +760,13 @@ namespace hpx { namespace parallel { inline namespace v1
                     beg = traits::begin(sit);
                     end = traits::end(sit);
                     out.seq_last = traits::end(sit);
-                    if (beg != end && !found)
+                    if (beg != end && !found) //do this only if sequence not found
                     {
                         out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, sequence,
                             op, out.last_position
                         );
+                        //if complete sequence found the store that
                         if(out.seq_last != end && out.last_position == sequence.size())
                         {
                             out.last_position = 0;
@@ -760,15 +774,18 @@ namespace hpx { namespace parallel { inline namespace v1
                             found = true;
                             break;
                         }
+                        //if earlier partial sequence completed store that
                         else if(partial_found && out.last_position == sequence.size())
                         {
                             output = partial_out;
                             found = true;
                         }
+                        //else discard earlier partial sequence
                         else
                         {
                             partial_found = false;
                         }
+                        //store new partial sequence if found
                         if (out.last_position != out.partial_position)
                         {
                             partial_out = traits::compose(sit, out.seq_first);
@@ -787,12 +804,14 @@ namespace hpx { namespace parallel { inline namespace v1
                         algo, policy, std::true_type(), beg, end, sequence,
                         op, out.last_position
                     );
+                    //if complete sequence found the store that
                     if(out.seq_last != end && out.last_position == sequence.size())
                     {
                         out.last_position = 0;
                         output=traits::compose(sit,out.seq_last);
                         found = true;
                     }
+                    //if earlier partial sequence completed then store  that
                     else if(partial_found && out.last_position == sequence.size())
                     {
                         found = true;
@@ -951,14 +970,17 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         std::vector<find_return<FwdIter1>> res =
                             hpx::util::unwrapped(std::move(r));
+                            //iterate from the first segment
                         auto it = res.begin();
                         while(it!=res.end())
                         {
+                            //if complete sequence found the return that
                             if(it->seq_last != last1 &&
                                 it->last_position == sequence.size())
                             {
                                 return it->seq_last;
                             }
+                            //if partial sequence found between this and next segment
                             if (std::next(it)->partial_position != sequence.size() &&
                                 std::next(it)->partial_position == it->last_position)
                             {
