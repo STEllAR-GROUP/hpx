@@ -17,8 +17,6 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
-static int zero_fd;
-
 # define sigemptyset(set)
 # define sigprocmask(how,set,oldset)
 
@@ -34,7 +32,7 @@ static int zero_fd;
 
 // stack size value if user has not provided one
 #ifndef SIGSTKSZ
-# define SIGSTKSZ 16384
+#define SIGSTKSZ 16384
 #endif
 
 // over allocate the stack to detect the address range
@@ -47,7 +45,7 @@ sigset_t mainsigset;
 char mystack_storage[SIGSTKSZ + 2 * MYSTACK_CRUMPLE_ZONE + 31];
 char *mystack; /* SIGSTKSZ bytes in the middle of storage. */
 
-static void
+void
 prepare_alternate_stack (void)
 {
   memset (mystack_storage, 's', sizeof mystack_storage);
@@ -57,9 +55,7 @@ prepare_alternate_stack (void)
 // to count the number of stack overflows occured in the implementation
 volatile int pass = 0;
 
-uintptr_t page;
-
-static void
+void
 stackoverflow_handler_continuation (void *arg1, void *arg2, void *arg3)
 {
   int arg = (int) (long) arg1;
@@ -72,8 +68,8 @@ stackoverflow_handler (int emergency, stackoverflow_context_t scp)
 {
   pass++;
   
-  // prints the starting address of the stack 
-  printf ("Stack overflow caught at %u.\n", mystack);
+  // prints the starting address of the stack
+  printf ("Stack overflow caught at %p.\n", mystack);
 
   sigprocmask (SIG_SETMASK, &mainsigset, NULL);
 
