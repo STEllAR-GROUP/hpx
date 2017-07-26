@@ -3,9 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// for Visual C++ compiler
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+
+// for Visual C++ compiler(NT platform)
 #ifndef _MSC_VER
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <sigsegv.h>
@@ -36,9 +38,7 @@ static int zero_fd;
 #endif
 
 // over allocate the stack to detect the address range
-#ifndef
 #define MYSTACK_CRUMPLE_ZONE 8192
-#endif
 
 #pragma startup call
 jmp_buf mainloop;
@@ -113,3 +113,5 @@ void stack_overflow_detection()
   if (sigsegv_install_handler (&sigsegv_handler) < 0)
     {exit (2);}
 }
+
+#endif  // HPX_HAVE_STACKOVERFLOW_DETECTION code ends here
