@@ -36,6 +36,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <iterator>
 #include <list>
@@ -551,7 +552,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 using hpx::util::invoke;
 
                 block<FwdIter> left_block, right_block;
-            
+
                 left_block = block_manager.get_left_block();
                 right_block = block_manager.get_right_block();
 
@@ -661,7 +662,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
             }
 
-            // The function which merges remaining blocks that are placed 
+            // The function which merges remaining blocks that are placed
             //     leftside of boundary.
             // Requires bidirectional iterator.
             template <typename BidirIter,
@@ -773,7 +774,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             // The function which merges remaining blocks into
-            //     one block which is adjacent to boundary. 
+            //     one block which is adjacent to boundary.
             template <typename FwdIter>
             static block<FwdIter>
             merge_remaining_blocks(std::vector<block<FwdIter>>& remaining_blocks,
@@ -807,7 +808,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     return { boundary, boundary_end };
                 }
             }
-            
+
             template <typename ExPolicy, typename FwdIter,
                 typename Pred, typename Proj>
             static typename util::detail::algorithm_result<
@@ -848,7 +849,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                 return partition_thread(block_manager, pred, proj);
                             });
                     }
-                    
+
                     // Wait sub-partitioning to be all finished.
                     hpx::wait_all(remaining_block_futures);
 
@@ -937,7 +938,7 @@ namespace hpx { namespace parallel { inline namespace v1
     }
 
     /// Reorders the elements in the range [first, last) in such a way that
-    /// all elements for which the predicate \a pred returns true precede 
+    /// all elements for which the predicate \a pred returns true precede
     /// the elements for which the predicate \a pred returns false.
     /// Relative order of the elements is not preserved.
     ///
