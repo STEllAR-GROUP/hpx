@@ -19,6 +19,7 @@
 #include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
@@ -365,6 +366,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 // Maybe 'std::int64_t' is enough to avoid overflow.
                 std::int64_t block_no;
 
+                block() = default;
+                block(FwdIter first, FwdIter last, std::int64_t block_no = -1)
+                    : first(first), last(last), block_no(block_no)
+                {}
+
                 bool empty() const { return first == last; }
 
                 bool operator<(block<FwdIter> const& other) const
@@ -523,7 +529,7 @@ namespace hpx { namespace parallel { inline namespace v1
             // std::swap_ranges doens't support overlapped ranges in standard.
             // But, actually general implementations of std::swap_ranges are useful
             //     in specific cases.
-            // The problem is that tstandard doesn't guarantee that implementation.
+            // The problem is that standard doesn't guarantee that implementation.
             // The swap_ranges_forward is the general implementation of
             //     std::swap_ranges for guaranteeing utilizations in specific cases.
             template <class FwdIter1, class FwdIter2>
@@ -843,10 +849,13 @@ namespace hpx { namespace parallel { inline namespace v1
                     for (std::size_t i = 0; i < remaining_block_futures.size(); ++i)
                     {
                         remaining_block_futures[i] = execution::async_execute(
-                            policy.executor(), &partition_thread<FwdIter, Pred, Proj>,
-                            std::ref(block_manager), pred, proj);
+                            policy.executor(),
+                            [&block_manager, pred, proj]()
+                            {
+                                return partition_thread(block_manager, pred, proj);
+                            });
                     }
-
+                    
                     // Wait sub-partitioning to be all finished.
                     hpx::wait_all(remaining_block_futures);
 
