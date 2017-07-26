@@ -5,12 +5,15 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/algorithms/fill.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+
 #include <hpx/runtime/serialization/partitioned_vector.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
+#include <hpx/include/traits.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -18,25 +21,36 @@
 #include <cstddef>
 #include <numeric>
 
+HPX_REGISTER_PARTITIONED_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(unsigned);
+
+typedef unsigned long ulong;
+
+HPX_REGISTER_PARTITIONED_VECTOR(ulong);
+HPX_REGISTER_PARTITIONED_VECTOR(long);
+HPX_REGISTER_PARTITIONED_VECTOR(double);
+
 template <typename T>
 void test(T minval, T maxval)
 {
     {
         std::vector<char> buffer;
+
         hpx::serialization::output_archive oarchive(buffer,
             hpx::serialization::disable_data_chunking);
 
         std::size_t sz = static_cast<std::size_t>(maxval-minval);
-        hpx::partitioned_vector<T> os(sz);
 
-        T n = minval;
-        hpx::parallel::generate(std::begin(os), std::end(os),
-            [&n] { return ++n; });
+        hpx::partitioned_vector<T> os(sz);
+        hpx::parallel::fill(hpx::parallel::par, std::begin(os), std::end(os), 0);
 
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
+
         hpx::partitioned_vector<T> is(os.size());
+        hpx::parallel::fill(hpx::parallel::par, std::begin(is), std::end(is), 0);
+
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
         for(std::size_t i = 0; i < os.size(); ++i)
@@ -65,7 +79,7 @@ int main()
     test<unsigned long>((std::numeric_limits<unsigned long>::min)(),
         (std::numeric_limits<unsigned long>::min)() + 100);
     test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100,
-        (std::numeric_limits<unsigned long>::max)());
+        (std::numeric_limits<unsigned long>::max)()); 
     test<double>((std::numeric_limits<double>::min)(),
         (std::numeric_limits<double>::min)() + 100);
     test<double>(-100, 100);

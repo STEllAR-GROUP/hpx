@@ -10,11 +10,11 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 
-#include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/is_partitioned.hpp>
+#include <hpx/include/traits.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/throw_exception.hpp>
 
@@ -77,24 +77,22 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, hpx::partitioned_vector<T> & v,
         unsigned)
     {
-        typedef typename hpx::partitioned_vector<T>::iterator FwdIter;
-        typedef typename hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef typename hpx::partitioned_vector<T>::segment_iterator segment_iterator;
+        typedef hpx::traits::is_segmented_iterator<segment_iterator> is_segmented;
 
-        auto vitr = std::begin(v);
-        detail::partitioned_vector_segmented_serializer::serialize<T>(
-            ar, v, is_segmented(vitr));
+        hpx::serialization::detail::partitioned_vector_segmented_serializer::serialize<T>(
+            ar, v, is_segmented());
     }
 
     template <typename T>
     void serialize(output_archive & ar, const hpx::partitioned_vector<T> & v,
         unsigned)
     {
-        typedef typename hpx::partitioned_vector<T>::iterator FwdIter;
-        typedef typename hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        typedef typename hpx::partitioned_vector<T>::segment_iterator segment_iterator;
+        typedef hpx::traits::is_segmented_iterator<segment_iterator> is_segmented;
 
-        auto vitr = std::begin(v);
-        detail::partitioned_vector_segmented_serializer::serialize<T>(
-            ar, v, is_segmented(vitr));
+        hpx::serialization::detail::partitioned_vector_segmented_serializer::serialize<T>(
+            ar, v, is_segmented());
     }
 
 }}
