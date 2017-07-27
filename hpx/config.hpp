@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -383,15 +383,6 @@
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
 #  define HPX_BUSY_LOOP_COUNT_MAX 2000
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Count number of terminated threads before forcefully cleaning up all of
-// them. Note: terminated threads are cleaned up either when this number is
-// reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
-// reached, which will clean up the terminated threads for _all_ thread queues.
-#if !defined(HPX_MAX_TERMINATED_THREADS)
-#  define HPX_MAX_TERMINATED_THREADS 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
