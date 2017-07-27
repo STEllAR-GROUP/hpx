@@ -754,7 +754,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         output=traits::compose(sit, out.seq_last);
                     }
                     //keep track of partial sequence if found
-                    if (out.last_position != out.partial_position)
+                    if (out.partial_position != 0)
                     {
                         partial_out = traits::compose(sit, out.seq_first);
                         partial_found = true;
@@ -763,12 +763,12 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
 
                 // handle all of the full partitions
-                for (++sit; sit != send; ++sit)
+                for (++sit; sit != send  && !found; ++sit)
                 {
                     beg = traits::begin(sit);
                     end = traits::end(sit);
                     out.seq_last = traits::end(sit);
-                    if (beg != end && !found) //do this only if sequence not found
+                    if (beg != end) //do this only if sequence not found
                     {
                         out = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, sequence,
@@ -794,9 +794,10 @@ namespace hpx { namespace parallel { inline namespace v1
                             partial_found = false;
                         }
                         //store new partial sequence if found
-                        if (out.last_position != out.partial_position)
+                        if (out.partial_position != 0)
                         {
-                            partial_out = traits::compose(sit, out.seq_first);
+                            if(out.partial_position < (std::size_t) std::distance(beg, end))
+                                partial_out = traits::compose(sit, out.seq_first);
                             partial_found = true;
                             out.last_position = out.partial_position;
                         }
