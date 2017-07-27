@@ -134,6 +134,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         FwdIter1 seq_start = first1, seq_last = first1;
                         std::size_t partial_position=0, last_position = sequence.size();
                         difference_type find_end_res = tok.get_data();
+                        bool span = false;
                         if (find_end_res != count && find_end_res != -1)
                         {
                             // complete sequence is present
@@ -152,8 +153,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 {
                                     FwdIter1 curr = first1;
                                     std::size_t temp_index = index;
-                                    while(curr != last1 && temp_index != sequence.size()
-                                        && hpx::util::invoke(op, *curr, sequence[temp_index]))
+                                    while(curr != last1 && temp_index != sequence.size() &&
+                                        hpx::util::invoke(op, *curr, sequence[temp_index]))
                                     {
                                         ++curr;
                                         ++temp_index;
@@ -163,35 +164,47 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                         seq_start = first1;
                                         partial_position = index;
                                     }
+                                    else if(curr == last1 &&
+                                        hpx::util::invoke(op, *(std::prev(curr)),
+                                            sequence[temp_index-1]))
+                                    {
+                                        seq_start = last1;
+                                        partial_position = index;
+                                        last_position = temp_index-1;
+                                        span = true;
+                                    }
                                 }
                                 ++index;
                             }
                         }
-                        //Also search for partial sequence at the end
-                        FwdIter1 curr = first1;
-                        std::advance(curr, count-diff+1);
-                        //loop till prefix of sequence at end found
-                        for(; curr != last1; ++curr)
+                        if(!span)
                         {
-                            FwdIter1 temp = curr;
-                            std::size_t index = 0;
-                            while(temp != last1 &&
-                                hpx::util::invoke(op, *temp, sequence[index]))
+                            //Also search for partial sequence at the end
+                            FwdIter1 curr = first1;
+                            std::advance(curr, count-diff+1);
+                            //loop till prefix of sequence at end found
+                            for(; curr != last1; ++curr)
                             {
-                                if(index == 0)
-                                    seq_last = curr;
-                                ++temp;
-                                ++index;
-                            }
-                            if(temp == last1)
-                            {
-                                last_position = index;
-                                break;
-                            }
-                            else
-                            {
-                                seq_last = last1;
-                                last_position = sequence.size();
+                                FwdIter1 temp = curr;
+                                std::size_t index = 0;
+                                while(temp != last1 &&
+                                    hpx::util::invoke(op, *temp, sequence[index]))
+                                {
+                                    if(index == 0)
+                                        seq_last = curr;
+                                    ++temp;
+                                    ++index;
+                                }
+                                if(temp == last1)
+                                {
+                                    last_position = index;
+                                    break;
+                                }
+                                else
+                                {
+                                    seq_last = last1;
+                                    last_position = sequence.size();
+                                }
                             }
                         }
                         // return both results
@@ -375,8 +388,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             {
                                 FwdIter1 curr = first1;
                                 std::size_t temp_index = index;
-                                while(curr != last1 && temp_index != sequence.size()
-                                    && hpx::util::invoke(op, *curr, sequence[temp_index]))
+                                while(curr != last1 && temp_index != sequence.size() &&
+                                    hpx::util::invoke(op, *curr, sequence[temp_index]))
                                 {
                                     ++curr;
                                     ++temp_index;
@@ -385,6 +398,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 {
                                     seq_start = first1;
                                     partial_position = index;
+                                }
+                                else if(curr == last1 &&
+                                    hpx::util::invoke(op, *(std::prev(curr)),
+                                        sequence[temp_index-1]))
+                                {
+                                    seq_start = last1;
+                                    partial_position = index;
+                                    last_position = temp_index-1;
                                 }
                             }
                             ++index;
