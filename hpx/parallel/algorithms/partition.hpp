@@ -374,6 +374,13 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 bool empty() const { return first == last; }
 
+                // The blocks are sorted by their positions.
+                // The block_no implies block's position.
+                // If the block is on leftside of boundary, block_no is negative number.
+                // Otherwise, block_no is positive number.
+                // The farther from the boundary, the larger its absolute value.
+                // The example of sorted blocks below (the number means block_no):
+                //     -3  -2  -1  1  2  3  4
                 bool operator<(block<FwdIter> const& other) const
                 {
                     if ((this->block_no < 0 && other.block_no < 0) ||
@@ -402,6 +409,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 block_manager(const block_manager&) = delete;
                 block_manager& operator=(const block_manager&) = delete;
 
+                // Get block from the end of leftside of boundary.
                 block<RandIter> get_left_block()
                 {
                     std::lock_guard<decltype(mutex_)> lk(mutex_);
@@ -422,6 +430,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     return { begin_iter, end_iter, left_block_no_-- };
                 }
 
+                // Get block from the end of rightside of boundary.
                 block<RandIter> get_right_block()
                 {
                     std::lock_guard<decltype(mutex_)> lk(mutex_);
@@ -461,6 +470,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 >::type>
             {
             public:
+                // In constructor, prepare all blocks for fast acquirements of blocks.
                 block_manager(FwdIter first, FwdIter last, std::size_t block_size)
                     : boundary_(first), blocks_(
                         (std::distance(first, last) + block_size - 1) / block_size)
@@ -491,6 +501,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 block_manager(const block_manager&) = delete;
                 block_manager& operator=(const block_manager&) = delete;
 
+                // Get block from the end of leftside of boundary.
                 block<FwdIter> get_left_block()
                 {
                     std::lock_guard<decltype(mutex_)> lk(mutex_);
@@ -504,6 +515,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     return std::move(blocks_[left_++]);
                 }
 
+                // // Get block from the end of rightside of boundary.
                 block<FwdIter> get_right_block()
                 {
                     std::lock_guard<decltype(mutex_)> lk(mutex_);
@@ -533,6 +545,8 @@ namespace hpx { namespace parallel { inline namespace v1
             // The problem is that standard doesn't guarantee that implementation.
             // The swap_ranges_forward is the general implementation of
             //     std::swap_ranges for guaranteeing utilizations in specific cases.
+            // If dest is previous to first, the range [first, last) can be
+            //     successfully moved to the range [dest, dest+distance(first, last)).
             template <class FwdIter1, class FwdIter2>
             static FwdIter2
             swap_ranges_forward(FwdIter1 first, FwdIter1 last, FwdIter2 dest)
@@ -581,7 +595,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
             }
 
-            // Collapse remaining blocks.
+            // The function which collapses remaining blocks.
+            // Performs sequential sub-partitioning to remaining blocks for
+            //     reducing the number and size of remaining blocks.
             template <typename FwdIter, typename Pred, typename Proj>
             static void
             collapse_remaining_blocks(std::vector<block<FwdIter>>& remaining_blocks,
@@ -663,8 +679,10 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             // The function which merges remaining blocks that are placed
-            //     leftside of boundary.
-            // Requires bidirectional iterator.
+            //     leftside of boundary. Requires bidirectional iterator.
+            // Move remaining blocks to the adjacent left of the boundary.
+            // In the end, all remaining blocks are merged into one block which
+            //     is adjacent to the left of boundary.
             template <typename BidirIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_bidirectional_iterator<BidirIter>::value)>
@@ -698,8 +716,10 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             // The function which merges remaining blocks that are placed
-            //     leftside of boundary.
-            // Requires forward iterator.
+            //     leftside of boundary. Requires forward iterator.
+            // Move remaining blocks to the adjacent left of the boundary.
+            // In the end, all remaining blocks are merged into one block which
+            //     is adjacent to the left of boundary.
             template <typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_forward_iterator<FwdIter>::value &&
@@ -758,13 +778,13 @@ namespace hpx { namespace parallel { inline namespace v1
                     if (remaining_block_indexes[i] + counts[i]
                         <= dest_iter_indexes[i])
                     {
-                        // when not overlapped.
+                        // when the ranges are not overlapped each other.
                         swap_ranges_forward(remaining_blocks[i].first,
                             remaining_blocks[i].last, dest_iters[i]);
                     }
                     else
                     {
-                        // when overlapped.
+                        // when the ranges are overlapped each other.
                         swap_ranges_forward(remaining_blocks[i].first,
                             dest_iters[i], remaining_blocks[i].last);
                     }
