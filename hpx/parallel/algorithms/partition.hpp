@@ -616,9 +616,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     using hpx::util::invoke;
 
-                    while (invoke(pred, invoke(proj, *left_iter->first)))
+                    while (true)
                     {
-                        ++left_iter->first;
                         if (left_iter->empty())
                         {
                             ++left_iter;
@@ -626,17 +625,22 @@ namespace hpx { namespace parallel { inline namespace v1
                                 left_iter->block_no > 0)
                                 break;
                         }
+                        if (!invoke(pred, invoke(proj, *left_iter->first)))
+                            break;
+                        ++left_iter->first;
                     }
 
-                    while (!invoke(pred, invoke(proj, *right_iter->first)))
+                    while (true)
                     {
-                        ++right_iter->first;
                         if (right_iter->empty())
                         {
                             if (right_iter == std::begin(remaining_blocks) ||
                                 (--right_iter)->block_no < 0)
                                 break;
                         }
+                        if (invoke(pred, invoke(proj, *right_iter->first)))
+                            break;
+                        ++right_iter->first;
                     }
 
                     if (left_iter == std::end(remaining_blocks) ||
@@ -647,19 +651,6 @@ namespace hpx { namespace parallel { inline namespace v1
                         break;
 
                     std::iter_swap(left_iter->first++, right_iter->first++);
-                    if (left_iter->empty())
-                    {
-                        ++left_iter;
-                        if (left_iter == std::end(remaining_blocks) ||
-                            left_iter->block_no > 0)
-                            break;
-                    }
-                    if (right_iter->empty())
-                    {
-                        if (right_iter == std::begin(remaining_blocks) ||
-                            (--right_iter)->block_no < 0)
-                            break;
-                    }
                 }
 
                 if (left_iter < right_iter ||
