@@ -6,6 +6,7 @@
 # Copyright (c)      2013 Jeroen Habraken
 # Copyright (c) 2014-2016 Andreas Schaefer
 # Copyright (c) 2017      Abhimanyu Rawat
+# Copyright (c) 2017      Google
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1090,6 +1091,13 @@ else()
   if(NOT HPX_WITH_CXX11_THREAD)
     hpx_error("HPX needs support for C++11 std::thread which is not available on this platform. Please enable HPX_WITH_THREAD_COMPATIBILITY to use Boost.Thread instead.")
   endif()
+endif()
+
+hpx_option(HPX_WITH_CXX11_AUTO_RETURN_VALUE BOOL
+  "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
+  ON ADVANCED)
+if(HPX_WITH_CXX11_AUTO_RETURN_VALUE)
+  hpx_add_config_define(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
 endif()
 
 ################################################################################
