@@ -10,11 +10,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.0.2
-cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
+# We require at least CMake V3.3.2
+cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.0.2)
+cmake_policy(VERSION 3.3.2)
 macro(hpx_set_cmake_policy policy value)
   if(POLICY ${policy})
     cmake_policy(SET ${policy} ${value})

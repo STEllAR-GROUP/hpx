@@ -60,7 +60,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__clang__                  ][3.4 or newer     ][3.3             ]]
 
     [[[*Build System]]]
-    [[__cmake__                  ][3.1              ][3.0.2           ]]
+    [[__cmake__                  ][3.3.2              ][3.3.2           ]]
 
     [[[*Required Libraries]]]
     [[__boost_libraries__        ][1.57.0 or newer    ][1.55.0          ]]
@@ -88,7 +88,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__visual_cxx__ (x64)       ][2015               ][2015            ]]
 
     [[[*Build System]]]
-    [[__cmake__                  ][3.1                ][3.0.2           ]]
+    [[__cmake__                  ][3.3.2                ][3.3.2           ]]
 
     [[[*Required Libraries]]]
     [[__boost__                  ][1.57.0 or newer    ][1.55.0          ]
