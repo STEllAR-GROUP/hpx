@@ -14,6 +14,8 @@ foreach(lib "hpx")
   endif()
 endforeach()
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/util/config.h)
+
 ################################################################################
 # gather sources
 

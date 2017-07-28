@@ -110,7 +110,7 @@ namespace hpx
 #include <stdlib.h>
 #include <string.h>
 
-#if (HPX_HAVE_STACKOVERFLOW_DETECTION == "ON")
+#ifdef HPX_HAVE_STACKOVERFLOW_DETECTION
 #include "util/stack_overflow_detection.hpp"
 #endif
 
@@ -171,10 +171,11 @@ namespace hpx
         sigaction(SIGFPE, &new_action, nullptr);  // Floating point exception
         sigaction(SIGILL, &new_action, nullptr);  // Illegal instruction
         sigaction(SIGPIPE, &new_action, nullptr); // Bad pipe
-        #if __linux__ 
-            #if (HPX_HAVE_STACKOVERFLOW_DETECTION == "ON")
-                stack_overflow_detection();  // Call to use libsigsegv for Seg. fault
-            #else sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
+        #if defined(__linux) || defined(linux) || defined(__linux__) || defined$
+            #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+                stack_overflow_detection();  // Call to use libsigsegv for Seg.$
+            #else
+                sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
             #endif
         #else
             sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
