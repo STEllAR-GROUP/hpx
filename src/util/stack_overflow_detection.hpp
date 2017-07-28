@@ -7,7 +7,7 @@
 
   // for Visual C+ compiler(NT platform)
   #ifndef _MSC_VER
-  #include <config.h>
+  #include "config.h"
   #endif
 
   #include <sigsegv.h>
