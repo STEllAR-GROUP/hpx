@@ -11,12 +11,13 @@
   #endif
   #include <iostream>
   #include <sigsegv.h>
-  #include <stdint.h>
-  #include <stdio.h>
-  #include <limits.h>
+  #include <<cstdint>
+  #include <cstdio>
+  #include <climits>
   #include <sys/types.h>
   #include <sys/mman.h>
 
+  // to record pending and blocking signals
   # define sigemptyset(set)
   # define sigprocmask(how,set,oldset)
 
