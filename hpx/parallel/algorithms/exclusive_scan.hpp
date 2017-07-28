@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     },
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapped(op),
+                    hpx::util::unwrapping(op),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value

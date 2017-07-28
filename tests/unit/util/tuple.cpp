@@ -15,6 +15,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -329,6 +330,50 @@ void tie_test()
 
 
 // ----------------------------------------------------------------------------
+// - testing cat -----------------------------------------------------------
+// ----------------------------------------------------------------------------
+void tuple_cat_test()
+{
+    hpx::util::tuple<int, float> two = hpx::util::make_tuple(1, 2.f);
+
+    // Cat two tuples
+    {
+        hpx::util::tuple<int, float, int, float> res =
+            hpx::util::tuple_cat(two, two);
+
+        auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f);
+
+        HPX_TEST((res == expected));
+    }
+
+    // Cat multiple tuples
+    {
+        hpx::util::tuple<int, float, int, float, int, float> res =
+            hpx::util::tuple_cat(two, two, two);
+
+        auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f, 1, 2.f);
+
+        HPX_TEST((res == expected));
+    }
+
+    // Cat move only types
+    {
+        auto t0 = hpx::util::make_tuple(std::unique_ptr<int>(new int(0)));
+        auto t1 = hpx::util::make_tuple(std::unique_ptr<int>(new int(1)));
+        auto t2 = hpx::util::make_tuple(std::unique_ptr<int>(new int(2)));
+
+        hpx::util::tuple<std::unique_ptr<int>, std::unique_ptr<int>,
+            std::unique_ptr<int>>
+            result = hpx::util::tuple_cat(
+                std::move(t0), std::move(t1), std::move(t2));
+
+        HPX_TEST_EQ((*hpx::util::get<0>(result)), 0);
+        HPX_TEST_EQ((*hpx::util::get<1>(result)), 1);
+        HPX_TEST_EQ((*hpx::util::get<2>(result)), 2);
+    }
+}
+
+// ----------------------------------------------------------------------------
 // - testing tuple equality   -------------------------------------------------
 // ----------------------------------------------------------------------------
 
@@ -429,6 +474,7 @@ int main(int argc, char* argv[])
         mutate_test();
         make_tuple_test();
         tie_test();
+        tuple_cat_test();
         equality_test();
         ordering_test();
         const_tuple_test();

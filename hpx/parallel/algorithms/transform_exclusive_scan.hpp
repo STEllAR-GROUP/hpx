@@ -160,7 +160,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     },
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapped(op),
+                    hpx::util::unwrapping(op),
                     // step 3 runs final_accumulation on each partition
                     std::move(f3),
                     // use this return value

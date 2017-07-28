@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     return util::accumulate_n(++part_begin, --part_size,
                         std::move(val), r);
                 },
-                hpx::util::unwrapped([r](std::vector<T> && results) -> T
+                hpx::util::unwrapping([r](std::vector<T> && results) -> T
                 {
                     auto rfirst = hpx::util::begin(results);
                     auto rlast = hpx::util::end(results);
@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 hpx::util::invoke(conv, next));
                         });
                 },
-                hpx::util::unwrapped([r](std::vector<T> && results) -> T
+                hpx::util::unwrapping([r](std::vector<T> && results) -> T
                 {
                     auto rfirst = hpx::util::begin(results);
                     auto rlast = hpx::util::end(results);

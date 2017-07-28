@@ -108,7 +108,7 @@ void hello_world_foreman()
         // all the futures in the vector have returned.
         hpx::lcos::local::spinlock mtx;
         hpx::lcos::wait_each(
-            hpx::util::unwrapped([&](std::size_t t) {
+            hpx::util::unwrapping([&](std::size_t t) {
                 if (std::size_t(-1) != t)
                 {
                     std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);

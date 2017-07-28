@@ -192,7 +192,7 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
         shen.interpolate_one_bulk_async(values,
             sheneos::server::partition3d::logpress);
 
-    std::vector<double> results = hpx::util::unwrapped(bulk_one_tests);
+    std::vector<double> results = hpx::util::unwrap(bulk_one_tests);
 }
 
 HPX_DECLARE_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
@@ -284,7 +284,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     hpx::lcos::future<std::vector<std::vector<double> > > bulk_tests =
         shen.interpolate_bulk_async(values);
 
-    std::vector<std::vector<double> > results = hpx::util::unwrapped(bulk_tests);
+    std::vector<std::vector<double> > results = hpx::util::unwrap(bulk_tests);
 }
 
 HPX_DECLARE_ACTION(test_sheneos_bulk, test_bulk_action);

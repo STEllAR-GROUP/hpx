@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/range.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         return util::accumulate_n(++part_begin, --part_size,
                             std::move(val), r);
                     },
-                    hpx::util::unwrapped(
+                    hpx::util::unwrapping(
                         [init, r](std::vector<T> && results) -> T
                         {
                             return util::accumulate_n(hpx::util::begin(results),
