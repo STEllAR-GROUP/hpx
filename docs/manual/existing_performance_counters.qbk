@@ -1059,9 +1059,9 @@ system and application performance.
         current percentage of scheduler threads executing __hpx__ threads.]
         [Percent]
     ]
-    [   [`/scheduler/idle-loop-count/instantaneous`]
-        [`locality#*/total` or[br]
-         `locality#*/worker-thread#*`
+    [   [`/threads/idle-loop-count/instantaneous`]
+        [`locality#*/worker-thread#*`
+         `locality#*/pool#*/worker-thread#*`
 
           where:[br]
           `locality#*` is defining the locality for which the current
@@ -1069,21 +1069,25 @@ system and application performance.
           threads should be queried. The locality id
           (given by `*`) is a (zero based) number identifying the locality.
 
+          `pool#*` is defining the pool for which the current value of the
+          idle-loop counter should be queried for.
+
           `worker-thread#*` is defining the worker thread for which the
           current value of the idle-loop counter should be queried
           for. The worker thread number (given by the `*`) is a (zero based)
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
-          option [hpx_cmdline `--hpx:threads`].
+          option [hpx_cmdline `--hpx:threads`]. If no pool-name is specified
+          the counter refers to the 'default' pool.
         ]
         [Returns the current (instantaneous) idle-loop count for the given
          __hpx__- worker thread or the accumulated value for all worker threads.]
         [None]
     ]
-    [   [`/scheduler/busy-loop-count/instantaneous`]
-        [`locality#*/total` or[br]
-         `locality#*/worker-thread#*`
+    [   [`/threads/busy-loop-count/instantaneous`]
+        [`locality#*/worker-thread#*`
+         `locality#*/pool#*/worker-thread#*`
 
           where:[br]
           `locality#*` is defining the locality for which the current
@@ -1091,13 +1095,17 @@ system and application performance.
           threads should be queried. The locality id
           (given by `*`) is a (zero based) number identifying the locality.
 
+          `pool#*` is defining the pool for which the current value of the
+          idle-loop counter should be queried for.
+
           `worker-thread#*` is defining the worker thread for which the
           current value of the busy-loop counter should be queried
           for. The worker thread number (given by the `*`) is a (zero based)
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
-          option [hpx_cmdline `--hpx:threads`].
+          option [hpx_cmdline `--hpx:threads`]. If no pool-name is specified
+          the counter refers to the 'default' pool.
         ]
         [Returns the current (instantaneous) busy-loop count for the given
          __hpx__- worker thread or the accumulated value for all worker threads.]

@@ -13,8 +13,7 @@
 #include <string>
 #include <vector>
 
-///////////////////////////////////////////////////////////////////////////////
-char const* const locality_thread_counter_names[] =
+char const* const locality_pool_thread_counter_names[] =
 {
     "/threadqueue/length",
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
@@ -28,6 +27,13 @@ char const* const locality_thread_counter_names[] =
     "/threads/cleanup-idle-rate",
 #endif
 #endif
+    "/threads/time/overall",
+    "/threads/count/instantaneous/all",
+    "/threads/count/instantaneous/active",
+    "/threads/count/instantaneous/pending",
+    "/threads/count/instantaneous/suspended",
+    "/threads/count/instantaneous/terminated",
+    "/threads/count/instantaneous/staged",
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
     "/threads/count/cumulative",
     "/threads/count/cumulative-phases",
@@ -40,13 +46,6 @@ char const* const locality_thread_counter_names[] =
     "/threads/time/cumulative-overhead",
 #endif
 #endif
-    "/threads/time/overall",
-    "/threads/count/instantaneous/all",
-    "/threads/count/instantaneous/active",
-    "/threads/count/instantaneous/pending",
-    "/threads/count/instantaneous/suspended",
-    "/threads/count/instantaneous/terminated",
-    "/threads/count/instantaneous/staged",
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
     "/threads/count/pending-misses",
     "/threads/count/pending-accesses",
@@ -55,10 +54,21 @@ char const* const locality_thread_counter_names[] =
     "/threads/count/stolen-to-pending",
     "/threads/count/stolen-to-staged",
 #endif
-    "/scheduler/idle-loop-count/instantaneous",
-    "/scheduler/busy-loop-count/instantaneous",
     nullptr
 };
+
+char const* const locality_pool_thread_no_total_counter_names[] =
+{
+    "/threads/idle-loop-count/instantaneous",
+    "/threads/busy-loop-count/instantaneous",
+    nullptr
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// char const* const locality_thread_counter_names[] =
+// {
+//     nullptr
+// };
 
 char const* const locality_counter_names[] =
 {
@@ -72,7 +82,7 @@ char const* const locality_counter_names[] =
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_all_locality_thread_counters(char const* const* counter_names,
-    std::size_t locality_id, std::size_t core)
+    std::size_t locality_id, std::size_t pool, std::size_t core)
 {
     for (char const* const*p = counter_names; *p != nullptr; ++p)
     {
@@ -85,15 +95,31 @@ void test_all_locality_thread_counters(char const* const* counter_names,
         // augment the counter path elements
         path.parentinstancename_ = "locality";
         path.parentinstanceindex_ = locality_id;
-        if (core == std::size_t(-1))
+        if (pool != std::size_t(-1))
         {
-            path.instancename_ = "total";
-            path.instanceindex_ = std::size_t(-1);
+            path.instancename_ = "pool";
+            path.instanceindex_ = pool;
+
+            if (core != std::size_t(-1))
+            {
+                path.subinstancename_ = "worker-thread";
+                path.subinstanceindex_ = core;
+            }
+            else
+            {
+                path.subinstancename_ = "total";
+                path.subinstanceindex_ = std::size_t(-1);
+            }
         }
-        else
+        else if (core != std::size_t(-1))
         {
             path.instancename_ = "worker-thread";
             path.instanceindex_ = core;
+        }
+        else
+        {
+            path.instancename_ = "total";
+            path.instanceindex_ = std::size_t(-1);
         }
 
         std::string name;
@@ -101,39 +127,87 @@ void test_all_locality_thread_counters(char const* const* counter_names,
             hpx::performance_counters::get_counter_name(path, name),
             hpx::performance_counters::status_valid_data);
 
+        std::cout << name << '\n';
+
         try
         {
             hpx::performance_counters::performance_counter counter(name);
             HPX_TEST_EQ(counter.get_name(hpx::launch::sync), name);
             counter.get_value<std::size_t>(hpx::launch::sync);
         }
-        catch (... )
+        catch (...)
         {
             HPX_TEST(false);        // should never happen
         }
     }
 }
 
-void test_all_locality_thread_counters(std::size_t locality_id, std::size_t core)
+///////////////////////////////////////////////////////////////////////////////
+void test_all_locality_pool_thread_counters(
+    std::size_t locality_id, std::size_t pool, std::size_t core)
 {
     test_all_locality_thread_counters(
-        locality_thread_counter_names, locality_id, core);
+        locality_pool_thread_counter_names, locality_id, pool, core);
 }
+
+void test_all_locality_pool_thread_no_total_counters(
+    std::size_t locality_id, std::size_t pool, std::size_t core)
+{
+    test_all_locality_thread_counters(
+        locality_pool_thread_no_total_counter_names, locality_id, pool, core);
+}
+
+// void test_all_locality_thread_counters(
+//     std::size_t locality_id, std::size_t core)
+// {
+//     test_all_locality_thread_counters(
+//         locality_thread_counter_names, locality_id, std::size_t(-1), core);
+// }
 
 void test_all_locality_counters(std::size_t locality_id)
 {
     test_all_locality_thread_counters(
-        locality_counter_names, locality_id, std::size_t(-1));
+        locality_counter_names, locality_id, std::size_t(-1), std::size_t(-1));
 }
 
+///////////////////////////////////////////////////////////////////////////////
 void test_all_counters_locality(std::size_t locality_id)
 {
-    test_all_locality_thread_counters(locality_id, std::size_t(-1));
-
     std::size_t cores = hpx::get_num_worker_threads();
-    for (std::size_t core = 0; core != cores; ++core)
-        test_all_locality_thread_counters(locality_id, core);
 
+    // locality/pool/thread
+    test_all_locality_pool_thread_counters(
+        locality_id, std::size_t(-1), std::size_t(-1));
+
+    std::size_t pools = hpx::resource::get_num_thread_pools();
+    for (std::size_t pool = 0; pool != pools; ++pool)
+    {
+        test_all_locality_pool_thread_counters(
+            locality_id, pool, std::size_t(-1));
+
+        for (std::size_t core = 0; core != cores; ++core)
+        {
+            test_all_locality_pool_thread_counters(locality_id, pool, core);
+            test_all_locality_pool_thread_no_total_counters(
+                locality_id, pool, core);
+        }
+    }
+
+    for (std::size_t core = 0; core != cores; ++core)
+    {
+        test_all_locality_pool_thread_counters(
+            locality_id, std::size_t(-1), core);
+    }
+
+//     // locality/thread (same as locality/pool#default/threads)
+//     test_all_locality_thread_counters(locality_id, std::size_t(-1));
+//
+//     for (std::size_t core = 0; core != cores; ++core)
+//     {
+//         test_all_locality_thread_counters(locality_id, core);
+//     }
+
+    // locality/total
     test_all_locality_counters(locality_id);
 }
 

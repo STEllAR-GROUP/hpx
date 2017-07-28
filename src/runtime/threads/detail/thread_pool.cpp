@@ -637,7 +637,7 @@ namespace hpx { namespace threads { namespace detail
     }
 #endif
 
-    std::int64_t thread_pool::get_idle_loop_count(std::size_t num) const
+    std::int64_t thread_pool::get_idle_loop_count(std::size_t num, bool reset)
     {
         if (num == std::size_t(-1))
         {
@@ -647,7 +647,7 @@ namespace hpx { namespace threads { namespace detail
         return idle_loop_counts_[num];
     }
 
-    std::int64_t thread_pool::get_busy_loop_count(std::size_t num) const
+    std::int64_t thread_pool::get_busy_loop_count(std::size_t num, bool reset)
     {
         if (num == std::size_t(-1))
         {

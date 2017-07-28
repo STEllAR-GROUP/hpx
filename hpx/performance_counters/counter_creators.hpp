@@ -37,6 +37,15 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT bool locality_counter_discoverer(counter_info const&,
         discover_counter_func const&, discover_counters_mode, error_code&);
 
+    /// Default discoverer function for performance counters; to be registered
+    /// with the counter types. It is suitable to be used for all counters
+    /// following the naming scheme:
+    ///
+    ///   /<objectname>(locality#<locality_id>/pool#<pool_name>/total)/<instancename>
+    ///
+    HPX_API_EXPORT bool locality_pool_counter_discoverer(counter_info const&,
+        discover_counter_func const&, discover_counters_mode, error_code&);
+
     /// Default discoverer function for AGAS performance counters; to be
     /// registered with the counter types. It is suitable to be used for all
     /// counters following the naming scheme:
@@ -54,6 +63,28 @@ namespace hpx { namespace performance_counters
     ///
     HPX_API_EXPORT bool locality_thread_counter_discoverer(counter_info const&,
         discover_counter_func const&, discover_counters_mode, error_code&);
+
+    /// Default discoverer function for performance counters; to be registered
+    /// with the counter types. It is suitable to be used for all counters
+    /// following the naming scheme:
+    ///
+    ///   /<objectname>{locality#<locality_id>/pool#<poolname>/thread#<threadnum>}/<instancename>
+    ///
+    bool locality_pool_thread_counter_discoverer(counter_info const& info,
+        discover_counter_func const& f,
+        discover_counters_mode mode, error_code& ec);
+
+    /// Default discoverer function for performance counters; to be registered
+    /// with the counter types. It is suitable to be used for all counters
+    /// following the naming scheme:
+    ///
+    ///   /<objectname>{locality#<locality_id>/pool#<poolname>/thread#<threadnum>}/<instancename>
+    ///
+    /// This is essentially the same as above just that locality#*/total is not
+    /// supported.
+    bool locality_pool_thread_no_total_counter_discoverer(
+        counter_info const& info, discover_counter_func const& f,
+        discover_counters_mode mode, error_code& ec);
 
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters

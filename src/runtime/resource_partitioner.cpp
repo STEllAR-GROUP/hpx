@@ -5,6 +5,7 @@
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
@@ -134,8 +135,40 @@ resource::resource_partitioner &get_resource_partitioner(
     return rp;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 namespace resource {
 
+    std::size_t get_num_thread_pools()
+    {
+        return get_resource_partitioner().get_num_pools();
+    }
+
+    std::size_t get_num_threads(std::size_t pool_index)
+    {
+        return get_resource_partitioner().get_num_threads(pool_index);
+    }
+
+    std::size_t get_pool_index(std::string const& pool_name)
+    {
+        return get_resource_partitioner().get_pool_index(pool_name);
+    }
+
+    std::string const& get_pool_name(std::size_t pool_index)
+    {
+        return get_resource_partitioner().get_pool_name(pool_index);
+    }
+
+    threads::detail::thread_pool& get_thread_pool(std::string const& pool_name)
+    {
+        return get_runtime().get_thread_manager().get_pool(pool_name);
+    }
+
+    threads::detail::thread_pool& get_thread_pool(std::size_t pool_index)
+    {
+        return get_thread_pool(get_pool_name(pool_index));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     std::vector<pu> pu::pus_sharing_core()
     {
         std::vector<pu> result;
@@ -418,7 +451,7 @@ namespace resource {
             }
         }
         // @TODO allow empty pools
-        if (get_pool("default").num_threads_ == 0)
+        if (get_pool_data("default").num_threads_ == 0)
         {
             throw std::runtime_error(
                 "Default pool has no threads assigned. Please rerun with "
@@ -631,7 +664,7 @@ namespace resource {
         if (p.thread_occupancy_count_ > 0)
         {
             p.thread_occupancy_count_--;
-            get_pool(pool_name).add_resource(p.id_, num_threads);
+            get_pool_data(pool_name).add_resource(p.id_, num_threads);
 
             // Make sure the total number of requested threads does not exceed
             // the number of threads requested on the command line
@@ -705,7 +738,7 @@ namespace resource {
     void resource_partitioner::set_scheduler(
         scheduling_policy sched, const std::string &pool_name)
     {
-        get_pool(pool_name).scheduling_policy_ = sched;
+        get_pool_data(pool_name).scheduling_policy_ = sched;
     }
 
     void resource_partitioner::configure_pools()
@@ -722,7 +755,7 @@ namespace resource {
         const std::string &pool_name)
     {
         // look up which scheduler is needed
-        scheduling_policy sched_type = get_pool(pool_name).scheduling_policy_;
+        scheduling_policy sched_type = get_pool_data(pool_name).scheduling_policy_;
         if (sched_type == unspecified)
         {
             throw std::invalid_argument("Thread pool " + pool_name +
@@ -754,16 +787,16 @@ namespace resource {
 
     size_t resource_partitioner::get_num_threads(std::size_t pool_index) const
     {
-        return get_pool(pool_index).num_threads_;
+        return get_pool_data(pool_index).num_threads_;
     }
 
-    size_t resource_partitioner::get_num_threads(
+    std::size_t resource_partitioner::get_num_threads(
         const std::string &pool_name) const
     {
-        return get_pool(pool_name).num_threads_;
+        return get_pool_data(pool_name).num_threads_;
     }
 
-    init_pool_data const& resource_partitioner::get_pool(
+    init_pool_data const& resource_partitioner::get_pool_data(
         std::size_t pool_index) const
     {
         if (pool_index >= initial_thread_pools_.size())
@@ -843,7 +876,7 @@ namespace resource {
 
     ////////////////////////////////////////////////////////////////////////
     std::size_t resource_partitioner::get_pool_index(
-        const std::string &pool_name) const
+        std::string const& pool_name) const
     {
         std::size_t N = initial_thread_pools_.size();
         for (size_t i(0); i < N; i++)
@@ -861,7 +894,7 @@ namespace resource {
 
     // has to be private bc pointers become invalid after data member
     // thread_pools_ is resized we don't want to allow the user to use it
-    init_pool_data const& resource_partitioner::get_pool(
+    init_pool_data const& resource_partitioner::get_pool_data(
         std::string const& pool_name) const
     {
         auto pool = std::find_if(
@@ -881,7 +914,7 @@ namespace resource {
             pool_name + "\". \n");
     }
 
-    init_pool_data& resource_partitioner::get_pool(std::string const& pool_name)
+    init_pool_data& resource_partitioner::get_pool_data(std::string const& pool_name)
     {
         auto pool = std::find_if(
             initial_thread_pools_.begin(), initial_thread_pools_.end(),
@@ -900,7 +933,7 @@ namespace resource {
             pool_name + "\". \n");
     }
 
-    init_pool_data& resource_partitioner::get_default_pool()
+    init_pool_data& resource_partitioner::get_default_pool_data()
     {
         auto pool = std::find_if(
             initial_thread_pools_.begin(), initial_thread_pools_.end(),
@@ -930,7 +963,6 @@ namespace resource {
     }
 
     ////////////////////////////////////////////////////////////////////////
-
     boost::atomic<int> resource_partitioner::instance_number_counter_(-1);
 
 }    // namespace resource

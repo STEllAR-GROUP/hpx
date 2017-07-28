@@ -12,6 +12,7 @@
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
@@ -69,7 +70,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // note: this data structure has to be protected from races from the outside
-    class HPX_EXPORT thread_pool
+    class thread_pool
     {
     public:
         thread_pool(threads::policies::callback_notifier& notifier,
@@ -149,18 +150,19 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-        virtual std::int64_t avg_creation_idle_rate(bool reset) = 0;
-        virtual std::int64_t avg_cleanup_idle_rate(bool reset) = 0;
+        virtual std::int64_t avg_creation_idle_rate(std::size_t, bool reset) = 0;
+        virtual std::int64_t avg_cleanup_idle_rate(std::size_t, bool reset) = 0;
 #endif
 #endif
 
-        virtual std::int64_t get_queue_length(std::size_t num_thread) const = 0;
+        virtual std::int64_t get_queue_length(
+            std::size_t num_thread, bool reset) = 0;
 
 #if defined(HPX_HAVE_THREAD_QUEUE_WAITTIME)
-        std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread) const = 0;
-        std::int64_t get_average_task_wait_time(
-            std::size_t num_thread) const = 0;
+        virtual std::int64_t get_average_thread_wait_time(
+            std::size_t num_thread, bool reset) = 0;
+        virtual std::int64_t get_average_task_wait_time(
+            std::size_t num_thread, bool reset) = 0;
 #endif
 
 #if defined(HPX_HAVE_THREAD_STEALING_COUNTS)
@@ -181,12 +183,47 @@ namespace hpx { namespace threads { namespace detail
 
         virtual std::int64_t get_thread_count(thread_state_enum state,
             thread_priority priority, std::size_t num_thread,
-            bool reset) const = 0;
+            bool reset) = 0;
+
+        std::int64_t get_thread_count_unknown(
+            std::size_t num_thread, bool reset)
+        {
+            return get_thread_count(
+                unknown, thread_priority_default, num_thread, reset);
+        }
+        std::int64_t get_thread_count_active(std::size_t num_thread, bool reset)
+        {
+            return get_thread_count(
+                active, thread_priority_default, num_thread, reset);
+        }
+        std::int64_t get_thread_count_pending(
+            std::size_t num_thread, bool reset)
+        {
+            return get_thread_count(
+                pending, thread_priority_default, num_thread, reset);
+        }
+        std::int64_t get_thread_count_suspended(
+            std::size_t num_thread, bool reset)
+        {
+            return get_thread_count(
+                suspended, thread_priority_default, num_thread, reset);
+        }
+        std::int64_t get_thread_count_terminated(
+            std::size_t num_thread, bool reset)
+        {
+            return get_thread_count(
+                terminated, thread_priority_default, num_thread, reset);
+        }
+        std::int64_t get_thread_count_staged(std::size_t num_thread, bool reset)
+        {
+            return get_thread_count(
+                staged, thread_priority_default, num_thread, reset);
+        }
 
         std::int64_t get_scheduler_utilization() const;
 
-        std::int64_t get_idle_loop_count(std::size_t num) const;
-        std::int64_t get_busy_loop_count(std::size_t num) const;
+        std::int64_t get_idle_loop_count(std::size_t num, bool reset);
+        std::int64_t get_busy_loop_count(std::size_t num, bool reset);
 
         ///////////////////////////////////////////////////////////////////////
         virtual bool enumerate_threads(

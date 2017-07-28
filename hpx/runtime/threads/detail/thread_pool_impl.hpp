@@ -185,7 +185,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         std::int64_t get_thread_count(thread_state_enum state,
-            thread_priority priority, std::size_t num, bool reset) const
+            thread_priority priority, std::size_t num, bool reset)
         {
             return sched_->Scheduler::get_thread_count(
                 state, priority, num, reset);
@@ -645,7 +645,7 @@ namespace hpx { namespace threads { namespace detail
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-        std::int64_t avg_creation_idle_rate(bool reset)
+        std::int64_t avg_creation_idle_rate(std::size_t, bool reset)
         {
             double const creation_total =
                 static_cast<double>(sched_->get_creation_time(reset));
@@ -686,7 +686,7 @@ namespace hpx { namespace threads { namespace detail
             return std::int64_t(10000. * percent);    // 0.01 percent
         }
 
-        std::int64_t avg_cleanup_idle_rate(bool reset)
+        std::int64_t avg_cleanup_idle_rate(std::size_t, bool reset)
         {
             double const cleanup_total =
                 static_cast<double>(sched_->get_cleanup_time(reset));
@@ -728,18 +728,20 @@ namespace hpx { namespace threads { namespace detail
         }
 #endif
 #endif
-        std::int64_t get_queue_length(std::size_t num_thread) const
+        std::int64_t get_queue_length(std::size_t num_thread, bool reset)
         {
             return sched_->Scheduler::get_queue_length(num_thread);
         }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::int64_t get_average_thread_wait_time(std::size_t num_thread) const
+        std::int64_t get_average_thread_wait_time(
+            std::size_t num_thread, bool reset)
         {
             return sched_->Scheduler::get_average_thread_wait_time(num_thread);
         }
 
-        std::int64_t get_average_task_wait_time(std::size_t num_thread) const
+        std::int64_t get_average_task_wait_time(
+            std::size_t num_thread, bool reset)
         {
             return sched_->Scheduler::get_average_task_wait_time(num_thread);
         }

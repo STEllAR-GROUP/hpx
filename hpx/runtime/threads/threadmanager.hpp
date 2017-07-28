@@ -75,6 +75,7 @@ namespace hpx { namespace threads
 
         // Get functions
         detail::thread_pool& default_pool() const;
+
         scheduler_type& default_scheduler() const;
 
         detail::thread_pool& get_pool(std::string const& pool_name) const;
@@ -179,7 +180,7 @@ namespace hpx { namespace threads
         /// \note This function lock the internal OS lock in the thread manager
         std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
-            std::size_t num_thread = std::size_t(-1), bool reset = false) const;
+            std::size_t num_thread = std::size_t(-1), bool reset = false);
 
         // Enumerate all matching threads
         bool enumerate_threads(
@@ -296,33 +297,105 @@ namespace hpx { namespace threads
 
     private:
         // counter creator functions
-        naming::gid_type queue_length_counter_creator(
-            performance_counters::counter_info const& info, error_code& ec);
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-#ifdef HPX_HAVE_THREAD_IDLE_RATES
-        naming::gid_type idle_rate_counter_creator(
-            performance_counters::counter_info const& info, error_code& ec);
-#endif
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        naming::gid_type thread_wait_time_counter_creator(
-            performance_counters::counter_info const& info, error_code& ec);
-        naming::gid_type task_wait_time_counter_creator(
-            performance_counters::counter_info const& info, error_code& ec);
-#endif
-
         naming::gid_type scheduler_utilization_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 
-        naming::gid_type idle_loop_count_counter_creator(
-            performance_counters::counter_info const& info, error_code& ec);
-        naming::gid_type busy_loop_count_counter_creator(
+        typedef std::int64_t (threadmanager::*threadmanager_counter_func)(
+            bool reset);
+        typedef std::int64_t (detail::thread_pool::*threadpool_counter_func)(
+            std::size_t num_thread, bool reset);
+
+        naming::gid_type locality_pool_thread_counter_creator(
+            threadmanager_counter_func total_func,
+            threadpool_counter_func pool_func,
             performance_counters::counter_info const& info, error_code& ec);
 
-    private:
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+        naming::gid_type queue_wait_time_counter_creator(
+            threadmanager_counter_func total_func,
+            threadpool_counter_func pool_func,
+            performance_counters::counter_info const& info, error_code& ec);
+#endif
+
+        naming::gid_type locality_pool_thread_no_total_counter_creator(
+            threadpool_counter_func pool_func,
+            performance_counters::counter_info const& info, error_code& ec);
+
+        // performance counters
+        std::int64_t get_queue_length(bool reset);
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+        std::int64_t get_average_thread_wait_time(bool reset);
+        std::int64_t get_average_task_wait_time(bool reset);
+#endif
+        std::int64_t get_cumulative_duration(bool reset);
+
+        std::int64_t get_thread_count_unknown(bool reset)
+        {
+            return get_thread_count(
+                unknown, thread_priority_default, std::size_t(-1), reset);
+        }
+        std::int64_t get_thread_count_active(bool reset)
+        {
+            return get_thread_count(
+                active, thread_priority_default, std::size_t(-1), reset);
+        }
+        std::int64_t get_thread_count_pending(bool reset)
+        {
+            return get_thread_count(
+                pending, thread_priority_default, std::size_t(-1), reset);
+        }
+        std::int64_t get_thread_count_suspended(bool reset)
+        {
+            return get_thread_count(
+                suspended, thread_priority_default, std::size_t(-1), reset);
+        }
+        std::int64_t get_thread_count_terminated(bool reset)
+        {
+            return get_thread_count(
+                terminated, thread_priority_default, std::size_t(-1), reset);
+        }
+        std::int64_t get_thread_count_staged(bool reset)
+        {
+            return get_thread_count(
+                staged, thread_priority_default, std::size_t(-1), reset);
+        }
+
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
+        std::int64_t avg_idle_rate(bool reset);
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+        std::int64_t avg_creation_idle_rate(bool reset);
+        std::int64_t avg_cleanup_idle_rate(bool reset);
+#endif
+#endif
+
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
+        std::int64_t get_executed_threads(bool reset);
+        std::int64_t get_executed_thread_phases(bool reset);
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
+        std::int64_t get_thread_duration(bool reset);
+        std::int64_t get_thread_phase_duration(bool reset);
+        std::int64_t get_thread_overhead(bool reset);
+        std::int64_t get_thread_phase_overhead(bool reset);
+        std::int64_t get_cumulative_thread_duration(bool reset);
+        std::int64_t get_cumulative_thread_overhead(bool reset);
+#endif
+#endif
+
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+        std::int64_t get_num_pending_misses(bool reset);
+        std::int64_t get_num_pending_accesses(bool reset);
+        std::int64_t get_num_stolen_from_pending(bool reset);
+        std::int64_t get_num_stolen_from_staged(bool reset);
+        std::int64_t get_num_stolen_to_pending(bool reset);
+        std::int64_t get_num_stolen_to_staged(bool reset);
+#endif
+
+private:
         mutable mutex_type mtx_; // mutex protecting the members
 
-        // specified by the user in command line, or 1 by default
+        // specified by the user in command line, or all cores by default
         // represents the total number of OS threads, irrespective of how many
         // are in which pool.
         std::size_t num_threads_;

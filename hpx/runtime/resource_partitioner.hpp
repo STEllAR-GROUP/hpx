@@ -195,6 +195,7 @@ namespace resource {
         scheduler_function create_function_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT resource_partitioner
     {
     public:
@@ -259,16 +260,20 @@ namespace resource {
         std::size_t init();
 
         ////////////////////////////////////////////////////////////////////////
-
         scheduling_policy which_scheduler(const std::string &pool_name);
         threads::topology &get_topology() const;
         util::command_line_handling &get_command_line_switches();
+
         std::size_t get_num_threads() const;
-        size_t get_num_pools() const;
-        size_t get_num_threads(const std::string &pool_name) const;
-        size_t get_num_threads(std::size_t pool_index) const;
-        init_pool_data const& get_pool(std::size_t pool_index) const;
-        const std::string &get_pool_name(size_t index) const;
+        std::size_t get_num_pools() const;
+        std::size_t get_num_threads(std::string const& pool_name) const;
+        std::size_t get_num_threads(std::size_t pool_index) const;
+
+        init_pool_data const& get_pool_data(std::size_t pool_index) const;
+
+        std::string const& get_pool_name(std::size_t index) const;
+        std::size_t get_pool_index(const std::string &pool_name) const;
+
         size_t get_pu_num(std::size_t global_thread_num);
         threads::mask_cref_type get_pu_mask(
             std::size_t num_thread, bool numa_sensitive) const;
@@ -291,11 +296,9 @@ namespace resource {
 
     private:
         ////////////////////////////////////////////////////////////////////////
-
         void fill_topology_vectors();
 
         ////////////////////////////////////////////////////////////////////////
-
         // called in hpx_init run_or_start
         void set_init_affinity_data();
         void setup_pools();
@@ -303,15 +306,12 @@ namespace resource {
         void reconfigure_affinities();
         bool check_empty_pools() const;
 
-        //! this is ugly, I should probably delete it
-        uint64_t get_pool_index(const std::string &pool_name) const;
-
         // has to be private bc pointers become invalid after data member
         // thread_pools_ is resized
         // we don't want to allow the user to use it
-        init_pool_data const& get_pool(const std::string &pool_name) const;
-        init_pool_data& get_pool(const std::string &pool_name);
-        init_pool_data& get_default_pool();
+        init_pool_data const& get_pool_data(const std::string &pool_name) const;
+        init_pool_data& get_pool_data(std::string const& pool_name);
+        init_pool_data& get_default_pool_data();
 
         ////////////////////////////////////////////////////////////////////////
 
