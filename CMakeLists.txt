@@ -1393,8 +1393,6 @@ if(HPX_WITH_HWLOC)
   hpx_add_config_define(HPX_HAVE_HWLOC)
 endif()
 
-hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION "\"${HPX_WITH_STACKOVERFLOW_DETECTION}\"")
-
 if(HPX_WITH_STACKOVERFLOW_DETECTION)
   find_package(LibSigSegv)
   if(NOT LIBSIGSEGV_FOUND)

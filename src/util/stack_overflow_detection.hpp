@@ -7,7 +7,7 @@
 
   // for Visual C+ compiler(NT platform)
   #ifndef _MSC_VER
-  #include "config.h"
+  #include <config.h>
   #endif
 
   #include <sigsegv.h>
@@ -69,7 +69,16 @@
     pass++;
     
     // prints the starting address of the stack
-    printf ("Stack overflow caught at %p.\n", mystack);
+    std::cerr << "Stack overflow caught at address " 
+              << mystack_storage
+              << ".\n\n";
+        
+    std::cerr <<"Configure the hpx runtime to allocate a larger coroutine"
+                "stack size.\n Use the hpx.stacks.small_size, "
+                "hpx.stacks.medium_size,\n hpx.stacks.large_size, "
+                "or hpx.stacks.huge_size configuration\nflags to configure "
+                "coroutine stack size.\n"
+              << std::endl;
 
     sigprocmask (SIG_SETMASK, &mainsigset, NULL);
 
@@ -88,7 +97,10 @@
 
     pass++;
 
-    printf ("Segmentation Fault occured.\n");
+    std::cerr <<"Segmentation fault occured.\n" 
+              <<".\n\n";
+    << std::endl;
+    
     sigprocmask (SIG_SETMASK, &mainsigset, NULL);
     return sigsegv_leave_handler (stackoverflow_handler_continuation,
                                   (void *) (long) pass, NULL, NULL);
@@ -104,10 +116,10 @@
     if (stackoverflow_install_handler (&stackoverflow_handler,
                                        mystack, SIGSTKSZ)
         < 0)
-      { exit (2);}
+      { std::terminate();}
     
     if (sigsegv_install_handler (&sigsegv_handler) < 0)
-      {exit (2);}
+      { std::terminate();}
   }
 
 #endif  // HPX_HAVE_STACKOVERFLOW_DETECTION code ends here

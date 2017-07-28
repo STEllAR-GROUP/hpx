@@ -1,6 +1,5 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
-# Copyright (c)      2017 Abhimanyu Rawat
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,8 +13,6 @@ foreach(lib "hpx")
     set(${lib}_HEADERS "" CACHE INTERNAL "Headers for lib${lib}." FORCE)
   endif()
 endforeach()
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/util/config.h)
 
 ################################################################################
 # gather sources
