@@ -190,14 +190,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 while(temp != last1 &&
                                     hpx::util::invoke(op, *temp, sequence[index]))
                                 {
-                                    if(index == 0)
-                                        seq_last = curr;
                                     ++temp;
                                     ++index;
                                 }
                                 if(temp == last1)
                                 {
                                     last_position = index;
+                                    seq_last = curr;
                                     break;
                                 }
                                 else

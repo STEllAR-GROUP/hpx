@@ -449,7 +449,9 @@ namespace hpx { namespace parallel { inline namespace v1
                         //check if new partial sequence found
                         if (out.partial_position != out.last_position)
                         {
-                            partial_out = traits::compose(sit, out.seq_last);
+                            if(out.last_position < (std::size_t) std::distance(beg, end))
+                                partial_out = traits::compose(sit, out.seq_last);
+                            // partial_out = traits::compose(sit, out.seq_last);
                             partial_found = true;
                             out.partial_position = out.last_position;
                         }
@@ -1000,7 +1002,10 @@ namespace hpx { namespace parallel { inline namespace v1
                                 std::next(temp)->partial_position != sequence.size())
                             {
                                 ++temp;
-                                if(temp->partial_position == std::prev(temp)->last_position)
+                                if(temp->partial_position ==
+                                    std::prev(temp)->last_position &&
+                                    temp->seq_first != last1
+                                )
                                     return it->seq_last;
                             }
                             it++;
