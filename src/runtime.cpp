@@ -181,7 +181,6 @@ namespace hpx
             sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
         #endif
         sigaction(SIGSYS, &new_action, nullptr);  // Bad syscall
-        
 #endif
 
         std::set_new_handler(hpx::new_handler);

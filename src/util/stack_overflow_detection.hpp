@@ -9,9 +9,9 @@
   #ifndef _MSC_VER
   #include <config.h>
   #endif
-
+  #include <iostream>
   #include <sigsegv.h>
-  #include <stdint.h> 
+  #include <stdint.h>
   #include <stdio.h>
   #include <limits.h>
   #include <sys/types.h>
@@ -20,7 +20,7 @@
   # define sigemptyset(set)
   # define sigprocmask(how,set,oldset)
 
-  #include <stddef.h> 
+  #include <stddef.h>
   #include <stdlib.h>
   #include <signal.h>
   #include <setjmp.h>
@@ -67,12 +67,12 @@
   stackoverflow_handler (int emergency, stackoverflow_context_t scp)
   {
     pass++;
-    
+
     // prints the starting address of the stack
-    std::cerr << "Stack overflow caught at address " 
+    std::cerr << "Stack overflow caught at address "
               << mystack_storage
               << ".\n\n";
-        
+
     std::cerr <<"Configure the hpx runtime to allocate a larger coroutine"
                 "stack size.\n Use the hpx.stacks.small_size, "
                 "hpx.stacks.medium_size,\n hpx.stacks.large_size, "
@@ -80,14 +80,14 @@
                 "coroutine stack size.\n"
               << std::endl;
 
-    sigprocmask (SIG_SETMASK, &mainsigset, NULL);
+    sigprocmask (SIG_SETMASK, &mainsigset, nullptr);
 
     // jump to the main and continue with the rest of the program if possible
     sigsegv_leave_handler (stackoverflow_handler_continuation,
-                           (void *) (long) (emergency ? -1 : pass), NULL, NULL);
+                           (void *) (long) (emergency ? -1 : pass), nullptr, nullptr);
   }
 
-  // handler for general segmentation fault 
+  // handler for general segmentation fault
   static int
   sigsegv_handler (void *address, int emergency)
   {
@@ -97,13 +97,13 @@
 
     pass++;
 
-    std::cerr <<"Segmentation fault occured.\n" 
+    std::cerr <<"Segmentation fault occured.\n"
               <<".\n\n";
     << std::endl;
-    
-    sigprocmask (SIG_SETMASK, &mainsigset, NULL);
+
+    sigprocmask (SIG_SETMASK, &mainsigset, nullptr);
     return sigsegv_leave_handler (stackoverflow_handler_continuation,
-                                  (void *) (long) pass, NULL, NULL);
+                                  (void *) (long) pass, nullptr, nullptr);
   }
 
   // stack overflow detection API starts from here
@@ -111,13 +111,13 @@
   {
     // alternate stack to handle the stack overflow
     prepare_alternate_stack ();
-    
+
     // first check if it's a stackoverflow, if not then segmentation fault handler
     if (stackoverflow_install_handler (&stackoverflow_handler,
                                        mystack, SIGSTKSZ)
         < 0)
       { std::terminate();}
-    
+
     if (sigsegv_install_handler (&sigsegv_handler) < 0)
       { std::terminate();}
   }
