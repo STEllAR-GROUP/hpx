@@ -272,7 +272,7 @@ namespace hpx { namespace threads
         std::vector<std::size_t> socket_numbers_;
         std::vector<std::size_t> numa_node_numbers_;
         std::vector<std::size_t> core_numbers_;
-        std::vector<std::size_t> pu_numbers_; // (empty vector)
+//        std::vector<std::size_t> pu_numbers_; // (empty vector)
 
         // Affinity masks: vectors of bitmasks
         // - Length of the vector: number of PUs of the machine

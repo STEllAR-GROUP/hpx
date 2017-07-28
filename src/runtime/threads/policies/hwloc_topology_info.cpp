@@ -1147,7 +1147,7 @@ namespace hpx { namespace threads
         os << v[0];
         for (std::size_t i = 1; i != s; i++)
         {
-            os << ", " << v[i];
+            os << ", " << std::dec << v[i];
         }
         os << "\n";
     }
@@ -1187,8 +1187,8 @@ namespace hpx { namespace threads
         print_vector(os, numa_node_numbers_);
         os << "core                  : \n";
         print_vector(os, core_numbers_);
-        os << "PUs (/threads)        : \n";
-        print_vector(os, pu_numbers_);
+        //os << "PUs (/threads)        : \n";
+        //print_vector(os, pu_numbers_);
     }
 }}
 

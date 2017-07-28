@@ -269,6 +269,7 @@ namespace resource {
         size_t get_num_threads(std::size_t pool_index) const;
         init_pool_data const& get_pool(std::size_t pool_index) const;
         const std::string &get_pool_name(size_t index) const;
+        size_t get_pu_num(std::size_t global_thread_num);
         threads::mask_cref_type get_pu_mask(
             std::size_t num_thread, bool numa_sensitive) const;
         bool cmd_line_parsed() const;

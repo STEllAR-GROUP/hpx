@@ -790,10 +790,15 @@ namespace resource {
         return initial_thread_pools_[index].pool_name_;
     }
 
-    threads::mask_cref_type resource_partitioner::get_pu_mask(
-        std::size_t num_thread, bool numa_sensitive) const
+    size_t resource_partitioner::get_pu_num(std::size_t global_thread_num)
     {
-        return affinity_data_.get_pu_mask(num_thread, numa_sensitive);
+        return affinity_data_.get_pu_num(global_thread_num);
+    }
+
+    threads::mask_cref_type resource_partitioner::get_pu_mask(
+        std::size_t global_thread_num, bool numa_sensitive) const
+    {
+        return affinity_data_.get_pu_mask(global_thread_num, numa_sensitive);
     }
 
     bool resource_partitioner::cmd_line_parsed() const
