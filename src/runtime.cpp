@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c)      2017 Abhimanyu Rawat
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -109,6 +110,10 @@ namespace hpx
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef HPX_HAVE_STACKOVERFLOW_DETECTION
+#include "util/stack_overflow_detection.hpp"
+#endif
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -166,7 +171,15 @@ namespace hpx
         sigaction(SIGFPE, &new_action, nullptr);  // Floating point exception
         sigaction(SIGILL, &new_action, nullptr);  // Illegal instruction
         sigaction(SIGPIPE, &new_action, nullptr); // Bad pipe
-        sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
+        #if defined(__linux) || defined(linux) || defined(__linux__) || defined$
+            #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+                stack_overflow_detection();  // Call to use libsigsegv for Seg.$
+            #else
+                sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
+            #endif
+        #else
+            sigaction(SIGSEGV, &new_action, nullptr); // Segmentation fault
+        #endif
         sigaction(SIGSYS, &new_action, nullptr);  // Bad syscall
 #endif
 
