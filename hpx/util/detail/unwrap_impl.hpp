@@ -165,19 +165,27 @@ namespace util {
             }
         };
 
+        /// Deduces to a true_type if the result of unwrap should
+        /// be fused invoked which is the case when:
+        /// - The callable was called with more than one argument
+        /// - The result of the unwrap is a tuple like type
+        template <bool HadMultipleArguments, typename T>
+        using should_fuse_invoke = std::integral_constant<bool,
+            (HadMultipleArguments &&
+                traits::is_tuple_like<typename std::decay<T>::type>::value)>;
+
         /// Invokes the callable object with the result:
         /// - If the result is a tuple-like type `invoke_fused` is used
         /// - Otherwise `invoke` is used
         template <bool HadMultipleArguments, typename C, typename T>
         auto dispatch_wrapped_invocation_select(C&& callable, T&& unwrapped)
-            -> decltype(
-                invoke_wrapped_invocation_select<(HadMultipleArguments &&
-                    traits::is_tuple_like<typename std::decay<T>::type>::
-                        value)>::apply(std::forward<C>(callable),
-                    std::forward<T>(unwrapped)))
+            -> decltype(invoke_wrapped_invocation_select<
+                should_fuse_invoke<HadMultipleArguments,
+                    T>::value>::apply(std::forward<C>(callable),
+                std::forward<T>(unwrapped)))
         {
-            return invoke_wrapped_invocation_select<(HadMultipleArguments &&
-                traits::is_tuple_like<typename std::decay<T>::type>::value)>::
+            return invoke_wrapped_invocation_select<
+                should_fuse_invoke<HadMultipleArguments, T>::value>::
                 apply(std::forward<C>(callable), std::forward<T>(unwrapped));
         }
 
