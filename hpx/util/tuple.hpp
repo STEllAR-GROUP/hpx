@@ -580,12 +580,6 @@ namespace hpx { namespace util
         {
             return tuple._impl.template get<I>();
         }
-
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
-        get(tuple<Ts...>&& tuple) noexcept
-        {
-            return std::move(tuple._impl.template get<I>());
-        }
     };
 
     template <typename T0, typename T1>
@@ -603,12 +597,6 @@ namespace hpx { namespace util
         get(std::pair<T0, T1> const& tuple) noexcept
         {
             return tuple.first;
-        }
-
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
-        get(std::pair<T0, T1>&& tuple) noexcept
-        {
-            return std::move(tuple.first);
         }
     };
 
@@ -628,12 +616,6 @@ namespace hpx { namespace util
         {
             return tuple.second;
         }
-
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
-        get(std::pair<T0, T1>&& tuple) noexcept
-        {
-            return std::move(tuple.second);
-        }
     };
 
     template <std::size_t I, typename Type, std::size_t Size>
@@ -651,12 +633,6 @@ namespace hpx { namespace util
         get(boost::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
-        }
-
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
-        get(boost::array<Type, Size>&& tuple) noexcept
-        {
-            return std::move(tuple[I]);
         }
     };
 
@@ -676,12 +652,6 @@ namespace hpx { namespace util
         get(std::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
-        }
-
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&&
-        get(std::array<Type, Size>&& tuple) noexcept
-        {
-            return std::move(tuple[I]);
         }
     };
 #endif
@@ -781,9 +751,9 @@ namespace hpx { namespace util
         struct tuple_cat_size_impl;
 
         template <std::size_t Size>
-        struct tuple_cat_size_impl<Size, detail::pack<> >
+        struct tuple_cat_size_impl<Size, detail::pack<>>
+          : std::integral_constant<std::size_t, Size>
         {
-            static const std::size_t value = Size;
         };
 
         template <std::size_t Size, typename Head, typename ...Tail>
@@ -809,16 +779,14 @@ namespace hpx { namespace util
           , typename std::enable_if<
                 (I < tuple_size<Head>::value)
             >::type
-        > : tuple_element<I, Head>
+        >
         {
-            typedef tuple_element<I, Head> base_type;
-
             template <typename THead, typename... TTail>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-                auto get(THead&& head, TTail&&... /*tail*/) noexcept
-                -> decltype(base_type::get(std::forward<THead>(head)))
+            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
+                THead&& head, TTail&&... /*tail*/) noexcept
+                -> decltype(hpx::util::get<I>(std::forward<THead>(head)))
             {
-                return base_type::get(std::forward<THead>(head));
+                return hpx::util::get<I>(std::forward<THead>(head));
             }
         };
 
@@ -839,8 +807,8 @@ namespace hpx { namespace util
             > base_type;
 
             template <typename THead, typename... TTail>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-                auto get(THead&& /*head*/, TTail&&... tail) noexcept
+            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
+                THead&& /*head*/, TTail&&... tail) noexcept
                 -> decltype(base_type::get(std::forward<TTail>(tail)...))
             {
                 return base_type::get(std::forward<TTail>(tail)...);
@@ -848,44 +816,43 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Indices, typename Tuples>
-        struct tuple_cat_result_impl;
-
-        template <std::size_t ...Is, typename ...Tuples>
-        struct tuple_cat_result_impl<
-            detail::pack_c<std::size_t, Is...>, detail::pack<Tuples...>
-        >
+        /// A helper function for creating a non owning tuple from the given
+        /// arguments. Which means that the funcitonality of this function
+        /// lies between make_tuple and forward_as_tuple.
+        template <typename... Ts>
+        tuple<Ts...> create_raw_tuple(Ts&&... args)
         {
-            typedef tuple<
-                typename tuple_cat_element<Is, detail::pack<Tuples...> >::type...
-            > type;
+            return tuple<Ts...>{std::forward<Ts>(args)...};
+        }
 
-            template <typename ...Tuples_>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            type make(Tuples_&&... tuples)
-            {
-                return type(tuple_cat_element<Is, detail::pack<Tuples...> >::get(
+        template <std::size_t... Is, typename... Tuples, typename... Tuples_>
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto
+        tuple_cat_impl(detail::pack_c<std::size_t, Is...>,
+            detail::pack<Tuples...>, Tuples_&&... tuples)
+            -> decltype(create_raw_tuple(
+                tuple_cat_element<Is, detail::pack<Tuples...>>::get(
+                    std::forward<Tuples_>(tuples)...)...))
+        {
+            return create_raw_tuple(
+                tuple_cat_element<Is, detail::pack<Tuples...>>::get(
                     std::forward<Tuples_>(tuples)...)...);
-            }
-        };
-
-        template <typename ...Tuples>
-        struct tuple_cat_result
-          : tuple_cat_result_impl<
-                typename make_index_pack<tuple_cat_size<Tuples...>::value>::type
-              , detail::pack<Tuples...>
-            >
-        {};
+        }
     }
 
-    template <typename ...Tuples>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename detail::tuple_cat_result<
-            typename std::decay<Tuples>::type...>::type
-        tuple_cat(Tuples&&... tuples)
+    template <typename... Tuples>
+    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(
+        Tuples&&... tuples)
+        -> decltype(detail::tuple_cat_impl(
+            typename detail::make_index_pack<detail::tuple_cat_size<
+                typename std::decay<Tuples>::type...>::value>::type{},
+            detail::pack<typename std::decay<Tuples>::type...>{},
+            std::forward<Tuples>(tuples)...))
     {
-        return detail::tuple_cat_result<typename std::decay<Tuples>::type...>::
-            make(std::forward<Tuples>(tuples)...);
+        return detail::tuple_cat_impl(
+            typename detail::make_index_pack<detail::tuple_cat_size<
+                typename std::decay<Tuples>::type...>::value>::type{},
+            detail::pack<typename std::decay<Tuples>::type...>{},
+            std::forward<Tuples>(tuples)...);
     }
 
     // 20.4.2.7, relational operators
