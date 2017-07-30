@@ -135,7 +135,6 @@ namespace hpx { namespace parallel { inline namespace v1
             std::forward<Pred>(pred),
             std::forward<Proj>(proj));
     }
-    /// \endcond
 }}}
 
 #endif
