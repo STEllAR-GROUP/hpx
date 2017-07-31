@@ -36,7 +36,6 @@
 #else
 #include <hpx/lcos/local/spinlock.hpp>
 #include <mutex>
-hpx::lcos::local::spinlock gmtime_call_mutex;
 #endif
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
@@ -105,7 +104,8 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
         // fall back to non-thread-safe version on other platforms
         std::tm local_tm;
         {
-            std::unique_lock<hpx::lcos::local::spinlock> ul(gmtime_call_mutex);
+            static hpx::lcos::local::spinlock mutex;
+            std::unique_lock<hpx::lcos::local::spinlock> ul(mutex);
             local_tm = *std::localtime(&tt);
         }
 #endif
