@@ -371,6 +371,21 @@ void tuple_cat_test()
         HPX_TEST_EQ((*hpx::util::get<1>(result)), 1);
         HPX_TEST_EQ((*hpx::util::get<2>(result)), 2);
     }
+
+    // Don't move references unconditionally
+    {
+        int i1 = 11;
+        int i2 = 22;
+
+        auto f1 = hpx::util::forward_as_tuple(i1);
+        auto f2 = hpx::util::forward_as_tuple(std::move(i2));
+
+        hpx::util::tuple<int&, int&&> result =
+            hpx::util::tuple_cat(std::move(f1), std::move(f2));
+
+        HPX_TEST_EQ((hpx::util::get<0>(result)), 11);
+        HPX_TEST_EQ((hpx::util::get<1>(result)), 22);
+    }
 }
 
 // ----------------------------------------------------------------------------

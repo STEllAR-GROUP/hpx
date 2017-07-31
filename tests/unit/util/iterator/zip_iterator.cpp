@@ -17,6 +17,7 @@
 #include <set>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 // Tests for https://svn.boost.org/trac/boost/ticket/1517
@@ -39,6 +40,12 @@ void category_test()
     );
 }
 //
+
+/// Deduces to the result of tuple_cat when it's invoked with the given
+/// parameters Ts.
+template <typename... Ts>
+using tuple_cat_result_of_t =
+    decltype(hpx::util::tuple_cat(std::declval<Ts>()...));
 
 int main(void)
 {
@@ -123,7 +130,7 @@ int main(void)
     ve4.push_back(12);
 
     // typedefs for cons lists of iterators.
-    typedef hpx::util::detail::tuple_cat_result<
+    typedef tuple_cat_result_of_t<
             hpx::util::tuple<
                 std::set<int>::iterator
             >,
@@ -134,18 +141,18 @@ int main(void)
                 std::vector<int>::iterator, std::list<int>::iterator,
                 std::set<int>::iterator, std::vector<int>::const_iterator
             >
-        >::type cons_11_its_type;
+        > cons_11_its_type;
     //
-    typedef hpx::util::detail::tuple_cat_result<
+    typedef tuple_cat_result_of_t<
             hpx::util::tuple<
                 std::list<int>::const_iterator
             >,
             cons_11_its_type
-        >::type cons_12_its_type;
+        > cons_12_its_type;
 
     // typedefs for cons lists for dereferencing the zip iterator
     // made from the cons list above.
-    typedef hpx::util::detail::tuple_cat_result<
+    typedef tuple_cat_result_of_t<
             hpx::util::tuple<
                 const int&
             >,
@@ -153,14 +160,14 @@ int main(void)
                 int&, int&, const int&, int&, int&, const int&,
                 int&, int&, const int&, const int&
             >
-        >::type cons_11_refs_type;
+        > cons_11_refs_type;
     //
-    typedef hpx::util::detail::tuple_cat_result<
+    typedef tuple_cat_result_of_t<
             hpx::util::tuple<
                 const int&
             >,
             cons_11_refs_type
-        >::type cons_12_refs_type;
+        > cons_12_refs_type;
 
     // typedef for zip iterator with 12 elements
     typedef hpx::util::zip_iterator<cons_12_its_type> zip_it_12_type;
