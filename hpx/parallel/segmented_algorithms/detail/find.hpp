@@ -132,8 +132,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         -> find_return<FwdIter1>
                     {
                         FwdIter1 complete_sequence_position = first1;
-                        FwdIter1 partial_sequence_position = first1;
-                        std::size_t complete_sequence_cursor=0;
+                        FwdIter1 partial_sequence_position = last1;
+                        std::size_t complete_sequence_cursor = 0;
                         std::size_t partial_sequence_cursor = sequence.size();
                         difference_type find_end_res = tok.get_data();
                         bool span = false;
@@ -342,9 +342,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         -> find_return<FwdIter1>
                     {
                         FwdIter1 complete_sequence_position = first1;
-                        FwdIter1 partial_sequence_position = first1;
+                        FwdIter1 partial_sequence_position = last1;
                         std::size_t complete_sequence_cursor = 0;
-                        std::size_t partial_sequence_cursor=sequence.size();
+                        std::size_t partial_sequence_cursor = sequence.size();
                         difference_type find_first_of_res = tok.get_data();
                         if(find_first_of_res != count)
                         {
