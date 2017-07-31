@@ -76,10 +76,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
         call(find_return<typename traits::local_raw_iterator> && in)
         {
             find_return<Iterator> ret;
-            ret.seq_first = traits::remote(std::move(in.seq_first));
-            ret.seq_last = traits::remote(std::move(in.seq_last));
-            ret.partial_position = in.partial_position;
-            ret.last_position = in.last_position;
+            ret.complete_sequence_position = traits::remote(std::move(in.complete_sequence_position));
+            ret.partial_sequence_position = traits::remote(std::move(in.partial_sequence_position));
+            ret.complete_sequence_cursor = in.complete_sequence_cursor;
+            ret.partial_sequence_cursor = in.partial_sequence_cursor;
             return ret;
         }
     };
@@ -180,10 +180,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 {
                     auto in=f.get();
                     find_return<Iterator> ret;
-                    ret.seq_first = traits::remote(std::move(in.seq_first));
-                    ret.seq_last = traits::remote(std::move(in.seq_last));
-                    ret.partial_position = in.partial_position;
-                    ret.last_position = in.last_position;
+                    ret.complete_sequence_position = traits::remote(std::move(in.complete_sequence_position));
+                    ret.partial_sequence_position = traits::remote(std::move(in.partial_sequence_position));
+                    ret.complete_sequence_cursor = in.complete_sequence_cursor;
+                    ret.partial_sequence_cursor = in.partial_sequence_cursor;
                     return ret;
                 });
         }

@@ -17,15 +17,20 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename FwdIter>
         struct find_return
         {
-            FwdIter seq_first;
-            std::size_t partial_position;
-            FwdIter seq_last;
-            std::size_t last_position;
+            //Position of complete sequence in the vector
+            FwdIter complete_sequence_position;
+            //Position in the sequence till which complete match is found
+            std::size_t complete_sequence_cursor;
+            //Position of partial sequence in the give vector
+            FwdIter partial_sequence_position;
+            // Position in the sequence till which partial match is found
+            std::size_t partial_sequence_cursor;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                ar & seq_first & partial_position & seq_last & last_position;
+                ar & complete_sequence_position & complete_sequence_cursor &
+                    partial_sequence_position & partial_sequence_cursor;
             }
         };
     }

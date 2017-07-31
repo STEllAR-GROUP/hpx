@@ -131,15 +131,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     [=](std::vector<hpx::future<void> > &&) mutable
                         -> find_return<FwdIter1>
                     {
-                        FwdIter1 seq_start = first1, seq_last = first1;
-                        std::size_t partial_position=0, last_position = sequence.size();
+                        FwdIter1 complete_sequence_position = first1;
+                        FwdIter1 partial_sequence_position = first1;
+                        std::size_t complete_sequence_cursor=0;
+                        std::size_t partial_sequence_cursor = sequence.size();
                         difference_type find_end_res = tok.get_data();
                         bool span = false;
                         if (find_end_res != count && find_end_res != -1)
                         {
                             // complete sequence is present
-                            std::advance(seq_start, find_end_res);
-                            partial_position = sequence.size();
+                            std::advance(complete_sequence_position, find_end_res);
+                            complete_sequence_cursor = sequence.size();
                         }
                         else
                         {
@@ -161,16 +163,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     }
                                     if(temp_index == sequence.size())
                                     {
-                                        seq_start = first1;
-                                        partial_position = index;
+                                        complete_sequence_position = first1;
+                                        complete_sequence_cursor = index;
                                     }
                                     else if(curr == last1 &&
                                         hpx::util::invoke(op, *(std::prev(curr)),
                                             sequence[temp_index-1]))
                                     {
-                                        seq_start = last1;
-                                        partial_position = index;
-                                        last_position = temp_index-1;
+                                        complete_sequence_position = last1;
+                                        complete_sequence_cursor = index;
+                                        partial_sequence_cursor = temp_index-1;
                                         span = true;
                                     }
                                 }
@@ -195,26 +197,28 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 }
                                 if(temp == last1)
                                 {
-                                    last_position = index;
-                                    seq_last = curr;
+                                    partial_sequence_cursor = index;
+                                    partial_sequence_position = curr;
                                     break;
                                 }
                                 else
                                 {
-                                    seq_last = last1;
-                                    last_position = sequence.size();
+                                    partial_sequence_position = last1;
+                                    partial_sequence_cursor = sequence.size();
                                 }
                             }
                         }
                         // return both results
-                        return find_return<FwdIter1>{std::move(seq_start),
-                            partial_position, std::move(seq_last), last_position};
+                        return find_return<FwdIter1>{std::move(complete_sequence_position),
+                            complete_sequence_cursor, std::move(partial_sequence_position),
+                            partial_sequence_cursor};
                     });
         }
     };
 
     template<typename Iter>
-    struct seg_find_first_of : public detail::algorithm<seg_find_first_of<Iter>, find_return<Iter> >
+    struct seg_find_first_of : public detail::algorithm<seg_find_first_of<Iter>,
+        find_return<Iter> >
     {
         seg_find_first_of()
           : seg_find_first_of<Iter>::algorithm("segmented_find_first_of")
@@ -268,8 +272,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             }
             // return consists of positions of complete sequence if found and
                 // partial sequence at the beginning
-            return find_return<FwdIter1>{std::move(start), cursor,
-                std::move(found_start), found_cursor};
+            return find_return<FwdIter1>{std::move(found_start), found_cursor,
+                std::move(start), cursor};
         }
 
         template <typename ExPolicy, typename FwdIter1, typename SeqVec,
@@ -337,15 +341,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     [=](std::vector<hpx::future<void> > &&) mutable
                         -> find_return<FwdIter1>
                     {
-                        FwdIter1 seq_last = first1, seq_start = first1;
-                        std::size_t partial_position = sequence.size(), last_position=0;
+                        FwdIter1 complete_sequence_position = first1;
+                        FwdIter1 partial_sequence_position = first1;
+                        std::size_t complete_sequence_cursor = 0;
+                        std::size_t partial_sequence_cursor=sequence.size();
                         difference_type find_first_of_res = tok.get_data();
                         if(find_first_of_res != count)
                         {
                             // complete sequence is not present so search for
                             // partial sequence at the beginning.
-                            std::advance(seq_last, find_first_of_res);
-                            last_position = sequence.size();
+                            std::advance(complete_sequence_position, find_first_of_res);
+                            complete_sequence_cursor = sequence.size();
                         }
                         else
                         {
@@ -362,19 +368,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     hpx::util::invoke(op, *temp, sequence[index]))
                                 {
                                     if(index == 0)
-                                        seq_last = curr;
+                                        complete_sequence_position = curr;
                                     ++temp;
                                     ++index;
                                 }
                                 if(temp == last1)
                                 {
-                                    last_position = index;
+                                    complete_sequence_cursor = index;
                                     break;
                                 }
                                 else
                                 {
-                                    seq_last = last1;
-                                    last_position = sequence.size();
+                                    complete_sequence_position = last1;
+                                    complete_sequence_cursor = sequence.size();
                                 }
                             }
                         }
@@ -395,22 +401,23 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 }
                                 if(temp_index == sequence.size())
                                 {
-                                    seq_start = first1;
-                                    partial_position = index;
+                                    partial_sequence_position = first1;
+                                    partial_sequence_cursor = index;
                                 }
                                 else if(curr == last1 &&
                                     hpx::util::invoke(op, *(std::prev(curr)),
                                         sequence[temp_index-1]))
                                 {
-                                    seq_start = last1;
-                                    partial_position = index;
-                                    last_position = temp_index-1;
+                                    partial_sequence_position = last1;
+                                    partial_sequence_cursor = index;
+                                    complete_sequence_cursor = temp_index-1;
                                 }
                             }
                             ++index;
                         }
-                        return find_return<FwdIter1>{std::move(seq_start),
-                            partial_position, std::move(seq_last), last_position};
+                        return find_return<FwdIter1>{std::move(complete_sequence_position),
+                            complete_sequence_cursor, std::move(partial_sequence_position),
+                            partial_sequence_cursor};
                     });
         }
     };
