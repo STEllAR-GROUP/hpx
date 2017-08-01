@@ -35,7 +35,7 @@ foreach(test ${tests})
       ${test}.cpp)
 
   set(${test}_FLAGS DEPENDENCIES partitioned_vector_component)
-  set(${test}_PARAMETERS LOCALITIES 4 THREADS_PER_LOCALITY 4)
+  set(${test}_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
 
   source_group("Source Files" FILES ${sources})
 
