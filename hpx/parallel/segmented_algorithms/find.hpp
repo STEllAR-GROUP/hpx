@@ -19,9 +19,9 @@
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <cstddef>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <numeric>
@@ -156,7 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<InIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
-                            [send,end,last](local_iterator_type const& out)
+                            [=](local_iterator_type const& out)
                                 -> InIter
                             {
                                 if(out != end)
@@ -176,7 +176,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<InIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
-                            [sit,end,last](local_iterator_type const& out)
+                            [=](local_iterator_type const& out)
                                 -> InIter
                             {
                                 if(out != end)
@@ -197,7 +197,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             hpx::make_future<InIter>(
                                 dispatch_async(traits::get_id(sit), algo,
                                     policy, forced_seq(), beg, end, f_or_val),
-                                [sit,end,last](local_iterator_type const& out)
+                                [=](local_iterator_type const& out)
                                     -> InIter
                                 {
                                     if(out != end)
@@ -217,7 +217,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<InIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
-                            [sit,end,last](local_iterator_type const& out)
+                            [=](local_iterator_type const& out)
                                 -> InIter
                             {
                                 if(out != end)
@@ -362,8 +362,9 @@ namespace hpx { namespace parallel { inline namespace v1
             execution::is_execution_policy<ExPolicy>::value,
             typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
         >::type
-        segmented_find_end(Algo && algo, ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred && op, std::true_type)
+        segmented_find_end(Algo && algo, ExPolicy && policy,
+            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
+            Pred && op, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<FwdIter1> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -526,7 +527,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<find_return<FwdIter1> >(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, sequence, op),
-                            [send,end,last1](find_return<local_iterator_type> const& out)
+                            [=](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
                                 FwdIter1 it_first, it_last;
@@ -556,7 +557,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<find_return<FwdIter1> >(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, sequence, op),
-                            [sit,end,last1](find_return<local_iterator_type> const& out)
+                            [=](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
                                 FwdIter1 it_first, it_last;
@@ -586,7 +587,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             hpx::make_future<find_return<FwdIter1> >(
                                 dispatch_async(traits::get_id(sit), algo,
                                     policy, forced_seq(), beg, end, sequence, op),
-                                [sit,end,last1](find_return<local_iterator_type> const& out)
+                                [=](find_return<local_iterator_type> const& out)
                                     -> find_return<FwdIter1>
                                 {
                                     FwdIter1 it_first, it_last;
@@ -659,15 +660,17 @@ namespace hpx { namespace parallel { inline namespace v1
                                 return it->complete_sequence_position;
                             }
                             //if partial sequence found in the segment behind it
-                            if (std::next(it)->partial_sequence_cursor != sequence.size()
-                                && std::next(it)->partial_sequence_cursor ==
-                                it->complete_sequence_cursor)
+                            if (std::next(it)->partial_sequence_cursor !=
+                                    sequence.size() &&
+                                std::next(it)->partial_sequence_cursor ==
+                                    it->complete_sequence_cursor)
                             {
                                 return std::next(it)->partial_sequence_position;
                             }
                             auto temp = it;
                             while (temp != res.rend() &&
-                                std::next(temp)->complete_sequence_cursor != sequence.size())
+                                std::next(temp)->complete_sequence_cursor !=
+                                    sequence.size())
                             {
                                 ++temp;
                                 if(temp->partial_sequence_cursor !=
@@ -811,7 +814,8 @@ namespace hpx { namespace parallel { inline namespace v1
                             break;
                         }
                         //if earlier partial sequence completed store that
-                        else if(partial_found && out.complete_sequence_cursor == sequence.size())
+                        else if(partial_found &&
+                            out.complete_sequence_cursor == sequence.size())
                         {
                             output = partial_out;
                             found = true;
@@ -853,7 +857,8 @@ namespace hpx { namespace parallel { inline namespace v1
                         found = true;
                     }
                     //if earlier partial sequence completed then store  that
-                    else if(partial_found && out.complete_sequence_cursor == sequence.size())
+                    else if(partial_found &&
+                        out.complete_sequence_cursor == sequence.size())
                     {
                         found = true;
                         output = partial_out;
@@ -901,7 +906,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<find_return<FwdIter1> >(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, sequence, op),
-                            [send,end,last1](find_return<local_iterator_type> const& out)
+                            [=](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
                                 FwdIter1 it_first, it_last;
@@ -931,7 +936,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<find_return<FwdIter1> >(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, sequence, op),
-                            [sit,end,last1](find_return<local_iterator_type> const& out)
+                            [=](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
                                 FwdIter1 it_first, it_last;
@@ -961,7 +966,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             hpx::make_future<find_return<FwdIter1> >(
                                 dispatch_async(traits::get_id(sit), algo,
                                     policy, forced_seq(), beg, end, sequence, op),
-                                [sit,end,last1](find_return<local_iterator_type> const& out)
+                                [=](find_return<local_iterator_type> const& out)
                                     -> find_return<FwdIter1>
                                 {
                                     FwdIter1 it_first, it_last;
@@ -990,7 +995,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<find_return<FwdIter1> >(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, sequence, op),
-                            [sit,end,last1](find_return<local_iterator_type> const& out)
+                            [=](find_return<local_iterator_type> const& out)
                                 -> find_return<FwdIter1>
                             {
                                 FwdIter1 it_first, it_last;

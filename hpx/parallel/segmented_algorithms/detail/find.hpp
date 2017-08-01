@@ -11,6 +11,10 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 
+#include <cstddef>
+#include <utility>
+#include <vector>
+
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
     /// \cond NOINTERNAL
@@ -155,8 +159,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 {
                                     FwdIter1 curr = first1;
                                     std::size_t temp_index = index;
-                                    while(curr != last1 && temp_index != sequence.size() &&
-                                        hpx::util::invoke(op, *curr, sequence[temp_index]))
+                                    while(curr != last1 &&
+                                        temp_index != sequence.size() &&
+                                        hpx::util::invoke(op, *curr,
+                                            sequence[temp_index]))
                                     {
                                         ++curr;
                                         ++temp_index;
@@ -206,8 +212,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             }
                         }
                         // return both results
-                        return find_return<FwdIter1>{std::move(complete_sequence_position),
-                            complete_sequence_cursor, std::move(partial_sequence_position),
+                        return find_return<FwdIter1>{
+                            std::move(complete_sequence_position),
+                            complete_sequence_cursor,
+                            std::move(partial_sequence_position),
                             partial_sequence_cursor};
                     });
         }
@@ -239,7 +247,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     if(cursor == 0)
                         start = first1;
                     ++cursor;
-                    // if complete sequence found, then store result and continue search
+                    // if complete sequence found, then store result
+                    // and continue search
                     if(cursor == sequence.size())
                     {
                         //only if sequence not previously found
@@ -348,7 +357,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         {
                             // complete sequence is not present so search for
                             // partial sequence at the beginning.
-                            std::advance(complete_sequence_position, find_first_of_res);
+                            std::advance(complete_sequence_position,
+                                find_first_of_res);
                             complete_sequence_cursor = sequence.size();
                         }
                         else
@@ -363,8 +373,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 {
                                     FwdIter1 curr = first1;
                                     std::size_t temp_index = index;
-                                    while(curr != last1 && temp_index != sequence.size() &&
-                                        hpx::util::invoke(op, *curr, sequence[temp_index]))
+                                    while(curr != last1 &&
+                                        temp_index != sequence.size() &&
+                                        hpx::util::invoke(op, *curr,
+                                            sequence[temp_index]))
                                     {
                                         ++curr;
                                         ++temp_index;
@@ -413,8 +425,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 }
                             }
                         }
-                        return find_return<FwdIter1>{std::move(complete_sequence_position),
-                            complete_sequence_cursor, std::move(partial_sequence_position),
+                        return find_return<FwdIter1>{
+                            std::move(complete_sequence_position),
+                            complete_sequence_cursor,
+                            std::move(partial_sequence_position),
                             partial_sequence_cursor};
                     });
         }
