@@ -10,7 +10,7 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -38,7 +38,7 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -78,23 +78,23 @@ void function_pointers(Executor& exec)
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    future<void> f1 = dataflow(exec, unwrapped(&void_f1), async(&int_f));
+    future<void> f1 = dataflow(exec, unwrapping(&void_f1), async(&int_f));
     future<int>
         f2 = dataflow(exec,
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
         );
     future<int>
         f3 = dataflow(exec,
-            unwrapped(&int_f2)
+            unwrapping(&int_f2)
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42)
             )
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(37)
             )
         );
@@ -103,18 +103,18 @@ void function_pointers(Executor& exec)
     std::vector<future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
-        vf.push_back(dataflow(exec, unwrapped(&int_f1), make_ready_future(42)));
+        vf.push_back(dataflow(exec, unwrapping(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(exec, unwrapped(&int_f_vector), std::move(vf));
+    future<int> f4 = dataflow(exec, unwrapping(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(exec,
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
           , dataflow(exec,
-                unwrapped(&void_f)
+                unwrapping(&void_f)
               , make_ready_future())
         );
 

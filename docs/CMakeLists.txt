@@ -111,6 +111,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/is_heap.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/minmax.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/partition.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/remove_copy.hpp"
@@ -185,6 +186,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/unwrapped.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 

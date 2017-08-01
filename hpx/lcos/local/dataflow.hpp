@@ -216,7 +216,7 @@ namespace hpx
     namespace lcos { namespace local
     {
         template <typename F, typename ...Ts>
-        HPX_FORCEINLINE
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) HPX_FORCEINLINE
         auto dataflow(F && f, Ts &&... ts)
         ->  decltype(lcos::detail::dataflow_dispatch<
                 typename std::decay<F>::type>::call(

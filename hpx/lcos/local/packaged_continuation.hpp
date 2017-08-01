@@ -112,7 +112,6 @@ namespace hpx { namespace lcos { namespace detail
         > is_void;
 
         hpx::util::annotate_function annotate(func);
-        (void)annotate;     // suppress warning about unused variable
         invoke_continuation(func, future, cont, is_void());
     }
 
@@ -360,6 +359,7 @@ namespace hpx { namespace lcos { namespace detail
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void async_exec_v1(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -439,6 +439,7 @@ namespace hpx { namespace lcos { namespace detail
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void async_exec_v1(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -563,6 +564,7 @@ namespace hpx { namespace lcos { namespace detail
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void attach_exec_v1(Future const& future, Executor& exec)
         {
             typedef
@@ -665,6 +667,7 @@ namespace hpx { namespace lcos { namespace detail
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     template <typename ContResult, typename Future, typename Executor,
         typename F>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type

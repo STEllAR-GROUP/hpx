@@ -20,8 +20,6 @@
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <type_traits>
 #include <utility>
 
@@ -131,11 +129,10 @@ namespace hpx { namespace parallel { inline namespace v1
         Proj && proj = Proj())
     {
         return partition_copy(std::forward<ExPolicy>(policy),
-            std::begin(rng), std::end(rng), dest_true, dest_false,
+            hpx::util::begin(rng), hpx::util::end(rng), dest_true, dest_false,
             std::forward<Pred>(pred),
             std::forward<Proj>(proj));
     }
-    /// \endcond
 }}}
 
 #endif

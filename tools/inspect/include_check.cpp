@@ -156,6 +156,12 @@ namespace boost
       // boost
       { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
       { "(\\bboost\\s*::\\s*intrusive_ptr\\b)", "boost::intrusive_ptr", "boost/intrusive_ptr.hpp" },
+      // macros
+      { "(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT", "hpx/util/detail/pp/cat.hpp" },
+      { "(\\bHPX_PP_EXPAND\\b)", "HPX_PP_EXPAND", "hpx/util/detail/pp/expand.hpp" },
+      { "(\\bHPX_PP_NARGS\\b)", "HPX_PP_NARGS", "hpx/util/detail/pp/nargs.hpp" },
+      { "(\\bHPX_PP_STRINGIZE\\b)", "HPX_PP_STRINGIZE", "hpx/util/detail/pp/stringize.hpp" },
+      { "(\\bHPX_PP_STRIP_PARENS\\b)", "HPX_PP_STRIP_PARENS", "hpx/util/detail/pp/strip_parens.hpp" },
       { nullptr, nullptr, nullptr }
     };
 

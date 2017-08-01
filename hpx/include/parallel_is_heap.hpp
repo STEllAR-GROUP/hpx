@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_IS_HEAP_JUN_22_2017_1706PM
 
 #include <hpx/parallel/algorithms/is_heap.hpp>
+#include <hpx/parallel/container_algorithms/is_heap.hpp>
 
 #endif
 

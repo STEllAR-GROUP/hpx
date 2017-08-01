@@ -7,9 +7,12 @@
 #define HPX_UTIL_PACK_TRAVERSAL_HPP
 
 #include <hpx/util/detail/pack_traversal_impl.hpp>
+#include <hpx/util/tuple.hpp>
 
+#include <type_traits>
 #include <utility>
 
+#if defined(DOXYGEN)
 namespace hpx {
 namespace util {
     /// Maps the pack with the given mapper.
@@ -24,7 +27,7 @@ namespace util {
     /// and preserved through the hierarchy.
     ///
     ///    ```cpp
-    ///    // Maps all ints to floats
+    ///    // Maps all integers to floats
     ///    map_pack([](int value) {
     ///        return float(value);
     ///    },
@@ -44,6 +47,14 @@ namespace util {
     ///               a `hpx::tuple`.
     ///
     template <typename Mapper, typename... T>
+    <unspecified> map_pack(Mapper&& mapper, T&&... pack);
+}
+}
+#else    // DOXYGEN
+
+namespace hpx {
+namespace util {
+    template <typename Mapper, typename... T>
     auto map_pack(Mapper&& mapper, T&&... pack)
         -> decltype(detail::apply_pack_transform(detail::strategy_remap_tag{},
             std::forward<Mapper>(mapper),
@@ -52,6 +63,17 @@ namespace util {
         return detail::apply_pack_transform(detail::strategy_remap_tag{},
             std::forward<Mapper>(mapper),
             std::forward<T>(pack)...);
+    }
+
+    /// Indicate that the result shall be spread across the parent container
+    /// if possible. This can be used to create a mapper function used
+    /// in map_pack that maps one element to an arbitrary count (1:n).
+    template <typename... T>
+    HPX_CONSTEXPR detail::spreading::spread_box<typename std::decay<T>::type...>
+    spread_this(T&&... args)
+    {
+        return detail::spreading::spread_box<typename std::decay<T>::type...>(
+            util::make_tuple(std::forward<T>(args)...));
     }
 
     /// Traverses the pack with the given visitor.
@@ -70,4 +92,5 @@ namespace util {
 }    // end namespace util
 }    // end namespace hpx
 
+#endif    // DOXYGEN
 #endif    // HPX_UTIL_PACK_TRAVERSAL_HPP

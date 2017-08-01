@@ -18,7 +18,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/iterator_range.hpp>
 #include <hpx/util/range.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <boost/atomic.hpp>
 

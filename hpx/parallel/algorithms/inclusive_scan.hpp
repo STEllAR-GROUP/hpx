@@ -6,13 +6,13 @@
 
 /// \file parallel/algorithms/inclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JUN_21_2017_0136PM)
-#define HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JUN_21_2017_0136PM
+#if !defined(HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM)
+#define HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -144,20 +144,24 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, conv](zip_iterator part_begin, std::size_t part_size) -> T
+                    [op, conv, last](zip_iterator part_begin,
+                        std::size_t part_size) -> T
                     {
                         T part_init = hpx::util::invoke(conv, get<0>(*part_begin));
                         get<1>(*part_begin++) = part_init;
                         auto iters = part_begin.get_iterator_tuple();
-                        return sequential_inclusive_scan_n(
-                            get<0>(iters),
-                            part_size-1,
-                            get<1>(iters),
-                            part_init, op, conv);
+                        if(get<0>(iters) != last)
+                            return sequential_inclusive_scan_n(
+                                get<0>(iters),
+                                part_size-1,
+                                get<1>(iters),
+                                part_init, op, conv);
+                        else
+                            return part_init;
                     },
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapped(op),
+                    hpx::util::unwrapping(op),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
@@ -333,6 +337,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter1>::value_type
             >::value)>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         T init, Op && op)
@@ -431,6 +436,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter1>::value_type
             >::value)>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         T init)

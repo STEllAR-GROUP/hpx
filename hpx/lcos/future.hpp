@@ -623,6 +623,7 @@ namespace hpx { namespace lcos { namespace detail
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor, typename F>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         typename util::lazy_enable_if<
             hpx::traits::is_executor<Executor>::value
           , hpx::traits::future_then_result<Derived, F>
@@ -988,6 +989,7 @@ namespace hpx { namespace lcos
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor, typename F>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         typename util::lazy_enable_if<
             hpx::traits::is_executor<Executor>::value
           , hpx::traits::future_then_result<future, F>
