@@ -5,21 +5,18 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/parallel/algorithms/fill.hpp>
+#include <hpx/include/parallel_fill.hpp>
+#include <hpx/include/partitioned_vector.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-
 #include <hpx/runtime/serialization/partitioned_vector.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
-
-#include <hpx/include/traits.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/include/partitioned_vector.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
 #include <numeric>
+#include <vector>
 
 HPX_REGISTER_PARTITIONED_VECTOR(int);
 HPX_REGISTER_PARTITIONED_VECTOR(unsigned);
@@ -42,18 +39,20 @@ void test(T minval, T maxval)
         std::size_t sz = static_cast<std::size_t>(maxval-minval);
 
         hpx::partitioned_vector<T> os(sz);
-        hpx::parallel::fill(hpx::parallel::par, std::begin(os), std::end(os), 0);
+        hpx::parallel::fill(
+            hpx::parallel::execution::par, std::begin(os), std::end(os), 0);
 
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
 
         hpx::partitioned_vector<T> is(os.size());
-        hpx::parallel::fill(hpx::parallel::par, std::begin(is), std::end(is), 0);
+        hpx::parallel::fill(
+            hpx::parallel::execution::par, std::begin(is), std::end(is), 0);
 
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             HPX_TEST_EQ(os[i], is[i]);
         }
@@ -79,7 +78,7 @@ int main()
     test<unsigned long>((std::numeric_limits<unsigned long>::min)(),
         (std::numeric_limits<unsigned long>::min)() + 100);
     test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100,
-        (std::numeric_limits<unsigned long>::max)()); 
+        (std::numeric_limits<unsigned long>::max)());
     test<double>((std::numeric_limits<double>::min)(),
         (std::numeric_limits<double>::min)() + 100);
     test<double>(-100, 100);

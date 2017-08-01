@@ -25,7 +25,7 @@ set(tests
 
 add_subdirectory(polymorphic)
 
-set(serialization_partitioned_vector_FLAGS DEPENDENCIES partitioned_vector)
+set(serialization_partitioned_vector_FLAGS DEPENDENCIES partitioned_vector_component)
 set(serialization_partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
