@@ -165,6 +165,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     {
                                         complete_sequence_position = first1;
                                         complete_sequence_cursor = index;
+                                        break;
                                     }
                                     else if(curr == last1 &&
                                         hpx::util::invoke(op, *(std::prev(curr)),
@@ -174,6 +175,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                         complete_sequence_cursor = index;
                                         partial_sequence_cursor = temp_index-1;
                                         span = true;
+                                        break;
                                     }
                                 }
                                 ++index;
@@ -200,11 +202,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     partial_sequence_cursor = index;
                                     partial_sequence_position = curr;
                                     break;
-                                }
-                                else
-                                {
-                                    partial_sequence_position = last1;
-                                    partial_sequence_cursor = sequence.size();
                                 }
                             }
                         }
@@ -346,6 +343,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         std::size_t complete_sequence_cursor = 0;
                         std::size_t partial_sequence_cursor = sequence.size();
                         difference_type find_first_of_res = tok.get_data();
+                        bool span = false;
                         if(find_first_of_res != count)
                         {
                             // complete sequence is not present so search for
@@ -356,7 +354,44 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         else
                         {
                             // complete sequence is not present so search for
-                            // partial sequence at the end.
+                            // partial sequence at the beginning.
+                            std::size_t index = 1;
+                            //loop till suffix of sequence at beginning found
+                            while(index != sequence.size())
+                            {
+                                if(hpx::util::invoke(op, *first1, sequence[index]))
+                                {
+                                    FwdIter1 curr = first1;
+                                    std::size_t temp_index = index;
+                                    while(curr != last1 && temp_index != sequence.size() &&
+                                        hpx::util::invoke(op, *curr, sequence[temp_index]))
+                                    {
+                                        ++curr;
+                                        ++temp_index;
+                                    }
+                                    if(temp_index == sequence.size())
+                                    {
+                                        complete_sequence_position = first1;
+                                        complete_sequence_cursor = index;
+                                        break;
+                                    }
+                                    else if(curr == last1 &&
+                                        hpx::util::invoke(op, *(std::prev(curr)),
+                                            sequence[temp_index-1]))
+                                    {
+                                        complete_sequence_position = last1;
+                                        complete_sequence_cursor = index;
+                                        partial_sequence_cursor = temp_index;
+                                        span = true;
+                                        break;
+                                    }
+                                }
+                                ++index;
+                            }
+                        }
+                        if(!span)
+                        {
+                            //Also search for partial sequence at the end
                             FwdIter1 curr = first1;
                             std::advance(curr, count-diff+1);
                             //loop till prefix of sequence at end found
@@ -367,53 +402,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 while(temp != last1 &&
                                     hpx::util::invoke(op, *temp, sequence[index]))
                                 {
-                                    if(index == 0)
-                                        complete_sequence_position = curr;
                                     ++temp;
                                     ++index;
                                 }
                                 if(temp == last1)
                                 {
-                                    complete_sequence_cursor = index;
+                                    partial_sequence_cursor = index;
+                                    partial_sequence_position = curr;
                                     break;
                                 }
-                                else
-                                {
-                                    complete_sequence_position = last1;
-                                    complete_sequence_cursor = sequence.size();
-                                }
                             }
-                        }
-                        //Also search for partial sequence at the beginning
-                        std::size_t index = 1;
-                        //loop till suffix of sequence at beginning found
-                        while(index != sequence.size())
-                        {
-                            if(hpx::util::invoke(op, *first1, sequence[index]))
-                            {
-                                FwdIter1 curr = first1;
-                                std::size_t temp_index = index;
-                                while(curr != last1 && temp_index != sequence.size() &&
-                                    hpx::util::invoke(op, *curr, sequence[temp_index]))
-                                {
-                                    ++curr;
-                                    ++temp_index;
-                                }
-                                if(temp_index == sequence.size())
-                                {
-                                    partial_sequence_position = first1;
-                                    partial_sequence_cursor = index;
-                                }
-                                else if(curr == last1 &&
-                                    hpx::util::invoke(op, *(std::prev(curr)),
-                                        sequence[temp_index-1]))
-                                {
-                                    partial_sequence_position = last1;
-                                    partial_sequence_cursor = index;
-                                    complete_sequence_cursor = temp_index-1;
-                                }
-                            }
-                            ++index;
                         }
                         return find_return<FwdIter1>{std::move(complete_sequence_position),
                             complete_sequence_cursor, std::move(partial_sequence_position),

@@ -667,11 +667,15 @@ namespace hpx { namespace parallel { inline namespace v1
                             }
                             auto temp = it;
                             while (temp != res.rend() &&
-                                std::next(temp)->partial_sequence_cursor != sequence.size())
+                                std::next(temp)->complete_sequence_cursor != sequence.size())
                             {
                                 ++temp;
-                                if(temp->partial_sequence_cursor ==
+                                if(temp->partial_sequence_cursor !=
                                     std::prev(temp)->complete_sequence_cursor)
+                                {
+                                    break;
+                                }
+                                if(temp->partial_sequence_position != last1)
                                 {
                                     return temp->partial_sequence_position;
                                 }
@@ -1021,7 +1025,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             hpx::util::unwrapped(std::move(r));
                             //iterate from the first segment
                         auto it = res.begin();
-                        while(it!=res.end())
+                        while(it != res.end())
                         {
                             //if complete sequence found the return that
                             if(it->complete_sequence_position != last1 &&
@@ -1030,21 +1034,21 @@ namespace hpx { namespace parallel { inline namespace v1
                                 return it->complete_sequence_position;
                             }
                             //if partial sequence found between this and next segment
-                            if (std::next(it)->partial_sequence_cursor != sequence.size()
-                                && std::next(it)->partial_sequence_cursor ==
-                                    it->complete_sequence_cursor)
+                            if(it->partial_sequence_position != last1)
                             {
-                                return it->complete_sequence_position;
-                            }
-                            auto temp = it;
-                            while (temp != res.end() &&
-                                std::next(temp)->partial_sequence_position != last1)
-                            {
-                                ++temp;
-                                if(temp->partial_sequence_cursor ==
-                                    std::prev(temp)->complete_sequence_cursor)
+                                auto temp = std::next(it);
+                                while (temp != res.end())
                                 {
-                                    return it->complete_sequence_position;
+                                    if(temp->complete_sequence_cursor !=
+                                        std::prev(temp)->partial_sequence_cursor)
+                                    {
+                                        break;
+                                    }
+                                    if(temp->complete_sequence_position != last1)
+                                    {
+                                        return it->partial_sequence_position;
+                                    }
+                                    ++temp;
                                 }
                             }
                             it++;
