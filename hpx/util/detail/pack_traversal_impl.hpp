@@ -118,7 +118,7 @@ namespace util {
             {
                 return unpack(std::forward<T>(type));
             }
-            HPX_CONSTEXPR inline void unpack_or_void(spread_box<>) noexcept
+            inline void unpack_or_void(spread_box<>) noexcept
             {
             }
 
@@ -282,7 +282,7 @@ namespace util {
             {
                 return std::move(val);
             }
-            HPX_CONSTEXPR inline void voidify_empty_tuple(tuple<>) noexcept
+            inline void voidify_empty_tuple(tuple<>) noexcept
             {
             }
 
