@@ -17,9 +17,8 @@
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <numeric>
