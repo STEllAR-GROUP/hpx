@@ -11,7 +11,7 @@
 #include <hpx/include/actions.hpp>
 
 #include <hpx/dataflow.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
@@ -26,7 +26,7 @@ using hpx::lcos::shared_future;
 using hpx::wait_all;
 using hpx::async;
 using hpx::dataflow;
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 struct block {
     int size;
@@ -130,34 +130,34 @@ void LU( int numBlocks)
     dfArray[0][0][0] = async( ProcessDiagonalBlock, blockList[0][0] );
     diag_block = &dfArray[0][0][0];
     for(int i = 1; i < numBlocks; i++) {
-        dfArray[0][0][i] = dataflow( unwrapped( &ProcessBlockOnRow ),
+        dfArray[0][0][i] = dataflow( unwrapping( &ProcessBlockOnRow ),
             hpx::make_ready_future( blockList[0][i] ), *diag_block);
     }
     for(int i = 1; i < numBlocks; i++) {
-        dfArray[0][i][0] = dataflow( unwrapped( &ProcessBlockOnColumn ),
+        dfArray[0][i][0] = dataflow( unwrapping( &ProcessBlockOnColumn ),
             hpx::make_ready_future( blockList[i][0] ), *diag_block);
         first_col = &dfArray[0][i][0];
         for(int j = 1; j < numBlocks; j++) {
-            dfArray[0][i][j] = dataflow( unwrapped( &ProcessInnerBlock ),
+            dfArray[0][i][j] = dataflow( unwrapping( &ProcessInnerBlock ),
                 hpx::make_ready_future( blockList[i][j]), dfArray[0][0][j], *first_col );
         }
     }
     //all calculation after initialization. Each iteration,
     //the number of tasks/blocks spawned is decreased.
     for(int i = 1; i < numBlocks; i++) {
-        dfArray[i][i][i] = dataflow( unwrapped( &ProcessDiagonalBlock ),
+        dfArray[i][i][i] = dataflow( unwrapping( &ProcessDiagonalBlock ),
             dfArray[i-1][i][i]);
         diag_block = &dfArray[i][i][i];
         for(int j = i + 1; j < numBlocks; j++){
-            dfArray[i][i][j] = dataflow( unwrapped(&ProcessBlockOnRow),
+            dfArray[i][i][j] = dataflow( unwrapping(&ProcessBlockOnRow),
                 dfArray[i-1][i][j], *diag_block);
         }
         for(int j = i + 1; j < numBlocks; j++){
-            dfArray[i][j][i] = dataflow( unwrapped( &ProcessBlockOnColumn ),
+            dfArray[i][j][i] = dataflow( unwrapping( &ProcessBlockOnColumn ),
                 dfArray[i-1][j][i], *diag_block);
             first_col = &dfArray[i][j][i];
             for(int k = i + 1; k < numBlocks; k++) {
-                dfArray[i][j][k] = dataflow( unwrapped( &ProcessInnerBlock ),
+                dfArray[i][j][k] = dataflow( unwrapping( &ProcessInnerBlock ),
                     dfArray[i-1][j][k], dfArray[i][i][k], *first_col );
             }
         }

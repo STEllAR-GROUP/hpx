@@ -27,7 +27,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -904,7 +904,7 @@ namespace hpx { namespace parallel { namespace execution
                             execution::async_execute(exec, f, elem, ts...)
                         );
                     }
-                    return hpx::util::unwrapped(results);
+                    return hpx::util::unwrap(results);
                 }
                 catch (std::bad_alloc const& ba) {
                     throw ba;

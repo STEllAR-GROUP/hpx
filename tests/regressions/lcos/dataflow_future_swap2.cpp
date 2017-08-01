@@ -10,7 +10,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
@@ -18,7 +18,7 @@
 #include <chrono>
 #include <iostream>
 
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 typedef hpx::lcos::shared_future< double > future_type;
 
@@ -45,11 +45,11 @@ struct divide
 void future_swap( future_type &f1 , future_type &f2 )
 {
     //future_type tmp = hpx::dataflow(
-    //  unwrapped( []( double x ){ return x; } ) , f1 );
+    //  unwrapping( []( double x ){ return x; } ) , f1 );
     future_type tmp = f1;
-    f1 = hpx::dataflow( unwrapped( []( double x ,
+    f1 = hpx::dataflow( unwrapping( []( double x ,
         double sync ){ return x; } ) , f2 , f1 );
-    f2 = hpx::dataflow( unwrapped( []( double x ,
+    f2 = hpx::dataflow( unwrapping( []( double x ,
         double sync ){ return x; } ) , tmp , f1 );
 }
 
@@ -60,9 +60,9 @@ int main()
 
     for( int n=0 ; n<20 ; ++n )
     {
-        f1 = hpx::dataflow( hpx::launch::async , unwrapped(mul()) ,
+        f1 = hpx::dataflow( hpx::launch::async , unwrapping(mul()) ,
             f1 , f2 );
-        f2 = hpx::dataflow( hpx::launch::async , unwrapped(divide()) ,
+        f2 = hpx::dataflow( hpx::launch::async , unwrapping(divide()) ,
             f1 , f2 );
         future_swap( f1 , f2 );
     }

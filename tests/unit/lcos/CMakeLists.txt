@@ -55,7 +55,6 @@ set(tests
     sliding_semaphore
     split_future
     split_shared_future
-    unwrapped
     use_allocator
     wait_all_std_array
     wait_any_std_array

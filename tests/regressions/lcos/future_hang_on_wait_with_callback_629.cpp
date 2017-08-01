@@ -10,7 +10,7 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>
@@ -122,7 +122,7 @@ double null_tree(
     null_function(seed, delay_iterations);
 
     hpx::lcos::wait_each(
-        hpx::util::unwrapped([&] (double r) { d += r; }),
+        hpx::util::unwrapping([&] (double r) { d += r; }),
         futures);
 
     return d;

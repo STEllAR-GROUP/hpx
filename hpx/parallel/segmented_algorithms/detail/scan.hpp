@@ -16,7 +16,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -43,15 +43,17 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // returns the last value of the scan
         // used to compute the next init value
-        template <typename T, typename InIter, typename Op>
-        T sequential_segmented_scan_T(InIter first, InIter last, Op && op)
+        template <typename T, typename InIter, typename Op, typename Conv>
+        T sequential_segmented_scan_T(InIter first, InIter last,
+            Op && op, Conv && conv)
         {
-            T ret = *first;
+            T ret = hpx::util::invoke(conv, *first);
             if (first != last)
             {
                 for(++first; first != last; ++first)
                 {
-                    ret = hpx::util::invoke(op, ret, *first);
+                    ret = hpx::util::invoke(op, ret,
+                        hpx::util::invoke(conv, *first));
                 }
             }
             return ret;
@@ -68,41 +70,46 @@ namespace hpx { namespace parallel { inline namespace v1
               : segmented_scan_T::algorithm("segmented_scan_T")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Op>
+            template <typename ExPolicy, typename InIter,
+                typename Op, typename Conv>
             static T
-            sequential(ExPolicy && policy, InIter first, InIter last, Op && op)
+            sequential(ExPolicy && policy, InIter first, InIter last,
+                Op && op, Conv && conv)
             {
                 return sequential_segmented_scan_T<T>(
-                    first, last, std::forward<Op>(op));
+                    first, last, std::forward<Op>(op), std::forward<Conv>(conv));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Op>
+            template <typename ExPolicy, typename FwdIter,
+                typename Op, typename Conv>
             static typename util::detail::algorithm_result<
                 ExPolicy, T
             >::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last, Op && op)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
+                Op && op, Conv && conv)
             {
                 return util::partitioner<ExPolicy, T>::call(
                     std::forward<ExPolicy>(policy),
                     first, std::distance(first, last),
-                    [op, policy](FwdIter part_begin, std::size_t part_size) -> T
+                    [op, policy, conv](FwdIter part_begin, std::size_t part_size) -> T
                     {
                         HPX_UNUSED(policy);
 
-                        T ret = *part_begin;
+                        T ret = hpx::util::invoke(conv, *part_begin);
                         if(part_size > 1)
                         {
                             // MSVC complains if 'op' is captured by reference
                             util::loop_n<ExPolicy>(
                                 part_begin+1, part_size-1,
-                                [&ret, op](FwdIter const& curr)
+                                [&ret, op, conv](FwdIter const& curr)
                                 {
-                                    ret = hpx::util::invoke(op, ret, *curr);
+                                    ret = hpx::util::invoke(op, ret,
+                                        hpx::util::invoke(conv, *curr));
                                 });
                         }
                         return ret;
                     },
-                    hpx::util::unwrapped(
+                    hpx::util::unwrapping(
                         [op, policy](std::vector<T>&& results) -> T
                         {
                             HPX_UNUSED(policy);
@@ -137,23 +144,25 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 
             template <typename ExPolicy, typename InIter,
-                typename OutIter, typename T, typename Op>
+                typename OutIter, typename T, typename Op, typename Conv>
             static hpx::util::unused_type
             sequential(ExPolicy && policy, InIter first,
-                InIter last, OutIter dest, T && init, Op && op)
+                InIter last, OutIter dest, T && init, Op && op, Conv && conv)
             {
                 Algo().sequential(
                     std::forward<ExPolicy>(policy), first, last, dest,
-                    std::forward<T>(init), std::forward<Op>(op));
+                    std::forward<T>(init), std::forward<Op>(op),
+                    std::forward<Conv>(conv)
+                );
 
                 return hpx::util::unused;
             }
 
             template <typename ExPolicy, typename InIter,
-                typename OutIter, typename T, typename Op>
+                typename OutIter, typename T, typename Op, typename Conv>
             static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy && policy, InIter first,
-                InIter last, OutIter dest, T && init, Op && op)
+                InIter last, OutIter dest, T && init, Op && op, Conv && conv)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
@@ -164,7 +173,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 return hpx::util::void_guard<result_type>(),
                     Algo().parallel(
                         std::forward<ExPolicy>(policy), first, last, dest,
-                        std::forward<T>(init), std::forward<Op>(op));
+                        std::forward<T>(init), std::forward<Op>(op),
+                        std::forward<Conv>(conv)
+                    );
             }
         };
 
@@ -307,10 +318,11 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // sequential segmented OutIter implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
-            typename OutIter, typename T, typename Op>
+            typename OutIter, typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_seq(ExPolicy const& policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::true_type, Conv && conv)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -348,7 +360,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     results.push_back(dispatch(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy,
-                        std::true_type(), beg, end, op));
+                        std::true_type(), beg, end, op, conv));
                     in_iters.push_back(hpx::util::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                 }
@@ -363,7 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     results.push_back(dispatch(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy,
-                        std::true_type(), beg, end, op));
+                        std::true_type(), beg, end, op, conv));
                     in_iters.push_back(hpx::util::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                 }
@@ -377,7 +389,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         results.push_back(dispatch(traits_in::get_id(sit_in),
                             segmented_scan_T<T>(), policy,
-                            std::true_type(), beg, end, op));
+                            std::true_type(), beg, end, op, conv));
                         in_iters.push_back(hpx::util::make_tuple(beg, end));
                         out_iters.push_back(sit_out);
                     }
@@ -390,7 +402,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     results.push_back(dispatch(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy,
-                        std::true_type(), beg, end, op));
+                        std::true_type(), beg, end, op, conv));
                     in_iters.push_back(hpx::util::make_tuple(beg, end));
                     out_iters.push_back(sit_out);
                 }
@@ -409,7 +421,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     segmented_scan_void<Algo>(),
                     policy, std::true_type(),
                     get<0>(in_iters[i]), get<1>(in_iters[i]),
-                    out, last_value, op);
+                    out, last_value, std::forward<Op>(op),
+                    std::forward<Conv>(conv));
 
                 // 3. Step: compute new init values for the next segment
                 last_value = op(results[i], last_value);
@@ -509,10 +522,11 @@ namespace hpx { namespace parallel { inline namespace v1
 
         // parallel segmented OutIter implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
-            typename OutIter, typename T, typename Op>
+            typename OutIter, typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_par(ExPolicy const& policy, SegIter first,
-            SegIter last, OutIter dest, T const& init, Op && op, std::true_type)
+            SegIter last, OutIter dest, T const& init, Op && op,
+            std::true_type, Conv && conv)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -565,7 +579,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     out_iters.push_back(sit_out);
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy,
-                        forced_seq(), beg, end, op));
+                        forced_seq(), beg, end, op, conv));
                 }
             }
             else
@@ -580,7 +594,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     out_iters.push_back(sit_out);
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy,
-                        forced_seq(), beg, end, op));
+                        forced_seq(), beg, end, op, conv));
                 }
 
                 // handle all partitions
@@ -594,7 +608,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         out_iters.push_back(sit_out);
                         results.push_back(dispatch_async(traits_in::get_id(sit_in),
                             segmented_scan_T<T>(), policy,
-                            forced_seq(), beg, end, op));
+                            forced_seq(), beg, end, op, conv));
                     }
                 }
 
@@ -607,7 +621,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     out_iters.push_back(sit_out);
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy,
-                        forced_seq(), beg, end, op));
+                        forced_seq(), beg, end, op, conv));
                 }
             }
 
@@ -636,15 +650,15 @@ namespace hpx { namespace parallel { inline namespace v1
                 finalitems.push_back(
                     hpx::dataflow(
                         policy.executor(),
-                        hpx::util::unwrapped(
-                            [=, &op](T last_value, T)
+                        hpx::util::unwrapping(
+                            [=, &op, &conv](T last_value, T) -> void
                             {
                                 dispatch(traits_out::get_id(out_it),
                                     segmented_scan_void<Algo>(),
                                     hpx::parallel::execution::seq,
                                     std::true_type(),
                                     get<0>(in_tuple), get<1>(in_tuple),
-                                    out, last_value, op);
+                                    out, last_value, op, conv);
                             }
                         ), workitems.back(), res
                     )
@@ -655,7 +669,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 workitems.push_back(
                     hpx::dataflow(
                         policy.executor(),
-                        hpx::util::unwrapped(op),
+                        hpx::util::unwrapping(op),
                         workitems.back(),
                         res
                     )
@@ -784,7 +798,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 finalitems.push_back(
                     hpx::dataflow(
                         policy.executor(),
-                        hpx::util::unwrapped(
+                        hpx::util::unwrapping(
                             [&, dest](T last_value, vector_type r)
                             {
                                 // merge function
@@ -801,11 +815,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 workitems.push_back(
                     hpx::dataflow(
                         policy.executor(),
-                        hpx::util::unwrapped(op),
+                        hpx::util::unwrapping(op),
                         workitems.back(),
                         execution::async_execute(
                             policy.executor(),
-                            hpx::util::unwrapped(f2),
+                            hpx::util::unwrapping(f2),
                             res
                         )
                     )

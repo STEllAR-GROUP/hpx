@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -386,15 +386,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Count number of terminated threads before forcefully cleaning up all of
-// them. Note: terminated threads are cleaned up either when this number is
-// reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
-// reached, which will clean up the terminated threads for _all_ thread queues.
-#if !defined(HPX_MAX_TERMINATED_THREADS)
-#  define HPX_MAX_TERMINATED_THREADS 1000
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_WRAPPER_HEAP_STEP)
 #  define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif
@@ -538,26 +529,5 @@
 #define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
 #define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
-
-#if defined(HPX_HAVE_SODIUM)
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB         0x0000000100000001ULL
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB         0x0000000000000005ULL
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL
-// this is made locality specific
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB  0x0000000000000006ULL
-#endif
-
-#if !defined(HPX_NO_DEPRECATED)
-#  define HPX_DEPRECATED_MSG \
-   "This function is deprecated and will be removed in the future."
-#  if defined(HPX_MSVC)
-#    define HPX_DEPRECATED(x) __declspec(deprecated(x))
-#  elif defined(__GNUC__)
-#    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
-#  endif
-#  if !defined(HPX_DEPRECATED)
-#    define HPX_DEPRECATED(x)  /**/
-#  endif
-#endif
 
 #endif
