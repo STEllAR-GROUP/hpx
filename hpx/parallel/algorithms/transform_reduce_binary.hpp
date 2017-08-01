@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/tranform_reduce_binary.hpp
+/// \file parallel/algorithms/transform_reduce_binary.hpp
 
 #if !defined(HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM)
 #define HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM

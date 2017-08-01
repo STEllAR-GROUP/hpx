@@ -4,20 +4,21 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 
 #include <cstddef>
 #include <mutex>
 #include <utility>
 #include <vector>
 
-#define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                              \
-    void BOOST_PP_CAT(NAME, _)(TYPE const & value)                              \
-    {                                                                           \
-        NAME .set(hpx::util::any(value));                                       \
-    }                                                                           \
-    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, BOOST_PP_CAT(NAME, _));    \
-                                                                                \
-    ::hpx::lcos::broadcast<BOOST_PP_CAT(BOOST_PP_CAT(NAME, _), _action)> NAME;  \
+#define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                            \
+    void HPX_PP_CAT(NAME, _)(TYPE const & value)                              \
+    {                                                                         \
+        NAME .set(hpx::util::any(value));                                     \
+    }                                                                         \
+    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, HPX_PP_CAT(NAME, _));    \
+                                                                              \
+    ::hpx::lcos::broadcast<HPX_PP_CAT(HPX_PP_CAT(NAME, _), _action)> NAME;    \
 /**/
 
 namespace hpx { namespace lcos

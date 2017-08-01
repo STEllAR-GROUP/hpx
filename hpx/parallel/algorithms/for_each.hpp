@@ -128,10 +128,7 @@ namespace hpx { namespace parallel { inline namespace v1
             void operator()(Iter part_begin, std::size_t part_size,
                 std::size_t /*part_index*/)
             {
-#if !defined(__NVCC__) && !defined(__CUDACC__)
                 hpx::util::annotate_function annotate(f_);
-                (void)annotate;     // suppress warning about unused variable
-#endif
                 execute(part_begin, part_size);
             }
         };

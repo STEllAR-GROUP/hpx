@@ -173,7 +173,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    hpx::util::unwrapped([=](std::vector<value_type> && r)
+                    hpx::util::unwrapping([=](std::vector<value_type> && r)
                     {
                         return std::accumulate(r.begin(), r.end(), value_type());
                     }),

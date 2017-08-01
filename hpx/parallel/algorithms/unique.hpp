@@ -11,6 +11,7 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_pair.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
@@ -26,7 +27,6 @@
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapped(std::plus<std::size_t>()),
+                    hpx::util::unwrapping(std::plus<std::size_t>()),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value

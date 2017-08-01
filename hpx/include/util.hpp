@@ -13,7 +13,11 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -24,7 +28,7 @@
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #endif

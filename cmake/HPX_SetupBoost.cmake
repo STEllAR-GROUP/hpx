@@ -64,7 +64,6 @@ endif()
 set(__boost_libraries
   ${__boost_libraries}
   atomic
-  date_time
   filesystem
   program_options
   regex

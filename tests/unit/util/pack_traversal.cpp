@@ -17,9 +17,20 @@
 #include <utility>
 #include <vector>
 
-using namespace hpx;
-using namespace hpx::util;
-using namespace hpx::util::detail;
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
+
+using hpx::util::tuple;
+using hpx::util::get;
+using hpx::util::make_tuple;
+using hpx::util::map_pack;
+using hpx::util::spread_this;
+using hpx::util::traverse_pack;
+using hpx::traits::future_traits;
+using hpx::traits::is_future;
+using hpx::lcos::future;
+using hpx::lcos::make_ready_future;
 
 struct all_map_float
 {
@@ -49,7 +60,7 @@ struct all_map
     }
 };
 
-static void testMixedTraversal()
+static void test_mixed_traversal()
 {
     {
         auto res = map_pack(all_map_float{},
@@ -127,18 +138,15 @@ static void testMixedTraversal()
 struct my_unwrapper
 {
     template <typename T,
-        typename std::enable_if<traits::is_future<T>::value>::type* = nullptr>
-    auto operator()(T future) const ->
-        typename traits::future_traits<T>::result_type
+        typename std::enable_if<is_future<T>::value>::type* = nullptr>
+    auto operator()(T future) const -> typename future_traits<T>::result_type
     {
         return future.get();
     }
 };
 
-static void testMixedEarlyUnwrapped()
+static void test_mixed_early_unwrapping()
 {
-    using namespace hpx::lcos;
-
     {
         auto res = map_pack(my_unwrapper{},    // ...
             0, 1, make_ready_future(3),
@@ -203,11 +211,11 @@ struct my_allocator
     }
 };
 
-static void testMixedContainerRemap()
+static void test_mixed_container_remap()
 {
     // Traits
     {
-        using namespace container_remapping;
+        using hpx::util::detail::container_remapping::has_push_back;
         HPX_TEST_EQ((has_push_back<std::vector<int>, int>::value), true);
         HPX_TEST_EQ((has_push_back<int, int>::value), false);
     }
@@ -274,7 +282,7 @@ struct my_int_mapper
     }
 };
 
-static void testMixedFallThrough()
+static void test_mixed_fall_through()
 {
     traverse_pack(my_int_mapper{}, int(0),
         std::vector<hpx::util::tuple<float, float>>{
@@ -290,7 +298,7 @@ static void testMixedFallThrough()
         hpx::util::make_tuple(77.f, 2));
 
     auto res2 = map_pack(
-        [](int /*i*/) {
+        [](int) {
             // ...
             return 0;
         },
@@ -382,7 +390,7 @@ public:
     }
 };
 
-static void testStrategicTraverse()
+static void test_strategic_traverse()
 {
     // Every element in the pack is visited
     {
@@ -467,14 +475,68 @@ static void testStrategicTraverse()
         HPX_TEST_EQ((*get<2>(res)), 4U);
     }
 
+    // Move only types contained in a pack which was passed as l-value
+    // reference is forwarded to the mapper as reference too.
+    {
+        std::vector<std::unique_ptr<int>> container;
+        container.push_back(std::unique_ptr<int>(new int(3)));
+
+        std::vector<int> res =
+            map_pack([](std::unique_ptr<int>& p) { return *p; }, container);
+
+        HPX_TEST_EQ(res.size(), 1U);
+        HPX_TEST_EQ(res[0], 3);
+    }
+
     // Single object remapping returns the value itself without any boxing
     {
         int res = map_pack([](int i) { return i; }, 1);
         HPX_TEST_EQ(res, 1);
     }
+
+    // Make it possible to pass move only objects in as reference,
+    // while returning those as reference.
+    {
+        std::unique_ptr<int> ptr(new int(7));
+
+        std::unique_ptr<int> const& ref = map_pack(
+            [](std::unique_ptr<int> const& ref) -> std::unique_ptr<int> const& {
+                // ...
+                return ref;
+            },
+            ptr);
+
+        HPX_TEST_EQ(*ref, 7);
+        *ptr = 0;
+        HPX_TEST_EQ(*ref, 0);
+    }
+
+    // Multiple args: Make it possible to pass move only objects in
+    // as reference, while returning those as reference.
+    {
+        std::unique_ptr<int> ptr1(new int(6));
+        std::unique_ptr<int> ptr2(new int(7));
+
+        hpx::util::tuple<std::unique_ptr<int> const&,
+            std::unique_ptr<int> const&>
+            ref = map_pack(
+                [](std::unique_ptr<int> const& ref)
+                    -> std::unique_ptr<int> const& {
+                    // ...
+                    return ref;
+                },
+                ptr1, ptr2);
+
+        HPX_TEST_EQ((*get<0>(ref)), 6);
+        HPX_TEST_EQ((*get<1>(ref)), 7);
+        *ptr1 = 1;
+        *ptr2 = 2;
+        HPX_TEST_EQ((*get<0>(ref)), 1);
+        HPX_TEST_EQ((*get<1>(ref)), 2);
+    }
 }
 
-static void testStrategicContainerTraverse()
+static void test_strategic_container_traverse()
 {
     // Every element in the container is visited
     // - Plain container
@@ -519,9 +581,10 @@ static void testStrategicContainerTraverse()
     // The container type itself is changed
     // - Plain container
     {
-        std::vector<int> container;
+        std::vector<int> container{1, 2, 3};
         std::vector<float> res =
             map_pack([](int) { return 0.f; }, std::move(container));
+        HPX_TEST_EQ(res.size(), 3U);
     }
 
     // - Nested container
@@ -529,6 +592,18 @@ static void testStrategicContainerTraverse()
         std::vector<std::vector<int>> container;
         std::vector<std::vector<float>> res =
             map_pack([](int) { return 0.f; }, std::move(container));
+    }
+
+    // - Move only container
+    {
+        std::vector<std::unique_ptr<int>> container;
+        container.push_back(std::unique_ptr<int>(new int(5)));
+        std::vector<int> res =
+            map_pack([](std::unique_ptr<int>&& ptr) { return *ptr; },
+                std::move(container));
+
+        HPX_TEST_EQ(res.size(), 1U);
+        HPX_TEST_EQ(res[0], 5);
     }
 
     // Every element in the container is remapped
@@ -557,9 +632,46 @@ static void testStrategicContainerTraverse()
                     nested.begin(), nested.end(), [](int i) { return i == 2; });
             })));
     }
+
+    /// - Ensure correct container remapping when returning references
+    {
+        // l-value references
+        {
+            std::vector<std::unique_ptr<int>> container;
+            container.push_back(std::unique_ptr<int>(new int(7)));
+
+            std::vector<int> res = map_pack(
+                [](std::unique_ptr<int> const& ref) -> int const& {
+                    // ...
+                    return *ref;
+                },
+                container);
+
+            HPX_TEST_EQ(res.size(), 1U);
+            HPX_TEST_EQ(res[0], 7);
+        }
+
+        // r-value references
+        {
+            std::vector<std::unique_ptr<std::unique_ptr<int>>> container;
+            container.push_back(std::unique_ptr<std::unique_ptr<int>>(
+                new std::unique_ptr<int>(new int(7))));
+
+            std::vector<std::unique_ptr<int>> res = map_pack(
+                [](std::unique_ptr<std::unique_ptr<int>> &
+                    ref) -> std::unique_ptr<int>&& {
+                    // ...
+                    return std::move(*ref);
+                },
+                container);
+
+            HPX_TEST_EQ(res.size(), 1U);
+            HPX_TEST_EQ((*res[0]), 7);
+        }
+    }
 }
 
-static void testStrategicTupleLikeTraverse()
+static void test_strategic_tuple_like_traverse()
 {
     // Every element in the tuple like type is visited
     {
@@ -604,18 +716,154 @@ static void testStrategicTupleLikeTraverse()
             "Type mismatch!");
         HPX_TEST((res == expected));
     }
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    // Fixed size homogeneous container
+    {
+        std::array<int, 3> values{{1, 2, 3}};
+        std::array<float, 3> res = map_pack([](int) { return 1.f; }, values);
+
+        HPX_TEST((res == std::array<float, 3>{{1.f, 1.f, 1.f}}));
+    }
+#endif
+
+    // Make it possible to pass tuples containing move only objects
+    // in as reference, while returning those as reference.
+    {
+        auto value = hpx::util::make_tuple(
+            std::unique_ptr<int>(new int(6)), std::unique_ptr<int>(new int(7)));
+
+        hpx::util::tuple<std::unique_ptr<int> const&,
+            std::unique_ptr<int> const&>
+            ref = map_pack(
+                [](std::unique_ptr<int> const& ref)
+                    -> std::unique_ptr<int> const& {
+                    // ...
+                    return ref;
+                },
+                value);
+
+        HPX_TEST_EQ((*get<0>(ref)), 6);
+        HPX_TEST_EQ((*get<1>(ref)), 7);
+        (*get<0>(ref)) = 1;
+        (*get<1>(ref)) = 2;
+        HPX_TEST_EQ((*get<0>(ref)), 1);
+        HPX_TEST_EQ((*get<1>(ref)), 2);
+    }
+}
+
+/// A mapper which duplicates the given element
+struct duplicate_mapper
+{
+    template <typename T>
+    auto operator()(T arg) -> decltype(hpx::util::spread_this(arg, arg))
+    {
+        return hpx::util::spread_this(arg, arg);
+    }
+};
+
+/// A mapper which removes the current element
+struct zero_mapper
+{
+    template <typename T>
+    auto operator()(T arg) -> decltype(hpx::util::spread_this())
+    {
+        return hpx::util::spread_this();
+    }
+};
+
+static void test_spread_traverse()
+{
+    // 1:2 mappings (multiple arguments)
+    {
+        tuple<int, int, int, int> res = map_pack(duplicate_mapper{}, 1, 2);
+
+        auto expected = make_tuple(1, 1, 2, 2);
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        using Result = decltype(map_pack(zero_mapper{}, 0, 1, 2));
+        static_assert(std::is_void<Result>::value, "Failed...");
+    }
+}
+
+static void test_spread_container_traverse()
+{
+    // 1:2 mappings (multiple arguments)
+    {
+        std::vector<tuple<int, int>> res =
+            map_pack(duplicate_mapper{}, std::vector<int>{1});
+
+        std::vector<tuple<int, int>> expected;
+        expected.push_back(make_tuple(1, 1));
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        using Result = decltype(map_pack(zero_mapper{}, std::vector<int>{1}));
+        static_assert(std::is_void<Result>::value, "Failed...");
+    }
+}
+
+static void test_spread_tuple_like_traverse()
+{
+    // 1:2 mappings (multiple arguments)
+    {
+        tuple<tuple<int, int, int, int>> res =
+            map_pack(duplicate_mapper{}, make_tuple(make_tuple(1, 2)));
+
+        tuple<tuple<int, int, int, int>> expected =
+            make_tuple(make_tuple(1, 1, 2, 2));
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        using Result = decltype(
+            map_pack(zero_mapper{}, make_tuple(make_tuple(1, 2), 1), 1));
+        static_assert(std::is_void<Result>::value, "Failed...");
+    }
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    // 1:2 mappings (multiple arguments)
+    {
+        std::array<int, 4> res =
+            map_pack(duplicate_mapper{}, std::array<int, 2>{{1, 2}});
+
+        std::array<int, 4> expected{{1, 1, 2, 2}};
+
+        HPX_TEST((res == expected));
+    }
+
+    // 1:0 mappings
+    {
+        using Result =
+            decltype(map_pack(zero_mapper{}, std::array<int, 2>{{1, 2}}));
+        static_assert(std::is_void<Result>::value, "Failed...");
+    }
+#endif
 }
 
 int main(int, char**)
 {
-    testMixedTraversal();
-    testMixedEarlyUnwrapped();
-    testMixedContainerRemap();
-    testMixedFallThrough();
+    test_mixed_traversal();
+    test_mixed_early_unwrapping();
+    test_mixed_container_remap();
+    test_mixed_fall_through();
 
-    testStrategicTraverse();
-    testStrategicContainerTraverse();
-    testStrategicTupleLikeTraverse();
+    test_strategic_traverse();
+    test_strategic_container_traverse();
+    test_strategic_tuple_like_traverse();
+
+    test_spread_traverse();
+    test_spread_container_traverse();
+    test_spread_tuple_like_traverse();
 
     return hpx::util::report_errors();
 }

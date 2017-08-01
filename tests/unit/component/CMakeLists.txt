@@ -28,6 +28,8 @@ set(tests
     partitioned_vector_view
     partitioned_vector_view_iterator
     partitioned_vector_subview
+    coarray
+    coarray_all_reduce
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
@@ -111,6 +113,13 @@ set(partitioned_vector_view_iterator_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(partitioned_vector_subview_FLAGS DEPENDENCIES partitioned_vector_component)
 set(partitioned_vector_subview_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(coarray_FLAGS DEPENDENCIES partitioned_vector_component)
+set(coarray_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(coarray_all_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(coarray_all_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

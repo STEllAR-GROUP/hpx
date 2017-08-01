@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
 
                         std::vector<SegIter> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                         return Algo::sequential_minmax_element_ind(
                             policy, res.begin(), res.size(), f, proj);
                     },
@@ -509,7 +509,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
 
                         std::vector<result_type> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                         return Algo::sequential_minmax_element_ind(
                             policy, res.begin(), res.size(), f, proj);
                     },

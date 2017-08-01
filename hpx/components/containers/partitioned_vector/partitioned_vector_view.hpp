@@ -34,26 +34,24 @@ namespace hpx
     private:
         // Type aliases
         using pvector_iterator = hpx::vector_iterator<T,Data>;
+        using const_pvector_iterator = hpx::const_vector_iterator<T,Data>;
         using segment_iterator = typename pvector_iterator::segment_iterator;
+        using const_segment_iterator =
+            typename const_pvector_iterator::segment_iterator;
         using traits
             = typename hpx::traits::segmented_iterator_traits<pvector_iterator>;
         using list_type = std::initializer_list<std::size_t>;
-
-        // Small utilities needed for partitioned_vector_view subscripts
-        template<bool ...>
-        struct bools;
-
-        template<typename ... I>
-        struct are_integral
-        : public std::integral_constant< bool,
-            std::is_same<
-                bools<true, std::is_integral<I>::value ...>,
-                bools<std::is_integral<I>::value ...,true > >::value >
-        {};
-
     public:
         using iterator
             = typename hpx::partitioned_vector_view_iterator<T,N,Data>;
+        using const_iterator
+            = typename hpx::const_partitioned_vector_view_iterator<T,N,Data>;
+
+        // Minimal dummy construction
+        explicit partitioned_vector_view(
+            hpx::lcos::spmd_block const & block)
+        : block_( block )
+        {}
 
         explicit partitioned_vector_view(
             hpx::lcos::spmd_block const & block,
@@ -75,7 +73,7 @@ namespace hpx
             segment_iterator && last,
             list_type sw_sizes,
             list_type hw_sizes = {})
-        : begin_( begin ), end_( begin ), block_( block )
+        : begin_( begin ), end_( begin ), cbegin_(begin), cend_(begin), block_(block)
         {
             using indices = typename hpx::util::detail::make_index_pack<N>::type;
 
@@ -108,6 +106,7 @@ namespace hpx
 
             // Update end_
             end_  += hw_basis_[N-1] * sw_sizes.begin()[N-1];
+            cend_ += hw_basis_[N-1] * sw_sizes.begin()[N-1];
         }
 
     private:
@@ -138,7 +137,8 @@ namespace hpx
 
             // Check that all the elements are of integral type
             static_assert(
-                partitioned_vector_view::are_integral<I...>::value,
+                util::detail::all_of<
+                    typename std::is_integral<I>::type ... >::value,
                 "One or more elements in subscript is not integral");
 
             std::size_t  offset = 0;
@@ -181,7 +181,39 @@ namespace hpx
         iterator end()
         {
             return iterator( block_
-                           , begin_, end_
+                           , end_, end_
+                           , sw_basis_, hw_basis_
+                           , sw_basis_.back());
+        }
+
+        const_iterator begin() const
+        {
+            return const_iterator( block_
+                                , cbegin_, cend_
+                                , sw_basis_,hw_basis_
+                                , 0);
+        }
+
+        const_iterator end() const
+        {
+            return const_iterator( block_
+                           , cend_, cend_
+                           , sw_basis_, hw_basis_
+                           , sw_basis_.back());
+        }
+
+        const_iterator cbegin() const
+        {
+            return const_iterator( block_
+                                , cbegin_, cend_
+                                , sw_basis_,hw_basis_
+                                , 0);
+        }
+
+        const_iterator cend() const
+        {
+            return const_iterator( block_
+                           , cend_, cend_
                            , sw_basis_, hw_basis_
                            , sw_basis_.back());
         }
@@ -190,6 +222,7 @@ namespace hpx
     private:
         std::array< std::size_t, N+1 > sw_basis_, hw_basis_;
         segment_iterator begin_, end_;
+        const_segment_iterator cbegin_, cend_;
         std::reference_wrapper<const hpx::lcos::spmd_block> block_;
     };
 }

@@ -9,6 +9,8 @@ set(tests
     foreach_range
     foreach_range_projection
     generate_range
+    is_heap_range
+    is_heap_until_range
     max_element_range
     min_element_range
     minmax_element_range

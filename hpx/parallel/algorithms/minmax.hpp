@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
                         std::forward<ExPolicy>(policy),
                         first, std::distance(first, last),
-                        std::move(f1), hpx::util::unwrapped(std::move(f2))
+                        std::move(f1), hpx::util::unwrapping(std::move(f2))
                     );
             }
         };
@@ -377,7 +377,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
                         std::forward<ExPolicy>(policy),
                         first, std::distance(first, last),
-                        std::move(f1), hpx::util::unwrapped(std::move(f2))
+                        std::move(f1), hpx::util::unwrapping(std::move(f2))
                     );
             }
         };
@@ -633,7 +633,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     call(
                         std::forward<ExPolicy>(policy),
                         result.first, std::distance(result.first, last),
-                        std::move(f1), hpx::util::unwrapped(std::move(f2))
+                        std::move(f1), hpx::util::unwrapping(std::move(f2))
                     );
             }
         };

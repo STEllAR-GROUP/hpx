@@ -160,7 +160,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     },
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::util::unwrapped(op),
+                    hpx::util::unwrapping(op),
                     // step 3 runs final_accumulation on each partition
                     std::move(f3),
                     // use this return value
@@ -360,6 +360,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     typename std::iterator_traits<FwdIter1>::value_type
                 >::type
             >::value)>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     transform_exclusive_scan(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Conv && conv, T init, Op && op)

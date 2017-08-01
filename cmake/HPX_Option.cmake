@@ -14,7 +14,6 @@ set(HPX_OPTION_CATEGORIES
   "Parcelport"
   "Profiling"
   "Debugging"
-  "Tools"
 )
 
 function(hpx_option option type description default)
@@ -32,7 +31,7 @@ function(hpx_option option type description default)
     set_property(CACHE "${option}" PROPERTY HELPSTRING "${description}")
     set_property(CACHE "${option}" PROPERTY TYPE "${type}")
   endif()
-  
+
   if(HPX_OPTION_STRINGS)
     if("${type}" STREQUAL "STRING")
       set_property(CACHE "${option}" PROPERTY STRINGS "${HPX_OPTION_STRINGS}")

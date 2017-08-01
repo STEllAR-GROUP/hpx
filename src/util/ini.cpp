@@ -27,6 +27,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 
@@ -111,7 +112,7 @@ section::section (const section & in)
 section& section::operator=(section const& rhs)
 {
     if (this != &rhs) {
-        std::lock_guard<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
 
         root_ = this;
         parent_name_ = rhs.get_parent_name();
@@ -133,7 +134,7 @@ section& section::operator=(section const& rhs)
 section& section::clone_from(section const& rhs, section* root)
 {
     if (this != &rhs) {
-        std::lock_guard<mutex_type> l(mtx_);
+        std::unique_lock<mutex_type> l(mtx_);
 
         root_ = root ? root : this;
         parent_name_ = rhs.get_parent_name();
@@ -267,7 +268,7 @@ void section::parse (std::string const& sourcename,
             current = current->add_section_if_new(sec_name.substr(pos));
 
             // add key/val to this section
-            std::lock_guard<mutex_type> l(current->mtx_);
+            std::unique_lock<mutex_type> l(current->mtx_);
 
             std::string key(what[2]);
             if (!force_entry(key) && verify_existing && !current->has_entry(l, key))
@@ -317,7 +318,7 @@ void section::parse (std::string const& sourcename,
             }
 
             // add key/val to current section
-            std::lock_guard<mutex_type> l(current->mtx_);
+            std::unique_lock<mutex_type> l(current->mtx_);
 
             std::string key(what[1]);
             if (!force_entry(key) && verify_existing && !current->has_entry(l, key))
@@ -337,7 +338,7 @@ void section::parse (std::string const& sourcename,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void section::add_section (std::lock_guard<mutex_type>& l,
+void section::add_section (std::unique_lock<mutex_type>& l,
     std::string const& sec_name, section& sec, section* root)
 {
     // setting name and root
@@ -349,7 +350,7 @@ void section::add_section (std::lock_guard<mutex_type>& l,
 }
 
 ///////////////////////////////////////////////////////////////////////////
-section* section::add_section_if_new(std::lock_guard<mutex_type>& l,
+section* section::add_section_if_new(std::unique_lock<mutex_type>& l,
     std::string const& sec_name)
 {
     // do we know this one?
@@ -363,7 +364,7 @@ section* section::add_section_if_new(std::lock_guard<mutex_type>& l,
     return get_section(l, sec_name);
 }
 
-bool section::has_section (std::lock_guard<mutex_type>& l,
+bool section::has_section (std::unique_lock<mutex_type>& l,
     std::string const& sec_name) const
 {
     std::string::size_type i = sec_name.find(".");
@@ -382,7 +383,7 @@ bool section::has_section (std::lock_guard<mutex_type>& l,
     return sections_.find(sec_name) != sections_.end();
 }
 
-section* section::get_section (std::lock_guard<mutex_type>& l,
+section* section::get_section (std::unique_lock<mutex_type>& l,
     std::string const& sec_name)
 {
     std::string::size_type i  = sec_name.find (".");
@@ -414,7 +415,7 @@ section* section::get_section (std::lock_guard<mutex_type>& l,
     return nullptr;
 }
 
-section const* section::get_section (std::lock_guard<mutex_type>& l,
+section const* section::get_section (std::unique_lock<mutex_type>& l,
     std::string const& sec_name) const
 {
     std::string::size_type i  = sec_name.find (".");
@@ -446,7 +447,7 @@ section const* section::get_section (std::lock_guard<mutex_type>& l,
     return nullptr;
 }
 
-void section::add_entry (std::lock_guard<mutex_type>& l,
+void section::add_entry (std::unique_lock<mutex_type>& l,
     std::string const& fullkey, std::string const& key, std::string val)
 {
     // first expand the full property name in the value (avoids infinite recursion)
@@ -481,7 +482,13 @@ void section::add_entry (std::lock_guard<mutex_type>& l,
         {
             it->second.first = std::move(val);
             if (!it->second.second.empty())
-                (it->second.second)(fullkey, it->second.first);
+            {
+                std::string value = it->second.first;
+                entry_changed_func f = it->second.second;
+
+                hpx::util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                f(fullkey, value);
+            }
         }
         else
         {
@@ -491,7 +498,7 @@ void section::add_entry (std::lock_guard<mutex_type>& l,
     }
 }
 
-void section::add_entry (std::lock_guard<mutex_type>& l,
+void section::add_entry (std::unique_lock<mutex_type>& l,
     std::string const& fullkey, std::string const& key, entry_type const& val)
 {
     std::string::size_type i = key.find_last_of(".");
@@ -523,7 +530,13 @@ void section::add_entry (std::lock_guard<mutex_type>& l,
         {
             it->second = val;
             if (!it->second.second.empty())
-                (it->second.second)(fullkey, it->second.first);
+            {
+                std::string value = it->second.first;
+                entry_changed_func f = it->second.second;
+
+                hpx::util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                f(fullkey, value);
+            }
         }
         else
         {
@@ -533,7 +546,14 @@ void section::add_entry (std::lock_guard<mutex_type>& l,
             HPX_ASSERT(p.second);
 
             if (!p.first->second.second.empty())
-                (p.first->second.second)(p.first->first, p.first->second.first);
+            {
+                std::string key = p.first->first;
+                std::string value = p.first->second.first;
+                entry_changed_func f = p.first->second.second;
+
+                hpx::util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                f(key, value);
+            }
         }
     }
 }
@@ -577,7 +597,7 @@ compose_callback(F1 && f1, F2 && f2)
     return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
 }
 
-void section::add_notification_callback(std::lock_guard<mutex_type>& l,
+void section::add_notification_callback(std::unique_lock<mutex_type>& l,
     std::string const& key, entry_changed_func const& callback)
 {
     std::string::size_type i = key.find_last_of(".");
@@ -617,7 +637,7 @@ void section::add_notification_callback(std::lock_guard<mutex_type>& l,
     }
 }
 
-bool section::has_entry (std::lock_guard<mutex_type>& l, std::string const& key) const
+bool section::has_entry (std::unique_lock<mutex_type>& l, std::string const& key) const
 {
     std::string::size_type i = key.find (".");
     if (i != std::string::npos)
@@ -635,7 +655,7 @@ bool section::has_entry (std::lock_guard<mutex_type>& l, std::string const& key)
     return entries_.find(key) != entries_.end();
 }
 
-std::string section::get_entry (std::lock_guard<mutex_type>& l,
+std::string section::get_entry (std::unique_lock<mutex_type>& l,
     std::string const& key) const
 {
     std::string::size_type i = key.find (".");
@@ -667,7 +687,7 @@ std::string section::get_entry (std::lock_guard<mutex_type>& l,
     return "";
 }
 
-std::string section::get_entry (std::lock_guard<mutex_type>& l,
+std::string section::get_entry (std::unique_lock<mutex_type>& l,
     std::string const& key, std::string const& default_val) const
 {
     typedef std::vector<std::string> string_vector;
@@ -703,7 +723,7 @@ inline void indent (int ind, std::ostream& strm)
 
 void section::dump(int ind, std::ostream& strm) const
 {
-    std::lock_guard<mutex_type> l(mtx_);
+    std::unique_lock<mutex_type> l(mtx_);
 
     bool header = false;
     if (0 == ind)
@@ -760,7 +780,7 @@ void section::merge(std::string const& filename)
 
 void section::merge(section& second)
 {
-    std::lock_guard<mutex_type> l(mtx_);
+    std::unique_lock<mutex_type> l(mtx_);
 
     // merge entries: keep own entries, and add other entries
     entry_map const& s_entries = second.get_entries();
@@ -827,7 +847,7 @@ find_next(char const* ch, std::string& value,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void section::expand(std::lock_guard<mutex_type>& l, std::string& value,
+void section::expand(std::unique_lock<mutex_type>& l, std::string& value,
     std::string::size_type begin) const
 {
     std::string::size_type p = value.find_first_of("$", begin+1);
@@ -841,7 +861,7 @@ void section::expand(std::lock_guard<mutex_type>& l, std::string& value,
     }
 }
 
-void section::expand_bracket(std::lock_guard<mutex_type>& l, std::string& value,
+void section::expand_bracket(std::unique_lock<mutex_type>& l, std::string& value,
     std::string::size_type begin) const
 {
     // expand all keys embedded inside this key
@@ -865,7 +885,7 @@ void section::expand_bracket(std::lock_guard<mutex_type>& l, std::string& value,
     }
 }
 
-void section::expand_brace(std::lock_guard<mutex_type>& l, std::string& value,
+void section::expand_brace(std::unique_lock<mutex_type>& l, std::string& value,
     std::string::size_type begin) const
 {
     // expand all keys embedded inside this key
@@ -889,14 +909,14 @@ void section::expand_brace(std::lock_guard<mutex_type>& l, std::string& value,
     }
 }
 
-std::string section::expand (std::lock_guard<mutex_type>& l, std::string value) const
+std::string section::expand (std::unique_lock<mutex_type>& l, std::string value) const
 {
     expand(l, value, std::string::size_type(-1));
     return value;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void section::expand_only(std::lock_guard<mutex_type>& l, std::string& value,
+void section::expand_only(std::unique_lock<mutex_type>& l, std::string& value,
     std::string::size_type begin, std::string const& expand_this) const
 {
     std::string::size_type p = value.find_first_of("$", begin+1);
@@ -909,7 +929,7 @@ void section::expand_only(std::lock_guard<mutex_type>& l, std::string& value,
     }
 }
 
-void section::expand_bracket_only(std::lock_guard<mutex_type>& l,
+void section::expand_bracket_only(std::unique_lock<mutex_type>& l,
     std::string& value, std::string::size_type begin,
     std::string const& expand_this) const
 {
@@ -936,7 +956,7 @@ void section::expand_bracket_only(std::lock_guard<mutex_type>& l,
     }
 }
 
-void section::expand_brace_only(std::lock_guard<mutex_type>& l,
+void section::expand_brace_only(std::unique_lock<mutex_type>& l,
     std::string& value, std::string::size_type begin,
     std::string const& expand_this) const
 {
@@ -961,7 +981,7 @@ void section::expand_brace_only(std::lock_guard<mutex_type>& l,
     }
 }
 
-std::string section::expand_only(std::lock_guard<mutex_type>& l,
+std::string section::expand_only(std::unique_lock<mutex_type>& l,
     std::string value, std::string const& expand_this) const
 {
     expand_only(l, value, std::string::size_type(-1), expand_this);

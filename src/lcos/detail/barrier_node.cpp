@@ -10,7 +10,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace detail {
                 ids.push_back(id);
             }
 
-            children_ = hpx::util::unwrapped(
+            children_ = hpx::util::unwrap(
                 hpx::find_from_basename(base_name_, ids));
 
             return;

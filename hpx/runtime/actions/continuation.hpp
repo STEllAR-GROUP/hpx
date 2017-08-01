@@ -24,10 +24,9 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unique_function.hpp>
-
-#include <boost/preprocessor/stringize.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -66,6 +65,7 @@ namespace hpx { namespace actions
         void serialize(hpx::serialization::output_archive& ar, unsigned);
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type const& get_gid() const
         {
             return gid_;

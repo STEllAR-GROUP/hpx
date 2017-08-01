@@ -22,7 +22,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/range.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
@@ -283,9 +283,9 @@ namespace hpx { namespace parallel { inline namespace v3
         template <typename F, typename Shape, typename ... Ts>
         struct bulk_execute_result_impl<F, Shape, false, Ts...>
         {
-            typedef typename hpx::util::detail::unwrap_impl<
-                    typename bulk_async_execute_result<F, Shape, Ts...>::type
-                >::type type;
+            typedef decltype(
+                util::unwrap(std::declval<typename bulk_async_execute_result<F,
+                        Shape, Ts...>::type>())) type;
         };
 
         template <typename F, typename Shape, typename ... Ts>
@@ -337,7 +337,7 @@ namespace hpx { namespace parallel { inline namespace v3
                     {
                         results.push_back(exec.async_execute(f, elem, ts...));
                     }
-                    return hpx::util::unwrapped(results);
+                    return hpx::util::unwrap(results);
                 }
                 catch (std::bad_alloc const& ba) {
                     throw ba;

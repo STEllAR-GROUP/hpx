@@ -185,7 +185,7 @@ namespace hpx
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/atomic.hpp>

@@ -10,11 +10,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.0.2
-cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
+# We require at least CMake V3.3.2
+cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.0.2)
+cmake_policy(VERSION 3.3.2)
 macro(hpx_set_cmake_policy policy value)
   if(POLICY ${policy})
     cmake_policy(SET ${policy} ${value})
@@ -543,6 +543,17 @@ if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
 
+# Count number of terminated threads before forcefully cleaning up all of
+# them. Note: terminated threads are cleaned up either when this number is
+# reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
+# reached, which will clean up the terminated threads for _all_ thread queues.
+hpx_option(HPX_SCHEDULER_MAX_TERMINATED_THREADS STRING
+  "Maximum number of terminated threads collected before those are cleaned up (default: 100)"
+  "100" CATEGORY "Thread Manager" ADVANCED)
+
+hpx_add_config_define(HPX_SCHEDULER_MAX_TERMINATED_THREADS
+  ${HPX_SCHEDULER_MAX_TERMINATED_THREADS})
+
 hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
@@ -687,7 +698,7 @@ endif()
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
   if(NOT OPENMP_FOUND)
@@ -696,7 +707,7 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
   "Enable examples requiring TBB support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
   if(NOT TBB_FOUND)
@@ -705,7 +716,7 @@ if(HPX_WITH_EXAMPLES_TBB)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
   "Enable examples requiring QThreads support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
   if(NOT QTHREADS_FOUND)
@@ -714,7 +725,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
   if(NOT HDF5_FOUND)
@@ -726,7 +737,7 @@ endif()
 if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
     "Enable examples requiring Qt4 support (default: OFF)." OFF
-    CATEGORY "Tools" ADVANCED)
+    CATEGORY "Build Targets" ADVANCED)
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
     if(NOT QT4_FOUND)
@@ -946,6 +957,14 @@ hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
     OFF ADVANCED)
 if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
   hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+endif()
+
+# HPX_WITH_UNWRAPPED_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
+    "Enable the deprecated unwrapped function (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -1896,6 +1915,10 @@ if(HPX_WITH_VIM_YCM)
   )
   hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
+
+################################################################################
+# print overall configuration summary
+include(HPX_PrintSummary)
 
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).
