@@ -40,7 +40,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hpx::runtime & rt = hpx::get_runtime();
         hpx::threads::topology const& t = rt.get_topology();
         hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(
-            rt.get_thread_manager().get_pu_num(current),
+            hpx::get_resource_partitioner().get_pu_num(current),
             numa_sensitive);
 
         std::size_t logical_idx = hpx::threads::find_first(desired_mask);

@@ -276,7 +276,7 @@ namespace resource {
 
         size_t get_pu_num(std::size_t global_thread_num);
         threads::mask_cref_type get_pu_mask(
-            std::size_t num_thread, bool numa_sensitive) const;
+            std::size_t num_thread, bool numa_sensitive = true) const;
         bool cmd_line_parsed() const;
         int parse(boost::program_options::options_description desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,

@@ -1431,9 +1431,6 @@ namespace hpx { namespace threads
 
         using util::placeholders::_1;
 
-        detail::thread_pool& pool = default_pool();
-        std::size_t shepherd_count = pool.get_os_thread_count();
-
         creator_data data[] = {
             // /threads{locality#%d/total}/count/stack-recycles
             {"count/stack-recycles",

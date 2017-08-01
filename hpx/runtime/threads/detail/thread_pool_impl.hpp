@@ -108,9 +108,11 @@ namespace hpx { namespace threads { namespace detail
         {
             resize(used_processing_units_, threads::hardware_concurrency());
             for (std::size_t i = 0; i != pool_threads; ++i)
+            {
                 used_processing_units_ |=
                     get_resource_partitioner().get_pu_mask(
                         threads_offset + i, sched_->numa_sensitive());
+            }
         }
 
         ///////////////////////////////////////////////////////////////////

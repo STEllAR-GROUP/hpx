@@ -134,8 +134,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
 #if defined(HPX_HAVE_HWLOC)
         std::string affinity_desc;
-        std::size_t numa_sensitive =
-            hpx::detail::get_affinity_description(cfg_, affinity_desc);
+        hpx::detail::get_affinity_description(cfg_, affinity_desc);
         if (affinity_desc == "none")
         {
             // don't use any affinity for any of the os-threads
