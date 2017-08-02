@@ -239,7 +239,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
 
                         std::vector<InIter> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                         auto it = res.begin();
                         while(it!=res.end())
                         {
@@ -648,7 +648,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
 
                         std::vector<find_return<FwdIter1>> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                         // iterate from the end usinga reverse iterator
                         auto it = res.rbegin();
                         while(it!=res.rend())
@@ -660,13 +660,6 @@ namespace hpx { namespace parallel { inline namespace v1
                                 return it->complete_sequence_position;
                             }
                             //if partial sequence found in the segment behind it
-                            if (std::next(it)->partial_sequence_cursor !=
-                                    sequence.size() &&
-                                std::next(it)->partial_sequence_cursor ==
-                                    it->complete_sequence_cursor)
-                            {
-                                return std::next(it)->partial_sequence_position;
-                            }
                             auto temp = it;
                             while (temp != res.rend() &&
                                 std::next(temp)->complete_sequence_cursor !=
@@ -1027,7 +1020,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
 
                         std::vector<find_return<FwdIter1>> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                             //iterate from the first segment
                         auto it = res.begin();
                         while(it != res.end())
