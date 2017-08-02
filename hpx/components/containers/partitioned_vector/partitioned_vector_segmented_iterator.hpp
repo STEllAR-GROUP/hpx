@@ -633,6 +633,18 @@ namespace hpx
             return !data_ || this->base() == end_;
         }
 
+        // increment until predicate is not satisfied any more
+        void unsatisfy_predicate()
+        {
+            while (this->base() != end_ && predicate_(*this->base()))
+                ++(this->base_reference());
+
+            if (this->base() != end_)
+                data_ = this->base()->local_data_;
+            else
+                data_.reset();
+        }
+
     private:
         friend class hpx::util::iterator_core_access;
 
@@ -645,7 +657,11 @@ namespace hpx
         void increment()
         {
             ++(this->base_reference());
-            satisfy_predicate();
+
+            if (this->base() != end_)
+                data_ = this->base()->local_data_;
+            else
+                data_.reset();
         }
 
         void satisfy_predicate()
