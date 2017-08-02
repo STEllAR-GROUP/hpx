@@ -236,7 +236,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
 
                         std::vector<InIter> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                         auto it = res.begin();
                         while(it!=res.end())
                         {

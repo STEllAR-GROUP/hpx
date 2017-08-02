@@ -96,10 +96,6 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename FwdIter, typename T>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        >::type
         find_(ExPolicy && policy, FwdIter first, FwdIter last, T const& val,
             std::false_type)
         {
@@ -124,10 +120,6 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename FwdIter, typename T>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        >::type
         find_(ExPolicy && policy, FwdIter first, FwdIter last, T const& val,
             std::true_type);
         /// \endcond
@@ -257,10 +249,6 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename FwdIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        >::type
         find_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type)
         {
@@ -285,10 +273,6 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename FwdIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        >::type
         find_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type);
         /// \endcond
@@ -437,10 +421,6 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename FwdIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        >::type
         find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type)
         {
@@ -465,10 +445,6 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename FwdIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        >::type
         find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type);
         /// \endcond
