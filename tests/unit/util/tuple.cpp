@@ -372,19 +372,36 @@ void tuple_cat_test()
         HPX_TEST_EQ((*hpx::util::get<2>(result)), 2);
     }
 
-    // Don't move references unconditionally
+    // Don't move references unconditionally (copyable types)
     {
         int i1 = 11;
         int i2 = 22;
 
-        auto f1 = hpx::util::forward_as_tuple(i1);
-        auto f2 = hpx::util::forward_as_tuple(std::move(i2));
+        hpx::util::tuple<int&> f1 = hpx::util::forward_as_tuple(i1);
+        hpx::util::tuple<int&&> f2 = hpx::util::forward_as_tuple(std::move(i2));
 
         hpx::util::tuple<int&, int&&> result =
             hpx::util::tuple_cat(std::move(f1), std::move(f2));
 
         HPX_TEST_EQ((hpx::util::get<0>(result)), 11);
         HPX_TEST_EQ((hpx::util::get<1>(result)), 22);
+    }
+
+    // Don't move references unconditionally (move only types)
+    {
+        std::unique_ptr<int> i1(new int(11));
+        std::unique_ptr<int> i2(new int(22));
+
+        hpx::util::tuple<std::unique_ptr<int>&> f1 =
+            hpx::util::forward_as_tuple(i1);
+        hpx::util::tuple<std::unique_ptr<int>&&> f2 =
+            hpx::util::forward_as_tuple(std::move(i2));
+
+        hpx::util::tuple<std::unique_ptr<int>&, std::unique_ptr<int>&&> result =
+            hpx::util::tuple_cat(std::move(f1), std::move(f2));
+
+        HPX_TEST_EQ((*hpx::util::get<0>(result)), 11);
+        HPX_TEST_EQ((*hpx::util::get<1>(result)), 22);
     }
 }
 
