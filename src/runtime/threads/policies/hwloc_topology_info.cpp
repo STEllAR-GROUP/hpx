@@ -27,8 +27,8 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+#include <string>
 #include <vector>
-#include <bitset>
 
 #include <hwloc.h>
 

@@ -79,7 +79,8 @@ namespace hpx { namespace threads { namespace executors
             mask_cref_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
             {
-                return hpx::get_resource_partitioner().get_pu_mask(num_thread, scheduler_.numa_sensitive());
+                return hpx::get_resource_partitioner().get_pu_mask(
+                    num_thread, scheduler_.numa_sensitive());
             }
 
             /// Set the new scheduler mode
@@ -169,7 +170,6 @@ namespace hpx { namespace threads { namespace executors
     };
 #endif
 
-
     struct HPX_EXPORT local_priority_queue_executor : public scheduled_executor
     {
         local_priority_queue_executor();
@@ -188,7 +188,6 @@ namespace hpx { namespace threads { namespace executors
     };
 #endif
 
-
 #if defined(HPX_HAVE_THROTTLING_SCHEDULER)
     struct HPX_EXPORT throttling_executor : public scheduled_executor
     {
@@ -198,10 +197,6 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 #endif
-
-
-
-
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>

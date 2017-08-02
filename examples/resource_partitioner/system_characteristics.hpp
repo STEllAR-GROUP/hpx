@@ -10,6 +10,8 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_impl.hpp>
 
+#include <iostream>
+
 void print_system_characteristics()
 {
     std::cout << "[hpx-main] System queries: \n\n";
@@ -47,26 +49,6 @@ void print_system_characteristics()
               << "                        " << hpx::get_os_thread_count()
               << "\n"
               << "command line          : " << cfg.get_cmd_line() << "\n\n";
-
-    //! -------------------------------------- affinity data
-    /*
-    std::size_t num_of_affinity_masks(affdat_ptr->affinity_masks_.size());
-    unsigned long num_of_pu_nums(affdat_ptr->pu_nums_.size());
-    std::cout << "[Affinity Data]\n"
-              << "number of threads     : " << affdat_ptr->num_threads_ << "\n"
-              << "affinity domain       : " << affdat_ptr->affinity_domain_ << "\n"
-              << "number of pu_nums_    : " << num_of_pu_nums << "\n"
-              << "number of aff. masks  : " << num_of_affinity_masks << "\n"
-              << "affinity masks        : " << "\n";
-
-    for(std::size_t i(0); i<num_of_affinity_masks; i++){
-        std::cout << "                        " << std::bitset<8>(affdat_ptr->affinity_masks_[i]) << "\n";
-    }
-*/
-    /*    std::cout << "pu_nums               : " << "\n";
-    for(unsigned long i(0); i<num_of_pu_nums; i++){
-        std::cout << "                        " << std::bitset<8>(affdat_ptr->pu_nums_[i]) << ",  " << affdat_ptr->pu_nums_[i] << "\n";
-    }*/
 
     //! -------------------------------------- topology
     topo.print_hwloc(std::cout);

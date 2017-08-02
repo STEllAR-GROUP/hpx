@@ -752,7 +752,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     std::string get_config_entry(
         std::string const& key, std::string const& dflt)
-    {    //! FIXME runtime_configuration should probs be a member of hpx::runtime only, not command_line_handling
+    {
+        //! FIXME runtime_configuration should probs be a member of
+        // hpx::runtime only, not command_line_handling
         //! FIXME change functions in this section accordingly
         if (get_runtime_ptr() != nullptr)
             return get_runtime().get_config().get_entry(key, dflt);

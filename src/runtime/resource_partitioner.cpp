@@ -9,6 +9,8 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <cstddef>
 #include <iosfwd>
 #include <string>

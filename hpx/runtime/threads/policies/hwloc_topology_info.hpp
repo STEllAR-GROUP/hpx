@@ -25,6 +25,7 @@
 
 #include <cstddef>
 #include <iosfwd>
+#include <string>
 #include <vector>
 
 #if defined(HPX_NATIVE_MIC) && HWLOC_API_VERSION < 0x00010600
@@ -33,17 +34,15 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace resource {
-        class resource_partitioner;
-    }
-}
+namespace hpx { namespace resource
+{
+    class resource_partitioner;
+}}
 
 namespace hpx { namespace threads
 {
-
     struct HPX_EXPORT hwloc_topology_info : topology
     {
-
         friend resource::resource_partitioner;
 
         hwloc_topology_info();
@@ -279,8 +278,9 @@ namespace hpx { namespace threads
         // - Elements of the vector:
         // Bitmasks of length equal to the number of PUs of the machine.
         // The bitmasks indicate which PUs belong to which resource.
-        // For example, core_affinity_masks[0] is a bitmask, where the elements = 1
-        // indicate the PUs that belong to the core on which PU #0 (zero-based index) lies.
+        // For example, core_affinity_masks[0] is a bitmask, where the
+        // elements = 1 indicate the PUs that belong to the core on which
+        // PU #0 (zero-based index) lies.
         mask_type machine_affinity_mask_;
         std::vector<mask_type> socket_affinity_masks_;
         std::vector<mask_type> numa_node_affinity_masks_;

@@ -9,7 +9,10 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
+#include <utility>
 
 namespace hpx { namespace threads { namespace executors
 {

@@ -20,6 +20,7 @@
 //
 #include <boost/preprocessor.hpp>
 #include <sched.h>
+
 // ------------------------------------------------------------------
 // Set flags to help simplify the log defines
 // ------------------------------------------------------------------
@@ -44,21 +45,24 @@
 // ------------------------------------------------------------------
 // useful macros for formatting log messages
 // ------------------------------------------------------------------
-#define nhex(n) "0x" << std::setfill('0') << std::setw(n) << std::noshowbase << std::hex
+#define nhex(n)                                                                \
+    "0x" << std::setfill('0') << std::setw(n) << std::noshowbase << std::hex
 #define hexpointer(p) nhex(16) << (uintptr_t)(p) << " "
-#define hexuint64(p)  nhex(16) << (uintptr_t)(p) << " "
-#define hexuint32(p)  nhex(8)  << (uint32_t)(p) << " "
-#define hexlength(p)  nhex(6)  << (uintptr_t)(p) << " "
-#define hexnumber(p)  nhex(4)  << (uintptr_t)(p) << " "
-#define hexbyte(p)    nhex(2)  << static_cast<int>(p) << " "
-#define decimal(n)    std::setfill('0') << std::setw(n) << std::noshowbase << std::dec
-#define decnumber(p)  std::dec << p << " "
-#define dec4(p)       decimal(4) << p << " "
-#define ipaddress(p)  std::dec << (int)(reinterpret_cast<const uint8_t*>(&p))[0] << "." \
-                               << (int)(reinterpret_cast<const uint8_t*>(&p))[1] << "." \
-                               << (int)(reinterpret_cast<const uint8_t*>(&p))[2] << "." \
-                               << (int)(reinterpret_cast<const uint8_t*>(&p))[3] << " "
-#define sockaddress(p) ipaddress(((struct sockaddr_in*)(p))->sin_addr.s_addr)
+#define hexuint64(p) nhex(16) << (uintptr_t)(p) << " "
+#define hexuint32(p) nhex(8) << (uint32_t)(p) << " "
+#define hexlength(p) nhex(6) << (uintptr_t)(p) << " "
+#define hexnumber(p) nhex(4) << (uintptr_t)(p) << " "
+#define hexbyte(p) nhex(2) << static_cast<int>(p) << " "
+#define decimal(n)                                                             \
+    std::setfill('0') << std::setw(n) << std::noshowbase << std::dec
+#define decnumber(p) std::dec << p << " "
+#define dec4(p) decimal(4) << p << " "
+#define ipaddress(p)                                                           \
+    std::dec << (int) (reinterpret_cast<const uint8_t*>(&p))[0] << "."         \
+             << (int) (reinterpret_cast<const uint8_t*>(&p))[1] << "."         \
+             << (int) (reinterpret_cast<const uint8_t*>(&p))[2] << "."         \
+             << (int) (reinterpret_cast<const uint8_t*>(&p))[3] << " "
+#define sockaddress(p) ipaddress(((struct sockaddr_in*) (p))->sin_addr.s_addr)
 
 // ------------------------------------------------------------------
 // include files needed for boost::log
@@ -93,7 +97,8 @@ namespace detail {
     // ------------------------------------------------------------------
     struct rdma_thread_print_helper {};
 
-    inline std::ostream& operator<<(std::ostream& os, const rdma_thread_print_helper&)
+    inline std::ostream& operator<<(
+        std::ostream& os, const rdma_thread_print_helper&)
     {
         if (hpx::threads::get_self_id()==hpx::threads::invalid_thread_id) {
             os << "------------------ ";
@@ -103,7 +108,8 @@ namespace detail {
                 hpx::this_thread::get_id().native_handle().get();
             os << hexpointer(dummy);
         }
-        os << nhex(12) << std::this_thread::get_id() << " cpu " << decnumber(sched_getcpu());
+        os << nhex(12) << std::this_thread::get_id() << " cpu "
+           << decnumber(sched_getcpu());
         return os;
     }
 
@@ -120,7 +126,8 @@ namespace detail {
     // ------------------------------------------------------------------
     // helper fuction for printing CRC32 and short memory dump
     // ------------------------------------------------------------------
-    inline std::string mem_crc32(const void *address, size_t length, const char *txt)
+    inline std::string mem_crc32(
+        const void* address, size_t length, const char* txt)
     {
         const uint64_t *uintBuf = static_cast<const uint64_t*>(address);
         std::stringstream temp;
@@ -171,18 +178,20 @@ namespace detail {
 #  define FUNC_START_DEBUG_MSG LOG_TRACE_MSG("*** Enter " << __func__);
 #  define FUNC_END_DEBUG_MSG   LOG_TRACE_MSG("### Exit  " << __func__);
 //
-#  define LOG_FORMAT_MSG(x)                                    \
-    (dynamic_cast<std::ostringstream &> (                      \
-        std::ostringstream().seekp(0, std::ios_base::cur) << x \
-        << __FILE__ << " " << std::dec << __LINE__ )).str()
+#define LOG_FORMAT_MSG(x)                                                      \
+    (dynamic_cast<std::ostringstream&>(                                        \
+         std::ostringstream().seekp(0, std::ios_base::cur)                     \
+         << x << __FILE__ << " " << std::dec << __LINE__))                     \
+        .str()
 
 #else
 #  define LOG_DEBUG_MSG(x)
 #  define LOG_INFO_MSG(x)
 #  define LOG_WARN_MSG(x)
-#  define LOG_ERROR_MSG(x) std::cout << "00: <ERROR> " << THREAD_ID << " " \
-    << x << " " << __FILE__ << " " << std::dec << __LINE__ << std::endl;
-#  define LOG_FATAL_MSG(x) LOG_ERROR_MSG(x)
+#define LOG_ERROR_MSG(x)                                                       \
+    std::cout << "00: <ERROR> " << THREAD_ID << " " << x << " " << __FILE__    \
+              << " " << std::dec << __LINE__ << std::endl;
+#define LOG_FATAL_MSG(x) LOG_ERROR_MSG(x)
 //
 #  define LOG_EXCLUSIVE(x)
 //
@@ -198,9 +207,10 @@ namespace detail {
 // but still show some that have been specially marked
 // ------------------------------------------------------------------
 #ifdef HPX_PARCELPORT_LOGGING_HAVE_DEVEL_LOG
-#  define LOG_DEVEL_MSG(x) BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
+#define LOG_DEVEL_MSG(x)                                                       \
+    BOOST_LOG_TRIVIAL(debug) << "" << THREAD_ID << " " << x;
 #else
-#  define LOG_DEVEL_MSG(x)
+#define LOG_DEVEL_MSG(x)
 #endif
 
 // ------------------------------------------------------------------
@@ -209,28 +219,29 @@ namespace detail {
 // ------------------------------------------------------------------
 #ifdef HPX_PARCELPORT_LOGGING_HAVE_TIMED_LOG
 
-#  define LOG_TIMED_INIT(name)                                                      \
-    using namespace std::chrono;                                                    \
-    static time_point<system_clock> log_timed_start_ ## name = system_clock::now(); \
+#define LOG_TIMED_INIT(name)                                                   \
+    using namespace std::chrono;                                               \
+    static time_point<system_clock> log_timed_start_##name =                   \
+        system_clock::now();
 
-#  define LOG_TIMED_MSG(name, level, delay, x)             \
-    time_point<system_clock> log_timed_now_ ## name =      \
-        system_clock::now();                               \
-    duration<double> log_timed_elapsed_ ## name =          \
-      log_timed_now_ ## name - log_timed_start_ ## name;   \
-    if (log_timed_elapsed_ ## name.count()>delay) {        \
-        LOG_DEVEL_MSG(x);                                  \
-        log_timed_start_ ## name = log_timed_now_ ## name; \
+#define LOG_TIMED_MSG(name, level, delay, x)                                   \
+    time_point<system_clock> log_timed_now_##name = system_clock::now();       \
+    duration<double> log_timed_elapsed_##name =                                \
+        log_timed_now_##name - log_timed_start_##name;                         \
+    if (log_timed_elapsed_##name.count() > delay)                              \
+    {                                                                          \
+        LOG_DEVEL_MSG(x);                                                      \
+        log_timed_start_##name = log_timed_now_##name;                         \
     }
 
-#  define LOG_TIMED_BLOCK(name, level, delay, x)           \
-    time_point<system_clock> log_timed_now_ ## name =      \
-        system_clock::now();                               \
-    duration<double> log_timed_elapsed_ ## name =          \
-      log_timed_now_ ## name - log_timed_start_ ## name;   \
-    if (log_timed_elapsed_ ## name.count()>delay) {        \
-        log_timed_start_ ## name = log_timed_now_ ## name; \
-        x;                                                 \
+#define LOG_TIMED_BLOCK(name, level, delay, x)                                 \
+    time_point<system_clock> log_timed_now_##name = system_clock::now();       \
+    duration<double> log_timed_elapsed_##name =                                \
+        log_timed_now_##name - log_timed_start_##name;                         \
+    if (log_timed_elapsed_##name.count() > delay)                              \
+    {                                                                          \
+        log_timed_start_##name = log_timed_now_##name;                         \
+        x;                                                                     \
     }
 
 #else

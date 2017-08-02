@@ -37,10 +37,13 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iosfwd>
+#include <memory>
 #include <mutex>
 #include <numeric>
 #include <sstream>
+#include <string>
 #include <utility>
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME

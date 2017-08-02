@@ -36,6 +36,7 @@
 #include <memory>
 #include <mutex>
 #include <numeric>
+#include <string>
 #include <type_traits>
 #include <vector>
 #include <utility>

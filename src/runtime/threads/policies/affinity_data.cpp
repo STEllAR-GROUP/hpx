@@ -12,10 +12,13 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace detail
 {

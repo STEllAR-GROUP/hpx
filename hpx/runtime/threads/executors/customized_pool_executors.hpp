@@ -13,6 +13,8 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>

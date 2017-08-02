@@ -17,7 +17,14 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <functional>
 #include <iosfwd>
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -620,8 +627,8 @@ namespace hpx { namespace threads { namespace detail
                     catch (std::exception const& e)
                     {
                         // Repackage exceptions to avoid slicing.
-                        boost::throw_exception(boost::enable_error_info(
-                            hpx::exception(unhandled_exception, e.what())));
+                        hpx::throw_with_info(
+                            hpx::exception(unhandled_exception, e.what()));
                     }
                 }
                 catch (...)
