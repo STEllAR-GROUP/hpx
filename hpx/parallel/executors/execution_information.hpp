@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nounnamed
+
 #if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_JAN_16_2017_0444PM)
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_JAN_16_2017_0444PM
 
@@ -105,29 +107,31 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), params);
         }
 
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+        template <typename Executor, typename Parameters>
+        HPX_FORCEINLINE
+        auto
+        customization_point<processing_units_count_tag>::operator()(
+            Executor && exec, Parameters& params) const
+        {
+            return processing_units_count(std::forward<Executor>(exec),
+                                          params);
+        }
+#else
         template <>
         struct customization_point<processing_units_count_tag>
         {
         public:
-#endif
             template <typename Executor, typename Parameters>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-            customization_point<processing_units_count_tag>::
-#endif
-            operator()(
-                Executor && exec, Parameters& params) const
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+            operator()(Executor && exec, Parameters& params) const
             -> decltype(processing_units_count(std::forward<Executor>(exec),
                     params))
-#endif
             {
                 return processing_units_count(std::forward<Executor>(exec),
                     params);
             }
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
         };
 #endif
 
@@ -178,27 +182,27 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec));
         }
 
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+        template <typename Executor>
+        HPX_FORCEINLINE
+        auto
+        customization_point<has_pending_closures_tag>::operator()(Executor && exec) const
+        {
+            return has_pending_closures(std::forward<Executor>(exec));
+        }
+#else
         template <>
         struct customization_point<has_pending_closures_tag>
         {
         public:
-#endif
             template <typename Executor>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-            customization_point<has_pending_closures_tag>::
-#endif
-            operator()(
-                Executor && exec) const
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+            operator()(Executor && exec) const
             -> decltype(has_pending_closures(std::forward<Executor>(exec)))
-#endif
             {
                 return has_pending_closures(std::forward<Executor>(exec));
             }
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
         };
 #endif
         /// \endcond
@@ -253,27 +257,28 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), topo, thread_num);
         }
 
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+        template <typename Executor>
+        HPX_FORCEINLINE
+        auto
+        customization_point<get_pu_mask_tag>::operator()(
+            Executor && exec, threads::topology& topo, std::size_t thread_num) const
+        {
+            return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
+        }
+#else
         template <>
         struct customization_point<get_pu_mask_tag>
         {
         public:
-#endif
             template <typename Executor>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-            customization_point<get_pu_mask_tag>::
-#endif
-            operator()(
-                Executor && exec, threads::topology& topo, std::size_t thread_num) const
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+            operator()(Executor && exec, threads::topology& topo, std::size_t thread_num) const
             -> decltype(get_pu_mask(std::forward<Executor>(exec), topo, thread_num))
-#endif
             {
                 return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);
             }
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
         };
 #endif
         /// \endcond
@@ -323,27 +328,28 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), mode);
         }
 
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+        template <typename Executor, typename Mode>
+        HPX_FORCEINLINE
+        auto
+        customization_point<set_scheduler_mode_tag>::operator()(
+            Executor && exec, Mode const& mode) const
+        {
+            return set_scheduler_mode(std::forward<Executor>(exec), mode);
+        }
+#else
         template <>
         struct customization_point<set_scheduler_mode_tag>
         {
         public:
-#endif
             template <typename Executor, typename Mode>
             HPX_FORCEINLINE
             auto
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-            customization_point<set_scheduler_mode_tag>::
-#endif
-            operator()(
-                Executor && exec, Mode const& mode) const
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+            operator()(Executor && exec, Mode const& mode) const
             -> decltype(set_scheduler_mode(std::forward<Executor>(exec), mode))
-#endif
             {
                 return set_scheduler_mode(std::forward<Executor>(exec), mode);
             }
-#ifndef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
         };
 #endif
         /// \endcond
