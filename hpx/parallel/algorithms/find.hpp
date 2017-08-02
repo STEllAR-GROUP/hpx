@@ -116,7 +116,7 @@ namespace hpx { namespace parallel { inline namespace v1
 #endif
             return detail::find<FwdIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, std::move(val));
+                first, last, val);
         }
 
         template <typename ExPolicy, typename FwdIter, typename T>
