@@ -61,10 +61,11 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef typename util::detail::algorithm_result<
                 ExPolicy
             >::type result_type;
+            typedef typename std::iterator_traits<InIter>::value_type value_type;
 
             return hpx::util::void_guard<result_type>(),
                 hpx::parallel::for_each(std::forward<ExPolicy>(policy),
-                    first, last, fill_function<T>(value));
+                    first, last, fill_function<value_type>(value));
         }
 
         // forward declare the non-segmented version of this algorithm

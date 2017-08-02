@@ -574,6 +574,12 @@ namespace hpx { namespace components
             registered_name_.clear();
         }
 
+        // Access registered name for the component
+        std::string const& registered_name() const
+        {
+            return registered_name_;
+        }
+
     protected:
         // will be set for created (non-attached) objects
         std::string registered_name_;
