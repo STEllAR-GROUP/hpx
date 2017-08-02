@@ -550,6 +550,12 @@ namespace hpx
           : data_(0)
         {}
 
+        template<typename RightBaseIter>
+        const_segment_vector_iterator(
+            segment_vector_iterator<T, Data, RightBaseIter> const & o)
+          : base_type(o.base()), data_(o.get_data())
+        {}
+
         const_segment_vector_iterator(BaseIter const& it,
                 partitioned_vector<T, Data> const* data = nullptr)
           : base_type(it), data_(data)

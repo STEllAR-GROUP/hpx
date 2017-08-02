@@ -11,11 +11,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.0.2
-cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
+# We require at least CMake V3.3.2
+cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.0.2)
+cmake_policy(VERSION 3.3.2)
 macro(hpx_set_cmake_policy policy value)
   if(POLICY ${policy})
     cmake_policy(SET ${policy} ${value})
@@ -544,6 +544,17 @@ if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
 
+# Count number of terminated threads before forcefully cleaning up all of
+# them. Note: terminated threads are cleaned up either when this number is
+# reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
+# reached, which will clean up the terminated threads for _all_ thread queues.
+hpx_option(HPX_SCHEDULER_MAX_TERMINATED_THREADS STRING
+  "Maximum number of terminated threads collected before those are cleaned up (default: 100)"
+  "100" CATEGORY "Thread Manager" ADVANCED)
+
+hpx_add_config_define(HPX_SCHEDULER_MAX_TERMINATED_THREADS
+  ${HPX_SCHEDULER_MAX_TERMINATED_THREADS})
+
 hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
@@ -947,6 +958,14 @@ hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
     OFF ADVANCED)
 if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
   hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+endif()
+
+# HPX_WITH_UNWRAPPED_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
+    "Enable the deprecated unwrapped function (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
 endif()
 
 ################################################################################

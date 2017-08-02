@@ -65,6 +65,7 @@ namespace hpx { namespace actions
         void serialize(hpx::serialization::output_archive& ar, unsigned);
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type const& get_gid() const
         {
             return gid_;

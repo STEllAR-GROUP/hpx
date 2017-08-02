@@ -21,7 +21,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/range.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -274,7 +274,7 @@ namespace hpx { namespace parallel { inline namespace v3
                     elem, ts...));
             }
 
-            return hpx::util::unwrapped(results);
+            return hpx::util::unwrap(results);
         }
 
         /// Retrieve whether this executor has operations pending or not.

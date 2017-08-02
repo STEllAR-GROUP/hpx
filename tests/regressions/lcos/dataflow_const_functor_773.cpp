@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 typedef hpx::lcos::shared_future< double > future_type;
 
@@ -30,7 +30,7 @@ struct mul
 
 int main()
 {
-    auto functor = hpx::util::unwrapped(mul<double>( 0.5 ));
+    auto functor = hpx::util::unwrapping(mul<double>( 0.5 ));
     future_type f1 = hpx::make_ready_future( 1.0 );
     future_type f2 = hpx::dataflow( functor , f1 , f1 );
 

@@ -309,7 +309,7 @@ namespace hpx { namespace lcos { namespace detail
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         // handle executors through their executor_traits
         template <typename Executor>
-        HPX_FORCEINLINE
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) HPX_FORCEINLINE
         typename std::enable_if<
             traits::is_executor<Executor>::value
         >::type

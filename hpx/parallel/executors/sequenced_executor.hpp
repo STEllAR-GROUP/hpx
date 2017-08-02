@@ -16,7 +16,7 @@
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <hpx/parallel/exception_list.hpp>
 
@@ -122,7 +122,7 @@ namespace hpx { namespace parallel { namespace execution
         static typename detail::bulk_execute_result<F, S, Ts...>::type
         bulk_sync_execute(F && f, S const& shape, Ts &&... ts)
         {
-            return hpx::util::unwrapped(
+            return hpx::util::unwrap(
                 bulk_async_execute(std::forward<F>(f), shape,
                     std::forward<Ts>(ts)...));
         }

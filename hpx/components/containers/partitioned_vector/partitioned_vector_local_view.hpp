@@ -25,11 +25,15 @@ namespace hpx
     private:
         using base_type = hpx::partitioned_vector_view<T,N,Data>;
         using base_iterator = typename base_type::iterator;
+        using const_base_iterator = typename base_type::const_iterator;
 
     public:
         using value_type = T;
         using iterator = typename
             hpx::partitioned_vector_local_view_iterator<Data, base_iterator>;
+        using const_iterator = typename
+            hpx::const_partitioned_vector_local_view_iterator<
+                Data, const_base_iterator>;
 
         explicit partitioned_vector_local_view(base_type const & global_pview )
         : base_type(global_pview)
@@ -46,6 +50,30 @@ namespace hpx
         {
             base_type & base(*this);
             return iterator( base.end(), base.end() );
+        }
+
+        const_iterator begin() const
+        {
+            base_type const & base(*this);
+            return const_iterator(base.begin(), base.end());
+        }
+
+        const_iterator end() const
+        {
+            base_type const & base(*this);
+            return const_iterator( base.end(), base.end() );
+        }
+
+        const_iterator cbegin() const
+        {
+            base_type const & base(*this);
+            return const_iterator(base.begin(), base.end());
+        }
+
+        const_iterator cend() const
+        {
+            base_type const & base(*this);
+            return const_iterator( base.end(), base.end() );
         }
 
     };

@@ -268,7 +268,7 @@ namespace hpx { namespace components
             rhs.shared_state_ = nullptr;
         }
 
-        // A future to a client_base can be unwrapped to represent the
+        // A future to a client_base can be unwrap to represent the
         // client_base directly as a client_base is semantically a future to
         // the id of the referenced object.
         client_base(future<Derived> && d)
@@ -370,6 +370,7 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         id_type const& get_gid() const
         {
             return get_id();

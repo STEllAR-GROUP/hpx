@@ -34,18 +34,6 @@ namespace hpx { namespace util
 
     template <typename Sig>
     using unique_function_nonser = unique_function<Sig, false>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    // forward declare unwrapped()
-    namespace detail
-    {
-        template <typename ... Ts>
-        struct unwrap_dispatch_result;
-    }
-
-    template <typename ... Ts>
-    typename detail::unwrap_dispatch_result<Ts...>::type
-    unwrapped(Ts &&... ts);
     /// \endcond
 }}
 
