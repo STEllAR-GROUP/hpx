@@ -1112,9 +1112,14 @@ else()
   endif()
 endif()
 
+set(CXX11_AUTO_RETURN_VALUE_VALUE OM)
+if(HPX_WITH_CUDA)
+  set(CXX11_AUTO_RETURN_VALUE_VALUE OFF)
+endif()
+
 hpx_option(HPX_WITH_CXX11_AUTO_RETURN_VALUE BOOL
   "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
-  ON ADVANCED)
+  ${CXX11_AUTO_RETURN_VALUE_VALUE} ADVANCED)
 if(HPX_WITH_CXX11_AUTO_RETURN_VALUE)
   hpx_add_config_define(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
 endif()
