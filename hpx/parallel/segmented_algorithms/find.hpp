@@ -32,23 +32,20 @@ namespace hpx { namespace parallel { inline namespace v1
     // segmented_find
     namespace detail
     {
-        template <typename Algo, typename ExPolicy, typename InIter,
+        template <typename Algo, typename ExPolicy, typename FwdIter,
             typename U>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        segmented_find(Algo && algo, ExPolicy && policy, InIter first,
-            InIter last, U && f_or_val, std::true_type)
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        segmented_find(Algo && algo, ExPolicy && policy, FwdIter first,
+            FwdIter last, U && f_or_val, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<InIter> traits;
+            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, InIter> result;
+            typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
-            InIter output = last;
+            FwdIter output = last;
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -118,28 +115,25 @@ namespace hpx { namespace parallel { inline namespace v1
             return result::get(std::move(output));
         }
 
-        template <typename Algo, typename ExPolicy, typename InIter,
+        template <typename Algo, typename ExPolicy, typename FwdIter,
             typename U>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        segmented_find(Algo && algo, ExPolicy && policy, InIter first,
-            InIter last, U && f_or_val, std::false_type)
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        segmented_find(Algo && algo, ExPolicy && policy, FwdIter first,
+            FwdIter last, U && f_or_val, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<InIter> traits;
+            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, InIter> result;
+            typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
             typedef std::integral_constant<bool,
-                    !hpx::traits::is_forward_iterator<InIter>::value
+                    !hpx::traits::is_forward_iterator<FwdIter>::value
                 > forced_seq;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            std::vector<future<InIter> > segments;
+            std::vector<future<FwdIter> > segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -150,11 +144,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     segments.push_back(
-                        hpx::make_future<InIter>(
+                        hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
                             [send,end,last](local_iterator_type const& out)
-                                -> InIter
+                                -> FwdIter
                             {
                                 if(out != end)
                                     return traits::compose(send, out);
@@ -170,11 +164,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     segments.push_back(
-                        hpx::make_future<InIter>(
+                        hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
                             [sit,end,last](local_iterator_type const& out)
-                                -> InIter
+                                -> FwdIter
                             {
                                 if(out != end)
                                     return traits::compose(sit, out);
@@ -191,11 +185,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     if (beg != end)
                     {
                         segments.push_back(
-                            hpx::make_future<InIter>(
+                            hpx::make_future<FwdIter>(
                                 dispatch_async(traits::get_id(sit), algo,
                                     policy, forced_seq(), beg, end, f_or_val),
                                 [sit,end,last](local_iterator_type const& out)
-                                    -> InIter
+                                    -> FwdIter
                                 {
                                     if(out != end)
                                         return traits::compose(sit, out);
@@ -211,11 +205,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     segments.push_back(
-                        hpx::make_future<InIter>(
+                        hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
                             [sit,end,last](local_iterator_type const& out)
-                                -> InIter
+                                -> FwdIter
                             {
                                 if(out != end)
                                     return traits::compose(sit, out);
@@ -226,8 +220,8 @@ namespace hpx { namespace parallel { inline namespace v1
             }
             return result::get(
                 dataflow(
-                    [=](std::vector<hpx::future<InIter> > && r)
-                        ->  InIter
+                    [=](std::vector<hpx::future<FwdIter> > && r)
+                        ->  FwdIter
                     {
                         // handle any remote exceptions, will throw on error
                         std::list<std::exception_ptr> errors;
@@ -235,7 +229,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             ExPolicy
                         >::call(r, errors);
 
-                        std::vector<InIter> res =
+                        std::vector<FwdIter> res =
                             hpx::util::unwrap(std::move(r));
                         auto it = res.begin();
                         while(it!=res.end())
@@ -249,12 +243,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(segments)));
         }
 
-        template <typename ExPolicy, typename InIter, typename T>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        find_(ExPolicy && policy, InIter first, InIter last, T const& val,
+        template <typename ExPolicy, typename FwdIter, typename T>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        find_(ExPolicy && policy, FwdIter first, FwdIter last, T const& val,
             std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
@@ -264,10 +255,10 @@ namespace hpx { namespace parallel { inline namespace v1
             if (first == last)
             {
                 return util::detail::algorithm_result<
-                        ExPolicy, InIter
-                    >::get(std::forward<InIter>(first));
+                        ExPolicy, FwdIter
+                    >::get(std::forward<FwdIter>(first));
             }
-            typedef hpx::traits::segmented_iterator_traits<InIter>
+            typedef hpx::traits::segmented_iterator_traits<FwdIter>
                 iterator_traits;
             return segmented_find(
                 find<typename iterator_traits::local_iterator>(),
@@ -275,20 +266,14 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::move(val),is_seq());
         }
 
-        template <typename ExPolicy, typename InIter, typename T>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        find_(ExPolicy && policy, InIter first, InIter last, T const& val,
+        template <typename ExPolicy, typename FwdIter, typename T>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        find_(ExPolicy && policy, FwdIter first, FwdIter last, T const& val,
             std::false_type);
 
-        template <typename ExPolicy, typename InIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        find_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
@@ -298,11 +283,11 @@ namespace hpx { namespace parallel { inline namespace v1
             if (first == last)
             {
                 return util::detail::algorithm_result<
-                        ExPolicy, InIter
-                    >::get(std::forward<InIter>(first));
+                        ExPolicy, FwdIter
+                    >::get(std::forward<FwdIter>(first));
             }
-            typedef typename std::iterator_traits<InIter>::value_type type;
-            typedef hpx::traits::segmented_iterator_traits<InIter>
+            typedef typename std::iterator_traits<FwdIter>::value_type type;
+            typedef hpx::traits::segmented_iterator_traits<FwdIter>
                 iterator_traits;
             return segmented_find(
                 find_if<typename iterator_traits::local_iterator>(),
@@ -310,20 +295,14 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::forward<F>(f),is_seq());
         }
 
-        template <typename ExPolicy, typename InIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        find_if_(ExPolicy && policy, InIter first, InIter last, F && f,
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        find_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type);
 
-        template <typename ExPolicy, typename InIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
@@ -333,11 +312,11 @@ namespace hpx { namespace parallel { inline namespace v1
             if (first == last)
             {
                 return util::detail::algorithm_result<
-                        ExPolicy, InIter
-                    >::get(std::forward<InIter>(first));
+                        ExPolicy, FwdIter
+                    >::get(std::forward<FwdIter>(first));
             }
-            typedef typename std::iterator_traits<InIter>::value_type type;
-            typedef hpx::traits::segmented_iterator_traits<InIter>
+            typedef typename std::iterator_traits<FwdIter>::value_type type;
+            typedef hpx::traits::segmented_iterator_traits<FwdIter>
                 iterator_traits;
             return segmented_find(
                 find_if_not<typename iterator_traits::local_iterator>(),
@@ -345,12 +324,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::forward<F>(f),is_seq());
         }
 
-        template <typename ExPolicy, typename InIter, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        >::type
-        find_if_not_(ExPolicy && policy, InIter first, InIter last, F && f,
+        template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type);
     }
 }}}

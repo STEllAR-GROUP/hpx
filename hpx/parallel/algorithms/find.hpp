@@ -96,6 +96,7 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename FwdIter, typename T>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_(ExPolicy && policy, FwdIter first, FwdIter last, T const& val,
             std::false_type)
         {
@@ -120,6 +121,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename FwdIter, typename T>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_(ExPolicy && policy, FwdIter first, FwdIter last, T const& val,
             std::true_type);
         /// \endcond
@@ -249,6 +251,7 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type)
         {
@@ -273,6 +276,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_if_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type);
         /// \endcond
@@ -421,6 +425,7 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type)
         {
@@ -445,6 +450,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename FwdIter, typename F>
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::true_type);
         /// \endcond
