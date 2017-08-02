@@ -362,6 +362,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     find_return<local_iterator_type> out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, sequence, op
                     );
+                    output=traits::compose(sit, out.complete_sequence_position);
                 }
             }
             else
@@ -428,6 +429,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             if(out.partial_sequence_cursor <
                                 (std::size_t) std::distance(beg, end))
                             {
+                                // update partial_out only if not spanning sequence
                                 partial_out = traits::compose(sit,
                                     out.partial_sequence_position);
                             }
@@ -445,7 +447,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         algo, policy, std::true_type(), beg, end, sequence,
                         op, out.partial_sequence_cursor
                     );
-                    //if complete sequence found the store that
+                    //if complete sequence found then store that
                     if(out.complete_sequence_position != end &&
                         out.complete_sequence_cursor == sequence.size())
                     {
@@ -619,17 +621,17 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         std::vector<find_return<FwdIter1>> res =
                             hpx::util::unwrap(std::move(r));
-                        // iterate from the end usinga reverse iterator
+                        // iterate from the end using a reverse iterator
                         auto it = res.rbegin();
                         while(it!=res.rend())
                         {
-                            //if complete sequence found the store that
+                            //if complete sequence found then store that
                             if(it->complete_sequence_position != last1 &&
                                 it->complete_sequence_cursor == sequence.size())
                             {
                                 return it->complete_sequence_position;
                             }
-                            //if partial sequence found in the segment behind it
+                            //loop to match partial sequences
                             auto temp = it;
                             while (temp != res.rend() &&
                                 std::next(temp)->complete_sequence_cursor !=
@@ -639,10 +641,14 @@ namespace hpx { namespace parallel { inline namespace v1
                                 if(temp->partial_sequence_cursor !=
                                     std::prev(temp)->complete_sequence_cursor)
                                 {
+                                    //if partial sequence of current segment
+                                    //does not match partial_sequence in the
+                                    //segment in front of it
                                     break;
                                 }
                                 if(temp->partial_sequence_position != last1)
                                 {
+                                    //if prefix (start) of sequence matched
                                     return temp->partial_sequence_position;
                                 }
                             }
@@ -711,7 +717,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     find_return<local_iterator_type> out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, sequence, op
                     );
-                    output=traits::compose(send, out.partial_sequence_position);
+                    output=traits::compose(send, out.complete_sequence_position);
                 }
             }
             else
@@ -785,6 +791,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             if(out.partial_sequence_cursor <
                                 (std::size_t) std::distance(beg, end))
                             {
+                                //update partial_out only if not spanning sequence
                                 partial_out = traits::compose(sit,
                                     out.partial_sequence_position);
                             }
@@ -979,7 +986,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         std::vector<find_return<FwdIter1>> res =
                             hpx::util::unwrap(std::move(r));
-                            //iterate from the first segment
+
+                        //iterate from the first segment
                         auto it = res.begin();
                         while(it != res.end())
                         {
@@ -989,7 +997,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             {
                                 return it->complete_sequence_position;
                             }
-                            //if partial sequence found between this and next segment
+                            //if partial sequence found in this segment
                             if(it->partial_sequence_position != last1)
                             {
                                 auto temp = std::next(it);
@@ -998,10 +1006,13 @@ namespace hpx { namespace parallel { inline namespace v1
                                     if(temp->complete_sequence_cursor !=
                                         std::prev(temp)->partial_sequence_cursor)
                                     {
+                                        //if found partial sequence matches
+                                        //previous segment
                                         break;
                                     }
                                     if(temp->complete_sequence_position != last1)
                                     {
+                                        // if ending suffix of sequence found 
                                         return it->partial_sequence_position;
                                     }
                                     ++temp;

@@ -157,6 +157,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             {
                                 if(hpx::util::invoke(op, *first1, sequence[index]))
                                 {
+                                    //partial found, check if match continues
                                     FwdIter1 curr = first1;
                                     std::size_t temp_index = index;
                                     while(curr != last1 &&
@@ -169,6 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     }
                                     if(temp_index == sequence.size())
                                     {
+                                        // if complete match found
                                         complete_sequence_position = first1;
                                         complete_sequence_cursor = index;
                                         break;
@@ -177,6 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                         hpx::util::invoke(op, *(std::prev(curr)),
                                             sequence[temp_index-1]))
                                     {
+                                        // if middle segment in spanning sequence
                                         complete_sequence_position = last1;
                                         complete_sequence_cursor = index;
                                         partial_sequence_cursor = temp_index-1;
@@ -195,6 +198,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             //loop till prefix of sequence at end found
                             for(; curr != last1; ++curr)
                             {
+                                // initial match found, check if match continues
                                 FwdIter1 temp = curr;
                                 std::size_t index = 0;
                                 while(temp != last1 &&
@@ -203,6 +207,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     ++temp;
                                     ++index;
                                 }
+                                // if match continues till end
                                 if(temp == last1)
                                 {
                                     partial_sequence_cursor = index;
@@ -248,7 +253,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                         start = first1;
                     ++cursor;
                     // if complete sequence found, then store result
-                    // and continue search
+                    // and stop search
                     if(cursor == sequence.size())
                     {
                         //only if sequence not previously found
@@ -371,6 +376,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             {
                                 if(hpx::util::invoke(op, *first1, sequence[index]))
                                 {
+                                    //initial match found, check if match continues
                                     FwdIter1 curr = first1;
                                     std::size_t temp_index = index;
                                     while(curr != last1 &&
@@ -383,6 +389,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     }
                                     if(temp_index == sequence.size())
                                     {
+                                        //if complete sequence found
                                         complete_sequence_position = first1;
                                         complete_sequence_cursor = index;
                                         break;
@@ -391,6 +398,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                         hpx::util::invoke(op, *(std::prev(curr)),
                                             sequence[temp_index-1]))
                                     {
+                                        //if middle segment in spanning sequence
                                         complete_sequence_position = last1;
                                         complete_sequence_cursor = index;
                                         partial_sequence_cursor = temp_index;
@@ -417,6 +425,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                     ++temp;
                                     ++index;
                                 }
+                                // if sequence continued till end
                                 if(temp == last1)
                                 {
                                     partial_sequence_cursor = index;
