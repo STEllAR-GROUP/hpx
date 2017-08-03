@@ -276,7 +276,7 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void reset_thread_distribution() {}
 
-        void set_parent_pool(threads::detail::thread_pool *p) {
+        void set_parent_pool(threads::detail::thread_pool_base *p) {
             parent_pool = p;
         }
 
@@ -292,7 +292,7 @@ namespace hpx { namespace threads { namespace policies
 
         std::vector<boost::atomic<hpx::state> > states_;
         char const* description_;
-        threads::detail::thread_pool *parent_pool; // the pool that owns this scheduler
+        threads::detail::thread_pool_base *parent_pool; // the pool that owns this scheduler
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

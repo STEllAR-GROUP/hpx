@@ -122,11 +122,11 @@ namespace threads {
                 thread_queue_type;
 
             shared_priority_scheduler(std::size_t num_worker_queues,
-                std::size_t num_high_priority_queues_,
-                bool numa_sensitive,
-                bool numa_pinned,
-                char const* description,
-                int max_tasks = max_thread_count)
+                    std::size_t num_high_priority_queues_,
+                    bool numa_sensitive,
+                    bool numa_pinned,
+                    char const* description,
+                    int max_tasks = max_thread_count)
               : scheduler_base(num_worker_queues, description)
               , max_queue_thread_count_(max_tasks)
               , queues_(num_worker_queues)
@@ -177,7 +177,8 @@ namespace threads {
             {
                 std::uint64_t time = 0;
 
-                time += high_priority_queue_.get_creation_time(reset);
+                for (std::size_t i = 0; i != queues_.size(); ++i)
+                    time += high_priority_queues_[i]->get_creation_time(reset);
 
                 time += low_priority_queue_.get_creation_time(reset);
 
@@ -191,7 +192,8 @@ namespace threads {
             {
                 std::uint64_t time = 0;
 
-                time += high_priority_queue_.get_cleanup_time(reset);
+                for (std::size_t i = 0; i != queues_.size(); ++i)
+                    time += high_priority_queues_[i]->get_cleanup_time(reset);
 
                 time += low_priority_queue_.get_cleanup_time(reset);
 
@@ -211,13 +213,17 @@ namespace threads {
                 {
                     for (std::size_t i = 0; i != high_priority_queues_.size();
                          ++i)
+                    {
                         num_pending_misses +=
                             high_priority_queues_[i]->get_num_pending_misses(
                                 reset);
+                    }
 
                     for (std::size_t i = 0; i != queues_.size(); ++i)
+                    {
                         num_pending_misses +=
                             queues_[i]->get_num_pending_misses(reset);
+                    }
 
                     num_pending_misses +=
                         low_priority_queue_.get_num_pending_misses(reset);
@@ -403,6 +409,105 @@ namespace threads {
                 }
                 return num_stolen_threads;
             }
+#endif
+
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+        ///////////////////////////////////////////////////////////////////////
+        // Queries the current average thread wait time of the queues.
+        std::int64_t get_average_thread_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            // Return average thread wait time of one specific queue.
+            std::uint64_t wait_time = 0;
+            std::uint64_t count = 0;
+            if (std::size_t(-1) != num_thread)
+            {
+                HPX_ASSERT(num_thread < queues_.size());
+
+                if (num_thread < high_priority_queues_.size())
+                {
+                    wait_time = high_priority_queues_[num_thread]->
+                        get_average_thread_wait_time();
+                    ++count;
+                }
+
+                if (queues_.size()-1 == num_thread)
+                {
+                    wait_time += low_priority_queue_.
+                        get_average_thread_wait_time();
+                    ++count;
+                }
+
+                wait_time += queues_[num_thread]->get_average_thread_wait_time();
+                return wait_time / (count + 1);
+            }
+
+            // Return the cumulative average thread wait time for all queues.
+            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
+            {
+                wait_time += high_priority_queues_[i]->get_average_thread_wait_time();
+                ++count;
+            }
+
+            wait_time += low_priority_queue_.get_average_thread_wait_time();
+
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+            {
+                wait_time += queues_[i]->get_average_thread_wait_time();
+                ++count;
+            }
+
+            return wait_time / (count + 1);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Queries the current average task wait time of the queues.
+        std::int64_t get_average_task_wait_time(
+            std::size_t num_thread = std::size_t(-1)) const
+        {
+            // Return average task wait time of one specific queue.
+            std::uint64_t wait_time = 0;
+            std::uint64_t count = 0;
+            if (std::size_t(-1) != num_thread)
+            {
+                HPX_ASSERT(num_thread < queues_.size());
+
+                if (num_thread < high_priority_queues_.size())
+                {
+                    wait_time = high_priority_queues_[num_thread]->
+                        get_average_task_wait_time();
+                    ++count;
+                }
+
+                if (queues_.size()-1 == num_thread)
+                {
+                    wait_time += low_priority_queue_.
+                        get_average_task_wait_time();
+                    ++count;
+                }
+
+                wait_time += queues_[num_thread]->get_average_task_wait_time();
+                return wait_time / (count + 1);
+            }
+
+            // Return the cumulative average task wait time for all queues.
+            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
+            {
+                wait_time += high_priority_queues_[i]->
+                    get_average_task_wait_time();
+                ++count;
+            }
+
+            wait_time += low_priority_queue_.get_average_task_wait_time();
+
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+            {
+                wait_time += queues_[i]->get_average_task_wait_time();
+                ++count;
+            }
+
+            return wait_time / (count + 1);
+        }
 #endif
 
             ///////////////////////////////////////////////////////////////////////

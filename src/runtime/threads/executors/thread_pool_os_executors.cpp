@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::unique_ptr<Scheduler> scheduler(new Scheduler(num_punits));
         scheduler_ = scheduler.get();
 
-        pool_.reset(new threads::detail::thread_pool_impl<Scheduler>(
+        pool_.reset(new threads::detail::scheduled_thread_pool<Scheduler>(
             std::move(scheduler), notifier_, 0, executor_name_.c_str()));
 
         std::unique_lock<mutex_type> lk(mtx_);

@@ -3,14 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREAD_POOL_HPP)
-#define HPX_THREAD_POOL_HPP
+#if !defined(HPX_SCHEDULED_THREAD_POOL_HPP)
+#define HPX_SCHEDULED_THREAD_POOL_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -30,16 +32,16 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    class HPX_EXPORT thread_pool_impl : public thread_pool
+    class scheduled_thread_pool : public thread_pool_base
     {
     public:
         ///////////////////////////////////////////////////////////////////
-        thread_pool_impl(std::unique_ptr<Scheduler> sched,
+        scheduled_thread_pool(std::unique_ptr<Scheduler> sched,
             threads::policies::callback_notifier& notifier, std::size_t index,
             char const* pool_name, policies::scheduler_mode m =
                 policies::scheduler_mode::nothing_special,
             std::size_t thread_offset = 0);
-        virtual ~thread_pool_impl();
+        virtual ~scheduled_thread_pool();
 
         void init (std::size_t pool_threads, std::size_t threads_offset);
 
@@ -290,5 +292,7 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::int64_t> idle_loop_counts_, busy_loop_counts_;
     };
 }}}    // namespace hpx::threads::detail
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

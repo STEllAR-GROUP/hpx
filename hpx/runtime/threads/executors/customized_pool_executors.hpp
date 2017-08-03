@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
 
 #include <hpx/compat/mutex.hpp>
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -70,7 +70,7 @@ namespace hpx { namespace threads { namespace executors
                 closure_type func);
 
         private:
-            typedef hpx::threads::detail::thread_pool& pool_type;
+            typedef hpx::threads::detail::thread_pool_base& pool_type;
             typedef hpx::threads::policies::scheduler_base scheduler_type;
 
             // the scheduler used by this executor

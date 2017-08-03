@@ -15,7 +15,7 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    class HPX_EXPORT thread_pool;
+    class HPX_EXPORT thread_pool_base;
 }}}
 
 namespace hpx { namespace resource
@@ -36,11 +36,11 @@ namespace hpx { namespace resource
     HPX_API_EXPORT std::string const& get_pool_name(std::size_t pool_index);
 
     /// Return the name of the pool given its name
-    HPX_API_EXPORT threads::detail::thread_pool& get_thread_pool(
+    HPX_API_EXPORT threads::detail::thread_pool_base& get_thread_pool(
         std::string const& pool_name);
 
     /// Return the thread pool given its internal index
-    HPX_API_EXPORT threads::detail::thread_pool& get_thread_pool(
+    HPX_API_EXPORT threads::detail::thread_pool_base& get_thread_pool(
         std::size_t pool_index);
 }
 }

@@ -13,7 +13,7 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
@@ -32,7 +32,7 @@
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    thread_pool::thread_pool(
+    thread_pool_base::thread_pool_base(
             std::size_t index, char const* pool_name,
             policies::scheduler_mode m, std::size_t thread_offset)
       : id_(index, pool_name),
@@ -43,13 +43,13 @@ namespace hpx { namespace threads { namespace detail
     {}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_cref_type thread_pool::get_used_processing_units() const
+    mask_cref_type thread_pool_base::get_used_processing_units() const
     {
         return used_processing_units_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_state thread_pool::set_state(
+    thread_state thread_pool_base::set_state(
         thread_id_type const& id, thread_state_enum new_state,
         thread_state_ex_enum new_state_ex, thread_priority priority,
         error_code& ec)
@@ -59,13 +59,13 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t thread_pool::get_worker_thread_num() const
+    std::size_t thread_pool_base::get_worker_thread_num() const
     {
         return thread_num_tss_.get_worker_thread_num();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void thread_pool::init_pool_time_scale()
+    void thread_pool_base::init_pool_time_scale()
     {
         // scale timestamps to nanoseconds
         std::uint64_t base_timestamp = util::hardware::timestamp();

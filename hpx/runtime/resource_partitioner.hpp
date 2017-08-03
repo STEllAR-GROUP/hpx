@@ -17,7 +17,7 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 //
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 
@@ -144,7 +144,7 @@ namespace resource {
 
     using scheduler_function =
         util::function_nonser<
-            std::unique_ptr<hpx::threads::detail::thread_pool>(
+            std::unique_ptr<hpx::threads::detail::thread_pool_base>(
                 hpx::threads::policies::callback_notifier&,
                 std::size_t, std::size_t, std::size_t, char const *
             )>;

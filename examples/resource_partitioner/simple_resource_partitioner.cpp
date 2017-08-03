@@ -12,6 +12,7 @@
 #include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 //
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
@@ -26,8 +27,8 @@
 #include "shared_priority_scheduler.hpp"
 #include "system_characteristics.hpp"
 
-namespace resource {
-namespace pools {
+namespace resource { namespace pools
+{
     enum ids
     {
         DEFAULT = 0,
@@ -35,8 +36,7 @@ namespace pools {
         GPU = 2,
         MATRIX = 3,
     };
-}
-}
+}}
 
 static bool use_pools = false;
 static bool use_scheduler = false;
@@ -49,7 +49,7 @@ using namespace hpx::threads::policies;
 // Force an instantiation of the pool type templated on our custom scheduler
 // we need this to ensure that the pool has the generated member functions needed
 // by the linker for this pool type
-template class hpx::threads::detail::thread_pool_impl<high_priority_sched>;
+// template class hpx::threads::detail::scheduled_thread_pool<high_priority_sched>;
 
 // dummy function we will call using async
 void do_stuff(std::size_t n, bool printout)
@@ -212,7 +212,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::parallel::execution::par
             .with(fixed /*, high_priority_async_policy*/)
             .on(mpi_executor),
-        0, loop_count, 1, [&](std::size_t i) {
+        0, loop_count, 1,
+        [&](std::size_t i)
+        {
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
@@ -235,11 +237,13 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     boost::program_options::options_description desc_cmdline("Test options");
-    desc_cmdline.add_options()(
-        "use-pools,u", "Enable advanced HPX thread pools and executors")(
-        "use-scheduler,s", "Enable custom priority scheduler")("pool-threads,m",
-        boost::program_options::value<int>()->default_value(1),
-        "Number of threads to assign to custom pool");
+    desc_cmdline.add_options()
+        ( "use-pools,u", "Enable advanced HPX thread pools and executors")
+        ( "use-scheduler,s", "Enable custom priority scheduler")
+        ( "pool-threads,m",
+          boost::program_options::value<int>()->default_value(1),
+          "Number of threads to assign to custom pool")
+    ;
 
     // HPX uses a boost program options variable map, but we need it before
     // hpx-main, so we will create another one here and throw it away after use
@@ -273,7 +277,8 @@ int main(int argc, char* argv[])
         [](hpx::threads::policies::callback_notifier& notifier,
             std::size_t num_threads, std::size_t thread_offset,
             std::size_t pool_index, char const* pool_name)
-            -> std::unique_ptr<hpx::threads::detail::thread_pool> {
+            -> std::unique_ptr<hpx::threads::detail::thread_pool_base>
+        {
             std::cout << "User defined scheduler creation callback "
                       << std::endl;
 
@@ -284,10 +289,10 @@ int main(int argc, char* argv[])
             auto mode = scheduler_mode(scheduler_mode::do_background_work |
                 scheduler_mode::delay_exit);
 
-            std::unique_ptr<hpx::threads::detail::thread_pool> pool(
-                new hpx::threads::detail::thread_pool_impl<high_priority_sched>(
-                    std::move(scheduler), notifier, pool_index, pool_name, mode,
-                    thread_offset));
+            std::unique_ptr<hpx::threads::detail::thread_pool_base> pool(
+                new hpx::threads::detail::scheduled_thread_pool<
+                    high_priority_sched>(std::move(scheduler), notifier,
+                    pool_index, pool_name, mode, thread_offset));
             return pool;
         });
 
@@ -304,7 +309,7 @@ int main(int argc, char* argv[])
             [](hpx::threads::policies::callback_notifier& notifier,
                 std::size_t num_threads, std::size_t thread_offset,
                 std::size_t pool_index, char const* pool_name)
-                -> std::unique_ptr<hpx::threads::detail::thread_pool> {
+                -> std::unique_ptr<hpx::threads::detail::thread_pool_base> {
                 std::cout << "User defined scheduler creation callback "
                           << std::endl;
                 std::unique_ptr<high_priority_sched> scheduler(
@@ -313,8 +318,8 @@ int main(int argc, char* argv[])
 
                 auto mode = scheduler_mode(scheduler_mode::delay_exit);
 
-                std::unique_ptr<hpx::threads::detail::thread_pool> pool(
-                    new hpx::threads::detail::thread_pool_impl<
+                std::unique_ptr<hpx::threads::detail::thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<
                         high_priority_sched>(std::move(scheduler), notifier,
                         pool_index, pool_name, mode, thread_offset));
                 return pool;

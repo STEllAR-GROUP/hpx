@@ -67,7 +67,7 @@ namespace hpx { namespace threads { namespace policies
     // We control whether to collect queue wait times using this global bool.
     // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.
-    extern bool maintain_queue_wait_times;
+    extern HPX_EXPORT bool maintain_queue_wait_times;
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////

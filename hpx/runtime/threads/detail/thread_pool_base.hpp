@@ -70,13 +70,13 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // note: this data structure has to be protected from races from the outside
-    class thread_pool
+    class thread_pool_base
     {
     public:
-        thread_pool(std::size_t index, char const* pool_name,
+        thread_pool_base(std::size_t index, char const* pool_name,
             policies::scheduler_mode m, std::size_t thread_offset);
 
-        virtual ~thread_pool() = default;
+        virtual ~thread_pool_base() = default;
 
         virtual void print_pool(std::ostream&) = 0;
 
