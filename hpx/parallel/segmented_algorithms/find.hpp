@@ -1012,7 +1012,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     }
                                     if(temp->complete_sequence_position != last1)
                                     {
-                                        // if ending suffix of sequence found 
+                                        // if ending suffix of sequence found
                                         return it->partial_sequence_position;
                                     }
                                     ++temp;
