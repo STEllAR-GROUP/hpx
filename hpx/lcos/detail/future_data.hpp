@@ -961,12 +961,6 @@ namespace detail
             return started_;
         }
 
-        bool started_test_and_set()
-        {
-            std::lock_guard<mutex_type> l(this->mtx_);
-            return started_test_and_set_locked(l);
-        }
-
         template <typename Lock>
         bool started_test_and_set_locked(Lock& l)
         {
@@ -979,6 +973,12 @@ namespace detail
         }
 
     protected:
+        bool started_test_and_set()
+        {
+            std::lock_guard<mutex_type> l(this->mtx_);
+            return started_test_and_set_locked(l);
+        }
+
         void check_started()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
