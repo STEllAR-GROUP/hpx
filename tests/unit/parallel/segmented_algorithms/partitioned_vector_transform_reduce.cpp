@@ -1,10 +1,10 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/util/zip_iterator.hpp>
@@ -15,10 +15,11 @@
 
 #include <cstddef>
 #include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
-// Define the vector types to be used.
-HPX_REGISTER_PARTITIONED_VECTOR(double);
-HPX_REGISTER_PARTITIONED_VECTOR(int);
+// The vector types to be used are defined in partitioned_vector module.
+// HPX_REGISTER_PARTITIONED_VECTOR(double);
+// HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 struct multiply
 {

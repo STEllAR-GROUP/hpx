@@ -37,6 +37,13 @@ namespace hpx { namespace components
           : base_type(std::forward<Arg>(arg)...)
         {}
 
+        locking_hook(locking_hook const& rhs)
+          : base_type(rhs)
+        {}
+        locking_hook(locking_hook && rhs)
+          : base_type(std::move(rhs))
+        {}
+
         /// This is the hook implementation for decorate_action which locks
         /// the component ensuring that only one action is executed at a time
         /// for this component instance.

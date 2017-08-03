@@ -15,14 +15,16 @@
 #include <numeric>
 #include <vector>
 
-HPX_REGISTER_PARTITIONED_VECTOR(int);
-HPX_REGISTER_PARTITIONED_VECTOR(unsigned);
+// partitioned_vector<int> and partitioned_vector<double> are predefined in the
+// partitioned_vector module
+HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int);
+HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double);
 
 typedef unsigned long ulong;
 
 HPX_REGISTER_PARTITIONED_VECTOR(ulong);
 HPX_REGISTER_PARTITIONED_VECTOR(long);
-HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(unsigned);
 
 template <typename T>
 void test(T minval, T maxval)

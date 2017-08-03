@@ -4,9 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
-#include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
+#include <hpx/include/partitioned_vector_view.hpp>
 #include <hpx/lcos/spmd_block.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -18,8 +17,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Define the vector types to be used.
-HPX_REGISTER_PARTITIONED_VECTOR(double);
+// The vector types to be used are defined in partitioned_vector module.
+// HPX_REGISTER_PARTITIONED_VECTOR(double);
 
 void bulk_test( hpx::lcos::spmd_block block,
                 std::size_t size_x,
