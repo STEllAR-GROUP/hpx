@@ -23,7 +23,7 @@ namespace hpx { namespace threads
                 std::size_t num_thread) const
         {
             auto &rp = hpx::get_resource_partitioner();
-            return rp.get_pu_mask(num_thread, false);
+            return rp.get_pu_mask(num_thread);
         }
     }
 

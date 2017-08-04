@@ -33,29 +33,21 @@ namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(
+            threads::policies::callback_notifier& notifier,
             std::size_t index, char const* pool_name,
             policies::scheduler_mode m, std::size_t thread_offset)
       : id_(index, pool_name),
         used_processing_units_(),
         mode_(m),
         thread_offset_(thread_offset),
-        timestamp_scale_(1.0)
+        timestamp_scale_(1.0),
+        notifier_(notifier)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
     mask_cref_type thread_pool_base::get_used_processing_units() const
     {
         return used_processing_units_;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    thread_state thread_pool_base::set_state(
-        thread_id_type const& id, thread_state_enum new_state,
-        thread_state_ex_enum new_state_ex, thread_priority priority,
-        error_code& ec)
-    {
-        return detail::set_thread_state(id, new_state, //-V107
-            new_state_ex, priority, get_worker_thread_num(), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -84,6 +76,29 @@ namespace hpx { namespace threads { namespace detail
             timestamp_scale_ = double(curr_time - base_time) /
                 double(curr_timestamp - base_timestamp);
         }
+    }
+
+    void thread_pool_base::init(std::size_t pool_threads,
+        std::size_t threads_offset)
+    {
+        thread_offset_ = threads_offset;
+
+        auto const& rp = get_resource_partitioner();
+
+        resize(used_processing_units_, threads::hardware_concurrency());
+        for (std::size_t i = 0; i != pool_threads; ++i)
+        {
+            used_processing_units_ |= rp.get_pu_mask(threads_offset + i);
+        }
+    }
+
+    bool thread_pool_base::run(
+        std::unique_lock<compat::mutex>& l, std::size_t num_threads)
+    {
+        compat::barrier startup(num_threads + 1);
+        bool ret = run(l, startup, num_threads);
+        startup.wait();
+        return ret;
     }
 }}}
 

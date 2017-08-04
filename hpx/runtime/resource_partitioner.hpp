@@ -244,12 +244,26 @@ namespace resource {
             scheduling_policy sched, const std::string &pool_name);
 
         void set_threadmanager(threads::threadmanager *thrd_manag);
-        threads::threadmanager *get_thread_manager() const;
+
+        threads::threadmanager const& get_thread_manager() const
+        {
+            HPX_ASSERT(nullptr != thread_manager_);
+            return *thread_manager_;
+        }
+        threads::threadmanager& get_thread_manager()
+        {
+            HPX_ASSERT(nullptr != thread_manager_);
+            return *thread_manager_;
+        }
 
         // called by constructor of scheduler_base
-        threads::policies::detail::affinity_data *get_affinity_data()
+        threads::policies::detail::affinity_data const& get_affinity_data() const
         {
-            return &affinity_data_;
+            return affinity_data_;
+        }
+        threads::policies::detail::affinity_data& get_affinity_data()
+        {
+            return affinity_data_;
         }
 
         // Does initialization of all resources and internal data of the resource
@@ -276,8 +290,8 @@ namespace resource {
         std::size_t get_pool_index(const std::string &pool_name) const;
 
         size_t get_pu_num(std::size_t global_thread_num);
-        threads::mask_cref_type get_pu_mask(
-            std::size_t num_thread, bool numa_sensitive = true) const;
+        threads::mask_cref_type get_pu_mask(std::size_t num_thread) const;
+
         bool cmd_line_parsed() const;
         int parse(boost::program_options::options_description desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,

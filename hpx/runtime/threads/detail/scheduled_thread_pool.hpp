@@ -43,13 +43,11 @@ namespace hpx { namespace threads { namespace detail
             std::size_t thread_offset = 0);
         virtual ~scheduled_thread_pool();
 
-        void init (std::size_t pool_threads, std::size_t threads_offset);
-
         void print_pool(std::ostream& os);
 
-        threads::policies::scheduler_base& get_scheduler() const
+        threads::policies::scheduler_base* get_scheduler() const
         {
-            return *sched_;
+            return sched_.get();
         }
 
         ///////////////////////////////////////////////////////////////////
@@ -73,10 +71,14 @@ namespace hpx { namespace threads { namespace detail
         void create_work(thread_init_data& data,
             thread_state_enum initial_state, error_code& ec);
 
-        thread_id_type set_state(util::steady_time_point const& abs_time,
-            thread_id_type const& id, thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex, thread_priority priority,
-            error_code& ec);
+        thread_state set_state(thread_id_type const& id,
+            thread_state_enum new_state, thread_state_ex_enum new_state_ex,
+            thread_priority priority, error_code& ec);
+
+        thread_id_type set_state(
+            util::steady_time_point const& abs_time, thread_id_type const& id,
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
+            thread_priority priority, error_code& ec);
 
         void report_error(std::size_t num, std::exception_ptr const& e);
 
@@ -118,12 +120,8 @@ namespace hpx { namespace threads { namespace detail
         bool run(std::unique_lock<compat::mutex>& l, compat::barrier& startup,
             std::size_t pool_threads);
 
-        ///////////////////////////////////////////////////////////////////
-        bool run(std::unique_lock<compat::mutex>& l, std::size_t pool_threads);
-
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
-
         void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
 
         ///////////////////////////////////////////////////////////////////
@@ -226,7 +224,6 @@ namespace hpx { namespace threads { namespace detail
         friend struct init_tss_helper<Scheduler>;
 
     private:
-        threads::policies::callback_notifier& notifier_;
         std::vector<compat::thread> threads_;           // vector of OS-threads
 
         // hold the used scheduler

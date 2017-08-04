@@ -70,12 +70,10 @@ namespace hpx { namespace threads { namespace executors
                 closure_type func);
 
         private:
-            typedef hpx::threads::detail::thread_pool_base& pool_type;
-            typedef hpx::threads::policies::scheduler_base scheduler_type;
+            typedef hpx::threads::detail::thread_pool_base pool_type;
 
             // the scheduler used by this executor
-            pool_type pool_;
-            scheduler_type& scheduler_;
+            pool_type& pool_;
 
             // protect scheduler initialization
             typedef compat::mutex mutex_type;

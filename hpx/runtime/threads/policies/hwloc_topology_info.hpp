@@ -84,13 +84,11 @@ namespace hpx { namespace threads
 
         mask_cref_type get_socket_affinity_mask(
             std::size_t num_thread
-          , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
         mask_cref_type get_numa_node_affinity_mask(
             std::size_t num_thread
-          , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
@@ -103,19 +101,11 @@ namespace hpx { namespace threads
 
         mask_cref_type get_core_affinity_mask(
             std::size_t num_thread
-          , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
         mask_cref_type get_thread_affinity_mask(
             std::size_t num_thread
-          , bool numa_sensitive = false
-          , error_code& ec = throws
-            ) const;
-
-        void set_thread_affinity_mask(
-            compat::thread&
-          , mask_cref_type //mask
           , error_code& ec = throws
             ) const;
 

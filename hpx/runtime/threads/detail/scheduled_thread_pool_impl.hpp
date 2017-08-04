@@ -70,12 +70,11 @@ namespace hpx { namespace threads { namespace detail
             threads::policies::callback_notifier& notifier, std::size_t index,
             char const* pool_name, policies::scheduler_mode m,
             std::size_t thread_offset)
-        : thread_pool_base(index, pool_name, m, thread_offset)
-        , notifier_(notifier)
+        : thread_pool_base(notifier, index, pool_name, m, thread_offset)
         , sched_(std::move(sched))
         , thread_count_(0)
     {
-        sched_->Scheduler::set_parent_pool(this);
+        sched_->set_parent_pool(this);
     }
 
     template <typename Scheduler>
@@ -105,23 +104,11 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::init(
-        std::size_t pool_threads, std::size_t threads_offset)
-    {
-        resize(used_processing_units_, threads::hardware_concurrency());
-        for (std::size_t i = 0; i != pool_threads; ++i)
-        {
-            used_processing_units_ |= get_resource_partitioner().get_pu_mask(
-                threads_offset + i, sched_->Scheduler::numa_sensitive());
-        }
-    }
-
-    template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::report_error(
         std::size_t num, std::exception_ptr const& e)
     {
         sched_->Scheduler::set_all_states(state_terminating);
-        notifier_.on_error(num, e);
+        this->thread_pool_base::report_error(num, e);
         sched_->Scheduler::on_error(num, e);
     }
 
@@ -194,16 +181,6 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    bool scheduled_thread_pool<Scheduler>::run(
-        std::unique_lock<compat::mutex>& l, std::size_t pool_threads)
-    {
-        compat::barrier startup(pool_threads + 1);
-        bool ret = run(l, startup, pool_threads);
-        startup.wait();
-        return ret;
-    }
-
-    template <typename Scheduler>
     bool hpx::threads::detail::scheduled_thread_pool<Scheduler>::run(
         std::unique_lock<compat::mutex>& l, compat::barrier& startup,
         std::size_t pool_threads)
@@ -240,15 +217,13 @@ namespace hpx { namespace threads { namespace detail
         std::size_t thread_num = 0;
         try
         {
+            auto const& rp = get_resource_partitioner();
             topology const& topology_ = get_topology();
 
             for (/**/; thread_num != pool_threads; ++thread_num)
             {
-                std::size_t global_thread_num =
-                    this->thread_offset_ + thread_num;
-                threads::mask_cref_type mask =
-                    get_resource_partitioner().get_pu_mask(
-                        global_thread_num, sched_->Scheduler::numa_sensitive());
+                std::size_t global_thread_num = this->thread_offset_ + thread_num;
+                threads::mask_cref_type mask = rp.get_pu_mask(global_thread_num);
 
                 // thread_num ordering: 1. threads of default pool
                 //                      2. threads of first special pool
@@ -268,21 +243,7 @@ namespace hpx { namespace threads { namespace detail
                         thread_num, std::ref(topology_), std::ref(startup)));
 
                 // set the new threads affinity (on Windows systems)
-                if (any(mask))
-                {
-                    error_code ec(lightweight);
-                    topology_.set_thread_affinity_mask(
-                        threads_.back(), mask, ec);
-                    if (ec)
-                    {
-                        LTM_(warning)    //-V128
-                            << "run: " << id_.name_
-                            << " setting thread affinity on OS thread "    //-V128
-                            << global_thread_num
-                            << " failed with: " << ec.get_message();
-                    }
-                }
-                else
+                if (!any(mask))
                 {
                     LTM_(debug)    //-V128
                         << "run: " << id_.name_
@@ -319,8 +280,8 @@ namespace hpx { namespace threads { namespace detail
         std::size_t global_thread_num = thread_num + this->thread_offset_;
 
         // Set the affinity for the current thread.
-        threads::mask_cref_type mask = get_resource_partitioner().get_pu_mask(
-            global_thread_num, sched_->Scheduler::numa_sensitive());
+        threads::mask_cref_type mask =
+            get_resource_partitioner().get_pu_mask(global_thread_num);
 
         if (LHPX_ENABLED(debug))
             topology.write_to_log();
@@ -505,6 +466,17 @@ namespace hpx { namespace threads { namespace detail
         }
 
         detail::create_work(sched_.get(), data, initial_state, ec);    //-V601
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    thread_state scheduled_thread_pool<Scheduler>::set_state(
+        thread_id_type const& id, thread_state_enum new_state,
+        thread_state_ex_enum new_state_ex, thread_priority priority,
+        error_code& ec)
+    {
+        return detail::set_thread_state(id, new_state, //-V107
+            new_state_ex, priority, get_worker_thread_num(), ec);
     }
 
     template <typename Scheduler>

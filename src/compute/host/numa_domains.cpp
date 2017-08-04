@@ -36,7 +36,7 @@ namespace hpx { namespace compute { namespace host
             std::size_t pu_num = rp.get_pu_num(num_thread);
             std::size_t numa_node = topo.get_numa_node_number(pu_num);
 
-            auto const& mask = topo.get_thread_affinity_mask(pu_num, true);
+            auto const& mask = topo.get_thread_affinity_mask(pu_num);
 
             std::size_t mask_size = hpx::threads::mask_size(mask);
             for (std::size_t idx = 0; idx != mask_size; ++idx)

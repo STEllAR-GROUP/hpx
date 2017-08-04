@@ -77,7 +77,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
           , states_(num_threads)
           , description_(description)
-          , parent_pool(nullptr)
+          , parent_pool_(nullptr)
         {
             for (std::size_t i = 0; i != num_threads; ++i)
                 states_[i].store(state_initialized);
@@ -85,6 +85,22 @@ namespace hpx { namespace threads { namespace policies
 
         virtual ~scheduler_base()
         {
+        }
+
+        void set_parent_pool(threads::detail::thread_pool_base *p)
+        {
+            HPX_ASSERT(parent_pool_ == nullptr);
+            parent_pool_ = p;
+        }
+
+        inline std::size_t global_to_local_thread_index(std::size_t n)
+        {
+            return n - parent_pool_->get_thread_offset();
+        }
+
+        inline std::size_t local_to_global_thread_index(std::size_t n)
+        {
+            return n + parent_pool_->get_thread_offset();
         }
 
         char const* get_description() const { return description_; }
@@ -276,10 +292,6 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void reset_thread_distribution() {}
 
-        void set_parent_pool(threads::detail::thread_pool_base *p) {
-            parent_pool = p;
-        }
-
     protected:
         boost::atomic<scheduler_mode> mode_;
 
@@ -292,7 +304,9 @@ namespace hpx { namespace threads { namespace policies
 
         std::vector<boost::atomic<hpx::state> > states_;
         char const* description_;
-        threads::detail::thread_pool_base *parent_pool; // the pool that owns this scheduler
+
+        // the pool that owns this scheduler
+        threads::detail::thread_pool_base *parent_pool_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

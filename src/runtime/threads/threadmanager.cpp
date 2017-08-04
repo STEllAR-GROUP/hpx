@@ -1842,6 +1842,7 @@ namespace hpx { namespace threads
             {
                 return true;    // do nothing if already running
             }
+
             if (!pool_iter->run(lk, std::ref(*startup_), num_threads_in_pool))
             {
 #ifdef HPX_HAVE_TIMER_POOL
@@ -1857,7 +1858,9 @@ namespace hpx { namespace threads
         // set all states of all schedulers to "running"
         for (auto& pool_iter : pools_)
         {
-            pool_iter->get_scheduler().set_all_states(state_running);
+            policies::scheduler_base* sched = pool_iter->get_scheduler();
+            if (sched)
+                sched->set_all_states(state_running);
         }
 
         LTM_(info) << "run: running";

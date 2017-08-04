@@ -260,7 +260,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_socket_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     { // {{{
@@ -284,7 +283,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_numa_node_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     { // {{{
@@ -308,7 +306,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_core_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     {
@@ -332,7 +329,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_thread_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     { // {{{
@@ -355,16 +351,6 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    void hwloc_topology_info::set_thread_affinity_mask(
-        compat::thread&
-      , mask_cref_type //mask
-      , error_code& ec
-        ) const
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-
     void hwloc_topology_info::set_thread_affinity_mask(
         mask_cref_type mask
       , error_code& ec
@@ -934,7 +920,7 @@ namespace hpx { namespace threads
 
         if (std::size_t(-1) == num_thread)
         {
-            return get_core_affinity_mask(num_thread, false);
+            return get_core_affinity_mask(num_thread);
         }
 
         std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
@@ -949,7 +935,7 @@ namespace hpx { namespace threads
 
         if (!obj)
         {
-            return get_core_affinity_mask(num_thread, false);
+            return get_core_affinity_mask(num_thread);
         }
 
         HPX_ASSERT(num_pu == detail::get_index(obj));

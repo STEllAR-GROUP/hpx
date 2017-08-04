@@ -82,7 +82,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::unique_lock<mutex_type> lk(mtx_);
         pool_->init(num_threads_, 0);
 
-        if (!pool_->run(lk, num_threads_))
+        if (!pool_->thread_pool_base::run(lk, num_threads_))
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "thread_pool_os_executor<Scheduler>::thread_pool_os_executor",

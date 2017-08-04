@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
@@ -28,12 +29,18 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread,
+            on_startstop_func_type const& on_start_thread,
+            on_stop_func_type const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
       : next_io_service_(0), stopped_(false),
         pool_size_(pool_size),
-        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
+        on_start_thread_(on_start_thread),
+        on_stop_thread_(
+            [on_stop_thread](std::size_t, char const*) -> void
+            {
+                on_stop_thread();
+            }
+        ),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
         LPROGRESS_ << pool_name;
@@ -56,21 +63,32 @@ namespace hpx { namespace util
     }
 
     io_service_pool::io_service_pool(
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread,
+            on_startstop_func_type const& on_start_thread,
+            on_stop_func_type const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
       : next_io_service_(0), stopped_(false),
-        pool_size_(2),
+        pool_size_(0),
+        on_start_thread_(on_start_thread),
+        on_stop_thread_(
+            [on_stop_thread](std::size_t, char const*) -> void
+            {
+                on_stop_thread();
+            }
+        ),
+        pool_name_(pool_name), pool_name_postfix_(name_postfix)
+    {
+        LPROGRESS_ << pool_name;
+    }
+
+    io_service_pool::io_service_pool(
+            on_startstop_func_type const& on_start_thread,
+            on_startstop_func_type const& on_stop_thread,
+            char const* pool_name, char const* name_postfix)
+      : next_io_service_(0), stopped_(false), pool_size_(0),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
         LPROGRESS_ << pool_name;
-
-        for (std::size_t i = 0; i < pool_size_; ++i)
-        {
-            io_services_.emplace_back(new boost::asio::io_service);
-            work_.emplace_back(initialize_work(*io_services_[i]));
-        }
     }
 
     io_service_pool::~io_service_pool()
@@ -81,8 +99,12 @@ namespace hpx { namespace util
         clear_locked();
     }
 
-    void io_service_pool::thread_run(std::size_t index)
+    void io_service_pool::thread_run(std::size_t index, compat::barrier* startup)
     {
+        // wait for all threads to start up before before starting HPX work
+        if (startup != nullptr)
+            startup->wait();
+
         if (on_start_thread_)
             on_start_thread_(index, pool_name_postfix_);
 
@@ -90,10 +112,11 @@ namespace hpx { namespace util
         io_services_[index]->run();   // run io service
 
         if (on_stop_thread_)
-            on_stop_thread_();
+            on_stop_thread_(index, pool_name_postfix_);
     }
 
-    bool io_service_pool::run(bool join_threads)
+    bool io_service_pool::run(std::size_t num_threads, bool join_threads,
+        compat::barrier* startup)
     {
         std::lock_guard<compat::mutex> l(mtx_);
 
@@ -115,20 +138,53 @@ namespace hpx { namespace util
         if (!io_services_.empty())
             clear_locked();
 
+        return run_locked(num_threads, join_threads, startup);
+    }
+
+    bool io_service_pool::run(bool join_threads, compat::barrier* startup)
+    {
+        std::lock_guard<compat::mutex> l(mtx_);
+
+        // Create a pool of threads to run all of the io_services.
+        if (!threads_.empty())   // should be called only once
+        {
+            HPX_ASSERT(pool_size_ == io_services_.size());
+            HPX_ASSERT(threads_.size() == io_services_.size());
+            HPX_ASSERT(work_.size() == io_services_.size());
+
+            if (join_threads)
+                join_locked();
+
+            return false;
+        }
+
+        // Give all the io_services work to do so that their run() functions
+        // will not exit until they are explicitly stopped.
+        if (!io_services_.empty())
+            clear_locked();
+
+        return run_locked(pool_size_, join_threads, startup);
+    }
+
+    bool io_service_pool::run_locked(std::size_t num_threads, bool join_threads,
+        compat::barrier* startup)
+    {
         if (io_services_.empty())
         {
-            for (std::size_t i = 0; i < pool_size_; ++i)
+            pool_size_ = num_threads;
+
+            for (std::size_t i = 0; i < num_threads; ++i)
             {
                 io_services_.emplace_back(new boost::asio::io_service);
                 work_.emplace_back(initialize_work(*io_services_[i]));
             }
         }
 
-        for (std::size_t i = 0; i < pool_size_; ++i)
+        for (std::size_t i = 0; i < num_threads; ++i)
         {
-            compat::thread thread(util::bind(
-                        &io_service_pool::thread_run, this, i));
-            threads_.emplace_back(std::move(thread));
+            compat::thread t(util::bind(
+                &io_service_pool::thread_run, this, i, startup));
+            threads_.emplace_back(std::move(t));
         }
 
         next_io_service_ = 0;
@@ -218,5 +274,12 @@ namespace hpx { namespace util
 
         return *io_services_[index]; //-V108
     }
+
+    compat::thread& io_service_pool::get_os_thread_handle(std::size_t thread_num)
+    {
+        HPX_ASSERT(thread_num < pool_size_);
+        return threads_[thread_num];
+    }
+
 }}  // namespace hpx::util
 

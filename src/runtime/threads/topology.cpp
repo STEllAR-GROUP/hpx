@@ -58,7 +58,7 @@ namespace hpx { namespace threads
     {
         // We bind the service threads to the first NUMA domain. This is useful
         // as the first NUMA domain is likely to have the PCI controllers etc.
-        mask_cref_type machine_mask = this->get_numa_node_affinity_mask(0, true, ec);
+        mask_cref_type machine_mask = this->get_numa_node_affinity_mask(0, ec);
         if (ec || !any(machine_mask))
             return mask_type();
 

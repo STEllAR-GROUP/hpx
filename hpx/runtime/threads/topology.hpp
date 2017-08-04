@@ -82,7 +82,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_socket_affinity_mask(std::size_t num_thread,
-            bool numa_sensitive, error_code& ec = throws) const = 0;
+            error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
@@ -92,7 +92,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_numa_node_affinity_mask(std::size_t num_thread,
-            bool numa_sensitive, error_code& ec = throws) const = 0;
+            error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit associated with the given NUMA node.
@@ -111,7 +111,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_core_affinity_mask(std::size_t num_thread,
-            bool numa_sensitive, error_code& ec = throws) const = 0;
+            error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread.
@@ -120,20 +120,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_thread_affinity_mask(std::size_t num_thread,
-            bool numa_sensitive = false, error_code& ec = throws) const = 0;
-
-        /// \brief Use the given bit mask to set the affinity of the given
-        ///        thread. Each set bit corresponds to a processing unit the
-        ///        thread will be allowed to run on.
-        ///
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
-        ///
-        /// \note  Use this function on systems where the affinity must be
-        ///        set from outside the thread itself.
-        virtual void set_thread_affinity_mask(compat::thread& t,
-            mask_cref_type mask, error_code& ec = throws) const = 0;
+            error_code& ec = throws) const = 0;
 
         /// \brief Use the given bit mask to set the affinity of the given
         ///        thread. Each set bit corresponds to a processing unit the

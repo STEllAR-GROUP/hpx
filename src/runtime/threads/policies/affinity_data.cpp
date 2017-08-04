@@ -203,8 +203,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return (std::max)(num_unique_cores, max_cores);
     }
 
-    mask_cref_type affinity_data::get_pu_mask(
-        std::size_t global_thread_num, bool numa_sensitive) const
+    mask_cref_type affinity_data::get_pu_mask(std::size_t global_thread_num) const
     {
         // get a topology instance
         topology const& topology = get_resource_partitioner().get_topology();
@@ -226,21 +225,21 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         {
             // The affinity domain is 'processing unit', just convert the
             // pu-number into a bit-mask.
-            return topology.get_thread_affinity_mask(pu_num, numa_sensitive);
+            return topology.get_thread_affinity_mask(pu_num);
         }
         if (0 == std::string("core").find(affinity_domain_))
         {
             // The affinity domain is 'core', return a bit mask corresponding
             // to all processing units of the core containing the given
             // pu_num.
-            return topology.get_core_affinity_mask(pu_num, numa_sensitive);
+            return topology.get_core_affinity_mask(pu_num);
         }
         if (0 == std::string("numa").find(affinity_domain_))
         {
             // The affinity domain is 'numa', return a bit mask corresponding
             // to all processing units of the NUMA domain containing the
             // given pu_num.
-            return topology.get_numa_node_affinity_mask(pu_num, numa_sensitive);
+            return topology.get_numa_node_affinity_mask(pu_num);
         }
 
         // The affinity domain is 'machine', return a bit mask corresponding

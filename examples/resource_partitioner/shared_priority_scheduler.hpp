@@ -549,16 +549,6 @@ namespace threads {
                 return empty;
             }
 
-            inline std::size_t global_to_local_thread_index(std::size_t n)
-            {
-                return n - this->parent_pool->get_thread_offset();
-            }
-
-            inline std::size_t local_to_global_thread_index(std::size_t n)
-            {
-                return n + this->parent_pool->get_thread_offset();
-            }
-
             std::size_t num_domains(const std::vector<std::size_t>& ts)
             {
                 auto const& topo = hpx::threads::get_topology();
@@ -566,7 +556,7 @@ namespace threads {
                 for (auto local_id : ts)
                 {
                     std::size_t global_id =
-                        local_to_global_thread_index(local_id);
+                        this->local_to_global_thread_index(local_id);
                     domains.insert(topo.get_numa_node_number(global_id));
                 }
                 return domains.size();
@@ -580,12 +570,12 @@ namespace threads {
             {
                 std::vector<std::size_t> result;
                 auto const& topo = hpx::threads::get_topology();
-                std::size_t global_index = local_to_global_thread_index(t);
+                std::size_t global_index = this->local_to_global_thread_index(t);
                 std::size_t numa = topo.get_numa_node_number(global_index);
                 for (auto local_id : ts)
                 {
                     std::size_t global_id =
-                        local_to_global_thread_index(local_id);
+                        this->local_to_global_thread_index(local_id);
                     if (pred(numa, topo.get_numa_node_number(global_id)))
                     {
                         result.push_back(local_id);
@@ -607,7 +597,7 @@ namespace threads {
                 {
                     std::size_t t = threads::detail::thread_num_tss_
                                         .get_worker_thread_num();
-                    pool_queue_num = global_to_local_thread_index(t);
+                    pool_queue_num = this->global_to_local_thread_index(t);
                 }
 
                 // now create the thread
@@ -779,7 +769,7 @@ namespace threads {
                 {
                     std::size_t t = threads::detail::thread_num_tss_
                                         .get_worker_thread_num();
-                    pool_queue_num = global_to_local_thread_index(t);
+                    pool_queue_num = this->global_to_local_thread_index(t);
                 }
 
                 if (priority == thread_priority_high ||

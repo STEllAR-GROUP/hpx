@@ -214,7 +214,7 @@ namespace hpx { namespace threads
             return total;
         }
 
-        compat::thread& get_os_thread_handle(std::size_t num_thread)
+        compat::thread& get_os_thread_handle(std::size_t num_thread) const
         {
             std::lock_guard<mutex_type> lk(mtx_);
             detail::pool_id_type id = threads_lookup_[num_thread];

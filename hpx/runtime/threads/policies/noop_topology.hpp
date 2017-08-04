@@ -57,7 +57,6 @@ public:
 
     mask_cref_type get_socket_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive
       , error_code& ec = throws
         ) const
     {
@@ -69,7 +68,6 @@ public:
 
     mask_cref_type get_numa_node_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive
       , error_code& ec = throws
         ) const
     {
@@ -88,7 +86,6 @@ public:
 
     mask_cref_type get_core_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive
       , error_code& ec = throws
         ) const
     {
@@ -100,7 +97,6 @@ public:
 
     mask_cref_type get_thread_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive = false
       , error_code& ec = throws
         ) const
     {
@@ -108,16 +104,6 @@ public:
             ec = make_success_code();
 
         return empty_mask;
-    }
-
-    void set_thread_affinity_mask(
-        compat::thread& thrd
-      , mask_cref_type mask
-      , error_code& ec = throws
-        ) const
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
     }
 
     void set_thread_affinity_mask(

@@ -1084,7 +1084,8 @@ namespace hpx { namespace util
     {
         threads::topology& top = threads::create_topology();
         runtime& rt = get_runtime();
-        auto& rp = hpx::get_resource_partitioner();
+        auto const& rp = hpx::get_resource_partitioner();
+        auto const& tm = rp.get_thread_manager();
         {
             std::ostringstream strm;    // make sure all output is kept together
 
@@ -1093,9 +1094,8 @@ namespace hpx { namespace util
             for (std::size_t i = 0; i != num_threads; ++i)
             {
                 // print the mask for the current PU
-                threads::mask_cref_type pu_mask = rp.get_pu_mask(i, false);
-                std::string pool_name =
-                    rt.get_thread_manager().get_pool(i).get_pool_name();
+                threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
+                std::string pool_name = tm.get_pool(i).get_pool_name();
 
                 if (!threads::any(pu_mask))
                 {
@@ -1112,9 +1112,9 @@ namespace hpx { namespace util
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                compat::thread& blob =
-                    rt.get_thread_manager().get_os_thread_handle(i);
+                compat::thread& blob = tm.get_os_thread_handle(i);
                 threads::mask_type boundcpu = top.get_cpubind_mask(blob, ec);
+
                 /* threads::mask_type boundcpu = top.get_cpubind_mask(
                     rt.get_thread_manager().get_os_thread_handle(i), ec);*/
 

@@ -313,7 +313,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             {
                 std::unique_lock<mutex_type> l(mtx_);
-                get_resource_partitioner().get_affinity_data()->add_punit(
+                get_resource_partitioner().get_affinity_data().add_punit(
                     0, thread_num_);
                 scheduler_.on_start_thread(0);
             }

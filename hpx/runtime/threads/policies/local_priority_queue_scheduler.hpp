@@ -1019,22 +1019,17 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_start_thread(num_thread);
 
             std::size_t num_threads = queues_.size();
+            auto const& rp = get_resource_partitioner();
+            auto const& topo = rp.get_topology();
+
             // get numa domain masks of all queues...
             std::vector<mask_type> numa_masks(num_threads);
             std::vector<mask_type> core_masks(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
             {
-                std::size_t num_pu =
-                    get_resource_partitioner().get_affinity_data()->get_pu_num(
-                        i);
-                numa_masks[i] = get_resource_partitioner()
-                                    .get_topology()
-                                    .get_numa_node_affinity_mask(
-                                        num_pu, numa_sensitive_ != 0);
-                core_masks[i] =
-                    get_resource_partitioner()
-                        .get_topology()
-                        .get_core_affinity_mask(num_pu, numa_sensitive_ != 0);
+                std::size_t num_pu = rp.get_affinity_data().get_pu_num(i);
+                numa_masks[i] = topo.get_numa_node_affinity_mask(num_pu);
+                core_masks[i] = topo.get_core_affinity_mask(num_pu);
             }
 
             // iterate over the number of threads again to determine where to
@@ -1042,13 +1037,9 @@ namespace hpx { namespace threads { namespace policies
             std::ptrdiff_t radius =
                 static_cast<std::ptrdiff_t>((num_threads / 2.0) + 0.5);
             victim_threads_[num_thread].reserve(num_threads);
-            std::size_t num_pu =
-                get_resource_partitioner().get_affinity_data()->get_pu_num(
-                    num_thread);
-            mask_cref_type pu_mask =
-                get_resource_partitioner()
-                    .get_topology()
-                    .get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
+
+            std::size_t num_pu = rp.get_affinity_data().get_pu_num(num_thread);
+            mask_cref_type pu_mask = topo.get_thread_affinity_mask(num_pu);
             mask_cref_type numa_mask = numa_masks[num_thread];
             mask_cref_type core_mask = core_masks[num_thread];
 

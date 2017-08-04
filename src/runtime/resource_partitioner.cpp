@@ -334,6 +334,7 @@ namespace resource {
 
     std::size_t resource_partitioner::init()
     {
+        HPX_ASSERT(nullptr != thread_manager_);
         thread_manager_->init();
         return cores_needed_;
     }
@@ -587,6 +588,7 @@ namespace resource {
     void resource_partitioner::set_threadmanager(
         threads::threadmanager* thrd_manag)
     {
+        HPX_ASSERT(nullptr == thread_manager_);
         thread_manager_ = thrd_manag;
     }
 
@@ -831,9 +833,9 @@ namespace resource {
     }
 
     threads::mask_cref_type resource_partitioner::get_pu_mask(
-        std::size_t global_thread_num, bool numa_sensitive) const
+        std::size_t global_thread_num) const
     {
-        return affinity_data_.get_pu_mask(global_thread_num, numa_sensitive);
+        return affinity_data_.get_pu_mask(global_thread_num);
     }
 
     bool resource_partitioner::cmd_line_parsed() const

@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/util/function.hpp>
@@ -33,6 +34,10 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(io_service_pool);
 
     public:
+        typedef util::function_nonser<void(std::size_t, char const*)>
+            on_startstop_func_type;
+        typedef util::function_nonser<void()> on_stop_func_type;
+
         /// \brief Construct the io_service pool.
         /// \param pool_size
         ///                 [in] The number of threads to run to serve incoming
@@ -40,27 +45,35 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            util::function_nonser<void(std::size_t, char const*)>
-                 const& on_start_thread = util::function_nonser<void(std::size_t,
-                        char const*)>(),
-            util::function_nonser<void()> const& on_stop_thread =
-                 util::function_nonser<void()>(),
+            on_startstop_func_type const& on_start_thread =
+                util::function_nonser<void(std::size_t, char const*)>(),
+            on_stop_func_type const& on_stop_thread = on_stop_func_type(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread =
-                                  util::function_nonser<void()>(),
+        explicit io_service_pool(on_startstop_func_type const& on_start_thread,
+            on_stop_func_type const& on_stop_thread = on_stop_func_type(),
+            char const* pool_name = "", char const* name_postfix = "");
+
+        /// \brief Construct the io_service pool.
+        /// \param start_thread
+        ///                 [in]
+        explicit io_service_pool(on_startstop_func_type const& on_start_thread,
+            on_startstop_func_type const& on_stop_thread,
             char const* pool_name = "", char const* name_postfix = "");
 
         ~io_service_pool();
 
-        /// \brief Run all io_service objects in the pool. If join_threads is true
-        ///        this will also wait for all threads to complete
-        bool run(bool join_threads = true);
+        /// Run all io_service objects in the pool. If join_threads is true
+        /// this will also wait for all threads to complete
+        bool run(bool join_threads = true, compat::barrier* startup = nullptr);
+
+        /// Run all io_service objects in the pool. If join_threads is true
+        /// this will also wait for all threads to complete
+        bool run(std::size_t num_threads, bool join_threads = true, 
+            compat::barrier* startup = nullptr);
 
         /// \brief Stop all io_service objects in the pool.
         void stop();
@@ -76,22 +89,31 @@ namespace hpx { namespace util
         /// \brief Get an io_service to use.
         boost::asio::io_service& get_io_service(int index = -1);
 
+        /// \brief access underlying thread handle
+        compat::thread& get_os_thread_handle(std::size_t thread_num);
+
         /// \brief Get number of threads associated with this I/O service.
         std::size_t size() const { return pool_size_; }
 
         /// \brief Activate the thread \a index for this thread pool
-        void thread_run(std::size_t index);
+        void thread_run(std::size_t index, compat::barrier* startup = nullptr);
 
         /// \brief Return name of this pool
         char const* get_name() const { return pool_name_; }
 
         /// \brief return the thread registration functions
-        util::function_nonser<void(std::size_t, char const*)> const&
-            get_on_start_thread() const { return on_start_thread_; }
-        util::function_nonser<void()> const&
-            get_on_stop_thread() const { return on_stop_thread_; }
+        on_startstop_func_type const& get_on_start_thread() const
+        {
+            return on_start_thread_;
+        }
+        on_startstop_func_type const& get_on_stop_thread() const
+        {
+            return on_stop_thread_;
+        }
 
     protected:
+        bool run_locked(std::size_t num_threads, bool join_threads, 
+            compat::barrier* startup);
         void stop_locked();
         void join_locked();
         void clear_locked();
@@ -133,11 +155,11 @@ namespace hpx { namespace util
         bool stopped_;
 
         /// initial number of OS threads to execute in this pool
-        std::size_t const pool_size_;
+        std::size_t pool_size_;
 
         /// call this for each thread start/stop
-        util::function_nonser<void(std::size_t, char const*)> on_start_thread_;
-        util::function_nonser<void()> on_stop_thread_;
+        on_startstop_func_type on_start_thread_;
+        on_startstop_func_type on_stop_thread_;
 
         char const* pool_name_;
         char const* pool_name_postfix_;
