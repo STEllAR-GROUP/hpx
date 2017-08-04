@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 //
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
@@ -22,7 +23,7 @@
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/format.hpp>
+#include <boost/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -31,6 +32,11 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#if !defined(HPX_EXPORTS)
+// This function must be implemented by the application.
+int hpx_main(boost::program_options::variables_map& vm);
+#endif
 
 namespace hpx {
 
@@ -42,33 +48,88 @@ namespace resource {
 // then on first access, this function should be used, to ensure that command line
 // affinity binding options are honored. Use this function signature only once
 // and thereafter use the parameter free version.
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    int argc, char** argv);
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
-    char** argv, bool check = true);
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    int argc, char** argv, std::vector<std::string> ini_config);
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    int argc, char** argv, runtime_mode mode);
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
-    char** argv, std::vector<std::string> ini_config);
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
-    char** argv, runtime_mode mode);
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    int argc, char** argv, std::vector<std::string> ini_config,
-    runtime_mode mode);
-extern HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
+HPX_EXPORT resource::resource_partitioner& get_resource_partitioner(
+    util::function_nonser<
+        int(boost::program_options::variables_map& vm)
+    > const& f,
+    boost::program_options::options_description const& desc_cmdline, int argc,
     char** argv, std::vector<std::string> ini_config, runtime_mode mode,
     bool check = true);
 
-// may be used anywhere in code and returns a reference to the
-// single, global resource partitioner
-extern HPX_EXPORT hpx::resource::resource_partitioner&
-    get_resource_partitioner();
+#if !defined(HPX_EXPORTS)
+typedef int (*hpx_main_type)(boost::program_options::variables_map&);
+
+inline resource::resource_partitioner& get_resource_partitioner(
+    int argc, char** argv)
+{
+    boost::program_options::options_description desc_cmdline(
+        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+    return get_resource_partitioner(static_cast<hpx_main_type>(::hpx_main),
+        desc_cmdline, argc, argv, std::vector<std::string>(),
+        runtime_mode_default);
+}
+
+inline resource::resource_partitioner &get_resource_partitioner(
+    boost::program_options::options_description const& desc_cmdline, int argc,
+    char **argv, bool check = true)
+{
+    return get_resource_partitioner(static_cast<hpx_main_type>(::hpx_main),
+        desc_cmdline, argc, argv, std::vector<std::string>(),
+        runtime_mode_default, check);
+}
+
+inline resource::resource_partitioner &get_resource_partitioner(
+    int argc, char **argv, std::vector<std::string> ini_config)
+{
+    boost::program_options::options_description desc_cmdline(
+        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+    return get_resource_partitioner(static_cast<hpx_main_type>(::hpx_main),
+        desc_cmdline, argc, argv, std::move(ini_config), runtime_mode_default);
+}
+
+inline resource::resource_partitioner &get_resource_partitioner(
+    int argc, char **argv, runtime_mode mode)
+{
+    boost::program_options::options_description desc_cmdline(
+        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+    return get_resource_partitioner(static_cast<hpx_main_type>(::hpx_main),
+        desc_cmdline, argc, argv, std::vector<std::string>(0), mode);
+}
+
+inline resource::resource_partitioner &get_resource_partitioner(
+    boost::program_options::options_description const& desc_cmdline, int argc,
+    char **argv, std::vector<std::string> ini_config)
+{
+    return get_resource_partitioner(static_cast<hpx_main_type>(::hpx_main),
+        desc_cmdline, argc, argv, std::move(ini_config), runtime_mode_default);
+}
+
+inline resource::resource_partitioner &get_resource_partitioner(
+    boost::program_options::options_description const& desc_cmdline, int argc,
+    char **argv, runtime_mode mode)
+{
+    return get_resource_partitioner(static_cast<hpx_main_type>(::hpx_main),
+        desc_cmdline, argc, argv, std::vector<std::string>(), mode);
+}
+
+inline resource::resource_partitioner& get_resource_partitioner(int argc,
+    char** argv, std::vector<std::string> ini_config, runtime_mode mode)
+{
+    boost::program_options::options_description desc_cmdline(
+        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+    return get_resource_partitioner(static_cast<hpx_main_type>(::hpx_main),
+        desc_cmdline, argc, argv, std::move(ini_config), mode);
+}
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// May be used anywhere in code and returns a reference to the single, global
+// resource partitioner
+HPX_EXPORT hpx::resource::resource_partitioner& get_resource_partitioner();
 
 namespace resource {
 
@@ -204,9 +265,6 @@ namespace resource {
         // but rather get_resource_partitioner
         resource_partitioner();
 
-        void set_hpx_init_options(util::function_nonser<int(
-                boost::program_options::variables_map &vm)> const &f);
-
         int call_cmd_line_options(
             boost::program_options::options_description const &desc_cmdline,
             int argc, char **argv);
@@ -293,7 +351,11 @@ namespace resource {
         threads::mask_cref_type get_pu_mask(std::size_t global_thread_num) const;
 
         bool cmd_line_parsed() const;
-        int parse(boost::program_options::options_description desc_cmdline,
+        int parse(
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            > const& f,
+            boost::program_options::options_description desc_cmdline,
             int argc, char **argv, std::vector<std::string> ini_config,
             runtime_mode mode, bool fill_internal_topology = true);
 

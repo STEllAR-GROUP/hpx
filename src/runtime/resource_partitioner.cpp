@@ -8,11 +8,15 @@
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/static.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/program_options.hpp>
 
 #include <cstddef>
 #include <iosfwd>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <utility>
@@ -39,79 +43,11 @@ resource::resource_partitioner &get_resource_partitioner()
     return rp.get();
 }
 
-resource::resource_partitioner &get_resource_partitioner(int argc, char **argv)
-{
-    using boost::program_options::options_description;
-
-    options_description desc_cmdline(
-        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
-
-    return get_resource_partitioner(desc_cmdline, argc, argv,
-        std::vector<std::string>(0), runtime_mode_default);
-}
-
 resource::resource_partitioner &get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
-    char **argv, bool check)
-{
-    return get_resource_partitioner(desc_cmdline, argc, argv,
-        std::vector<std::string>(0), runtime_mode_default, check);
-}
-
-resource::resource_partitioner &get_resource_partitioner(
-    int argc, char **argv, std::vector<std::string> ini_config)
-{
-    using boost::program_options::options_description;
-
-    options_description desc_cmdline(
-        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
-
-    return get_resource_partitioner(
-        desc_cmdline, argc, argv, std::move(ini_config), runtime_mode_default);
-}
-
-resource::resource_partitioner &get_resource_partitioner(
-    int argc, char **argv, runtime_mode mode)
-{
-    using boost::program_options::options_description;
-
-    options_description desc_cmdline(
-        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
-
-    return get_resource_partitioner(
-        desc_cmdline, argc, argv, std::vector<std::string>(0), mode);
-}
-
-resource::resource_partitioner &get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
-    char **argv, std::vector<std::string> ini_config)
-{
-    return get_resource_partitioner(
-        desc_cmdline, argc, argv, std::move(ini_config), runtime_mode_default);
-}
-
-resource::resource_partitioner &get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
-    char **argv, runtime_mode mode)
-{
-    return get_resource_partitioner(
-        desc_cmdline, argc, argv, std::vector<std::string>(0), mode);
-}
-
-resource::resource_partitioner &get_resource_partitioner(int argc, char **argv,
-    std::vector<std::string> ini_config, runtime_mode mode)
-{
-    using boost::program_options::options_description;
-
-    options_description desc_cmdline(
-        std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
-
-    return get_resource_partitioner(
-        desc_cmdline, argc, argv, std::move(ini_config), mode);
-}
-
-resource::resource_partitioner &get_resource_partitioner(
-    boost::program_options::options_description desc_cmdline, int argc,
+    util::function_nonser<
+        int(boost::program_options::variables_map& vm)
+    > const& f,
+    boost::program_options::options_description const& desc_cmdline, int argc,
     char **argv, std::vector<std::string> ini_config, runtime_mode mode,
     bool check)
 {
@@ -132,7 +68,7 @@ resource::resource_partitioner &get_resource_partitioner(
     }
     else
     {
-        rp.parse(desc_cmdline, argc, argv, std::move(ini_config), mode);
+        rp.parse(f, desc_cmdline, argc, argv, std::move(ini_config), mode);
     }
     return rp;
 }
@@ -337,12 +273,6 @@ namespace resource {
         HPX_ASSERT(nullptr != thread_manager_);
         thread_manager_->init();
         return cores_needed_;
-    }
-
-    void resource_partitioner::set_hpx_init_options(util::function_nonser<int(
-            boost::program_options::variables_map &vm)> const &f)
-    {
-        cfg_.hpx_main_f_ = f;
     }
 
     int resource_partitioner::call_cmd_line_options(
@@ -569,7 +499,7 @@ namespace resource {
 
         for (std::size_t i = 0; i != num_thread_pools; i++)
         {
-            if (initial_thread_pools_[i].assigned_pus_.size() == 0)
+            if (initial_thread_pools_[i].assigned_pus_.empty())
             {
                 return false;
             }
@@ -844,6 +774,9 @@ namespace resource {
     }
 
     int resource_partitioner::parse(
+        util::function_nonser<
+            int(boost::program_options::variables_map& vm)
+        > const& f,
         boost::program_options::options_description desc_cmdline, int argc,
         char **argv, std::vector<std::string> ini_config, runtime_mode mode,
         bool fill_internal_topology)
@@ -851,6 +784,7 @@ namespace resource {
         // set internal parameters of runtime configuration
         cfg_.rtcfg_ = util::runtime_configuration(argv[0], mode);
         cfg_.ini_config_ = std::move(ini_config);
+        cfg_.hpx_main_f_ = f;
 
         // parse command line and set options
         // terminate set if program options contain --hpx:help or --hpx:version ...
@@ -861,7 +795,7 @@ namespace resource {
 
         if (fill_internal_topology)
         {
-            // set data describing internal topology backend
+            // set data describing internal topology back-end
             fill_topology_vectors();
         }
 

@@ -577,9 +577,8 @@ namespace hpx
             > const& f,
             boost::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> && ini_config,
-            startup_function_type startup,
-            shutdown_function_type shutdown, hpx::runtime_mode mode,
-            bool blocking)
+            startup_function_type startup, shutdown_function_type shutdown,
+            hpx::runtime_mode mode, bool blocking)
         {
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
@@ -615,12 +614,8 @@ namespace hpx
                 // Construct resource partitioner if this has not been done yet
                 // and get a handle to it
                 // (if the command-line parsing has not yet been done, do it now)
-                auto& rp = hpx::get_resource_partitioner(desc_cmdline, argc,
+                auto& rp = hpx::get_resource_partitioner(f, desc_cmdline, argc,
                     argv, std::move(ini_config), mode, false);
-
-                // give the command_line_handling object the options the user
-                // may have passed as arguments of hpx_init(...)
-                rp.set_hpx_init_options(f);
 
                 // check whether HPX should be exited at this point
                 // (if the program options contain --hpx:help or --hpx:version)
