@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/executors/thread_pool_os_executors.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
@@ -82,7 +83,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::unique_lock<mutex_type> lk(mtx_);
         pool_->init(num_threads_, 0);
 
-        if (!pool_->thread_pool_base::run(lk, num_threads_))
+        if (!pool_->threads::detail::thread_pool_base::run(lk, num_threads_))
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "thread_pool_os_executor<Scheduler>::thread_pool_os_executor",
