@@ -81,6 +81,22 @@ namespace hpx { namespace traits
                 >::call(f.f_);
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename Result, typename F>
+    struct get_function_annotation_itt<
+        parallel::util::detail::partitioner_iteration<Result, F> >
+    {
+        static char const* call(
+            parallel::util::detail::partitioner_iteration<Result, F> const& f)
+                noexcept
+        {
+            return get_function_annotation_itt<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+#endif
 }}
 #endif
 

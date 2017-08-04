@@ -48,6 +48,7 @@ set(tests
     split_future_2246
     wait_all_hang_1946
     wait_for_1751
+    wait_for_action_2796
     when_all_vectors_1623
    )
 

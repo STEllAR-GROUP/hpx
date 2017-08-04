@@ -450,11 +450,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(x);
-            else
-                object = new value_type(x);
+            new_object(object, x,
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         // Move constructor
@@ -481,11 +478,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(std::forward<T>(x));
-            else
-                object = new value_type(std::forward<T>(x));
+            new_object(object, std::forward<T>(x),
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         ~basic_any()
@@ -510,6 +504,20 @@ namespace hpx { namespace util
                 }
             }
             return *this;
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::true_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            new (&object) value_type(std::forward<T>(x));
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::false_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            object = new value_type(std::forward<T>(x));
         }
 
     public:
@@ -733,11 +741,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(x);
-            else
-                object = new value_type(x);
+            new_object(object, x,
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         // Move constructor
@@ -764,11 +769,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(std::forward<T>(x));
-            else
-                object = new value_type(std::forward<T>(x));
+            new_object(object, std::forward<T>(x),
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         ~basic_any()
@@ -792,6 +794,20 @@ namespace hpx { namespace util
                 }
             }
             return *this;
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::true_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            new (&object) value_type(std::forward<T>(x));
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::false_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            object = new value_type(std::forward<T>(x));
         }
 
     public:
