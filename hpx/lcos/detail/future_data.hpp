@@ -230,11 +230,18 @@ namespace detail
                 return;
             }
 
-            f1_();
-            f2_();
+            {
+                hpx::util::annotate_function annotate(f1_);
+                (void)annotate;
+                f1_();
+            }
+            {
+                hpx::util::annotate_function annotate(f2_);
+                (void)annotate;
+                f2_();
+            }
         }
 
-    private:
         F1 f1_;
         F2 f2_;
     };
@@ -1148,13 +1155,41 @@ namespace detail
     };
 }}}
 
-namespace hpx { namespace traits { namespace detail
+namespace hpx { namespace traits
 {
-    template <typename R, typename Allocator>
-    struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
+    namespace detail
     {
-        typedef lcos::detail::future_data_allocator<R, Allocator> type;
+        template <typename R, typename Allocator>
+        struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
+        {
+            typedef lcos::detail::future_data_allocator<R, Allocator> type;
+        };
+    }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F1, typename F2>
+    struct get_function_annotation<lcos::detail::compose_cb_impl<F1, F2> >
+    {
+        static char const*
+            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
+        {
+            return get_function_annotation<F1>::call(f.f1_);
+        }
     };
-}}}
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename F1, typename F2>
+    struct get_function_annotation_itt<lcos::detail::compose_cb_impl<F1, F2> >
+    {
+        static char const*
+            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
+        {
+            return get_function_annotation_itt<F1>::call(f.f1_);
+        }
+    };
+#endif
+#endif
+}}
 
 #endif

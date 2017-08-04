@@ -959,6 +959,22 @@ namespace hpx { namespace traits
                 >::call(f.f_);
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_annotation_itt<
+        parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> >
+    {
+        static char const* call(
+            parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
+                noexcept
+        {
+            return get_function_annotation_itt<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+#endif
 }}
 #endif
 #endif
