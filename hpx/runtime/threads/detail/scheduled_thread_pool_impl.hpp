@@ -42,15 +42,14 @@ namespace hpx { namespace threads { namespace detail
     struct init_tss_helper
     {
         init_tss_helper(
-            scheduled_thread_pool<Scheduler>& pool, std::size_t thread_num,
-                std::size_t offset)
+            scheduled_thread_pool<Scheduler>& pool,
+                std::size_t pool_thread_num, std::size_t offset)
           : pool_(pool)
-          , thread_num_(thread_num)
+          , thread_num_(pool_thread_num)
         {
-            pool.notifier_.on_start_thread(thread_num);
-            threads::get_thread_manager().init_tss(thread_num + offset);
-            pool.sched_->Scheduler::on_start_thread(
-                thread_num - pool.get_thread_offset());
+            pool.notifier_.on_start_thread(pool_thread_num);
+            threads::get_thread_manager().init_tss(pool_thread_num + offset);
+            pool.sched_->Scheduler::on_start_thread(pool_thread_num);
         }
         ~init_tss_helper()
         {

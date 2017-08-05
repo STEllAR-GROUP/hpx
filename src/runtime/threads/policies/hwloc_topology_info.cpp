@@ -1140,7 +1140,7 @@ namespace hpx { namespace threads
 
     void hwloc_topology_info::print_hwloc(std::ostream& os) const
     {
-        os << "[HWLOC topology info] number of ...\n"
+        os << "[HWLOC topology info] number of ...\n" << std::dec
            << "number of sockets     : " << get_number_of_sockets()
            << "\n"
            << "number of numa nodes  : " << get_number_of_numa_nodes()
@@ -1148,8 +1148,7 @@ namespace hpx { namespace threads
            << "number of cores       : " << get_number_of_cores() << "\n"
            << "number of PUs         : " << get_number_of_pus() << "\n"
            << "hardware concurrency  : "
-           << hpx::threads::hardware_concurrency() << "\n\n";
-
+           << hpx::threads::hardware_concurrency() << "\n" << std::endl;
         //! -------------------------------------- topology (affinity masks)
         os << "[HWLOC topology info] affinity masks :\n"
            << "machine               : \n"

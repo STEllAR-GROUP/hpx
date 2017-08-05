@@ -43,9 +43,9 @@ static std::chrono::system_clock::time_point log_t_start =
 #define LOG_CUSTOM_WORKER(x)                                                   \
     dummy << "<CUSTOM> " << THREAD_ID << " time " << decimal(16) << nowt       \
           << ' ';                                                              \
-    if (parent_pool)                                                           \
+    if (parent_pool_)                                                           \
         dummy << "pool " << std::setfill(' ') << std::setw(8)                  \
-              << parent_pool->get_pool_name() << " " << x << std::endl;        \
+              << parent_pool_->get_pool_name() << " " << x << std::endl;        \
     else                                                                       \
         dummy << "pool (unset) " << x << std::endl;                            \
     std::cout << dummy.str().c_str();
@@ -66,9 +66,14 @@ static std::chrono::system_clock::time_point log_t_start =
     "\"" << thrd->get_description().get_description() << "\" "                 \
          << hexpointer(thrd)
 
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #define THREAD_DESC2(data, thrd)                                               \
     "\"" << data.description.get_description() << "\" "                        \
          << hexpointer(thrd ? thrd->get() : 0)
+#else
+#define THREAD_DESC2(data, thrd)                                               \
+    hexpointer(thrd ? thrd->get() : 0)
+#endif
 
 #undef LOG_CUSTOM_MSG
 #undef LOG_CUSTOM_MSG2
@@ -78,6 +83,36 @@ static std::chrono::system_clock::time_point log_t_start =
 #define LOG_CUSTOM_MSG(x)
 #define LOG_CUSTOM_MSG2(x)
 #endif
+
+#define EXTRA_DEBUG
+//
+namespace debug {
+    template<typename T>
+    void output(const std::string &name, const std::vector<T> &v) {
+#ifdef EXTRA_DEBUG
+        std::cout << name.c_str() << "\t : {" << decnumber(v.size()) << "} : ";
+        std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
+        std::cout << "\n";
+#endif
+    }
+
+    template<typename Iter>
+    void output(const std::string &name, Iter begin, Iter end) {
+#ifdef EXTRA_DEBUG
+        std::cout << name.c_str() << "\t : {"
+                  << decnumber(std::distance(begin,end)) << "} : ";
+        std::copy(begin, end,
+            std::ostream_iterator<typename std::iterator_traits<Iter>::
+            value_type>(std::cout, ", "));
+        std::cout << "\n";
+#endif
+    }
+#if defined(EXTRA_DEBUG)
+# define debug_msg(a) std::cout << a
+#else
+# define debug_msg(a)
+#endif
+};
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -122,11 +157,11 @@ namespace threads {
                 thread_queue_type;
 
             shared_priority_scheduler(std::size_t num_worker_queues,
-                    std::size_t num_high_priority_queues_,
-                    bool numa_sensitive,
-                    bool numa_pinned,
-                    char const* description,
-                    int max_tasks = max_thread_count)
+                std::size_t num_high_priority_queues_,
+                bool numa_sensitive,
+                bool numa_pinned,
+                char const* description,
+                int max_tasks = max_thread_count)
               : scheduler_base(num_worker_queues, description)
               , max_queue_thread_count_(max_tasks)
               , queues_(num_worker_queues)
@@ -136,7 +171,7 @@ namespace threads {
               , curr_hp_queue_(0)
               , numa_sensitive_(numa_sensitive)
               , numa_pinned_(numa_pinned)
-              , initialized(false)
+              , initialized_(false)
             {
                 LOG_CUSTOM_MSG("Constructing scheduler with num queues "
                     << decnumber(num_worker_queues));
@@ -529,13 +564,15 @@ namespace threads {
                 bool empty = true;
                 for (std::size_t i = 0; i != queues_.size(); ++i)
                 {
-                    //LOG_CUSTOM_MSG(hexpointer(this) << "cleanup_terminated " << delete_all << " " << i);
+                    //LOG_CUSTOM_MSG(hexpointer(this) << "cleanup_terminated "
+                    //<< delete_all << " " << i);
                     empty = queues_[i]->cleanup_terminated(delete_all) && empty;
                 }
                 if (!delete_all)
                     return empty;
 
-                //LOG_CUSTOM_MSG(hexpointer(this) << "high_priority_queue_ cleanup_terminated " << empty);
+                //LOG_CUSTOM_MSG(hexpointer(this)
+                //<< "high_priority_queue_ cleanup_terminated " << empty);
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
                 {
                     empty = high_priority_queues_[i]->cleanup_terminated(
@@ -543,45 +580,11 @@ namespace threads {
                         empty;
                 }
 
-                //LOG_CUSTOM_MSG2(hexpointer(this) << "low_priority_queue_ cleanup_terminated " << empty);
+                //LOG_CUSTOM_MSG2(hexpointer(this)
+                //<< "low_priority_queue_ cleanup_terminated " << empty);
                 empty =
                     low_priority_queue_.cleanup_terminated(delete_all) && empty;
                 return empty;
-            }
-
-            std::size_t num_domains(const std::vector<std::size_t>& ts)
-            {
-                auto const& topo = hpx::threads::get_topology();
-                std::set<std::size_t> domains;
-                for (auto local_id : ts)
-                {
-                    std::size_t global_id =
-                        this->local_to_global_thread_index(local_id);
-                    domains.insert(topo.get_numa_node_number(global_id));
-                }
-                return domains.size();
-            }
-
-            // either threads in same domain, or not in same domain
-            // depending on the predicate
-            std::vector<std::size_t> domain_threads(std::size_t t,
-                const std::vector<std::size_t>& ts,
-                std::function<bool(std::size_t, std::size_t)> pred)
-            {
-                std::vector<std::size_t> result;
-                auto const& topo = hpx::threads::get_topology();
-                std::size_t global_index = this->local_to_global_thread_index(t);
-                std::size_t numa = topo.get_numa_node_number(global_index);
-                for (auto local_id : ts)
-                {
-                    std::size_t global_id =
-                        this->local_to_global_thread_index(local_id);
-                    if (pred(numa, topo.get_numa_node_number(global_id)))
-                    {
-                        result.push_back(local_id);
-                    }
-                }
-                return result;
             }
 
             ///////////////////////////////////////////////////////////////////////
@@ -637,7 +640,7 @@ namespace threads {
                     return;
                 }
 
-                // if a non worker threads started this ...
+                // if a non worker thread is creating this task
                 if (pool_queue_num >= queues_.size())
                 {
                     pool_queue_num = curr_queue_++ % queues_.size();
@@ -656,20 +659,17 @@ namespace threads {
                 bool running, std::int64_t& idle_loop_count,
                 threads::thread_data*& thrd)
             {
-                // is there a high priority task we can take from the queue assigned to us
+                // is there a high priority task to take from the queue assigned to us
                 std::size_t tq = hp_queue_lookup_[pool_queue_num];
-                auto high_priority_queue = high_priority_queues_[tq];
-                bool result = high_priority_queue->get_next_thread(thrd);
-                // if, not how about an HP task from somewhere else?
+                auto stealing_queue = high_priority_queues_[tq];
+                bool result = stealing_queue->get_next_thread(thrd);
 
-                if (!result)
-                {
-                    for (std::size_t i : hp_victim_queues_[pool_queue_num])
-                    {
-                        high_priority_queue = high_priority_queues_[i];
-                        if (high_priority_queue->get_pending_queue_length() > 1)
-                        {
-                            result = high_priority_queue->get_next_thread(
+                // if, not how about an HP task from somewhere else?
+                if (!result) {
+                    for (std::size_t i : hp_victim_queues_[pool_queue_num]) {
+                        stealing_queue = high_priority_queues_[i];
+                        if (stealing_queue->get_pending_queue_length() > 1) {
+                            result = stealing_queue->get_next_thread(
                                 thrd, false, true);
                             if (result)
                                 break;
@@ -677,8 +677,23 @@ namespace threads {
                     }
                 }
 
+                // cross-numa stealing - steal from the queues if they are 'full'
+                if (!result) {
+                    for (std::size_t i : hp_xnuma_queues_[pool_queue_num]) {
+                        stealing_queue = high_priority_queues_[i];
+                        if (stealing_queue->get_pending_queue_length() > 8) {
+                            result = stealing_queue->get_next_thread(
+                                thrd, false, true);
+                            if (result) {
+                                LOG_CUSTOM_MSG("xnuma steal");
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 // counter for access queries
-                high_priority_queue->increment_num_pending_accesses();
+                stealing_queue->increment_num_pending_accesses();
                 if (result)
                 {
                     HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -688,7 +703,7 @@ namespace threads {
                     return true;
                 }
                 // counter for high priority misses
-                high_priority_queue->increment_num_pending_misses();
+                stealing_queue->increment_num_pending_misses();
 
                 // try to get a task from the queue associated with the requested thread
                 std::size_t queues_size = queues_.size();
@@ -744,8 +759,8 @@ namespace threads {
                 }
 
                 // if all else failed, then try the low priority queue
-                auto ret = low_priority_queue_.get_next_thread(thrd);
-                if (ret)
+                result = low_priority_queue_.get_next_thread(thrd);
+                if (result)
                 {
                     LOG_CUSTOM_MSG("get_next_thread low priority "
                         << THREAD_DESC(thrd) << "pool_queue_num "
@@ -755,7 +770,7 @@ namespace threads {
                 // counter for low priority misses
                 low_priority_queue_.increment_num_pending_misses();
 
-                return ret;
+                return result;
             }
 
             /// Schedule the passed thread
@@ -1048,14 +1063,13 @@ namespace threads {
                 std::size_t added = 0;
                 bool result = true;
 
-                auto high_priority_queue =
+                thread_queue_type* high_priority_queue =
                     high_priority_queues_[hp_queue_lookup_[pool_queue_num]];
                 result = high_priority_queue->wait_or_add_new(
-                             running, idle_loop_count, added) &&
+                    running, idle_loop_count, added) &&
                     result;
                 if (0 != added)
                 {
-                    //LOG_CUSTOM_MSG(hexpointer(this) << "wait_or_add_new high_priority_queue_ " << "pool_queue_num " << decnumber(pool_queue_num) );
                     return result;
                 }
 
@@ -1065,15 +1079,26 @@ namespace threads {
                     result;
                 if (0 != added)
                 {
-                    //LOG_CUSTOM_MSG(hexpointer(this) << "wait_or_add_new this_queue_ " << "pool_queue_num " << decnumber(pool_queue_num) );
                     return result;
                 }
 
-                // try all the threads we might steal from
+                // try all the HP queues we might steal from
+                for (std::size_t idx : hp_victim_queues_[pool_queue_num])
+                {
+                    result = high_priority_queue->wait_or_add_new(running,
+                                 idle_loop_count, added, high_priority_queues_[idx]) &&
+                        result;
+                    if (0 != added)
+                    {
+                        high_priority_queues_[idx]->increment_num_stolen_from_staged(added);
+                        high_priority_queue->increment_num_stolen_to_staged(added);
+                        return result;
+                    }
+                }
+
+                // try all the normal queues we might steal from
                 for (std::size_t idx : victim_queues_[pool_queue_num])
                 {
-                    HPX_ASSERT(idx != pool_queue_num);
-
                     result = this_queue->wait_or_add_new(running,
                                  idle_loop_count, added, queues_[idx]) &&
                         result;
@@ -1081,7 +1106,6 @@ namespace threads {
                     {
                         queues_[idx]->increment_num_stolen_from_staged(added);
                         this_queue->increment_num_stolen_to_staged(added);
-                        //LOG_CUSTOM_MSG(hexpointer(this) << "wait_or_add_new pool_queue_num " << decnumber(pool_queue_num) << "victim " << decnumber(idx));
                         return result;
                     }
                 }
@@ -1089,110 +1113,138 @@ namespace threads {
                 result = low_priority_queue_.wait_or_add_new(
                              running, idle_loop_count, added) &&
                     result;
-                if (0 != added)
-                {
-                    //LOG_CUSTOM_MSG(hexpointer(this) << "wait_or_add_new low_priority_queue_ " << "pool_queue_num " << decnumber(pool_queue_num) );
-                }
+                if (0 != added) {}
 
                 return result;
             }
 
             ///////////////////////////////////////////////////////////////////////
+            /* @TODO make sure on_start_thread is forwarded
+             * currently it does nothing in the thread queue - but might one day
+             * queues_[pool_queue_num]->on_start_thread(pool_queue_num);
+            */
             void on_start_thread(std::size_t pool_queue_num)
             {
                 LOG_CUSTOM_MSG("start thread with local thread num "
                     << decnumber(pool_queue_num));
-                /*
-                // forward this call to all queues etc.
-                if (pool_queue_num == queues_.size() - 1)
-                    high_priority_queue_.on_start_thread(pool_queue_num);
-
-                if (pool_queue_num == queues_.size() - 1)
-                    low_priority_queue_.on_start_thread(pool_queue_num);
-
-                queues_[pool_queue_num]->on_start_thread(pool_queue_num);
-*/
-                // int pool_offset = get_resource_partitioner().
-
                 //
-                // @TODO. move this to init somewhere
+                // @TODO. move this to a proper init function
                 //
                 std::lock_guard<hpx::lcos::local::spinlock> lock(init_mutex);
-                if (!initialized)
+                if (!initialized_)
                 {
-                    initialized = true;
+                    initialized_ = true;
                     std::size_t num_queues = queues_.size();
-                    std::size_t hpq_size = high_priority_queues_.size();
+                    std::size_t   hpq_size = high_priority_queues_.size();
+                    std::size_t        qph = num_queues/hpq_size;
+                    std::vector<std::size_t> hp_queue_mapping_;
                     // init hp queues with default zero queue/domain
                     hp_queue_lookup_.resize(num_queues, 0);
-                    hp_domain_.resize(num_queues, 0);
+                    hp_queue_mapping_.resize(num_queues, 0);
                     hp_victim_queues_.resize(num_queues);
-                    // generate thread ids for this pool
-                    std::vector<std::size_t> ts(num_queues);
-                    std::iota(ts.begin(), ts.end(), 0);
-                    // how many domains are we using
-                    std::size_t nd = num_domains(ts);
-                    // assign HP queues to domains
-                    double s = double(hpq_size);
-                    for (std::size_t i = 0; i < hpq_size; ++i)
-                    {
-                        hp_domain_[i] =
-                            static_cast<std::size_t>(0.5 + (nd - 1.0) * i / s);
-                    }
+                    hp_xnuma_queues_.resize(num_queues);
 
-                    // for each queue/thread
+                    // assign queues for stealing according to numa domain
                     for (std::size_t i = 0; i < num_queues; ++i)
                     {
                         // fill a vector with all thread ids except 'itself'
-                        // offset so that not each queue steals in a staggered pattern
+                        // offset so that each queue steals in a staggered pattern
                         // and don't all hit pu=0 first for example
                         std::vector<std::size_t> thread_ids;
-                        for (std::size_t j = 0; j < num_queues; ++j)
-                        {
-                            std::size_t pu = (i + j) % num_queues;
-                            if (pu != i)
-                                thread_ids.push_back(pu);
+                        for (std::size_t j=0; j<num_queues; ++j) {
+                            std::size_t pu = (i + j) % (int)num_queues;
+                            if (pu!=i) thread_ids.push_back(pu);
                         }
-                        std::vector<std::size_t> same = domain_threads(
-                            i, thread_ids, std::equal_to<std::size_t>());
-                        std::vector<std::size_t> diff = domain_threads(
-                            i, thread_ids, std::not_equal_to<std::size_t>());
+                        // get a list of all threads on the same numa domain
+                        std::vector<std::size_t> same = domain_threads(i, thread_ids,
+                            std::equal_to<std::size_t>());
+                        // get a list of all threads on other numa domains
+                        std::vector<std::size_t> diff = domain_threads(i, thread_ids,
+                            std::not_equal_to<std::size_t>());
 
                         // always steal from queues on the same numa domain first
                         victim_queues_[i] = same;
                         // if we are not numa sensitive, steal from other domains
-                        if (!numa_sensitive_)
-                        {
+//                        if (!numa_sensitive_) {
                             victim_queues_[i].insert(victim_queues_[i].end(),
                                 diff.begin(), diff.end());
-                        }
+//                        }
 
                         // which HP queue do we use for this thread?
-                        double s = double(hpq_size - 1);
-                        if (!numa_sensitive_)
-                        {
-                            // no numa check - just take from any HP queue
-                            hp_queue_lookup_[i] =
-                                static_cast<int>(0.5 + i * s / num_queues);
+                        double s = hpq_size-1;
+                        hp_victim_queues_[i].clear();
+                        hp_queue_lookup_[i] =
+                            static_cast<int>(i*(s+1)/(num_queues));
+                        hp_queue_mapping_[i] = hp_queue_lookup_[i] * qph;
+                    }
+
+                    // clean up mapping of HP queues to thread numbers
+                    auto last = std::unique(
+                        hp_queue_mapping_.begin(), hp_queue_mapping_.end());
+                    hp_queue_mapping_.erase(last, hp_queue_mapping_.end());
+                    //
+                    debug::output("hp_queue_lookup_ ", hp_queue_lookup_);
+                    debug::output("hp_queue_mapping_ ", hp_queue_mapping_);
+                    //
+                    for (std::size_t i = 0; i < num_queues; ++i)
+                    {
+                        auto temp_ = hp_queue_mapping_;
+                        // map i to hp queue num, and then to thread,
+                        // remove that thread from our list
+                        temp_.erase(
+                            std::remove(temp_.begin(), temp_.end(),
+                            hp_queue_mapping_[hp_queue_lookup_[i]]),
+                            temp_.end());
+
+                        // get a list of all HP queues on the same numa domain
+                        std::vector<std::size_t> same = domain_threads(
+                            hp_queue_mapping_[hp_queue_lookup_[i]], temp_,
+                            std::equal_to<std::size_t>());
+
+                        // get a list of all HP threads on other numa domains
+                        std::vector<std::size_t> diff = domain_threads(
+                            hp_queue_mapping_[hp_queue_lookup_[i]], temp_,
+                            std::not_equal_to<std::size_t>());
+
+                        if (same.size()>0) {
+                            //debug::output("same  ", same);
+                            std::rotate(same.begin(), same.begin() + i/qph % same.size(),
+                                same.end());
+                            // convert HP queue numbers to threads
+                            for (auto q : same) {
+                                hp_victim_queues_[i].push_back(hp_queue_lookup_[q]);
+                            }
+                        }
+
+                        if (diff.size()>0) {
+                            //debug::output("diff ", diff);
+                            std::rotate(diff.begin(), diff.begin() + i/qph % diff.size(),
+                                diff.end());
+                            // convert HP queue numbers to threads
+                            for (auto q : diff) {
+                                hp_xnuma_queues_[i].push_back(hp_queue_lookup_[q]);
+                            }
+                        }
+
+                        if (!numa_sensitive_) {
+                            // no numa check - merge queues into one
                             // hp tasks can be stolen from any hp queue
-                            for (std::size_t q = 1; q < hpq_size; ++q)
-                            {
-                                hp_victim_queues_[i].push_back(
-                                    (hp_queue_lookup_[i] + q) % hpq_size);
-                            }
+                            hp_victim_queues_[i].insert(hp_victim_queues_[i].end(),
+                                hp_xnuma_queues_[i].begin(), hp_xnuma_queues_[i].end());
+                            hp_xnuma_queues_[i].clear();
                         }
-                        else
-                        {
-                            hp_queue_lookup_[i] =
-                                static_cast<int>(0.5 + i * s / num_queues);
-                            std::size_t qpd = hpq_size / nd;
-                            for (std::size_t q = 1; q < qpd; ++q)
-                            {
-                                hp_victim_queues_[i].push_back(
-                                    qpd * (i * nd / num_queues) +
-                                    (hp_queue_lookup_[i] + q) % qpd);
-                            }
-                        }
+                    }
+
+                    for (std::size_t i=0; i<num_queues; ++i) {
+                        char buff[256];
+                        sprintf(buff, "%03i", (int)i);
+                        debug::output("victim_queue    " + std::string(buff) + " ",
+                            victim_queues_[i]);
+                        debug::output("hp_victim_queue " + std::string(buff) + " ",
+                            hp_victim_queues_[i]);
+                        debug::output("hp_xnuma_queues " + std::string(buff) + " ",
+                            hp_xnuma_queues_[i]);
+                        i++;
                     }
                 }
             }
@@ -1234,10 +1286,10 @@ namespace threads {
 
             std::vector<std::vector<std::size_t>> victim_queues_;
             std::vector<std::vector<std::size_t>> hp_victim_queues_;
+            std::vector<std::vector<std::size_t>> hp_xnuma_queues_;
             std::vector<std::size_t> hp_queue_lookup_;
-            std::vector<std::size_t> hp_domain_;
             hpx::lcos::local::spinlock init_mutex;
-            bool initialized;
+            bool initialized_;
         };
     }
 }

@@ -290,7 +290,7 @@ namespace resource {
         std::size_t get_pool_index(const std::string &pool_name) const;
 
         size_t get_pu_num(std::size_t global_thread_num);
-        threads::mask_cref_type get_pu_mask(std::size_t num_thread) const;
+        threads::mask_cref_type get_pu_mask(std::size_t global_thread_num) const;
 
         bool cmd_line_parsed() const;
         int parse(boost::program_options::options_description desc_cmdline,
