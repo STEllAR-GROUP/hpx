@@ -228,6 +228,8 @@ namespace resource {
         throttle = 8
     };
 
+    class HPX_EXPORT resource_partitioner;
+
     namespace detail
     {
         // structure used to encapsulate all characteristics of thread_pools
@@ -240,7 +242,7 @@ namespace resource {
 
             void print_pool(std::ostream&) const;
 
-            friend class resource_partitioner;
+            friend class resource::resource_partitioner;
 
             // counter ... overall, in all the thread pools
             static std::size_t num_threads_overall;
@@ -262,7 +264,7 @@ namespace resource {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT resource_partitioner
+    class resource_partitioner
     {
     public:
         // constructor: users shouldn't use the constructor
