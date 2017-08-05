@@ -660,8 +660,9 @@ namespace hpx
 
     std::uint32_t runtime::assign_cores()
     {
+        get_thread_manager().init();
         return static_cast<std::uint32_t>(
-            hpx::get_resource_partitioner().init());
+            hpx::get_resource_partitioner().cores_needed());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -750,46 +751,50 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::string get_config_entry(
-        std::string const& key, std::string const& dflt)
+    std::string get_config_entry(std::string const& key, std::string const& dflt)
     {
         //! FIXME runtime_configuration should probs be a member of
         // hpx::runtime only, not command_line_handling
         //! FIXME change functions in this section accordingly
         if (get_runtime_ptr() != nullptr)
+        {
             return get_runtime().get_config().get_entry(key, dflt);
+        }
         return get_resource_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.get_entry(key, dflt);
+            .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
         if (get_runtime_ptr() != nullptr)
+        {
             return get_runtime().get_config().get_entry(key, dflt);
+        }
         return get_resource_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.get_entry(key, dflt);
+            .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     // set entries
     void set_config_entry(std::string const& key, std::string const& value)
     {
         if (get_runtime_ptr() != nullptr)
+        {
             return get_runtime_ptr()->get_config().add_entry(key, value);
+        }
         return get_resource_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.add_entry(key, value);
+            .get_command_line_switches().rtcfg_.add_entry(key, value);
     }
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
         if (get_runtime_ptr() != nullptr)
+        {
             return get_runtime_ptr()->get_config().add_entry(
                 key, std::to_string(value));
+        }
         return get_resource_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.add_entry(key, std::to_string(value));
+            .get_command_line_switches().rtcfg_.
+                add_entry(key, std::to_string(value));
     }
 
     void set_config_entry_callback(std::string const& key,
@@ -797,8 +802,10 @@ namespace hpx
             std::string const&, std::string const&)> const& callback)
     {
         if (get_runtime_ptr() != nullptr)
+        {
             return get_runtime_ptr()->get_config().add_notification_callback(
                 key, callback);
+        }
         return get_resource_partitioner()
             .get_command_line_switches()
             .rtcfg_.add_notification_callback(key, callback);

@@ -38,7 +38,6 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-
     ///////////////////////////////////////////////////////////////////////////
     struct manage_active_thread_count
     {
@@ -55,12 +54,11 @@ namespace hpx { namespace threads { namespace detail
         boost::atomic<long>& counter_;
     };
 
-
     ///////////////////////////////////////////////////////////////////////////
     struct pool_id_type
     {
-        pool_id_type(std::size_t index, std::string name)
-                : index_(index), name_(name)
+        pool_id_type(std::size_t index, std::string const& name)
+          : index_(index), name_(name)
         {}
 
         std::size_t index_;
@@ -74,7 +72,7 @@ namespace hpx { namespace threads { namespace detail
     {
     public:
         thread_pool_base(threads::policies::callback_notifier& notifier,
-            std::size_t index, char const* pool_name,
+            std::size_t index, std::string const& pool_name,
             policies::scheduler_mode m, std::size_t thread_offset);
 
         virtual ~thread_pool_base() = default;

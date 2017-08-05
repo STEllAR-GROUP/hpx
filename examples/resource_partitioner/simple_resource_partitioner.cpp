@@ -276,8 +276,8 @@ int main(int argc, char* argv[])
     rp.create_thread_pool("default",
         [](hpx::threads::policies::callback_notifier& notifier,
             std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, char const* pool_name)
-            -> std::unique_ptr<hpx::threads::detail::thread_pool_base>
+            std::size_t pool_index, std::string const& pool_name)
+        -> std::unique_ptr<hpx::threads::detail::thread_pool_base>
         {
             std::cout << "User defined scheduler creation callback "
                       << std::endl;
@@ -291,10 +291,13 @@ int main(int argc, char* argv[])
 
             std::unique_ptr<hpx::threads::detail::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<
-                    high_priority_sched>(std::move(scheduler), notifier,
-                    pool_index, pool_name, mode, thread_offset));
+                        high_priority_sched
+                    >(std::move(scheduler), notifier,
+                        pool_index, pool_name, mode, thread_offset));
             return pool;
         });
+
+//     rp.add_resource(rp.numa_domains(), "default");
 
     if (use_pools)
     {
@@ -308,8 +311,9 @@ int main(int argc, char* argv[])
         rp.create_thread_pool("mpi",
             [](hpx::threads::policies::callback_notifier& notifier,
                 std::size_t num_threads, std::size_t thread_offset,
-                std::size_t pool_index, char const* pool_name)
-                -> std::unique_ptr<hpx::threads::detail::thread_pool_base> {
+                std::size_t pool_index, std::string const& pool_name)
+            -> std::unique_ptr<hpx::threads::detail::thread_pool_base>
+            {
                 std::cout << "User defined scheduler creation callback "
                           << std::endl;
                 std::unique_ptr<high_priority_sched> scheduler(
@@ -320,8 +324,9 @@ int main(int argc, char* argv[])
 
                 std::unique_ptr<hpx::threads::detail::thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        high_priority_sched>(std::move(scheduler), notifier,
-                        pool_index, pool_name, mode, thread_offset));
+                            high_priority_sched
+                        >(std::move(scheduler), notifier,
+                            pool_index, pool_name, mode, thread_offset));
                 return pool;
             });
 

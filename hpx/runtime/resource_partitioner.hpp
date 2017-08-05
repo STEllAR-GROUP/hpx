@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
@@ -207,7 +208,7 @@ namespace resource {
         util::function_nonser<
             std::unique_ptr<hpx::threads::detail::thread_pool_base>(
                 hpx::threads::policies::callback_notifier&,
-                std::size_t, std::size_t, std::size_t, char const *
+                std::size_t, std::size_t, std::size_t, std::string const&
             )>;
 
     // scheduler assigned to thread_pool
@@ -227,35 +228,38 @@ namespace resource {
         throttle = 8
     };
 
-    // structure used to encapsulate all characteristics of thread_pools
-    // as specified by the user in int main()
-    class init_pool_data
+    namespace detail
     {
-    public:
-        // mechanism for adding resources (zero-based index)
-        void add_resource(std::size_t pu_index, std::size_t num_threads);
+        // structure used to encapsulate all characteristics of thread_pools
+        // as specified by the user in int main()
+        class init_pool_data
+        {
+        public:
+            // mechanism for adding resources (zero-based index)
+            void add_resource(std::size_t pu_index, std::size_t num_threads);
 
-        void print_pool(std::ostream&) const;
+            void print_pool(std::ostream&) const;
 
-        friend class resource_partitioner;
+            friend class resource_partitioner;
 
-        // counter ... overall, in all the thread pools
-        static std::size_t num_threads_overall;
+            // counter ... overall, in all the thread pools
+            static std::size_t num_threads_overall;
 
-    private:
-        init_pool_data(const std::string &name,
-            scheduling_policy = scheduling_policy::unspecified);
+        private:
+            init_pool_data(const std::string &name,
+                scheduling_policy = scheduling_policy::unspecified);
 
-        init_pool_data(std::string const& name, scheduler_function create_func);
+            init_pool_data(std::string const& name, scheduler_function create_func);
 
-        std::string pool_name_;
-        scheduling_policy scheduling_policy_;
-        // PUs this pool is allowed to run on
-        std::vector<threads::mask_type> assigned_pus_;
-        // counter for number of threads bound to this pool
-        std::size_t num_threads_;
-        scheduler_function create_function_;
-    };
+            std::string pool_name_;
+            scheduling_policy scheduling_policy_;
+            // PUs this pool is allowed to run on
+            std::vector<threads::mask_type> assigned_pus_;
+            // counter for number of threads bound to this pool
+            std::size_t num_threads_;
+            scheduler_function create_function_;
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT resource_partitioner
@@ -264,12 +268,6 @@ namespace resource {
         // constructor: users shouldn't use the constructor
         // but rather get_resource_partitioner
         resource_partitioner();
-
-        int call_cmd_line_options(
-            boost::program_options::options_description const &desc_cmdline,
-            int argc, char **argv);
-
-        bool pu_exposed(std::size_t pid);
 
         void print_init_pool_data(std::ostream&) const;
 
@@ -297,23 +295,6 @@ namespace resource {
         void add_resource(const std::vector<hpx::resource::numa_domain>& ndv,
             const std::string& pool_name);
 
-        // stuff that has to be done during hpx_init ...
-        void set_scheduler(
-            scheduling_policy sched, const std::string &pool_name);
-
-        void set_threadmanager(threads::threadmanager *thrd_manag);
-
-        threads::threadmanager const& get_thread_manager() const
-        {
-            HPX_ASSERT(nullptr != thread_manager_);
-            return *thread_manager_;
-        }
-        threads::threadmanager& get_thread_manager()
-        {
-            HPX_ASSERT(nullptr != thread_manager_);
-            return *thread_manager_;
-        }
-
         // called by constructor of scheduler_base
         threads::policies::detail::affinity_data const& get_affinity_data() const
         {
@@ -324,13 +305,9 @@ namespace resource {
             return affinity_data_;
         }
 
-        // Does initialization of all resources and internal data of the resource
-        // partitioner
-        // called in hpx_init
+        // Does initialization of all resources and internal data of the
+        // resource partitioner called in hpx_init
         void configure_pools();
-
-        // called in runtime::assign_cores()
-        std::size_t init();
 
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(const std::string &pool_name);
@@ -342,7 +319,7 @@ namespace resource {
         std::size_t get_num_threads(std::string const& pool_name) const;
         std::size_t get_num_threads(std::size_t pool_index) const;
 
-        init_pool_data const& get_pool_data(std::size_t pool_index) const;
+        detail::init_pool_data const& get_pool_data(std::size_t pool_index) const;
 
         std::string const& get_pool_name(std::size_t index) const;
         std::size_t get_pool_index(const std::string &pool_name) const;
@@ -371,9 +348,17 @@ namespace resource {
             return cfg_.parse_terminate_;
         }
 
+        std::size_t cores_needed() const
+        {
+            // should have been initialized by now
+            HPX_ASSERT(cores_needed_ != std::size_t(-1));
+            return cores_needed_;
+        }
+
     private:
         ////////////////////////////////////////////////////////////////////////
         void fill_topology_vectors();
+        bool pu_exposed(std::size_t pid);
 
         ////////////////////////////////////////////////////////////////////////
         // called in hpx_init run_or_start
@@ -386,12 +371,15 @@ namespace resource {
         // has to be private bc pointers become invalid after data member
         // thread_pools_ is resized
         // we don't want to allow the user to use it
-        init_pool_data const& get_pool_data(const std::string &pool_name) const;
-        init_pool_data& get_pool_data(std::string const& pool_name);
-        init_pool_data& get_default_pool_data();
+        detail::init_pool_data const& get_pool_data(
+            const std::string &pool_name) const;
+        detail::init_pool_data& get_pool_data(std::string const& pool_name);
+        detail::init_pool_data& get_default_pool_data();
+
+        void set_scheduler(
+            scheduling_policy sched, const std::string &pool_name);
 
         ////////////////////////////////////////////////////////////////////////
-
         // counter for instance numbers
         static boost::atomic<int> instance_number_counter_;
 
@@ -401,16 +389,13 @@ namespace resource {
 
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
-        std::vector<init_pool_data> initial_thread_pools_;
-
-        // pointer to the threadmanager instance
-        hpx::threads::threadmanager *thread_manager_;
+        std::vector<detail::init_pool_data> initial_thread_pools_;
 
         // reference to the topology and affinity data
         threads::hwloc_topology_info &topology_;
         hpx::threads::policies::detail::affinity_data affinity_data_;
 
-        // contains the internal topology backend used to add resources to
+        // contains the internal topology back-end used to add resources to
         // initial_thread_pools
         std::vector<numa_domain> numa_domains_;
     };

@@ -34,7 +34,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(
             threads::policies::callback_notifier& notifier,
-            std::size_t index, char const* pool_name,
+            std::size_t index, std::string const& pool_name,
             policies::scheduler_mode m, std::size_t thread_offset)
       : id_(index, pool_name),
         used_processing_units_(),

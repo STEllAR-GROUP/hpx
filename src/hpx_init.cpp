@@ -630,10 +630,9 @@ namespace hpx
                 rp.configure_pools();
 
                 // initialize logging
+                util::command_line_handling& cms = rp.get_command_line_switches();
                 util::detail::init_logging(
-                    rp.get_command_line_switches().rtcfg_,
-                    rp.get_command_line_switches().rtcfg_.mode_ ==
-                        runtime_mode_console);
+                    cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
 
                 util::apex_wrapper_init apex(argc, argv);
 
@@ -643,11 +642,10 @@ namespace hpx
                 // Build and configure this runtime instance.
                 typedef hpx::runtime_impl runtime_type;
                 std::unique_ptr<hpx::runtime> rt(
-                    new runtime_type(rp.get_command_line_switches().rtcfg_));
+                    new runtime_type(cms.rtcfg_));
 
                 result = run_or_start(blocking, std::move(rt),
-                    rp.get_command_line_switches(), std::move(startup),
-                    std::move(shutdown));
+                    cms, std::move(startup), std::move(shutdown));
             }
             catch (detail::command_line_error const& e) {
                 std::cerr << "{env}: " << hpx::detail::get_execution_environment();

@@ -343,16 +343,14 @@ namespace hpx { namespace threads
         notifier_(notifier)
     {
         auto& rp = hpx::get_resource_partitioner();
-        rp.set_threadmanager(this);
         size_t num_pools = rp.get_num_pools();
-        util::command_line_handling cfg_ = rp.get_command_line_switches();
-        std::string name;
+        util::command_line_handling const& cfg_ = rp.get_command_line_switches();
         std::size_t thread_offset = 0;
 
         // instantiate the pools
-        for (size_t i(0); i < num_pools; i++)
+        for (size_t i = 0; i != num_pools; i++)
         {
-            name = rp.get_pool_name(i);
+            std::string name = rp.get_pool_name(i);
             resource::scheduling_policy sched_type = rp.which_scheduler(name);
             std::size_t num_threads_in_pool = rp.get_num_threads(i);
 
@@ -373,8 +371,9 @@ namespace hpx { namespace threads
             case resource::user_defined:
             {
                 auto const& pool_func = rp.get_pool_creator(i);
-                std::unique_ptr<detail::thread_pool_base> pool(pool_func(notifier,
-                    num_threads_in_pool, thread_offset, i, name.c_str()));
+                std::unique_ptr<detail::thread_pool_base> pool(
+                    pool_func(notifier, num_threads_in_pool,
+                        thread_offset, i, name));
                 pools_.push_back(std::move(pool));
                 break;
             }

@@ -67,7 +67,7 @@ namespace hpx { namespace threads { namespace detail
     scheduled_thread_pool<Scheduler>::scheduled_thread_pool(
             std::unique_ptr<Scheduler> sched,
             threads::policies::callback_notifier& notifier, std::size_t index,
-            char const* pool_name, policies::scheduler_mode m,
+            std::string const& pool_name, policies::scheduler_mode m,
             std::size_t thread_offset)
         : thread_pool_base(notifier, index, pool_name, m, thread_offset)
         , sched_(std::move(sched))
