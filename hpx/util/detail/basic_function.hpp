@@ -200,7 +200,7 @@ namespace hpx { namespace util { namespace detail
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->get_function_address(object);
 #else
-            return nullptr;
+            return 0;
 #endif
         }
 
