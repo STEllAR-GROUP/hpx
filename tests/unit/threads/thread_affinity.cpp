@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2016 Thomas Heller
 //
@@ -40,8 +40,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hpx::runtime & rt = hpx::get_runtime();
         hpx::threads::topology const& t = rt.get_topology();
         hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(
-            hpx::get_resource_partitioner().get_pu_num(current),
-            numa_sensitive);
+            hpx::get_resource_partitioner().get_pu_num(current));
 
         std::size_t logical_idx = hpx::threads::find_first(desired_mask);
 

@@ -85,6 +85,11 @@ static std::chrono::system_clock::time_point log_t_start =
 #endif
 
 #define EXTRA_DEBUG
+
+#if defined(HPX_MSVC)
+#undef EXTRA_DEBUG
+#endif
+
 //
 namespace debug {
     template<typename T>
@@ -1171,7 +1176,7 @@ namespace threads {
 //                        }
 
                         // which HP queue do we use for this thread?
-                        double s = hpq_size-1;
+                        double s = static_cast<double>(hpq_size-1);
                         hp_victim_queues_[i].clear();
                         hp_queue_lookup_[i] =
                             static_cast<int>(i*(s+1)/(num_queues));
