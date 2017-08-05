@@ -87,6 +87,8 @@ namespace posix
             PROT_EXEC | PROT_READ | PROT_WRITE,
 #if defined(__APPLE__)
             MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
+#elif defined(__FreeBSD__)
+            MAP_PRIVATE | MAP_ANON,
 #else
             MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
 #endif
