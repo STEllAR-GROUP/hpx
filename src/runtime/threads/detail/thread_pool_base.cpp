@@ -28,6 +28,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 namespace hpx { namespace threads { namespace detail
 {

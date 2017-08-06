@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -72,7 +72,7 @@ namespace hpx { namespace util
 
         /// Run all io_service objects in the pool. If join_threads is true
         /// this will also wait for all threads to complete
-        bool run(std::size_t num_threads, bool join_threads = true, 
+        bool run(std::size_t num_threads, bool join_threads = true,
             compat::barrier* startup = nullptr);
 
         /// \brief Stop all io_service objects in the pool.
@@ -112,7 +112,7 @@ namespace hpx { namespace util
         }
 
     protected:
-        bool run_locked(std::size_t num_threads, bool join_threads, 
+        bool run_locked(std::size_t num_threads, bool join_threads,
             compat::barrier* startup);
         void stop_locked();
         void join_locked();

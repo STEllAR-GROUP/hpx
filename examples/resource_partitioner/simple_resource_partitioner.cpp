@@ -22,6 +22,7 @@
 #include <iostream>
 #include <memory>
 #include <set>
+#include <string>
 #include <utility>
 //
 #include "shared_priority_scheduler.hpp"

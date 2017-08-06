@@ -11,6 +11,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <cstddef>
+#include <exception>
 
 namespace hpx { namespace threads { namespace detail
 {

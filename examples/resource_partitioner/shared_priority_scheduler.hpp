@@ -1091,12 +1091,15 @@ namespace threads {
                 for (std::size_t idx : hp_victim_queues_[pool_queue_num])
                 {
                     result = high_priority_queue->wait_or_add_new(running,
-                                 idle_loop_count, added, high_priority_queues_[idx]) &&
+                                 idle_loop_count, added,
+                                 high_priority_queues_[idx]) &&
                         result;
                     if (0 != added)
                     {
-                        high_priority_queues_[idx]->increment_num_stolen_from_staged(added);
-                        high_priority_queue->increment_num_stolen_to_staged(added);
+                        high_priority_queues_[idx]
+                            ->increment_num_stolen_from_staged(added);
+                        high_priority_queue->increment_num_stolen_to_staged(
+                            added);
                         return result;
                     }
                 }

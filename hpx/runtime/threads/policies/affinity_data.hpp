@@ -13,6 +13,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>

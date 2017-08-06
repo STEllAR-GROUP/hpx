@@ -32,6 +32,7 @@
 #include <functional>
 #include <iosfwd>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
