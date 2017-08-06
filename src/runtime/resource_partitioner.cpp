@@ -48,7 +48,8 @@ resource::resource_partitioner &get_resource_partitioner(
         int(boost::program_options::variables_map& vm)
     > const& f,
     boost::program_options::options_description const& desc_cmdline, int argc,
-    char **argv, std::vector<std::string> ini_config, runtime_mode mode,
+    char **argv, std::vector<std::string> ini_config,
+    resource::resource_partitioner_mode rpmode, runtime_mode mode,
     bool check)
 {
     util::static_<resource::resource_partitioner, resource_partitioner_tag> rp_;
@@ -68,7 +69,7 @@ resource::resource_partitioner &get_resource_partitioner(
     }
     else
     {
-        rp.parse(f, desc_cmdline, argc, argv, std::move(ini_config), mode);
+        rp.parse(f, desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode);
     }
     return rp;
 }
@@ -203,8 +204,11 @@ namespace resource {
             threads::set(pu_mask, pu_index);
 
             // Add one mask for each OS-thread
-            for (std::size_t i(0); i < num_threads; i++)
+            for (std::size_t i = 0; i != num_threads; i++)
+            {
                 assigned_pus_.push_back(pu_mask);
+                assigned_pu_nums_.push_back(pu_index);
+            }
         }
 
         void init_pool_data::print_pool(std::ostream& os) const
@@ -261,6 +265,7 @@ namespace resource {
     resource_partitioner::resource_partitioner()
       : cores_needed_(std::size_t(-1))
       , topology_(threads::create_topology())
+      , mode_(mode_default)
     {
         // Create the default pool
         initial_thread_pools_.push_back(detail::init_pool_data("default"));
@@ -329,7 +334,8 @@ namespace resource {
                                 "PU #" + std::to_string(pid) +
                                 " has thread occupancy 0");
                         }
-                        p.thread_occupancy_count_ = p.thread_occupancy_;
+
+                        p.thread_occupancy_count_ = 0;
                         core_contains_exposed_pus = true;
                     }
                     ++pid;
@@ -364,14 +370,14 @@ namespace resource {
             {
                 for (hpx::resource::pu &p : c.pus_)
                 {
-                    std::size_t threads_to_add = p.thread_occupancy_count_;
-                    if (threads_to_add > 0)
+                    if (p.thread_occupancy_count_ == 0)
                     {
-                        add_resource(p, "default", threads_to_add);
+                        add_resource(p, "default");
                     }
                 }
             }
         }
+
         // @TODO allow empty pools
         if (get_pool_data("default").num_threads_ == 0)
         {
@@ -467,17 +473,24 @@ namespace resource {
     // at this stage.
     void resource_partitioner::reconfigure_affinities()
     {
+        std::vector<std::size_t> new_pu_nums;
         std::vector<threads::mask_type> new_affinity_masks;
 
         for (auto &itp : initial_thread_pools_)
         {
-            for (auto &mask : itp.assigned_pus_)
+            for (auto const& mask : itp.assigned_pus_)
             {
                 new_affinity_masks.push_back(mask);
             }
+            for (auto const& pu_num : itp.assigned_pu_nums_)
+            {
+                new_pu_nums.push_back(pu_num);
+            }
         }
 
-        affinity_data_.set_affinity_masks(new_affinity_masks);
+        affinity_data_.set_num_threads(new_pu_nums.size());
+        affinity_data_.set_pu_nums(std::move(new_pu_nums));
+        affinity_data_.set_affinity_masks(std::move(new_affinity_masks));
     }
 
     // Returns true if any of the pools defined by the user is empty of resources
@@ -555,7 +568,7 @@ namespace resource {
 
         //! if there already exists a pool with this name
         std::size_t num_thread_pools = initial_thread_pools_.size();
-        for (size_t i(1); i < num_thread_pools; i++)
+        for (size_t i = 1; i != num_thread_pools; ++i)
         {
             if (name == initial_thread_pools_[i].pool_name_)
             {
@@ -574,17 +587,22 @@ namespace resource {
     void resource_partitioner::add_resource(
         pu const& p, std::string const& pool_name, std::size_t num_threads)
     {
-        //! FIXME except if policy allow_extra_thread_creation is activated
-        //! then I don't have to check the occupancy count ...
-        // check occupancy counter and decrement it
-        if (p.thread_occupancy_count_ > 0)
+        if (mode_ & mode_allow_oversubscription)
         {
-            p.thread_occupancy_count_--;
+            // increment occupancy counter
             get_pool_data(pool_name).add_resource(p.id_, num_threads);
+            ++p.thread_occupancy_count_;
+            return;
+        }
+
+        // check occupancy counter and increment it
+        if (p.thread_occupancy_count_ == 0)
+        {
+            get_pool_data(pool_name).add_resource(p.id_, num_threads);
+            ++p.thread_occupancy_count_;
 
             // Make sure the total number of requested threads does not exceed
             // the number of threads requested on the command line
-            //! FIXME except if policy allow_extra_thread_creation is activated
             if (detail::init_pool_data::num_threads_overall > cfg_.num_threads_)
             {
                 //! FIXME add allow_empty_default_pool policy
@@ -691,17 +709,34 @@ namespace resource {
         return cfg_;
     }
 
-    std::size_t resource_partitioner::get_num_threads() const
+    std::size_t resource_partitioner::get_num_distinct_pus() const
     {
         return cfg_.num_threads_;
     }
 
-    size_t resource_partitioner::get_num_pools() const
+    std::size_t resource_partitioner::get_num_threads() const
+    {
+        std::size_t num_thread_pools = initial_thread_pools_.size();
+        std::size_t num_threads = 0;
+        for (size_t i = 0; i != num_thread_pools; ++i)
+        {
+            num_threads += get_pool_data(i).num_threads_;
+        }
+
+        // the number of allocated threads should be the same as the number of
+        // threads to create (if no over-subscription is allowed)
+        HPX_ASSERT(mode_ & mode_allow_oversubscription ||
+            num_threads == cfg_.num_threads_);
+
+        return num_threads;
+    }
+
+    std::size_t resource_partitioner::get_num_pools() const
     {
         return initial_thread_pools_.size();
     }
 
-    size_t resource_partitioner::get_num_threads(std::size_t pool_index) const
+    std::size_t resource_partitioner::get_num_threads(std::size_t pool_index) const
     {
         return get_pool_data(pool_index).num_threads_;
     }
@@ -760,9 +795,12 @@ namespace resource {
             int(boost::program_options::variables_map& vm)
         > const& f,
         boost::program_options::options_description desc_cmdline, int argc,
-        char **argv, std::vector<std::string> ini_config, runtime_mode mode,
+        char **argv, std::vector<std::string> ini_config,
+        resource::resource_partitioner_mode rpmode, runtime_mode mode,
         bool fill_internal_topology)
     {
+        mode_ = rpmode;
+
         // set internal parameters of runtime configuration
         cfg_.rtcfg_ = util::runtime_configuration(argv[0], mode);
         cfg_.ini_config_ = std::move(ini_config);

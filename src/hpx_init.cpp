@@ -615,7 +615,8 @@ namespace hpx
                 // and get a handle to it
                 // (if the command-line parsing has not yet been done, do it now)
                 auto& rp = hpx::get_resource_partitioner(f, desc_cmdline, argc,
-                    argv, std::move(ini_config), mode, false);
+                    argv, std::move(ini_config), resource::mode_default,
+                    mode, false);
 
                 // check whether HPX should be exited at this point
                 // (if the program options contain --hpx:help or --hpx:version)

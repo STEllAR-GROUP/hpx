@@ -39,6 +39,11 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         {
             affinity_masks_ = affinity_masks;
         }
+        void set_affinity_masks(
+            std::vector<threads::mask_type> && affinity_masks)
+        {
+            affinity_masks_ = std::move(affinity_masks);
+        }
 
         std::size_t get_num_threads() const
         {
@@ -54,6 +59,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         {
             HPX_ASSERT(num_thread < pu_nums_.size());
             return pu_nums_[num_thread];
+        }
+        void set_pu_nums(std::vector<std::size_t> const& pu_nums)
+        {
+            pu_nums_ = pu_nums;
+        }
+        void set_pu_nums(std::vector<std::size_t> && pu_nums)
+        {
+            pu_nums_ = std::move(pu_nums);
         }
 
         void add_punit(std::size_t virt_core, std::size_t thread_num);

@@ -219,25 +219,25 @@ namespace hpx { namespace threads { namespace policies
         inline std::size_t domain_from_local_thread_index(std::size_t n)
         {
             auto &rp = get_resource_partitioner();
-            auto const& topo = hpx::threads::get_topology();
+            auto const& topo = rp.get_topology();
             std::size_t global_id = local_to_global_thread_index(n);
             std::size_t pu_num = rp.get_pu_num(global_id);
-            //
+
             return topo.get_numa_node_number(pu_num);
         }
 
-        template <typename queue_type>
-        std::size_t num_domains(const std::vector<queue_type*> &queues)
+        template <typename Queue>
+        std::size_t num_domains(const std::vector<Queue*> &queues)
         {
             auto &rp = get_resource_partitioner();
-            auto const& topo = hpx::threads::get_topology();
+            auto const& topo = rp.get_topology();
             std::size_t num_queues = queues.size();
-            //
+
             std::set<std::size_t> domains;
-            for (std::size_t local_id=0; local_id<num_queues; ++local_id) {
+            for (std::size_t local_id = 0; local_id != num_queues; ++local_id)
+            {
                 std::size_t global_id = local_to_global_thread_index(local_id);
                 std::size_t pu_num = rp.get_pu_num(global_id);
-                //
                 std::size_t dom = topo.get_numa_node_number(pu_num);
                 domains.insert(dom);
             }
@@ -252,14 +252,16 @@ namespace hpx { namespace threads { namespace policies
         {
             std::vector<std::size_t> result;
             auto &rp = get_resource_partitioner();
-            auto const& topo = hpx::threads::get_topology();
+            auto const& topo = rp.get_topology();
             std::size_t global_id = local_to_global_thread_index(local_id);
             std::size_t pu_num = rp.get_pu_num(global_id);
             std::size_t numa = topo.get_numa_node_number(pu_num);
-            for (auto local_id : ts) {
-                std::size_t global_id = local_to_global_thread_index(local_id);
-                std::size_t pu_num = rp.get_pu_num(global_id);
-                if (pred(numa,topo.get_numa_node_number(pu_num))) {
+            for (auto local_id : ts)
+            {
+                global_id = local_to_global_thread_index(local_id);
+                pu_num = rp.get_pu_num(global_id);
+                if (pred(numa, topo.get_numa_node_number(pu_num)))
+                {
                     result.push_back(local_id);
                 }
             }

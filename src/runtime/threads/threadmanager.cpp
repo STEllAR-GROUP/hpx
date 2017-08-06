@@ -336,7 +336,7 @@ namespace hpx { namespace threads
             util::io_service_pool& timer_pool,
 #endif
             notification_policy_type& notifier)
-      : num_threads_(hpx::get_resource_partitioner().get_num_threads()),
+      : num_threads_(hpx::get_resource_partitioner().get_num_distinct_pus()),
 #ifdef HPX_HAVE_TIMER_POOL
         timer_pool_(timer_pool),
 #endif
@@ -1813,19 +1813,14 @@ namespace hpx { namespace threads
     bool threadmanager::run()
     {
         std::unique_lock<mutex_type> lk(mtx_);
-        auto& rp = hpx::get_resource_partitioner();
-        std::size_t num_threads(rp.get_num_threads());
 
-        // reset the startup barrier for controlling startup
+        // startup barrier for controlling startup
         HPX_ASSERT(startup_.get() == nullptr);
-        startup_.reset(
-            new compat::barrier(static_cast<unsigned>(num_threads + 1)));
-
-        // the main thread needs to have a unique thread_num
 
         // the main thread needs to have a unique thread_num
         // worker threads are numbered 0..N-1, so we can use N for this thread
-        init_tss(num_threads);
+        auto& rp = hpx::get_resource_partitioner();
+        init_tss(rp.get_num_threads());
 
 #ifdef HPX_HAVE_TIMER_POOL
         LTM_(info) << "run: running timer pool";
@@ -1836,6 +1831,9 @@ namespace hpx { namespace threads
         {
             std::size_t num_threads_in_pool =
                 rp.get_num_threads(pool_iter->get_pool_name());
+            startup_.reset(new compat::barrier(
+                static_cast<unsigned>(num_threads_in_pool + 1)));
+
             if (pool_iter->get_os_thread_count() != 0 ||
                 pool_iter->has_reached_state(state_running))
             {
@@ -1849,17 +1847,13 @@ namespace hpx { namespace threads
 #endif
                 return false;
             }
-        }
 
-        // wait for all thread pools to have launched all OS threads
-        startup_->wait();
+            // wait for all thread pools to have launched all OS threads
+            startup_->wait();
 
-        // set all states of all schedulers to "running"
-        for (auto& pool_iter : pools_)
-        {
+            // set all states of all schedulers to "running"
             policies::scheduler_base* sched = pool_iter->get_scheduler();
-            if (sched)
-                sched->set_all_states(state_running);
+            if (sched) sched->set_all_states(state_running);
         }
 
         LTM_(info) << "run: running";
