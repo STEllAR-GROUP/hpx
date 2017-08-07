@@ -36,8 +36,9 @@ void test(T minval, T maxval)
         std::size_t sz = static_cast<std::size_t>(maxval-minval);
 
         hpx::partitioned_vector<T> os(sz);
+        os.register_as("test_vector");
         hpx::parallel::fill(
-            hpx::parallel::execution::par, std::begin(os), std::end(os), 0);
+            hpx::parallel::execution::par, std::begin(os), std::end(os), 42);
 
         oarchive << os;
 
@@ -48,8 +49,9 @@ void test(T minval, T maxval)
             hpx::parallel::execution::par, std::begin(is), std::end(is), 0);
 
         iarchive >> is;
+
         HPX_TEST_EQ(os.size(), is.size());
-        for (std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i != os.size(); ++i)
         {
             HPX_TEST_EQ(os[i], is[i]);
         }
