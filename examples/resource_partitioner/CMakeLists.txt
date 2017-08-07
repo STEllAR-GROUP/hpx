@@ -4,9 +4,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
+  oversubscribing_resource_partitioner
   simple_resource_partitioner
 )
 
+set(oversubscribing_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 set(simple_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})

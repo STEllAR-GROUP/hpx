@@ -28,6 +28,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 
 namespace hpx { namespace threads { namespace detail
@@ -55,6 +56,13 @@ namespace hpx { namespace threads { namespace detail
     std::size_t thread_pool_base::get_worker_thread_num() const
     {
         return thread_num_tss_.get_worker_thread_num();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // detail::manage_executor interface implementation
+    char const* thread_pool_base::get_description() const
+    {
+        return id_.name_.c_str();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -91,15 +99,6 @@ namespace hpx { namespace threads { namespace detail
         {
             used_processing_units_ |= rp.get_pu_mask(threads_offset + i);
         }
-    }
-
-    bool thread_pool_base::run(
-        std::unique_lock<compat::mutex>& l, std::size_t num_threads)
-    {
-        compat::barrier startup(num_threads + 1);
-        bool ret = run(l, startup, num_threads);
-        startup.wait();
-        return ret;
     }
 }}}
 

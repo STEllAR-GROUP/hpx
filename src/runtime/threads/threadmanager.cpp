@@ -370,7 +370,7 @@ namespace hpx { namespace threads
             {
             case resource::user_defined:
             {
-                auto const& pool_func = rp.get_pool_creator(i);
+                auto pool_func = rp.get_pool_creator(i);
                 std::unique_ptr<detail::thread_pool_base> pool(
                     pool_func(notifier, num_threads_in_pool,
                         thread_offset, i, name));
@@ -1810,12 +1810,32 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::size_t threadmanager::shrink_pool(std::string const& pool_name)
+    {
+        return get_resource_partitioner().shrink_pool(
+            pool_name,
+            [this, &pool_name](std::size_t virt_core)
+            {
+                get_pool(pool_name).remove_processing_unit(virt_core);
+            });
+    }
+
+    std::size_t threadmanager::expand_pool(std::string const& pool_name)
+    {
+        return get_resource_partitioner().expand_pool(
+            pool_name,
+            [this, &pool_name](std::size_t virt_core)
+            {
+                detail::thread_pool_base& pool = get_pool(pool_name);
+                pool.add_processing_unit(virt_core,
+                    pool.get_thread_offset() + virt_core);
+            });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run()
     {
         std::unique_lock<mutex_type> lk(mtx_);
-
-        // startup barrier for controlling startup
-        HPX_ASSERT(startup_.get() == nullptr);
 
         // the main thread needs to have a unique thread_num
         // worker threads are numbered 0..N-1, so we can use N for this thread
@@ -1831,8 +1851,6 @@ namespace hpx { namespace threads
         {
             std::size_t num_threads_in_pool =
                 rp.get_num_threads(pool_iter->get_pool_name());
-            startup_.reset(new compat::barrier(
-                static_cast<unsigned>(num_threads_in_pool + 1)));
 
             if (pool_iter->get_os_thread_count() != 0 ||
                 pool_iter->has_reached_state(state_running))
@@ -1840,16 +1858,13 @@ namespace hpx { namespace threads
                 return true;    // do nothing if already running
             }
 
-            if (!pool_iter->run(lk, std::ref(*startup_), num_threads_in_pool))
+            if (!pool_iter->run(lk, num_threads_in_pool))
             {
 #ifdef HPX_HAVE_TIMER_POOL
                 timer_pool_.stop();
 #endif
                 return false;
             }
-
-            // wait for all thread pools to have launched all OS threads
-            startup_->wait();
 
             // set all states of all schedulers to "running"
             policies::scheduler_base* sched = pool_iter->get_scheduler();

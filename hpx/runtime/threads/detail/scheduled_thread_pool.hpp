@@ -10,6 +10,7 @@
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -120,8 +121,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         ///////////////////////////////////////////////////////////////////
-        bool run(std::unique_lock<compat::mutex>& l, compat::barrier& startup,
-            std::size_t pool_threads);
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t pool_threads);
 
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
@@ -136,8 +136,8 @@ namespace hpx { namespace threads { namespace detail
             return threads_[num_thread_local];
         }
 
-        void thread_func(std::size_t thread_num,
-            topology const& topology, compat::barrier& startup);
+        void thread_func(std::size_t thread_num, std::size_t global_thread_num,
+            std::shared_ptr<compat::barrier> startup);
 
         std::size_t get_os_thread_count() const
         {
@@ -194,6 +194,8 @@ namespace hpx { namespace threads { namespace detail
         }
 #endif
 
+        std::int64_t get_executed_threads() const;
+
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         std::int64_t get_executed_threads(std::size_t, bool);
         std::int64_t get_executed_thread_phases(std::size_t, bool);
@@ -223,8 +225,28 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t get_busy_loop_count(std::size_t num, bool reset);
         std::int64_t get_scheduler_utilization() const;
 
+        ///////////////////////////////////////////////////////////////////////
+        // detail::manage_executor implementation
+
+        // Return the requested policy element
+        std::size_t get_policy_element(executor_parameter p, error_code&) const;
+
+        // Return statistics collected by this scheduler
+        void get_statistics(executor_statistics& s, error_code&) const;
+
+        // Provide the given processing unit to the scheduler.
+        void add_processing_unit(std::size_t virt_core,
+            std::size_t thread_num, error_code&);
+
+        // Remove the given processing unit from the scheduler.
+        void remove_processing_unit(std::size_t virt_core, error_code&);
+
     protected:
         friend struct init_tss_helper<Scheduler>;
+
+        void add_processing_unit(std::size_t virt_core,
+            std::size_t thread_num, std::shared_ptr<compat::barrier> startup,
+            error_code& ec = hpx::throws);
 
     private:
         std::vector<compat::thread> threads_;           // vector of OS-threads
@@ -239,7 +261,6 @@ namespace hpx { namespace threads { namespace detail
         // count number of executed HPX-threads and thread phases (invocations)
         std::vector<std::int64_t> executed_threads_;
         std::vector<std::int64_t> executed_thread_phases_;
-        boost::atomic<long> thread_count_;
 
         // scheduler utilization data
         std::vector<std::uint8_t> tasks_active_;
@@ -290,6 +311,10 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::uint64_t> reset_tfunc_times_;
 
         std::vector<std::int64_t> idle_loop_counts_, busy_loop_counts_;
+
+        // support detail::manage_executor interface
+        boost::atomic<long> thread_count_;
+        boost::atomic<std::int64_t> tasks_scheduled_;
     };
 }}}    // namespace hpx::threads::detail
 

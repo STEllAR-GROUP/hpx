@@ -296,6 +296,10 @@ namespace hpx { namespace threads
             detail::thread_num_tss_.deinit_tss();
         }
 
+    public:
+        std::size_t shrink_pool(std::string const& pool_name);
+        std::size_t expand_pool(std::string const& pool_name);
+
     private:
         // counter creator functions
         naming::gid_type thread_counts_counter_creator(
@@ -409,9 +413,6 @@ private:
         pool_vector pools_;
 
         notification_policy_type& notifier_;
-
-        // startup barrier
-        boost::scoped_ptr<compat::barrier> startup_;
     };
 }}
 

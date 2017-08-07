@@ -6,6 +6,7 @@
 #if !defined(HPX_RESOURCE_PARTITIONER)
 #define HPX_RESOURCE_PARTITIONER
 
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
@@ -18,6 +19,7 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util/tuple.hpp>
 //
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
@@ -51,6 +53,7 @@ namespace resource
     {
         mode_default = 0,
         mode_allow_oversubscription = 1,
+        mode_allow_dynamic_pools = 2
     };
 }
 
@@ -232,9 +235,16 @@ namespace resource {
         {
         public:
             // mechanism for adding resources (zero-based index)
-            void add_resource(std::size_t pu_index, std::size_t num_threads);
+            void add_resource(std::size_t pu_index, bool exclusive,
+                std::size_t num_threads);
 
             void print_pool(std::ostream&) const;
+
+            void assign_pu(std::size_t virt_core);
+            void unassign_pu(std::size_t virt_core);
+
+            bool pu_is_exclusive(std::size_t virt_core) const;
+            bool pu_is_assigned(std::size_t virt_core) const;
 
             friend class resource::resource_partitioner;
 
@@ -249,9 +259,13 @@ namespace resource {
 
             std::string pool_name_;
             scheduling_policy scheduling_policy_;
+
             // PUs this pool is allowed to run on
             std::vector<threads::mask_type> assigned_pus_;  // mask
-            std::vector<std::size_t> assigned_pu_nums_;     // pu index
+
+            // pu index/exclusive/assigned
+            std::vector<util::tuple<std::size_t, bool, bool>> assigned_pu_nums_;
+
             // counter for number of threads bound to this pool
             std::size_t num_threads_;
             scheduler_function create_function_;
@@ -261,6 +275,8 @@ namespace resource {
     ///////////////////////////////////////////////////////////////////////////
     class resource_partitioner
     {
+        typedef lcos::local::spinlock mutex_type;
+
     public:
         // constructor: users shouldn't use the constructor
         // but rather get_resource_partitioner
@@ -280,17 +296,23 @@ namespace resource {
         // Functions to add processing units to thread pools via
         // the pu/core/numa_domain API
         void add_resource(hpx::resource::pu const& p,
-            const std::string& pool_name, std::size_t num_threads = 1);
+            std::string const& pool_name, std::size_t num_threads = 1)
+        {
+            add_resource(p, pool_name, true, num_threads);
+        }
+        void add_resource(hpx::resource::pu const& p,
+            std::string const& pool_name, bool exclusive,
+            std::size_t num_threads = 1);
         void add_resource(const std::vector<hpx::resource::pu>& pv,
-            const std::string& pool_name);
+            std::string const& pool_name, bool exclusive = true);
         void add_resource(const hpx::resource::core& c,
-            const std::string& pool_name);
+            std::string const& pool_name, bool exclusive = true);
         void add_resource(const std::vector<hpx::resource::core>& cv,
-            const std::string& pool_name);
+            std::string const& pool_name, bool exclusive = true);
         void add_resource(const hpx::resource::numa_domain& nd,
-            const std::string& pool_name);
+            std::string const& pool_name, bool exclusive = true);
         void add_resource(const std::vector<hpx::resource::numa_domain>& ndv,
-            const std::string& pool_name);
+            std::string const& pool_name, bool exclusive = true);
 
         // called by constructor of scheduler_base
         threads::policies::detail::affinity_data const& get_affinity_data() const
@@ -318,10 +340,8 @@ namespace resource {
         std::size_t get_num_threads(std::string const& pool_name) const;
         std::size_t get_num_threads(std::size_t pool_index) const;
 
-        detail::init_pool_data const& get_pool_data(std::size_t pool_index) const;
-
         std::string const& get_pool_name(std::size_t index) const;
-        std::size_t get_pool_index(const std::string &pool_name) const;
+        std::size_t get_pool_index(std::string const& pool_name) const;
 
         size_t get_pu_num(std::size_t global_thread_num);
         threads::mask_cref_type get_pu_mask(std::size_t global_thread_num) const;
@@ -336,7 +356,7 @@ namespace resource {
             resource::resource_partitioner_mode rpmode,
             runtime_mode mode, bool fill_internal_topology = true);
 
-        scheduler_function const& get_pool_creator(size_t index) const;
+        scheduler_function get_pool_creator(size_t index) const;
 
         std::vector<numa_domain> &numa_domains()
         {
@@ -355,6 +375,15 @@ namespace resource {
             return cores_needed_;
         }
 
+        // manage dynamic footprint of pools
+        void assign_pu(std::string const& pool_name, std::size_t virt_core);
+        void unassign_pu(std::string const& pool_name, std::size_t virt_core);
+
+        std::size_t shrink_pool(std::string const& pool_name,
+            util::function_nonser<void(std::size_t)> const& remove_pu);
+        std::size_t expand_pool(std::string const& pool_name,
+            util::function_nonser<void(std::size_t)> const& add_pu);
+
     private:
         ////////////////////////////////////////////////////////////////////////
         void fill_topology_vectors();
@@ -368,16 +397,17 @@ namespace resource {
         void reconfigure_affinities();
         bool check_empty_pools() const;
 
-        // has to be private bc pointers become invalid after data member
-        // thread_pools_ is resized
-        // we don't want to allow the user to use it
+        // helper functions
         detail::init_pool_data const& get_pool_data(
-            const std::string &pool_name) const;
-        detail::init_pool_data& get_pool_data(std::string const& pool_name);
-        detail::init_pool_data& get_default_pool_data();
+            std::size_t pool_index) const;
 
-        void set_scheduler(
-            scheduling_policy sched, const std::string &pool_name);
+        // has to be private because pointers become invalid after data member
+        // thread_pools_ is resized we don't want to allow the user to use it
+        detail::init_pool_data const& get_pool_data(
+            std::string const& pool_name) const;
+        detail::init_pool_data& get_pool_data(std::string const& pool_name);
+
+        void set_scheduler(scheduling_policy sched, std::string const& pool_name);
 
         ////////////////////////////////////////////////////////////////////////
         // counter for instance numbers
@@ -389,6 +419,7 @@ namespace resource {
 
         // contains the basic characteristics of the thread pool partitioning ...
         // that will be passed to the runtime
+        mutable mutex_type mtx_;
         std::vector<detail::init_pool_data> initial_thread_pools_;
 
         // reference to the topology and affinity data

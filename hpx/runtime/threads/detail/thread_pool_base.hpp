@@ -10,6 +10,7 @@
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -17,6 +18,7 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
@@ -30,6 +32,7 @@
 #include <cstdint>
 #include <exception>
 #include <iosfwd>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -38,22 +41,6 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    struct manage_active_thread_count
-    {
-        manage_active_thread_count(boost::atomic<long>& counter)
-                : counter_(counter)
-        {
-            ++counter_;
-        }
-        ~manage_active_thread_count()
-        {
-            --counter_;
-        }
-
-        boost::atomic<long>& counter_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     struct pool_id_type
     {
@@ -68,7 +55,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // note: this data structure has to be protected from races from the outside
-    class thread_pool_base
+    class thread_pool_base : public detail::manage_executor
     {
     public:
         thread_pool_base(threads::policies::callback_notifier& notifier,
@@ -87,9 +74,7 @@ namespace hpx { namespace threads { namespace detail
         virtual void init(std::size_t num_threads, std::size_t threads_offset);
 
         virtual bool run(std::unique_lock<compat::mutex>& l,
-            compat::barrier& startup, std::size_t num_threads) = 0;
-
-        bool run(std::unique_lock<compat::mutex>& l, std::size_t num_threads);
+            std::size_t num_threads) = 0;
 
         virtual void stop(
             std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
@@ -262,6 +247,28 @@ namespace hpx { namespace threads { namespace detail
         {
             notifier_.on_error(num, e);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        // detail::manage_executor implementation
+
+        // Return the requested policy element
+        virtual std::size_t get_policy_element(executor_parameter p,
+            error_code& ec = throws) const = 0;
+
+        // Return statistics collected by this scheduler
+        virtual void get_statistics(executor_statistics& stats,
+            error_code& ec = throws) const = 0;
+
+        // Provide the given processing unit to the scheduler.
+        virtual void add_processing_unit(std::size_t virt_core,
+            std::size_t thread_num, error_code& ec = throws) = 0;
+
+        // Remove the given processing unit from the scheduler.
+        virtual void remove_processing_unit(std::size_t thread_num,
+            error_code& ec = throws) = 0;
+
+        // return the description string of the underlying scheduler
+        char const* get_description() const;
 
     public:
         void init_pool_time_scale();

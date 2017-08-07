@@ -366,7 +366,7 @@ namespace hpx { namespace threads { namespace policies
         coroutines::detail::tss_data_node* find_tss_data(void const* key)
         {
             if (!thread_data_)
-                return 0;
+                return nullptr;
             return thread_data_->find(key);
         }
 
@@ -395,7 +395,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 return current_node->get_value();
             }
-            return 0;
+            return nullptr;
         }
 
         void set_tss_data(void const* key,

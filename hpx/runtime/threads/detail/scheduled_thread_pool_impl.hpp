@@ -39,6 +39,21 @@
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
+    struct manage_active_thread_count
+    {
+        manage_active_thread_count(boost::atomic<long>& counter)
+          : counter_(counter)
+        {
+        }
+        ~manage_active_thread_count()
+        {
+            --counter_;
+        }
+
+        boost::atomic<long>& counter_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     struct init_tss_helper
     {
@@ -73,6 +88,7 @@ namespace hpx { namespace threads { namespace detail
         : thread_pool_base(notifier, index, pool_name, m, thread_offset)
         , sched_(std::move(sched))
         , thread_count_(0)
+        , tasks_scheduled_(0)
     {
         sched_->set_parent_pool(this);
     }
@@ -155,17 +171,20 @@ namespace hpx { namespace threads { namespace detail
             {
                 for (std::size_t i = 0; i != threads_.size(); ++i)
                 {
+                    // skip this if already stopped
+                    if (!threads_[i].joinable())
+                        continue;
+
                     // make sure no OS thread is waiting
                     LTM_(info) << "stop: " << id_.name_ << " notify_all";
 
                     sched_->Scheduler::do_some_work(std::size_t(-1));
 
-                    LTM_(info)                                        //-V128
-                        << "stop: " << id_.name_ << " join:" << i;    //-V128
+                    LTM_(info) << "stop: " << id_.name_ << " join:" << i;
 
                     // unlock the lock while joining
                     util::unlock_guard<Lock> ul(l);
-                    threads_[i].join();
+                    remove_processing_unit(i, hpx::throws);
                 }
                 threads_.clear();
             }
@@ -182,8 +201,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     bool hpx::threads::detail::scheduled_thread_pool<Scheduler>::run(
-        std::unique_lock<compat::mutex>& l, compat::barrier& startup,
-        std::size_t pool_threads)
+        std::unique_lock<compat::mutex>& l, std::size_t pool_threads)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -215,10 +233,11 @@ namespace hpx { namespace threads { namespace detail
 
         // run threads and wait for initialization to complete
         std::size_t thread_num = 0;
+        std::shared_ptr<compat::barrier> startup =
+            std::make_shared<compat::barrier>(pool_threads + 1);
         try
         {
             auto const& rp = get_resource_partitioner();
-            topology const& topology_ = get_topology();
 
             for (/**/; thread_num != pool_threads; ++thread_num)
             {
@@ -238,9 +257,7 @@ namespace hpx { namespace threads { namespace detail
                     << std::hex << HPX_CPU_MASK_PREFIX << mask;
 
                 // create a new thread
-                threads_.push_back(
-                    compat::thread(&scheduled_thread_pool::thread_func, this,
-                        thread_num, std::ref(topology_), std::ref(startup)));
+                add_processing_unit(thread_num, global_thread_num, startup);
 
                 // set the new threads affinity (on Windows systems)
                 if (!any(mask))
@@ -251,6 +268,11 @@ namespace hpx { namespace threads { namespace detail
                         << global_thread_num << " was explicitly disabled.";
                 }
             }
+
+            // wait for all threads to have started up
+            startup->wait();
+
+            HPX_ASSERT(pool_threads == std::size_t(thread_count_.load()));
         }
         catch (std::exception const& e)
         {
@@ -260,7 +282,7 @@ namespace hpx { namespace threads { namespace detail
             // trigger the barrier
             pool_threads -= thread_num;
             while (pool_threads-- != 0)
-                startup.wait();
+                startup->wait();
 
             stop_locked(l);
             threads_.clear();
@@ -274,22 +296,22 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename Scheduler>
     void hpx::threads::detail::scheduled_thread_pool<Scheduler>::thread_func(
-        std::size_t thread_num, topology const& topology,
-        compat::barrier& startup)
+        std::size_t thread_num, std::size_t global_thread_num,
+        std::shared_ptr<compat::barrier> startup)
     {
-        std::size_t global_thread_num = thread_num + this->thread_offset_;
+        auto const& rp = get_resource_partitioner();
+        topology const& topo = rp.get_topology();
 
         // Set the affinity for the current thread.
-        threads::mask_cref_type mask =
-            get_resource_partitioner().get_pu_mask(global_thread_num);
+        threads::mask_cref_type mask = rp.get_pu_mask(global_thread_num);
 
         if (LHPX_ENABLED(debug))
-            topology.write_to_log();
+            topo.write_to_log();
 
         error_code ec(lightweight);
         if (any(mask))
         {
-            topology.set_thread_affinity_mask(mask, ec);
+            topo.set_thread_affinity_mask(mask, ec);
             if (ec)
             {
                 LTM_(warning)    //-V128
@@ -314,7 +336,7 @@ namespace hpx { namespace threads { namespace detail
         if ((mode_ & policies::reduce_thread_priority) &&
             any(mask & used_processing_units_))
         {
-            topology.reduce_thread_priority(ec);
+            topo.reduce_thread_priority(ec);
             if (ec)
             {
                 LTM_(warning)    //-V128
@@ -330,105 +352,110 @@ namespace hpx { namespace threads { namespace detail
             *this, thread_num, this->thread_offset_);
 
         // wait for all threads to start up before before starting HPX work
-        startup.wait();
+        ++thread_count_;
+        startup->wait();
 
+        LTM_(info)    //-V128
+            << "thread_func: " << id_.name_
+            << " starting OS thread: " << thread_num;    //-V128
+
+        // set state to running
+        boost::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(thread_num);
+        hpx::state oldstate = state.exchange(state_running);
+
+        HPX_ASSERT(oldstate <= state_running);
+
+        try
         {
-            LTM_(info)    //-V128
-                << "thread_func: " << id_.name_
-                << " starting OS thread: " << thread_num;    //-V128
-
             try
             {
-                try
+                manage_active_thread_count count(thread_count_);
+
+                // run the work queue
+                hpx::threads::coroutines::prepare_main_thread main_thread;
+
+                // run main Scheduler loop until terminated
+                detail::scheduling_counters counters(
+                    executed_threads_[thread_num],
+                    executed_thread_phases_[thread_num],
+                    tfunc_times_[thread_num],
+                    exec_times_[thread_num],
+                    idle_loop_counts_[thread_num],
+                    busy_loop_counts_[thread_num],
+                    tasks_active_[thread_num]);
+
+                detail::scheduling_callbacks callbacks(
+                    util::bind(    //-V107
+                        &policies::scheduler_base::idle_callback,
+                        std::ref(sched_), global_thread_num),
+                    detail::scheduling_callbacks::callback_type());
+
+                if (mode_ & policies::do_background_work)
                 {
-                    manage_active_thread_count count(thread_count_);
-
-                    // run the work queue
-                    hpx::threads::coroutines::prepare_main_thread main_thread;
-
-                    // run main Scheduler loop until terminated
-                    detail::scheduling_counters counters(
-                        executed_threads_[thread_num],
-                        executed_thread_phases_[thread_num],
-                        tfunc_times_[thread_num],
-                        exec_times_[thread_num],
-                        idle_loop_counts_[thread_num],
-                        busy_loop_counts_[thread_num],
-                        tasks_active_[thread_num]);
-
-                    detail::scheduling_callbacks callbacks(
-                        util::bind(    //-V107
-                            &policies::scheduler_base::idle_callback,
-                            std::ref(sched_), global_thread_num),
-                        detail::scheduling_callbacks::callback_type());
-
-                    if (mode_ & policies::do_background_work)
-                    {
-                        callbacks.background_ = util::bind(    //-V107
-                            &policies::scheduler_base::background_callback,
-                            std::ref(sched_), global_thread_num);
-                    }
-
-                    sched_->Scheduler::set_scheduler_mode(mode_);
-                    detail::scheduling_loop(
-                        thread_num, *sched_, counters, callbacks);
-
-                    // the OS thread is allowed to exit only if no more HPX
-                    // threads exist or if some other thread has terminated
-                    HPX_ASSERT(
-                        !sched_->Scheduler::get_thread_count(unknown,
-                                   thread_priority_default, thread_num) ||
-                        sched_->Scheduler::get_state(thread_num) ==
-                            state_terminating);
+                    callbacks.background_ = util::bind(    //-V107
+                        &policies::scheduler_base::background_callback,
+                        std::ref(sched_), global_thread_num);
                 }
-                catch (hpx::exception const& e)
-                {
-                    LFATAL_    //-V128
-                        << "thread_func: " << id_.name_
-                        << " thread_num:" << global_thread_num    //-V128
-                        << " : caught hpx::exception: " << e.what()
-                        << ", aborted thread execution";
 
-                    report_error(global_thread_num, std::current_exception());
-                    return;
-                }
-                catch (boost::system::system_error const& e)
-                {
-                    LFATAL_    //-V128
-                        << "thread_func: " << id_.name_
-                        << " thread_num:" << global_thread_num    //-V128
-                        << " : caught boost::system::system_error: " << e.what()
-                        << ", aborted thread execution";
+                sched_->Scheduler::set_scheduler_mode(mode_);
+                detail::scheduling_loop(
+                    thread_num, *sched_, counters, callbacks);
 
-                    report_error(global_thread_num, std::current_exception());
-                    return;
-                }
-                catch (std::exception const& e)
-                {
-                    // Repackage exceptions to avoid slicing.
-                    hpx::throw_with_info(
-                        hpx::exception(unhandled_exception, e.what()));
-                }
+                // the OS thread is allowed to exit only if no more HPX
+                // threads exist or if some other thread has terminated
+                HPX_ASSERT(
+                    !sched_->Scheduler::get_thread_count(
+                        unknown, thread_priority_default, thread_num) ||
+                    sched_->Scheduler::get_state(thread_num) == state_terminating);
             }
-            catch (...)
+            catch (hpx::exception const& e)
             {
                 LFATAL_    //-V128
                     << "thread_func: " << id_.name_
                     << " thread_num:" << global_thread_num    //-V128
-                    << " : caught unexpected "                //-V128
-                       "exception, aborted thread execution";
+                    << " : caught hpx::exception: " << e.what()
+                    << ", aborted thread execution";
 
                 report_error(global_thread_num, std::current_exception());
                 return;
             }
+            catch (boost::system::system_error const& e)
+            {
+                LFATAL_    //-V128
+                    << "thread_func: " << id_.name_
+                    << " thread_num:" << global_thread_num    //-V128
+                    << " : caught boost::system::system_error: " << e.what()
+                    << ", aborted thread execution";
 
-            LTM_(info)    //-V128
-                << "thread_func: " << id_.name_
-                << " thread_num: " << global_thread_num
-                << " : ending OS thread, "    //-V128
-                   "executed "
-                << executed_threads_[global_thread_num] << " HPX threads";
+                report_error(global_thread_num, std::current_exception());
+                return;
+            }
+            catch (std::exception const& e)
+            {
+                // Repackage exceptions to avoid slicing.
+                hpx::throw_with_info(
+                    hpx::exception(unhandled_exception, e.what()));
+            }
         }
+        catch (...)
+        {
+            LFATAL_    //-V128
+                << "thread_func: " << id_.name_
+                << " thread_num:" << global_thread_num    //-V128
+                << " : caught unexpected "                //-V128
+                    "exception, aborted thread execution";
+
+            report_error(global_thread_num, std::current_exception());
+            return;
+        }
+
+        LTM_(info)    //-V128
+            << "thread_func: " << id_.name_
+            << " thread_num: " << global_thread_num
+            << " : ending OS thread, "    //-V128
+                "executed "
+            << executed_threads_[global_thread_num] << " HPX threads";
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -449,6 +476,9 @@ namespace hpx { namespace threads { namespace detail
 
         detail::create_thread(
             sched_.get(), data, id, initial_state, run_now, ec);    //-V601
+
+        // update statistics
+        ++tasks_scheduled_;
     }
 
     template <typename Scheduler>
@@ -466,6 +496,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         detail::create_work(sched_.get(), data, initial_state, ec);    //-V601
+
+        // update statistics
+        ++tasks_scheduled_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -525,6 +558,25 @@ namespace hpx { namespace threads { namespace detail
         HPX_ASSERT(executed_threads >= reset_executed_threads);
 
         return executed_threads - reset_executed_threads;
+    }
+
+    template <typename Scheduler>
+    std::int64_t scheduled_thread_pool<Scheduler>::get_executed_threads() const
+    {
+        std::int64_t executed_threads =
+            std::accumulate(executed_threads_.begin(), executed_threads_.end(),
+            std::int64_t(0));
+
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
+        std::int64_t reset_executed_threads =
+            std::accumulate(reset_executed_threads_.begin(),
+                reset_executed_threads_.end(), std::int64_t(0));
+
+        HPX_ASSERT(executed_threads >= reset_executed_threads);
+        return executed_threads - reset_executed_threads;
+#else
+        return executed_threads;
+#endif
     }
 
     template <typename Scheduler>
@@ -1227,6 +1279,113 @@ namespace hpx { namespace threads { namespace detail
         reset_cleanup_idle_rate_time_total_.resize(pool_threads);
 #endif
 #endif
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    std::size_t
+    scheduled_thread_pool<Scheduler>::get_policy_element(executor_parameter p,
+        error_code& ec) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        switch(p) {
+        case threads::detail::min_concurrency:
+//             return min_punits_;
+            break;
+
+        case threads::detail::max_concurrency:
+//             return max_punits_;
+            break;
+
+        case threads::detail::current_concurrency:
+            return thread_count_;
+
+        default:
+            break;
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter,
+            "thread_pool_executor::get_policy_element",
+            "requested value of invalid policy element");
+        return std::size_t(-1);
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::get_statistics(
+        executor_statistics& s, error_code& ec) const
+    {
+        s.queue_length_ = sched_->Scheduler::get_queue_length();
+        s.tasks_scheduled_ = tasks_scheduled_;
+        s.tasks_completed_ = get_executed_threads();
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::add_processing_unit(
+        std::size_t virt_core, std::size_t thread_num,
+        std::shared_ptr<compat::barrier> startup, error_code& ec)
+    {
+        get_resource_partitioner().assign_pu(id_.name_, virt_core);
+
+        if (threads_.size() <= virt_core)
+            threads_.resize(virt_core + 1);
+
+        if (threads_[virt_core].joinable())
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::add_processing_unit",
+                "the given virtual core has already been added to this "
+                "thread pool");
+            return;
+        }
+
+        threads_[virt_core] =
+            compat::thread(&scheduled_thread_pool::thread_func, this,
+                virt_core, thread_num, std::move(startup));
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::add_processing_unit(
+        std::size_t virt_core, std::size_t thread_num, error_code& ec)
+    {
+        std::shared_ptr<compat::barrier> startup =
+            std::make_shared<compat::barrier>(2);
+        add_processing_unit(virt_core, thread_num, startup, ec);
+        startup->wait();
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::remove_processing_unit(
+        std::size_t virt_core, error_code& ec)
+    {
+        if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::remove_processing_unit",
+                "the given virtual core has already been stopped to run on "
+                "this thread pool");
+            return;
+        }
+
+        // inform the scheduler to stop the virtual core
+        boost::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(virt_core);
+        hpx::state oldstate = state.exchange(state_stopped);
+
+        HPX_ASSERT(oldstate == state_starting ||
+            oldstate == state_running || oldstate == state_suspended ||
+            oldstate == state_stopping || oldstate == state_stopped);
+
+        threads_[virt_core].join();
+
+        get_resource_partitioner().unassign_pu(id_.name_, virt_core);
     }
 }}}
 

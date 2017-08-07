@@ -59,9 +59,8 @@ namespace hpx { namespace threads { namespace detail
 
         void report_error(std::size_t num, std::exception_ptr const& e);
 
-        ///////////////////////////////////////////////////////////////////
-        bool run(std::unique_lock<compat::mutex>& l, compat::barrier& startup,
-            std::size_t pool_threads);
+        ///////////////////////////////////////////////////////////////////////
+        bool run(std::unique_lock<compat::mutex>& l, std::size_t pool_threads);
 
         ///////////////////////////////////////////////////////////////////////
         void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
@@ -70,6 +69,23 @@ namespace hpx { namespace threads { namespace detail
         compat::thread& get_os_thread_handle(std::size_t global_thread_num);
 
         std::size_t get_os_thread_count() const;
+
+        ///////////////////////////////////////////////////////////////////////
+        // detail::manage_executor implementation
+
+        // Return the requested policy element
+        std::size_t get_policy_element(
+            executor_parameter p, error_code& ec) const;
+
+        // Return statistics collected by this scheduler
+        void get_statistics(executor_statistics& stats, error_code& ec) const;
+
+        // Provide the given processing unit to the scheduler.
+        void add_processing_unit(std::size_t virt_core, std::size_t thread_num,
+            error_code& ec);
+
+        // Remove the given processing unit from the scheduler.
+        void remove_processing_unit(std::size_t thread_num, error_code& ec);
 
     private:
         util::io_service_pool threads_;

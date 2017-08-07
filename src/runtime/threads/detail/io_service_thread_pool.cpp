@@ -74,9 +74,10 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     bool io_service_thread_pool::run(std::unique_lock<compat::mutex>& l,
-        compat::barrier& startup, std::size_t num_threads)
+        std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
+        compat::barrier startup(1);
         return threads_.run(num_threads, false, &startup);
     }
 
@@ -97,4 +98,26 @@ namespace hpx { namespace threads { namespace detail
         return threads_.size();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // detail::manage_executor implementation
+    std::size_t io_service_thread_pool::get_policy_element(
+        executor_parameter p, error_code& ec) const
+    {
+        return 0;
+    }
+
+    void io_service_thread_pool::get_statistics(
+        executor_statistics& stats, error_code& ec) const
+    {
+    }
+
+    void io_service_thread_pool::add_processing_unit(
+        std::size_t virt_core, std::size_t thread_num, error_code& ec)
+    {
+    }
+
+    void io_service_thread_pool::remove_processing_unit(
+        std::size_t thread_num, error_code& ec)
+    {
+    }
 }}}

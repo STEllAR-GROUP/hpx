@@ -267,7 +267,8 @@ int main(int argc, char* argv[])
 
     pool_threads = vm["pool-threads"].as<int>();
 
-    auto& rp = hpx::get_resource_partitioner(desc_cmdline, argc, argv);
+    auto& rp = hpx::get_resource_partitioner(desc_cmdline, argc, argv,
+        hpx::resource::mode_allow_oversubscription);
 
     //    auto &topo = rp.get_topology();
     std::cout << "[main] obtained reference to the resource_partitioner\n";
@@ -297,6 +298,8 @@ int main(int argc, char* argv[])
                         pool_index, pool_name, mode, thread_offset));
             return pool;
         });
+
+    rp.add_resource(rp.numa_domains(), "default");
 
     if (use_pools)
     {
