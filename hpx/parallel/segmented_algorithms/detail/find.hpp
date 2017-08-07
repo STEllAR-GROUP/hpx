@@ -68,8 +68,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             }
             // return consists of positions of complete sequence if found and
                 // partial sequence at the beginning
-            return std::move(find_return<FwdIter1>{std::move(found_start), found_cursor,
-                std::move(start), cursor});
+            return std::move(find_return<FwdIter1>{found_start, found_cursor,
+                start, cursor});
         }
 
         template <typename ExPolicy, typename FwdIter1, typename SeqVec,
@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             difference_type diff = sequence.size();
             if (diff <= 0)
                 return result::get(find_return<FwdIter1>{
-                    std::move(last1), 0, std::move(first1), 0});
+                    last1, 0, first1, 0});
 
             difference_type count = std::distance(first1, last1);
 
@@ -217,11 +217,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                             }
                         }
                         // return both results
-                        return find_return<FwdIter1>{
-                            std::move(complete_sequence_position),
+                        return std::move(find_return<FwdIter1>{
+                            complete_sequence_position,
                             complete_sequence_cursor,
-                            std::move(partial_sequence_position),
-                            partial_sequence_cursor};
+                            partial_sequence_position,
+                            partial_sequence_cursor});
                     });
         }
     };
@@ -283,8 +283,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             }
             // return consists of positions of complete sequence if found and
                 // partial sequence at the beginning
-            return find_return<FwdIter1>{std::move(found_start), found_cursor,
-                std::move(start), cursor};
+            return std::move(find_return<FwdIter1>{found_start, found_cursor,
+                start, cursor});
         }
 
         template <typename ExPolicy, typename FwdIter1, typename SeqVec,
@@ -306,7 +306,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             difference_type diff = sequence.size();
             if (diff <= 0)
                 return result::get(find_return<FwdIter1>{
-                    std::move(last1), 0, std::move(last1), 0});
+                    last1, 0, last1, 0});
 
             difference_type count = std::distance(first1, last1);
 
@@ -434,11 +434,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                                 }
                             }
                         }
-                        return find_return<FwdIter1>{
-                            std::move(complete_sequence_position),
+                        return std::move(find_return<FwdIter1>{
+                            complete_sequence_position,
                             complete_sequence_cursor,
-                            std::move(partial_sequence_position),
-                            partial_sequence_cursor};
+                            partial_sequence_position,
+                            partial_sequence_cursor});
                     });
         }
     };
