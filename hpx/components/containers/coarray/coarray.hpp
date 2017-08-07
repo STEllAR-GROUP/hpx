@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Antoine Tran Tan
+//  Copyright (c) 2017 Google
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -218,11 +219,11 @@ namespace hpx
         }
 
         template<typename... I,
-            typename = std::enable_if_t<
+            typename = typename std::enable_if<
                 ! std::is_same<
                     typename util::detail::at_index<sizeof...(I)-1,I...>::type,
                         detail::auto_subscript>::value
-                >
+                >::type
             >
         hpx::detail::view_element<T,Data>
         operator()(I... index) const
@@ -234,11 +235,11 @@ namespace hpx
         }
 
         template<typename... I,
-            typename = std::enable_if_t<
+            typename = typename std::enable_if<
                 std::is_same<
                     typename util::detail::at_index<sizeof...(I)-1,I...>::type,
                         detail::auto_subscript>::value
-                >
+                >::type
             >
         Data &
         operator()(I... index)
