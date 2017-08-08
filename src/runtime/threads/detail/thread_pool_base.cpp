@@ -23,9 +23,6 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/system/system_error.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <memory>

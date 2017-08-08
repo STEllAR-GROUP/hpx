@@ -25,9 +25,6 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/scoped_ptr.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <exception>

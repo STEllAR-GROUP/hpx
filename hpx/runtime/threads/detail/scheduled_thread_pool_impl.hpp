@@ -24,6 +24,9 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/system/system_error.hpp>
+
 #include <algorithm>
 #include <numeric>
 #include <cstddef>
