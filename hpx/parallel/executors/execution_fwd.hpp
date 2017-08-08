@@ -17,52 +17,54 @@
 
 namespace hpx { namespace parallel { namespace execution
 {
-///////////////////////////////////////////////////////////////////////////
-/// Function invocations executed by a group of sequential execution agents
-/// execute in sequential order.
-struct sequenced_execution_tag {};
+    ///////////////////////////////////////////////////////////////////////////
+    /// Function invocations executed by a group of sequential execution agents
+    /// execute in sequential order.
+    struct sequenced_execution_tag {};
 
-/// Function invocations executed by a group of parallel execution agents
-/// execute in unordered fashion. Any such invocations executing in the
-/// same thread are indeterminately sequenced with respect to each other.
-///
-/// \note \a parallel_execution_tag is weaker than
-///       \a sequenced_execution_tag.
-struct parallel_execution_tag {};
+    /// Function invocations executed by a group of parallel execution agents
+    /// execute in unordered fashion. Any such invocations executing in the
+    /// same thread are indeterminately sequenced with respect to each other.
+    ///
+    /// \note \a parallel_execution_tag is weaker than
+    ///       \a sequenced_execution_tag.
+    struct parallel_execution_tag {};
 
-/// Function invocations executed by a group of vector execution agents are
-/// permitted to execute in unordered fashion when executed in different
-/// threads, and un-sequenced with respect to one another when executed in
-/// the same thread.
-///
-/// \note \a unsequenced_execution_tag is weaker than
-///       \a parallel_execution_tag.
-struct unsequenced_execution_tag {};
+    /// Function invocations executed by a group of vector execution agents are
+    /// permitted to execute in unordered fashion when executed in different
+    /// threads, and un-sequenced with respect to one another when executed in
+    /// the same thread.
+    ///
+    /// \note \a unsequenced_execution_tag is weaker than
+    ///       \a parallel_execution_tag.
+    struct unsequenced_execution_tag {};
 
-/// \cond NOINTERNAL
-struct task_policy_tag
-{
-    HPX_CONSTEXPR task_policy_tag() {}
-};
+    /// \cond NOINTERNAL
+    struct task_policy_tag
+    {
+        HPX_CONSTEXPR task_policy_tag() {}
+    };
+    /// \endcond
 
-///////////////////////////////////////////////////////////////////////////
-// Define infrastructure for customization points
-namespace detail
-{
-struct post_tag {};
-struct sync_execute_tag {};
-struct async_execute_tag {};
-struct then_execute_tag {};
-struct bulk_sync_execute_tag {};
-struct bulk_async_execute_tag {};
-struct bulk_then_execute_tag {};
+    ///////////////////////////////////////////////////////////////////////////
+    // Define infrastructure for customization points
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        struct post_tag {};
+        struct sync_execute_tag {};
+        struct async_execute_tag {};
+        struct then_execute_tag {};
+        struct bulk_sync_execute_tag {};
+        struct bulk_async_execute_tag {};
+        struct bulk_then_execute_tag {};
 
-template <typename Executor, typename ... Ts>
-struct undefined_customization_point;
+        template <typename Executor, typename ... Ts>
+        struct undefined_customization_point;
 
-template <typename Tag>
-struct customization_point
-{
+        template <typename Tag>
+        struct customization_point
+        {
             template <typename Executor, typename ... Ts>
             auto operator()(Executor && exec, Ts &&... ts) const
             ->  undefined_customization_point<Executor, Ts...>
@@ -71,7 +73,7 @@ struct customization_point
             }
         };
 
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
         // forward declare customization point implementations
         template <>
         struct customization_point<post_tag>
@@ -147,15 +149,16 @@ struct customization_point
 
         template <typename T>
         T const static_const<T>::value = T{};
-    }
-    /// \endcond
 
-    /// \cond NOINTERNAL
+        /// \endcond
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization points
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename Executor, typename Enable = void>
         struct async_execute_fn_helper;
 
@@ -176,12 +179,14 @@ struct customization_point
 
         template <typename Executor, typename Enable = void>
         struct bulk_then_execute_fn_helper;
+        /// \endcond
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization point implementations
     namespace detail
     {
+        /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_async_execute dispatch point
@@ -310,25 +315,23 @@ struct customization_point
 
         ///////////////////////////////////////////////////////////////////////
         // async_execute customization point
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto
-        customization_point<async_execute_tag>::operator()(Executor && exec, F && f, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<async_execute_tag>::
+        operator()(Executor&& exec, F&& f, Ts&&... ts) const
         {
             return async_execute(std::forward<Executor>(exec),
-                                 std::forward<F>(f), std::forward<Ts>(ts)...);
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 #else
         template <>
         struct customization_point<async_execute_tag>
         {
         public:
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto
-            operator()(Executor && exec, F && f, Ts &&... ts) const
-            -> decltype(async_execute(std::forward<Executor>(exec),
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Ts&&... ts) const
+                -> decltype(async_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 return async_execute(std::forward<Executor>(exec),
@@ -339,26 +342,23 @@ struct customization_point
 
         ///////////////////////////////////////////////////////////////////////
         // sync_execute customization point
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto
-        customization_point<sync_execute_tag>::operator()(
-            Executor && exec, F && f, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<sync_execute_tag>::
+        operator()(Executor&& exec, F&& f, Ts&&... ts) const
         {
             return sync_execute(std::forward<Executor>(exec),
-                                std::forward<F>(f), std::forward<Ts>(ts)...);
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 #else
         template <>
         struct customization_point<sync_execute_tag>
         {
         public:
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto
-            operator()(Executor && exec, F && f, Ts &&... ts) const
-            -> decltype(sync_execute(std::forward<Executor>(exec),
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Ts&&... ts) const
+                -> decltype(sync_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 return sync_execute(std::forward<Executor>(exec),
@@ -369,12 +369,12 @@ struct customization_point
 
         ///////////////////////////////////////////////////////////////////////
         // then_execute customization point
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename Future, typename ... Ts>
-        HPX_FORCEINLINE
-        auto
-        customization_point<then_execute_tag>::operator()(
-            Executor && exec, F && f, Future& predecessor, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename Future,
+            typename... Ts>
+        HPX_FORCEINLINE auto customization_point<then_execute_tag>::
+        operator()(
+            Executor&& exec, F&& f, Future& predecessor, Ts&&... ts) const
         {
             return then_execute(std::forward<Executor>(exec),
                 std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
@@ -384,73 +384,71 @@ struct customization_point
         struct customization_point<then_execute_tag>
         {
         public:
-            template <typename Executor, typename F, typename Future, typename ... Ts>
-            HPX_FORCEINLINE
-            auto
-            operator()(Executor && exec, F && f, Future& predecessor, Ts &&... ts) const
-            -> decltype(then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), predecessor, std::forward<Ts>(ts)...))
+            template <typename Executor, typename F, typename Future,
+                typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
+                Future& predecessor, Ts&&... ts) const
+                -> decltype(then_execute(std::forward<Executor>(exec),
+                    std::forward<F>(f), predecessor,
+                    std::forward<Ts>(ts)...))
 
             {
                 return then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
-            }
-        };
-#endif
-
-        ///////////////////////////////////////////////////////////////////////
-        // post customization point
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto
-        customization_point<post_tag>::operator()(
-            Executor && exec, F && f, Ts &&... ts) const
-        {
-            return post(std::forward<Executor>(exec), std::forward<F>(f),
-                        std::forward<Ts>(ts)...);
-        }
-#else
-        template <>
-        struct customization_point<post_tag>
-        {
-        public:
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto
-            operator()(
-                Executor && exec, F && f, Ts &&... ts) const
-            -> decltype(post(std::forward<Executor>(exec), std::forward<F>(f),
-                    std::forward<Ts>(ts)...))
-            {
-                return post(std::forward<Executor>(exec), std::forward<F>(f),
+                    std::forward<F>(f), predecessor,
                     std::forward<Ts>(ts)...);
             }
         };
 #endif
 
         ///////////////////////////////////////////////////////////////////////
+        // post customization point
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<post_tag>::operator()(
+            Executor&& exec, F&& f, Ts&&... ts) const
+        {
+            return post(std::forward<Executor>(exec), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+        }
+#else
+        template <>
+        struct customization_point<post_tag>
+        {
+        public:
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Ts&&... ts) const
+                -> decltype(post(std::forward<Executor>(exec),
+                    std::forward<F>(f), std::forward<Ts>(ts)...))
+            {
+                return post(std::forward<Executor>(exec),
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+        };
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
         // bulk_async_execute customization point
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE
-        auto
-        customization_point<bulk_async_execute_tag>::operator()(
-            Executor && exec, F && f, Shape const& shape, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename Shape,
+            typename... Ts>
+        HPX_FORCEINLINE auto customization_point<bulk_async_execute_tag>::
+        operator()(
+            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
         {
             return bulk_async_execute(std::forward<Executor>(exec),
-                                      std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 #else
         template <>
         struct customization_point<bulk_async_execute_tag>
         {
         public:
-            template <typename Executor, typename F, typename Shape, typename ... Ts>
-            HPX_FORCEINLINE
-            auto
-            operator()(Executor && exec, F && f, Shape const& shape, Ts &&... ts) const
-            -> decltype(bulk_async_execute(std::forward<Executor>(exec),
+            template <typename Executor, typename F, typename Shape,
+                typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
+                Shape const& shape, Ts&&... ts) const
+                -> decltype(bulk_async_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape, std::forward<Ts>(ts)...))
             {
                 return bulk_async_execute(std::forward<Executor>(exec),
@@ -461,26 +459,26 @@ struct customization_point
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_sync_execute customization point
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename Shape, typename ... Ts>
-        HPX_FORCEINLINE
-        auto
-        customization_point<bulk_sync_execute_tag>::operator()(
-            Executor && exec, F && f, Shape const& shape, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename Shape,
+            typename... Ts>
+        HPX_FORCEINLINE auto customization_point<bulk_sync_execute_tag>::
+        operator()(
+            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
         {
             return bulk_sync_execute(std::forward<Executor>(exec),
-                                     std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 #else
         template <>
         struct customization_point<bulk_sync_execute_tag>
         {
         public:
-            template <typename Executor, typename F, typename Shape, typename ... Ts>
-            HPX_FORCEINLINE
-            auto
-            operator()(Executor && exec, F && f, Shape const& shape, Ts &&... ts) const
-            -> decltype(bulk_sync_execute(std::forward<Executor>(exec),
+            template <typename Executor, typename F, typename Shape,
+                typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
+                Shape const& shape, Ts&&... ts) const
+                -> decltype(bulk_sync_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape, std::forward<Ts>(ts)...))
             {
                 return bulk_sync_execute(std::forward<Executor>(exec),
@@ -491,18 +489,16 @@ struct customization_point
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_then_execute customization point
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
         template <typename Executor, typename F, typename Shape,
-                  typename Future, typename ... Ts>
-        HPX_FORCEINLINE
-        auto
-        customization_point<bulk_then_execute_tag>::operator()(
-                Executor && exec, F && f, Shape const& shape, Future& predecessor,
-                Ts &&... ts) const
+            typename Future, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<bulk_then_execute_tag>::
+        operator()(Executor&& exec, F&& f, Shape const& shape,
+            Future& predecessor, Ts&&... ts) const
         {
             return bulk_then_execute(std::forward<Executor>(exec),
-                                     std::forward<F>(f), shape, predecessor,
-                                     std::forward<Ts>(ts)...);
+                std::forward<F>(f), shape, predecessor,
+                std::forward<Ts>(ts)...);
         }
 #else
         template <>
@@ -510,13 +506,10 @@ struct customization_point
         {
         public:
             template <typename Executor, typename F, typename Shape,
-                typename Future, typename ... Ts>
-            HPX_FORCEINLINE
-            auto
-            operator()(
-                Executor && exec, F && f, Shape const& shape, Future& predecessor,
-                Ts &&... ts) const
-            -> decltype(bulk_then_execute(std::forward<Executor>(exec),
+                typename Future, typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
+                Shape const& shape, Future& predecessor, Ts&&... ts) const
+                -> decltype(bulk_then_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape, predecessor,
                     std::forward<Ts>(ts)...))
             {
@@ -526,9 +519,8 @@ struct customization_point
             }
         };
 #endif
-
+        /// \endcond
     }
-    /// \endcond
 
     // define customization points
     namespace

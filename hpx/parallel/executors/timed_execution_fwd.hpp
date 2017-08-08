@@ -14,6 +14,9 @@
 #include <hpx/parallel/executors/timed_executors.hpp>
 #include <hpx/traits/executor_traits.hpp>
 
+#include <type_traits>
+#include <utility>
+
 namespace hpx { namespace util
 {
     class steady_time_point;
@@ -94,7 +97,7 @@ namespace hpx { namespace parallel { namespace execution
         struct async_execute_at_tag {};
         struct async_execute_after_tag {};
 
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
         // forward declare customization point implementations
         template <>
         struct customization_point<post_at_tag>
@@ -265,170 +268,160 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<post_after_tag>::operator()(
-            Executor && exec, hpx::util::steady_duration const& rel_time,
-            F && f, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<post_after_tag>::operator()(
+            Executor&& exec, hpx::util::steady_duration const& rel_time, F&& f,
+            Ts&&... ts) const
         {
-            return post_after(std::forward<Executor>(exec),
-                rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return post_after(std::forward<Executor>(exec), rel_time,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 #else
-        template<>
+        template <>
         struct customization_point<post_after_tag>
         {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(
-                Executor && exec, hpx::util::steady_duration const& rel_time,
-                F && f, Ts &&... ts) const
-            -> decltype(post_after(std::forward<Executor>(exec),
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec,
+                hpx::util::steady_duration const& rel_time, F&& f,
+                Ts&&... ts) const
+                -> decltype(post_after(std::forward<Executor>(exec), rel_time,
+                    std::forward<F>(f), std::forward<Ts>(ts)...))
+            {
+                return post_after(std::forward<Executor>(exec), rel_time,
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+        };
+#endif
+
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<post_at_tag>::operator()(
+            Executor&& exec, hpx::util::steady_time_point const& abs_time,
+            F&& f, Ts&&... ts) const
+        {
+            return post_at(std::forward<Executor>(exec), abs_time,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+#else
+        template <>
+        struct customization_point<post_at_tag>
+        {
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec,
+                hpx::util::steady_time_point const& abs_time, F&& f,
+                Ts&&... ts) const
+                -> decltype(post_at(std::forward<Executor>(exec), abs_time,
+                    std::forward<F>(f), std::forward<Ts>(ts)...))
+            {
+                return post_at(std::forward<Executor>(exec), abs_time,
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+        };
+#endif
+
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<sync_execute_after_tag>::
+        operator()(Executor&& exec, hpx::util::steady_duration const& rel_time,
+            F&& f, Ts&&... ts) const
+        {
+            return sync_execute_after(std::forward<Executor>(exec), rel_time,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+#else
+        template <>
+        struct customization_point<sync_execute_after_tag>
+        {
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec,
+                hpx::util::steady_duration const& rel_time, F&& f,
+                Ts&&... ts) const
+                -> decltype(sync_execute_after(std::forward<Executor>(exec),
                     rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return post_after(std::forward<Executor>(exec),
+                return sync_execute_after(std::forward<Executor>(exec),
                     rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
 
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<post_at_tag>::operator()(
-            Executor && exec, hpx::util::steady_time_point const& abs_time,
-            F && f, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<sync_execute_at_tag>::
+        operator()(Executor&& exec,
+            hpx::util::steady_time_point const& abs_time, F&& f,
+            Ts&&... ts) const
         {
-            return post_at(std::forward<Executor>(exec),
-                abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return sync_execute_at(std::forward<Executor>(exec), abs_time,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 #else
-        template<>
-        struct customization_point<post_at_tag>
-        {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(
-                Executor && exec, hpx::util::steady_time_point const& abs_time,
-                F && f, Ts &&... ts) const
-            -> decltype(post_at(std::forward<Executor>(exec),
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
-            {
-                return post_at(std::forward<Executor>(exec),
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
-            }
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<sync_execute_after_tag>::operator()(
-            Executor && exec, hpx::util::steady_duration const& rel_time,
-            F && f, Ts &&... ts) const
-        {
-            return sync_execute_after(std::forward<Executor>(exec),
-                rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-#else
-        template<>
-        struct customization_point<sync_execute_after_tag>
-        {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(
-                Executor && exec, hpx::util::steady_duration const& rel_time,
-                F && f, Ts &&... ts) const
-            -> decltype(sync_execute_after(std::forward<Executor>(exec),
-                                           rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
-            {
-                return sync_execute_after(std::forward<Executor>(exec),
-                                          rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
-            }
-        };
-#endif
-
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<sync_execute_at_tag>::operator()(
-            Executor && exec, hpx::util::steady_time_point const& abs_time,
-            F && f, Ts &&... ts) const
-        {
-            return sync_execute_at(std::forward<Executor>(exec),
-                abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-#else
-        template<>
+        template <>
         struct customization_point<sync_execute_at_tag>
         {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(
-                Executor && exec, hpx::util::steady_time_point const& abs_time,
-                F && f, Ts &&... ts) const
-            -> decltype(sync_execute_at(std::forward<Executor>(exec),
-                                        abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec,
+                hpx::util::steady_time_point const& abs_time, F&& f,
+                Ts&&... ts) const
+                -> decltype(sync_execute_at(std::forward<Executor>(exec),
+                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return sync_execute_at(std::forward<Executor>(exec),
-                                       abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return sync_execute_at(std::forward<Executor>(exec), abs_time,
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
 
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<async_execute_at_tag>::operator()(
-            Executor && exec, hpx::util::steady_time_point const& abs_time,
-            F && f, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<async_execute_at_tag>::
+        operator()(Executor&& exec,
+            hpx::util::steady_time_point const& abs_time, F&& f,
+            Ts&&... ts) const
         {
-            return async_execute_at(std::forward<Executor>(exec),
-                abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return async_execute_at(std::forward<Executor>(exec), abs_time,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 #else
-        template<>
+        template <>
         struct customization_point<async_execute_at_tag>
         {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(
-                Executor && exec, hpx::util::steady_time_point const& abs_time,
-                F && f, Ts &&... ts) const
-            -> decltype(async_execute_at(std::forward<Executor>(exec),
-                                         abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec,
+                hpx::util::steady_time_point const& abs_time, F&& f,
+                Ts&&... ts) const
+                -> decltype(async_execute_at(std::forward<Executor>(exec),
+                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return async_execute_at(std::forward<Executor>(exec),
-                                        abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return async_execute_at(std::forward<Executor>(exec), abs_time,
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
 
-#ifdef HPX_HAVE_CXX11_AUTO_RETURN_VALUE
-        template <typename Executor, typename F, typename ... Ts>
-        HPX_FORCEINLINE
-        auto customization_point<async_execute_after_tag>::operator()(
-            Executor && exec, hpx::util::steady_duration const& rel_time,
-            F && f, Ts &&... ts) const
+#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+        template <typename Executor, typename F, typename... Ts>
+        HPX_FORCEINLINE auto customization_point<async_execute_after_tag>::
+        operator()(Executor&& exec, hpx::util::steady_duration const& rel_time,
+            F&& f, Ts&&... ts) const
         {
-            return async_execute_after(std::forward<Executor>(exec),
-                rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return async_execute_after(std::forward<Executor>(exec), rel_time,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 #else
-        template<>
+        template <>
         struct customization_point<async_execute_after_tag>
         {
-            template <typename Executor, typename F, typename ... Ts>
-            HPX_FORCEINLINE
-            auto operator()(
-                Executor && exec, hpx::util::steady_duration const& rel_time,
-                F && f, Ts &&... ts) const
-            -> decltype(async_execute_after(std::forward<Executor>(exec),
-                                            rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
+            template <typename Executor, typename F, typename... Ts>
+            HPX_FORCEINLINE auto operator()(Executor&& exec,
+                hpx::util::steady_duration const& rel_time, F&& f,
+                Ts&&... ts) const
+                -> decltype(async_execute_after(std::forward<Executor>(exec),
+                    rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
                 return async_execute_after(std::forward<Executor>(exec),
-                                           rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
