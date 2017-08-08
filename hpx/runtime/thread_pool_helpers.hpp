@@ -25,6 +25,14 @@ namespace hpx { namespace resource
     /// \a resource_partitioner
     HPX_API_EXPORT std::size_t get_num_thread_pools();
 
+    /// Return the number of threads in all thread pools currently
+    /// managed by the \a resource_partitioner
+    HPX_API_EXPORT std::size_t get_num_threads();
+
+    /// Return the number of threads in the given thread pool currently
+    /// managed by the \a resource_partitioner
+    HPX_API_EXPORT std::size_t get_num_threads(std::string const& pool_name);
+
     /// Return the number of threads in the given thread pool currently
     /// managed by the \a resource_partitioner
     HPX_API_EXPORT std::size_t get_num_threads(std::size_t pool_index);
@@ -42,7 +50,6 @@ namespace hpx { namespace resource
     /// Return the thread pool given its internal index
     HPX_API_EXPORT threads::detail::thread_pool_base& get_thread_pool(
         std::size_t pool_index);
-}
-}
+}}
 
 #endif /*HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP*/

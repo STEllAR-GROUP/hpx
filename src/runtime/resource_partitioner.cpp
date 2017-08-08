@@ -84,6 +84,16 @@ namespace resource {
         return get_resource_partitioner().get_num_pools();
     }
 
+    std::size_t get_num_threads()
+    {
+        return get_resource_partitioner().get_num_threads();
+    }
+
+    std::size_t get_num_threads(std::string const& pool_name)
+    {
+        return get_resource_partitioner().get_num_threads(pool_name);
+    }
+
     std::size_t get_num_threads(std::size_t pool_index)
     {
         return get_resource_partitioner().get_num_threads(pool_index);

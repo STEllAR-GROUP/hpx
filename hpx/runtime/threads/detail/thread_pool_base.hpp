@@ -45,9 +45,12 @@ namespace hpx { namespace threads { namespace detail
           : index_(index), name_(name)
         {}
 
-        std::size_t index_;
-        std::string name_;
-        //! could get an hpx::naming::id_type in the future
+        std::size_t index() const { return index_; };
+        std::string const& name() const { return name_; }
+
+    private:
+        std::size_t const index_;
+        std::string const name_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -97,9 +100,17 @@ namespace hpx { namespace threads { namespace detail
             thread_state_ex_enum newstate_ex, thread_priority priority,
             error_code& ec) = 0;
 
-        const std::string &get_pool_name() const
+        std::size_t get_pool_index() const
         {
-            return id_.name_;
+            return id_.index();
+        }
+        std::string const& get_pool_name() const
+        {
+            return id_.name();
+        }
+        std::size_t get_thread_offset() const
+        {
+            return thread_offset_;
         }
 
         virtual policies::scheduler_base* get_scheduler() const
@@ -267,13 +278,8 @@ namespace hpx { namespace threads { namespace detail
         // return the description string of the underlying scheduler
         char const* get_description() const;
 
-    public:
+    protected:
         void init_pool_time_scale();
-
-        std::size_t get_thread_offset() const
-        {
-            return thread_offset_;
-        }
 
     protected:
         pool_id_type id_;

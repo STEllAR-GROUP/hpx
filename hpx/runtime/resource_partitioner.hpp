@@ -285,12 +285,12 @@ namespace resource {
         void print_init_pool_data(std::ostream&) const;
 
         // create a thread_pool
-        void create_thread_pool(const std::string &name,
+        void create_thread_pool(std::string const& name,
             scheduling_policy sched = scheduling_policy::unspecified);
 
         // create a thread_pool with a callback function for creating a custom
         // scheduler
-        void create_thread_pool(const std::string &name,
+        void create_thread_pool(std::string const& name,
             scheduler_function scheduler_creation);
 
         // Functions to add processing units to thread pools via
@@ -319,31 +319,28 @@ namespace resource {
         {
             return affinity_data_;
         }
-        threads::policies::detail::affinity_data& get_affinity_data()
-        {
-            return affinity_data_;
-        }
 
         // Does initialization of all resources and internal data of the
         // resource partitioner called in hpx_init
         void configure_pools();
 
         ////////////////////////////////////////////////////////////////////////
-        scheduling_policy which_scheduler(const std::string &pool_name);
+        scheduling_policy which_scheduler(std::string const& pool_name);
         threads::topology &get_topology() const;
         util::command_line_handling &get_command_line_switches();
 
         std::size_t get_num_distinct_pus() const;
-        std::size_t get_num_threads() const;
 
         std::size_t get_num_pools() const;
+
+        std::size_t get_num_threads() const;
         std::size_t get_num_threads(std::string const& pool_name) const;
         std::size_t get_num_threads(std::size_t pool_index) const;
 
         std::string const& get_pool_name(std::size_t index) const;
         std::size_t get_pool_index(std::string const& pool_name) const;
 
-        size_t get_pu_num(std::size_t global_thread_num);
+        std::size_t get_pu_num(std::size_t global_thread_num);
         threads::mask_cref_type get_pu_mask(std::size_t global_thread_num) const;
 
         bool cmd_line_parsed() const;
@@ -358,7 +355,7 @@ namespace resource {
 
         scheduler_function get_pool_creator(size_t index) const;
 
-        std::vector<numa_domain> &numa_domains()
+        std::vector<numa_domain> const& numa_domains() const
         {
             return numa_domains_;
         }

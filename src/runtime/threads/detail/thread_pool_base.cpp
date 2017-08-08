@@ -59,7 +59,7 @@ namespace hpx { namespace threads { namespace detail
     // detail::manage_executor interface implementation
     char const* thread_pool_base::get_description() const
     {
-        return id_.name_.c_str();
+        return id_.name().c_str();
     }
 
     ///////////////////////////////////////////////////////////////////////////

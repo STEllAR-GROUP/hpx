@@ -284,7 +284,7 @@ namespace hpx { namespace util
             util::batch_environment& env, bool using_nodelist, bool initial)
         {
             std::size_t batch_threads = env.retrieve_number_of_threads();
-            std::size_t default_threads = 1;
+            std::size_t default_threads = thread::hardware_concurrency();
             std::string threads_str = cfgmap.get_value<std::string>(
                 "hpx.os_threads", "");
 

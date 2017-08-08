@@ -831,7 +831,7 @@ namespace hpx { namespace threads
     detail::thread_pool_base& threadmanager::get_pool(
         detail::pool_id_type pool_id) const
     {
-        return get_pool(pool_id.name_);
+        return get_pool(pool_id.name());
     }
 
     detail::thread_pool_base& threadmanager::get_pool(
