@@ -15,6 +15,7 @@ set(tests
     range
     tagged
     tuple
+    unwrap
    )
 
 if(HPX_WITH_CXX11_STD_INITIALIZER_LIST)

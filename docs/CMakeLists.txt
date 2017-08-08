@@ -107,9 +107,11 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_move.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_value_construct.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/unique.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/is_heap.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/minmax.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/partition.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/remove_copy.hpp"
@@ -118,6 +120,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/rotate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/sort.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/transform.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/unique.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/auto_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/dynamic_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/execution_fwd.hpp"
@@ -183,6 +186,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/invoke_fused.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/unwrapped.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 

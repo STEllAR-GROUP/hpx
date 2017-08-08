@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 
 #include <cstdint>
 #include <string>
@@ -181,8 +181,8 @@ namespace hpx { namespace components
 #define HPX_DEFINE_GET_COMPONENT_TYPE_TEMPLATE(template_, component)          \
     namespace hpx { namespace traits                                          \
     {                                                                         \
-        HPX_UTIL_STRIP(template_)                                             \
-        struct component_type_database<HPX_UTIL_STRIP(component) >            \
+        HPX_PP_STRIP_PARENS(template_)                                        \
+        struct component_type_database<HPX_PP_STRIP_PARENS(component) >       \
         {                                                                     \
             static components::component_type value;                          \
                                                                               \
@@ -192,8 +192,8 @@ namespace hpx { namespace components
                 { value = t; }                                                \
         };                                                                    \
                                                                               \
-        HPX_UTIL_STRIP(template_) components::component_type                  \
-        component_type_database<HPX_UTIL_STRIP(component) >::value =          \
+        HPX_PP_STRIP_PARENS(template_) components::component_type             \
+        component_type_database<HPX_PP_STRIP_PARENS(component) >::value =     \
             components::component_invalid;                                    \
     }}                                                                        \
 /**/

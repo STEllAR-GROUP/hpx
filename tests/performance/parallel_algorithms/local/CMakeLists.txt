@@ -6,7 +6,10 @@
 set(benchmarks
     benchmark_is_heap
     benchmark_is_heap_until
+    benchmark_partition
     benchmark_partition_copy
+    benchmark_unique_copy
+
    )
 
 foreach(benchmark ${benchmarks})

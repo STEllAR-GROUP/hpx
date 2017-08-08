@@ -128,6 +128,19 @@ namespace hpx { namespace util
 #endif
             }
 
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            char const* get_function_annotation_itt() const
+            {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return traits::get_function_annotation_itt<
+                        typename util::decay_unwrap<F>::type
+                    >::call(_f);
+#else
+                return nullptr;
+#endif
+            }
+#endif
+
         private:
             typename util::decay_unwrap<F>::type _f;
             util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
@@ -159,6 +172,7 @@ namespace hpx { namespace util
     }
 }}
 
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
@@ -173,7 +187,6 @@ namespace hpx { namespace traits
         }
     };
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig>
     struct get_function_annotation<util::detail::deferred<Sig> >
@@ -184,8 +197,20 @@ namespace hpx { namespace traits
             return f.get_function_annotation();
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename Sig>
+    struct get_function_annotation_itt<util::detail::deferred<Sig> >
+    {
+        static char const*
+            call(util::detail::deferred<Sig> const& f) noexcept
+        {
+            return f.get_function_annotation_itt();
+        }
+    };
 #endif
 }}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization

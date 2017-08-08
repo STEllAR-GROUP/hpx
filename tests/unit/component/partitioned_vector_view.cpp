@@ -126,9 +126,9 @@ void bulk_test( hpx::lcos::spmd_block block,
             std::vector<double> value = (std::vector<double>)out(j,i);
 
             const_iterator it1 = result.begin(), it2 = value.begin();
-            const_iterator end1 = result.end(), end2 = value.end();
+            const_iterator end1 = result.end();
 
-            for (; it1 != end1 && it2 != end2; ++it1, ++it2)
+            for (; it1 != end1; ++it1, ++it2)
             {
                 HPX_TEST_EQ(*it1, *it2);
             }
@@ -192,8 +192,7 @@ void async_bulk_test( hpx::lcos::spmd_block block,
 
     block.sync_all(hpx::launch::async)
     .then(
-        [&block, &in, &out, width, height, local_width, local_height,
-            local_leading_dimension] (hpx::future<void> event)
+        [&block, &in, &out, width, height] (hpx::future<void> event)
         {
             event.get();
 
@@ -208,7 +207,7 @@ void async_bulk_test( hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
     .then(
-        [&block, &in, &out, width, height, local_width, local_height,
+        [&block, &out, local_width, local_height,
             local_leading_dimension] (hpx::future<void> event)
         {
             event.get();
@@ -228,7 +227,7 @@ void async_bulk_test( hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
     .then(
-        [&block, &in, &out, width, height, local_width, local_height,
+        [&block, &out, width, height, local_width, local_height,
             local_leading_dimension] (hpx::future<void> event)
         {
             event.get();
@@ -263,9 +262,9 @@ void async_bulk_test( hpx::lcos::spmd_block block,
                         (std::vector<double>)out(j,i);
 
                     const_iterator it1 = result.begin(), it2 = value.begin();
-                    const_iterator end1 = result.end(), end2 = value.end();
+                    const_iterator end1 = result.end();
 
-                    for (; it1 != end1 && it2 != end2; ++it1, ++it2)
+                    for (; it1 != end1; ++it1, ++it2)
                     {
                         HPX_TEST_EQ(*it1, *it2);
                     }

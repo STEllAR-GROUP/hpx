@@ -15,6 +15,10 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -117,8 +121,8 @@ namespace hpx { namespace lcos { namespace server
     HPX_REGISTER_CHANNEL_DECLARATION_(__VA_ARGS__)                            \
 /**/
 #define HPX_REGISTER_CHANNEL_DECLARATION_(...)                                \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_CHANNEL_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)      \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_CHANNEL_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)          \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -127,19 +131,19 @@ namespace hpx { namespace lcos { namespace server
 /**/
 #define HPX_REGISTER_CHANNEL_DECLARATION_2(type, name)                        \
     typedef ::hpx::lcos::server::channel< type>                               \
-        BOOST_PP_CAT(__channel_, BOOST_PP_CAT(type, name));                   \
+        HPX_PP_CAT(__channel_, HPX_PP_CAT(type, name));                       \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::lcos::server::channel< type>::get_generation_action,             \
-        BOOST_PP_CAT(__channel_get_generation_action,                         \
-            BOOST_PP_CAT(type, name)));                                       \
+        HPX_PP_CAT(__channel_get_generation_action,                           \
+            HPX_PP_CAT(type, name)));                                         \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::lcos::server::channel< type>::set_generation_action,             \
-        BOOST_PP_CAT(__channel_set_generation_action,                         \
-            BOOST_PP_CAT(type, name)));                                       \
+        HPX_PP_CAT(__channel_set_generation_action,                           \
+            HPX_PP_CAT(type, name)));                                         \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         hpx::lcos::server::channel< type>::close_action,                      \
-        BOOST_PP_CAT(__channel_close_action,                                  \
-            BOOST_PP_CAT(type, name)));                                       \
+        HPX_PP_CAT(__channel_close_action,                                    \
+            HPX_PP_CAT(type, name)))                                          \
     HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(                             \
         type, type, name, hpx::traits::detail::component_tag)                 \
 /**/
@@ -148,8 +152,8 @@ namespace hpx { namespace lcos { namespace server
     HPX_REGISTER_CHANNEL_(__VA_ARGS__)                                        \
 /**/
 #define HPX_REGISTER_CHANNEL_(...)                                            \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_CHANNEL_, HPX_UTIL_PP_NARG(__VA_ARGS__)                  \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_CHANNEL_, HPX_PP_NARGS(__VA_ARGS__)                      \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -158,26 +162,26 @@ namespace hpx { namespace lcos { namespace server
 /**/
 #define HPX_REGISTER_CHANNEL_2(type, name)                                    \
     typedef ::hpx::lcos::server::channel< type>                               \
-        BOOST_PP_CAT(__channel_, BOOST_PP_CAT(type, name));                   \
+        HPX_PP_CAT(__channel_, HPX_PP_CAT(type, name));                       \
     typedef ::hpx::components::component<                                     \
-            BOOST_PP_CAT(__channel_, BOOST_PP_CAT(type, name))                \
-        > BOOST_PP_CAT(__channel_component_, name);                           \
+            HPX_PP_CAT(__channel_, HPX_PP_CAT(type, name))                    \
+        > HPX_PP_CAT(__channel_component_, name);                             \
     HPX_REGISTER_DERIVED_COMPONENT_FACTORY(                                   \
-        BOOST_PP_CAT(__channel_component_, name),                             \
-        BOOST_PP_CAT(__channel_component_, name),                             \
-        BOOST_PP_STRINGIZE(BOOST_PP_CAT(__base_lco_with_value_channel_, name)));\
+        HPX_PP_CAT(__channel_component_, name),                               \
+        HPX_PP_CAT(__channel_component_, name),                               \
+        HPX_PP_STRINGIZE(HPX_PP_CAT(__base_lco_with_value_channel_, name)));  \
     HPX_REGISTER_ACTION(                                                      \
         hpx::lcos::server::channel< type>::get_generation_action,             \
-        BOOST_PP_CAT(__channel_get_generation_action,                         \
-            BOOST_PP_CAT(type, name)));                                       \
+        HPX_PP_CAT(__channel_get_generation_action,                           \
+            HPX_PP_CAT(type, name)));                                         \
     HPX_REGISTER_ACTION(                                                      \
         hpx::lcos::server::channel< type>::set_generation_action,             \
-        BOOST_PP_CAT(__channel_set_generation_action,                         \
-            BOOST_PP_CAT(type, name)));                                       \
+        HPX_PP_CAT(__channel_set_generation_action,                           \
+            HPX_PP_CAT(type, name)));                                         \
     HPX_REGISTER_ACTION(                                                      \
         hpx::lcos::server::channel< type>::close_action,                      \
-        BOOST_PP_CAT(__channel_close_action,                                  \
-            BOOST_PP_CAT(type, name)))                                        \
+        HPX_PP_CAT(__channel_close_action,                                    \
+            HPX_PP_CAT(type, name)))                                          \
     HPX_REGISTER_BASE_LCO_WITH_VALUE(                                         \
         type, type, name, hpx::traits::detail::component_tag)                 \
 /**/

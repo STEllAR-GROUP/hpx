@@ -128,10 +128,7 @@ namespace hpx { namespace parallel { inline namespace v1
             void operator()(Iter part_begin, std::size_t part_size,
                 std::size_t /*part_index*/)
             {
-#if !defined(__NVCC__) && !defined(__CUDACC__)
                 hpx::util::annotate_function annotate(f_);
-                (void)annotate;     // suppress warning about unused variable
-#endif
                 execute(part_begin, part_size);
             }
         };
@@ -176,6 +173,50 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(first));
             }
         };
+        /// Non Segmented implementation
+        template <typename ExPolicy, typename FwdIter, typename Size, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n_(ExPolicy && policy, FwdIter first, Size count, F && f,
+            std::false_type, Proj && proj)
+        {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            typedef std::integral_constant<bool,
+                    parallel::execution::is_sequenced_execution_policy<
+                        ExPolicy
+                    >::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
+                > is_seq;
+#else
+            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                is_seq;
+#endif
+            return detail::for_each_n<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, std::size_t(count), std::forward<F>(f),
+                std::forward<Proj>(proj));
+        }
+        // forward declare the segmented version of for_each_ algorithm
+        template <typename ExPolicy, typename SegIter, typename F,
+            typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
+        for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
+            Proj && proj, std::true_type);
+
+        /// Segmented implementaion using for_each.
+        template <typename ExPolicy, typename FwdIter, typename Size, typename F,
+            typename Proj>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        for_each_n_(ExPolicy && policy, FwdIter first, Size count, F && f,
+            std::true_type, Proj && proj)
+        {
+            auto last = first;
+            detail::advance(last, std::size_t(count));
+            return for_each_(
+                std::forward<ExPolicy>(policy),
+                first, last, std::forward<F>(f), std::forward<Proj>(proj),
+                std::true_type());
+        }
         /// \endcond
     }
 
@@ -292,10 +333,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::move(first));
         }
 
-        return detail::for_each_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, std::size_t(count), std::forward<F>(f),
-            std::forward<Proj>(proj));
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+
+        return detail::for_each_n_(std::forward<ExPolicy>(policy), first, count,
+            std::forward<F>(f), is_segmented(), std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -373,14 +414,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::forward<ExPolicy>(policy), is_seq(),
                 first, last, std::forward<F>(f), std::forward<Proj>(proj));
         }
-
-        // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename SegIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
-        for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
-            Proj && proj, std::true_type);
-
         /// \endcond
     }
 
@@ -526,6 +559,22 @@ namespace hpx { namespace traits
                 >::call(f.f_);
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename ExPolicy, typename F, typename Proj>
+    struct get_function_annotation_itt<
+        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> >
+    {
+        static char const* call(
+            parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const& f)
+                noexcept
+        {
+            return get_function_annotation_itt<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+#endif
 }}
 #endif
 

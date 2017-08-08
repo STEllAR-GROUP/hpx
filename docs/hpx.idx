@@ -478,6 +478,9 @@ broadcast_apply_with_index            "" "header\.hpx\.lcos\.broadcast.*"
 gather_here                           "" "header\.hpx\.lcos\.gather.*"
 gather_there                          "" "header\.hpx\.lcos\.gather.*"
 
+HPX_REGISTER_GATHER_DECLARATION       "" "header\.hpx\.lcos\.gather.*"
+HPX_REGISTER_GATHER                   "" "header\.hpx\.lcos\.gather.*"
+
 # hpx/lcos/reduce.hpp
 reduce                                "" "header\.hpx\.lcos\.reduce.*"
 reduce_with_index                     "" "header\.hpx\.lcos\.reduce.*"
@@ -533,7 +536,16 @@ invoke_fused_r                        "" "header\.hpx\.util\.invoke_fused_r.*"
 
 # hpx/util/pack_traversal.hpp
 map_pack                              "" "header\.hpx\.util\.pack_traversal.*"
+spread_this                           "" "header\.hpx\.util\.pack_traversal.*"
 traverse_pack                         "" "header\.hpx\.util\.pack_traversal.*"
+
+# hpx/util/unwrap.hpp
+unwrap                                "" "header\.hpx\.util\.unwrap.*"
+unwrap_n                              "" "header\.hpx\.util\.unwrap_n.*"
+unwrap_all                            "" "header\.hpx\.util\.unwrap_all.*"
+unwrapping                            "" "header\.hpx\.util\.unwrapping.*"
+unwrapping_n                          "" "header\.hpx\.util\.unwrapping_n.*"
+unwrapping_all                        "" "header\.hpx\.util\.unwrapping_all.*"
 
 # hpx/util/unwrapped.hpp
 unwrapped                             "" "header\.hpx\.util\.unwrapped.*"
@@ -568,3 +580,4 @@ HPX_PLAIN_ACTION_ID                       "" "HPX_PLAIN_ACTION_ID"
 
 # hpx/runtime/components/component_factory.hpp
 HPX_REGISTER_COMPONENT                    "" "HPX_REGISTER_COMPONENT"
+

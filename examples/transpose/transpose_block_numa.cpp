@@ -492,7 +492,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                 )
             );
         }
-        std::vector<double> errsqs = hpx::util::unwrapped(numa_workers);
+        std::vector<double> errsqs = hpx::util::unwrap(numa_workers);
 
         ///////////////////////////////////////////////////////////////////////
         // Analyze and output results

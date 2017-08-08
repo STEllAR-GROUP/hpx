@@ -15,12 +15,12 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/component_type_database.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/unused.hpp>
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstdlib>
 #include <sstream>
@@ -145,19 +145,19 @@ namespace hpx { namespace traits
     /**/
 
 #define HPX_DEFINE_PLAIN_ACTION_(...)                                         \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DEFINE_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)               \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DEFINE_PLAIN_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                   \
     )(__VA_ARGS__))                                                           \
     /**/
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_(...)                                  \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DEFINE_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)        \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DEFINE_PLAIN_DIRECT_ACTION_, HPX_PP_NARGS(__VA_ARGS__)            \
     )(__VA_ARGS__))                                                           \
     /**/
 
 #define HPX_DEFINE_PLAIN_ACTION_1(func)                                       \
-    HPX_DEFINE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))              \
+    HPX_DEFINE_PLAIN_ACTION_2(func, HPX_PP_CAT(func, _action))                \
     /**/
 
 #if defined(__NVCC__) || defined(__CUDACC__)
@@ -175,7 +175,7 @@ namespace hpx { namespace traits
 #endif
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_1(func)                                \
-    HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, BOOST_PP_CAT(func, _action))       \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, HPX_PP_CAT(func, _action))         \
     /**/
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                          \
@@ -307,8 +307,8 @@ namespace hpx { namespace traits
 
 // macros for plain actions
 #define HPX_PLAIN_ACTION_(...)                                                \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                      \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_PLAIN_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                          \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_PLAIN_ACTION_2(func, name)                                        \
@@ -317,13 +317,13 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION(name, name);                                          \
 /**/
 #define HPX_PLAIN_ACTION_1(func)                                              \
-    HPX_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action));                    \
+    HPX_PLAIN_ACTION_2(func, HPX_PP_CAT(func, _action));                      \
 /**/
 
 // same for direct actions
 #define HPX_PLAIN_DIRECT_ACTION_(...)                                         \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)               \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_PLAIN_DIRECT_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                   \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_2(func, name)                                 \
@@ -332,7 +332,7 @@ namespace hpx { namespace traits
     HPX_REGISTER_ACTION(name, name);                                          \
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_1(func)                                       \
-    HPX_PLAIN_DIRECT_ACTION_2(func, BOOST_PP_CAT(func, _action));             \
+    HPX_PLAIN_DIRECT_ACTION_2(func, HPX_PP_CAT(func, _action));               \
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_ID(func, name, id)                            \
     HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \

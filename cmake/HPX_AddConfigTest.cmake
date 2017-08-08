@@ -561,6 +561,13 @@ macro(hpx_check_for_cxx14_variable_templates)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx14_deprecated_attribute)
+  add_hpx_config_test(HPX_WITH_CXX14_DEPRECATED_ATTRIBUTE
+    SOURCE cmake/tests/cxx14_deprecated_attribute.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
     SOURCE cmake/tests/libfun_std_experimental_optional.cpp

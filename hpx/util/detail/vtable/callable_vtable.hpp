@@ -21,6 +21,7 @@ namespace hpx { namespace util { namespace detail
 {
     struct callable_vtable_base
     {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
         template <typename T>
         HPX_FORCEINLINE static std::size_t _get_function_address(void** f)
         {
@@ -31,20 +32,32 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         HPX_FORCEINLINE static char const* _get_function_annotation(void** f)
         {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return traits::get_function_annotation<T>::call(vtable::get<T>(f));
-#else
-            return nullptr;
-#endif
         }
         char const* (*get_function_annotation)(void**);
 
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        template <typename T>
+        HPX_FORCEINLINE static char const* _get_function_annotation_itt(void** f)
+        {
+            return traits::get_function_annotation_itt<T>::call(vtable::get<T>(f));
+        }
+        char const* (*get_function_annotation_itt)(void**);
+#endif
+#endif
+
         template <typename T>
         HPX_CONSTEXPR callable_vtable_base(construct_vtable<T>) noexcept
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
           : get_function_address(
                 &callable_vtable_base::template _get_function_address<T>)
           , get_function_annotation(
                 &callable_vtable_base::template _get_function_annotation<T>)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+          , get_function_annotation_itt(
+                &callable_vtable_base::template _get_function_annotation_itt<T>)
+#endif
+#endif
         {}
     };
 

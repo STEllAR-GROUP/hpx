@@ -10,11 +10,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.0.2
-cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
+# We require at least CMake V3.3.2
+cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.0.2)
+cmake_policy(VERSION 3.3.2)
 macro(hpx_set_cmake_policy policy value)
   if(POLICY ${policy})
     cmake_policy(SET ${policy} ${value})
@@ -145,6 +145,21 @@ set(DEFAULT_MALLOC "system")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   set(DEFAULT_MALLOC "tcmalloc")
 #    set(DEFAULT_MALLOC "jemalloc")
+endif()
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT OFF)
+  string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UC)
+  if("${CMAKE_BUILD_TYPE_UC}" STREQUAL "DEBUG")
+    set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT ON)
+  endif()
+  hpx_option(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION
+    BOOL
+    "Enable stackoverflow detection for HPX threads/coroutines. (default: OFF, debug: ON)"
+    ${HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT} ADVANCED)
+  if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+    hpx_add_config_define(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+  endif()
 endif()
 
 hpx_option(HPX_WITH_MALLOC
@@ -528,6 +543,17 @@ if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
 
+# Count number of terminated threads before forcefully cleaning up all of
+# them. Note: terminated threads are cleaned up either when this number is
+# reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
+# reached, which will clean up the terminated threads for _all_ thread queues.
+hpx_option(HPX_SCHEDULER_MAX_TERMINATED_THREADS STRING
+  "Maximum number of terminated threads collected before those are cleaned up (default: 100)"
+  "100" CATEGORY "Thread Manager" ADVANCED)
+
+hpx_add_config_define(HPX_SCHEDULER_MAX_TERMINATED_THREADS
+  ${HPX_SCHEDULER_MAX_TERMINATED_THREADS})
+
 hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
@@ -672,7 +698,7 @@ endif()
 ## External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
   if(NOT OPENMP_FOUND)
@@ -681,7 +707,7 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_TBB BOOL
   "Enable examples requiring TBB support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
   if(NOT TBB_FOUND)
@@ -690,7 +716,7 @@ if(HPX_WITH_EXAMPLES_TBB)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_QTHREADS BOOL
   "Enable examples requiring QThreads support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
   if(NOT QTHREADS_FOUND)
@@ -699,7 +725,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 endif()
 hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
-  CATEGORY "Tools" ADVANCED)
+  CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
   if(NOT HDF5_FOUND)
@@ -711,7 +737,7 @@ endif()
 if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_option(HPX_WITH_EXAMPLES_QT4 BOOL
     "Enable examples requiring Qt4 support (default: OFF)." OFF
-    CATEGORY "Tools" ADVANCED)
+    CATEGORY "Build Targets" ADVANCED)
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
     if(NOT QT4_FOUND)
@@ -931,6 +957,14 @@ hpx_option(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT BOOL
     OFF ADVANCED)
 if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
   hpx_add_config_define(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+endif()
+
+# HPX_WITH_UNWRAPPED_COMPATIBILITY: introduced in V1.1.0
+hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
+    "Enable the deprecated unwrapped function (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -1518,7 +1552,7 @@ endif()
 if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
   if(NOT Boost_CONTEXT_FOUND)
-    hpx_error("The usage of Boost.Context was selected but Boost.Context was not found (Version 1.51 or higher is required).")
+    hpx_error("The usage of Boost.Context was selected but Boost.Context was not found.")
   endif()
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     if(Boost_VERSION LESS 105600)
@@ -1829,24 +1863,6 @@ if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
     PATTERN ".git" EXCLUDE)
 endif()
 
-if(Boost_VERSION LESS 105300)
-  # Install Boost.Atomic library for older Boost versions only
-  install(
-    DIRECTORY external/atomic/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-
-  # Install Boost.Lockfree library for older Boost versions only
-  install(
-    DIRECTORY external/lockfree/boost
-    DESTINATION include/hpx/external
-    COMPONENT core
-    FILES_MATCHING PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE)
-endif()
-
 install(
   FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
   DESTINATION share/hpx-${HPX_VERSION}
@@ -1899,6 +1915,10 @@ if(HPX_WITH_VIM_YCM)
   )
   hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
 endif()
+
+################################################################################
+# print overall configuration summary
+include(HPX_PrintSummary)
 
 ################################################################################
 # External build system support (FindHPX.cmake and pkg-config).

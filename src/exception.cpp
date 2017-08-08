@@ -47,6 +47,8 @@
 #ifdef __APPLE__
 #include <crt_externs.h>
 #define environ (*_NSGetEnviron())
+#elif defined(__FreeBSD__)
+HPX_EXPORT char** freebsd_environ = nullptr;
 #elif !defined(HPX_WINDOWS)
 extern char **environ;
 #endif
@@ -188,11 +190,15 @@ namespace hpx { namespace detail
         std::size_t len = get_arraylen(_environ);
         env.reserve(len);
         std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
-#elif defined(linux) || defined(__linux) || defined(__linux__) \
-                     || defined(__FreeBSD__) || defined(__AIX__)
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__AIX__)
         std::size_t len = get_arraylen(environ);
         env.reserve(len);
         std::copy(&environ[0], &environ[len], std::back_inserter(env));
+#elif defined(__FreeBSD__)
+        std::size_t len = get_arraylen(freebsd_environ);
+        env.reserve(len);
+        std::copy(&freebsd_environ[0], &freebsd_environ[len],
+            std::back_inserter(env));
 #elif defined(__APPLE__)
         std::size_t len = get_arraylen(environ);
         env.reserve(len);
@@ -563,38 +569,20 @@ namespace hpx
         if (pid_ && -1 != *pid_)
             strm << "{process-id}: " << *pid_ << "\n";
 
-        char const* func = xi.function_name();
-        if (func) {
-            strm << "{function}: " << *func << "\n";
-        }
-        else {
-            std::string const* s =
-                xi.get<hpx::detail::throw_function>();
-            if (s)
-                strm << "{function}: " << *s << "\n";
-        }
+        std::string const* function =
+            xi.get<hpx::detail::throw_function>();
+        if (function)
+            strm << "{function}: " << *function << "\n";
 
-        char const* file = xi.file_name();
-        if (file) {
+        std::string const* file =
+            xi.get<hpx::detail::throw_file>();
+        if (file)
             strm << "{file}: " << *file << "\n";
-        }
-        else {
-            std::string const* s =
-                xi.get<hpx::detail::throw_file>();
-            if (s)
-                strm << "{file}: " << *s << "\n";
-        }
 
-        int line = xi.line();
-        if (line) {
-            strm << "{line}: " << line << "\n";
-        }
-        else {
-            long const* l =
-                xi.get<hpx::detail::throw_line>();
-            if (l)
-                strm << "{line}: " << *l << "\n";
-        }
+        long const* line =
+            xi.get<hpx::detail::throw_line>();
+        if (line)
+            strm << "{line}: " << *line << "\n";
 
         bool thread_info = false;
         char const* const thread_prefix = "{os-thread}: ";
@@ -735,14 +723,10 @@ namespace hpx
     /// Return the function name from which the exception was thrown.
     std::string get_error_function_name(hpx::exception_info const& xi)
     {
-        char const* func = xi.function_name();
-        if (func)
-            return func;
-
-        std::string const* s =
+        std::string const* function =
             xi.get<hpx::detail::throw_function>();
-        if (s)
-            return *s;
+        if (function)
+            return *function;
 
         return std::string();
     }
@@ -762,14 +746,10 @@ namespace hpx
     /// exception was thrown.
     std::string get_error_file_name(hpx::exception_info const& xi)
     {
-        char const* file = xi.file_name();
-        if (file)
-            return file;
-
-        std::string const* s =
+        std::string const* file =
             xi.get<hpx::detail::throw_file>();
-        if (s)
-            return *s;
+        if (file)
+            return *file;
 
         return "<unknown>";
     }
@@ -778,14 +758,10 @@ namespace hpx
     /// which the exception was thrown.
     long get_error_line_number(hpx::exception_info const& xi)
     {
-        int line = xi.line();
-        if (line)
-            return line;
-
-        long const* l =
+        long const* line =
             xi.get<hpx::detail::throw_line>();
-        if (l)
-            return *l;
+        if (line)
+            return *line;
         return -1;
     }
 

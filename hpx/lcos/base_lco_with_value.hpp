@@ -17,7 +17,9 @@
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_guard.hpp>
@@ -248,9 +250,9 @@ namespace hpx { namespace traits
     HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_(__VA_ARGS__)                \
 /**/
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_(...)                    \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_,                        \
-        HPX_UTIL_PP_NARG(__VA_ARGS__)                                         \
+        HPX_PP_NARGS(__VA_ARGS__)                                             \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -278,15 +280,15 @@ namespace hpx { namespace traits
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_4(                       \
         Value, RemoteValue, Name, Tag)                                        \
     typedef ::hpx::lcos::base_lco_with_value< Value, RemoteValue, Tag>        \
-        BOOST_PP_CAT(base_lco_with_value_, Name);                             \
+        HPX_PP_CAT(base_lco_with_value_, Name);                               \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,           \
-        BOOST_PP_CAT(set_value_action_, Name))                                \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        HPX_PP_CAT(set_value_action_, Name))                                  \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,           \
-        BOOST_PP_CAT(get_value_action_, Name))                                \
+        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        HPX_PP_CAT(get_value_action_, Name))                                  \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                   \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,           \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))             \
 /**/
 
@@ -295,9 +297,9 @@ namespace hpx { namespace traits
     HPX_REGISTER_BASE_LCO_WITH_VALUE_(__VA_ARGS__)                            \
 /**/
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_(...)                                \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_REGISTER_BASE_LCO_WITH_VALUE_,                                    \
-        HPX_UTIL_PP_NARG(__VA_ARGS__)                                         \
+        HPX_PP_NARGS(__VA_ARGS__)                                             \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -318,15 +320,15 @@ namespace hpx { namespace traits
 
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_4(Value, RemoteValue, Name, Tag)     \
     typedef ::hpx::lcos::base_lco_with_value< Value, RemoteValue, Tag>        \
-        BOOST_PP_CAT(base_lco_with_value_, Name);                             \
+        HPX_PP_CAT(base_lco_with_value_, Name);                               \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,           \
-        BOOST_PP_CAT(set_value_action_, Name))                                \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        HPX_PP_CAT(set_value_action_, Name))                                  \
     HPX_REGISTER_ACTION(                                                      \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,           \
-        BOOST_PP_CAT(get_value_action_, Name))                                \
+        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        HPX_PP_CAT(get_value_action_, Name))                                  \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                    \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,           \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))             \
 /**/
 
@@ -335,9 +337,9 @@ namespace hpx { namespace traits
     HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_(__VA_ARGS__)                         \
 /**/
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_(...)                             \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
         HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_,                                 \
-        HPX_UTIL_PP_NARG(__VA_ARGS__)                                         \
+        HPX_PP_NARGS(__VA_ARGS__)                                             \
     )(__VA_ARGS__))                                                           \
 /**/
 
@@ -364,15 +366,15 @@ namespace hpx { namespace traits
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_6(                                \
         Value, RemoteValue, Name, ActionIdGet, ActionIdSet, Tag)              \
     typedef ::hpx::lcos::base_lco_with_value< Value, RemoteValue, Tag>        \
-        BOOST_PP_CAT(base_lco_with_value_, Name);                             \
+        HPX_PP_CAT(base_lco_with_value_, Name);                               \
     HPX_REGISTER_ACTION_ID(                                                   \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,           \
-        BOOST_PP_CAT(set_value_action_, Name), ActionIdSet)                   \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        HPX_PP_CAT(set_value_action_, Name), ActionIdSet)                     \
     HPX_REGISTER_ACTION_ID(                                                   \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,           \
-        BOOST_PP_CAT(get_value_action_, Name), ActionIdGet)                   \
+        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        HPX_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                    \
-        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,           \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))             \
 /**/
 

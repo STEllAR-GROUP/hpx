@@ -35,7 +35,19 @@ namespace hpx { namespace util
 {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
-#if HPX_HAVE_ITTNOTIFY != 0
+#if (!defined(__NVCC__) && !defined(__CUDACC__))
+    struct annotate_function
+    {
+        HPX_NON_COPYABLE(annotate_function);
+
+        explicit annotate_function(char const* name) {}
+        template <typename F>
+        explicit HPX_HOST_DEVICE annotate_function(F && f) {}
+
+        // add empty (but non-trivial) destructor to silence warnings
+        ~annotate_function() {}
+    };
+#elif HPX_HAVE_ITTNOTIFY != 0
     struct annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
@@ -79,26 +91,27 @@ namespace hpx { namespace util
 
         explicit annotate_function(char const* name)
           : desc_(hpx::threads::get_self_ptr() ?
-                hpx::threads::set_thread_description(hpx::threads::get_self_id(),
-                    name) :
+                hpx::threads::set_thread_description(
+                    hpx::threads::get_self_id(), name) :
                 nullptr)
         {}
+
         template <typename F>
         explicit annotate_function(F && f)
           : desc_(hpx::threads::get_self_ptr() ?
                 hpx::threads::set_thread_description(
                     hpx::threads::get_self_id(),
-                    hpx::traits::get_function_annotation<
-                        typename std::decay<F>::type
-                    >::call(f)) :
+                    hpx::util::thread_description(f)) :
                 nullptr)
         {}
 
         ~annotate_function()
         {
             if (hpx::threads::get_self_ptr())
+            {
                 hpx::threads::set_thread_description(
                     hpx::threads::get_self_id(), desc_);
+            }
         }
 
         hpx::util::thread_description desc_;
@@ -170,7 +183,11 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name) {}
-        template <typename F> explicit annotate_function(F && f) {}
+        template <typename F>
+        explicit HPX_HOST_DEVICE annotate_function(F && f) {}
+
+        // add empty (but non-trivial) destructor to silence warnings
+        ~annotate_function() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////

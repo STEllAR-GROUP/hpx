@@ -136,6 +136,7 @@ namespace hpx { namespace util
     }
 }}
 
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
@@ -149,7 +150,6 @@ namespace hpx { namespace traits
         }
     };
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     template <typename Sig, bool Serializable>
     struct get_function_annotation<util::function<Sig, Serializable> >
     {
@@ -159,8 +159,20 @@ namespace hpx { namespace traits
             return f.get_function_annotation();
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename Sig, bool Serializable>
+    struct get_function_annotation_itt<util::function<Sig, Serializable> >
+    {
+        static char const*
+            call(util::function<Sig, Serializable> const& f) noexcept
+        {
+            return f.get_function_annotation_itt();
+        }
+    };
 #endif
 }}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, F, Name)                  \

@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
@@ -331,7 +332,7 @@ namespace hpx { namespace util
                 if (threads > HPX_HAVE_MAX_CPU_COUNT)
                 {
                     throw hpx::detail::command_line_error("Requested more than "
-                        BOOST_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
+                        HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
                         "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }

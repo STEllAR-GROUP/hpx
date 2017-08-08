@@ -38,7 +38,8 @@ namespace hpx { namespace actions
         typedef transfer_base_action<Action> base_type;
         typedef typename base_type::continuation_type continuation_type;
     public:
-        // construct an empty transfer_continuation_action to avoid serialization overhead
+        // construct an empty transfer_continuation_action to avoid serialization
+        // overhead
         transfer_continuation_action();
 
         // construct an action from its arguments
@@ -222,8 +223,8 @@ namespace hpx { namespace actions
 
         if (deferred_schedule)
         {
-            // If this is a direct action and deferred schedule was requested, that
-            // is we are not the last parcel, return immediately
+            // If this is a direct action and deferred schedule was requested,
+            // that is we are not the last parcel, return immediately
             if (base_type::direct_execution::value)
                 return;
 

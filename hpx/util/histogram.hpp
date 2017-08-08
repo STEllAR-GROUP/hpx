@@ -60,15 +60,9 @@ namespace hpx { namespace util
         template <typename Sample>
         struct histogram_impl : boost::accumulators::accumulator_base
         {
-#if BOOST_VERSION > 105400
             typedef typename boost::numeric::functional::fdiv_base<
                     Sample, std::size_t
                 >::result_type float_type;
-#else
-            typedef typename boost::numeric::functional::average<
-                    Sample, std::size_t
-                >::result_type float_type;
-#endif
             typedef std::vector<std::pair<float_type, float_type> > histogram_type;
             typedef std::vector<float_type> array_type;
 

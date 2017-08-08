@@ -15,13 +15,13 @@
 #include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/traits/plugin_config_data.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <string>
@@ -147,22 +147,22 @@ namespace hpx { namespace plugins
 /// Hpx.Plugin.
 #define HPX_REGISTER_PARCELPORT_(Parcelport, pluginname, pp)                  \
     typedef hpx::plugins::parcelport_factory<Parcelport>                      \
-        BOOST_PP_CAT(pluginname, _plugin_factory_type);                       \
+        HPX_PP_CAT(pluginname, _plugin_factory_type);                         \
     HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
-        BOOST_PP_CAT(pluginname, _plugin_factory_type), pp)                   \
+        HPX_PP_CAT(pluginname, _plugin_factory_type), pp)                     \
     template struct hpx::plugins::parcelport_factory<Parcelport>;             \
     HPX_EXPORT hpx::plugins::parcelport_factory_base*                         \
-    BOOST_PP_CAT(pluginname, _factory_init)                                   \
+    HPX_PP_CAT(pluginname, _factory_init)                                     \
     (std::vector<hpx::plugins::parcelport_factory_base *>& factories)         \
     {                                                                         \
-        static BOOST_PP_CAT(pluginname, _plugin_factory_type) factory(factories);\
+        static HPX_PP_CAT(pluginname, _plugin_factory_type) factory(factories);\
         return &factory;                                                      \
     }                                                                         \
 /**/
 
 #define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                       \
         HPX_REGISTER_PARCELPORT_(Parcelport,                                  \
-            BOOST_PP_CAT(parcelport_, pluginname), pluginname)                \
+            HPX_PP_CAT(parcelport_, pluginname), pluginname)                  \
 
 #endif
 

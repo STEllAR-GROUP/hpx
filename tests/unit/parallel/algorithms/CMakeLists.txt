@@ -77,6 +77,7 @@ set(tests
     mismatch_binary
     move
     none_of
+    partition
     partition_copy
     reduce_
     reduce_by_key
@@ -120,6 +121,7 @@ set(tests
     uninitialized_moven
     uninitialized_value_construct
     uninitialized_value_constructn
+    unique_copy
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)

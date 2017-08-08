@@ -471,7 +471,8 @@ system and application performance.
          executing one __hpx__-thread for all worker threads separately.
          This counter is available only if the configuration time constants
          `HPX_WITH_THREAD_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).]
+         `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
+         The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/time/average-overhead`]
@@ -499,7 +500,8 @@ system and application performance.
          one __hpx__-thread for all worker threads separately.
          This counter is available only if the configuration time constants
          `HPX_WITH_THREAD_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).]
+         `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
+         The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/count/cumulative-phases`]
@@ -527,7 +529,8 @@ system and application performance.
          the counter will return the overall number of executed __hpx__-thread
          phases for all worker threads separately.
          This counter is available only if the configuration time constant
-         `HPX_WITH_THREAD_CUMULATIVE_COUNTS` is set to `ON` (default: ON).]
+         `HPX_WITH_THREAD_CUMULATIVE_COUNTS` is set to `ON` (default: ON).
+         The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/time/average-phase`]
@@ -556,7 +559,8 @@ system and application performance.
          __hpx__-thread phase for all worker threads separately.
          This counter is available only if the configuration time constants
          `HPX_WITH_THREAD_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).]
+         `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
+         The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/time/average-phase-overhead`]
@@ -586,7 +590,8 @@ system and application performance.
         for all worker threads separately.  This counter is available only
         if the configuration time constants
         `HPX_WITH_THREAD_CUMULATIVE_COUNTS` (default: ON) and
-        `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).]
+        `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
+        The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/time/overall`]
@@ -613,8 +618,9 @@ system and application performance.
          (cores) on that locality. If the instance name is `worker-thread#*`
          the counter will return the overall time spent running the scheduler
          for all worker threads separately. This counter is available only
-        if the configuration time constant
-        `HPX_WITH_THREAD_IDLE_RATES` is set to `ON` (default: OFF).]
+         if the configuration time constant
+         `HPX_WITH_THREAD_IDLE_RATES` is set to `ON` (default: OFF).
+         The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/time/cumulative`]
@@ -672,7 +678,8 @@ system and application performance.
          all __hpx__-threads for all worker threads separately.
          This counter is available only if the configuration time constants
          `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).
+         The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/count/instantaneous/<thread-state>`
@@ -745,7 +752,8 @@ system and application performance.
 
          These counters are available only if the compile time constant
          `HPX_WITH_THREAD_QUEUE_WAITTIME` was defined while compiling the
-         __hpx__ core library (default: OFF).]
+         __hpx__ core library (default: OFF).
+         The unit of  measure for this counter is nanosecond [ns].]
         [None]
     ]
     [   [`/threads/idle-rate`]
@@ -1047,7 +1055,7 @@ system and application performance.
           (instantaneous) scheduler utilization queried for. The locality id
           (given by `*`) is a (zero based) number identifying the locality.
         ]
-        [Returns the total scheduler (instantaneous) utilization. This is the
+        [Returns the total (instantaneous) scheduler utilization. This is the
         current percentage of scheduler threads executing __hpx__ threads.]
         [Percent]
     ]
@@ -1283,6 +1291,43 @@ system and application performance.
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[table Performance Counters exposing PAPI hardware counters
+    [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
+    [   [`/papi/<papi_event>`
+
+          where:[br] `<papi_event>` is the name of the PAPI event to expose as
+          a performance counter (such as `PAPI_SR_INS`). Note that the list of
+          available PAPI events changes depending on the used architecture.
+
+          For a full list of available PAPI events and their (short) description
+          use the `--hpx:list-counters` and --papi-event-info=all command line
+          options.
+        ]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the current
+          current accumulated value of all busy-loop counters of all worker
+          threads should be queried. The locality id
+          (given by `*`) is a (zero based) number identifying the locality.
+
+          `worker-thread#*` is defining the worker thread for which the
+          current value of the busy-loop counter should be queried
+          for. The worker thread number (given by the `*`) is a (zero based)
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [This counter returns the current count of occurrences of the specified
+         PAPI event. This counter is available only if the configuration time
+         constant `HPX_WITH_PAPI` is set to `ON` (default: OFF).]
+        [None]
+    ]
+]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [table Performance Counters for General Statistics
     [[Counter Type] [Counter Instance Formatting] [Description] [Parameters]]
     [   [`/statistics/average`]
@@ -1455,6 +1500,51 @@ system and application performance.
     [   [`/arithmetics/divide`]
         [None]
         [Returns the result of division of the values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/mean`]
+        [None]
+        [Returns the average value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/variance`]
+        [None]
+        [Returns the standard deviation of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/median`]
+        [None]
+        [Returns the median value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/min`]
+        [None]
+        [Returns the minimum value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
+    [   [`/arithmetics/max`]
+        [None]
+        [Returns the maximum value of all values queried from the
          underlying counters (the ones specified as the parameters).]
         [The parameter will be interpreted as a comma separated list of
          full performance counter names which are queried whenever

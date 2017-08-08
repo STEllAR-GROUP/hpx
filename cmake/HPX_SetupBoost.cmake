@@ -12,6 +12,7 @@ endif()
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
     ${Boost_ADDITIONAL_VERSIONS}
+    "1.66.0" "1.66"
     "1.65.0" "1.65"
     "1.64.0" "1.64"
     "1.63.0" "1.63"
@@ -62,13 +63,13 @@ endif()
 
 set(__boost_libraries
   ${__boost_libraries}
-  date_time
+  atomic
   filesystem
   program_options
   regex
   system)
 
-find_package(Boost 1.51 REQUIRED COMPONENTS ${__boost_libraries})
+find_package(Boost 1.55 REQUIRED COMPONENTS ${__boost_libraries})
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
@@ -86,7 +87,7 @@ endif()
 set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost 1.51 QUIET COMPONENTS iostreams)
+  find_package(Boost 1.55 QUIET COMPONENTS iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
@@ -96,23 +97,9 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 # attempt to load Boost.Random (if available), it's needed for one example only
-find_package(Boost 1.51 QUIET COMPONENTS random)
+find_package(Boost 1.55 QUIET COMPONENTS random)
 if(Boost_RANDOM_FOUND)
   hpx_info("  random")
-  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-endif()
-
-# If the found Boost installation is < 1.53, we need to include our packaged
-# atomic library
-if(Boost_VERSION LESS 105300)
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/external/atomic")
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/external/lockfree")
-else()
-  find_package(Boost 1.53 QUIET REQUIRED COMPONENTS atomic)
-  if(Boost_ATOMIC_FOUND)
-    hpx_info("  atomic")
-  endif()
-
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
@@ -140,11 +127,6 @@ endif()
 hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
 hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
-
-# Disable usage of std::atomics in lockfree
-if(Boost_VERSION LESS 105300)
-  hpx_add_config_cond_define(BOOST_NO_0X_HDR_ATOMIC)
-endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
