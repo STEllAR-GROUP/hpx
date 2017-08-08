@@ -7,20 +7,25 @@
 #define HPX_SERIALIZATION_DETAIL_SERIALIZE_COLLECTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace serialization { namespace detail {
 
-    // default fallbacks. in fact, they should never be called
+    // default fallbacks
     template <class Archive, class T>
     void save_construct_data(Archive&, T*, unsigned)
     {
+        // a user is not required to provide their own adl-overload
     }
 
     template <class Archive, class T>
     void load_construct_data(Archive&, T* t, unsigned)
     {
+        // this function is never supposed to be called
+        HPX_ASSERT(false);
         ::new (t) T;
     }
 
@@ -85,13 +90,15 @@ namespace hpx { namespace serialization { namespace detail {
                     sizeof(value_type), alignof(value_type)>;
 
                 collection.clear();
+                hpx::traits::detail::reserve_if_reservable(collection, size);
+
                 while (size-- > 0)
                 {
                     storage_type storage;
                     value_type& ref = reinterpret_cast<value_type&>(storage);
                     load_construct_data(ar, &ref, 0);
                     ar >> ref;
-                    collection.push_back(ref);
+                    collection.push_back(std::move(ref));
                 }
             }
         };
