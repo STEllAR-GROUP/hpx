@@ -14,15 +14,12 @@ set(subdirs
     parallel
     parcelset
     performance_counter
+    resource
     serialization
     threads
     traits
     util
    )
-
-if(HPX_WITH_SECURITY)
-  set(subdirs ${subdirs} security)
-endif()
 
 if(HPX_WITH_APEX)
   set(subdirs ${subdirs} apex)
