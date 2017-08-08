@@ -20,7 +20,7 @@
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 
 #include <cstddef>
 #include <iostream>
