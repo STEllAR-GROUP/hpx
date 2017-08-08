@@ -31,8 +31,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/preprocessor/cat.hpp>
-
 namespace hpx { namespace lcos
 {
     namespace detail

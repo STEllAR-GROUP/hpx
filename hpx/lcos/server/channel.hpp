@@ -25,8 +25,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/preprocessor/cat.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
