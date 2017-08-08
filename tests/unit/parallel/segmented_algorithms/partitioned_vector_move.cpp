@@ -19,7 +19,7 @@
 // The vector types to be used are defined in partitioned_vector module.
 // HPX_REGISTER_PARTITIONED_VECTOR(double);
 // HPX_REGISTER_PARTITIONED_VECTOR(int);
-// 
+//
 // typedef std::string string;
 // HPX_REGISTER_PARTITIONED_VECTOR(string);
 
