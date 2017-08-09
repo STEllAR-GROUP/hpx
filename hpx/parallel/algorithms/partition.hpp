@@ -686,8 +686,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 HPX_UNUSED(first);
 
                 auto boundary_rbegin = std::reverse_iterator<BidirIter>(boundary);
-                for (auto it = std::rbegin(remaining_blocks);
-                    it != std::rend(remaining_blocks);
+                for (auto it = remaining_blocks.rbegin();
+                    it != remaining_blocks.rend();
                     ++it)
                 {
                     auto rbegin = std::reverse_iterator<BidirIter>(it->last);
