@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
+
+#include <boost/atomic.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -150,6 +152,33 @@ void test_remote_async(hpx::id_type const& target)
         hpx::future<std::int32_t> f1 = hpx::async(inc, target, f);
         hpx::future<std::int32_t> f2 =
             hpx::async(hpx::launch::all, inc, target, f);
+
+        HPX_TEST_EQ(f1.get(), 44);
+        HPX_TEST_EQ(f2.get(), 44);
+    }
+
+    {
+        auto policy1 =
+            hpx::launch::lazy([]()
+            {
+                return hpx::launch::deferred;
+            });
+
+        increment_with_future_action inc;
+        hpx::shared_future<std::int32_t> f =
+            hpx::async(policy1, hpx::util::bind(&increment, 42));
+
+        boost::atomic<int> count(0);
+        auto policy2 =
+            hpx::launch::lazy([&count]() -> hpx::launch
+            {
+                if (count++ == 0)
+                    return hpx::launch::async;
+                return hpx::launch::sync;
+            });
+
+        hpx::future<std::int32_t> f1 = hpx::async(policy2, inc, target, f);
+        hpx::future<std::int32_t> f2 = hpx::async(policy2, inc, target, f);
 
         HPX_TEST_EQ(f1.get(), 44);
         HPX_TEST_EQ(f2.get(), 44);

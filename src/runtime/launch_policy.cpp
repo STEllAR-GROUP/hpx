@@ -20,17 +20,21 @@ namespace hpx
     const detail::deferred_policy launch::deferred = detail::deferred_policy{};
     const detail::apply_policy launch::apply = detail::apply_policy{};
 
-    const detail::policy_holder launch::all =
-        detail::policy_holder{detail::launch_policy::all};
-    const detail::policy_holder launch::sync_policies =
-        detail::policy_holder{detail::launch_policy::sync_policies};
-    const detail::policy_holder launch::async_policies =
-        detail::policy_holder{detail::launch_policy::async_policies};
+    const detail::lazy_policy_generator launch::lazy =
+        detail::lazy_policy_generator{};
+
+    const detail::policy_holder<> launch::all =
+        detail::policy_holder<>{detail::launch_policy::all};
+    const detail::policy_holder<> launch::sync_policies =
+        detail::policy_holder<>{detail::launch_policy::sync_policies};
+    const detail::policy_holder<> launch::async_policies =
+        detail::policy_holder<>{detail::launch_policy::async_policies};
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        void policy_holder::load(serialization::input_archive& ar, unsigned)
+        void policy_holder_base::load(
+            serialization::input_archive& ar, unsigned)
         {
             int value = 0;
             ar & value;
@@ -39,7 +43,8 @@ namespace hpx
             priority_ = static_cast<threads::thread_priority>(value);
         }
 
-        void policy_holder::save(serialization::output_archive& ar, unsigned) const
+        void policy_holder_base::save(
+            serialization::output_archive& ar, unsigned) const
         {
             int value = static_cast<int>(policy_);
             ar & value;

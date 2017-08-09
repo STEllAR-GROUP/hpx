@@ -502,7 +502,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     public:
-        void attach(Future const& future, launch policy)
+        template <typename Policy>
+        void attach(Future const& future, Policy && policy)
         {
             typedef
                 typename traits::detail::shared_state_ptr_for<Future>::type
@@ -511,12 +512,6 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr &&, threads::thread_priority);
-
-            if (policy & launch::sync)
-                cb = &continuation::run;
-            else
-                cb = &continuation::async;
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
@@ -530,7 +525,14 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(util::deferred_call(
-                    cb, std::move(this_), std::move(state), policy.priority()
+                    [this_](shared_state_ptr && f, Policy && policy)
+                    {
+                        if (hpx::detail::has_async_policy(policy))
+                            this_->async(std::move(f), policy.priority());
+                        else
+                            this_->run(std::move(f), policy.priority());
+                    },
+                    std::move(state), std::forward<Policy>(policy)
                 ));
         }
 
@@ -630,11 +632,11 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult, typename Future, typename F>
+    template <typename ContResult, typename Future, typename Policy, typename F>
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, launch policy, F && f)
+    make_continuation(Future const& future, Policy && policy, F && f)
     {
         typedef typename continuation_result<ContResult>::type result_type;
         typedef detail::continuation<Future, F, result_type> shared_state;
@@ -643,7 +645,8 @@ namespace hpx { namespace lcos { namespace detail
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
             new shared_state(std::forward<F>(f), init_no_addref()), false);
-        static_cast<shared_state*>(p.get())->attach(future, policy);
+        static_cast<shared_state*>(p.get())->attach(
+            future, std::forward<Policy>(policy));
         return p;
     }
 

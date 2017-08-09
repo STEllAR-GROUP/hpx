@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2013 Vicente Botet
+//  Copyright (C) 2012-2013 Vicente Botet
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
@@ -10,6 +10,8 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
+
+#include <boost/atomic.hpp>
 
 #include <chrono>
 #include <memory>
@@ -24,7 +26,7 @@ int p1()
     return 1;
 }
 
-int p2(hpx::lcos::future<int> f)
+int p2(hpx::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
@@ -32,7 +34,7 @@ int p2(hpx::lcos::future<int> f)
     return 2 * i;
 }
 
-void p3(hpx::lcos::future<int> f)
+void p3(hpx::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
@@ -41,7 +43,7 @@ void p3(hpx::lcos::future<int> f)
     return;
 }
 
-hpx::lcos::future<int> p4(hpx::lcos::future<int> f)
+hpx::future<int> p4(hpx::future<int> f)
 {
     return hpx::async(p2, std::move(f));
 }
@@ -49,12 +51,29 @@ hpx::lcos::future<int> p4(hpx::lcos::future<int> f)
 ///////////////////////////////////////////////////////////////////////////////
 void test_return_int()
 {
-    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    hpx::future<int> f1 = hpx::async(hpx::launch::async, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<int> f2 = f1.then(&p2);
+    hpx::future<int> f2 = f1.then(&p2);
     HPX_TEST(f2.valid());
     try {
-        HPX_TEST(f2.get()==2);
+        HPX_TEST(f2.get() == 2);
+    }
+    catch (hpx::exception const& /*ex*/) {
+        HPX_TEST(false);
+    }
+    catch (...) {
+        HPX_TEST(false);
+    }
+}
+
+void test_return_int_launch()
+{
+    hpx::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    HPX_TEST(f1.valid());
+    hpx::future<int> f2 = f1.then(hpx::launch::async, &p2);
+    HPX_TEST(f2.valid());
+    try {
+        HPX_TEST(f2.get() == 2);
     }
     catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
@@ -67,9 +86,26 @@ void test_return_int()
 ///////////////////////////////////////////////////////////////////////////////
 void test_return_void()
 {
-    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    hpx::future<int> f1 = hpx::async(hpx::launch::async, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<void> f2 = f1.then(&p3);
+    hpx::future<void> f2 = f1.then(&p3);
+    HPX_TEST(f2.valid());
+    try {
+        f2.wait();
+    }
+    catch (hpx::exception const& /*ex*/) {
+        HPX_TEST(false);
+    }
+    catch (...) {
+        HPX_TEST(false);
+    }
+}
+
+void test_return_void_launch()
+{
+    hpx::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    HPX_TEST(f1.valid());
+    hpx::future<void> f2 = f1.then(hpx::launch::sync, &p3);
     HPX_TEST(f2.valid());
     try {
         f2.wait();
@@ -85,9 +121,9 @@ void test_return_void()
 ///////////////////////////////////////////////////////////////////////////////
 void test_implicit_unwrapping()
 {
-    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    hpx::future<int> f1 = hpx::async(hpx::launch::async, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<int> f2 = f1.then(&p4);
+    hpx::future<int> f2 = f1.then(&p4);
     HPX_TEST(f2.valid());
     try {
         HPX_TEST(f2.get()==2);
@@ -103,54 +139,86 @@ void test_implicit_unwrapping()
 ///////////////////////////////////////////////////////////////////////////////
 void test_simple_then()
 {
-    hpx::lcos::future<int> f2 = hpx::async(p1).then(&p2);
+    hpx::future<int> f2 = hpx::async(p1).then(&p2);
     HPX_TEST(f2.get()==2);
 }
 
 void test_simple_deferred_then()
 {
-    hpx::lcos::future<int> f2 = hpx::async(hpx::launch::deferred, p1).then(&p2);
+    hpx::future<int> f2 = hpx::async(hpx::launch::deferred, p1).then(&p2);
     HPX_TEST(f2.get()==2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then()
 {
-    hpx::lcos::future<int> f1 = hpx::async(p1);
-    hpx::lcos::future<int> f21 = f1.then(&p2);
-    hpx::lcos::future<int> f2= f21.then(&p2);
-    HPX_TEST(f2.get()==4);
+    hpx::future<int> f1 = hpx::async(p1);
+    hpx::future<int> f21 = f1.then(&p2);
+    hpx::future<int> f2= f21.then(&p2);
+    HPX_TEST(f2.get() == 4);
+}
+
+void test_complex_then_launch()
+{
+    auto policy =
+        hpx::launch::lazy([]()
+        {
+            return hpx::launch::async;
+        });
+
+    hpx::future<int> f1 = hpx::async(p1);
+    hpx::future<int> f21 = f1.then(policy, &p2);
+    hpx::future<int> f2= f21.then(policy, &p2);
+    HPX_TEST(f2.get() == 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then_chain_one()
 {
-    hpx::lcos::future<int> f1 = hpx::async(p1);
-    hpx::lcos::future<int> f2= f1.then(&p2).then(&p2);
+    hpx::future<int> f1 = hpx::async(p1);
+    hpx::future<int> f2 = f1.then(&p2).then(&p2);
+    HPX_TEST(f2.get()==4);
+}
+
+void test_complex_then_chain_one_launch()
+{
+    boost::atomic<int> count(0);
+    auto policy =
+        hpx::launch::lazy(
+            [&count]() -> hpx::launch
+            {
+                if (count++ == 0)
+                    return hpx::launch::async;
+                return hpx::launch::sync;
+            });
+
+    hpx::future<int> f1 = hpx::async(p1);
+    hpx::future<int> f2 = f1.then(policy, &p2).then(policy, &p2);
     HPX_TEST(f2.get()==4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then_chain_two()
 {
-    hpx::lcos::future<int> f2 = hpx::async(p1).then(&p2).then(&p2);
+    hpx::future<int> f2 = hpx::async(p1).then(&p2).then(&p2);
     HPX_TEST(f2.get()==4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-
-int hpx_main(variables_map&)
+int hpx_main()
 {
     {
         test_return_int();
+        test_return_int_launch();
         test_return_void();
+        test_return_void_launch();
         test_implicit_unwrapping();
         test_simple_then();
         test_simple_deferred_then();
         test_complex_then();
+        test_complex_then_launch();
         test_complex_then_chain_one();
+        test_complex_then_chain_one_launch();
         test_complex_then_chain_two();
     }
 
@@ -161,15 +229,12 @@ int hpx_main(variables_map&)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options
-    options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
-
     // We force this test to use several threads by default.
     std::vector<std::string> const cfg = {
         "hpx.os_threads=all"
     };
 
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv, cfg);
+    return hpx::init(argc, argv, cfg);
 }
 

@@ -83,6 +83,45 @@ void plain_actions(hpx::id_type const& there)
             HPX_TEST(there == f2.get());
         }
     }
+
+    auto policy1 =
+        hpx::launch::lazy([]()
+        {
+            return hpx::launch::sync;
+        });
+
+    {
+        void_f_count.store(0);
+
+        hpx::future<void> f1 = hpx::dataflow(policy1,
+            void_f_action(), here, hpx::make_ready_future(42));
+        hpx::future<void> f2 = hpx::dataflow<void_f_action>(policy1,
+            here, hpx::make_ready_future(42));
+
+        f1.get();
+        f2.get();
+
+        HPX_TEST_EQ(void_f_count, 2u);
+    }
+
+    boost::atomic<int> count(0);
+    auto policy2 =
+        hpx::launch::lazy([&count]() -> hpx::launch
+        {
+            if (count++ == 0)
+                return hpx::launch::async;
+            return hpx::launch::sync;
+        });
+
+    {
+        hpx::future<hpx::id_type> f1 = hpx::dataflow(
+            policy2, id_f_action(), there);
+        hpx::future<hpx::id_type> f2 = hpx::dataflow<id_f_action>(
+            policy2, there);
+
+        HPX_TEST(there == f1.get());
+        HPX_TEST(there == f2.get());
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
