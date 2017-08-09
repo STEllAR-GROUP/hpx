@@ -889,7 +889,7 @@ template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::periodic_priority_queue_scheduler<> >;
 #endif
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
 #include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::throttling_scheduler<> >;
