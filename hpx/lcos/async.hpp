@@ -128,7 +128,7 @@ namespace hpx { namespace detail
         call(Policy_ && launch_policy, DistPolicy const& policy, Ts&&... ts)
         {
             return policy.template async<Action>(
-                std::forward<Policy>(launch_policy),
+                std::forward<Policy_>(launch_policy),
                 std::forward<Ts>(ts)...);
         }
     };

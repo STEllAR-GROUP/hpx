@@ -525,7 +525,7 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(util::deferred_call(
-                    [this_](shared_state_ptr && f, Policy && policy)
+                    [this_](shared_state_ptr && f, launch policy)
                     {
                         if (hpx::detail::has_async_policy(policy))
                             this_->async(std::move(f), policy.priority());
