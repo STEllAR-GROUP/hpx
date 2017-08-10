@@ -85,7 +85,7 @@ void plain_actions(hpx::id_type const& there)
     }
 
     auto policy1 =
-        hpx::launch::lazy([]()
+        hpx::launch::select([]()
         {
             return hpx::launch::sync;
         });
@@ -106,7 +106,7 @@ void plain_actions(hpx::id_type const& there)
 
     boost::atomic<int> count(0);
     auto policy2 =
-        hpx::launch::lazy([&count]() -> hpx::launch
+        hpx::launch::select([&count]() -> hpx::launch
         {
             if (count++ == 0)
                 return hpx::launch::async;

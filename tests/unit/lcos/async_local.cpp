@@ -260,7 +260,7 @@ int hpx_main()
         using hpx::util::placeholders::_1;
 
         auto policy1 =
-            hpx::launch::lazy([]()
+            hpx::launch::select([]()
             {
                 return hpx::launch::sync;
             });
@@ -275,7 +275,7 @@ int hpx_main()
 
         boost::atomic<int> count(0);
         auto policy2 =
-            hpx::launch::lazy([&count]() -> hpx::launch
+            hpx::launch::select([&count]() -> hpx::launch
             {
                 if (count++ == 0)
                     return hpx::launch::async;

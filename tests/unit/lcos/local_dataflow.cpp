@@ -327,7 +327,7 @@ void plain_arguments_lazy()
     int_f4_count.store(0);
 
     auto policy1 =
-        hpx::launch::lazy([]()
+        hpx::launch::select([]()
         {
             return hpx::launch::sync;
         });
@@ -344,7 +344,7 @@ void plain_arguments_lazy()
     }
 
     auto policy2 =
-        hpx::launch::lazy([]()
+        hpx::launch::select([]()
         {
             return hpx::launch::async;
         });
@@ -365,7 +365,7 @@ void plain_arguments_lazy()
 
     boost::atomic<int> count(0);
     auto policy3 =
-        hpx::launch::lazy([&count]() -> hpx::launch
+        hpx::launch::select([&count]() -> hpx::launch
         {
             if (count++ == 0)
                 return hpx::launch::async;

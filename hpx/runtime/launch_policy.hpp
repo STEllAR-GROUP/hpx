@@ -196,15 +196,15 @@ namespace hpx
         };
 
         template <typename Pred>
-        struct lazy_policy : policy_holder<lazy_policy<Pred> >
+        struct select_policy : policy_holder<select_policy<Pred> >
         {
             template <typename F, typename U =
                 typename std::enable_if<!std::is_same<
-                    lazy_policy<Pred>, typename std::decay<F>::type
+                    select_policy<Pred>, typename std::decay<F>::type
                 >::value>::type>
-            explicit lazy_policy(F && f, threads::thread_priority priority =
+            explicit select_policy(F && f, threads::thread_priority priority =
                         threads::thread_priority_default)
-              : policy_holder<lazy_policy<Pred> >(launch_policy::async, priority)
+              : policy_holder<select_policy<Pred> >(launch_policy::async, priority)
               , pred_(std::forward<F>(f))
             {}
 
@@ -222,7 +222,7 @@ namespace hpx
             Pred pred_;
         };
 
-        struct lazy_policy_generator
+        struct select_policy_generator
         {
             HPX_CONSTEXPR async_policy operator()(
                 threads::thread_priority priority) const noexcept
@@ -231,11 +231,11 @@ namespace hpx
             }
 
             template <typename F>
-            lazy_policy<typename std::decay<F>::type> operator()(F && f,
+            select_policy<typename std::decay<F>::type> operator()(F && f,
                 threads::thread_priority priority =
                     threads::thread_priority_default) const
             {
-                return lazy_policy<typename std::decay<F>::type>(
+                return select_policy<typename std::decay<F>::type>(
                     std::forward<F>(f), priority);
             }
         };
@@ -377,7 +377,7 @@ namespace hpx
 
         /// Create a launch policy representing fire and forget execution
         template <typename F>
-        HPX_CONSTEXPR launch(detail::lazy_policy<F> const& p) noexcept
+        HPX_CONSTEXPR launch(detail::select_policy<F> const& p) noexcept
           : detail::policy_holder<>{p.policy()}
         {}
 
@@ -389,7 +389,7 @@ namespace hpx
         using deferred_policy = detail::deferred_policy;
         using apply_policy = detail::apply_policy;
         template <typename F>
-        using lazy_policy = detail::lazy_policy<F>;
+        using select_policy = detail::select_policy<F>;
         /// \endcond
 
         ///////////////////////////////////////////////////////////////////////
@@ -409,9 +409,8 @@ namespace hpx
         /// Predefined launch policy representing fire and forget execution
         HPX_EXPORT static const detail::apply_policy apply;
 
-        /// Predefined launch policy representing conditionally asynchronous
-        /// execution
-        HPX_EXPORT static const detail::lazy_policy_generator lazy;
+        /// Predefined launch policy representing delayed policy selection
+        HPX_EXPORT static const detail::select_policy_generator select;
 
         /// \cond NOINTERNAL
         HPX_EXPORT static const detail::policy_holder<> all;

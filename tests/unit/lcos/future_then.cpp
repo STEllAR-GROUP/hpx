@@ -161,7 +161,7 @@ void test_complex_then()
 void test_complex_then_launch()
 {
     auto policy =
-        hpx::launch::lazy([]()
+        hpx::launch::select([]()
         {
             return hpx::launch::async;
         });
@@ -184,7 +184,7 @@ void test_complex_then_chain_one_launch()
 {
     boost::atomic<int> count(0);
     auto policy =
-        hpx::launch::lazy(
+        hpx::launch::select(
             [&count]() -> hpx::launch
             {
                 if (count++ == 0)

@@ -159,7 +159,7 @@ void test_remote_async(hpx::id_type const& target)
 
     {
         auto policy1 =
-            hpx::launch::lazy([]()
+            hpx::launch::select([]()
             {
                 return hpx::launch::deferred;
             });
@@ -170,7 +170,7 @@ void test_remote_async(hpx::id_type const& target)
 
         boost::atomic<int> count(0);
         auto policy2 =
-            hpx::launch::lazy([&count]() -> hpx::launch
+            hpx::launch::select([&count]() -> hpx::launch
             {
                 if (count++ == 0)
                     return hpx::launch::async;
