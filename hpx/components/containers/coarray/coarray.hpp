@@ -218,11 +218,11 @@ namespace hpx
         }
 
         template<typename... I,
-            typename = std::enable_if_t<
+            typename = typename std::enable_if<
                 ! std::is_same<
                     typename util::detail::at_index<sizeof...(I)-1,I...>::type,
                         detail::auto_subscript>::value
-                >
+                >::type
             >
         hpx::detail::view_element<T,Data>
         operator()(I... index) const
@@ -234,11 +234,11 @@ namespace hpx
         }
 
         template<typename... I,
-            typename = std::enable_if_t<
+            typename = typename std::enable_if<
                 std::is_same<
                     typename util::detail::at_index<sizeof...(I)-1,I...>::type,
                         detail::auto_subscript>::value
-                >
+                >::type
             >
         Data &
         operator()(I... index)
