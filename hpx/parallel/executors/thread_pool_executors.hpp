@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { namespace execution
         threads::executors::static_priority_queue_executor;
 #endif
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
     /// Creates a new throttling_executor
     ///
     /// \param max_punits   [in] The maximum number of processing units to
@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { inline namespace v3
         threads::executors::static_queue_executor;
 #endif
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
     using throttling_executor =
         threads::executors::throttling_executor;
 #endif

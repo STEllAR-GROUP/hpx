@@ -60,7 +60,7 @@ struct user_defined_type
             return this->val < rand_base;
     }
 
-    bool operator<(user_defined_type const& t)
+    bool operator<(user_defined_type const& t) const
     {
         return this->name < t.name ||
             (this->name == t.name && this->val < t.val);
