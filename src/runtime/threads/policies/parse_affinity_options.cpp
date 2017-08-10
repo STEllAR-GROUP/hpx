@@ -10,7 +10,6 @@
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hwloc.h>

@@ -14,6 +14,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if !defined(HPX_EXPORTS)
@@ -84,7 +85,8 @@ namespace hpx { namespace resource { namespace detail
         runtime_mode mode = runtime_mode_default, bool check = true)
     {
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
-            desc_cmdline, argc, argv, ini_config, rpmode, mode, check);
+            desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode,
+            check);
     }
 #endif
 }}}

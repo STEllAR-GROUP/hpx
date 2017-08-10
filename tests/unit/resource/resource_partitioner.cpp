@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     };
 
     // set up the resource partitioner
-    hpx::resource::partitioner rp(argc, argv, cfg);
+    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
     // now run  the test
     HPX_TEST_EQ(hpx::init(), 0);

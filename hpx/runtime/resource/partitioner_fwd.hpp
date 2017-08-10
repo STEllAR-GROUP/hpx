@@ -23,7 +23,7 @@ namespace hpx
         class core;
         class pu;
 
-        class HPX_EXPORT partitioner;
+        class partitioner;
 
         namespace detail
         {
