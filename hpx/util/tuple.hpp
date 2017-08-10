@@ -779,7 +779,7 @@ namespace hpx { namespace util
           , typename std::enable_if<
                 (I < tuple_size<Head>::value)
             >::type
-        >
+        > : tuple_element<I, Head>
         {
             template <typename THead, typename... TTail>
             static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
@@ -816,26 +816,31 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        /// A helper function for creating a non owning tuple from the given
-        /// arguments. Which means that the funcitonality of this function
-        /// lies between make_tuple and forward_as_tuple.
-        template <typename... Ts>
-        tuple<Ts...> create_raw_tuple(Ts&&... args)
+        template <typename Indices, typename Tuples>
+        struct tuple_cat_result_impl;
+
+        template <std::size_t... Is, typename... Tuples>
+        struct tuple_cat_result_impl<pack_c<std::size_t, Is...>,
+            pack<Tuples...>>
         {
-            return tuple<Ts...>{std::forward<Ts>(args)...};
-        }
+            using type =
+                tuple<typename tuple_cat_element<Is, pack<Tuples...>>::type...>;
+        };
+
+        template <typename Indices, typename Tuples>
+        using tuple_cat_result_of_t =
+            typename tuple_cat_result_impl<Indices, Tuples>::type;
 
         template <std::size_t... Is, typename... Tuples, typename... Tuples_>
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto
-        tuple_cat_impl(detail::pack_c<std::size_t, Is...>,
-            detail::pack<Tuples...>, Tuples_&&... tuples)
-            -> decltype(create_raw_tuple(
-                tuple_cat_element<Is, detail::pack<Tuples...>>::get(
-                    std::forward<Tuples_>(tuples)...)...))
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat_impl(
+            pack_c<std::size_t, Is...> is_pack, pack<Tuples...> tuple_pack,
+            Tuples_&&... tuples)
+            -> tuple_cat_result_of_t<decltype(is_pack), decltype(tuple_pack)>
         {
-            return create_raw_tuple(
-                tuple_cat_element<Is, detail::pack<Tuples...>>::get(
-                    std::forward<Tuples_>(tuples)...)...);
+            return tuple_cat_result_of_t<decltype(is_pack),
+                decltype(tuple_pack)>{
+                tuple_cat_element<Is, pack<Tuples...>>::get(
+                    std::forward<Tuples_>(tuples)...)...};
         }
     }
 

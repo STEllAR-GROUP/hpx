@@ -55,7 +55,20 @@ namespace hpx { namespace util
         if (altname == nullptr)
         {
             hpx::threads::thread_id_type id = hpx::threads::get_self_id();
-            if (id) *this = hpx::threads::get_thread_description(id);
+            if (id)
+            {
+                thread_description desc = hpx::threads::get_thread_description(id);
+                type_ = desc.kind();
+                if (type_ == data_type_description)
+                {
+                    data_.desc_ = desc.get_description();
+                }
+                else
+                {
+                    HPX_ASSERT(type_ == data_type_address);
+                    data_.addr_ = desc.get_address();
+                }
+            }
         }
 #endif
     }

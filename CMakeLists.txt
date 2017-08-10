@@ -141,6 +141,13 @@ endif()
 # Set our build options cache variables which are customizable by users
 #
 
+hpx_option(HPX_WITH_DEPRECATION_WARNINGS
+  BOOL "Enable warnings for deprecated facilities. (default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_DEPRECATION_WARNINGS)
+  hpx_add_config_define(HPX_HAVE_DEPRECATION_WARNINGS)
+endif()
+
 ## Generic build options
 set(DEFAULT_MALLOC "system")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
