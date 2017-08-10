@@ -45,6 +45,16 @@ public:
         return std::size_t(-1);
     }
 
+    std::size_t get_socket_number(
+        std::size_t num_thread
+      , error_code& ec) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return std::size_t(-1);
+    }
+
     mask_cref_type get_machine_affinity_mask(
         error_code& ec = throws
         ) const
@@ -202,7 +212,7 @@ public:
     }
 
     void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-        mask_type const& m) const
+        mask_type const& m, std::string pool_name) const
     {
     }
 

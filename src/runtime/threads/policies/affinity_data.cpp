@@ -7,7 +7,7 @@
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -109,7 +109,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     {
         num_threads_ = cfg_.num_threads_;
         std::size_t num_system_pus = hardware_concurrency();
-        auto& topo = get_resource_partitioner().get_topology();
+        auto& topo = resource::get_partitioner().get_topology();
 
         // initialize from command line
         std::size_t pu_offset = get_pu_offset(cfg_);
@@ -206,7 +206,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     mask_cref_type affinity_data::get_pu_mask(std::size_t global_thread_num) const
     {
         // get a topology instance
-        topology const& topology = get_resource_partitioner().get_topology();
+        topology const& topology = resource::get_partitioner().get_topology();
 
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, global_thread_num))

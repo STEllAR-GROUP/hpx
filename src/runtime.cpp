@@ -235,8 +235,7 @@ namespace hpx
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
-        resource_partitioner_(&get_resource_partitioner()),
-        topology_(resource_partitioner_->get_topology()),
+        topology_(resource::get_partitioner().get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
@@ -662,7 +661,7 @@ namespace hpx
     {
         get_thread_manager().init();
         return static_cast<std::uint32_t>(
-            hpx::get_resource_partitioner().cores_needed());
+            hpx::resource::get_partitioner().cores_needed());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -760,7 +759,7 @@ namespace hpx
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
-        return get_resource_partitioner()
+        return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
@@ -770,7 +769,7 @@ namespace hpx
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
-        return get_resource_partitioner()
+        return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
@@ -781,7 +780,7 @@ namespace hpx
         {
             return get_runtime_ptr()->get_config().add_entry(key, value);
         }
-        return get_resource_partitioner()
+        return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.add_entry(key, value);
     }
 
@@ -792,7 +791,7 @@ namespace hpx
             return get_runtime_ptr()->get_config().add_entry(
                 key, std::to_string(value));
         }
-        return get_resource_partitioner()
+        return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.
                 add_entry(key, std::to_string(value));
     }
@@ -806,7 +805,7 @@ namespace hpx
             return get_runtime_ptr()->get_config().add_notification_callback(
                 key, callback);
         }
-        return get_resource_partitioner()
+        return resource::get_partitioner()
             .get_command_line_switches()
             .rtcfg_.add_notification_callback(key, callback);
     }

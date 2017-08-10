@@ -16,9 +16,9 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

@@ -11,9 +11,10 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util_fwd.hpp>
@@ -218,7 +219,7 @@ namespace hpx { namespace threads { namespace policies
 
         inline std::size_t domain_from_local_thread_index(std::size_t n)
         {
-            auto &rp = get_resource_partitioner();
+            auto &rp = resource::get_partitioner();
             auto const& topo = rp.get_topology();
             std::size_t global_id = local_to_global_thread_index(n);
             std::size_t pu_num = rp.get_pu_num(global_id);
@@ -229,7 +230,7 @@ namespace hpx { namespace threads { namespace policies
         template <typename Queue>
         std::size_t num_domains(const std::vector<Queue*> &queues)
         {
-            auto &rp = get_resource_partitioner();
+            auto &rp = resource::get_partitioner();
             auto const& topo = rp.get_topology();
             std::size_t num_queues = queues.size();
 
@@ -251,7 +252,7 @@ namespace hpx { namespace threads { namespace policies
             std::function<bool(std::size_t, std::size_t)> pred)
         {
             std::vector<std::size_t> result;
-            auto &rp = get_resource_partitioner();
+            auto &rp = resource::get_partitioner();
             auto const& topo = rp.get_topology();
             std::size_t global_id = local_to_global_thread_index(local_id);
             std::size_t pu_num = rp.get_pu_num(global_id);

@@ -3,18 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/include/runtime.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/cpu_mask.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/resource/partitioner.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/util/tuple.hpp>
-
-#include <boost/atomic.hpp>
-#include <boost/program_options.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -23,316 +20,216 @@
 #include <vector>
 #include <utility>
 
-namespace hpx {
-
-struct resource_partitioner_tag {};
-
-resource::resource_partitioner &get_resource_partitioner()
+namespace hpx { namespace resource { namespace detail
 {
-    util::static_<resource::resource_partitioner, resource_partitioner_tag> rp;
-
-    if (!rp.get().cmd_line_parsed())
-    {
-        // if the resource partitioner is not accessed for the first time
-        // if the command-line parsing has not yet been done
-        throw std::invalid_argument(
-            "hpx::get_resource_partitioner() can be called only after the "
-            "resource partitioner has been allowed to parse the command line "
-            "options. Please call hpx::get_resource_partitioner(desc_cmdline, "
-            "argc, argv) or hpx::get_resource_partitioner(argc, argv) instead");
-    }
-
-    return rp.get();
-}
-
-resource::resource_partitioner &get_resource_partitioner(
-    util::function_nonser<
-        int(boost::program_options::variables_map& vm)
-    > const& f,
-    boost::program_options::options_description const& desc_cmdline, int argc,
-    char **argv, std::vector<std::string> ini_config,
-    resource::resource_partitioner_mode rpmode, runtime_mode mode,
-    bool check)
-{
-    util::static_<resource::resource_partitioner, resource_partitioner_tag> rp_;
-    auto &rp = rp_.get();
-
-    if (rp.cmd_line_parsed())
-    {
-        if (check)
-        {
-            throw std::invalid_argument(
-                "After hpx::get_resource_partitioner(desc_cmdline, argc, argv) "
-                "or hpx::get_resource_partitioner(argc, argv) has been called, "
-                "the command line has been parsed by the resource partitioner. "
-                "Please call hpx::get_resource_partitioner()");
-        }
-        // no need to parse a second time
-    }
-    else
-    {
-        rp.parse(f, desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode);
-    }
-    return rp;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace resource {
-
-    std::size_t get_num_thread_pools()
-    {
-        return get_resource_partitioner().get_num_pools();
-    }
-
-    std::size_t get_num_threads()
-    {
-        return get_resource_partitioner().get_num_threads();
-    }
-
-    std::size_t get_num_threads(std::string const& pool_name)
-    {
-        return get_resource_partitioner().get_num_threads(pool_name);
-    }
-
-    std::size_t get_num_threads(std::size_t pool_index)
-    {
-        return get_resource_partitioner().get_num_threads(pool_index);
-    }
-
-    std::size_t get_pool_index(std::string const& pool_name)
-    {
-        return get_resource_partitioner().get_pool_index(pool_name);
-    }
-
-    std::string const& get_pool_name(std::size_t pool_index)
-    {
-        return get_resource_partitioner().get_pool_name(pool_index);
-    }
-
-    threads::detail::thread_pool_base& get_thread_pool(std::string const& pool_name)
-    {
-        return get_runtime().get_thread_manager().get_pool(pool_name);
-    }
-
-    threads::detail::thread_pool_base& get_thread_pool(std::size_t pool_index)
-    {
-        return get_thread_pool(get_pool_name(pool_index));
-    }
-
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<pu> pu::pus_sharing_core()
-    {
-        std::vector<pu> result;
-        result.reserve(core_->pus_.size());
+    std::size_t init_pool_data::num_threads_overall = 0;
 
-        for (const pu &p : core_->pus_)
+    init_pool_data::init_pool_data(
+            std::string const& name, scheduling_policy sched)
+        : pool_name_(name)
+        , scheduling_policy_(sched)
+        , num_threads_(0)
+    {
+        if (name.empty())
         {
-            if (p.id_ != id_)
+            if (get_runtime_ptr() != nullptr)
             {
-                result.push_back(p);
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "init_pool_data::init_pool_data",
+                    "cannot instantiate a thread_pool with empty string "
+                    "as a name.");
             }
-        }
-        return result;
-    }
-
-    std::vector<pu> pu::pus_sharing_numa_domain()
-    {
-        std::vector<pu> result;
-        result.reserve(core_->domain_->cores_.size());
-
-        for (const core &c : core_->domain_->cores_)
-        {
-            for (const pu &p : c.pus_)
-            {
-                if (p.id_ != id_)
-                {
-                    result.push_back(p);
-                }
-            }
-        }
-        return result;
-    }
-
-    std::vector<core> core::cores_sharing_numa_domain()
-    {
-        std::vector<core> result;
-        result.reserve(domain_->cores_.size());
-
-        for (const core &c : domain_->cores_)
-        {
-            if (c.id_ != id_)
-            {
-                result.push_back(c);
-            }
-        }
-        return result;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        std::size_t init_pool_data::num_threads_overall = 0;
-
-        init_pool_data::init_pool_data(
-            const std::string &name, scheduling_policy sched)
-          : pool_name_(name)
-          , scheduling_policy_(sched)
-          , num_threads_(0)
-        {
-            if (name.empty())
+            else
             {
                 throw std::invalid_argument(
-                    "cannot instantiate a thread_pool with empty string as a "
-                    "name.");
+                    "cannot instantiate a thread_pool with empty string "
+                    "as a name.");
             }
         }
+    }
 
-        init_pool_data::init_pool_data(const std::string &name,
-                scheduler_function create_func)
-          : pool_name_(name)
-          , scheduling_policy_(user_defined)
-          , num_threads_(0)
-          , create_function_(std::move(create_func))
+    init_pool_data::init_pool_data(std::string const& name,
+            scheduler_function create_func)
+        : pool_name_(name)
+        , scheduling_policy_(user_defined)
+        , num_threads_(0)
+        , create_function_(std::move(create_func))
+    {
+        if (name.empty())
         {
-            if (name.empty())
+            if (get_runtime_ptr() != nullptr)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "init_pool_data::init_pool_data",
+                    "cannot instantiate a thread_pool with empty string "
+                    "as a name.");
+            }
+            else
             {
                 throw std::invalid_argument(
-                    "cannot instantiate a thread pool with empty string as a "
-                    "name.");
+                    "cannot instantiate a thread_pool with empty string "
+                    "as a name.");
             }
         }
+    }
 
-        // mechanism for adding resources
-        // num threads = number of threads desired on a PU. defaults to 1.
-        // note: if num_threads > 1 => oversubscription
-        void init_pool_data::add_resource(
-            std::size_t pu_index, bool exclusive, std::size_t num_threads)
+    // mechanism for adding resources
+    // num threads = number of threads desired on a PU. defaults to 1.
+    // note: if num_threads > 1 => oversubscription
+    void init_pool_data::add_resource(
+        std::size_t pu_index, bool exclusive, std::size_t num_threads)
+    {
+        if (pu_index >= hpx::threads::hardware_concurrency())
         {
-            if (pu_index >= hpx::threads::hardware_concurrency())
+            if (get_runtime_ptr() != nullptr)
             {
-                throw std::invalid_argument(
-                    "init_pool_data::add_resource: processing unit index out "
-                    "of bounds. The total number of processing units on this "
-                    "machine is " +
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "init_pool_data::add_resource",
+                    "init_pool_data::add_resource: processing unit index "
+                    "out of bounds. The total available number of "
+                    "processing units on this machine is " +
                     std::to_string(hpx::threads::hardware_concurrency()));
             }
-
-            // Increment thread_num count (for pool-count and global count)
-            num_threads_ += num_threads;
-            num_threads_overall += num_threads;
-
-            // Add pu mask to internal data structure
-            threads::mask_type pu_mask = threads::mask_type();
-            threads::set(pu_mask, pu_index);
-
-            // Add one mask for each OS-thread
-            for (std::size_t i = 0; i != num_threads; i++)
+            else
             {
-                assigned_pus_.push_back(pu_mask);
-                assigned_pu_nums_.push_back(
-                    util::make_tuple(pu_index, exclusive, false)
-                );
+                throw std::invalid_argument(
+                    "init_pool_data::add_resource: processing unit index "
+                    "out of bounds. The total available number of "
+                    "processing units on this machine is " +
+                    std::to_string(hpx::threads::hardware_concurrency()));
             }
         }
 
-        void init_pool_data::print_pool(std::ostream& os) const
+        // Increment thread_num count (for pool-count and global count)
+        num_threads_ += num_threads;
+        num_threads_overall += num_threads;
+
+        // Add pu mask to internal data structure
+        threads::mask_type pu_mask = threads::mask_type();
+        threads::set(pu_mask, pu_index);
+
+        // Add one mask for each OS-thread
+        for (std::size_t i = 0; i != num_threads; i++)
         {
-            os << "[pool \"" << pool_name_ << "\"] with scheduler ";
-            std::string sched;
-            switch (scheduling_policy_)
-            {
-            case resource::unspecified:
-                sched = "unspecified";
-                break;
-            case resource::user_defined:
-                sched = "user supplied";
-                break;
-            case resource::local:
-                sched = "local";
-                break;
-            case resource::local_priority_fifo:
-                sched = "local_priority_fifo";
-                break;
-            case resource::local_priority_lifo:
-                sched = "local_priority_lifo";
-                break;
-            case resource::static_:
-                sched = "static";
-                break;
-            case resource::static_priority:
-                sched = "static_priority";
-                break;
-            case resource::abp_priority:
-                sched = "abp_priority";
-                break;
-            case resource::hierarchy:
-                sched = "hierarchy";
-                break;
-            case resource::periodic_priority:
-                sched = "periodic_priority";
-                break;
-            case resource::throttle:
-                sched = "throttle";
-                break;
-            }
+            assigned_pus_.push_back(pu_mask);
+            assigned_pu_nums_.push_back(
+                util::make_tuple(pu_index, exclusive, false)
+            );
+        }
+    }
 
-            os << "\"" << sched << "\" is running on PUs : \n";
+    void init_pool_data::print_pool(std::ostream& os) const
+    {
+        os << "[pool \"" << pool_name_ << "\"] with scheduler ";
 
-            for (threads::mask_cref_type assigned_pu : assigned_pus_)
-            {
-                os << std::hex << HPX_CPU_MASK_PREFIX << assigned_pu << '\n';
-            }
+        std::string sched;
+        switch (scheduling_policy_)
+        {
+        case resource::unspecified:
+            sched = "unspecified";
+            break;
+        case resource::user_defined:
+            sched = "user supplied";
+            break;
+        case resource::local:
+            sched = "local";
+            break;
+        case resource::local_priority_fifo:
+            sched = "local_priority_fifo";
+            break;
+        case resource::local_priority_lifo:
+            sched = "local_priority_lifo";
+            break;
+        case resource::static_:
+            sched = "static";
+            break;
+        case resource::static_priority:
+            sched = "static_priority";
+            break;
+        case resource::abp_priority:
+            sched = "abp_priority";
+            break;
+        case resource::hierarchy:
+            sched = "hierarchy";
+            break;
+        case resource::periodic_priority:
+            sched = "periodic_priority";
+            break;
+        case resource::throttle:
+            sched = "throttle";
+            break;
         }
 
-        void init_pool_data::assign_pu(std::size_t virt_core)
+        os << "\"" << sched << "\" is running on PUs : \n";
+
+        for (threads::mask_cref_type assigned_pu : assigned_pus_)
         {
-            HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-            HPX_ASSERT(!util::get<2>(assigned_pu_nums_[virt_core]));
-
-            util::get<2>(assigned_pu_nums_[virt_core]) = true;
+            os << std::hex << HPX_CPU_MASK_PREFIX << assigned_pu << '\n';
         }
+    }
 
-        void init_pool_data::unassign_pu(std::size_t virt_core)
-        {
-            HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-            HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
+    void init_pool_data::assign_pu(std::size_t virt_core)
+    {
+        HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
+        HPX_ASSERT(!util::get<2>(assigned_pu_nums_[virt_core]));
 
-            util::get<2>(assigned_pu_nums_[virt_core]) = false;
-        }
+        util::get<2>(assigned_pu_nums_[virt_core]) = true;
+    }
 
-        bool init_pool_data::pu_is_exclusive(std::size_t virt_core) const
-        {
-            HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-            HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
+    void init_pool_data::unassign_pu(std::size_t virt_core)
+    {
+        HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
+        HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
 
-            return util::get<1>(assigned_pu_nums_[virt_core]);
-        }
+        util::get<2>(assigned_pu_nums_[virt_core]) = false;
+    }
 
-        bool init_pool_data::pu_is_assigned(std::size_t virt_core) const
-        {
-            HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
-            HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
+    bool init_pool_data::pu_is_exclusive(std::size_t virt_core) const
+    {
+        HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
+        HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
 
-            return util::get<2>(assigned_pu_nums_[virt_core]);
-        }
+        return util::get<1>(assigned_pu_nums_[virt_core]);
+    }
+
+    bool init_pool_data::pu_is_assigned(std::size_t virt_core) const
+    {
+        HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
+        HPX_ASSERT(util::get<2>(assigned_pu_nums_[virt_core]));
+
+        return util::get<2>(assigned_pu_nums_[virt_core]);
     }
 
     ////////////////////////////////////////////////////////////////////////
-    resource_partitioner::resource_partitioner()
-      : cores_needed_(std::size_t(-1))
-      , topology_(threads::create_topology())
-      , mode_(mode_default)
+    partitioner::partitioner()
+        : cores_needed_(std::size_t(-1))
+        , topology_(threads::create_topology())
+        , mode_(mode_default)
     {
-        // Create the default pool
-        initial_thread_pools_.push_back(detail::init_pool_data("default"));
-
-        // allow only one resource_partitioner instance
+        // allow only one partitioner instance
         if (instance_number_counter_++ >= 0)
-            throw std::runtime_error(
-                "Cannot instantiate more than one resource partitioner");
+        {
+            if (get_runtime_ptr() != nullptr)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "partitioner::partitioner",
+                    "Cannot instantiate more than one resource "
+                    "partitioner");
+            }
+            else
+            {
+                throw std::runtime_error(
+                    "Cannot instantiate more than one resource "
+                    "partitioner");
+            }
+        }
+
+        // Create the default pool
+        initial_thread_pools_.push_back(init_pool_data("default"));
     }
 
-    bool resource_partitioner::pu_exposed(std::size_t pu_num)
+    bool partitioner::pu_exposed(std::size_t pu_num)
     {
         threads::mask_type pu_mask = threads::mask_type();
         threads::set(pu_mask, pu_num);
@@ -341,7 +238,7 @@ namespace resource {
         return threads::any(comp & pu_mask);
     }
 
-    void resource_partitioner::fill_topology_vectors()
+    void partitioner::fill_topology_vectors()
     {
         std::size_t pid = 0;
         std::size_t num_numa_nodes = topology_.get_number_of_numa_nodes();
@@ -350,48 +247,43 @@ namespace resource {
         numa_domains_.reserve(num_numa_nodes);
 
         // loop on the numa-domains
-        for (std::size_t i = 0; i < num_numa_nodes; ++i)
+        for (std::size_t i = 0; i != num_numa_nodes; ++i)
         {
-            numa_domains_.push_back(numa_domain());    // add a numa domain
-            numa_domain &nd = numa_domains_.back();    // numa-domain just added
-            nd.id_ = i;         // set its index
-            nd.cores_.reserve(topology_.get_number_of_numa_node_cores(i));
+            numa_domains_.emplace_back(i);    // add a numa domain
+            numa_domain &nd = numa_domains_.back();     // numa-domain just added
+
+            std::size_t numa_node_cores =
+                topology_.get_number_of_numa_node_cores(i);
+            nd.cores_.reserve(numa_node_cores);
 
             bool numa_domain_contains_exposed_cores = false;
 
             // loop on the cores
-            for (std::size_t j = 0;
-                 j != topology_.get_number_of_numa_node_cores(i); ++j)
+            for (std::size_t j = 0; j != numa_node_cores; ++j)
             {
-                nd.cores_.push_back(core());
+                nd.cores_.emplace_back(j, &nd);
                 core &c = nd.cores_.back();
-                c.id_ = j;
-                c.domain_ = &nd;
-                c.pus_.reserve(topology_.get_number_of_core_pus(j));
+
+                std::size_t core_pus = topology_.get_number_of_core_pus(j);
+                c.pus_.reserve(core_pus);
 
                 bool core_contains_exposed_pus = false;
 
                 // loop on the processing units
-                for (std::size_t k = 0; k != topology_.get_number_of_core_pus(j);
-                     ++k)
+                for (std::size_t k = 0; k != core_pus; ++k)
                 {
                     if (pu_exposed(pid))
                     {
-                        c.pus_.push_back(pu());
+                        c.pus_.emplace_back(pid, &c,
+                            affinity_data_.get_thread_occupancy(pid));
                         pu &p = c.pus_.back();
-                        p.id_ = pid;
-                        p.core_ = &c;
 
-                        p.thread_occupancy_ =
-                            affinity_data_.get_thread_occupancy(pid);
                         if (p.thread_occupancy_ == 0)
                         {
                             throw std::runtime_error(
                                 "PU #" + std::to_string(pid) +
                                 " has thread occupancy 0");
                         }
-
-                        p.thread_occupancy_count_ = 0;
                         core_contains_exposed_pus = true;
                     }
                     ++pid;
@@ -417,7 +309,7 @@ namespace resource {
     // resource partitioner related to the pools
     // -1 assigns all free resources to the default pool
     // -2 checks whether there are empty pools
-    void resource_partitioner::setup_pools()
+    void partitioner::setup_pools()
     {
         // Assign all free resources to the default pool
         bool first = true;
@@ -465,7 +357,7 @@ namespace resource {
     // This function is called in hpx_init, before the instantiation of the runtime
     // It takes care of configuring some internal parameters of the resource partitioner
     // related to the pools' schedulers
-    void resource_partitioner::setup_schedulers()
+    void partitioner::setup_schedulers()
     {
         // select the default scheduler
         scheduling_policy default_scheduler;
@@ -537,7 +429,7 @@ namespace resource {
     // pool created, etc.) and instantiate them according to this system.
     // We need to re-write affinity_data_ with the masks in the correct order
     // at this stage.
-    void resource_partitioner::reconfigure_affinities()
+    void partitioner::reconfigure_affinities()
     {
         std::vector<std::size_t> new_pu_nums;
         std::vector<threads::mask_type> new_affinity_masks;
@@ -567,7 +459,7 @@ namespace resource {
 
     // Returns true if any of the pools defined by the user is empty of resources
     // called in set_default_pool()
-    bool resource_partitioner::check_empty_pools() const
+    bool partitioner::check_empty_pools() const
     {
         std::size_t num_thread_pools = initial_thread_pools_.size();
 
@@ -590,7 +482,7 @@ namespace resource {
     }
 
     // create a new thread_pool
-    void resource_partitioner::create_thread_pool(
+    void partitioner::create_thread_pool(
         std::string const& pool_name, scheduling_policy sched)
     {
         if (pool_name.empty())
@@ -623,7 +515,7 @@ namespace resource {
     }
 
     // create a new thread_pool
-    void resource_partitioner::create_thread_pool(
+    void partitioner::create_thread_pool(
         std::string const& pool_name, scheduler_function scheduler_creation)
     {
         if (pool_name.empty())
@@ -660,7 +552,7 @@ namespace resource {
     // ----------------------------------------------------------------------
     // Add processing units to pools via pu/core/domain api
     // ----------------------------------------------------------------------
-    void resource_partitioner::add_resource(
+    void partitioner::add_resource(
         pu const& p, std::string const& pool_name, bool exclusive,
         std::size_t num_threads)
     {
@@ -670,7 +562,7 @@ namespace resource {
         {
             throw std::invalid_argument(
                 "init_pool_data::add_resource: dynamic pools have not been "
-                "enabled for this resource_partitioner");
+                "enabled for this partitioner");
         }
 
         if (mode_ & mode_allow_oversubscription)
@@ -715,7 +607,7 @@ namespace resource {
         }
     }
 
-    void resource_partitioner::add_resource(std::vector<pu> const& pv,
+    void partitioner::add_resource(std::vector<pu> const& pv,
         std::string const& pool_name, bool exclusive)
     {
         for (pu const& p : pv)
@@ -724,13 +616,13 @@ namespace resource {
         }
     }
 
-    void resource_partitioner::add_resource(core const& c,
+    void partitioner::add_resource(core const& c,
         std::string const& pool_name, bool exclusive)
     {
         add_resource(c.pus_, pool_name, exclusive);
     }
 
-    void resource_partitioner::add_resource(std::vector<core> const& cv,
+    void partitioner::add_resource(std::vector<core> const& cv,
         std::string const& pool_name, bool exclusive)
     {
         for (const core &c : cv)
@@ -739,13 +631,13 @@ namespace resource {
         }
     }
 
-    void resource_partitioner::add_resource(numa_domain const& nd,
+    void partitioner::add_resource(numa_domain const& nd,
         std::string const& pool_name, bool exclusive)
     {
         add_resource(nd.cores_, pool_name, exclusive);
     }
 
-    void resource_partitioner::add_resource(
+    void partitioner::add_resource(
         std::vector<numa_domain> const& ndv,
         std::string const& pool_name, bool exclusive)
     {
@@ -755,17 +647,14 @@ namespace resource {
         }
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-    void resource_partitioner::set_scheduler(
+    void partitioner::set_scheduler(
         scheduling_policy sched, std::string const& pool_name)
     {
         std::lock_guard<mutex_type> l(mtx_);
         get_pool_data(pool_name).scheduling_policy_ = sched;
     }
 
-    void resource_partitioner::configure_pools()
+    void partitioner::configure_pools()
     {
         setup_pools();
         setup_schedulers();
@@ -775,7 +664,7 @@ namespace resource {
     ////////////////////////////////////////////////////////////////////////
     // this function is called in the constructor of thread_pool
     // returns a scheduler (moved) that thread pool should have as a data member
-    scheduling_policy resource_partitioner::which_scheduler(
+    scheduling_policy partitioner::which_scheduler(
         std::string const& pool_name)
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -791,23 +680,23 @@ namespace resource {
         return sched_type;
     }
 
-    threads::topology &resource_partitioner::get_topology() const
+    threads::topology &partitioner::get_topology() const
     {
         return topology_;
     }
 
     util::command_line_handling &
-    resource_partitioner::get_command_line_switches()
+    partitioner::get_command_line_switches()
     {
         return cfg_;
     }
 
-    std::size_t resource_partitioner::get_num_distinct_pus() const
+    std::size_t partitioner::get_num_distinct_pus() const
     {
         return cfg_.num_threads_;
     }
 
-    std::size_t resource_partitioner::get_num_threads() const
+    std::size_t partitioner::get_num_threads() const
     {
         std::size_t num_threads = 0;
 
@@ -828,20 +717,20 @@ namespace resource {
         return num_threads;
     }
 
-    std::size_t resource_partitioner::get_num_pools() const
+    std::size_t partitioner::get_num_pools() const
     {
         std::lock_guard<mutex_type> l(mtx_);
         return initial_thread_pools_.size();
     }
 
-    std::size_t resource_partitioner::get_num_threads(
+    std::size_t partitioner::get_num_threads(
         std::size_t pool_index) const
     {
         std::lock_guard<mutex_type> l(mtx_);
         return get_pool_data(pool_index).num_threads_;
     }
 
-    std::size_t resource_partitioner::get_num_threads(
+    std::size_t partitioner::get_num_threads(
         const std::string &pool_name) const
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -849,7 +738,7 @@ namespace resource {
     }
 
 
-    detail::init_pool_data const& resource_partitioner::get_pool_data(
+    detail::init_pool_data const& partitioner::get_pool_data(
         std::size_t pool_index) const
     {
         if (pool_index >= initial_thread_pools_.size())
@@ -863,7 +752,7 @@ namespace resource {
         return initial_thread_pools_[pool_index];
     }
 
-    std::string const& resource_partitioner::get_pool_name(
+    std::string const& partitioner::get_pool_name(
         std::size_t index) const
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -871,35 +760,35 @@ namespace resource {
         {
             throw std::invalid_argument("pool " + std::to_string(index) +
                 " (zero-based index) requested out of bounds. The "
-                "resource_partitioner owns only " +
+                "partitioner owns only " +
                 std::to_string(initial_thread_pools_.size()) + " pools\n");
         }
         return initial_thread_pools_[index].pool_name_;
     }
 
-    size_t resource_partitioner::get_pu_num(std::size_t global_thread_num)
+    size_t partitioner::get_pu_num(std::size_t global_thread_num)
     {
         return affinity_data_.get_pu_num(global_thread_num);
     }
 
-    threads::mask_cref_type resource_partitioner::get_pu_mask(
+    threads::mask_cref_type partitioner::get_pu_mask(
         std::size_t global_thread_num) const
     {
         return affinity_data_.get_pu_mask(global_thread_num);
     }
 
-    bool resource_partitioner::cmd_line_parsed() const
+    bool partitioner::cmd_line_parsed() const
     {
         return (cfg_.cmd_line_parsed_ == true);
     }
 
-    int resource_partitioner::parse(
+    int partitioner::parse(
         util::function_nonser<
             int(boost::program_options::variables_map& vm)
         > const& f,
         boost::program_options::options_description desc_cmdline, int argc,
         char **argv, std::vector<std::string> ini_config,
-        resource::resource_partitioner_mode rpmode, runtime_mode mode,
+        resource::partitioner_mode rpmode, runtime_mode mode,
         bool fill_internal_topology)
     {
         mode_ = rpmode;
@@ -925,7 +814,7 @@ namespace resource {
         return cfg_.parse_terminate_;
     }
 
-    scheduler_function resource_partitioner::get_pool_creator(
+    scheduler_function partitioner::get_pool_creator(
         std::size_t index) const
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -937,7 +826,7 @@ namespace resource {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void resource_partitioner::assign_pu(
+    void partitioner::assign_pu(
         std::string const& pool_name, std::size_t virt_core)
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -945,7 +834,7 @@ namespace resource {
         data.assign_pu(virt_core);
     }
 
-    void resource_partitioner::unassign_pu(
+    void partitioner::unassign_pu(
         std::string const& pool_name, std::size_t virt_core)
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -953,15 +842,15 @@ namespace resource {
         data.unassign_pu(virt_core);
     }
 
-    std::size_t resource_partitioner::shrink_pool(std::string const& pool_name,
+    std::size_t partitioner::shrink_pool(std::string const& pool_name,
         util::function_nonser<void(std::size_t)> const& remove_pu)
     {
         if (!(mode_ & mode_allow_dynamic_pools))
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "resource_partitioner::shrink_pool",
+                "partitioner::shrink_pool",
                 "dynamic pools have not been enabled for the "
-                "resource_partitioner");
+                "partitioner");
         }
 
         std::vector<std::size_t> pu_nums_to_remove;
@@ -989,7 +878,7 @@ namespace resource {
         if (!has_non_exclusive_pus)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "resource_partitioner::shrink_pool",
+                "partitioner::shrink_pool",
                 "pool '" + pool_name + "' has no non-exclusive pus "
                 "associated");
         }
@@ -1002,15 +891,15 @@ namespace resource {
         return pu_nums_to_remove.size();
     }
 
-    std::size_t resource_partitioner::expand_pool(std::string const& pool_name,
+    std::size_t partitioner::expand_pool(std::string const& pool_name,
         util::function_nonser<void(std::size_t)> const& add_pu)
     {
         if (!(mode_ & mode_allow_dynamic_pools))
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "resource_partitioner::expand_pool",
+                "partitioner::expand_pool",
                 "dynamic pools have not been enabled for the "
-                "resource_partitioner");
+                "partitioner");
         }
 
         std::vector<std::size_t> pu_nums_to_add;
@@ -1038,7 +927,7 @@ namespace resource {
         if (!has_non_exclusive_pus)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "resource_partitioner::expand_pool",
+                "partitioner::expand_pool",
                 "pool '" + pool_name + "' has no non-exclusive pus "
                 "associated");
         }
@@ -1052,7 +941,7 @@ namespace resource {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    std::size_t resource_partitioner::get_pool_index(
+    std::size_t partitioner::get_pool_index(
         std::string const& pool_name) const
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -1073,7 +962,7 @@ namespace resource {
 
     // has to be private bc pointers become invalid after data member
     // thread_pools_ is resized we don't want to allow the user to use it
-    detail::init_pool_data const& resource_partitioner::get_pool_data(
+    detail::init_pool_data const& partitioner::get_pool_data(
         std::string const& pool_name) const
     {
         auto pool = std::find_if(
@@ -1093,7 +982,7 @@ namespace resource {
             pool_name + "\". \n");
     }
 
-    detail::init_pool_data& resource_partitioner::get_pool_data(
+    detail::init_pool_data& partitioner::get_pool_data(
         std::string const& pool_name)
     {
         auto pool = std::find_if(
@@ -1113,13 +1002,13 @@ namespace resource {
             pool_name + "\". \n");
     }
 
-    void resource_partitioner::print_init_pool_data(std::ostream& os) const
+    void partitioner::print_init_pool_data(std::ostream& os) const
     {
         std::lock_guard<mutex_type> l(mtx_);
 
         //! make this prettier
         os << "the resource partitioner owns "
-           << initial_thread_pools_.size() << " pool(s) : \n";
+            << initial_thread_pools_.size() << " pool(s) : \n";
         for (auto itp : initial_thread_pools_)
         {
             itp.print_pool(os);
@@ -1127,8 +1016,5 @@ namespace resource {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    boost::atomic<int> resource_partitioner::instance_number_counter_(-1);
-
-}    // namespace resource
-
-}    // namespace hpx
+    boost::atomic<int> partitioner::instance_number_counter_(-1);
+}}}

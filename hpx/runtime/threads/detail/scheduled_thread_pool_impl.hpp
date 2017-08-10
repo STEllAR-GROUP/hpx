@@ -11,15 +11,16 @@
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -240,7 +241,7 @@ namespace hpx { namespace threads { namespace detail
             std::make_shared<compat::barrier>(pool_threads + 1);
         try
         {
-            auto const& rp = get_resource_partitioner();
+            auto const& rp = resource::get_partitioner();
 
             for (/**/; thread_num != pool_threads; ++thread_num)
             {
@@ -302,7 +303,7 @@ namespace hpx { namespace threads { namespace detail
         std::size_t thread_num, std::size_t global_thread_num,
         std::shared_ptr<compat::barrier> startup)
     {
-        auto const& rp = get_resource_partitioner();
+        auto const& rp = resource::get_partitioner();
         topology const& topo = rp.get_topology();
 
         // Set the affinity for the current thread.
@@ -1332,7 +1333,7 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<compat::barrier> startup, error_code& ec)
     {
-        get_resource_partitioner().assign_pu(id_.name(), virt_core);
+        resource::get_partitioner().assign_pu(id_.name(), virt_core);
 
         if (threads_.size() <= virt_core)
             threads_.resize(virt_core + 1);
@@ -1388,7 +1389,7 @@ namespace hpx { namespace threads { namespace detail
 
         threads_[virt_core].join();
 
-        get_resource_partitioner().unassign_pu(id_.name(), virt_core);
+        resource::get_partitioner().unassign_pu(id_.name(), virt_core);
     }
 }}}
 

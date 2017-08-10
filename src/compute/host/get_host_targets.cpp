@@ -10,7 +10,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -42,7 +42,7 @@ namespace hpx { namespace compute { namespace host
         std::vector<target> targets;
         targets.reserve(num_os_threads);
 
-        auto& rp = hpx::get_resource_partitioner();
+        auto& rp = hpx::resource::get_partitioner();
         for (std::size_t num_thread = 0; num_thread != num_os_threads;
                 ++num_thread)
         {

@@ -9,10 +9,10 @@
 #include <hpx/parallel/algorithms/for_loop.hpp>
 #include <hpx/parallel/executors.hpp>
 //
-#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
-#include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
+#include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
 //
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
@@ -104,14 +104,10 @@ int hpx_main(boost::program_options::variables_map& vm)
         mpi_executor = high_priority_executor;
     }
 
-    // get a pointer to the resource_partitioner instance
-    hpx::resource::resource_partitioner& rpart =
-        hpx::get_resource_partitioner();
-
     // print partition characteristics
     std::cout << "\n\n[hpx_main] print resource_partitioner characteristics : "
               << "\n";
-    rpart.print_init_pool_data(std::cout);
+    hpx::resource::get_partitioner().print_init_pool_data(std::cout);
 
     // print partition characteristics
     std::cout << "\n\n[hpx_main] print thread-manager pools : "
@@ -267,7 +263,8 @@ int main(int argc, char* argv[])
 
     pool_threads = vm["pool-threads"].as<int>();
 
-    auto& rp = hpx::get_resource_partitioner(desc_cmdline, argc, argv);
+    // Create the resource partitioner
+    hpx::resource::partitioner rp(desc_cmdline, argc, argv);
 
     //    auto &topo = rp.get_topology();
     std::cout << "[main] obtained reference to the resource_partitioner\n";
@@ -350,5 +347,5 @@ int main(int argc, char* argv[])
         std::cout << "[main] resources added to thread_pools \n";
     }
 
-    return hpx::init(desc_cmdline, argc, argv);
+    return hpx::init();
 }

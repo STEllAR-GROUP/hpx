@@ -10,27 +10,27 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
+#include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
+#include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/format.hpp>
@@ -336,13 +336,13 @@ namespace hpx { namespace threads
             util::io_service_pool& timer_pool,
 #endif
             notification_policy_type& notifier)
-      : num_threads_(hpx::get_resource_partitioner().get_num_distinct_pus()),
+      : num_threads_(hpx::resource::get_partitioner().get_num_distinct_pus()),
 #ifdef HPX_HAVE_TIMER_POOL
         timer_pool_(timer_pool),
 #endif
         notifier_(notifier)
     {
-        auto& rp = hpx::get_resource_partitioner();
+        auto& rp = hpx::resource::get_partitioner();
         size_t num_pools = rp.get_num_pools();
         util::command_line_handling const& cfg_ = rp.get_command_line_switches();
         std::size_t thread_offset = 0;
@@ -740,7 +740,7 @@ namespace hpx { namespace threads
 
     void threadmanager::init()
     {
-        auto& rp = hpx::get_resource_partitioner();
+        auto& rp = hpx::resource::get_partitioner();
         std::size_t threads_offset = 0;
 
         // initialize all pools
@@ -1812,7 +1812,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     std::size_t threadmanager::shrink_pool(std::string const& pool_name)
     {
-        return get_resource_partitioner().shrink_pool(
+        return resource::get_partitioner().shrink_pool(
             pool_name,
             [this, &pool_name](std::size_t virt_core)
             {
@@ -1822,7 +1822,7 @@ namespace hpx { namespace threads
 
     std::size_t threadmanager::expand_pool(std::string const& pool_name)
     {
-        return get_resource_partitioner().expand_pool(
+        return resource::get_partitioner().expand_pool(
             pool_name,
             [this, &pool_name](std::size_t virt_core)
             {
@@ -1839,7 +1839,7 @@ namespace hpx { namespace threads
 
         // the main thread needs to have a unique thread_num
         // worker threads are numbered 0..N-1, so we can use N for this thread
-        auto& rp = hpx::get_resource_partitioner();
+        auto& rp = hpx::resource::get_partitioner();
         init_tss(rp.get_num_threads());
 
 #ifdef HPX_HAVE_TIMER_POOL

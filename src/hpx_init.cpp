@@ -8,19 +8,20 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
 #include <hpx/compat/mutex.hpp>
-#include <hpx/runtime_impl.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/resource/detail/create_partitioner.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime_impl.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
@@ -614,9 +615,9 @@ namespace hpx
                 // Construct resource partitioner if this has not been done yet
                 // and get a handle to it
                 // (if the command-line parsing has not yet been done, do it now)
-                auto& rp = hpx::get_resource_partitioner(f, desc_cmdline, argc,
-                    argv, std::move(ini_config), resource::mode_default,
-                    mode, false);
+                auto& rp = hpx::resource::detail::create_partitioner(f,
+                    desc_cmdline, argc, argv, std::move(ini_config),
+                    resource::mode_default, mode, false);
 
                 // check whether HPX should be exited at this point
                 // (if the program options contain --hpx:help or --hpx:version)

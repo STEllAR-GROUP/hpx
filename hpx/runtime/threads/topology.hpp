@@ -147,7 +147,8 @@ namespace hpx { namespace threads
 
         /// \brief Prints the \param m to os in a human readable form
         virtual void print_affinity_mask(std::ostream& os,
-            std::size_t num_thread, mask_type const& m, std::string pool_name) const = 0;
+            std::size_t num_thread, mask_type const& m,
+            std::string pool_name) const = 0;
 
         /// \brief Reduce thread priority of the current thread.
         ///

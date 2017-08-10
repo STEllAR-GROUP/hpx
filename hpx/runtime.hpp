@@ -23,7 +23,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
@@ -336,9 +335,6 @@ namespace hpx
         // certain components (such as PAPI) require all threads to be
         // registered with the library
         boost::scoped_ptr<util::thread_mapper> thread_support_;
-
-        // pointer to the resource_partitioner
-        resource::resource_partitioner* resource_partitioner_;
 
         // topology and affinity data
         threads::topology& topology_;

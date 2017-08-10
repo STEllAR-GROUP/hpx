@@ -1019,7 +1019,7 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_start_thread(num_thread);
 
             std::size_t num_threads = queues_.size();
-            auto const& rp = get_resource_partitioner();
+            auto const& rp = resource::get_partitioner();
             auto const& topo = rp.get_topology();
 
             // get numa domain masks of all queues...

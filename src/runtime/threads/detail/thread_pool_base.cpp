@@ -89,7 +89,7 @@ namespace hpx { namespace threads { namespace detail
     {
         thread_offset_ = threads_offset;
 
-        auto const& rp = get_resource_partitioner();
+        auto const& rp = resource::get_partitioner();
 
         resize(used_processing_units_, threads::hardware_concurrency());
         for (std::size_t i = 0; i != pool_threads; ++i)

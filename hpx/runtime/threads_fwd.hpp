@@ -25,6 +25,11 @@ namespace hpx
         {
             struct HPX_EXPORT current_executor;
         }
+
+        namespace detail
+        {
+            class HPX_EXPORT thread_pool_base;
+        }
     }
 }
 

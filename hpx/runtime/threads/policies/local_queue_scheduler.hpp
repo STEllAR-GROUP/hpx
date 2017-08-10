@@ -344,7 +344,7 @@ namespace hpx { namespace threads { namespace policies
 
             if (numa_sensitive_ != 0)
             {
-                auto const& rp = get_resource_partitioner();
+                auto const& rp = resource::get_partitioner();
 
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
@@ -632,7 +632,7 @@ namespace hpx { namespace threads { namespace policies
 
             if (numa_sensitive_ != 0)   // limited or no stealing across domains
             {
-                auto const& rp = get_resource_partitioner();
+                auto const& rp = resource::get_partitioner();
 
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
@@ -766,7 +766,7 @@ namespace hpx { namespace threads { namespace policies
 
             queues_[num_thread]->on_start_thread(num_thread);
 
-            auto const& rp = get_resource_partitioner();
+            auto const& rp = resource::get_partitioner();
             auto const& topo = rp.get_topology();
 
             // pre-calculate certain constants for the given thread number

@@ -1084,7 +1084,7 @@ namespace hpx { namespace util
     {
         threads::topology& top = threads::create_topology();
         runtime& rt = get_runtime();
-        auto const& rp = hpx::get_resource_partitioner();
+        auto const& rp = hpx::resource::get_partitioner();
         auto const& tm = rt.get_thread_manager();
         {
             std::ostringstream strm;    // make sure all output is kept together

@@ -8,7 +8,7 @@
 #include <hpx/compute/host/target.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
@@ -19,7 +19,7 @@ namespace hpx { namespace compute { namespace host
 {
     std::pair<std::size_t, std::size_t> target::num_pus() const
     {
-        auto& rp = hpx::get_resource_partitioner();
+        auto& rp = hpx::resource::get_partitioner();
         std::size_t num_os_threads = hpx::get_os_thread_count();
 
         hpx::threads::mask_type mask = native_handle().get_device();

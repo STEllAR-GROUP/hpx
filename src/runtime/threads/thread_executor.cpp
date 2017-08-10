@@ -8,7 +8,7 @@
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/resource_partitioner.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/atomic.hpp>
@@ -22,7 +22,7 @@ namespace hpx { namespace threads
         mask_cref_type executor_base::get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
         {
-            auto &rp = hpx::get_resource_partitioner();
+            auto &rp = hpx::resource::get_partitioner();
             return rp.get_pu_mask(num_thread);
         }
     }
