@@ -141,6 +141,13 @@ endif()
 # Set our build options cache variables which are customizable by users
 #
 
+hpx_option(HPX_WITH_DEPRECATION_WARNINGS
+  BOOL "Enable warnings for deprecated facilities. (default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_DEPRECATION_WARNINGS)
+  hpx_add_config_define(HPX_HAVE_DEPRECATION_WARNINGS)
+endif()
+
 ## Generic build options
 set(DEFAULT_MALLOC "system")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
@@ -1093,6 +1100,20 @@ if(HPX_WITH_CUDA)
   endif()
 endif()
 
+# Set default for enabling auto-return type workaround to ON for non-clang CUDA
+# only
+set(HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT ON)
+if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
+  set(HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT OFF)
+endif()
+
+hpx_option(HPX_WITH_CXX11_AUTO_RETURN_VALUE BOOL
+  "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
+  ${HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT} ADVANCED)
+if(HPX_WITH_CXX11_AUTO_RETURN_VALUE)
+  hpx_add_config_define(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+endif()
+
 ################################################################################
 # C++ feature tests
 ################################################################################
@@ -1110,18 +1131,6 @@ else()
   if(NOT HPX_WITH_CXX11_THREAD)
     hpx_error("HPX needs support for C++11 std::thread which is not available on this platform. Please enable HPX_WITH_THREAD_COMPATIBILITY to use Boost.Thread instead.")
   endif()
-endif()
-
-set(CXX11_AUTO_RETURN_VALUE_VALUE OM)
-if(HPX_WITH_CUDA)
-  set(CXX11_AUTO_RETURN_VALUE_VALUE OFF)
-endif()
-
-hpx_option(HPX_WITH_CXX11_AUTO_RETURN_VALUE BOOL
-  "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
-  ${CXX11_AUTO_RETURN_VALUE_VALUE} ADVANCED)
-if(HPX_WITH_CXX11_AUTO_RETURN_VALUE)
-  hpx_add_config_define(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
 endif()
 
 ################################################################################

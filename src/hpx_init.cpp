@@ -1054,7 +1054,7 @@ namespace hpx
             shutdown_function_type shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
             ensure_high_priority_compatibility(cfg.vm_);
             ensure_hierarchy_arity_compatibility(cfg.vm_);
 

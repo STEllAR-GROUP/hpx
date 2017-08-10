@@ -16,9 +16,9 @@
 #endif
 
 // handle [[deprecated]]
-#if !defined(HPX_NO_DEPRECATED)
+#if defined(HPX_HAVE_DEPRECATION_WARNINGS)
 #  define HPX_DEPRECATED_MSG \
-   "This function is deprecated and will be removed in the future."
+   "This functionality is deprecated and will be removed in the future."
 #  if defined(HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
 #    define HPX_DEPRECATED(x) [[deprecated(x)]]
 #  elif defined(HPX_MSVC)
@@ -26,9 +26,10 @@
 #  elif defined(__GNUC__)
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
 #  endif
-#  if !defined(HPX_DEPRECATED)
-#    define HPX_DEPRECATED(x)  /**/
-#  endif
+#endif
+
+#if !defined(HPX_DEPRECATED)
+#  define HPX_DEPRECATED(x)  /**/
 #endif
 
 #endif
