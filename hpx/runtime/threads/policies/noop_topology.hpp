@@ -31,7 +31,7 @@ namespace hpx { namespace threads
 struct noop_topology : topology
 {
 private:
-    static mask_type empty_mask;
+    HPX_EXPORT static mask_type empty_mask;
 
 public:
     std::size_t get_numa_node_number(

@@ -16,16 +16,22 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/first_argument.hpp>
+#include <hpx/util/jenkins_hash.hpp>
 
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
+#include <set>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace lcos
 {
@@ -38,6 +44,11 @@ namespace hpx { namespace lcos
     /// define_spmd_block function is to accept a spmd_block as first parameter.
     struct spmd_block
     {
+    private:
+        using barrier_type = hpx::lcos::barrier;
+        using table_type =
+            std::map<std::set<std::size_t>,std::shared_ptr<barrier_type>>;
+    public:
         spmd_block(){}
 
         explicit spmd_block(std::string name, std::size_t images_per_locality,
@@ -76,16 +87,148 @@ namespace hpx { namespace lcos
            return barrier_->wait(hpx::launch::async);
         }
 
+        // Synchronous versions of sync_images()
+
+        void sync_images(std::set<std::size_t> const & images) const
+        {
+            using list_type = std::set<std::size_t>;
+
+            typename table_type::iterator table_it(barriers_.find(images));
+            typename list_type::iterator image_it(images.find(image_id_));
+
+            // Is current image in the input list?
+            if(image_it != images.end())
+            {
+                // Does the barrier for the input list non-exist?
+                if(table_it == barriers_.end())
+                {
+                    std::size_t rank = std::distance(images.begin(),image_it);
+                    std::string suffix;
+
+                    for(std::size_t s : images)
+                        suffix += ("_" + std::to_string(s));
+
+                    table_it = barriers_.insert({images,
+                        std::make_shared<barrier_type>(
+                            name_ + "_barrier_" + std::to_string(hash_(suffix)),
+                            images.size(),
+                            rank)}).first;
+                }
+
+                table_it->second->wait();
+            }
+        }
+
+        void sync_images(std::vector<std::size_t> const & input_images) const
+        {
+            std::set<std::size_t> images(
+                input_images.begin(),input_images.end());
+            sync_images(images);
+        }
+
+        template<typename Iterator>
+        typename std::enable_if<
+            traits::is_input_iterator<Iterator>::value
+        >::type
+        sync_images(Iterator begin, Iterator end) const
+        {
+            std::set<std::size_t> images(begin,end);
+            sync_images(images);
+        }
+
+        template<typename ... I>
+        typename std::enable_if<
+            util::detail::all_of<
+                typename std::is_integral<I>::type ... >::value
+        >::type
+        sync_images(I... i)
+        {
+            std::set<std::size_t> images = {(std::size_t)i...};
+            sync_images(images);
+        }
+
+        // Asynchronous versions of sync_images()
+
+        hpx::future<void>
+        sync_images(hpx::launch::async_policy const & policy,
+            std::set<std::size_t> const & images) const
+        {
+            using list_type = std::set<std::size_t>;
+
+            typename table_type::iterator table_it(barriers_.find(images));
+            typename list_type::iterator image_it(images.find(image_id_));
+
+            // Is current image in the input list?
+            if(image_it != images.end())
+            {
+                // Does the barrier for the input list non-exist?
+                if(table_it == barriers_.end())
+                {
+                    std::size_t rank = std::distance(images.begin(),image_it);
+                    std::string suffix;
+
+                    for(std::size_t s : images)
+                        suffix += ("_" + std::to_string(s));
+
+                    table_it = barriers_.insert({images,
+                        std::make_shared<barrier_type>(
+                            name_ + "_barrier_" + std::to_string(hash_(suffix)),
+                            images.size(),
+                            rank)}).first;
+                }
+
+                return table_it->second->wait(hpx::launch::async);
+            }
+
+            return hpx::make_ready_future();
+        }
+
+        hpx::future<void>
+        sync_images(hpx::launch::async_policy const & policy,
+            std::vector<std::size_t> const & input_images) const
+        {
+            std::set<std::size_t> images(
+                input_images.begin(),input_images.end());
+            return sync_images(policy,images);
+        }
+
+        template<typename Iterator>
+        typename std::enable_if<
+            traits::is_input_iterator<Iterator>::value,
+            hpx::future<void>
+        >::type
+        sync_images(hpx::launch::async_policy const & policy,
+            Iterator begin, Iterator end) const
+        {
+            std::set<std::size_t> images(begin,end);
+            return sync_images(policy,images);
+        }
+
+        template<typename ... I>
+        typename std::enable_if<
+            util::detail::all_of<
+                typename std::is_integral<I>::type ... >::value,
+            hpx::future<void>
+        >::type
+        sync_images(hpx::launch::async_policy const & policy,
+            I ... i) const
+        {
+            std::set<std::size_t> images = {(std::size_t)i...};
+            return sync_images(policy,images);
+        }
+
     private:
         std::string name_;
         std::size_t images_per_locality_;
         std::size_t num_images_;
         std::size_t image_id_;
+        hpx::util::jenkins_hash hash_;
 
         // Note : barrier is stored as a pointer because hpx::lcos::barrier
         // default constructor does not exist (Needed by
         // spmd_block::spmd_block())
         mutable std::shared_ptr<hpx::lcos::barrier> barrier_;
+        mutable table_type barriers_;
 
     private:
         friend class hpx::serialization::access;

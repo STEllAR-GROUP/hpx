@@ -756,7 +756,8 @@ namespace hpx { namespace components { namespace server
             initiating_locality_id, num_localities, dijkstra_token);
     }
 
-    // kick off termination detection
+    // Kick off termination detection, this is modeled after Dijkstra's paper:
+    // http://www.cs.mcgill.ca/~lli22/575/termination3.pdf.
     std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {

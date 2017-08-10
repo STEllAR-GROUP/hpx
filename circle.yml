@@ -20,7 +20,7 @@ dependencies:
         - docker pull ${IMAGE_NAME}
         - mkdir build
     override:
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" -DHPX_WITH_TESTS_HEADERS=On -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" -DHPX_WITH_TESTS_HEADERS=On -DHPX_WITH_DEPRECATION_WARNINGS=Off -DCMAKE_EXPORT_COMPILE_COMMANDS=On
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ../tools/clang-tidy.sh -diff-master
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
