@@ -274,7 +274,8 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor>
             HPX_FORCEINLINE
             auto
-            operator()(Executor && exec, threads::topology& topo, std::size_t thread_num) const
+            operator()(
+                Executor && exec, threads::topology& topo, std::size_t thread_num) const
             -> decltype(get_pu_mask(std::forward<Executor>(exec), topo, thread_num))
             {
                 return get_pu_mask(std::forward<Executor>(exec), topo, thread_num);

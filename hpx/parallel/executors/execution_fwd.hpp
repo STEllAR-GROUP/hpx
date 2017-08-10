@@ -314,7 +314,8 @@ struct customization_point
         template <typename Executor, typename F, typename ... Ts>
         HPX_FORCEINLINE
         auto
-        customization_point<async_execute_tag>::operator()(Executor && exec, F && f, Ts &&... ts) const
+        customization_point<async_execute_tag>::operator()(
+            Executor && exec, F && f, Ts &&... ts) const
         {
             return async_execute(std::forward<Executor>(exec),
                                  std::forward<F>(f), std::forward<Ts>(ts)...);

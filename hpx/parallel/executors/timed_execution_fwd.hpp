@@ -14,6 +14,9 @@
 #include <hpx/parallel/executors/timed_executors.hpp>
 #include <hpx/traits/executor_traits.hpp>
 
+#include <type_traits>
+#include <utility>
+
 namespace hpx { namespace util
 {
     class steady_time_point;
@@ -340,11 +343,13 @@ namespace hpx { namespace parallel { namespace execution
             auto operator()(
                 Executor && exec, hpx::util::steady_duration const& rel_time,
                 F && f, Ts &&... ts) const
-            -> decltype(sync_execute_after(std::forward<Executor>(exec),
-                                           rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
+            -> decltype(sync_execute_after(
+                            std::forward<Executor>(exec),
+                            rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return sync_execute_after(std::forward<Executor>(exec),
-                                          rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return sync_execute_after(
+                    std::forward<Executor>(exec),
+                    rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
@@ -368,11 +373,13 @@ namespace hpx { namespace parallel { namespace execution
             auto operator()(
                 Executor && exec, hpx::util::steady_time_point const& abs_time,
                 F && f, Ts &&... ts) const
-            -> decltype(sync_execute_at(std::forward<Executor>(exec),
-                                        abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
+            -> decltype(sync_execute_at(
+                            std::forward<Executor>(exec),
+                            abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return sync_execute_at(std::forward<Executor>(exec),
-                                       abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return sync_execute_at(
+                    std::forward<Executor>(exec),
+                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
@@ -396,11 +403,13 @@ namespace hpx { namespace parallel { namespace execution
             auto operator()(
                 Executor && exec, hpx::util::steady_time_point const& abs_time,
                 F && f, Ts &&... ts) const
-            -> decltype(async_execute_at(std::forward<Executor>(exec),
-                                         abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
+            -> decltype(async_execute_at(
+                            std::forward<Executor>(exec),
+                            abs_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return async_execute_at(std::forward<Executor>(exec),
-                                        abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return async_execute_at(
+                    std::forward<Executor>(exec),
+                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
@@ -424,11 +433,13 @@ namespace hpx { namespace parallel { namespace execution
             auto operator()(
                 Executor && exec, hpx::util::steady_duration const& rel_time,
                 F && f, Ts &&... ts) const
-            -> decltype(async_execute_after(std::forward<Executor>(exec),
-                                            rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
+            -> decltype(async_execute_after(
+                            std::forward<Executor>(exec),
+                            rel_time, std::forward<F>(f), std::forward<Ts>(ts)...))
             {
-                return async_execute_after(std::forward<Executor>(exec),
-                                           rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                return async_execute_after(
+                    std::forward<Executor>(exec),
+                    rel_time, std::forward<F>(f), std::forward<Ts>(ts)...);
             }
         };
 #endif
