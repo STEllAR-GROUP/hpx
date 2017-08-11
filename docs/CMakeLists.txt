@@ -79,6 +79,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_sorted.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/lexicographical_compare.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/merge.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/minmax.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/mismatch.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/move.hpp"
