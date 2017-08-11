@@ -39,7 +39,7 @@ if(NOT HPX_WITH_MALLOC_DEFAULT)
   endif()
 
   if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "JEMALLOC")
-    if(MSVC)
+    if(MSVC AND NOT HPX_WITH_VCPKG)
       hpx_error("jemalloc is not usable with MSVC")
     endif()
     find_package(Jemalloc)
