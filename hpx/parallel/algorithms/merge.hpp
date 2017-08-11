@@ -167,16 +167,19 @@ namespace hpx { namespace parallel { inline namespace v1
             hpx::traits::is_random_access_iterator<RandIter3>::value)>
         void
         parallel_merge_helper(ExPolicy policy,
-            RandIter1 first1, std::size_t size1,
-            RandIter2 first2, std::size_t size2,
+            RandIter1 first1, RandIter1 last1,
+            RandIter2 first2, RandIter2 last2,
             RandIter3 dest, Comp comp,
             Proj1 proj1, Proj2 proj2, BinarySearchHelper)
         {
             using hpx::util::invoke;
 
-            const std::size_t threshold = 8192u;
+            const std::size_t threshold = 65536ul;
 
             HPX_ASSERT(threshold >= 1u);
+
+            std::size_t size1 = last1 - first1;
+            std::size_t size2 = last2 - first2;
 
             if (size1 + size2 <= threshold)
             {
@@ -188,52 +191,57 @@ namespace hpx { namespace parallel { inline namespace v1
             if (size1 < size2)
             {
                 parallel_merge_helper(policy,
-                    first2, size2, first1, size1, dest, comp, proj2, proj1,
+                    first2, last2, first1, last1, dest, comp, proj2, proj1,
                     typename BinarySearchHelper::another_type());
                 return;
             }
 
             HPX_ASSERT(size1 >= 1u);
 
-            std::size_t leftside1_size = size1 / 2;
-            std::size_t rightside1_size = size1 - leftside1_size - 1;
-            RandIter1 mid1 = first1 + leftside1_size;
-
+            RandIter1 mid1 = first1 + size1 / 2;
             RandIter2 boundary2 = BinarySearchHelper::call(
-                first2, first2 + size2, invoke(proj1, *mid1), comp, proj2);
-            std::size_t leftside2_size = boundary2 - first2;
-            std::size_t rightside2_size = size2 - leftside2_size;
-
-            RandIter3 target = dest + leftside1_size + leftside2_size;
+                first2, last2, invoke(proj1, *mid1), comp, proj2);
+            RandIter3 target = dest + (mid1 - first1) + (boundary2 - first2);
 
             *target = *mid1;
 
-            hpx::future<void> left = execution::async_execute(policy.executor(),
+            hpx::future<void> fut = execution::async_execute(policy.executor(),
                 [&]() -> void
                 {
                     parallel_merge_helper(policy,
-                        first1, leftside1_size, first2, leftside2_size,
+                        first1, mid1, first2, boundary2,
                         dest, comp, proj1, proj2, BinarySearchHelper());
                 });
-            hpx::future<void> right = execution::async_execute(policy.executor(),
-                [&]() -> void
-                {
-                    parallel_merge_helper(policy,
-                        mid1 + 1, rightside1_size, boundary2, rightside2_size,
-                        target + 1, comp, proj1, proj2, BinarySearchHelper());
-                });
 
-            hpx::wait_all(left, right);
+            try {
+                parallel_merge_helper(policy,
+                    mid1 + 1, last1, boundary2, last2,
+                    target + 1, comp, proj1, proj2, BinarySearchHelper());
+            }
+            catch (...) {
+                fut.wait();
 
-            if (left.has_exception() || right.has_exception())
-            {
                 std::vector<hpx::future<void>> futures(2);
-                futures[0] = std::move(left);
-                futures[1] = std::move(right);
+                futures[0] = std::move(fut);
+                futures[1] = hpx::make_exceptional_future<void>(
+                        std::current_exception());
 
                 std::list<std::exception_ptr> errors;
                 util::detail::handle_local_exceptions<ExPolicy>::call(
                     futures, errors);
+
+                // Not reachable.
+                HPX_ASSERT(false);
+            }
+
+            try {
+                fut.get();
+            }
+            catch (std::bad_alloc const& ba) {
+                throw ba;
+            }
+            catch (...) {
+                throw exception_list(std::current_exception());
             }
         }
 
@@ -252,7 +260,7 @@ namespace hpx { namespace parallel { inline namespace v1
             Proj1 && proj1, Proj2 && proj2)
         {
             parallel_merge_helper(std::forward<ExPolicy>(policy),
-                first1, last1 - first1, first2, last2 - first2, dest,
+                first1, last1, first2, last2, dest,
                 std::forward<Comp>(comp),
                 std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2),
