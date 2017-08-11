@@ -71,6 +71,7 @@ set(tests
     is_sorted_until
     lexicographical_compare
     max_element
+    merge
     min_element
     minmax_element
     mismatch
