@@ -75,7 +75,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <>
     struct handle_remote_exceptions<execution::parallel_unsequenced_policy>
     {
-        HPX_ATTRIBUTE_NORETURN static void call(
+        HPX_NORETURN static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             hpx::terminate();
