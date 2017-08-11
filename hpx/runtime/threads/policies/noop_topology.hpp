@@ -24,6 +24,7 @@
 #endif
 
 #include <cstddef>
+#include <string>
 
 namespace hpx { namespace threads
 {

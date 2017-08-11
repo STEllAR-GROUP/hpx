@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 int hpx_main(int argc, char* argv[])

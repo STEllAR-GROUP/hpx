@@ -13,6 +13,8 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <cstddef>
 #include <iosfwd>
 #include <stdexcept>
