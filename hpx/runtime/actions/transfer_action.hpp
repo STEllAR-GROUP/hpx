@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
@@ -226,5 +228,7 @@ namespace hpx { namespace traits
     {};
     /// \endcond
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif /*HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP*/

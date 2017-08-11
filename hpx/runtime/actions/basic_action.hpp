@@ -871,8 +871,9 @@ namespace hpx { namespace serialization
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
     namespace hpx { namespace actions {                                       \
-        template struct transfer_action< action>;                             \
-        template struct transfer_continuation_action< action>;                \
+        template struct HPX_ALWAYS_EXPORT transfer_action< action>;           \
+        template struct HPX_ALWAYS_EXPORT                                     \
+            transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
 
@@ -882,8 +883,9 @@ namespace hpx { namespace serialization
 #else
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
     namespace hpx { namespace actions {                                       \
-        extern template struct HPX_EXPORT transfer_action< action>;           \
-        extern template struct HPX_EXPORT transfer_continuation_action< action>;\
+        extern template struct HPX_ALWAYS_IMPORT transfer_action< action>;    \
+        extern template struct HPX_ALWAYS_IMPORT                              \
+            transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
 #endif

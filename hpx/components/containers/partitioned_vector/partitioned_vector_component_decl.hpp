@@ -304,13 +304,13 @@ namespace hpx { namespace server
 /**/
 
 #define HPX_REGISTER_VECTOR_DECLARATION_1(type)                               \
-    HPX_REGISTER_VECTOR_DECLARATION_2(type, std::vector<type>)                \
+    HPX_REGISTER_VECTOR_DECLARATION_2(type, std::vector< type>)               \
 /**/
 #define HPX_REGISTER_VECTOR_DECLARATION_2(type, data)                         \
     HPX_REGISTER_VECTOR_DECLARATION_3(type, data, type)                       \
 /**/
 #define HPX_REGISTER_VECTOR_DECLARATION_3(type, data, name)                   \
-    typedef ::hpx::server::partitioned_vector<type, data>                     \
+    typedef ::hpx::server::partitioned_vector< type, data>                    \
         HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name));            \
     HPX_REGISTER_VECTOR_DECLARATION_IMPL(                                     \
         HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name)), name)      \
@@ -333,7 +333,7 @@ namespace hpx
             > base_type;
 
     public:
-        partitioned_vector_partition() = default;
+        partitioned_vector_partition() {}
         partitioned_vector_partition(id_type const& gid);
 
         partitioned_vector_partition(hpx::shared_future<id_type> const& gid);
