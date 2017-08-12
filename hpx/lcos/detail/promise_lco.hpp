@@ -191,7 +191,7 @@ namespace traits {
 
     template <typename Result, typename RemoteResult>
     struct component_type_database<
-        lcos::detail::promise_lco<Result, RemoteResult>>
+        lcos::detail::promise_lco<Result, RemoteResult> >
     {
         static components::component_type value;
 

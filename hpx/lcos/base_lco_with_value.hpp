@@ -12,10 +12,14 @@
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_guard.hpp>
@@ -29,15 +33,43 @@
 
 namespace hpx { namespace lcos
 {
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename ComponentTag, typename BaseLco>
+        struct base_lco_wrapping_type;
+
+        template <typename BaseLco>
+        struct base_lco_wrapping_type<traits::detail::component_tag, BaseLco>
+        {
+            typedef components::simple_component<BaseLco> type;
+        };
+
+        template <typename BaseLco>
+        struct base_lco_wrapping_type<traits::detail::simple_component_tag, BaseLco>
+        {
+            typedef components::simple_component<BaseLco> type;
+        };
+
+        template <typename BaseLco>
+        struct base_lco_wrapping_type<traits::detail::managed_component_tag, BaseLco>
+        {
+            typedef components::managed_component<BaseLco> type;
+        };
+        /// \endcond
+    }
+
     /// The \a base_lco_with_value class is the common base class for all LCO's
     /// synchronizing on a value.
     /// The \a RemoteResult template argument should be set to the type of the
     /// argument expected for the set_value action.
     ///
     /// \tparam RemoteResult The type of the result value to be carried back
-    /// to the LCO instance.
-    template <typename Result, typename RemoteResult>
-    class base_lco_with_value : public base_lco
+    ///                      to the LCO instance.
+    /// \tparam ComponentTag The tag type representing the type of the component
+    ///                      (either component_tag or managed_component_tag).
+    template <typename Result, typename RemoteResult, typename ComponentTag>
+    class base_lco_with_value : public base_lco, public ComponentTag
     {
     protected:
         typedef typename std::conditional<
@@ -65,7 +97,10 @@ namespace hpx { namespace lcos
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
         // component
-        typedef components::managed_component<base_lco_with_value> wrapping_type;
+        typedef typename detail::base_lco_wrapping_type<
+                ComponentTag, base_lco_with_value
+            >::type wrapping_type;
+
         typedef base_lco_with_value base_type_holder;
 
         static components::component_type get_component_type()
@@ -90,7 +125,7 @@ namespace hpx { namespace lcos
             set_value(std::move(result));
         }
 
-   /// The \a function get_result_nonvirt is called whenever a
+        /// The \a function get_result_nonvirt is called whenever a
         /// \a get_result_action is applied on this LCO instance. This
         /// function just forwards to the virtual function \a get_result, which
         /// is overloaded by the derived concrete LCO.
@@ -126,8 +161,9 @@ namespace hpx { namespace lcos
     ///
     /// \tparam void This specialization expects no result value and is almost
     ///              completely equivalent to the plain \a base_lco.
-    template <>
-    class base_lco_with_value<void, void> : public base_lco
+    template <typename ComponentTag>
+    class base_lco_with_value<void, void, ComponentTag>
+      : public base_lco, public ComponentTag
     {
     protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
@@ -140,6 +176,15 @@ namespace hpx { namespace lcos
         // component
         typedef components::managed_component<base_lco_with_value> wrapping_type;
         typedef base_lco_with_value base_type_holder;
+
+        // refer to base type for the corresponding implementation
+        typedef typename base_lco::set_event_action set_value_action;
+
+        // dummy action definition
+        void get_value() {}
+
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(base_lco_with_value,
+            get_value, get_value_action);
     };
 }}
 
@@ -148,7 +193,43 @@ namespace hpx { namespace traits
     // define component type data base entry generator
     template <typename Result, typename RemoteResult, typename Enable>
     struct component_type_database<
-        hpx::lcos::base_lco_with_value<Result, RemoteResult>, Enable>
+        hpx::lcos::base_lco_with_value<
+            Result, RemoteResult, traits::detail::managed_component_tag
+        >, Enable>
+    {
+        static components::component_type get()
+        {
+            return components::component_base_lco_with_value;
+        }
+
+        static void set(components::component_type)
+        {
+            HPX_ASSERT(false);
+        }
+    };
+
+    template <typename Result, typename RemoteResult, typename Enable>
+    struct component_type_database<
+        hpx::lcos::base_lco_with_value<
+            Result, RemoteResult, traits::detail::simple_component_tag
+        >, Enable>
+    {
+        static components::component_type get()
+        {
+            return components::component_base_lco_with_value_unmanaged;
+        }
+
+        static void set(components::component_type)
+        {
+            HPX_ASSERT(false);
+        }
+    };
+
+    template <typename Result, typename RemoteResult, typename Enable>
+    struct component_type_database<
+        hpx::lcos::base_lco_with_value<
+            Result, RemoteResult, traits::detail::component_tag
+        >, Enable>
     {
         static components::component_type get()
         {
@@ -162,88 +243,156 @@ namespace hpx { namespace traits
     };
 }}
 
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(Value, Name)               \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        HPX_PP_CAT(set_value_action_, Name))                                    \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
-        HPX_PP_CAT(get_value_action_, Name))                                    \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(...)                     \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_(__VA_ARGS__)                \
+/**/
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_(...)                    \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_,                        \
+        HPX_PP_NARGS(__VA_ARGS__)                                             \
+    )(__VA_ARGS__))                                                           \
 /**/
 
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(Value, RemoteValue, Name) \
-    typedef hpx::lcos::base_lco_with_value<Value, RemoteValue>                  \
-        HPX_PP_CAT(base_lco_with_value_, Name);                                 \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,               \
-        HPX_PP_CAT(set_value_action_, Name))                                    \
-    HPX_REGISTER_ACTION_DECLARATION(                                            \
-        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,               \
-        HPX_PP_CAT(get_value_action_, Name))                                    \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                     \
-        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,               \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
+// obsolete
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(Value, RemoteValue, Name)\
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_3(Value, RemoteValue, Name)  \
 /**/
 
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE(Value, Name)                           \
-    HPX_REGISTER_ACTION(                                                        \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        HPX_PP_CAT(set_value_action_, Name))                                    \
-    HPX_REGISTER_ACTION(                                                        \
-        hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
-        HPX_PP_CAT(get_value_action_, Name))                                    \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_1(Value)                 \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_4(                           \
+        Value, Value, Value, ::hpx::traits::detail::managed_component_tag)    \
 /**/
 
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(                                    \
-        Value, Name, ActionIdGet, ActionIdSet)                                  \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        HPX_PP_CAT(set_value_action_, Name), ActionIdSet)                       \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
-        HPX_PP_CAT(get_value_action_, Name), ActionIdGet)                       \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
-        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_2(Value, Name)           \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_4(                           \
+        Value, Value, Name, ::hpx::traits::detail::managed_component_tag)     \
 /**/
-#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(                                   \
-        Value, RemoteValue, Name, ActionIdGet, ActionIdSet)                     \
-    typedef hpx::lcos::base_lco_with_value<Value, RemoteValue>                  \
-        HPX_PP_CAT(base_lco_with_value_, Name);                                 \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,               \
-        HPX_PP_CAT(set_value_action_, Name), ActionIdSet)                       \
-    HPX_REGISTER_ACTION_ID(                                                     \
-        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,               \
-        HPX_PP_CAT(get_value_action_, Name), ActionIdGet)                       \
-    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                      \
-        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,               \
-        "lco_set_value_action", std::size_t(-1), std::size_t(-1))               \
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_3(                       \
+        Value, RemoteValue, Name)                                             \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_4(                           \
+        Value, RemoteValue, Name, ::hpx::traits::detail::managed_component_tag)\
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION_4(                       \
+        Value, RemoteValue, Name, Tag)                                        \
+    typedef ::hpx::lcos::base_lco_with_value< Value, RemoteValue, Tag>        \
+        HPX_PP_CAT(base_lco_with_value_, Name);                               \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        HPX_PP_CAT(set_value_action_, Name))                                  \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        HPX_PP_CAT(get_value_action_, Name))                                  \
+    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                   \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        "lco_set_value_action", std::size_t(-1), std::size_t(-1))             \
+/**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE(...)                                 \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_(__VA_ARGS__)                            \
+/**/
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_(...)                                \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_BASE_LCO_WITH_VALUE_,                                    \
+        HPX_PP_NARGS(__VA_ARGS__)                                             \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_1(Value)                             \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_4(                                       \
+        Value, Value, Value, ::hpx::traits::detail::managed_component_tag)    \
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_2(Value, Name)                       \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_4(                                       \
+        Value, Value, Name, ::hpx::traits::detail::managed_component_tag)     \
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_3(Value, RemoteValue, Name)          \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_4(                                       \
+        Value, RemoteValue, Name, ::hpx::traits::detail::managed_component_tag)\
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_4(Value, RemoteValue, Name, Tag)     \
+    typedef ::hpx::lcos::base_lco_with_value< Value, RemoteValue, Tag>        \
+        HPX_PP_CAT(base_lco_with_value_, Name);                               \
+    HPX_REGISTER_ACTION(                                                      \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        HPX_PP_CAT(set_value_action_, Name))                                  \
+    HPX_REGISTER_ACTION(                                                      \
+        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        HPX_PP_CAT(get_value_action_, Name))                                  \
+    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                    \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        "lco_set_value_action", std::size_t(-1), std::size_t(-1))             \
+/**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(...)                              \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_(__VA_ARGS__)                         \
+/**/
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_(...)                             \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_,                                 \
+        HPX_PP_NARGS(__VA_ARGS__)                                             \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+// obsolete
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(                                 \
+        Value, RemoteValue, Name, ActionIdGet, ActionIdSet)                   \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_6(                                    \
+        Value, RemoteValue, Name, ActionIdGet, ActionIdSet,                   \
+        ::hpx::traits::detail::managed_component_tag)                         \
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_4(                                \
+        Value, Name, ActionIdGet, ActionIdSet)                                \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_6(Value, Value, Name,                 \
+        ActionIdGet, ActionIdSet, ::hpx::traits::detail::managed_component_tag)\
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_5(                                \
+        Value, RemoteValue, Name, ActionIdGet, ActionIdSet)                   \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_6(Value, RemoteValue, Name,           \
+        ActionIdGet, ActionIdSet, ::hpx::traits::detail::managed_component_tag)\
+/**/
+
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID_6(                                \
+        Value, RemoteValue, Name, ActionIdGet, ActionIdSet, Tag)              \
+    typedef ::hpx::lcos::base_lco_with_value< Value, RemoteValue, Tag>        \
+        HPX_PP_CAT(base_lco_with_value_, Name);                               \
+    HPX_REGISTER_ACTION_ID(                                                   \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        HPX_PP_CAT(set_value_action_, Name), ActionIdSet)                     \
+    HPX_REGISTER_ACTION_ID(                                                   \
+        HPX_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        HPX_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
+    HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                    \
+        HPX_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        "lco_set_value_action", std::size_t(-1), std::size_t(-1))             \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::gid_type>, vector_gid_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::naming::id_type, hpx::naming::gid_type, id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::naming::id_type, naming_id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION2(
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::id_type>, std::vector<hpx::naming::gid_type>,
     vector_id_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::id_type>, vector_id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::util::unused_type, hpx_unused_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float, float)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(double, double)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(double)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int8_t, int8_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint8_t, uint8_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int16_t, int16_t)
@@ -252,7 +401,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int32_t, int32_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint32_t, uint32_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::int64_t, int64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::uint64_t, uint64_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool, bool)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<bool>, vector_bool_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<std::uint32_t>, vector_std_uint32_type)

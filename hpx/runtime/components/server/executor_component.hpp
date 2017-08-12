@@ -55,6 +55,7 @@ namespace hpx { namespace components
             traits::is_threads_executor<Executor_>::value
         >::type
         schedule_thread(hpx::naming::address::address_type lva,
+            naming::address::component_type comptype,
             hpx::threads::thread_init_data& data,
             hpx::threads::thread_state_enum initial_state)
         {
@@ -73,6 +74,7 @@ namespace hpx { namespace components
             !traits::is_threads_executor<Executor_>::value
         >::type
         schedule_thread(hpx::naming::address::address_type lva,
+            naming::address::component_type comptype,
             hpx::threads::thread_init_data& data,
             hpx::threads::thread_state_enum initial_state)
         {
