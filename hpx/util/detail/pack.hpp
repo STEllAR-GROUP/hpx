@@ -59,6 +59,28 @@ namespace hpx { namespace util { namespace detail
     {};
 
     ///////////////////////////////////////////////////////////////////////////
+    // Workaround for clang bug [https://bugs.llvm.org/show_bug.cgi?id=35077]
+    template <typename T>
+    struct is_true
+      : std::integral_constant<bool, (bool)T::value>
+    {};
+
+    template <typename T>
+    struct is_false
+      : std::integral_constant<bool, !(bool)T::value>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ...Ts>
+    struct _always_true
+      : std::true_type
+    {};
+
+    template <typename ...Ts>
+    struct _always_false
+      : std::false_type
+    {};
+
     template <typename ...Ts>
     struct all_of;
 
@@ -71,8 +93,15 @@ namespace hpx { namespace util { namespace detail
     {};
 
     template <typename ...Ts>
+    static std::false_type _all_of(...);
+
+    template <typename ...Ts>
+    static auto _all_of(int) -> _always_true<
+        typename std::enable_if<is_true<Ts>::value>::type...>;
+
+    template <typename ...Ts>
     struct all_of
-      : all_of<pack_c<bool, ((bool)Ts::value)...> >
+      : decltype(detail::_all_of<Ts...>(0))
     {};
 
     template <>
@@ -86,13 +115,23 @@ namespace hpx { namespace util { namespace detail
     template <bool ...Vs>
     struct any_of<pack_c<bool, Vs...> >
       : std::integral_constant<bool,
-            !all_of<pack_c<bool, !Vs...> >::value
+            !std::is_same<
+                pack_c<bool, Vs...>
+              , pack_c<bool, (Vs && false)...> // false...
+            >::value
         >
     {};
 
     template <typename ...Ts>
+    static std::true_type _any_of(...);
+
+    template <typename ...Ts>
+    static auto _any_of(int) -> _always_false<
+        typename std::enable_if<is_false<Ts>::value>::type...>;
+
+    template <typename ...Ts>
     struct any_of
-      : any_of<pack_c<bool, ((bool)Ts::value)...> >
+      : decltype(detail::_any_of<Ts...>(0))
     {};
 
     template <>
@@ -101,21 +140,8 @@ namespace hpx { namespace util { namespace detail
     {};
 
     template <typename ...Ts>
-    struct none_of;
-
-    template <bool ...Vs>
-    struct none_of<pack_c<bool, Vs...> >
-      : all_of<pack_c<bool, !Vs...> >
-    {};
-
-    template <typename ...Ts>
     struct none_of
-      : none_of<pack_c<bool, ((bool)Ts::value)...> >
-    {};
-
-    template <>
-    struct none_of<> // <fake-type>
-      : std::true_type
+      : std::integral_constant<bool, !any_of<Ts...>::value>
     {};
 
     template <typename T, typename ...Ts>
