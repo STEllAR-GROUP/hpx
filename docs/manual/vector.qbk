@@ -214,7 +214,7 @@ Which is equivalent to:
 [endsect]
 
 [//////////////////////////////////////////////////////////////////////////////]
-[section:SPMD Using Views]
+[section:partitioned_vector_views Using Views]
 
 The use of multi-dimensional arrays is quite common
 in the numerical field whether to perform dense matrix operations
@@ -231,7 +231,7 @@ data is thus preserved at the segment level, and the composability of the
 segments is made possible thanks to multi-dimensional array -inspired
 access mode.
 
-[section:SPMD Preface : Why SPMD ?]
+[section:spmd_block Preface : Why SPMD ?]
 
 Although HPX refutes by design this programming model, the locality plays a
 dominant role when it comes to implement vectorized code. To maximize local
@@ -345,7 +345,7 @@ indicating the number of images per locality to create.
 ]
 [endsect]
 
-[section:Views SPMD Multidimensionnal Views]
+[section:spmd_views SPMD Multidimensionnal Views]
 Object classes are defined as "container views" when the purpose is to
 observe and/or to modify the values of a container using another perspective
 than the one that caracterizes the container. For example, the values of an
@@ -396,7 +396,7 @@ Here are some examples of using subscripts in the 2-D view case:
     ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
 
     using Vec = hpx::partitioned_vector<double>;
-    using 2D_View = hpx::partitioned_vector_view<double,2>;
+    using View_2D = hpx::partitioned_vector_view<double,2>;
 
     /* Do some code */
 
@@ -407,7 +407,7 @@ Here are some examples of using subscripts in the 2-D view case:
         std::size_t height, width;
 
         // Instanciate the view
-        2D_View vv(block, v.begin(), v.end(), {height,width});
+        View_2D vv(block, v.begin(), v.end(), {height,width});
 
         // The l-value is a view subscript, the image that owns vv(1,0)
         // evaluates the assignment.
@@ -432,7 +432,7 @@ Here are some examples of using iterators in the 3-D view case :
     ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(int);
 
     using Vec = hpx::partitioned_vector<int>;
-    using 3D_View = hpx::partitioned_vector_view<int,3>;
+    using View_3D = hpx::partitioned_vector_view<int,3>;
 
     /* Do some code */
 
@@ -443,8 +443,8 @@ Here are some examples of using iterators in the 3-D view case :
         std::size_t sixe_x, size_y, size_z;
 
         // Instanciate the views
-        3D_View vv1(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
-        3D_View vv2(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
+        View_3D vv1(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
+        View_3D vv2(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
 
         // Save previous segments covered by vv1 into segments covered by vv2
         auto vv2_it = vv2.begin();
@@ -487,7 +487,7 @@ owned by the current image :
     ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(float);
 
     using Vec = hpx::partitioned_vector<float>;
-    using 1D_View = hpx::partitioned_vector_view<float,1>;
+    using View_1D = hpx::partitioned_vector_view<float,1>;
 
     /* Do some code */
 
@@ -498,7 +498,7 @@ owned by the current image :
         std::size_t num_segments;
 
         // Instanciate the view
-        1D_View vv(block, v.begin(), v.end(), {num_segments});
+        View_1D vv(block, v.begin(), v.end(), {num_segments});
 
         // Instanciate the local view from the view
         auto local_vv = hpx::local_view(vv);
@@ -528,7 +528,7 @@ sub-view.
     ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(float);
 
     using Vec = hpx::partitioned_vector<float>;
-    using 2D_View = hpx::partitioned_vector_view<float,2>;
+    using View_2D = hpx::partitioned_vector_view<float,2>;
 
     /* Do some code */
 
@@ -540,10 +540,10 @@ sub-view.
         std::size_t tilesize = 5;
 
         // Instanciate the view
-        2D_View vv(block, v.begin(), v.end(), {N,N});
+        View_2D vv(block, v.begin(), v.end(), {N,N});
 
         // Instanciate the subview
-        2D_View svv(
+        View_2D svv(
             block,&v(tilesize,0),&v(2*tilesize-1,tilesize-1),{tilesize,tilesize},{N,N});
 
         if(block.this_image() == 0)
