@@ -7,6 +7,7 @@
 # Copyright (c) 2014-2016 Andreas Schaefer
 # Copyright (c) 2017      Abhimanyu Rawat
 # Copyright (c) 2017      Google
+# Copyright (c) 2017      Taeguk Kwon
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1100,17 +1101,22 @@ if(HPX_WITH_CUDA)
   endif()
 endif()
 
-# Set default for enabling auto-return type workaround to ON for non-clang CUDA
-# only
-set(HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT ON)
-if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-  set(HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT OFF)
+# Set default for enabling auto-return type workaround to ON
+# for only CUDA with clang which uses C++ version >= C++14
+if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
+    set(HPX_CXX11_AUTO_RETURN_VALUE_DEFAULT OFF)
+  else()
+    set(HPX_CXX11_AUTO_RETURN_VALUE_DEFAULT ON)
+  endif()
+else()
+  set(HPX_CXX11_AUTO_RETURN_VALUE_DEFAULT OFF)
 endif()
 
 hpx_option(HPX_WITH_CXX11_AUTO_RETURN_VALUE BOOL
   "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
-  ${HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT} ADVANCED)
-if(HPX_WITH_CXX11_AUTO_RETURN_VALUE)
+  ${HPX_CXX11_AUTO_RETURN_VALUE_DEFAULT} ADVANCED)
+if(${HPX_WITH_CXX11_AUTO_RETURN_VALUE})
   hpx_add_config_define(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
 endif()
 
