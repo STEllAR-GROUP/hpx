@@ -213,4 +213,355 @@ Which is equivalent to:
 
 [endsect]
 
+[//////////////////////////////////////////////////////////////////////////////]
+[section:SPMD Using Views]
+
+The use of multi-dimensional arrays is quite common
+in the numerical field whether to perform dense matrix operations
+or to process images. It exist many libraries which implement such object
+classes overloading their basic operators (e.g. `+`, `-`, `*`, `()`, etc.).
+However, such operation becomes more delicate when the underlying data layout
+is segmented or when it is mandatory to use fully-optimimized linear algebra
+subroutines (i.e. BLAS subroutines).
+
+Our solution is thus to relax the level of abstraction by allowing
+the user to work not directly on n-dimensionnal data, but on "n-dimensionnal
+collections of 1-D arrays". The use of well-accepted techniques on contiguous
+data is thus preserved at the segment level, and the composability of the
+segments is made possible thanks to multi-dimensional array -inspired
+access mode.
+
+[section:SPMD Preface : Why SPMD ?]
+
+Although HPX refutes by design this programming model, the locality plays a
+dominant role when it comes to implement vectorized code. To maximize local
+computing and avoid uneededed data transfer, a parallel section (or Single
+Programming Multiple Data section) is required. Because the use of global
+variables is prohibited, this parallel section is created via the RAII idiom.
+
+To define a parallel section, simply write an action taking a `spmd_block`
+variable as the first parameter.
+
+    #include <hpx/lcos/spmd_block.hpp>
+
+    void bulk_function(hpx::lcos::spmd_block block /* , arg0, arg1, ... */)
+    {
+        // Parallel section
+
+        /* Do some code */
+    }
+    HPX_PLAIN_ACTION(bulk_function, bulk_action);
+
+[note In the following paragraphs, we will use the term "image" several times.
+      An image is defined as a lightweight process whose the entry point is a
+      function provided by the user. It's an "image of the function".
+]
+
+The `spmd_block` class contains the following methods:
+
+* [def Team information]
+  `get_num_images`, `this_image`, `images_per_locality`
+* [def Control statements]
+  `sync_all`, `sync_images`
+
+Here is a sample code summarizing the features offered by the `spmd_block` class.
+
+    #include <hpx/lcos/spmd_block.hpp>
+
+    void bulk_function(hpx::lcos::spmd_block block /* , arg0, arg1, ... */)
+    {
+        std::size_t num_images = block.get_num_images();
+        std::size_t this_image = block.this_image();
+        std::size_t images_per_locality = block.images_per_locality();
+
+        /* Do some code */
+
+        // Synchronize all images in the team
+        block.sync_all();
+
+        /* Do some code */
+
+        // Synchronize image 0 and image 1
+        block.sync_images(0,1);
+
+        /* Do some code */
+
+        std::vector<std::size_t> vec_images = {2,3,4};
+
+        // Synchronize images 2, 3 and 4
+        block.sync_images(vec_images);
+
+        // Alternate call to synchronize images 2, 3 and 4
+        block.sync_images(vec_images.begin(), vec_images.end());
+
+        /* Do some code */
+
+        // Non-blocking version of sync_all()
+        hpx::future<void> event =
+            block.sync_all(hpx::launch::async);
+
+        // Callback waiting for 'event' to be ready before being scheduled
+        hpx::future<void> cb =
+            event.then(
+              [](hpx::future<void>)
+              {
+
+                /* Do some code */
+
+              });
+
+        // Finally wait for the execution tree to be finished
+        cb.get();
+    }
+    HPX_PLAIN_ACTION(bulk_test_function, bulk_test_action);
+
+Then, in order to invoke the parallel section, call the
+function 'define_spmd_block` specifying an arbitrary symbolic name and
+indicating the number of images per locality to create.
+
+    void bulk_function(hpx::lcos::spmd_block block, /* , arg0, arg1, ... */)
+    {
+
+    }
+    HPX_PLAIN_ACTION(bulk_test_function, bulk_test_action);
+
+
+    int main()
+    {
+        /* std::size_t arg0, arg1, ...; */
+
+        bulk_action act;
+        std::size_t images_per_locality = 4;
+
+        // Instanciate the parallel section
+        hpx::lcos::define_spmd_block(
+            "some_name", images_per_locality, std::move(act) /*, arg0, arg1, ... */);
+
+        return 0;
+    }
+[note In principle, the user should never call the `spmd_block` constructor.
+      The `define_spmd_block` function is responsible of instanciating it and
+      broadcasting it to each created image.
+]
+[endsect]
+
+[section:Views SPMD Multidimensionnal Views]
+Object classes are defined as "container views" when the purpose is to
+observe and/or to modify the values of a container using another perspective
+than the one that caracterizes the container. For example, the values of an
+`std::vector` object can be accessed via the expression `v[i]`. Container views
+can be used, for example, when it is desired for those values to be "viewed" as
+a 2D matrix that would have been flattened in a `std::vector`. The values would
+be possibly accessible via the expression `vv(i,j)` which would call internally
+the expression `v[k]`.
+
+By default, the `partitioned_vector` class integrates 1-D views of its segments :
+
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
+
+    hpx::partitioned_vector<double> v;
+
+    // Create a 1-D view of the vector of segments
+    auto vv = traits::segment(v.begin());
+
+    // Access segment i
+    std::vector<double> v = vv[i];
+
+Our views are called "multi-dimensional" in the sense that they generalize
+to N dimensions the purpose of `traits::segments()` in the 1-D case. Note that
+in a parallel section, the 2-D expression `a(i,j) = b(i,j)` is quite confusing
+because without convention, each of the images invoked will race to execute
+the statement. For this reason, our views are not only multi-dimensional
+but also "spmd-aware".
+
+[note Spmd-awareness: The convention is simple. If an assignment statement
+       contains a view subscript as an l-value, it is only and only the image
+       holding the r-value who is evaluating the statement. (In MPI sense,
+       it is called a Put operation]
+
+[section:Subscripts Subscript-based operations]
+Here are some examples of using subscripts in the 2-D view case:
+
+    #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
+
+    using Vec = hpx::partitioned_vector<double>;
+    using 2D_View = hpx::partitioned_vector_view<double,2>;
+
+    /* Do some code */
+
+    Vec v;
+
+    // Parallel section (suppose 'block' an spmd_block instance)
+    {
+        std::size_t height, width;
+
+        // Instanciate the view
+        2D_View vv(block, v.begin(), v.end(), {height,width});
+
+        // The l-value is a view subscript, the image that owns vv(1,0)
+        // evaluates the assignment.
+        vv(0,1) = vv(1,0);
+
+        // The l-value is a view subscript, the image that owns the r-value
+        // (result of expression 'std::vector<double>(4,1.0)') evaluates the
+        // assignment : oops! race between all participating images.
+        vv(2,3) = std::vector<double>(4,1.0);
+    }
+[endsect]
+
+[section:ViewIterators Iterator-based operations]
+Here are some examples of using iterators in the 3-D view case :
+
+    #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(int);
+
+    using Vec = hpx::partitioned_vector<int>;
+    using 3D_View = hpx::partitioned_vector_view<int,3>;
+
+    /* Do some code */
+
+    Vec v1, v2;
+
+    // Parallel section (suppose 'block' an spmd_block instance)
+    {
+        std::size_t sixe_x, size_y, size_z;
+
+        // Instanciate the views
+        3D_View vv1(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
+        3D_View vv2(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
+
+        // Save previous segments covered by vv1 into segments covered by vv2
+        auto vv2_it = vv2.begin();
+        auto vv1_it = vv1.cbegin();
+
+        for(; vv2_it != vv2.end(); vv2_it++, vv1_it++)
+        {
+            // It's a Put operation
+            *vv2_it = *vv1_it;
+        }
+
+        // Ensure that all images have performed their Put operations
+        block.sync_all();
+
+        // Ensure that only one image is putting updated data into the different
+        // segments covered by vv1
+        if(block.this_image() == 0)
+        {
+            int idx = 0;
+
+            // Update all the segments covered by vv1
+            for(auto i = vv1.begin(); i != vv1.end(); i++)
+            {
+                // It's a Put operation
+                *i = std::vector<float>(elt_size,idx++);
+            }
+        }
+    }
+
+Here is an example that shows how to iterate only over segments
+owned by the current image :
+
+    #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
+    #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(float);
+
+    using Vec = hpx::partitioned_vector<float>;
+    using 1D_View = hpx::partitioned_vector_view<float,1>;
+
+    /* Do some code */
+
+    Vec v;
+
+    // Parallel section (suppose 'block' an spmd_block instance)
+    {
+        std::size_t num_segments;
+
+        // Instanciate the view
+        1D_View vv(block, v.begin(), v.end(), {num_segments});
+
+        // Instanciate the local view from the view
+        auto local_vv = hpx::local_view(vv);
+
+        for ( auto i = localvv.begin(); i != localvv.end(); i++ )
+        {
+            std::vector<float> & segment = *i;
+
+            /* Do some code */
+        }
+
+    }
+[endsect]
+
+[section:SubViews Instanciating Sub-views]
+It is possible to construct views from other views : we call it sub-views. The
+constraint nevertheless for the subviews is to retain the dimension and the
+value type of the input view. Here is an example showing how to create a
+sub-view.
+
+    #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
+    #include <hpx/include/partitioned_vector.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'partitioned_vector' segments
+    //
+    ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(float);
+
+    using Vec = hpx::partitioned_vector<float>;
+    using 2D_View = hpx::partitioned_vector_view<float,2>;
+
+    /* Do some code */
+
+    Vec v;
+
+    // Parallel section (suppose 'block' an spmd_block instance)
+    {
+        std::size_t N = 20;
+        std::size_t tilesize = 5;
+
+        // Instanciate the view
+        2D_View vv(block, v.begin(), v.end(), {N,N});
+
+        // Instanciate the subview
+        2D_View svv(
+            block,&v(tilesize,0),&v(2*tilesize-1,tilesize-1),{tilesize,tilesize},{N,N});
+
+        if(block.this_image() == 0)
+        {
+            // Equivalent to 'sv(tilesize,0) = 2.0f'
+            svv(0,0) = 2.0f;
+
+            // Equivalent to 'sv(2*tilesize-1,tilesize-1) = 3.0f'
+            svv(tilesize-1,tilesize-1) = 3.0f;
+        }
+
+    }
+[note The last parameter of the subview constructor is the size of the
+      original view. If one would like to create a subview of the subview and so
+      on, this parameter should stay unchanged. (`{N,N}` for the above example)
+]
+[endsect]
+
+[endsect]
+
 [endsect]
