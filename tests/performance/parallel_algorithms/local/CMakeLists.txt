@@ -1,14 +1,22 @@
 # Copyright (c) 2017 Taeguk Kwon
+# Copyright (c) 2017 Google
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks
-    benchmark_is_heap
-    benchmark_is_heap_until
-    benchmark_partition_copy
-    benchmark_unique_copy
-   )
+set(
+  benchmarks
+  benchmark_is_heap
+  benchmark_is_heap_until
+  benchmark_unique_copy)
+
+if(HPX_WITH_CXX14)
+  set(
+    benchmarks
+    ${benchmarks}
+    benchmark_partition
+    benchmark_partition_copy)
+endif()
 
 foreach(benchmark ${benchmarks})
   set(sources

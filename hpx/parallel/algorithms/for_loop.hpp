@@ -1166,6 +1166,22 @@ namespace hpx { namespace traits
                 >::call(f.f_);
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename F, typename S, typename Tuple>
+    struct get_function_annotation_itt<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static char const* call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                noexcept
+        {
+            return get_function_annotation_itt<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+#endif
 }}
 #endif
 

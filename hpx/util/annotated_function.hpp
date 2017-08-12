@@ -91,26 +91,27 @@ namespace hpx { namespace util
 
         explicit annotate_function(char const* name)
           : desc_(hpx::threads::get_self_ptr() ?
-                hpx::threads::set_thread_description(hpx::threads::get_self_id(),
-                    name) :
+                hpx::threads::set_thread_description(
+                    hpx::threads::get_self_id(), name) :
                 nullptr)
         {}
+
         template <typename F>
         explicit annotate_function(F && f)
           : desc_(hpx::threads::get_self_ptr() ?
                 hpx::threads::set_thread_description(
                     hpx::threads::get_self_id(),
-                    hpx::traits::get_function_annotation<
-                        typename std::decay<F>::type
-                    >::call(f)) :
+                    hpx::util::thread_description(f)) :
                 nullptr)
         {}
 
         ~annotate_function()
         {
             if (hpx::threads::get_self_ptr())
+            {
                 hpx::threads::set_thread_description(
                     hpx::threads::get_self_id(), desc_);
+            }
         }
 
         hpx::util::thread_description desc_;

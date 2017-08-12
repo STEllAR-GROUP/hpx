@@ -47,6 +47,11 @@ namespace lcos {
                 f_ = std::move(f);
             }
 
+            void mark_as_started()
+            {
+                this->task_base<Result>::started_test_and_set();
+            }
+
         private:
             void do_run()
             {

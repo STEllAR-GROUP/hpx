@@ -67,22 +67,26 @@ namespace hpx { namespace actions
         template <std::size_t ...Is>
         threads::thread_function_type
         get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-            naming::id_type&& target, naming::address::address_type lva);
+            naming::id_type&& target, naming::address::address_type lva,
+            naming::address::component_type comptype);
 
         threads::thread_function_type
         get_thread_function(naming::id_type&& target,
-            naming::address::address_type lva);
+            naming::address::address_type lva,
+            naming::address::component_type comptype);
 
         template <std::size_t ...Is>
         void
         schedule_thread(util::detail::pack_c<std::size_t, Is...>,
             naming::gid_type const& target_gid,
             naming::address::address_type lva,
+            naming::address::component_type comptype,
             std::size_t num_thread);
 
         // schedule a new thread
         void schedule_thread(naming::gid_type const& target_gid,
             naming::address::address_type lva,
+            naming::address::component_type comptype,
             std::size_t num_thread);
 
         // serialization support
@@ -94,7 +98,8 @@ namespace hpx { namespace actions
 
         void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
-            std::size_t num_thread, bool& deferred_schedule);
+            naming::component_type comptype, std::size_t num_thread,
+            bool& deferred_schedule);
     };
     /// \endcond
 
@@ -126,21 +131,23 @@ namespace hpx { namespace actions
     threads::thread_function_type
     transfer_action<Action>::get_thread_function(
         util::detail::pack_c<std::size_t, Is...>,
-        naming::id_type&& target, naming::address::address_type lva)
+        naming::id_type&& target, naming::address::address_type lva,
+        naming::address::component_type comptype)
     {
         return base_type::derived_type::construct_thread_function(
-            std::move(target), lva,
+            std::move(target), lva, comptype,
             util::get<Is>(std::move(this->arguments_))...);
     }
 
     template <typename Action>
     threads::thread_function_type
     transfer_action<Action>::get_thread_function(
-        naming::id_type&& target, naming::address::address_type lva)
+        naming::id_type&& target, naming::address::address_type lva,
+        naming::address::component_type comptype)
     {
         return get_thread_function(
             typename util::detail::make_index_pack<Action::arity>::type(),
-            std::move(target), lva);
+            std::move(target), lva, comptype);
     }
 
     template <typename Action>
@@ -150,6 +157,7 @@ namespace hpx { namespace actions
             util::detail::pack_c<std::size_t, Is...>,
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
+        naming::address::component_type comptype,
         std::size_t num_thread)
     {
         naming::id_type target;
@@ -165,7 +173,7 @@ namespace hpx { namespace actions
         data.parent_locality_id = this->parent_locality_;
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
-            std::move(data), target, lva, this->priority_,
+            std::move(data), target, lva, comptype, this->priority_,
             std::move(util::get<Is>(this->arguments_))...);
     }
 
@@ -173,11 +181,12 @@ namespace hpx { namespace actions
     void transfer_action<Action>::schedule_thread(
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
+        naming::address::component_type comptype,
         std::size_t num_thread)
     {
         schedule_thread(
             typename util::detail::make_index_pack<Action::arity>::type(),
-            target_gid, lva, num_thread);
+            target_gid, lva, comptype, num_thread);
 
         // keep track of number of invocations
         this->increment_invocation_count();
@@ -198,7 +207,8 @@ namespace hpx { namespace actions
     template <typename Action>
     void transfer_action<Action>::load_schedule(serialization::input_archive& ar,
         naming::gid_type&& target, naming::address_type lva,
-        std::size_t num_thread, bool& deferred_schedule)
+        naming::component_type comptype, std::size_t num_thread,
+        bool& deferred_schedule)
     {
         // First, serialize, then schedule
         load(ar);
@@ -215,7 +225,7 @@ namespace hpx { namespace actions
             deferred_schedule = false;
         }
 
-        schedule_thread(std::move(target), lva, num_thread);
+        schedule_thread(std::move(target), lva, comptype, num_thread);
     }
 }}
 
