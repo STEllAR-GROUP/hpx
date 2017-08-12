@@ -30,12 +30,6 @@
 #include <utility>
 #include <vector>
 
-#if defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION)
-#define HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT HPX_PARTITIONED_VECTOR_EXPORT
-#else
-#define HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-#endif
-
 namespace hpx { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////

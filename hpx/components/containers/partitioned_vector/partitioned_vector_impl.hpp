@@ -43,21 +43,24 @@ namespace hpx
 {
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline std::size_t partitioned_vector<T, Data>::get_partition_size() const
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT std::size_t
+    partitioned_vector<T, Data>::get_partition_size() const
     {
         std::size_t num_parts = partitions_.size();
         return num_parts ? ((size_ + num_parts - 1) / num_parts) : 0;
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline std::size_t partitioned_vector<T, Data>::get_global_index(
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT std::size_t
+    partitioned_vector<T, Data>::get_global_index(
         std::size_t segment, std::size_t part_size, size_type local_index) const
     {
         return segment * part_size + local_index;
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline void partitioned_vector<T, Data>::get_data_helper(
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::get_data_helper(
         id_type id, future<server::partitioned_vector_config_data>&& f)
     {
         server::partitioned_vector_config_data data = f.get();
@@ -94,8 +97,8 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline hpx::future<void> partitioned_vector<T, Data>::connect_to_helper(
-        shared_future<id_type>&& f)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
+    partitioned_vector<T, Data>::connect_to_helper(shared_future<id_type>&& f)
     {
         using util::placeholders::_1;
         typedef typename components::server::distributed_metadata_base<
@@ -107,8 +110,8 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline hpx::future<void> partitioned_vector<T, Data>::connect_to(
-        std::string const& symbolic_name)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
+    partitioned_vector<T, Data>::connect_to(std::string const& symbolic_name)
     {
         using util::placeholders::_1;
         this->base_type::connect_to(symbolic_name);
@@ -117,34 +120,34 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline void partitioned_vector<T, Data>::connect_to(
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::connect_to(
         launch::sync_policy, std::string const& symbolic_name)
     {
         connect_to(symbolic_name).get();
     }
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
     template <typename T, typename Data /*= std::vector<T> */>
-    inline void partitioned_vector<T, Data>::connect_to_sync(
-        std::string const& symbolic_name)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::connect_to_sync(std::string const& symbolic_name)
     {
         connect_to(launch::sync, symbolic_name);
     }
-#endif
+    #endif
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline hpx::future<void> partitioned_vector<T, Data>::register_as(
-        std::string const& symbolic_name)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
+    partitioned_vector<T, Data>::register_as(std::string const& symbolic_name)
     {
         std::vector<server::partitioned_vector_config_data::partition_data>
             partitions;
         partitions.reserve(partitions_.size());
 
-        std::copy(partitions_.begin(), partitions_.end(),
-            std::back_inserter(partitions));
+        std::copy(
+            partitions_.begin(), partitions_.end(), std::back_inserter(partitions));
 
-        server::partitioned_vector_config_data data(
-            size_, std::move(partitions));
+        server::partitioned_vector_config_data data(size_, std::move(partitions));
         this->base_type::reset(
             hpx::new_<components::server::distributed_metadata_base<
                 server::partitioned_vector_config_data>>(
@@ -154,24 +157,26 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline void partitioned_vector<T, Data>::register_as(
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::register_as(
         launch::sync_policy, std::string const& symbolic_name)
     {
         register_as(symbolic_name).get();
     }
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
     template <typename T, typename Data /*= std::vector<T> */>
-    inline void partitioned_vector<T, Data>::register_as_sync(
-        std::string const& symbolic_name)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::register_as_sync(std::string const& symbolic_name)
     {
         register_as(launch::sync, symbolic_name);
     }
-#endif
+    #endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data /*= std::vector<T> */>
-    inline partitioned_vector<T, Data>::partitioned_vector(future<id_type>&& f)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+    partitioned_vector<T, Data>::partitioned_vector(future<id_type>&& f)
     {
         using util::placeholders::_1;
         f.share().then(
@@ -180,8 +185,8 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data /*= std::vector<T> */>
-    inline std::size_t partitioned_vector<T, Data>::get_partition(
-        size_type global_index) const
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT std::size_t
+    partitioned_vector<T, Data>::get_partition(size_type global_index) const
     {
         if (global_index == size_)
             return partitions_.size();
@@ -194,8 +199,8 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline std::size_t partitioned_vector<T, Data>::get_local_index(
-        size_type global_index) const
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT std::size_t
+    partitioned_vector<T, Data>::get_local_index(size_type global_index) const
     {
         if (global_index == size_ || partition_size_ == std::size_t(-1) ||
             partition_size_ == 0)
@@ -208,9 +213,10 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline std::vector<typename partitioned_vector<T, Data>::size_type>
-    partitioned_vector<T, Data>::get_local_indices(
-        std::vector<size_type> indices) const
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+        std::vector<typename partitioned_vector<T, Data>::size_type>
+        partitioned_vector<T, Data>::get_local_indices(
+            std::vector<size_type> indices) const
     {
         for (size_type& index : indices)
             index = get_local_index(index);
@@ -218,9 +224,10 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline typename partitioned_vector<T, Data>::local_iterator
-    partitioned_vector<T, Data>::get_local_iterator(
-        size_type global_index) const
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+        typename partitioned_vector<T, Data>::local_iterator
+        partitioned_vector<T, Data>::get_local_iterator(
+            size_type global_index) const
     {
         HPX_ASSERT(global_index != std::size_t(-1));
 
@@ -229,8 +236,7 @@ namespace hpx
         {
             // return an iterator to the end of the last partition
             auto const& back = partitions_.back();
-            return local_iterator(
-                back.partition_, back.size_, back.local_data_);
+            return local_iterator(back.partition_, back.size_, back.local_data_);
         }
 
         std::size_t local_index = get_local_index(global_index);
@@ -241,9 +247,10 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline typename partitioned_vector<T, Data>::const_local_iterator
-    partitioned_vector<T, Data>::get_const_local_iterator(
-        size_type global_index) const
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+        typename partitioned_vector<T, Data>::const_local_iterator
+        partitioned_vector<T, Data>::get_const_local_iterator(
+            size_type global_index) const
     {
         HPX_ASSERT(global_index != std::size_t(-1));
 
@@ -252,8 +259,7 @@ namespace hpx
         {
             // return an iterator to the end of the last partition
             auto const& back = partitions_.back();
-            return local_iterator(
-                back.partition_, back.size_, back.local_data_);
+            return local_iterator(back.partition_, back.size_, back.local_data_);
         }
 
         std::size_t local_index = get_local_index(global_index);
@@ -264,9 +270,9 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline typename partitioned_vector<T, Data>::segment_iterator
-    partitioned_vector<T, Data>::get_segment_iterator(
-        size_type global_index)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+        typename partitioned_vector<T, Data>::segment_iterator
+        partitioned_vector<T, Data>::get_segment_iterator(size_type global_index)
     {
         std::size_t part = get_partition(global_index);
         if (part == partitions_.size())
@@ -276,9 +282,10 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline typename partitioned_vector<T, Data>::const_segment_iterator
-    partitioned_vector<T, Data>::get_const_segment_iterator(
-        size_type global_index) const
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+        typename partitioned_vector<T, Data>::const_segment_iterator
+        partitioned_vector<T, Data>::get_const_segment_iterator(
+            size_type global_index) const
     {
         std::size_t part = get_partition(global_index);
         if (part == partitions_.size())
@@ -290,34 +297,33 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
-    inline hpx::future<
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<
         std::vector<typename partitioned_vector<T, Data>::bulk_locality_result>>
     partitioned_vector<T, Data>::create_helper1(
         DistPolicy const& policy, std::size_t count, std::size_t size)
     {
-        typedef
-            typename partitioned_vector_partition_client::server_component_type
-                component_type;
+        typedef typename partitioned_vector_partition_client::server_component_type
+            component_type;
 
         return policy.template bulk_create<component_type>(count, size);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
-    inline hpx::future<
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<
         std::vector<typename partitioned_vector<T, Data>::bulk_locality_result>>
-    partitioned_vector<T, Data>::create_helper2(DistPolicy const& policy,
-        std::size_t count, std::size_t size, T const& val)
+    partitioned_vector<T, Data>::create_helper2(
+        DistPolicy const& policy, std::size_t count, std::size_t size, T const& val)
     {
-        typedef
-            typename partitioned_vector_partition_client::server_component_type
-                component_type;
+        typedef typename partitioned_vector_partition_client::server_component_type
+            component_type;
 
         return policy.template bulk_create<component_type>(count, size, val);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline void partitioned_vector<T, Data>::get_ptr_helper(std::size_t loc,
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::get_ptr_helper(std::size_t loc,
         partitions_vector_type& partitions,
         future<std::shared_ptr<partitioned_vector_partition_server>>&& f)
     {
@@ -393,7 +399,8 @@ namespace hpx
 
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
-    inline void partitioned_vector<T, Data>::create(DistPolicy const& policy)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::create(DistPolicy const& policy)
     {
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -406,21 +413,21 @@ namespace hpx
 
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
-    inline void partitioned_vector<T, Data>::create(
-        T const& val, DistPolicy const& policy)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::create(T const& val, DistPolicy const& policy)
     {
         using util::placeholders::_1;
         using util::placeholders::_2;
         using util::placeholders::_3;
 
         create(policy,
-            util::bind(&partitioned_vector::create_helper2<DistPolicy>, _1, _2,
-                _3, std::ref(val)));
+            util::bind(&partitioned_vector::create_helper2<DistPolicy>, _1, _2, _3,
+                std::ref(val)));
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline void partitioned_vector<T, Data>::copy_from(
-        partitioned_vector const& rhs)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
+    partitioned_vector<T, Data>::copy_from(partitioned_vector const& rhs)
     {
         typedef typename partitions_vector_type::const_iterator const_iterator;
 
@@ -428,10 +435,10 @@ namespace hpx
         const_iterator end = rhs.partitions_.end();
         for (const_iterator it = rhs.partitions_.begin(); it != end; ++it)
         {
-            typedef typename partitioned_vector_partition_client::
-                server_component_type component_type;
-            objs.push_back(
-                hpx::components::copy<component_type>(it->partition_));
+            typedef
+                typename partitioned_vector_partition_client::server_component_type
+                    component_type;
+            objs.push_back(hpx::components::copy<component_type>(it->partition_));
         }
         wait_all(objs);
 
@@ -444,8 +451,8 @@ namespace hpx
         {
             std::uint32_t locality = rhs.partitions_[i].locality_id_;
 
-            partitions.push_back(partition_data(
-                objs[i].get(), rhs.partitions_[i].size_, locality));
+            partitions.push_back(
+                partition_data(objs[i].get(), rhs.partitions_[i].size_, locality));
 
             if (locality == this_locality)
             {
@@ -467,14 +474,16 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data /*= std::vector<T> */>
-    inline partitioned_vector<T, Data>::partitioned_vector()
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+    partitioned_vector<T, Data>::partitioned_vector()
       : size_(0)
       , partition_size_(std::size_t(-1))
     {
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline partitioned_vector<T, Data>::partitioned_vector(size_type size)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+    partitioned_vector<T, Data>::partitioned_vector(size_type size)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
@@ -483,8 +492,8 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    inline partitioned_vector<T, Data>::partitioned_vector(
-        size_type size, T const& val)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+    partitioned_vector<T, Data>::partitioned_vector(size_type size, T const& val)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
@@ -494,11 +503,11 @@ namespace hpx
 
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
-    inline partitioned_vector<T, Data>::partitioned_vector(size_type size,
-            DistPolicy const& policy,
-            typename std::enable_if<
-                traits::is_distribution_policy<DistPolicy>::value
-            >::type*)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+    partitioned_vector<T, Data>::partitioned_vector(size_type size,
+        DistPolicy const& policy,
+        typename std::enable_if<
+            traits::is_distribution_policy<DistPolicy>::value>::type*)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
@@ -508,17 +517,17 @@ namespace hpx
 
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
-    inline partitioned_vector<T, Data>::partitioned_vector(size_type size,
-        T const& val, DistPolicy const& policy,
-        typename std::enable_if<traits::is_distribution_policy<
-            DistPolicy>::value>::type* /*= nullptr*/)
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+    partitioned_vector<T, Data>::partitioned_vector(size_type size, T const& val,
+        DistPolicy const& policy,
+        typename std::enable_if<
+            traits::is_distribution_policy<DistPolicy>::value>::type* /*= nullptr*/)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
         if (size != 0)
             create(val, policy);
     }
-
 }
 
 #endif
