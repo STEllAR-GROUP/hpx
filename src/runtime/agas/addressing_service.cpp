@@ -1725,7 +1725,8 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     lcos::promise<naming::id_type, naming::gid_type> p;
     auto result_f = p.get_future();
 
-    hpx::future<bool> f = symbol_ns_.on_event(name, call_for_past_events, p.get_id());
+    hpx::future<bool> f =
+        symbol_ns_.on_event(name, call_for_past_events, p.get_id());
 
     using util::placeholders::_1;
     return f.then(util::bind(
