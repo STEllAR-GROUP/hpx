@@ -95,6 +95,39 @@ namespace hpx { namespace parallel { inline namespace v1
                     });
             }
         };
+
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+        none_of_(ExPolicy && policy, FwdIter first, FwdIter last,
+            F && f, std::false_type)
+        {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            static_assert(
+                (hpx::traits::is_input_iterator<FwdIter>::value),
+                "Requires at least input iterator.");
+
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
+                > is_seq;
+#else
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least forward iterator.");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+            return detail::none_of().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+
+        }
+
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+        none_of_(ExPolicy && policy, FwdIter first, FwdIter last,
+            F && f, std::true_type);
         /// \endcond
     }
 
@@ -163,26 +196,10 @@ namespace hpx { namespace parallel { inline namespace v1
     >::type
     none_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
-        return detail::none_of().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        return detail::none_of_(
+            std::forward<ExPolicy>(policy),
+            first, last, std::forward<F>(f), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -251,6 +268,39 @@ namespace hpx { namespace parallel { inline namespace v1
                     });
             }
         };
+
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+        any_of_(ExPolicy && policy, FwdIter first, FwdIter last,
+            F && f, std::false_type)
+        {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            static_assert(
+                (hpx::traits::is_input_iterator<FwdIter>::value),
+                "Requires at least input iterator.");
+
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
+                > is_seq;
+#else
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least forward iterator.");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+            return detail::any_of().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+
+        }
+
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+        any_of_(ExPolicy && policy, FwdIter first, FwdIter last,
+            F && f, std::true_type);
         /// \endcond
     }
 
@@ -319,26 +369,10 @@ namespace hpx { namespace parallel { inline namespace v1
     >::type
     any_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
-        return detail::any_of().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        return detail::any_of_(
+            std::forward<ExPolicy>(policy),
+            first, last, std::forward<F>(f), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -406,6 +440,39 @@ namespace hpx { namespace parallel { inline namespace v1
                     });
             }
         };
+
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+        all_of_(ExPolicy && policy, FwdIter first, FwdIter last,
+            F && f, std::false_type)
+        {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            static_assert(
+                (hpx::traits::is_input_iterator<FwdIter>::value),
+                "Requires at least input iterator.");
+
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter>::value
+                > is_seq;
+#else
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least forward iterator.");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+            return detail::all_of().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<F>(f));
+
+        }
+
+        template <typename ExPolicy, typename FwdIter, typename F>
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
+        all_of_(ExPolicy && policy, FwdIter first, FwdIter last,
+            F && f, std::true_type);
         /// \endcond
     }
 
@@ -474,26 +541,10 @@ namespace hpx { namespace parallel { inline namespace v1
     >::type
     all_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
-        return detail::all_of().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        return detail::all_of_(
+            std::forward<ExPolicy>(policy),
+            first, last, std::forward<F>(f), is_segmented());
     }
 }}}
 
