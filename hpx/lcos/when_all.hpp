@@ -387,7 +387,7 @@ namespace hpx { namespace lcos
         typename std::iterator_traits<Iterator>::
             difference_type difference = std::distance(begin, end);
         if (difference > 0)
-            traits::detail::reserve_if_vector(
+            traits::detail::reserve_if_reservable(
                 lazy_values_, static_cast<std::size_t>(difference));
 
         std::transform(begin, end, std::back_inserter(lazy_values_),
@@ -410,7 +410,7 @@ namespace hpx { namespace lcos
     when_all_n(Iterator begin, std::size_t count)
     {
         Container values;
-        traits::detail::reserve_if_vector(values, count);
+        traits::detail::reserve_if_reservable(values, count);
 
         traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
