@@ -577,7 +577,8 @@ endmacro()
 macro(hpx_check_for_cxx14_return_type_deduction)
   add_hpx_config_test(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION
     SOURCE cmake/tests/cxx14_return_type_deduction.cpp
-    FILE ${ARGN})
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_return_type_deduction)
 endmacro()
 
 ###############################################################################
