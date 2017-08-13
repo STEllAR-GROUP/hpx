@@ -2,6 +2,7 @@
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2017 Denis Blank
 # Copyright (c) 2017 Google
+# Copyright (c) 2017 Taeguk Kwon
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -512,6 +513,13 @@ endmacro()
 macro(hpx_check_for_cxx11_std_unordered_set)
   add_hpx_config_test(HPX_WITH_CXX11_UNORDERED_SET
     SOURCE cmake/tests/cxx11_std_unordered_set.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_auto_return_value)
+  add_hpx_config_test(HPX_WITH_CXX14_AUTO_RETURN_VALUE
+    SOURCE cmake/tests/cxx14_auto_return_value.cpp
     FILE ${ARGN})
 endmacro()
 
