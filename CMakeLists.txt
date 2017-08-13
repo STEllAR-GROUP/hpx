@@ -1108,15 +1108,15 @@ endif()
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
 
-# HPX_WITH_CXX14_AUTO_RETURN_VALUE
+# HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION
 # It is okay to set default value to OFF because the default value
-# is used only when HPX_WITH_CXX14_AUTO_RETURN_VALUE is not defined.
-hpx_option(HPX_WITH_CXX14_AUTO_RETURN_VALUE BOOL
+# is used only when HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION is not defined.
+hpx_option(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION BOOL
   "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
   OFF ADVANCED)
-if(HPX_WITH_CXX14_AUTO_RETURN_VALUE)
+if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
   if(NOT HPX_WITH_CUDA OR HPX_WITH_CUDA_CLANG)
-    hpx_add_config_define(HPX_HAVE_CXX14_AUTO_RETURN_VALUE)
+    hpx_add_config_define(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
   endif()
 endif()
 

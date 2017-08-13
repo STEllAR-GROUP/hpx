@@ -517,13 +517,6 @@ macro(hpx_check_for_cxx11_std_unordered_set)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx14_auto_return_value)
-  add_hpx_config_test(HPX_WITH_CXX14_AUTO_RETURN_VALUE
-    SOURCE cmake/tests/cxx14_auto_return_value.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx14_constexpr)
   add_hpx_config_test(HPX_WITH_CXX14_CONSTEXPR
     SOURCE cmake/tests/cxx14_constexpr.cpp
@@ -577,6 +570,13 @@ endmacro()
 macro(hpx_check_for_cxx14_deprecated_attribute)
   add_hpx_config_test(HPX_WITH_CXX14_DEPRECATED_ATTRIBUTE
     SOURCE cmake/tests/cxx14_deprecated_attribute.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_return_type_deduction)
+  add_hpx_config_test(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION
+    SOURCE cmake/tests/cxx14_return_type_deduction.cpp
     FILE ${ARGN})
 endmacro()
 

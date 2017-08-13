@@ -30,7 +30,7 @@ namespace hpx { namespace parallel { namespace execution
         struct get_pu_mask_tag {};
         struct set_scheduler_mode_tag {};
 
-#if defined(HPX_HAVE_CXX14_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         // forward declare customization point implementations
         template <>
         struct customization_point<processing_units_count_tag>
@@ -106,7 +106,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), params);
         }
 
-#if defined(HPX_HAVE_CXX14_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename Parameters>
         HPX_FORCEINLINE auto customization_point<processing_units_count_tag>::
         operator()(Executor&& exec, Parameters& params) const
@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec));
         }
 
-#if defined(HPX_HAVE_CXX14_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor>
         HPX_FORCEINLINE auto customization_point<has_pending_closures_tag>::
         operator()(Executor&& exec) const
@@ -182,7 +182,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), topo, thread_num);
         }
 
-#if defined(HPX_HAVE_CXX14_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor>
         HPX_FORCEINLINE auto customization_point<get_pu_mask_tag>::operator()(
             Executor&& exec, threads::topology& topo,
@@ -221,7 +221,7 @@ namespace hpx { namespace parallel { namespace execution
                 >::call(0, std::forward<Executor>(exec), mode);
         }
 
-#if defined(HPX_HAVE_CXX14_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename Mode>
         HPX_FORCEINLINE auto customization_point<set_scheduler_mode_tag>::
         operator()(Executor&& exec, Mode const& mode) const
