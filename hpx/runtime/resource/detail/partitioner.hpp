@@ -44,6 +44,8 @@ namespace hpx { namespace resource { namespace detail
         bool pu_is_exclusive(std::size_t virt_core) const;
         bool pu_is_assigned(std::size_t virt_core) const;
 
+        void assign_first_core(std::size_t first_core);
+
         friend class resource::detail::partitioner;
 
         // counter ... overall, in all the thread pools
@@ -160,12 +162,7 @@ namespace hpx { namespace resource { namespace detail
             return cfg_.parse_terminate_;
         }
 
-        std::size_t cores_needed() const
-        {
-            // should have been initialized by now
-            HPX_ASSERT(cores_needed_ != std::size_t(-1));
-            return cores_needed_;
-        }
+        std::size_t assign_cores(std::size_t first_core);
 
         // manage dynamic footprint of pools
         void assign_pu(std::string const& pool_name, std::size_t virt_core);
@@ -183,10 +180,10 @@ namespace hpx { namespace resource { namespace detail
 
         ////////////////////////////////////////////////////////////////////////
         // called in hpx_init run_or_start
-        void set_init_affinity_data();
         void setup_pools();
         void setup_schedulers();
         void reconfigure_affinities();
+        void reconfigure_affinities_locked();
         bool check_empty_pools() const;
 
         // helper functions
@@ -207,6 +204,7 @@ namespace hpx { namespace resource { namespace detail
 
         // holds all of the command line switches
         util::command_line_handling cfg_;
+        std::size_t first_core_;
         std::size_t cores_needed_;
 
         // contains the basic characteristics of the thread pool partitioning ...

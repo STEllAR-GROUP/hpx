@@ -89,12 +89,13 @@ namespace hpx { namespace threads { namespace detail
     {
         thread_offset_ = threads_offset;
 
-        auto const& rp = resource::get_partitioner();
+        threads::resize(used_processing_units_, threads::hardware_concurrency());
+        threads::reset(used_processing_units_);
 
-        resize(used_processing_units_, threads::hardware_concurrency());
+        auto const& rp = resource::get_partitioner();
         for (std::size_t i = 0; i != pool_threads; ++i)
         {
-            used_processing_units_ |= rp.get_pu_mask(threads_offset + i);
+            bit_or(used_processing_units_, rp.get_pu_mask(threads_offset + i));
         }
     }
 }}}

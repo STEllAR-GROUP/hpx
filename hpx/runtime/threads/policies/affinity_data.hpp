@@ -70,9 +70,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
 
         void add_punit(std::size_t virt_core, std::size_t thread_num);
+        void init_cached_pu_nums(std::size_t hardware_concurrency);
 
     protected:
-        void init_cached_pu_nums(std::size_t hardware_concurrency);
         std::size_t get_pu_num(std::size_t num_thread,
             std::size_t hardware_concurrency) const;
 

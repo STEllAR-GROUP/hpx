@@ -659,9 +659,15 @@ namespace hpx
 
     std::uint32_t runtime::assign_cores()
     {
+        // adjust thread assignments to allow for more than one locality per
+        // node
+        std::size_t first_core = this->get_config().get_first_used_core();
+        std::size_t cores_needed =
+            hpx::resource::get_partitioner().assign_cores(first_core);
+
+        // this initializes the used_processing_units_ mask
         get_thread_manager().init();
-        return static_cast<std::uint32_t>(
-            hpx::resource::get_partitioner().cores_needed());
+        return static_cast<std::uint32_t>(cores_needed);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -167,14 +167,18 @@ namespace hpx {
         // and get_runtime_ptr) is already initialized at this point.
         applier_.init_tss();
 
+        // now create all threadmanager pools
+        thread_manager_->create_pools();
+
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
             parcel_handler_, std::uint64_t(runtime_support_.get()),
             std::uint64_t(memory_.get()));
+
         parcel_handler_.initialize(agas_client_, &applier_);
 
         applier_.initialize(std::uint64_t(runtime_support_.get()),
-        std::uint64_t(memory_.get()));
+            std::uint64_t(memory_.get()));
 
         // copy over all startup functions registered so far
         for (startup_function_type& f : global_pre_startup_functions)

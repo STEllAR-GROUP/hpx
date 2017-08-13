@@ -128,12 +128,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         affinity_domain_ = hpx::detail::get_affinity_domain(cfg_);
         pu_nums_.clear();
 
-        const std::size_t used_cores = 0;
-
+        std::size_t const used_cores = cfg_.rtcfg_.get_first_used_core();
         std::size_t max_cores =
             hpx::util::safe_lexical_cast<std::size_t>(
-                get_config_entry("hpx.cores", used_cores),
-                used_cores);
+                get_config_entry("hpx.cores", 0), 0);
 
 #if defined(HPX_HAVE_HWLOC)
         std::string affinity_desc;
@@ -180,7 +178,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         // correct used_cores from config data if appropriate
         if (used_cores_ == 0)
         {
-            used_cores_ = std::size_t(cfg_.rtcfg_.get_first_used_core());
+            used_cores_ = used_cores;
         }
 
         pu_offset_ %= num_system_pus;

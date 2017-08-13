@@ -341,6 +341,9 @@ namespace hpx { namespace threads
         timer_pool_(timer_pool),
 #endif
         notifier_(notifier)
+    {}
+
+    void threadmanager::create_pools()
     {
         auto& rp = hpx::resource::get_partitioner();
         size_t num_pools = rp.get_num_pools();
@@ -372,7 +375,7 @@ namespace hpx { namespace threads
             {
                 auto pool_func = rp.get_pool_creator(i);
                 std::unique_ptr<detail::thread_pool_base> pool(
-                    pool_func(notifier, num_threads_in_pool,
+                    pool_func(notifier_, num_threads_in_pool,
                         thread_offset, i, name));
                 pools_.push_back(std::move(pool));
                 break;
@@ -407,7 +410,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
@@ -451,7 +454,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
@@ -488,7 +491,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
@@ -524,7 +527,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
@@ -571,7 +574,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
@@ -614,7 +617,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
@@ -655,7 +658,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),
@@ -696,7 +699,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier, i, name.c_str(),
+                        notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
                             policies::delay_exit),

@@ -70,6 +70,7 @@ namespace hpx { namespace threads
         ~threadmanager();
 
         void init();
+        void create_pools();
 
         //! FIXME move to private and add --hpx:printpools cmd line option
         void print_pools(std::ostream&);

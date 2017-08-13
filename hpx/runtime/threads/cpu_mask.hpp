@@ -94,19 +94,19 @@ namespace hpx { namespace threads
         return ~std::size_t(0);
     }
 
-    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return lhs == rhs;
     }
 
     // return true if at least one of the masks has a bit set
-    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs | rhs) != 0;
     }
 
     // return true if at least one bit is set in both masks
-    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs & rhs) != 0;
     }
@@ -121,6 +121,11 @@ namespace hpx { namespace threads
               mask &= mask - 1; // clear the least significant bit set
         }
         return c;
+    }
+
+    inline void reset(mask_type& mask)
+    {
+        mask = 0ull;
     }
 
 #define HPX_CPU_MASK_PREFIX "0x"
@@ -191,19 +196,19 @@ namespace hpx { namespace threads
 #define HPX_CPU_MASK_PREFIX "0x"
 #endif
 
-    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return lhs == rhs;
     }
 
     // return true if at least one of the masks has a bit set
-    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs | rhs).any();
     }
 
     // return true if at least one bit is set in both masks
-    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs & rhs).any();
     }
@@ -213,6 +218,12 @@ namespace hpx { namespace threads
     {
         return mask.count();
     }
+
+    inline void reset(mask_type& mask)
+    {
+        mask.reset();
+    }
+
 #endif
 
     HPX_API_EXPORT std::string to_string(mask_cref_type);
