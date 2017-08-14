@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/container_category.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
@@ -154,17 +155,6 @@ namespace util {
             }
         };
 
-        /// An internally used exception to detach the current execution context
-        struct async_traversal_detached_exception : std::exception
-        {
-            explicit async_traversal_detached_exception() {}
-
-            char const* what() const noexcept override
-            {
-                return "The execution context was detached!";
-            }
-        };
-
         template <typename Target, std::size_t Begin, std::size_t End>
         struct static_async_range
         {
@@ -266,13 +256,28 @@ namespace util {
         {
             Frame frame_;
             tuple<Hierarchy...> hierarchy_;
+            bool detached_;
 
         public:
             explicit async_traversal_point(
                 Frame frame, tuple<Hierarchy...> hierarchy)
               : frame_(std::move(frame))
               , hierarchy_(std::move(hierarchy))
+              , detached_(false)
             {
+            }
+
+            // Abort the current control flow
+            void detach() noexcept
+            {
+                HPX_ASSERT(!detached_);
+                detached_ = true;
+            }
+
+            /// Returns true when we should abort the current control flow
+            bool is_detached() const noexcept
+            {
+                return detached_;
             }
 
             /// Creates a new traversal point which
@@ -300,6 +305,12 @@ namespace util {
 
                 // Continue the traversal with the current element
                 point.async_traverse(std::forward<Child>(child));
+
+                // Propagate the control detach back
+                if (point.is_detached())
+                {
+                    detach();
+                }
             }
 
             /// Async traverse a single element, and do nothing.
@@ -307,16 +318,12 @@ namespace util {
             template <typename Matcher, typename Current>
             void async_traverse_one_impl(Matcher, Current&& current)
             {
-                // Do nothing if the visitor does't accept the type
+                // Do nothing if the visitor doesn't accept the type
             }
 
             /// Async traverse a single element which isn't a container or
             /// tuple like type. This function is SFINAEd out if the element
             /// isn't accepted by the visitor.
-            ///
-            /// \throws async_traversal_detached_exception If the execution
-            ///         context was detached, an exception is thrown to
-            ///         stop the traversal.
             template <typename Current>
             auto async_traverse_one_impl(container_category_tag<false, false>,
                 Current&& current)
@@ -339,10 +346,8 @@ namespace util {
 
                     frame_->async_continue(*current, std::move(state));
 
-                    // Then detach the current execution context through throwing
-                    // an async_traversal_detached_exception which is catched
-                    // below the traversal call hierarchy.
-                    throw async_traversal_detached_exception{};
+                    // Then detach the current execution context
+                    detach();
                 }
             }
 
@@ -377,13 +382,24 @@ namespace util {
                     std::forward<Current>(current));
             }
 
+            /// Async traverse the current iterator but don't traverse
+            /// if the control flow was detached.
+            template <typename Current>
+            void async_traverse_one_checked(Current&& current)
+            {
+                if (!is_detached())
+                {
+                    async_traverse_one(std::forward<Current>(current));
+                }
+            }
+
             template <std::size_t... Sequence, typename Current>
             void async_traverse_static_async_range(
                 pack_c<std::size_t, Sequence...>,
                 Current&& current)
             {
                 int dummy[] = {0,
-                    ((void) async_traverse_one(
+                    ((void) async_traverse_one_checked(
                          current.template relocate<Sequence>()),
                         0)...};
                 (void) dummy;
@@ -401,7 +417,7 @@ namespace util {
             template <typename Begin, typename Sentinel>
             void async_traverse(dynamic_async_range<Begin, Sentinel> range)
             {
-                for (; !range.is_finished(); ++range)
+                for (; !range.is_finished() && !is_detached(); ++range)
                 {
                     async_traverse_one(range);
                 }
@@ -429,10 +445,18 @@ namespace util {
                 if (!current.is_finished())
                 {
                     traversal_point_of_t<Frame> point(
-                        std::forward<Frame>(frame), util::make_tuple());
+                        frame, util::make_tuple());
 
                     point.async_traverse(std::forward<Current>(current));
+
+                    // Don't continue the frame when the execution was detached
+                    if (point.is_detached())
+                    {
+                        return;
+                    }
                 }
+
+                frame->async_complete();
             }
 
             /// Reenter an asynchronous iterator pack and continue
@@ -442,7 +466,7 @@ namespace util {
             void operator()(Frame&& frame, Current&& current, Parent&& parent,
                 Hierarchy&&... hierarchy) const
             {
-                // Only process element if the current iterator
+                // Only process the element if the current iterator
                 // hasn't reached its end.
                 if (!current.is_finished())
                 {
@@ -452,6 +476,12 @@ namespace util {
                         frame, util::make_tuple(parent, hierarchy...));
 
                     point.async_traverse(std::forward<Current>(current));
+
+                    // Don't continue the frame when the execution was detached
+                    if (point.is_detached())
+                    {
+                        return;
+                    }
                 }
 
                 // Pop the top element from the hierarchy, and shift the
@@ -465,22 +495,9 @@ namespace util {
         template <typename Frame, typename State>
         void resume_traversal_callable<Frame, State>::operator()()
         {
-            try
-            {
-                auto hierarchy = util::tuple_cat(
-                    util::make_tuple(frame_), std::move(state_));
-                util::invoke_fused(
-                    resume_state_callable{}, std::move(hierarchy));
-
-                // Complete the asynchrnous traversal when the last iterator
-                // was processed to its end.
-                frame_->async_complete();
-            }
-            catch (async_traversal_detached_exception const&)
-            {
-                // Do nothing here since the exception was just meant
-                // for terminating the control flow.
-            }
+            auto hierarchy =
+                util::tuple_cat(util::make_tuple(frame_), std::move(state_));
+            util::invoke_fused(resume_state_callable{}, std::move(hierarchy));
         }
 
         /// Traverses the given pack with the given mapper
