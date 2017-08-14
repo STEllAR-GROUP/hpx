@@ -83,16 +83,26 @@ namespace util {
         /// Stores the visitor and the arguments to traverse
         template <typename Visitor, typename... Args>
         class async_traversal_frame
-          : public std::enable_shared_from_this<
+          : public Visitor
+          , public std::enable_shared_from_this<
                 async_traversal_frame<Visitor, Args...>>
         {
-            Visitor visitor_;
             tuple<Args...> args_;
+
+            Visitor& visitor() noexcept
+            {
+                return *static_cast<Visitor*>(this);
+            }
+
+            Visitor const& visitor() const noexcept
+            {
+                return *static_cast<Visitor const*>(this);
+            }
 
         public:
             explicit HPX_CONSTEXPR async_traversal_frame(Visitor visitor,
                 Args... args)
-              : visitor_(std::move(visitor))
+              : Visitor(std::move(visitor))
               , args_(util::make_tuple(std::move(args)...))
             {
             }
@@ -106,9 +116,9 @@ namespace util {
             /// Calls the visitor with the given element
             template <typename T>
             auto traverse(T&& value) -> decltype(util::invoke(
-                visitor_, async_traverse_visit_tag{}, std::forward<T>(value)))
+                visitor(), async_traverse_visit_tag{}, std::forward<T>(value)))
             {
-                return util::invoke(visitor_, async_traverse_visit_tag{},
+                return util::invoke(visitor(), async_traverse_visit_tag{},
                     std::forward<T>(value));
             }
 
@@ -121,7 +131,7 @@ namespace util {
                 auto resumable =
                     make_resume_traversal_callable(this->shared_from_this(),
                         std::forward<Hierarchy>(hierarchy));
-                util::invoke(visitor_, async_traverse_detach_tag{},
+                util::invoke(visitor(), async_traverse_detach_tag{},
                     std::forward<T>(value), std::move(resumable));
             }
 
@@ -130,7 +140,7 @@ namespace util {
             void async_complete()
             {
                 util::invoke(
-                    visitor_, async_traverse_complete_tag{}, std::move(args_));
+                    visitor(), async_traverse_complete_tag{}, std::move(args_));
             }
         };
 
