@@ -62,6 +62,7 @@ set(tests
     when_all_std_array
     when_any
     when_any_std_array
+    when_each
     when_some
     when_some_std_array
    )
