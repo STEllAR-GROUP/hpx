@@ -31,6 +31,11 @@ using hpx::util::make_tuple;
 using hpx::util::traverse_pack_async;
 using hpx::util::tuple;
 
+/// A tag which isn't accepted by any mapper
+struct not_accepted_tag
+{
+};
+
 template <typename Child>
 class async_counter_base : public boost::intrusive_ref_counter<Child>
 {
@@ -174,7 +179,13 @@ void test_async_traversal_base(Args&&... args)
 static void test_async_traversal()
 {
     // Just test everything using a casual int pack
-    test_async_traversal_base<4U>(0U, 1U, 2U, 3U);
+    test_async_traversal_base<4U>(not_accepted_tag{},
+        0U,
+        1U,
+        not_accepted_tag{},
+        2U,
+        3U,
+        not_accepted_tag{});
 }
 
 template <typename ContainerFactory>
@@ -238,9 +249,11 @@ static void test_async_container_traversal()
 static void test_async_tuple_like_traversal()
 {
     // Test by passing a tuple in the middle
-    test_async_traversal_base<4U>(0U, make_tuple(1U, 2U), 3U);
+    test_async_traversal_base<4U>(
+        not_accepted_tag{}, 0U, make_tuple(1U, not_accepted_tag{}, 2U), 3U);
     // Test by splitting the pack in two tuples
-    test_async_traversal_base<4U>(make_tuple(0U, 1U), make_tuple(2U, 3U));
+    test_async_traversal_base<4U>(
+        make_tuple(0U, not_accepted_tag{}, 1U), make_tuple(2U, 3U));
     // Test by passing a huge tuple to the traversal
     test_async_traversal_base<4U>(make_tuple(0U, 1U, 2U, 3U));
 }
@@ -262,7 +275,8 @@ static void test_async_mixed_traversal()
         0U, hpx::util::make_tuple(container_t{1U, 2U}), 3U);
 
     test_async_traversal_base<4U>(
-        hpx::util::make_tuple(0U, vector_of(vector_of(1U))),
+        hpx::util::make_tuple(
+            0U, vector_of(not_accepted_tag{}), vector_of(vector_of(1U))),
         make_tuple(2U, 3U));
 
     test_async_traversal_base<4U>(
