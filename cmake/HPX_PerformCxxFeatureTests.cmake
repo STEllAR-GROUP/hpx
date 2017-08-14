@@ -1,6 +1,7 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
+# Copyright (c)      2017 Taeguk Kwon
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -162,6 +163,8 @@ macro(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx14_deprecated_attribute(
       DEFINITIONS HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
+    
+    hpx_check_for_cxx14_return_type_deduction()
 
     # check for experimental facilities
 

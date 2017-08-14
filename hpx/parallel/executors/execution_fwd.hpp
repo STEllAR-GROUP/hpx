@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         // forward declare customization point implementations
         template <>
         struct customization_point<post_tag>
@@ -315,7 +315,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // async_execute customization point
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<async_execute_tag>::
         operator()(Executor&& exec, F&& f, Ts&&... ts) const
@@ -342,7 +342,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // sync_execute customization point
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<sync_execute_tag>::
         operator()(Executor&& exec, F&& f, Ts&&... ts) const
@@ -369,7 +369,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // then_execute customization point
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename Future,
             typename... Ts>
         HPX_FORCEINLINE auto customization_point<then_execute_tag>::
@@ -402,7 +402,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // post customization point
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<post_tag>::operator()(
             Executor&& exec, F&& f, Ts&&... ts) const
@@ -429,7 +429,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_async_execute customization point
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename Shape,
             typename... Ts>
         HPX_FORCEINLINE auto customization_point<bulk_async_execute_tag>::
@@ -459,7 +459,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_sync_execute customization point
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename Shape,
             typename... Ts>
         HPX_FORCEINLINE auto customization_point<bulk_sync_execute_tag>::
@@ -489,7 +489,7 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_then_execute customization point
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename Shape,
             typename Future, typename... Ts>
         HPX_FORCEINLINE auto customization_point<bulk_then_execute_tag>::
