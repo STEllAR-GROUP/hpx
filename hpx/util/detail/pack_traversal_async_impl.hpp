@@ -25,6 +25,16 @@
 namespace hpx {
 namespace util {
     namespace detail {
+        struct async_traverse_visit_tag
+        {
+        };
+        struct async_traverse_detach_tag
+        {
+        };
+        struct async_traverse_complete_tag
+        {
+        };
+
         /// Relocates the given pack with the given offset
         template <std::size_t Offset, typename Pack>
         struct relocate_index_pack;
@@ -95,10 +105,11 @@ namespace util {
 
             /// Calls the visitor with the given element
             template <typename T>
-            auto traverse(T&& value)
-                -> decltype(util::invoke(visitor_, std::forward<T>(value)))
+            auto traverse(T&& value) -> decltype(util::invoke(
+                visitor_, async_traverse_visit_tag{}, std::forward<T>(value)))
             {
-                return util::invoke(visitor_, std::forward<T>(value));
+                return util::invoke(visitor_, async_traverse_visit_tag{},
+                    std::forward<T>(value));
             }
 
             /// Calls the visitor with the given element and a continuation
@@ -110,15 +121,16 @@ namespace util {
                 auto resumable =
                     make_resume_traversal_callable(this->shared_from_this(),
                         std::forward<Hierarchy>(hierarchy));
-                util::invoke(
-                    visitor_, std::forward<T>(value), std::move(resumable));
+                util::invoke(visitor_, async_traverse_detach_tag{},
+                    std::forward<T>(value), std::move(resumable));
             }
 
             /// Calls the visitor with no arguments to signalize that the
             /// asynchrnous traversal was finished.
             void async_complete()
             {
-                util::invoke(visitor_);
+                util::invoke(
+                    visitor_, async_traverse_complete_tag{}, std::move(args_));
             }
         };
 

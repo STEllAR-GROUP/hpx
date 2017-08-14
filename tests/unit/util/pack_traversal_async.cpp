@@ -23,6 +23,9 @@
 #include <array>
 #endif
 
+using hpx::util::async_traverse_complete_tag;
+using hpx::util::async_traverse_detach_tag;
+using hpx::util::async_traverse_visit_tag;
 using hpx::util::make_tuple;
 using hpx::util::traverse_pack_async;
 using hpx::util::tuple;
@@ -40,7 +43,7 @@ public:
     {
     }
 
-    bool operator()(std::size_t i) const
+    bool operator()(async_traverse_visit_tag, std::size_t i) const
     {
         HPX_TEST_EQ(i, counter_.get());
         ++counter_.get();
@@ -48,7 +51,7 @@ public:
     }
 
     template <typename N>
-    void operator()(std::size_t i, N&& next)
+    void operator()(async_traverse_detach_tag, std::size_t i, N&& next)
     {
         HPX_UNUSED(i);
         HPX_UNUSED(next);
@@ -57,8 +60,11 @@ public:
         HPX_TEST(false);
     }
 
-    void operator()() const
+    template <typename T>
+    void operator()(async_traverse_complete_tag, T&& pack) const
     {
+        HPX_UNUSED(pack);
+
         HPX_TEST_EQ(counter_.get(), ArgCount);
         ++counter_.get();
     }
@@ -76,14 +82,14 @@ public:
     {
     }
 
-    bool operator()(std::size_t i) const
+    bool operator()(async_traverse_visit_tag, std::size_t i) const
     {
         HPX_TEST_EQ(i, counter_.get());
         return false;
     }
 
     template <typename N>
-    void operator()(std::size_t i, N&& next)
+    void operator()(async_traverse_detach_tag, std::size_t i, N&& next)
     {
         HPX_UNUSED(i);
 
@@ -91,8 +97,11 @@ public:
         std::forward<N>(next)();
     }
 
-    void operator()() const
+    template <typename T>
+    void operator()(async_traverse_complete_tag, T&& pack) const
     {
+        HPX_UNUSED(pack);
+
         HPX_TEST_EQ(counter_.get(), ArgCount);
         ++counter_.get();
     }
@@ -111,7 +120,7 @@ public:
     {
     }
 
-    bool operator()(std::size_t i) const
+    bool operator()(async_traverse_visit_tag, std::size_t i) const
     {
         HPX_TEST_EQ(i, counter_.get());
         ++counter_.get();
@@ -121,7 +130,7 @@ public:
     }
 
     template <typename N>
-    void operator()(std::size_t i, N&& next)
+    void operator()(async_traverse_detach_tag, std::size_t i, N&& next)
     {
         HPX_TEST_EQ(i, 1U);
         HPX_TEST_EQ(counter_.get(), 2U);
@@ -130,8 +139,11 @@ public:
         HPX_UNUSED(next);
     }
 
-    void operator()() const
+    template <typename T>
+    void operator()(async_traverse_complete_tag, T&& pack) const
     {
+        HPX_UNUSED(pack);
+
         // Will never be called
         HPX_TEST(false);
     }
@@ -280,7 +292,8 @@ public:
     {
     }
 
-    bool operator()(std::unique_ptr<std::size_t>& i) const
+    bool operator()(async_traverse_visit_tag,
+        std::unique_ptr<std::size_t>& i) const
     {
         HPX_TEST_EQ(*i, counter_.get());
         ++counter_.get();
@@ -288,7 +301,9 @@ public:
     }
 
     template <typename N>
-    void operator()(std::unique_ptr<std::size_t>& i, N&& next)
+    void operator()(async_traverse_detach_tag,
+        std::unique_ptr<std::size_t>& i,
+        N&& next)
     {
         HPX_UNUSED(i);
         HPX_UNUSED(next);
@@ -297,8 +312,11 @@ public:
         HPX_TEST(false);
     }
 
-    void operator()() const
+    template <typename T>
+    void operator()(async_traverse_complete_tag, T&& pack) const
     {
+        HPX_UNUSED(pack);
+
         HPX_TEST_EQ(counter_.get(), ArgCount);
         ++counter_.get();
     }
@@ -315,14 +333,17 @@ public:
     {
     }
 
-    bool operator()(std::unique_ptr<std::size_t>& i) const
+    bool operator()(async_traverse_visit_tag,
+        std::unique_ptr<std::size_t>& i) const
     {
         HPX_TEST_EQ(*i, counter_.get());
         return false;
     }
 
     template <typename N>
-    void operator()(std::unique_ptr<std::size_t>& i, N&& next)
+    void operator()(async_traverse_detach_tag,
+        std::unique_ptr<std::size_t>& i,
+        N&& next)
     {
         HPX_UNUSED(i);
 
@@ -330,8 +351,11 @@ public:
         std::forward<N>(next)();
     }
 
-    void operator()() const
+    template <typename T>
+    void operator()(async_traverse_complete_tag, T&& pack) const
     {
+        HPX_UNUSED(pack);
+
         HPX_TEST_EQ(counter_.get(), ArgCount);
         ++counter_.get();
     }

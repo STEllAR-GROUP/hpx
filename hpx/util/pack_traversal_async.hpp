@@ -12,6 +12,16 @@
 
 namespace hpx {
 namespace util {
+    /// A tag which is passed to the `operator()` of the visitor
+    /// if an element is visited synchronously.
+    using detail::async_traverse_visit_tag;
+    /// A tag which is passed to the `operator()` of the visitor
+    /// if an element is visited after the traversal was detached.
+    using detail::async_traverse_detach_tag;
+    /// A tag which is passed to the `operator()` of the visitor
+    /// if the asynchronous pack traversal was finished.
+    using detail::async_traverse_complete_tag;
+
     /// Traverses the pack with the given visitor in an asynchronous way.
     ///
     /// This function works in the same way as `traverse_pack`,
@@ -26,7 +36,7 @@ namespace util {
     ///        /// it may return false to suspend the current control.
     ///        /// In that case the overload below is called.
     ///        template <typename T>
-    ///        bool operator()(T&& element)
+    ///        bool operator()(async_traverse_visit_tag, T&& element)
     ///        {
     ///            return true;
     ///        }
@@ -39,13 +49,15 @@ namespace util {
     ///        /// The continuation next may be stored and called later or
     ///        /// dropped completely to abort the traversal early.
     ///        template <typename T, typename N>
-    ///        void operator()(T&& element, N&& next)
+    ///        void operator()(async_traverse_detach_tag, T&& element, N&& next)
     ///        {
     ///        }
     ///
-    ///        /// The overload with no parameters is called when the traversal
-    ///        /// was finished.
-    ///        void operator()()
+    ///        /// The overload is called when the traversal was finished.
+    ///        /// As argument the whole pack is passed over which we
+    ///        /// traversed asynchrnously.
+    ///        template <typename T>
+    ///        void operator()(async_traverse_complete_tag, T&& pack)
     ///        {
     ///        }
     ///    };
