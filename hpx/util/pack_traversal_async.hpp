@@ -63,11 +63,27 @@ namespace util {
     ///    };
     ///    ```
     ///
-    /// See `traverse_pack` for a detailed description.
+    /// \param   visitor A visitor object which provides the three `operator()`
+    ///                  overloads that were described above.
+    ///                  Additionally the visitor must be compatible
+    ///                  for referencing it from a `boost::intrusive_ptr`.
+    ///
+    /// \param   pack    The arbitrary parameter pack which is traversed
+    ///                  asynchronously. Nested objects inside containers and
+    ///                  tuple like types are traversed recursively.
+    ///
+    /// \returns         A boost::intrusive_ptr that references an instance of
+    ///                  the given visitor object.
+    ///
+    /// See `traverse_pack` for a detailed description about the
+    /// traversal behaviour and capabilities.
+    ///
     template <typename Visitor, typename... T>
-    void traverse_pack_async(Visitor&& visitor, T&&... pack)
+    auto traverse_pack_async(Visitor&& visitor, T&&... pack)
+        -> decltype(detail::apply_pack_transform_async(
+            std::forward<Visitor>(visitor), std::forward<T>(pack)...))
     {
-        detail::apply_pack_transform_async(
+        return detail::apply_pack_transform_async(
             std::forward<Visitor>(visitor), std::forward<T>(pack)...);
     }
 }    // end namespace util

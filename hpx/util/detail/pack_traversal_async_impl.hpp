@@ -12,25 +12,31 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/iterator_range.hpp>
 #include <hpx/util/tuple.hpp>
+
+#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <iterator>
-#include <memory>
 #include <type_traits>
 #include <utility>
 
 namespace hpx {
 namespace util {
     namespace detail {
+        /// A tag which is passed to the `operator()` of the visitor
+        /// if an element is visited synchronously.
         struct async_traverse_visit_tag
         {
         };
+        /// A tag which is passed to the `operator()` of the visitor
+        /// if an element is visited after the traversal was detached.
         struct async_traverse_detach_tag
         {
         };
+        /// A tag which is passed to the `operator()` of the visitor
+        /// if the asynchronous pack traversal was finished.
         struct async_traverse_complete_tag
         {
         };
@@ -82,10 +88,7 @@ namespace util {
 
         /// Stores the visitor and the arguments to traverse
         template <typename Visitor, typename... Args>
-        class async_traversal_frame
-          : public Visitor
-          , public std::enable_shared_from_this<
-                async_traversal_frame<Visitor, Args...>>
+        class async_traversal_frame : public Visitor
         {
             tuple<Args...> args_;
 
@@ -128,9 +131,16 @@ namespace util {
             template <typename T, typename Hierarchy>
             void async_continue(T&& value, Hierarchy&& hierarchy)
             {
-                auto resumable =
-                    make_resume_traversal_callable(this->shared_from_this(),
-                        std::forward<Hierarchy>(hierarchy));
+                // Create a self reference
+                boost::intrusive_ptr<async_traversal_frame> self(this);
+
+                // Create a callable object which resumes the current
+                // traversal when it's called.
+                auto resumable = make_resume_traversal_callable(
+                    std::move(self), std::forward<Hierarchy>(hierarchy));
+
+                // Invoke the visitor with the current value and the
+                // callable object to resume the control flow.
                 util::invoke(visitor(), async_traverse_detach_tag{},
                     std::forward<T>(value), std::move(resumable));
             }
@@ -326,6 +336,7 @@ namespace util {
                     // If the traversal method returns false, we detach the
                     // current execution context and call the visitor with the
                     // element and a continue callable object again.
+
                     frame_->async_continue(*current, std::move(state));
 
                     // Then detach the current execution context through throwing
@@ -474,7 +485,8 @@ namespace util {
 
         /// Traverses the given pack with the given mapper
         template <typename Mapper, typename... T>
-        void apply_pack_transform_async(Mapper&& mapper, T&&... pack)
+        auto apply_pack_transform_async(Mapper&& mapper, T&&... pack)
+            -> boost::intrusive_ptr<typename std::decay<Mapper>::type>
         {
             using frame_type =
                 async_traversal_frame<typename std::decay<Mapper>::type,
@@ -482,17 +494,23 @@ namespace util {
 
             // Create the frame on the heap which stores the arguments
             // to traverse asynchronous.
-            auto frame = std::make_shared<frame_type>(
-                std::forward<Mapper>(mapper), std::forward<T>(pack)...);
+            auto frame = [&] {
+                auto ptr = new frame_type(
+                    std::forward<Mapper>(mapper), std::forward<T>(pack)...);
+
+                /// Create a intrusive_ptr from the heap object
+                return boost::intrusive_ptr<frame_type>(ptr);
+            }();
 
             // Create a static range for the top level tuple
             auto range = make_static_range(frame->head());
 
             auto resumer = make_resume_traversal_callable(
-                std::move(frame), util::make_tuple(std::move(range)));
+                frame, util::make_tuple(std::move(range)));
 
             // Start the asynchronous traversal
             resumer();
+            return frame;
         }
     }    // end namespace detail
 }    // end namespace util

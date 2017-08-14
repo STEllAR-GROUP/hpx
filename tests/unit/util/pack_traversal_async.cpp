@@ -4,14 +4,15 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>
-#include "hpx/util/lightweight_test.hpp"
+
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <functional>
 #include <list>
 #include <memory>
 #include <set>
@@ -30,23 +31,33 @@ using hpx::util::make_tuple;
 using hpx::util::traverse_pack_async;
 using hpx::util::tuple;
 
-template <std::size_t ArgCount>
-class async_increasing_int_sync_visitor
+template <typename Child>
+class async_counter_base : public boost::intrusive_ref_counter<Child>
 {
-    std::reference_wrapper<std::size_t> counter_;
+    std::size_t counter_ = 0;
 
 public:
-    explicit async_increasing_int_sync_visitor(
-        std::reference_wrapper<std::size_t>
-            counter)
-      : counter_(counter)
+    explicit async_counter_base() = default;
+
+    std::size_t const& counter() const noexcept
     {
+        return counter_;
     }
 
-    bool operator()(async_traverse_visit_tag, std::size_t i) const
+    std::size_t& counter() noexcept
     {
-        HPX_TEST_EQ(i, counter_.get());
-        ++counter_.get();
+        return counter_;
+    }
+};
+
+template <std::size_t ArgCount>
+struct async_increasing_int_sync_visitor
+  : async_counter_base<async_increasing_int_sync_visitor<ArgCount>>
+{
+    bool operator()(async_traverse_visit_tag, std::size_t i)
+    {
+        HPX_TEST_EQ(i, this->counter());
+        ++this->counter();
         return true;
     }
 
@@ -61,30 +72,22 @@ public:
     }
 
     template <typename T>
-    void operator()(async_traverse_complete_tag, T&& pack) const
+    void operator()(async_traverse_complete_tag, T&& pack)
     {
         HPX_UNUSED(pack);
 
-        HPX_TEST_EQ(counter_.get(), ArgCount);
-        ++counter_.get();
+        HPX_TEST_EQ(this->counter(), ArgCount);
+        ++this->counter();
     }
 };
 
 template <std::size_t ArgCount>
-class async_increasing_int_visitor
+struct async_increasing_int_visitor
+  : async_counter_base<async_increasing_int_visitor<ArgCount>>
 {
-    std::reference_wrapper<std::size_t> counter_;
-
-public:
-    explicit async_increasing_int_visitor(std::reference_wrapper<std::size_t>
-            counter)
-      : counter_(counter)
-    {
-    }
-
     bool operator()(async_traverse_visit_tag, std::size_t i) const
     {
-        HPX_TEST_EQ(i, counter_.get());
+        HPX_TEST_EQ(i, this->counter());
         return false;
     }
 
@@ -93,37 +96,28 @@ public:
     {
         HPX_UNUSED(i);
 
-        ++counter_.get();
+        ++this->counter();
         std::forward<N>(next)();
     }
 
     template <typename T>
-    void operator()(async_traverse_complete_tag, T&& pack) const
+    void operator()(async_traverse_complete_tag, T&& pack)
     {
         HPX_UNUSED(pack);
 
-        HPX_TEST_EQ(counter_.get(), ArgCount);
-        ++counter_.get();
+        HPX_TEST_EQ(this->counter(), ArgCount);
+        ++this->counter();
     }
 };
 
 template <std::size_t ArgCount>
-class async_increasing_int_interrupted_visitor
+struct async_increasing_int_interrupted_visitor
+  : async_counter_base<async_increasing_int_interrupted_visitor<ArgCount>>
 {
-    std::reference_wrapper<std::size_t> counter_;
-
-public:
-    explicit async_increasing_int_interrupted_visitor(
-        std::reference_wrapper<std::size_t>
-            counter)
-      : counter_(counter)
+    bool operator()(async_traverse_visit_tag, std::size_t i)
     {
-    }
-
-    bool operator()(async_traverse_visit_tag, std::size_t i) const
-    {
-        HPX_TEST_EQ(i, counter_.get());
-        ++counter_.get();
+        HPX_TEST_EQ(i, this->counter());
+        ++this->counter();
 
         // Detach the control flow at the second step
         return i == 0;
@@ -133,7 +127,7 @@ public:
     void operator()(async_traverse_detach_tag, std::size_t i, N&& next)
     {
         HPX_TEST_EQ(i, 1U);
-        HPX_TEST_EQ(counter_.get(), 2U);
+        HPX_TEST_EQ(this->counter(), 2U);
 
         // Don't call next here
         HPX_UNUSED(next);
@@ -155,30 +149,25 @@ void test_async_traversal_base(Args&&... args)
     // Test that every element is traversed in the correct order
     // when we detach the control flow on every visit.
     {
-        std::size_t counter = 0U;
-        traverse_pack_async(
-            async_increasing_int_sync_visitor<ArgCount>(std::ref(counter)),
-            args...);
-        HPX_TEST_EQ(counter, ArgCount + 1U);
+        auto result = traverse_pack_async(
+            async_increasing_int_sync_visitor<ArgCount>{}, args...);
+        HPX_TEST_EQ(result->counter(), ArgCount + 1U);
     }
 
     // Test that every element is traversed in the correct order
     // when we detach the control flow on every visit.
     {
-        std::size_t counter = 0U;
-        traverse_pack_async(
-            async_increasing_int_visitor<ArgCount>(std::ref(counter)), args...);
-        HPX_TEST_EQ(counter, ArgCount + 1U);
+        auto result = traverse_pack_async(
+            async_increasing_int_visitor<ArgCount>{}, args...);
+        HPX_TEST_EQ(result->counter(), ArgCount + 1U);
     }
 
     // Test that the first element is traversed only,
     // if we don't call the resume continuation.
     {
-        std::size_t counter = 0U;
-        traverse_pack_async(async_increasing_int_interrupted_visitor<ArgCount>(
-                                std::ref(counter)),
-            args...);
-        HPX_TEST_EQ(counter, 2U);
+        auto result = traverse_pack_async(
+            async_increasing_int_interrupted_visitor<ArgCount>{}, args...);
+        HPX_TEST_EQ(result->counter(), 2U);
     }
 }
 
@@ -281,22 +270,13 @@ static void test_async_mixed_traversal()
 }
 
 template <std::size_t ArgCount>
-class async_unique_sync_visitor
+struct async_unique_sync_visitor
+  : async_counter_base<async_unique_sync_visitor<ArgCount>>
 {
-    std::reference_wrapper<std::size_t> counter_;
-
-public:
-    explicit async_unique_sync_visitor(std::reference_wrapper<std::size_t>
-            counter)
-      : counter_(counter)
+    bool operator()(async_traverse_visit_tag, std::unique_ptr<std::size_t>& i)
     {
-    }
-
-    bool operator()(async_traverse_visit_tag,
-        std::unique_ptr<std::size_t>& i) const
-    {
-        HPX_TEST_EQ(*i, counter_.get());
-        ++counter_.get();
+        HPX_TEST_EQ(*i, this->counter());
+        ++this->counter();
         return true;
     }
 
@@ -313,30 +293,22 @@ public:
     }
 
     template <typename T>
-    void operator()(async_traverse_complete_tag, T&& pack) const
+    void operator()(async_traverse_complete_tag, T&& pack)
     {
         HPX_UNUSED(pack);
 
-        HPX_TEST_EQ(counter_.get(), ArgCount);
-        ++counter_.get();
+        HPX_TEST_EQ(this->counter(), ArgCount);
+        ++this->counter();
     }
 };
 
 template <std::size_t ArgCount>
-class async_unique_visitor
+struct async_unique_visitor : async_counter_base<async_unique_visitor<ArgCount>>
 {
-    std::reference_wrapper<std::size_t> counter_;
-
-public:
-    explicit async_unique_visitor(std::reference_wrapper<std::size_t> counter)
-      : counter_(counter)
-    {
-    }
-
     bool operator()(async_traverse_visit_tag,
         std::unique_ptr<std::size_t>& i) const
     {
-        HPX_TEST_EQ(*i, counter_.get());
+        HPX_TEST_EQ(*i, this->counter());
         return false;
     }
 
@@ -347,17 +319,17 @@ public:
     {
         HPX_UNUSED(i);
 
-        ++counter_.get();
+        ++this->counter();
         std::forward<N>(next)();
     }
 
     template <typename T>
-    void operator()(async_traverse_complete_tag, T&& pack) const
+    void operator()(async_traverse_complete_tag, T&& pack)
     {
         HPX_UNUSED(pack);
 
-        HPX_TEST_EQ(counter_.get(), ArgCount);
-        ++counter_.get();
+        HPX_TEST_EQ(this->counter(), ArgCount);
+        ++this->counter();
     }
 };
 
@@ -368,23 +340,15 @@ static void test_async_move_only_traversal()
     };
 
     {
-        std::size_t counter = 0U;
-        traverse_pack_async(async_unique_sync_visitor<4>(std::ref(counter)),
-            of(0),
-            of(1),
-            of(2),
-            of(3));
-        HPX_TEST_EQ(counter, 5U);
+        auto result = traverse_pack_async(
+            async_unique_sync_visitor<4>{}, of(0), of(1), of(2), of(3));
+        HPX_TEST_EQ(result->counter(), 5U);
     }
 
     {
-        std::size_t counter = 0U;
-        traverse_pack_async(async_unique_visitor<4>(std::ref(counter)),
-            of(0),
-            of(1),
-            of(2),
-            of(3));
-        HPX_TEST_EQ(counter, 5U);
+        auto result = traverse_pack_async(
+            async_unique_visitor<4>{}, of(0), of(1), of(2), of(3));
+        HPX_TEST_EQ(result->counter(), 5U);
     }
 }
 
