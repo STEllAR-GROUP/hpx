@@ -11,7 +11,6 @@
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/tagged_tuple.hpp>
-//#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
@@ -22,23 +21,19 @@
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
-//#include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-//#include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
-//#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>
-//#include <cstring>
+#include <exception>
 #include <iterator>
+#include <list>
 #include <memory>
 #include <type_traits>
 #include <utility>
-//#include <vector>
-
-#include <boost/shared_array.hpp>
+#include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1
 {
@@ -158,7 +153,7 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef struct upper_bound_helper another_type;
         };
 
-        template <typename ExPolicy, 
+        template <typename ExPolicy,
             typename RandIter1, typename RandIter2, typename RandIter3,
             typename Comp, typename Proj1, typename Proj2, typename BinarySearchHelper,
         HPX_CONCEPT_REQUIRES_(
@@ -175,12 +170,12 @@ namespace hpx { namespace parallel { inline namespace v1
             using hpx::util::invoke;
 
             const std::size_t threshold = 65536ul;
-
-            HPX_ASSERT(threshold >= 1u);
+            HPX_ASSERT(threshold >= 1ul);
 
             std::size_t size1 = last1 - first1;
             std::size_t size2 = last2 - first2;
 
+            // Perform sequential merge if data size is smaller than threshold.
             if (size1 + size2 <= threshold)
             {
                 sequential_merge(first1, first1 + size1,
@@ -188,15 +183,19 @@ namespace hpx { namespace parallel { inline namespace v1
                 return;
             }
 
+            // Let size1 is bigger than size2 always.
             if (size1 < size2)
             {
+                // For stability of algorithm, must switch binary search methods
+                //   when swapping size1 and size2.
                 parallel_merge_helper(policy,
                     first2, last2, first1, last1, dest, comp, proj2, proj1,
                     typename BinarySearchHelper::another_type());
                 return;
             }
 
-            HPX_ASSERT(size1 >= 1u);
+            HPX_ASSERT(size1 >= size2);
+            HPX_ASSERT(size1 >= 1ul);
 
             RandIter1 mid1 = first1 + size1 / 2;
             RandIter2 boundary2 = BinarySearchHelper::call(
@@ -208,12 +207,14 @@ namespace hpx { namespace parallel { inline namespace v1
             hpx::future<void> fut = execution::async_execute(policy.executor(),
                 [&]() -> void
                 {
+                    // Process leftside ranges.
                     parallel_merge_helper(policy,
                         first1, mid1, first2, boundary2,
                         dest, comp, proj1, proj2, BinarySearchHelper());
                 });
 
             try {
+                // Process rightside ranges.
                 parallel_merge_helper(policy,
                     mid1 + 1, last1, boundary2, last2,
                     target + 1, comp, proj1, proj2, BinarySearchHelper());
@@ -224,7 +225,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::vector<hpx::future<void>> futures(2);
                 futures[0] = std::move(fut);
                 futures[1] = hpx::make_exceptional_future<void>(
-                        std::current_exception());
+                    std::current_exception());
 
                 std::list<std::exception_ptr> errors;
                 util::detail::handle_local_exceptions<ExPolicy>::call(
@@ -234,18 +235,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 HPX_ASSERT(false);
             }
 
-            try {
-                fut.get();
-            }
-            catch (std::bad_alloc const& ba) {
-                throw ba;
-            }
-            catch (...) {
-                throw exception_list(std::current_exception());
-            }
+            fut.get();
         }
 
-        template <typename ExPolicy, 
+        template <typename ExPolicy,
             typename RandIter1, typename RandIter2, typename RandIter3,
             typename Comp, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
