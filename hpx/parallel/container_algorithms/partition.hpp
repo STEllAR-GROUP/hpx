@@ -121,7 +121,7 @@ namespace hpx { namespace parallel { inline namespace v1
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_tuple<
-            tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
+            tag::in(typename hpx::traits::range_iterator<Rng>::type),
             tag::out1(FwdIter2), tag::out2(FwdIter3)>
     >::type
     partition_copy(ExPolicy && policy, Rng && rng,

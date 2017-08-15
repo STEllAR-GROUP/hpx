@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { inline namespace v1
     typename util::detail::algorithm_result<
         ExPolicy,
         hpx::util::tagged_pair<
-            tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
+            tag::in(typename hpx::traits::range_iterator<Rng>::type),
             tag::out(FwdIter2)>
     >::type
     unique_copy(ExPolicy && policy, Rng && rng,

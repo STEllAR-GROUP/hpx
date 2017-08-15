@@ -170,7 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        typename hpx::traits::range_traits<Rng>::iterator_type
+        typename hpx::traits::range_iterator<Rng>::type
     >::type
     is_heap_until(ExPolicy && policy, Rng && rng,
         Comp && comp = Comp(), Proj && proj = Proj())
