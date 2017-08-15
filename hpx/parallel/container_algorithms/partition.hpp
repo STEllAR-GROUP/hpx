@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { inline namespace v1
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy,
-        typename hpx::traits::range_traits<Rng>::iterator_type
+        typename hpx::traits::range_iterator<Rng>::type
     >::type
     partition(ExPolicy && policy, Rng && rng, Pred && pred,
         Proj && proj = Proj())
