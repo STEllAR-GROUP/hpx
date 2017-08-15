@@ -22,6 +22,10 @@ namespace util {
     /// if the asynchronous pack traversal was finished.
     using detail::async_traverse_complete_tag;
 
+    /// A tag to identify that a mapper shall be constructed in-place
+    /// from the first argument passed.
+    using detail::async_traverse_in_place_tag;
+
     /// Traverses the pack with the given visitor in an asynchronous way.
     ///
     /// This function works in the same way as `traverse_pack`,

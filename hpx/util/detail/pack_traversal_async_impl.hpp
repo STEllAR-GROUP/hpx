@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <exception>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -39,6 +40,13 @@ namespace util {
         /// A tag which is passed to the `operator()` of the visitor
         /// if the asynchronous pack traversal was finished.
         struct async_traverse_complete_tag
+        {
+        };
+
+        /// A tag to identify that a mapper shall be constructed in-place
+        /// from the first argument passed.
+        template <typename T>
+        struct async_traverse_in_place_tag
         {
         };
 
@@ -104,9 +112,16 @@ namespace util {
             }
 
         public:
-            explicit HPX_CONSTEXPR async_traversal_frame(Visitor visitor,
-                Args... args)
+            explicit async_traversal_frame(Visitor visitor, Args... args)
               : Visitor(std::move(visitor))
+              , args_(util::make_tuple(std::move(args)...))
+            {
+            }
+
+            template <typename MapperArg>
+            explicit async_traversal_frame(async_traverse_in_place_tag<Visitor>,
+                MapperArg&& mapper_arg, Args... args)
+              : Visitor(std::forward<MapperArg>(mapper_arg))
               , args_(util::make_tuple(std::move(args)...))
             {
             }
@@ -500,23 +515,43 @@ namespace util {
             util::invoke_fused(resume_state_callable{}, std::move(hierarchy));
         }
 
-        /// Traverses the given pack with the given mapper
-        template <typename Mapper, typename... T>
-        auto apply_pack_transform_async(Mapper&& mapper, T&&... pack)
-            -> boost::intrusive_ptr<typename std::decay<Mapper>::type>
+        /// Gives access to types related to the traversal frame
+        template <typename Visitor, typename... Args>
+        struct async_traversal_types
         {
+            /// Deduces to the async traversal frame type of the given
+            /// traversal arguments and mapper
             using frame_type =
-                async_traversal_frame<typename std::decay<Mapper>::type,
-                    typename std::decay<T>::type...>;
+                async_traversal_frame<typename std::decay<Visitor>::type,
+                    typename std::decay<Args>::type...>;
 
+            /// The type of the frame pointer
+            using frame_pointer_type = boost::intrusive_ptr<frame_type>;
+
+            /// The type of the demoted visitor type
+            using visitor_pointer_type = boost::intrusive_ptr<Visitor>;
+        };
+        template <typename Visitor, typename VisitorArg, typename... Args>
+        struct async_traversal_types<async_traverse_in_place_tag<Visitor>,
+            VisitorArg, Args...> : async_traversal_types<Visitor, Args...>
+        {
+        };
+
+        /// Traverses the given pack with the given mapper
+        template <typename Visitor, typename... Args,
+            typename types = async_traversal_types<Visitor, Args...>>
+        auto apply_pack_transform_async(Visitor&& visitor, Args&&... args) ->
+            typename types::visitor_pointer_type
+        {
             // Create the frame on the heap which stores the arguments
             // to traverse asynchronous.
             auto frame = [&] {
-                auto ptr = new frame_type(
-                    std::forward<Mapper>(mapper), std::forward<T>(pack)...);
+                auto ptr = new
+                    typename types::frame_type(std::forward<Visitor>(visitor),
+                        std::forward<Args>(args)...);
 
-                /// Create a intrusive_ptr from the heap object
-                return boost::intrusive_ptr<frame_type>(ptr);
+                // Create a intrusive_ptr from the heap object
+                return typename types::frame_pointer_type(ptr);
             }();
 
             // Create a static range for the top level tuple
