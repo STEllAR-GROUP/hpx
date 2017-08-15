@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { inline namespace v1
             return hpx::util::make_tuple(last1, last2, dest);
         }
 
-        struct UpperBoundHelper
+        struct upper_bound_helper
         {
             // upper_bound with projection function.
             template<typename FwdIter, typename Type, typename Comp, typename Proj>
@@ -118,10 +118,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 return first;
             }
 
-            typedef struct LowerBoundHelper another_type;
+            typedef struct lower_bound_helper another_type;
         };
 
-        struct LowerBoundHelper
+        struct lower_bound_helper
         {
             // lower_bound with projection function.
             template<typename FwdIter, typename Type, typename Comp, typename Proj>
@@ -155,7 +155,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return first;
             }
 
-            typedef struct UpperBoundHelper another_type;
+            typedef struct upper_bound_helper another_type;
         };
 
         template <typename ExPolicy, 
@@ -264,7 +264,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::forward<Comp>(comp),
                 std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2),
-                UpperBoundHelper());
+                upper_bound_helper());
 
             return hpx::util::make_tuple(last1, last2,
                 dest + (last1 - first1) + (last2 - first2));
