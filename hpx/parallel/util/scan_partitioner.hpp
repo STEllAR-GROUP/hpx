@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
-//  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c)      2015 Daniel Bourgeois
+//  Copyright (c)      2017 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -42,117 +43,14 @@ namespace hpx { namespace parallel { namespace util
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
-        template <typename ExPolicy_, typename R, typename Result1,
-            typename Result2>
-        struct static_scan_partitioner
+        template <typename R, typename Result1, typename Result2>
+        struct static_scan_partitioner_async
         {
             template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3, typename F4>
-            static R call(ExPolicy && policy, FwdIter first,
+            static hpx::future<R> call(ExPolicy && policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 F4 && f4)
-            {
-                typedef typename
-                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                    parameters_type;
-                typedef executor_parameter_traits<parameters_type>
-                    parameters_traits;
-
-                // inform parameter traits
-                scoped_executor_parameters<parameters_type> scoped_param(
-                    policy.parameters());
-
-                std::vector<hpx::shared_future<Result1> > workitems;
-                std::vector<hpx::future<Result2> > finalitems;
-                std::list<std::exception_ptr> errors;
-
-                try {
-                    // pre-initialize first intermediate result
-                    workitems.push_back(make_ready_future(std::forward<T>(init)));
-
-                    HPX_ASSERT(count > 0);
-                    FwdIter first_ = first;
-                    std::size_t count_ = count;
-
-                    // estimate a chunk size based on number of cores used
-                    typedef typename parameters_traits::has_variable_chunk_size
-                        has_variable_chunk_size;
-
-                    auto shape = get_bulk_iteration_shape(policy, workitems,
-                        f1, first, count, 1, has_variable_chunk_size());
-
-                    // schedule every chunk on a separate thread
-                    std::size_t size = hpx::util::size(shape);
-                    workitems.reserve(size + 1);
-                    finalitems.reserve(size);
-
-                    // If the size of count was enough to warrant testing for a
-                    // chunk, pre-initialize second intermediate result and
-                    // start f3.
-                    if (workitems.size() == 2)
-                    {
-                        HPX_ASSERT(count_ > count);
-
-                        hpx::shared_future<Result1> curr = workitems[1];
-                        finalitems.push_back(dataflow(hpx::launch::sync,
-                            f3, first_, count_ - count, workitems[0], curr));
-
-                        workitems[1] = dataflow(hpx::launch::sync,
-                            f2, workitems[0], curr);
-                    }
-
-                    // Schedule first step of scan algorithm, step 2 is
-                    // performed as soon as the current partition and the
-                    // partition to the left is ready.
-                    for(auto const& elem: shape)
-                    {
-                        FwdIter it = hpx::util::get<0>(elem);
-                        std::size_t size = hpx::util::get<1>(elem);
-
-                        hpx::shared_future<Result1> prev = workitems.back();
-                        auto curr = execution::async_execute(
-                            policy.executor(), f1, it, size).share();
-
-                        finalitems.push_back(dataflow(hpx::launch::sync,
-                            f3, it, size, prev, curr));
-
-                        workitems.push_back(dataflow(hpx::launch::sync,
-                            f2, prev, curr));
-                    }
-                }
-                catch (...) {
-                    handle_local_exceptions<ExPolicy>::call(
-                        std::current_exception(), errors);
-                }
-
-                // wait for all tasks to finish
-                hpx::wait_all(finalitems, workitems);
-
-                // always rethrow if 'errors' is not empty or 'workitems' or
-                // 'finalitems' have an exceptional future
-                handle_local_exceptions<ExPolicy>::call(workitems, errors);
-                handle_local_exceptions<ExPolicy>::call(finalitems, errors);
-
-                try {
-                    return f4(std::move(workitems), std::move(finalitems));
-                }
-                catch (...) {
-                    // rethrow either bad_alloc or exception_list
-                    handle_local_exceptions<ExPolicy>::call(
-                        std::current_exception());
-                }
-            }
-        };
-
-        template <typename R, typename Result1, typename Result2>
-        struct static_scan_partitioner<
-            execution::parallel_task_policy, R, Result1, Result2>
-        {
-            template <typename ExPolicy, typename FwdIter, typename T,
-                typename F1, typename F2, typename F3, typename F4>
-            static hpx::future<R> call(ExPolicy && policy,
-                FwdIter first, std::size_t count, T && init, F1 && f1,
-                F2 && f2, F3 && f3, F4 && f4)
             {
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
@@ -250,6 +148,46 @@ namespace hpx { namespace parallel { namespace util
                         return f4(std::move(witems), std::move(fitems));
                     },
                     std::move(workitems), std::move(finalitems));
+            }
+        };
+
+        template <typename ExPolicy_, typename R, typename Result1,
+            typename Result2>
+        struct static_scan_partitioner
+        {
+            template <typename ExPolicy, typename FwdIter, typename T,
+                typename F1, typename F2, typename F3, typename F4>
+            static R call(ExPolicy && policy, FwdIter first,
+                std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
+                F4 && f4)
+            {
+                return static_scan_partitioner_async<
+                        R, Result1, Result2
+                    >::call(
+                        std::forward<ExPolicy>(policy),
+                        first, count, std::forward<T>(init),
+                        std::forward<F1>(f1), std::forward<F2>(f2),
+                        std::forward<F3>(f3), std::forward<F4>(f4)).get();
+            }
+        };
+
+        template <typename R, typename Result1, typename Result2>
+        struct static_scan_partitioner<
+            execution::parallel_task_policy, R, Result1, Result2>
+        {
+            template <typename ExPolicy, typename FwdIter, typename T,
+                typename F1, typename F2, typename F3, typename F4>
+            static hpx::future<R> call(ExPolicy && policy,
+                FwdIter first, std::size_t count, T && init, F1 && f1,
+                F2 && f2, F3 && f3, F4 && f4)
+            {
+                return static_scan_partitioner_async<
+                        R, Result1, Result2
+                    >::call(
+                        std::forward<ExPolicy>(policy),
+                        first, count, std::forward<T>(init),
+                        std::forward<F1>(f1), std::forward<F2>(f2),
+                        std::forward<F3>(f3), std::forward<F4>(f4));
             }
         };
 
