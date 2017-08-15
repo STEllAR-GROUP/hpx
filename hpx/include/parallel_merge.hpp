@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_MERGE_AUG_08_2017_0808AM
 
 #include <hpx/parallel/algorithms/merge.hpp>
+#include <hpx/parallel/container_algorithms/merge.hpp>
 
 #endif
 

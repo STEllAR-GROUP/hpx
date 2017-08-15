@@ -12,6 +12,7 @@ set(tests
     is_heap_range
     is_heap_until_range
     max_element_range
+    merge_range
     min_element_range
     minmax_element_range
     partition_copy_range

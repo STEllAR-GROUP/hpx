@@ -113,6 +113,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/is_heap.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/merge.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/minmax.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/partition.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/remove_copy.hpp"
