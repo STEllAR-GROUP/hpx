@@ -347,19 +347,17 @@ namespace hpx { namespace lcos { namespace detail
     template <typename ContResult>
     struct continuation_result;
 
-    template <typename ContResult, typename Future, typename F>
+    template <typename ContResult, typename Future, typename Policy, typename F>
     inline typename hpx::traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, launch policy,
-        F && f);
+    make_continuation(Future const& future, Policy && policy, F && f);
 
     template <typename ContResult, typename Future, typename F>
     inline typename hpx::traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, threads::executor& sched,
-        F && f);
+    make_continuation(Future const& future, threads::executor& sched, F && f);
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     template <typename ContResult, typename Future, typename Executor,
@@ -561,9 +559,14 @@ namespace hpx { namespace lcos { namespace detail
             return then(launch::all, std::forward<F>(f), ec);
         }
 
-        template <typename F>
-        typename hpx::traits::future_then_result<Derived, F>::type
-        then(launch policy, F && f, error_code& ec = throws) const
+        template <typename Policy, typename F>
+        typename util::lazy_enable_if<
+            hpx::traits::is_launch_policy<
+                typename std::decay<Policy>::type
+            >::value,
+            hpx::traits::future_then_result<Derived, F>
+        >::type
+        then(Policy && policy, F && f, error_code& ec = throws) const
         {
             typedef
                 typename hpx::traits::future_then_result<Derived, F>::result_type
@@ -586,7 +589,8 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr p =
                 detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived const*>(this), policy, std::forward<F>(f));
+                    *static_cast<Derived const*>(this),
+                    std::forward<Policy>(policy), std::forward<F>(f));
             return hpx::traits::future_access<future<result_type> >::create(
                 std::move(p));
         }
@@ -971,12 +975,18 @@ namespace hpx { namespace lcos
             return base_type::then(std::forward<F>(f), ec);
         }
 
-        template <typename F>
-        typename hpx::traits::future_then_result<future, F>::type
-        then(launch policy, F && f, error_code& ec = throws)
+        template <typename Policy, typename F>
+        typename util::lazy_enable_if<
+            hpx::traits::is_launch_policy<
+                typename std::decay<Policy>::type
+            >::value,
+            hpx::traits::future_then_result<future, F>
+        >::type
+        then(Policy && policy, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return base_type::then(policy, std::forward<F>(f), ec);
+            return base_type::then(
+                std::forward<Policy>(policy), std::forward<F>(f), ec);
         }
 
         template <typename F>
