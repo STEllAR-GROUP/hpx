@@ -187,8 +187,7 @@ namespace hpx { namespace threads { namespace executors
     };
 #endif
 
-
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
     struct HPX_EXPORT throttling_executor : public scheduled_executor
     {
         throttling_executor();
@@ -197,9 +196,6 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 #endif
-
-
-
 
 }}}
 

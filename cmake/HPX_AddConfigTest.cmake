@@ -1,6 +1,8 @@
 # Copyright (c) 2011 Bryce Lelbach
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2017 Denis Blank
+# Copyright (c) 2017 Google
+# Copyright (c) 2017 Taeguk Kwon
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,14 +16,18 @@ macro(add_hpx_config_test variable)
   cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_run_msg)
-  if(${variable}_CMAKECXXFEATURE)
-    # We don't have to run our own feasture test if there is a corresponding
-    # cmake feature test and cmake reports the feature is supported on this
-    # platform.
-    list(FIND CMAKE_CXX_COMPILE_FEATURES ${${variable}_CMAKECXXFEATURE} __pos)
-    if(NOT ${__pos} EQUAL -1)
-      set(${variable} TRUE)
-      set(_run_msg "Success (cmake feature test)")
+  # Check CMake feature tests iff the user didn't override the value
+  # of this variable:
+  if(NOT DEFINED ${variable})
+    if(${variable}_CMAKECXXFEATURE)
+      # We don't have to run our own feature test if there is a corresponding
+      # cmake feature test and cmake reports the feature is supported on this
+      # platform.
+      list(FIND CMAKE_CXX_COMPILE_FEATURES ${${variable}_CMAKECXXFEATURE} __pos)
+      if(NOT ${__pos} EQUAL -1)
+        set(${variable} TRUE)
+        set(_run_msg "Success (cmake feature test)")
+      endif()
     endif()
   endif()
 
@@ -236,7 +242,7 @@ endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_sfinae_expression_complete)
-  add_hpx_in_framework_config_test(HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
+  add_hpx_in_framework_config_test(HPX_WITH_CXX11_SFINAE_EXPRESSION_COMPLETE
     SOURCE cmake/tests/cxx11_sfinae_expression_complete.cpp
     FILE ${ARGN})
 endmacro()
@@ -565,6 +571,14 @@ macro(hpx_check_for_cxx14_deprecated_attribute)
   add_hpx_config_test(HPX_WITH_CXX14_DEPRECATED_ATTRIBUTE
     SOURCE cmake/tests/cxx14_deprecated_attribute.cpp
     FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_return_type_deduction)
+  add_hpx_config_test(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION
+    SOURCE cmake/tests/cxx14_return_type_deduction.cpp
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_return_type_deduction)
 endmacro()
 
 ###############################################################################

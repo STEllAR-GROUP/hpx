@@ -7,6 +7,7 @@
 #define HPX_SERIALIZATION_LIST_HPP
 
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/detail/serialize_collection.hpp>
 
 #include <cstdint>
 #include <list>
@@ -19,14 +20,9 @@ namespace hpx { namespace serialization
         // normal load ...
         std::uint64_t size;
         ar >> size; //-V128
-
-        ls.resize(size);
         if(size == 0) return;
 
-        for(auto & li: ls)
-        {
-            ar >> li;
-        }
+        detail::load_collection(ar, ls, size);
     }
 
     template <typename T, typename Allocator>
@@ -37,10 +33,7 @@ namespace hpx { namespace serialization
         ar << size;
         if(ls.empty()) return;
 
-        for(auto const & li: ls)
-        {
-            ar << li;
-        }
+        detail::save_collection(ar, ls);
     }
 }}
 

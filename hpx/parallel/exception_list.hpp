@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
+//                     2017 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,6 +36,9 @@ namespace hpx { namespace parallel { inline namespace v1
                 catch(std::bad_alloc const& e) {
                     throw e;
                 }
+                catch (hpx::exception_list const& el) {
+                    throw el;
+                }
                 catch (...) {
                     throw hpx::exception_list(std::current_exception());
                 }
@@ -58,6 +62,10 @@ namespace hpx { namespace parallel { inline namespace v1
                     return hpx::make_exceptional_future<Result>(
                         std::current_exception());
                 }
+                catch (hpx::exception_list const& el) {
+                    // rethrow exception_list
+                    return hpx::make_exceptional_future<Result>(el);
+                }
                 catch (...) {
                     // package up everything else as an exception_list
                     return hpx::make_exceptional_future<Result>(
@@ -80,6 +88,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     }
                     catch(std::bad_alloc const& e) {
                         throw e;
+                    }
+                    catch (hpx::exception_list const& el) {
+                        throw el;
                     }
                     catch (...) {
                         throw hpx::exception_list(std::current_exception());
@@ -107,6 +118,10 @@ namespace hpx { namespace parallel { inline namespace v1
                     // rethrow bad_alloc
                     return hpx::make_exceptional_future<Result>(
                         std::current_exception());
+                }
+                catch (hpx::exception_list const& el) {
+                    // rethrow exception_list
+                    return hpx::make_exceptional_future<Result>(el);
                 }
                 catch (...) {
                     // package up everything else as an exception_list
