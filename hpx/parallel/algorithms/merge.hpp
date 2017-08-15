@@ -82,12 +82,12 @@ namespace hpx { namespace parallel { inline namespace v1
         struct upper_bound_helper
         {
             // upper_bound with projection function.
-            template<typename FwdIter, typename Type, typename Comp, typename Proj>
-            static FwdIter
-            call(FwdIter first, FwdIter last, const Type& value,
+            template<typename RandIter, typename Type, typename Comp, typename Proj>
+            static RandIter
+            call(RandIter first, RandIter last, const Type& value,
                 Comp comp, Proj proj)
             {
-                typedef typename std::iterator_traits<FwdIter>::difference_type
+                typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
                 using hpx::util::invoke;
@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 while (count > 0)
                 {
                     difference_type step = count / 2;
-                    FwdIter mid = std::next(first, step);
+                    RandIter mid = std::next(first, step);
 
                     if (!invoke(comp, value, invoke(proj, *mid)))
                     {
@@ -119,12 +119,12 @@ namespace hpx { namespace parallel { inline namespace v1
         struct lower_bound_helper
         {
             // lower_bound with projection function.
-            template<typename FwdIter, typename Type, typename Comp, typename Proj>
-            static FwdIter
-            call(FwdIter first, FwdIter last, const Type& value,
+            template<typename RandIter, typename Type, typename Comp, typename Proj>
+            static RandIter
+            call(RandIter first, RandIter last, const Type& value,
                 Comp comp, Proj proj)
             {
-                typedef typename std::iterator_traits<FwdIter>::difference_type
+                typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
                 using hpx::util::invoke;
@@ -134,7 +134,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 while (count > 0)
                 {
                     difference_type step = count / 2;
-                    FwdIter mid = std::next(first, step);
+                    RandIter mid = std::next(first, step);
 
                     if (invoke(comp, invoke(proj, *mid), value))
                     {
@@ -288,18 +288,18 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             template <typename ExPolicy,
-                typename FwdIter1, typename FwdIter2, typename FwdIter3,
+                typename RandIter1, typename RandIter2, typename RandIter3,
                 typename Comp, typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<
-                ExPolicy, hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>
+                ExPolicy, hpx::util::tuple<RandIter1, RandIter2, RandIter3>
             >::type
             parallel(ExPolicy && policy,
-                FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2,
-                FwdIter3 dest, Comp && comp,
+                RandIter1 first1, RandIter1 last1,
+                RandIter2 first2, RandIter2 last2,
+                RandIter3 dest, Comp && comp,
                 Proj1 && proj1, Proj2 && proj2)
             {
-                typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>
+                typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3>
                     result_type;
                 typedef util::detail::algorithm_result<
                     ExPolicy, result_type
@@ -323,6 +323,8 @@ namespace hpx { namespace parallel { inline namespace v1
         /// \endcond
     }
 
+    // TODO: Support forward and bidirectional iterator. (#2826)
+    // For now, only support random access iterator.
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
     /// into one sorted range beginning at \a dest. The order of
     /// equivalent elements in the each of original two ranges is preserved.
@@ -338,18 +340,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced)
+    /// \tparam RandIter1   The type of the source iterators used (deduced)
     ///                     representing the first range.
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the source iterators used (deduced)
+    ///                     random access iterator.
+    /// \tparam RandIter2   The type of the source iterators used (deduced)
     ///                     representing the second range.
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
+    ///                     random access iterator.
+    /// \tparam RandIter3   The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a merge requires \a Comp to meet the
@@ -385,7 +387,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types \a FwdIter1 and \a FwdIter2 can be
+    ///                     objects of types \a RandIter1 and \a RandIter2 can be
     ///                     dereferenced and then implicitly converted to
     ///                     both \a Type1 and \a Type2
     /// \param proj1        Specifies the function (or function object) which
@@ -408,11 +410,11 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \returns  The \a merge algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)> >
+    /// \a hpx::future<tagged_tuple<tag::in1(RandIter1), tag::in2(RandIter2), tag::out(RandIter3)> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns
-    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)>
+    /// \a tagged_tuple<tag::in1(RandIter1), tag::in2(RandIter2), tag::out(RandIter3)>
     ///           otherwise.
     ///           The \a merge algorithm returns the tuple of
     ///           the source iterator \a last1,
@@ -420,65 +422,65 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the destination iterator to the end of the \a dest range.
     ///
     template <typename ExPolicy,
-        typename FwdIter1, typename FwdIter2, typename FwdIter3,
+        typename RandIter1, typename RandIter2, typename RandIter3,
         typename Comp = detail::less,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value &&
-        hpx::traits::is_iterator<FwdIter3>::value &&
-        traits::is_projected<Proj1, FwdIter1>::value &&
-        traits::is_projected<Proj2, FwdIter2>::value &&
+        hpx::traits::is_iterator<RandIter1>::value &&
+        hpx::traits::is_iterator<RandIter2>::value &&
+        hpx::traits::is_iterator<RandIter3>::value &&
+        traits::is_projected<Proj1, RandIter1>::value &&
+        traits::is_projected<Proj2, RandIter2>::value &&
         traits::is_indirect_callable<
             ExPolicy, Comp,
-            traits::projected<Proj1, FwdIter1>,
-            traits::projected<Proj2, FwdIter2>
+            traits::projected<Proj1, RandIter1>,
+            traits::projected<Proj2, RandIter2>
         >::value)>
     typename util::detail::algorithm_result<
         ExPolicy, hpx::util::tagged_tuple<
-        tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)>
+        tag::in1(RandIter1), tag::in2(RandIter2), tag::out(RandIter3)>
     >::type
     merge(ExPolicy && policy,
-        FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2,
-        FwdIter3 dest, Comp && comp = Comp(),
+        RandIter1 first1, RandIter1 last1,
+        RandIter2 first2, RandIter2 last2,
+        RandIter3 dest, Comp && comp = Comp(),
         Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
+            (hpx::traits::is_input_iterator<RandIter1>::value),
             "Required at least input iterator.");
         static_assert(
-            (hpx::traits::is_input_iterator<FwdIter2>::value),
+            (hpx::traits::is_input_iterator<RandIter2>::value),
             "Required at least input iterator.");
         static_assert(
-            (hpx::traits::is_output_iterator<FwdIter3>::value ||
-                hpx::traits::is_forward_iterator<FwdIter3>::value),
+            (hpx::traits::is_output_iterator<RandIter3>::value ||
+                hpx::traits::is_random_access_iterator<RandIter3>::value),
             "Requires at least output iterator.");
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter2>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter3>::value
+               !hpx::traits::is_random_access_iterator<RandIter1>::value ||
+               !hpx::traits::is_random_access_iterator<RandIter2>::value ||
+               !hpx::traits::is_random_access_iterator<RandIter3>::value
             > is_seq;
 #else
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Required at least forward iterator.");
+            (hpx::traits::is_random_access_iterator<RandIter1>::value),
+            "Required at least random access iterator.");
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
+            (hpx::traits::is_random_access_iterator<RandIter2>::value),
+            "Requires at least random access iterator.");
         static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter3>::value),
-            "Requires at least forward iterator.");
+            (hpx::traits::is_random_access_iterator<RandIter3>::value),
+            "Requires at least random access iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 #endif
 
-        typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
+        typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3> result_type;
 
         return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
             detail::merge<result_type>().call(

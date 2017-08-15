@@ -25,6 +25,8 @@
 
 namespace hpx { namespace parallel { inline namespace v1
 {
+    // TODO: Support forward and bidirectional iterator. (#2826)
+    // For now, only support random access iterator.
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
     /// into one sorted range beginning at \a dest. The order of
     /// equivalent elements in the each of original two ranges is preserved.
@@ -42,14 +44,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     in which it executes the assignments.
     /// \tparam Rng1        The type of the first source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Rng2        The type of the second source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
+    ///                     meet the requirements of an random access iterator.
+    /// \tparam RandIter3   The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a merge requires \a Comp to meet the
@@ -81,7 +83,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types \a FwdIter1 and \a FwdIter2 can be
+    ///                     objects of types \a RandIter1 and \a RandIter2 can be
     ///                     dereferenced and then implicitly converted to
     ///                     both \a Type1 and \a Type2
     /// \param proj1        Specifies the function (or function object) which
@@ -104,11 +106,11 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \returns  The \a merge algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)> >
+    /// \a hpx::future<tagged_tuple<tag::in1(RandIter1), tag::in2(RandIter2), tag::out(RandIter3)> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns
-    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)>
+    /// \a tagged_tuple<tag::in1(RandIter1), tag::in2(RandIter2), tag::out(RandIter3)>
     ///           otherwise.
     ///           The \a merge algorithm returns the tuple of
     ///           the source iterator \a last1,
@@ -116,7 +118,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           the destination iterator to the end of the \a dest range.
     ///
     template <typename ExPolicy,
-        typename Rng1, typename Rng2, typename FwdIter3,
+        typename Rng1, typename Rng2, typename RandIter3,
         typename Comp = detail::less,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
@@ -124,7 +126,7 @@ namespace hpx { namespace parallel { inline namespace v1
         execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_range<Rng1>::value &&
         hpx::traits::is_range<Rng2>::value &&
-        hpx::traits::is_iterator<FwdIter3>::value &&
+        hpx::traits::is_iterator<RandIter3>::value &&
         traits::is_projected_range<Proj1, Rng1>::value &&
         traits::is_projected_range<Proj2, Rng2>::value &&
         traits::is_indirect_callable<
@@ -137,10 +139,10 @@ namespace hpx { namespace parallel { inline namespace v1
         hpx::util::tagged_tuple<
             tag::in1(typename hpx::traits::range_iterator<Rng1>::type),
             tag::in2(typename hpx::traits::range_iterator<Rng2>::type),
-            tag::out(FwdIter3)>
+            tag::out(RandIter3)>
     >::type
     merge(ExPolicy && policy, Rng1 && rng1, Rng2 && rng2,
-        FwdIter3 dest, Comp && comp = Comp(),
+        RandIter3 dest, Comp && comp = Comp(),
         Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
         return merge(std::forward<ExPolicy>(policy),
