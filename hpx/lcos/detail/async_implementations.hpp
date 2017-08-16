@@ -120,7 +120,7 @@ namespace hpx { namespace detail
                     typename Action::component_type
                 >::call(addr));
 
-            return Action::execute_function(addr.address_,
+            return Action::execute_function(addr.address_, addr.type_,
                 std::forward<Ts>(vs)...);
         }
     };
@@ -162,7 +162,7 @@ namespace hpx { namespace detail
                 >::call(addr));
 
             lcos::future<Result> f = Action::execute_function(
-                addr.address_, std::forward<Ts>(vs)...);
+                addr.address_, addr.type_, std::forward<Ts>(vs)...);
 
             // invoke callback
             cb(boost::system::error_code(), parcelset::parcel());

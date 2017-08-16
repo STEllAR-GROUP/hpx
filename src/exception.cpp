@@ -382,58 +382,58 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template HPX_EXPORT std::exception_ptr
         get_exception(hpx::exception const&, std::string const&,
-        std::string const&, long, std::string const&);
+            std::string const&, long, std::string const&);
 
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_EXPORT void
         throw_exception(hpx::exception const&,
-        std::string const&, std::string const&, long);
+            std::string const&, std::string const&, long);
 
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_EXPORT void
         throw_exception(boost::system::system_error const&,
-        std::string const&, std::string const&, long);
+            std::string const&, std::string const&, long);
 
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+    template HPX_EXPORT void
         throw_exception(std::exception const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(hpx::detail::std_exception const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::bad_exception const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(hpx::detail::bad_exception const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::bad_typeid const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(hpx::detail::bad_typeid const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::bad_cast const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(hpx::detail::bad_cast const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::bad_alloc const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(hpx::detail::bad_alloc const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::logic_error const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::runtime_error const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::out_of_range const&,
-        std::string const&, std::string const&, long);
-    template HPX_ATTRIBUTE_NORETURN HPX_EXPORT void
+            std::string const&, std::string const&, long);
+    template HPX_EXPORT void
         throw_exception(std::invalid_argument const&,
-        std::string const&, std::string const&, long);
+            std::string const&, std::string const&, long);
 
     ///////////////////////////////////////////////////////////////////////////
     void assertion_failed(char const* expr, char const* function,

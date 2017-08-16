@@ -366,7 +366,8 @@ namespace hpx { namespace parcelset
         return result;
     }
 
-    naming::address_type parcel::determine_lva()
+    std::pair<naming::address_type, naming::component_type>
+        parcel::determine_lva()
     {
         naming::resolver_client& client = hpx::naming::get_agas_client();
         int comptype = action_->get_component_type();
@@ -418,7 +419,7 @@ namespace hpx { namespace parcelset
                 strm.str());
         }
 
-        return lva;
+        return std::make_pair(lva, comptype);
     }
 
     bool parcel::load_schedule(serialization::input_archive & ar,
@@ -429,10 +430,10 @@ namespace hpx { namespace parcelset
         // make sure this parcel destination matches the proper locality
         HPX_ASSERT(destination_locality() == data_.addr_.locality_);
 
-        naming::address_type lva = determine_lva();
+        std::pair<naming::address_type, naming::component_type> p = determine_lva();
 
         // make sure the target has not been migrated away
-        auto r = action_->was_object_migrated(data_.dest_, lva);
+        auto r = action_->was_object_migrated(data_.dest_, p.first);
         if (r.first)
         {
             // If the object was migrated, just load the action and return.
@@ -441,8 +442,8 @@ namespace hpx { namespace parcelset
         }
 
         // continuation support, this is handled in the transfer action
-        action_->load_schedule(ar, std::move(data_.dest_), lva, num_thread,
-            deferred_schedule);
+        action_->load_schedule(ar, std::move(data_.dest_), p.first, p.second,
+            num_thread, deferred_schedule);
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         static util::itt::event parcel_recv("recv_parcel");
@@ -464,14 +465,14 @@ namespace hpx { namespace parcelset
         // make sure this parcel destination matches the proper locality
         HPX_ASSERT(destination_locality() == data_.addr_.locality_);
 
-        naming::address_type lva = determine_lva();
+        std::pair<naming::address_type, naming::component_type> p = determine_lva();
 
         // make sure the target has not been migrated away
-        auto r = action_->was_object_migrated(data_.dest_, lva);
+        auto r = action_->was_object_migrated(data_.dest_, p.first);
         if (r.first)
         {
-            naming::resolver_client& client = hpx::naming::get_agas_client();
             // If the object was migrated, just route.
+            naming::resolver_client& client = hpx::naming::get_agas_client();
             client.route(
                 std::move(*this),
                 &detail::parcel_route_handler,
@@ -481,7 +482,8 @@ namespace hpx { namespace parcelset
 
         // dispatch action, register work item either with or without
         // continuation support, this is handled in the transfer action
-        action_->schedule_thread(std::move(data_.dest_), lva, num_thread);
+        action_->schedule_thread(std::move(data_.dest_), p.first, p.second,
+            num_thread);
     }
 
     void parcel::load_data(serialization::input_archive & ar)

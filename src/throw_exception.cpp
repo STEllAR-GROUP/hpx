@@ -16,7 +16,7 @@
 
 namespace hpx { namespace detail
 {
-    HPX_ATTRIBUTE_NORETURN void throw_exception(
+    HPX_NORETURN void throw_exception(
         error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
@@ -26,7 +26,7 @@ namespace hpx { namespace detail
             func, p.string(), line);
     }
 
-    HPX_ATTRIBUTE_NORETURN void rethrow_exception(
+    HPX_NORETURN void rethrow_exception(
         exception const& e, std::string const& func)
     {
         hpx::detail::throw_exception(
@@ -83,7 +83,7 @@ namespace hpx { namespace detail
         }
     }
 
-    HPX_ATTRIBUTE_NORETURN void throw_thread_interrupted_exception()
+    HPX_NORETURN void throw_thread_interrupted_exception()
     {
         throw hpx::thread_interrupted();
     }

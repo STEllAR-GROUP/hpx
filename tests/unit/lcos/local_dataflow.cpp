@@ -321,6 +321,69 @@ void plain_deferred_arguments()
     }
 }
 
+void plain_arguments_lazy()
+{
+    void_f4_count.store(0);
+    int_f4_count.store(0);
+
+    auto policy1 =
+        hpx::launch::select([]()
+        {
+            return hpx::launch::sync;
+        });
+
+    {
+        future<void> f1 = dataflow(policy1, &void_f4, 42);
+        future<int> f2 = dataflow(policy1, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 1u);
+    }
+
+    auto policy2 =
+        hpx::launch::select([]()
+        {
+            return hpx::launch::async;
+        });
+
+    {
+        future<void> f1 = dataflow(policy2, &void_f4, 42);
+        future<int> f2 = dataflow(policy2, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 2u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 2u);
+    }
+
+    void_f5_count.store(0);
+    int_f5_count.store(0);
+
+    boost::atomic<int> count(0);
+    auto policy3 =
+        hpx::launch::select([&count]() -> hpx::launch
+        {
+            if (count++ == 0)
+                return hpx::launch::async;
+            return hpx::launch::sync;
+        });
+
+    {
+        future<void> f1 = dataflow(policy3, &void_f5, 42, async(&int_f));
+        future<int> f2 = dataflow(policy3, &int_f5, 42, async(&int_f));
+
+        f1.wait();
+        HPX_TEST_EQ(void_f5_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 126);
+        HPX_TEST_EQ(int_f5_count, 1u);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
@@ -328,6 +391,7 @@ int hpx_main(variables_map&)
     future_function_pointers();
     plain_arguments();
     plain_deferred_arguments();
+    plain_arguments_lazy();
 
     return hpx::finalize();
 }
