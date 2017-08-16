@@ -336,6 +336,19 @@ namespace hpx { namespace util
 #endif
             }
 
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            char const* get_function_annotation_itt() const
+            {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return traits::get_function_annotation_itt<
+                        typename std::decay<F>::type
+                    >::call(_f);
+#else
+                return nullptr;
+#endif
+            }
+#endif
+
         private:
             typename std::decay<F>::type _f;
             util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
@@ -438,6 +451,17 @@ namespace hpx { namespace util
 #endif
             }
 
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            char const* get_function_annotation_itt() const
+            {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return traits::get_function_annotation_itt<F>::call(_f);
+#else
+                return nullptr;
+#endif
+            }
+#endif
+
         public: // exposition-only
             F _f;
 #           if !defined(HPX_DISABLE_ASSERTS)
@@ -474,6 +498,7 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     template <typename Sig>
     struct get_function_address<util::detail::bound<Sig> >
     {
@@ -494,7 +519,6 @@ namespace hpx { namespace traits
         }
     };
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig>
     struct get_function_annotation<util::detail::bound<Sig> >
@@ -515,6 +539,28 @@ namespace hpx { namespace traits
             return f.get_function_annotation();
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename Sig>
+    struct get_function_annotation_itt<util::detail::bound<Sig> >
+    {
+        static char const*
+            call(util::detail::bound<Sig> const& f) noexcept
+        {
+            return f.get_function_annotation_itt();
+        }
+    };
+
+    template <typename F>
+    struct get_function_annotation_itt<util::detail::one_shot_wrapper<F> >
+    {
+        static char const*
+            call(util::detail::one_shot_wrapper<F> const& f) noexcept
+        {
+            return f.get_function_annotation_itt();
+        }
+    };
+#endif
 #endif
 }}
 

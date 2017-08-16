@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Agustin Berge
+//  Copyright (c) 2017 Google
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -73,10 +74,10 @@ namespace hpx
           : public exception_info_node_base
         {
         public:
-            template <typename ...Tags, typename ...Types>
+            template <typename ...ErrorInfo>
             explicit exception_info_node(
-                error_info<Tags, Types>&&... tagged_values)
-              : data(std::forward<Types>(tagged_values._value)...)
+                ErrorInfo&&... tagged_values)
+              : data(tagged_values._value...)
             {}
 
             template <std::size_t ...Is>
@@ -130,11 +131,11 @@ namespace hpx
 
         virtual ~exception_info() = default;
 
-        template <typename ...Tags, typename ...Types>
-        exception_info& set(error_info<Tags, Types>&&... tagged_values)
+        template <typename ...ErrorInfo>
+        exception_info& set(ErrorInfo&&... tagged_values)
         {
             using node_type = detail::exception_info_node<
-                error_info<Tags, Types>...>;
+                ErrorInfo...>;
 
             node_ptr node = std::make_shared<node_type>(std::move(tagged_values)...);
             node->next = std::move(_data);
@@ -185,7 +186,7 @@ namespace hpx
         };
     }
 
-    template <typename E> HPX_ATTRIBUTE_NORETURN
+    template <typename E> HPX_NORETURN
     void throw_with_info(E&& e, exception_info&& xi = exception_info())
     {
         using ED = typename std::decay<E>::type;
@@ -203,7 +204,7 @@ namespace hpx
         throw detail::exception_with_info<ED>(std::forward<E>(e), std::move(xi));
     }
 
-    template <typename E> HPX_ATTRIBUTE_NORETURN
+    template <typename E> HPX_NORETURN
     void throw_with_info(E&& e, exception_info const& xi)
     {
         throw_with_info(std::forward<E>(e), exception_info(xi));

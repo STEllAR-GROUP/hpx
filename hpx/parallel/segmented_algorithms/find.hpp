@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { inline namespace v1
     {
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename U>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         segmented_find(Algo && algo, ExPolicy && policy, FwdIter first,
             FwdIter last, U && f_or_val, std::true_type)
         {
@@ -120,7 +120,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename U>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         segmented_find(Algo && algo, ExPolicy && policy, FwdIter first,
             FwdIter last, U && f_or_val, std::false_type)
         {
@@ -150,7 +150,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
-                            [=](local_iterator_type const& out)
+                            [send,end,last](local_iterator_type const& out)
                                 -> FwdIter
                             {
                                 if(out != end)
@@ -170,7 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
-                            [=](local_iterator_type const& out)
+                            [sit,end,last](local_iterator_type const& out)
                                 -> FwdIter
                             {
                                 if(out != end)
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             hpx::make_future<FwdIter>(
                                 dispatch_async(traits::get_id(sit), algo,
                                     policy, forced_seq(), beg, end, f_or_val),
-                                [=](local_iterator_type const& out)
+                                [sit,end,last](local_iterator_type const& out)
                                     -> FwdIter
                                 {
                                     if(out != end)
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo,
                                 policy, forced_seq(), beg, end, f_or_val),
-                            [=](local_iterator_type const& out)
+                            [sit,end,last](local_iterator_type const& out)
                                 -> FwdIter
                             {
                                 if(out != end)
@@ -331,7 +331,7 @@ namespace hpx { namespace parallel { inline namespace v1
         inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type);
-
+  
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2, typename Pred>
         typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type

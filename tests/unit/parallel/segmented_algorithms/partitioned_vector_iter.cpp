@@ -176,7 +176,6 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     HPX_TEST_EQ(count, size);
 
     // test segmented iteration over localities
-    count = 0;
     seg_count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
@@ -185,6 +184,10 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
         for (local_segment_iterator seg_it = v.segment_begin(locality_id);
              seg_it != seg_end; ++seg_it, ++seg_count)
         {
+            // local raw iterators are valid locally only
+            if (loc != hpx::find_here())
+                continue;
+
             local_raw_iterator loc_end = traits::end(seg_it);
             for (local_raw_iterator lit = traits::begin(seg_it);
                  lit != loc_end; ++lit, ++count)
@@ -192,10 +195,8 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
             }
         }
     }
-    HPX_TEST_EQ(count, size);
     HPX_TEST_EQ(seg_count, parts);
 
-    count = 0;
     seg_count = 0;
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
@@ -204,6 +205,10 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
         for (const_local_segment_iterator seg_cit = v.segment_cbegin(locality_id);
              seg_cit != seg_cend; ++seg_cit, ++seg_count)
         {
+            // local raw iterators are valid locally only
+            if (loc != hpx::find_here())
+                continue;
+
             const_local_raw_iterator loc_cend = const_traits::end(seg_cit);
             for (const_local_raw_iterator lcit = const_traits::begin(seg_cit);
                  lcit != loc_cend; ++lcit, ++count)
@@ -211,7 +216,6 @@ void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
             }
         }
     }
-    HPX_TEST_EQ(count, size);
     HPX_TEST_EQ(seg_count, parts);
 
     // test iterator composition

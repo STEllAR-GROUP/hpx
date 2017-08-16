@@ -76,6 +76,6 @@ namespace hpx { namespace agas { namespace detail
 }}}
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    parcelset::endpoints_type, parcelset_endpoints_type)
+    hpx::parcelset::endpoints_type, parcelset_endpoints_type)
 
 #endif

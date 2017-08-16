@@ -7,6 +7,7 @@
 #define HPX_SERIALIZATION_DEQUE_HPP
 
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/detail/serialize_collection.hpp>
 
 #include <cstdint>
 #include <deque>
@@ -19,14 +20,9 @@ namespace hpx { namespace serialization
         // normal load ...
         std::uint64_t size;
         ar >> size; //-V128
-
-        d.resize(size);
         if(size == 0) return;
 
-        for(auto & e: d)
-        {
-            ar >> e;
-        }
+        detail::load_collection(ar, d, size);
     }
 
     template <typename T, typename Allocator>
@@ -37,10 +33,7 @@ namespace hpx { namespace serialization
         ar << size;
         if(d.empty()) return;
 
-        for(auto const & e: d)
-        {
-            ar << e;
-        }
+        detail::save_collection(ar, d);
     }
 }}
 

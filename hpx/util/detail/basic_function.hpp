@@ -1,6 +1,7 @@
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
+//  Copyright (c) 2017 Google
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -197,12 +198,29 @@ namespace hpx { namespace util { namespace detail
 
         std::size_t get_function_address() const
         {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->get_function_address(object);
+#else
+            return 0;
+#endif
         }
 
         char const* get_function_annotation() const
         {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->get_function_annotation(object);
+#else
+            return nullptr;
+#endif
+        }
+
+        char const* get_function_annotation_itt() const
+        {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            return vptr->get_function_annotation_itt(object);
+#else
+            return nullptr;
+#endif
         }
 
     private:

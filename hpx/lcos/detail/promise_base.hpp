@@ -47,6 +47,11 @@ namespace lcos {
                 f_ = std::move(f);
             }
 
+            void mark_as_started()
+            {
+                this->task_base<Result>::started_test_and_set();
+            }
+
         private:
             void do_run()
             {
@@ -221,7 +226,8 @@ namespace lcos {
                 return *this;
             }
 
-            naming::id_type get_id(error_code& ec = throws) const
+            naming::id_type get_id(bool mark_as_started = true,
+                error_code& ec = throws) const
             {
                 if (this->shared_state_ == nullptr)
                 {
@@ -245,21 +251,30 @@ namespace lcos {
                     return naming::invalid_id;
                 }
 
-                id_retrieved_ = true;
+                if (mark_as_started)
+                {
+                    this->shared_state_->mark_as_started();
+                }
 
+                id_retrieved_ = true;
                 return id_;
+            }
+
+            naming::id_type get_id(error_code& ec) const
+            {
+                return get_id(true, ec);
             }
 
             naming::id_type get_unmanaged_gid(error_code& ec = throws) const
             {
-                return get_id(ec);
+                return get_id(false, ec);
             }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
             HPX_DEPRECATED(HPX_DEPRECATED_MSG)
             naming::id_type get_gid(error_code& ec = throws) const
             {
-                return get_id(ec);
+                return get_id(false, ec);
             }
 #endif
 
