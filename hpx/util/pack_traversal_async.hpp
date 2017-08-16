@@ -71,6 +71,7 @@ namespace util {
     ///                  overloads that were described above.
     ///                  Additionally the visitor must be compatible
     ///                  for referencing it from a `boost::intrusive_ptr`.
+    ///                  The visitor should must have a virtual destructor!
     ///
     /// \param   pack    The arbitrary parameter pack which is traversed
     ///                  asynchronously. Nested objects inside containers and

@@ -118,6 +118,9 @@ namespace util {
             {
             }
 
+            /// We require a virtual base
+            ~async_traversal_frame() noexcept override {}
+
             template <typename MapperArg>
             explicit async_traversal_frame(async_traverse_in_place_tag<Visitor>,
                 MapperArg&& mapper_arg, Args... args)

@@ -44,6 +44,8 @@ class async_counter_base : public boost::intrusive_ref_counter<Child>
 public:
     explicit async_counter_base() = default;
 
+    virtual ~async_counter_base() {}
+
     std::size_t const& counter() const noexcept
     {
         return counter_;
