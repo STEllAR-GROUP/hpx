@@ -235,7 +235,7 @@ access mode.
 
 Although HPX refutes by design this programming model, the locality plays a
 dominant role when it comes to implement vectorized code. To maximize local
-computing and avoid uneededed data transfer, a parallel section (or Single
+computing and avoid the unneeded data transfer, a parallel section (or Single
 Programming Multiple Data section) is required. Because the use of global
 variables is prohibited, this parallel section is created via the RAII idiom.
 
@@ -340,7 +340,7 @@ indicating the number of images per locality to create.
         return 0;
     }
 [note In principle, the user should never call the `spmd_block` constructor.
-      The `define_spmd_block` function is responsible of instanciating it and
+      The `define_spmd_block` function is responsible of instantiating it and
       broadcasting it to each created image.
 ]
 [endsect]
@@ -348,7 +348,7 @@ indicating the number of images per locality to create.
 [section:spmd_views SPMD Multidimensionnal Views]
 Object classes are defined as "container views" when the purpose is to
 observe and/or to modify the values of a container using another perspective
-than the one that caracterizes the container. For example, the values of an
+than the one that characterizes the container. For example, the values of an
 `std::vector` object can be accessed via the expression `v[i]`. Container views
 can be used, for example, when it is desired for those values to be "viewed" as
 a 2D matrix that would have been flattened in a `std::vector`. The values would
