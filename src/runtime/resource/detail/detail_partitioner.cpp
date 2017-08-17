@@ -25,7 +25,7 @@
 namespace hpx { namespace resource { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_ATTRIBUTE_NORETURN void throw_runtime_error(
+    HPX_NORETURN void throw_runtime_error(
         std::string const& func, std::string const& message)
     {
         if (get_runtime_ptr() != nullptr)
@@ -38,7 +38,7 @@ namespace hpx { namespace resource { namespace detail
         }
     }
 
-    HPX_ATTRIBUTE_NORETURN void throw_invalid_argument(
+    HPX_NORETURN void throw_invalid_argument(
         std::string const& func, std::string const& message)
     {
         if (get_runtime_ptr() != nullptr)
