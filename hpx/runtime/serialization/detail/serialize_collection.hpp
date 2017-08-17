@@ -86,8 +86,8 @@ namespace hpx { namespace serialization { namespace detail {
                     typename Collection::size_type size)
             {
                 using value_type = typename Collection::value_type;
-                using storage_type = std::aligned_storage<
-                    sizeof(value_type), alignof(value_type)>;
+                using storage_type = typename std::aligned_storage<
+                    sizeof(value_type), alignof(value_type)>::type;
 
                 collection.clear();
                 hpx::traits::detail::reserve_if_reservable(collection, size);
