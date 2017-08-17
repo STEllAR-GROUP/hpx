@@ -10,9 +10,12 @@ set(tests
     bind_action
     config_entry
     function
+    pack_traversal
     parse_slurm_nodelist
+    range
     tagged
     tuple
+    unwrap
    )
 
 if(HPX_WITH_CXX11_STD_INITIALIZER_LIST)

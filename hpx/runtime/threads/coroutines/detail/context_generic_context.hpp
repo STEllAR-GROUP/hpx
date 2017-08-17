@@ -26,22 +26,13 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/version.hpp>
-
-#if BOOST_VERSION < 105100
-#error Boost.Context is available only with Boost V1.51 or later
-#endif
-
 #include <boost/atomic.hpp>
+#include <boost/version.hpp>
 
 #if BOOST_VERSION < 106100
 #include <boost/context/all.hpp>
 #else
 #include <boost/context/detail/fcontext.hpp>
-#endif
-
-#if !defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
-#include <boost/throw_exception.hpp>
 #endif
 
 #include <cstddef>
@@ -52,7 +43,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS) && BOOST_VERSION >= 105300
+#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
 
 #define HPX_COROUTINES_SEGMENTS 10
 
@@ -108,7 +99,7 @@ namespace hpx { namespace threads { namespace coroutines
                 posix::watermark_stack(limit, size);
 #else
                 void* limit = std::calloc(size, sizeof(char));
-                if (!limit) boost::throw_exception(std::bad_alloc());
+                if (!limit) throw std::bad_alloc();
 #endif
                 return static_cast<char*>(limit) + size;
             }
@@ -152,7 +143,7 @@ namespace hpx { namespace threads { namespace coroutines
                 HPX_ASSERT(default_stacksize() <= size);
 
                 void* limit = __splitstack_makecontext(size, segments_ctx_, &size);
-                if (!limit) boost::throw_exception(std::bad_alloc());
+                if (!limit) throw std::bad_alloc();
 
                 int off = 0;
                  __splitstack_block_signals_context(segments_ctx_, &off, 0);

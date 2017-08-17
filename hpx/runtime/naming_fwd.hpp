@@ -28,6 +28,7 @@ namespace hpx
 
         HPX_API_EXPORT resolver_client& get_agas_client();
 
+        typedef std::int32_t component_type;
         typedef std::uint64_t address_type;
 
         HPX_CONSTEXPR_OR_CONST std::uint32_t invalid_locality_id = ~0U;

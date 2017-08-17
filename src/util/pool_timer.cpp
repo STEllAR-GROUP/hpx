@@ -10,7 +10,6 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
@@ -18,7 +17,7 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/basic_waitable_timer.hpp>
 
 #include <chrono>
 #include <memory>
@@ -57,10 +56,8 @@ namespace hpx { namespace util { namespace detail
         bool stop_locked();
 
     private:
-        typedef boost::asio::basic_deadline_timer<
-            util::steady_clock,
-            util::chrono_traits<util::steady_clock>
-        > deadline_timer;
+        typedef boost::asio::basic_waitable_timer<
+            util::steady_clock> deadline_timer;
 
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_; ///< function to call

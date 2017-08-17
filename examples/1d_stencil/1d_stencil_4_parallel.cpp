@@ -117,7 +117,7 @@ struct stepper
     // time steps
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
     {
-        using hpx::util::unwrapped;
+        using hpx::util::unwrapping;
         using hpx::dataflow;
         using hpx::parallel::for_each;
         using hpx::parallel::execution::par;
@@ -131,7 +131,7 @@ struct stepper
         for (std::size_t i = 0; i != np; ++i)
             U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
 
-        auto Op = unwrapped(&stepper::heat_part);
+        auto Op = unwrapping(&stepper::heat_part);
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)

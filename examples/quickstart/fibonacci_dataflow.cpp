@@ -14,7 +14,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -45,7 +45,7 @@ hpx::future<std::uint64_t> fibonacci(std::uint64_t n)
 
     return
         hpx::dataflow(
-            hpx::util::unwrapped(
+            hpx::util::unwrapping(
             [](std::uint64_t lhs, std::uint64_t rhs)
             {
                 return lhs + rhs;

@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
@@ -65,8 +65,13 @@ namespace hpx { namespace threads { namespace policies
 
         using local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::queues_;
+
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+        using local_queue_scheduler<
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::mtx_;
         using local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::cond_;
+#endif
         using local_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing>::curr_queue_;
 
@@ -99,7 +104,7 @@ namespace hpx { namespace threads { namespace policies
         virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
-            //Drain the queue of the disableed OS thread
+            // Drain the queue of the disabled OS thread
             while (disabled(num_thread)) {
                 thread_queue_type* q = queues_[num_thread];
                 while (q->get_next_thread(thrd)) {
@@ -107,7 +112,7 @@ namespace hpx { namespace threads { namespace policies
                     this->schedule_thread(thrd, num_thread, thread_priority_normal);
                 }
 
-                std::unique_lock<std::mutex> l(mtx_);
+                std::unique_lock<compat::mutex> l(mtx_);
                 cond_.wait(l);
             }
 
@@ -270,7 +275,10 @@ namespace hpx { namespace threads { namespace policies
     protected:
         typedef hpx::lcos::local::spinlock mutex_type;
         mutex_type throttle_mtx_;
-        mutable std::mutex mtx_;
+#if !defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+        mutable compat::mutex mtx_;
+        compat::condition_variable cond_;
+#endif
         mutable boost::dynamic_bitset<> disabled_os_threads_;
         int num_physical_cores;
         int num_logical_cores;

@@ -12,8 +12,7 @@
 #include <hpx/lcos/server/queue.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,7 +84,7 @@ namespace hpx { namespace lcos
             typedef lcos::base_lco::set_exception_action action_type;
 
             HPX_ASSERT(this->get_id());
-            boost::exception_ptr exception =
+            std::exception_ptr exception =
                 HPX_GET_EXCEPTION(hpx::no_success, "queue::abort_pending", "");
             return hpx::async<action_type>(this->get_id(), exception);
         }
@@ -112,21 +111,25 @@ namespace hpx { namespace lcos
         }
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         ValueType get_value_sync()
         {
             return get_value(launch::sync);
         }
 
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void set_value_sync(RemoteType const& val)
         {
             set_value(launch::sync, val);
         }
 
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void set_value_sync(RemoteType && val) //-V659
         {
             set_value(launch::sync, std::move(val));
         }
 
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void abort_pending_sync()
         {
             abort_pending(launch::sync);

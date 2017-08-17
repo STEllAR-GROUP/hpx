@@ -133,6 +133,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         naming::id_type get_unmanaged_id() const;
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type get_gid() const //-V659
         {
             return get_unmanaged_id();
@@ -567,9 +568,11 @@ namespace hpx { namespace components { namespace server
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
+            static component_type t = component_memory_block;
+
             util::reinitializable_static<
                 heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT
-            > heap(component_memory_block);
+            > heap(t);
             return heap.get(get_runtime_instance_number());
         }
 
@@ -660,6 +663,7 @@ namespace hpx { namespace components { namespace server
         }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type get_gid() const
         {
             return get_checked()->get_gid();

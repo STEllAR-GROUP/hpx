@@ -9,15 +9,14 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/throw_exception.hpp>
 
+#include <exception>
 #include <string>
 
 namespace hpx { namespace detail
 {
-    HPX_ATTRIBUTE_NORETURN void throw_exception(
+    HPX_NORETURN void throw_exception(
         error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
@@ -27,7 +26,7 @@ namespace hpx { namespace detail
             func, p.string(), line);
     }
 
-    HPX_ATTRIBUTE_NORETURN void rethrow_exception(
+    HPX_NORETURN void rethrow_exception(
         exception const& e, std::string const& func)
     {
         hpx::detail::throw_exception(
@@ -35,7 +34,7 @@ namespace hpx { namespace detail
             func, hpx::get_error_file_name(e), hpx::get_error_line_number(e));
     }
 
-    boost::exception_ptr get_exception(
+    std::exception_ptr get_exception(
         error errcode, std::string const& msg, throwmode mode,
         std::string const& func, std::string const& file, long line,
         std::string const& auxinfo)
@@ -46,7 +45,7 @@ namespace hpx { namespace detail
             p.string(), file, line, auxinfo);
     }
 
-    boost::exception_ptr get_exception(
+    std::exception_ptr get_exception(
         boost::system::error_code ec, std::string const& msg, throwmode mode,
         std::string const& func, std::string const& file, long line,
         std::string const& auxinfo)
@@ -84,8 +83,8 @@ namespace hpx { namespace detail
         }
     }
 
-    HPX_ATTRIBUTE_NORETURN void throw_thread_interrupted_exception()
+    HPX_NORETURN void throw_thread_interrupted_exception()
     {
-        boost::throw_exception(hpx::thread_interrupted());
+        throw hpx::thread_interrupted();
     }
 }}

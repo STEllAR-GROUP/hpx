@@ -14,9 +14,9 @@
 #include <hpx/exception_fwd.hpp>
 
 #include <boost/current_function.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 
+#include <exception>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -25,32 +25,32 @@
 namespace hpx { namespace detail
 {
     template <typename Exception>
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+    HPX_NORETURN HPX_EXPORT
     void throw_exception(Exception const& e,
         std::string const& func, std::string const& file, long line);
 
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT void throw_exception(
+    HPX_NORETURN HPX_EXPORT void throw_exception(
         error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line);
 
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT void rethrow_exception(
+    HPX_NORETURN HPX_EXPORT void rethrow_exception(
         exception const& e, std::string const& func);
 
     template <typename Exception>
-    HPX_EXPORT boost::exception_ptr get_exception(Exception const& e,
+    HPX_EXPORT std::exception_ptr get_exception(Exception const& e,
             std::string const& func = "<unknown>",
             std::string const& file = "<unknown>",
             long line = -1,
             std::string const& auxinfo = "");
 
-    HPX_EXPORT boost::exception_ptr get_exception(
+    HPX_EXPORT std::exception_ptr get_exception(
             error errcode, std::string const& msg, throwmode mode,
             std::string const& func = "<unknown>",
             std::string const& file = "<unknown>",
             long line = -1,
             std::string const& auxinfo = "");
 
-    HPX_EXPORT boost::exception_ptr get_exception(
+    HPX_EXPORT std::exception_ptr get_exception(
             boost::system::error_code ec, std::string const& msg, throwmode mode,
             std::string const& func = "<unknown>",
             std::string const& file = "<unknown>",
@@ -64,7 +64,7 @@ namespace hpx { namespace detail
     HPX_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+    HPX_NORETURN HPX_EXPORT
     void throw_thread_interrupted_exception();
 }}
 /// \endcond
@@ -74,7 +74,7 @@ namespace hpx
     /// \cond NOINTERNAL
 
     /// \brief throw an hpx::exception initialized from the given arguments
-    HPX_ATTRIBUTE_NORETURN inline
+    HPX_NORETURN inline
     void throw_exception(error e, std::string const& msg,
         std::string const& func, std::string const& file = "", long line = -1)
     {

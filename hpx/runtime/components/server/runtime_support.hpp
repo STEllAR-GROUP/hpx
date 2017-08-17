@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Thomas Heller
 //
@@ -194,13 +194,13 @@ namespace hpx { namespace components { namespace server
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        HPX_ATTRIBUTE_NORETURN void terminate(
+        HPX_NORETURN void terminate(
             naming::id_type const& respond_to);
 
         void terminate_act(naming::id_type const& id) { terminate(id); }
 
         /// \brief Shutdown runtime system instances on all localities
-        HPX_ATTRIBUTE_NORETURN void terminate_all();
+        HPX_NORETURN void terminate_all();
 
         void terminate_all_act() { terminate_all(); }
 
@@ -799,11 +799,14 @@ namespace hpx { namespace components { namespace server
         }
 
         typedef typename Component::wrapping_type wrapping_type;
+        typename wrapping_type::derived_type* new_instance = nullptr;
+
         naming::gid_type id = factory->create_with_args(migrated_id,
-            detail::construct_function<wrapping_type>(std::move(*p)));
+            detail::construct_function<wrapping_type>(std::move(*p)),
+            reinterpret_cast<void**>(&new_instance));
 
         // sanity checks
-        if (!id)
+        if (!id || new_instance == nullptr)
         {
             // we should not get here (id should not be invalid)
             HPX_THROW_EXCEPTION(hpx::invalid_status,
@@ -825,6 +828,9 @@ namespace hpx { namespace components { namespace server
             << " of type: " << components::get_component_type_name(type)
             << " to locality: " << find_here();
 
+        // inform the newly created component that it has been migrated
+        new_instance->on_migrated();
+
         // At this point the object has been fully migrated. We now remove
         // the object from the AGAS table of migrated objects. This is
         // necessary as this object might have been migrated off this locality
@@ -832,6 +838,7 @@ namespace hpx { namespace components { namespace server
         agas::unmark_as_migrated(id);
 
         to_migrate.make_unmanaged();
+
         return id;
     }
 }}}

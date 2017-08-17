@@ -7,34 +7,34 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/state.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/unlock_guard.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/promise.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/local/promise.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -42,12 +42,12 @@
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/detail/endian.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/format.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -714,7 +714,7 @@ namespace hpx { namespace parcelset
             }
 
             // all unhandled exceptions terminate the whole application
-            boost::exception_ptr exception =
+            std::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
                     "default_write_handler", __FILE__,
                     __LINE__, parcelset::dump_parcel(p));
@@ -1567,17 +1567,17 @@ namespace hpx { namespace parcelset
             "[hpx.parcel]",
             "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_PARCEL_SERVER_PORT:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+                HPX_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
             "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
             "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
             "max_connections_per_locality = "
                 "${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
             "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
             "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else

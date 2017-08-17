@@ -24,7 +24,6 @@
 
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -451,11 +450,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(x);
-            else
-                object = new value_type(x);
+            new_object(object, x,
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         // Move constructor
@@ -482,11 +478,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(std::forward<T>(x));
-            else
-                object = new value_type(std::forward<T>(x));
+            new_object(object, std::forward<T>(x),
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         ~basic_any()
@@ -511,6 +504,20 @@ namespace hpx { namespace util
                 }
             }
             return *this;
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::true_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            new (&object) value_type(std::forward<T>(x));
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::false_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            object = new value_type(std::forward<T>(x));
         }
 
     public:
@@ -734,11 +741,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(x);
-            else
-                object = new value_type(x);
+            new_object(object, x,
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         // Move constructor
@@ -765,11 +769,8 @@ namespace hpx { namespace util
             object(nullptr)
         {
             typedef typename util::decay<T>::type value_type;
-
-            if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(std::forward<T>(x));
-            else
-                object = new value_type(std::forward<T>(x));
+            new_object(object, std::forward<T>(x),
+                typename detail::any::get_table<value_type>::is_small());
         }
 
         ~basic_any()
@@ -793,6 +794,20 @@ namespace hpx { namespace util
                 }
             }
             return *this;
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::true_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            new (&object) value_type(std::forward<T>(x));
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T && x, std::false_type)
+        {
+            typedef typename util::decay<T>::type value_type;
+            object = new value_type(std::forward<T>(x));
         }
 
     public:
@@ -966,7 +981,7 @@ namespace hpx { namespace util
 
         nonref* result = any_cast<nonref>(&operand);
         if(!result)
-            boost::throw_exception(bad_any_cast(operand.type(), BOOST_SP_TYPEID(T)));
+            throw bad_any_cast(operand.type(), BOOST_SP_TYPEID(T));
         return static_cast<T>(*result);
     }
 
@@ -1009,6 +1024,7 @@ namespace hpx { namespace util
             bool flush(void* dst, std::size_t dst_count,
                 std::size_t& written)
             {
+                written = dst_count;
                 return true;
             }
 

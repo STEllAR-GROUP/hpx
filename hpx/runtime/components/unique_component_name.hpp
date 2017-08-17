@@ -6,7 +6,7 @@
 #if !defined(HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649)
 #define HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
 
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 namespace hpx { namespace components
 {
@@ -30,7 +30,7 @@ namespace hpx { namespace components
                                                                               \
             static type call (void)                                           \
             {                                                                 \
-                return BOOST_PP_STRINGIZE(name);                              \
+                return HPX_PP_STRINGIZE(name);                                \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
@@ -46,7 +46,7 @@ namespace hpx { namespace components
                                                                               \
             static type call (void)                                           \
             {                                                                 \
-                return BOOST_PP_STRINGIZE(name);                              \
+                return HPX_PP_STRINGIZE(name);                                \
             }                                                                 \
         };                                                                    \
                                                                               \

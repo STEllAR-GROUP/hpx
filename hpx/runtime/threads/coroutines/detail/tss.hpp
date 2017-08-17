@@ -51,32 +51,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             value_(val)
         {}
 
-#if !(defined(HPX_INTEL_VERSION) && __GNUC__ == 4 && __GNUC_MINOR__ == 6)
-        tss_data_node(tss_data_node&& rhs)
-          : func_(std::move(rhs.func_)),
-            value_(rhs.value_)
-        {
-            rhs.func_.reset();
-            rhs.value_ = nullptr;
-        }
-#endif
-
         ~tss_data_node()
         {
             cleanup();
         }
-
-#if !(defined(HPX_INTEL_VERSION) && __GNUC__ == 4 && __GNUC_MINOR__ == 6)
-        tss_data_node& operator=(tss_data_node&& rhs)
-        {
-            func_ = std::move(rhs.func_);
-            value_ = rhs.value_;
-
-            rhs.func_.reset();
-            rhs.value_ = nullptr;
-            return *this;
-        }
-#endif
 
         template <typename T>
         T get_data() const

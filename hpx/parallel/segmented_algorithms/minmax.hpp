@@ -16,9 +16,8 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>
@@ -210,13 +209,13 @@ namespace hpx { namespace parallel { inline namespace v1
                         ->  SegIter
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
 
                         std::vector<SegIter> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                         return Algo::sequential_minmax_element_ind(
                             policy, res.begin(), res.size(), f, proj);
                     },
@@ -504,13 +503,13 @@ namespace hpx { namespace parallel { inline namespace v1
                         ->  result_type
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);
 
                         std::vector<result_type> res =
-                            hpx::util::unwrapped(std::move(r));
+                            hpx::util::unwrap(std::move(r));
                         return Algo::sequential_minmax_element_ind(
                             policy, res.begin(), res.size(), f, proj);
                     },

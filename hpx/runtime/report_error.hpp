@@ -10,18 +10,17 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
+#include <exception>
 
 namespace hpx
 {
     /// The function report_error reports the given exception to the console
     HPX_API_EXPORT void report_error(std::size_t num_thread,
-        boost::exception_ptr const& e);
+        std::exception_ptr const& e);
 
     /// The function report_error reports the given exception to the console
-    HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
+    HPX_API_EXPORT void report_error(std::exception_ptr const& e);
 }
 
 #endif

@@ -29,11 +29,10 @@
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -517,7 +516,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::report_error(
-        std::size_t num_thread, boost::exception_ptr const& e)
+        std::size_t num_thread, std::exception_ptr const& e)
     {
         // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(state_running))
@@ -562,7 +561,7 @@ namespace hpx {
 
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::report_error(
-        boost::exception_ptr const& e)
+        std::exception_ptr const& e)
     {
         return report_error(hpx::get_worker_thread_num(), e);
     }
@@ -575,9 +574,9 @@ namespace hpx {
             std::lock_guard<compat::mutex> l(mtx_);
             if (exception_)
             {
-                boost::exception_ptr e = exception_;
-                exception_ = boost::exception_ptr();
-                boost::rethrow_exception(e);
+                std::exception_ptr e = exception_;
+                exception_ = std::exception_ptr();
+                std::rethrow_exception(e);
             }
         }
     }
@@ -634,7 +633,7 @@ namespace hpx {
         get_notification_policy(char const* prefix)
     {
         typedef void (runtime_impl::*report_error_t)(
-            std::size_t, boost::exception_ptr const&);
+            std::size_t, std::exception_ptr const&);
 
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -890,7 +889,7 @@ template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::periodic_priority_queue_scheduler<> >;
 #endif
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
 #include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::throttling_scheduler<> >;

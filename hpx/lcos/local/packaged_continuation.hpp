@@ -28,6 +28,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <functional>
 #include <mutex>
 #include <utility>
@@ -46,7 +47,7 @@ namespace hpx { namespace lcos { namespace detail
                 dest.set_value(src.get());
             }
             catch (...) {
-                dest.set_exception(boost::current_exception());
+                dest.set_exception(std::current_exception());
             }
         }
 
@@ -58,7 +59,7 @@ namespace hpx { namespace lcos { namespace detail
                 dest.set_value(util::unused);
             }
             catch (...) {
-                dest.set_exception(boost::current_exception());
+                dest.set_exception(std::current_exception());
             }
         }
 
@@ -82,7 +83,7 @@ namespace hpx { namespace lcos { namespace detail
             cont.set_value(func(std::move(future)));
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(std::current_exception());
         }
     }
 
@@ -95,7 +96,7 @@ namespace hpx { namespace lcos { namespace detail
             cont.set_value(util::unused);
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(std::current_exception());
         }
     }
 
@@ -111,7 +112,6 @@ namespace hpx { namespace lcos { namespace detail
         > is_void;
 
         hpx::util::annotate_function annotate(func);
-        (void)annotate;     // suppress warning about unused variable
         invoke_continuation(func, future, cont, is_void());
     }
 
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace detail
                     std::move(inner_state), std::move(cont_)));
         }
         catch (...) {
-            cont.set_exception(boost::current_exception());
+            cont.set_exception(std::current_exception());
         }
      }
 
@@ -359,6 +359,7 @@ namespace hpx { namespace lcos { namespace detail
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void async_exec_v1(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -438,6 +439,7 @@ namespace hpx { namespace lcos { namespace detail
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void async_exec_v1(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -494,13 +496,14 @@ namespace hpx { namespace lcos { namespace detail
             }
             catch (...) {
                 this->started_ = true;
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
                 throw;
             }
         }
 
     public:
-        void attach(Future const& future, launch policy)
+        template <typename Policy>
+        void attach(Future const& future, Policy && policy)
         {
             typedef
                 typename traits::detail::shared_state_ptr_for<Future>::type
@@ -509,12 +512,6 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr &&, threads::thread_priority);
-
-            if (policy & launch::sync)
-                cb = &continuation::run;
-            else
-                cb = &continuation::async;
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
@@ -528,7 +525,14 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(util::deferred_call(
-                    cb, std::move(this_), std::move(state), policy.priority()
+                    [this_](shared_state_ptr && f, launch policy)
+                    {
+                        if (hpx::detail::has_async_policy(policy))
+                            this_->async(std::move(f), policy.priority());
+                        else
+                            this_->run(std::move(f), policy.priority());
+                    },
+                    std::move(state), std::forward<Policy>(policy)
                 ));
         }
 
@@ -562,6 +566,7 @@ namespace hpx { namespace lcos { namespace detail
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void attach_exec_v1(Future const& future, Executor& exec)
         {
             typedef
@@ -627,11 +632,11 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult, typename Future, typename F>
+    template <typename ContResult, typename Future, typename Policy, typename F>
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
-    make_continuation(Future const& future, launch policy, F && f)
+    make_continuation(Future const& future, Policy && policy, F && f)
     {
         typedef typename continuation_result<ContResult>::type result_type;
         typedef detail::continuation<Future, F, result_type> shared_state;
@@ -640,7 +645,8 @@ namespace hpx { namespace lcos { namespace detail
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
             new shared_state(std::forward<F>(f), init_no_addref()), false);
-        static_cast<shared_state*>(p.get())->attach(future, policy);
+        static_cast<shared_state*>(p.get())->attach(
+            future, std::forward<Policy>(policy));
         return p;
     }
 
@@ -664,6 +670,7 @@ namespace hpx { namespace lcos { namespace detail
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     template <typename ContResult, typename Future, typename Executor,
         typename F>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
     >::type
@@ -742,7 +749,7 @@ namespace hpx { namespace lcos { namespace detail
                 transfer_result<Inner>()(std::move(inner_state), this);
             }
             catch (...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
@@ -787,7 +794,7 @@ namespace hpx { namespace lcos { namespace detail
                         std::move(inner_state)));
             }
             catch (...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 

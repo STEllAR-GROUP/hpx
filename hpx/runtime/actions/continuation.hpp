@@ -24,12 +24,11 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/exception_ptr.hpp>
-#include <boost/preprocessor/stringize.hpp>
-
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -58,14 +57,15 @@ namespace hpx { namespace actions
         continuation& operator=(continuation&& o);
 
         //
-        void trigger_error(boost::exception_ptr const& e);
-        void trigger_error(boost::exception_ptr && e);
+        void trigger_error(std::exception_ptr const& e);
+        void trigger_error(std::exception_ptr && e);
 
         // serialization support
         void serialize(hpx::serialization::input_archive& ar, unsigned);
         void serialize(hpx::serialization::output_archive& ar, unsigned);
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type const& get_gid() const
         {
             return gid_;

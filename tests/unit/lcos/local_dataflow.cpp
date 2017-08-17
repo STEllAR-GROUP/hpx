@@ -8,7 +8,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <boost/atomic.hpp>
 
@@ -36,7 +36,7 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -75,23 +75,23 @@ void function_pointers()
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    future<void> f1 = dataflow(unwrapped(&void_f1), async(&int_f));
+    future<void> f1 = dataflow(unwrapping(&void_f1), async(&int_f));
     future<int>
         f2 = dataflow(
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
         );
     future<int>
         f3 = dataflow(
-            unwrapped(&int_f2)
+            unwrapping(&int_f2)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42)
             )
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(37)
             )
         );
@@ -100,18 +100,18 @@ void function_pointers()
     std::vector<future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
-        vf.push_back(dataflow(unwrapped(&int_f1), make_ready_future(42)));
+        vf.push_back(dataflow(unwrapping(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(unwrapped(&int_f_vector), std::move(vf));
+    future<int> f4 = dataflow(unwrapping(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
           , dataflow(
-                unwrapped(&void_f)
+                unwrapping(&void_f)
               , make_ready_future())
         );
 
@@ -321,6 +321,69 @@ void plain_deferred_arguments()
     }
 }
 
+void plain_arguments_lazy()
+{
+    void_f4_count.store(0);
+    int_f4_count.store(0);
+
+    auto policy1 =
+        hpx::launch::select([]()
+        {
+            return hpx::launch::sync;
+        });
+
+    {
+        future<void> f1 = dataflow(policy1, &void_f4, 42);
+        future<int> f2 = dataflow(policy1, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 1u);
+    }
+
+    auto policy2 =
+        hpx::launch::select([]()
+        {
+            return hpx::launch::async;
+        });
+
+    {
+        future<void> f1 = dataflow(policy2, &void_f4, 42);
+        future<int> f2 = dataflow(policy2, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 2u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 2u);
+    }
+
+    void_f5_count.store(0);
+    int_f5_count.store(0);
+
+    boost::atomic<int> count(0);
+    auto policy3 =
+        hpx::launch::select([&count]() -> hpx::launch
+        {
+            if (count++ == 0)
+                return hpx::launch::async;
+            return hpx::launch::sync;
+        });
+
+    {
+        future<void> f1 = dataflow(policy3, &void_f5, 42, async(&int_f));
+        future<int> f2 = dataflow(policy3, &int_f5, 42, async(&int_f));
+
+        f1.wait();
+        HPX_TEST_EQ(void_f5_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 126);
+        HPX_TEST_EQ(int_f5_count, 1u);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
@@ -328,6 +391,7 @@ int hpx_main(variables_map&)
     future_function_pointers();
     plain_arguments();
     plain_deferred_arguments();
+    plain_arguments_lazy();
 
     return hpx::finalize();
 }

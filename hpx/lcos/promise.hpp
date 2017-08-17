@@ -11,8 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/promise_base.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <memory>
 #include <utility>
 #include <type_traits>

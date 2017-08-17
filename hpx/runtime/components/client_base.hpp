@@ -23,9 +23,9 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -268,7 +268,7 @@ namespace hpx { namespace components
             rhs.shared_state_ = nullptr;
         }
 
-        // A future to a client_base can be unwrapped to represent the
+        // A future to a client_base can be unwrap to represent the
         // client_base directly as a client_base is semantically a future to
         // the id of the referenced object.
         client_base(future<Derived> && d)
@@ -370,6 +370,7 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         id_type const& get_gid() const
         {
             return get_id();
@@ -469,7 +470,7 @@ namespace hpx { namespace components
         //   - Blocks until the future is ready.
         // Returns: The stored exception_ptr if has_exception(), a null
         //          pointer otherwise.
-        boost::exception_ptr get_exception_ptr() const
+        std::exception_ptr get_exception_ptr() const
         {
             if (!shared_state_)
             {
@@ -480,7 +481,7 @@ namespace hpx { namespace components
 
             error_code ec(lightweight);
             this->shared_state_->get_result(ec);
-            if (!ec) return boost::exception_ptr();
+            if (!ec) return std::exception_ptr();
             return hpx::detail::access_exception(ec);
         }
 
@@ -526,7 +527,7 @@ namespace hpx { namespace components
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        static void register_as_helper(Derived && f,
+        static void register_as_helper(client_base const& f,
             std::string const& symbolic_name)
         {
             hpx::agas::register_name(launch::sync, symbolic_name, f.get());
@@ -571,6 +572,12 @@ namespace hpx { namespace components
         {
             HPX_ASSERT(!registered_name_.empty());   // call only once
             registered_name_.clear();
+        }
+
+        // Access registered name for the component
+        std::string const& registered_name() const
+        {
+            return registered_name_;
         }
 
     protected:

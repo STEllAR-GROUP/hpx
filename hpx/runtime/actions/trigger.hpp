@@ -39,7 +39,7 @@ namespace hpx { namespace actions {
                 }
                 catch (...) {
                     // make sure hpx::exceptions are propagated back to the client
-                    cont.trigger_error(boost::current_exception());
+                    cont.trigger_error(std::current_exception());
                 }
             }
 
@@ -54,7 +54,7 @@ namespace hpx { namespace actions {
                 }
                 catch (...) {
                     // make sure hpx::exceptions are propagated back to the client
-                    cont.trigger_error(boost::current_exception());
+                    cont.trigger_error(std::current_exception());
                 }
             }
         };
@@ -99,13 +99,14 @@ namespace hpx { namespace actions {
             }
             catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont.trigger_error(boost::current_exception());
+                cont.trigger_error(std::current_exception());
             }
         }
 
         // Overload when return type is "void" aka util::unused_type
         template <typename Result, typename RemoteResult, typename F, typename ...Ts>
-        void trigger_impl(std::true_type, typed_continuation<Result, RemoteResult>&& cont,
+        void trigger_impl(std::true_type,
+            typed_continuation<Result, RemoteResult>&& cont,
             F&& f, Ts&&... vs)
         {
             try {
@@ -114,7 +115,7 @@ namespace hpx { namespace actions {
             }
             catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
-                cont.trigger_error(boost::current_exception());
+                cont.trigger_error(std::current_exception());
             }
         }
 

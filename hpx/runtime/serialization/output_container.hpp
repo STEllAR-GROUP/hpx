@@ -14,6 +14,7 @@
 #include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
+#include <hpx/traits/serialization_access_data.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <cstddef> // for size_t
@@ -27,72 +28,6 @@ namespace hpx { namespace serialization
 {
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Container>
-        struct access_data
-        {
-            typedef std::false_type preprocessing_only;
-
-            HPX_CONSTEXPR static bool is_preprocessing() { return false; }
-
-            static void await_future(
-                Container& cont
-              , hpx::lcos::detail::future_data_refcnt_base & future_data)
-            {}
-
-            static void add_gid(Container& cont,
-                naming::gid_type const & gid,
-                naming::gid_type const & split_gid)
-            {}
-
-            HPX_CONSTEXPR static bool has_gid(Container& cont,
-                naming::gid_type const& gid)
-            {
-                return false;
-            }
-
-            static void write(Container& cont, std::size_t count,
-                std::size_t current, void const* address)
-            {
-                void* dest = &cont[current];
-                switch (count)
-                {
-                case 8:
-                    *static_cast<std::uint64_t*>(dest) =
-                        *static_cast<std::uint64_t const*>(address);
-                    break;
-
-                case 4:
-                    *static_cast<std::uint32_t*>(dest) =
-                        *static_cast<std::uint32_t const*>(address);
-                    break;
-
-                case 2:
-                    *static_cast<std::uint16_t*>(dest) =
-                        *static_cast<std::uint16_t const*>(address);
-                    break;
-
-                case 1:
-                    *static_cast<std::uint8_t*>(dest) =
-                        *static_cast<std::uint8_t const*>(address);
-                    break;
-
-                default:
-                    std::memcpy(dest, address, count);
-                    break;
-                }
-            }
-
-            static bool flush(binary_filter* filter, Container& cont,
-                std::size_t current, std::size_t size, std::size_t& written)
-            {
-                return filter->flush(&cont[current], size, written);
-            }
-
-            static void reset(Container& cont)
-            {}
-        };
-
         ///////////////////////////////////////////////////////////////////////
         struct basic_chunker
         {
@@ -224,6 +159,8 @@ namespace hpx { namespace serialization
     template <typename Container, typename Chunker>
     struct output_container : erased_output_container
     {
+        typedef traits::serialization_access_data<Container> access_traits;
+
         output_container(Container& cont,
                 std::vector<serialization_chunk>* chunks = nullptr)
           : cont_(cont), current_(0), chunker_(chunks)
@@ -252,25 +189,25 @@ namespace hpx { namespace serialization
 
         bool is_preprocessing() const
         {
-            return detail::access_data<Container>::is_preprocessing();
+            return access_traits::is_preprocessing();
         }
 
         void await_future(
             hpx::lcos::detail::future_data_refcnt_base & future_data)
         {
-            detail::access_data<Container>::await_future(cont_, future_data);
+            access_traits::await_future(cont_, future_data);
         }
 
         void add_gid(
             naming::gid_type const & gid,
             naming::gid_type const & split_gid)
         {
-            detail::access_data<Container>::add_gid(cont_, gid, split_gid);
+            access_traits::add_gid(cont_, gid, split_gid);
         }
 
         bool has_gid(naming::gid_type const & gid)
         {
-            return detail::access_data<Container>::has_gid(cont_, gid);
+            return access_traits::has_gid(cont_, gid);
         }
 
         std::size_t get_num_chunks() const
@@ -281,7 +218,7 @@ namespace hpx { namespace serialization
         void reset()
         {
             chunker_.reset();
-            detail::access_data<Container>::reset(cont_);
+            access_traits::reset(cont_);
         }
 
         void set_filter(binary_filter* filter) // override
@@ -306,21 +243,22 @@ namespace hpx { namespace serialization
             }
 
             std::size_t new_current = current_ + count;
-            if (cont_.size() < new_current)
-                cont_.resize(cont_.size() + count);
+            if (access_traits::size(cont_) < new_current)
+                access_traits::resize(cont_, count);
 
-            detail::access_data<Container>::write(
-                cont_, count, current_, address);
+            access_traits::write(cont_, count, current_, address);
 
             current_ = new_current;
         }
 
-        void save_binary_chunk(void const* address, std::size_t count) // override
+        std::size_t save_binary_chunk(void const* address, std::size_t count) // override
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
+                // the container has grown by count bytes
+                return count;
             }
             else {
                 HPX_ASSERT(
@@ -339,6 +277,8 @@ namespace hpx { namespace serialization
                 // add a new serialization_chunk referring to the external
                 // buffer
                 chunker_.push_back(create_pointer_chunk(address, count));
+                // the container did not grow
+                return 0;
             }
         }
 
@@ -352,6 +292,7 @@ namespace hpx { namespace serialization
     template <typename Container, typename Chunker>
     struct filtered_output_container : output_container<Container, Chunker>
     {
+        typedef traits::serialization_access_data<Container> access_traits;
         typedef output_container<Container, Chunker> base_type;
 
         filtered_output_container(Container& cont,
@@ -367,26 +308,28 @@ namespace hpx { namespace serialization
         {
             std::size_t written = 0;
 
-            if (this->cont_.size() < this->current_)
-                this->cont_.resize(this->current_);
+            if (access_traits::size(this->cont_) < this->current_)
+                access_traits::resize(this->cont_, this->current_);
 
             this->current_ = start_compressing_at_;
 
             do {
-                bool flushed = detail::access_data<Container>::flush(
+                bool flushed = access_traits::flush(
                     filter_, this->cont_, this->current_,
-                    this->cont_.size()-this->current_, written);
+                    access_traits::size(this->cont_)-this->current_, written);
 
                 this->current_ += written;
                 if (flushed)
                     break;
 
                 // resize container
-                this->cont_.resize(this->cont_.size()*2);
+                std::size_t size = access_traits::size(this->cont_);
+                access_traits::resize(this->cont_, 2 * size);
 
             } while (true);
 
-            this->cont_.resize(this->current_);         // truncate container
+            // truncate container
+            access_traits::resize(this->cont_, this->current_);
         }
 
         void set_filter(binary_filter* filter) // override
@@ -408,7 +351,7 @@ namespace hpx { namespace serialization
             this->current_ += count;
         }
 
-        void save_binary_chunk(void const* address, std::size_t count) // override
+        std::size_t save_binary_chunk(void const* address, std::size_t count) // override
         {
             if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
             {
@@ -416,9 +359,10 @@ namespace hpx { namespace serialization
                 HPX_ASSERT(count != 0);
                 filter_->save(address, count);
                 this->current_ += count;
+                return count;
             }
             else {
-                this->base_type::save_binary_chunk(address, count);
+                return this->base_type::save_binary_chunk(address, count);
             }
         }
 

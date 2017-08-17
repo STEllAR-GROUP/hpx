@@ -16,6 +16,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <utility>
 #include <vector>
 
@@ -86,7 +87,7 @@ double receive_double(
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
-        for_each(par, boost::begin(range), boost::end(range),
+        for_each(par, std::begin(range), std::end(range),
             [&](std::uint64_t j)
             {
                 double d = 0.0;
@@ -124,7 +125,7 @@ double receive(
         std::size_t const start = 0;
 
         auto range = boost::irange(start, window_size);
-        for_each(par, boost::begin(range), boost::end(range),
+        for_each(par, std::begin(range), std::end(range),
             [&](std::uint64_t j)
             {
                 msg(dest,

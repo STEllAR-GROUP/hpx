@@ -12,6 +12,7 @@
 #include <boost/atomic.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <numeric>
 #include <random>
 #include <vector>
@@ -76,50 +77,60 @@ namespace test
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct count_instances
+    template <typename T>
+    struct count_instances_v
     {
-        count_instances()
-          : value_(std::size_t(-1))
+        count_instances_v()
         {
             ++instance_count;
+            ++max_instance_count;
         }
-        count_instances(int value)
+        count_instances_v(T value)
           : value_(value)
         {
             ++instance_count;
+            ++max_instance_count;
         }
-        count_instances(count_instances const& rhs)
+
+        count_instances_v(count_instances_v const& rhs)
           : value_(rhs.value_)
         {
             ++instance_count;
         }
-        count_instances(count_instances && rhs)
+        count_instances_v(count_instances_v && rhs)
           : value_(rhs.value_)
         {
             ++instance_count;
         }
 
-        count_instances& operator=(count_instances const& rhs)
+        count_instances_v& operator=(count_instances_v const& rhs)
         {
             value_ = rhs.value_;
             return *this;
         }
-        count_instances& operator=(count_instances && rhs)
+        count_instances_v& operator=(count_instances_v && rhs)
         {
             value_ = rhs.value_;
             return *this;
         }
 
-        ~count_instances()
+        ~count_instances_v()
         {
             --instance_count;
         }
 
-        std::size_t value_;
+        T value_;
         static boost::atomic<std::size_t> instance_count;
+        static boost::atomic<std::size_t> max_instance_count;
     };
 
-    boost::atomic<std::size_t> count_instances::instance_count(0);
+    template <typename T>
+    boost::atomic<std::size_t> count_instances_v<T>::instance_count(0);
+
+    template <typename T>
+    boost::atomic<std::size_t> count_instances_v<T>::max_instance_count(0);
+
+    using count_instances = count_instances_v<std::size_t>;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename IteratorTag>
@@ -202,15 +213,15 @@ namespace test
     inline std::vector<std::size_t> iota(std::size_t size, std::size_t start)
     {
         std::vector<std::size_t> c(size);
-        std::iota(boost::begin(c), boost::end(c), start);
+        std::iota(std::begin(c), std::end(c), start);
         return c;
     }
 
     inline std::vector<std::size_t> random_iota(std::size_t size)
     {
         std::vector<std::size_t> c(size);
-        std::iota(boost::begin(c), boost::end(c), 0);
-        std::random_shuffle(boost::begin(c), boost::end(c));
+        std::iota(std::begin(c), std::end(c), 0);
+        std::random_shuffle(std::begin(c), std::end(c));
         return c;
     }
 
@@ -218,15 +229,15 @@ namespace test
     inline std::vector<T> random_iota(std::size_t size)
     {
         std::vector<T> c(size);
-        std::iota(boost::begin(c), boost::end(c), 0);
-        std::random_shuffle(boost::begin(c), boost::end(c));
+        std::iota(std::begin(c), std::end(c), 0);
+        std::random_shuffle(std::begin(c), std::end(c));
         return c;
     }
 
     inline std::vector<std::size_t> random_fill(std::size_t size)
     {
         std::vector<std::size_t> c(size);
-        std::generate(boost::begin(c), boost::end(c), std::rand);
+        std::generate(std::begin(c), std::end(c), std::rand);
         return c;
     }
 
@@ -234,7 +245,7 @@ namespace test
     inline void make_ready(std::vector<hpx::promise<std::size_t> >& p,
         std::vector<std::size_t>& idx)
     {
-        std::for_each(boost::begin(idx), boost::end(idx),
+        std::for_each(std::begin(idx), std::end(idx),
             [&p](std::size_t i)
             {
                 p[i].set_value(i);
@@ -245,7 +256,7 @@ namespace test
         std::vector<hpx::promise<std::size_t> >& p)
     {
         std::vector<hpx::future<std::size_t> > f;
-        std::transform(boost::begin(p), boost::end(p), std::back_inserter(f),
+        std::transform(std::begin(p), std::end(p), std::back_inserter(f),
             [](hpx::promise<std::size_t>& pr)
             {
                 return pr.get_future();

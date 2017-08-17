@@ -59,7 +59,7 @@ double measure(Policy policy)
         cores.push_back(hpx::async(&measure_one<Policy>, policy));
     }
 
-    std::vector<double> times = hpx::util::unwrapped(cores);
+    std::vector<double> times = hpx::util::unwrap(cores);
     return std::accumulate(times.begin(), times.end(), 0.0);
 }
 

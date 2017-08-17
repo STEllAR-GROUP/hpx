@@ -16,13 +16,15 @@
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/iterator_range.hpp>
+#include <hpx/util/range.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/range/iterator_range_core.hpp>
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -108,7 +110,7 @@ namespace hpx { namespace compute { namespace host
         /// \endcond
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
             parallel::execution::post(executors_[current_],
                 std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -139,35 +141,29 @@ namespace hpx { namespace compute { namespace host
                 F, Shape, Ts...
             >::type>
         >
-        async_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             std::vector<hpx::future<
                 typename hpx::parallel::v3::detail::bulk_async_execute_result<
                         F, Shape, Ts...
                     >::type
             > > results;
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-            std::size_t cnt = std::distance(boost::begin(shape), boost::end(shape));
-#else
-            std::size_t cnt = boost::size(shape);
-#endif
+            std::size_t cnt = util::size(shape);
             std::size_t part_size = cnt / executors_.size();
 
             results.reserve(cnt);
 
             try {
-                auto begin = boost::begin(shape);
+                auto begin = util::begin(shape);
                 for (std::size_t i = 0; i != executors_.size(); ++i)
                 {
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto futures =
-                        parallel::execution::async_bulk_execute(
+                        parallel::execution::bulk_async_execute(
                             executors_[i],
                             std::forward<F>(f),
-                            boost::make_iterator_range(begin, part_end),
+                            util::make_iterator_range(begin, part_end),
                             std::forward<Ts>(ts)...);
                     results.insert(
                         results.end(),
@@ -178,12 +174,10 @@ namespace hpx { namespace compute { namespace host
                 return results;
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
         }
 
@@ -191,33 +185,27 @@ namespace hpx { namespace compute { namespace host
         typename hpx::parallel::v3::detail::bulk_execute_result<
             F, Shape, Ts...
         >::type
-        sync_bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             typename hpx::parallel::v3::detail::bulk_execute_result<
                     F, Shape, Ts...
                 >::type results;
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-            std::size_t cnt = std::distance(boost::begin(shape), boost::end(shape));
-#else
-            std::size_t cnt = boost::size(shape);
-#endif
+            std::size_t cnt = util::size(shape);
             std::size_t part_size = cnt / executors_.size();
 
             results.reserve(cnt);
 
             try {
-                auto begin = boost::begin(shape);
+                auto begin = util::begin(shape);
                 for (std::size_t i = 0; i != executors_.size(); ++i)
                 {
                     auto part_end = begin;
                     std::advance(part_end, part_size);
                     auto part_results =
-                        parallel::execution::sync_bulk_execute(
+                        parallel::execution::bulk_sync_execute(
                             executors_[i],
                             std::forward<F>(f),
-                            boost::make_iterator_range(begin, part_end),
+                            util::make_iterator_range(begin, part_end),
                             std::forward<Ts>(ts)...);
                     results.insert(
                         results.end(),
@@ -228,12 +216,10 @@ namespace hpx { namespace compute { namespace host
                 return results;
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (...) {
-                boost::throw_exception(
-                    exception_list(boost::current_exception())
-                );
+                throw exception_list(std::current_exception());
             }
         }
 

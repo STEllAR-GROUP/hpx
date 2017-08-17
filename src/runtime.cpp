@@ -34,10 +34,10 @@
 #include <hpx/version.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -56,7 +56,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_ATTRIBUTE_NORETURN void handle_termination(char const* reason)
+    HPX_NORETURN void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
         {
@@ -112,7 +112,7 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT HPX_ATTRIBUTE_NORETURN void termination_handler(int signum)
+    HPX_EXPORT HPX_NORETURN void termination_handler(int signum)
     {
         if (signum != SIGINT &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -248,7 +248,7 @@ namespace hpx
         runtime::init_tss();
         util::reinit_construct();       // call only after TLS was initialized
 
-        counters_.reset(new performance_counters::registry());
+        counters_ = std::make_shared<performance_counters::registry>();
     }
 
     runtime::~runtime()
@@ -427,6 +427,19 @@ namespace hpx
               ""
             },
 
+#if BOOST_VERSION >= 105600
+            // rolling stddev counter
+            { "/statistics/rolling_stddev", performance_counters::counter_aggregating,
+              "returns the rolling standard deviation value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_stddev",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+#endif
+
             // median counter
             { "/statistics/median", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
@@ -457,6 +470,28 @@ namespace hpx
               HPX_PERFORMANCE_COUNTER_V1,
                &performance_counters::detail::statistics_counter_creator,
                &performance_counters::default_counter_discoverer,
+              ""
+            },
+
+            // rolling max counter
+            { "/statistics/rolling_max", performance_counters::counter_aggregating,
+              "returns the rolling maximum value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_max",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+
+            // rolling min counter
+            { "/statistics/rolling_min", performance_counters::counter_aggregating,
+              "returns the rolling minimum value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_min",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
               ""
             },
 
@@ -549,6 +584,57 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
+
+            // arithmetics mean counter
+            { "/arithmetics/mean", performance_counters::counter_aggregating,
+              "returns the average value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/mean@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics variance counter
+            { "/arithmetics/variance", performance_counters::counter_aggregating,
+              "returns the standard deviation of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/variance@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics median counter
+            { "/arithmetics/median", performance_counters::counter_aggregating,
+              "returns the median of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/median@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics min counter
+            { "/arithmetics/min", performance_counters::counter_aggregating,
+              "returns the minimum value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/min@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics max counter
+            { "/arithmetics/max", performance_counters::counter_aggregating,
+              "returns the maximum value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/max@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
         };
         performance_counters::install_counter_types(
             arithmetic_counter_types,
@@ -622,7 +708,7 @@ namespace hpx
         rt->unregister_thread();
     }
 
-    void report_error(std::size_t num_thread, boost::exception_ptr const& e)
+    void report_error(std::size_t num_thread, std::exception_ptr const& e)
     {
         // Early and late exceptions
         if (!threads::threadmanager_is(state_running))
@@ -638,7 +724,7 @@ namespace hpx
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
-    void report_error(boost::exception_ptr const& e)
+    void report_error(std::exception_ptr const& e)
     {
         // Early and late exceptions
         if (!threads::threadmanager_is(state_running))

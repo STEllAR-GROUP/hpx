@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
+//                     2017 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,9 +15,7 @@
 
 #include <hpx/parallel/execution_policy_fwd.hpp>
 
-#include <boost/exception_ptr.hpp>
-#include <boost/throw_exception.hpp>
-
+#include <exception>
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1
@@ -29,18 +28,19 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             typedef Result type;
 
-            HPX_ATTRIBUTE_NORETURN static Result call()
+            HPX_NORETURN static Result call()
             {
                 try {
                     throw; //-V667
                 }
                 catch(std::bad_alloc const& e) {
-                    boost::throw_exception(e);
+                    throw e;
+                }
+                catch (hpx::exception_list const& el) {
+                    throw el;
                 }
                 catch (...) {
-                    boost::throw_exception(
-                        hpx::exception_list(boost::current_exception())
-                    );
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
 
@@ -52,15 +52,19 @@ namespace hpx { namespace parallel { inline namespace v1
                 return std::move(f);
             }
 
-            static hpx::future<Result> call(boost::exception_ptr const& e)
+            static hpx::future<Result> call(std::exception_ptr const& e)
             {
                 try {
-                    boost::rethrow_exception(e);
+                    std::rethrow_exception(e);
                 }
                 catch (std::bad_alloc const&) {
                     // rethrow bad_alloc
                     return hpx::make_exceptional_future<Result>(
-                        boost::current_exception());
+                        std::current_exception());
+                }
+                catch (hpx::exception_list const& el) {
+                    // rethrow exception_list
+                    return hpx::make_exceptional_future<Result>(el);
                 }
                 catch (...) {
                     // package up everything else as an exception_list
@@ -83,17 +87,18 @@ namespace hpx { namespace parallel { inline namespace v1
                         throw; //-V667
                     }
                     catch(std::bad_alloc const& e) {
-                        boost::throw_exception(e);
+                        throw e;
+                    }
+                    catch (hpx::exception_list const& el) {
+                        throw el;
                     }
                     catch (...) {
-                        boost::throw_exception(
-                            hpx::exception_list(boost::current_exception())
-                        );
+                        throw hpx::exception_list(std::current_exception());
                     }
                 }
                 catch (...) {
                     return hpx::make_exceptional_future<Result>(
-                        boost::current_exception());
+                        std::current_exception());
                 }
             }
 
@@ -104,15 +109,19 @@ namespace hpx { namespace parallel { inline namespace v1
                 return std::move(f);
             }
 
-            static future<Result> call(boost::exception_ptr const& e)
+            static future<Result> call(std::exception_ptr const& e)
             {
                 try {
-                    boost::rethrow_exception(e);
+                    std::rethrow_exception(e);
                 }
                 catch (std::bad_alloc const&) {
                     // rethrow bad_alloc
                     return hpx::make_exceptional_future<Result>(
-                        boost::current_exception());
+                        std::current_exception());
+                }
+                catch (hpx::exception_list const& el) {
+                    // rethrow exception_list
+                    return hpx::make_exceptional_future<Result>(el);
                 }
                 catch (...) {
                     // package up everything else as an exception_list
@@ -165,21 +174,21 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             typedef Result type;
 
-            HPX_ATTRIBUTE_NORETURN static Result call()
+            HPX_NORETURN static Result call()
             {
                 // any exceptions thrown by algorithms executed with the
                 // parallel_unsequenced_policy are to call terminate.
                 hpx::terminate();
             }
 
-            HPX_ATTRIBUTE_NORETURN
+            HPX_NORETURN
             static hpx::future<Result> call(hpx::future<Result> &&)
             {
                 hpx::terminate();
             }
 
-            HPX_ATTRIBUTE_NORETURN
-            static hpx::future<Result> call(boost::exception_ptr const&)
+            HPX_NORETURN
+            static hpx::future<Result> call(std::exception_ptr const&)
             {
                 hpx::terminate();
             }

@@ -9,14 +9,20 @@
 
 //  tuple_test_bench.cpp  --------------------------------
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
+
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+#include <array>
+#endif
 
 // ----------------------------------------------------------------------------
 // helpers
@@ -189,6 +195,11 @@ void element_access_test()
     HPX_TEST((std::is_const<hpx::util::tuple_element<1, const hpx::util::tuple<int,
         float> >::type>::value));
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    HPX_TEST((std::is_same<hpx::util::tuple_element<1,
+                           std::array<float, 4>>::type, float>::value));
+#endif
+
     dummy(i); dummy(i2); dummy(j); dummy(e); // avoid warns for unused variables
 }
 
@@ -319,6 +330,82 @@ void tie_test()
 
 
 // ----------------------------------------------------------------------------
+// - testing cat -----------------------------------------------------------
+// ----------------------------------------------------------------------------
+void tuple_cat_test()
+{
+    hpx::util::tuple<int, float> two = hpx::util::make_tuple(1, 2.f);
+
+    // Cat two tuples
+    {
+        hpx::util::tuple<int, float, int, float> res =
+            hpx::util::tuple_cat(two, two);
+
+        auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f);
+
+        HPX_TEST((res == expected));
+    }
+
+    // Cat multiple tuples
+    {
+        hpx::util::tuple<int, float, int, float, int, float> res =
+            hpx::util::tuple_cat(two, two, two);
+
+        auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f, 1, 2.f);
+
+        HPX_TEST((res == expected));
+    }
+
+    // Cat move only types
+    {
+        auto t0 = hpx::util::make_tuple(std::unique_ptr<int>(new int(0)));
+        auto t1 = hpx::util::make_tuple(std::unique_ptr<int>(new int(1)));
+        auto t2 = hpx::util::make_tuple(std::unique_ptr<int>(new int(2)));
+
+        hpx::util::tuple<std::unique_ptr<int>, std::unique_ptr<int>,
+            std::unique_ptr<int>>
+            result = hpx::util::tuple_cat(
+                std::move(t0), std::move(t1), std::move(t2));
+
+        HPX_TEST_EQ((*hpx::util::get<0>(result)), 0);
+        HPX_TEST_EQ((*hpx::util::get<1>(result)), 1);
+        HPX_TEST_EQ((*hpx::util::get<2>(result)), 2);
+    }
+
+    // Don't move references unconditionally (copyable types)
+    {
+        int i1 = 11;
+        int i2 = 22;
+
+        hpx::util::tuple<int&> f1 = hpx::util::forward_as_tuple(i1);
+        hpx::util::tuple<int&&> f2 = hpx::util::forward_as_tuple(std::move(i2));
+
+        hpx::util::tuple<int&, int&&> result =
+            hpx::util::tuple_cat(std::move(f1), std::move(f2));
+
+        HPX_TEST_EQ((hpx::util::get<0>(result)), 11);
+        HPX_TEST_EQ((hpx::util::get<1>(result)), 22);
+    }
+
+    // Don't move references unconditionally (move only types)
+    {
+        std::unique_ptr<int> i1(new int(11));
+        std::unique_ptr<int> i2(new int(22));
+
+        hpx::util::tuple<std::unique_ptr<int>&> f1 =
+            hpx::util::forward_as_tuple(i1);
+        hpx::util::tuple<std::unique_ptr<int>&&> f2 =
+            hpx::util::forward_as_tuple(std::move(i2));
+
+        hpx::util::tuple<std::unique_ptr<int>&, std::unique_ptr<int>&&> result =
+            hpx::util::tuple_cat(std::move(f1), std::move(f2));
+
+        HPX_TEST_EQ((*hpx::util::get<0>(result)), 11);
+        HPX_TEST_EQ((*hpx::util::get<1>(result)), 22);
+    }
+}
+
+// ----------------------------------------------------------------------------
 // - testing tuple equality   -------------------------------------------------
 // ----------------------------------------------------------------------------
 
@@ -377,6 +464,12 @@ void tuple_length_test()
     HPX_TEST(hpx::util::tuple_size<t1>::value == 3);
     HPX_TEST(hpx::util::tuple_size<t2>::value == 0);
 
+#if defined(HPX_HAVE_CXX11_STD_ARRAY)
+    {
+        using t3 = std::array<int, 4>;
+        HPX_TEST(hpx::util::tuple_size<t3>::value == 4);
+    }
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -413,6 +506,7 @@ int main(int argc, char* argv[])
         mutate_test();
         make_tuple_test();
         tie_test();
+        tuple_cat_test();
         equality_test();
         ordering_test();
         const_tuple_test();

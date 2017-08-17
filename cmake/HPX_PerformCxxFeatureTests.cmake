@@ -1,6 +1,7 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
+# Copyright (c)      2017 Taeguk Kwon
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -88,6 +89,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_cstdint(
     REQUIRED "HPX needs support for C++11 std::[u]intX_t")
 
+  hpx_check_for_cxx11_std_exception_ptr(
+    REQUIRED "HPX needs support for C++11 std::exception_ptr")
+
   hpx_check_for_cxx11_std_initializer_list(
     REQUIRED "HPX needs support for C++11 std::initializer_list")
 
@@ -103,11 +107,17 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_lock_guard(
     REQUIRED "HPX needs support for C++11 std::lock_guard")
 
+  hpx_check_for_cxx11_std_range_access(
+    REQUIRED "HPX needs support for C++11 std::begin/end")
+
   hpx_check_for_cxx11_std_reference_wrapper(
     REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
 
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
+
+  hpx_check_for_cxx11_std_shuffle(
+    DEFINITIONS HPX_HAVE_CXX11_STD_SHUFFLE)
 
   hpx_check_for_cxx11_std_thread(
     DEFINITIONS HPX_HAVE_CXX11_STD_THREAD)
@@ -127,7 +137,10 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_unordered_set(
     REQUIRED "HPX needs support for C++11 std::unordered_set")
 
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
+  hpx_check_for_cxx11_noreturn_attribute(
+    DEFINITIONS HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
+
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
     # Check the availability of certain C++14 language features
     hpx_check_for_cxx14_constexpr(
       DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
@@ -147,14 +160,40 @@ macro(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx14_std_result_of_sfinae(
       DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
-  endif()
 
-  # check for experimental facilities
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14)
-    # check for Library Fundamentals TS v2's experimental/optional only if in
-    # C++1y or C++14 mode.
+    hpx_check_for_cxx14_variable_templates(
+      DEFINITIONS HPX_HAVE_CXX14_VARIABLE_TEMPLATES)
+
+    hpx_check_for_cxx14_deprecated_attribute(
+      DEFINITIONS HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
+    
+    hpx_check_for_cxx14_return_type_deduction()
+
+    # check for experimental facilities
+
+    # check for Library Fundamentals TS v2's experimental/optional
     hpx_check_for_libfun_std_experimental_optional(
       DEFINITIONS HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
   endif()
+
+  if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+    # Check the availability of certain C++17 language features
+    hpx_check_for_cxx17_fold_expressions(
+        DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
+
+    hpx_check_for_cxx17_fallthrough_attribute(
+      DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
+  endif()
 endmacro()
 
+################################################################################
+# C++ feature tests which require 3. party libraries
+# and a present config file to work.
+#
+# This tests are meant for testing the compiler on the capability
+# to compile parts of HPX directly without relying on generic feature tests.
+################################################################################
+macro(hpx_perform_on_framework_cxx_feature_tests)
+  hpx_check_for_cxx11_sfinae_expression_complete(
+    DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE)
+endmacro()

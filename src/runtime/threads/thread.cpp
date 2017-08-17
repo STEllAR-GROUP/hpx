@@ -21,10 +21,10 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <mutex>
 #include <utility>
 
@@ -44,7 +44,7 @@ namespace hpx
             HPX_THROW_EXCEPTION(invalid_status, function, reason);
         }
         catch(...) {
-            hpx::report_error(boost::current_exception());
+            hpx::report_error(std::current_exception());
             /* nothing else we can do */;
         }
     }

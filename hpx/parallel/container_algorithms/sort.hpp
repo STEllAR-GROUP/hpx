@@ -10,14 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#include <hpx/traits/is_range.hpp>
+#include <hpx/util/range.hpp>
 
 #include <hpx/parallel/algorithms/sort.hpp>
-#include <hpx/parallel/traits/is_range.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
-#include <hpx/parallel/traits/range_traits.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-
-#include <boost/range/functions.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -91,7 +89,7 @@ namespace hpx { namespace parallel { inline namespace v1
         typename Compare = detail::less,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_range<Rng>::value &&
+        hpx::traits::is_range<Rng>::value &&
         traits::is_projected_range<Proj, Rng>::value &&
         traits::is_indirect_callable<
             ExPolicy, Compare,
@@ -99,13 +97,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 traits::projected_range<Proj, Rng>
         >::value)>
     typename util::detail::algorithm_result<
-        ExPolicy, typename traits::range_iterator<Rng>::type
+        ExPolicy, typename hpx::traits::range_iterator<Rng>::type
     >::type
     sort(ExPolicy && policy, Rng && rng, Compare && comp = Compare(),
         Proj && proj = Proj())
     {
         return sort(std::forward<ExPolicy>(policy),
-            boost::begin(rng), boost::end(rng), std::forward<Compare>(comp),
+            hpx::util::begin(rng), hpx::util::end(rng), std::forward<Compare>(comp),
             std::forward<Proj>(proj));
     }
 }}}

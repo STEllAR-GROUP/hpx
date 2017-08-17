@@ -14,6 +14,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
@@ -23,13 +24,10 @@
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-#include <hpx/util/unused.hpp>
-
-#include <boost/exception_ptr.hpp>
-#include <boost/range/functions.hpp>
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <list>
 #include <memory>
 #include <utility>
@@ -66,7 +64,7 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
-                std::list<boost::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;
 
                 try {
                     // pre-initialize first intermediate result
@@ -84,14 +82,7 @@ namespace hpx { namespace parallel { namespace util
                         f1, first, count, 1, has_variable_chunk_size());
 
                     // schedule every chunk on a separate thread
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-                    std::size_t size =
-                        std::distance(boost::begin(shape), boost::end(shape));
-#else
-                    std::size_t size = boost::size(shape);
-#endif
+                    std::size_t size = hpx::util::size(shape);
                     workitems.reserve(size + 1);
                     finalitems.reserve(size);
 
@@ -131,7 +122,7 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (...) {
                     handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception(), errors);
+                        std::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
@@ -148,7 +139,7 @@ namespace hpx { namespace parallel { namespace util
                 catch (...) {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions<ExPolicy>::call(
-                        boost::current_exception());
+                        std::current_exception());
                 }
             }
         };
@@ -180,7 +171,7 @@ namespace hpx { namespace parallel { namespace util
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
-                std::list<boost::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;
 
                 try {
                     // pre-initialize first intermediate result
@@ -198,14 +189,7 @@ namespace hpx { namespace parallel { namespace util
                         f1, first, count, 1, has_variable_chunk_size());
 
                     // schedule every chunk on a separate thread
-// Before Boost V1.56 boost::size() does not respect the iterator category of
-// its argument.
-#if BOOST_VERSION < 105600
-                    std::size_t size =
-                        std::distance(boost::begin(shape), boost::end(shape));
-#else
-                    std::size_t size = boost::size(shape);
-#endif
+                    std::size_t size = hpx::util::size(shape);
                     workitems.reserve(size + 1);
                     finalitems.reserve(size);
 
@@ -245,10 +229,10 @@ namespace hpx { namespace parallel { namespace util
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<R>(
-                        boost::current_exception());
+                        std::current_exception());
                 }
                 catch (...) {
-                    errors.push_back(boost::current_exception());
+                    errors.push_back(std::current_exception());
                 }
 
                 // wait for all tasks to finish

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -44,8 +44,8 @@ namespace hpx { namespace components
     {
     protected:
         typedef typename std::conditional<
-            std::is_same<Component, detail::this_type>::value,
-            simple_component_base, Component
+                std::is_same<Component, detail::this_type>::value,
+                simple_component_base, Component
             >::type this_component_type;
 
         Component& derived()
@@ -130,7 +130,7 @@ namespace hpx { namespace components
 
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
-            util::unique_function_nonser<void(void*)> const& ctor);
+            util::unique_function_nonser<void(void*)> const& ctor, void** p);
 
         template <typename Component_, typename ...Ts>
         friend naming::gid_type server::create_with_args(Ts&&... ts);
@@ -227,6 +227,7 @@ namespace hpx { namespace components
         }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type get_gid() const
         {
             return get_id();
@@ -243,6 +244,14 @@ namespace hpx { namespace components
             // If this assertion is triggered then this component instance is
             // being migrated even if the component type has not been enabled
             // to support migration.
+            HPX_ASSERT(false);
+        }
+
+        void on_migrated()
+        {
+            // If this assertion is triggered then this component instance is being
+            // migrated even if the component type has not been enabled to support
+            // migration.
             HPX_ASSERT(false);
         }
 

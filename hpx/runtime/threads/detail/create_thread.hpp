@@ -70,12 +70,20 @@ namespace hpx { namespace threads { namespace detail
         if (nullptr == data.scheduler_base)
             data.scheduler_base = scheduler;
 
-        // Pass critical priority from parent to child.
+        // Pass critical priority from parent to child (but only if there is
+        // none is explicitly specified).
         if (self)
         {
-            if (thread_priority_critical == threads::get_self_id()->get_priority())
-                data.priority = thread_priority_critical;
+            if (data.priority == thread_priority_default &&
+                thread_priority_high_recursive ==
+                    threads::get_self_id()->get_priority())
+            {
+                data.priority = thread_priority_high_recursive;
+            }
         }
+
+        if (data.priority == thread_priority_default)
+            data.priority = thread_priority_normal;
 
         // create the new thread
         std::size_t num_thread = data.num_os_thread;

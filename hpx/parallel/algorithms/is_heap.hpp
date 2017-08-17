@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/concepts.hpp>
 #include <hpx/traits/is_callable.hpp>
@@ -20,13 +19,9 @@
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
-#include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -43,11 +38,35 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        // sequential is_heap with projection function
+        template <typename RandIter, typename Comp, typename Proj>
+        bool
+        sequential_is_heap(RandIter first, RandIter last,
+            Comp && comp, Proj && proj)
+        {
+            typedef typename std::iterator_traits<RandIter>::difference_type
+                difference_type;
+
+            difference_type count = last - first;
+
+            for (difference_type i = 1; i < count; ++i)
+            {
+                if (hpx::util::invoke(comp,
+                    hpx::util::invoke(proj, *(first + (i - 1) / 2)),
+                    hpx::util::invoke(proj, *(first + i))))
+                    return false;
+            }
+            return true;
+        }
+
         struct is_heap_helper
         {
-            template <typename ExPolicy, typename RandIter, typename Comp>
+            template <typename ExPolicy, typename RandIter, typename Comp,
+                typename Proj>
             typename util::detail::algorithm_result<ExPolicy, bool>::type
-            operator()(ExPolicy && policy, RandIter first, RandIter last, Comp comp)
+            operator()(ExPolicy && policy, RandIter first, RandIter last,
+                Comp comp, Proj proj)
             {
                 typedef util::detail::algorithm_result<ExPolicy, bool> result;
                 typedef typename std::iterator_traits<RandIter>::value_type type;
@@ -65,18 +84,23 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, bool, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
-                        [tok, first, comp](RandIter it,
-                            std::size_t part_size, std::size_t base_idx) mutable
+                        [tok, first, comp, proj](RandIter it,
+                            std::size_t part_size, std::size_t base_idx
+                        ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, first, &comp](type const& v, std::size_t i)
+                                [&tok, first, &comp, proj](
+                                    type const& v, std::size_t i
+                                ) -> void
                                 {
-                                    if (comp(*(first + i / 2), v))
+                                    if (hpx::util::invoke(comp,
+                                        hpx::util::invoke(proj, *(first + i / 2)),
+                                        hpx::util::invoke(proj, v)))
                                         tok.cancel(0);
                                 });
                         },
-                        [tok, second](std::vector<hpx::future<void> > &&) mutable
+                        [tok](std::vector<hpx::future<void> > &&) mutable
                             -> bool
                         {
                             difference_type find_res =
@@ -95,24 +119,25 @@ namespace hpx { namespace parallel { inline namespace v1
               : is_heap::algorithm("is_heap")
             {}
 
-            template <typename ExPolicy, typename Comp>
+            template <typename ExPolicy, typename Comp, typename Proj>
             static bool
             sequential(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp)
+                Comp && comp, Proj && proj)
             {
-                return std::is_heap(first, last, std::forward<Comp>(comp));
+                return sequential_is_heap(first, last,
+                    std::forward<Comp>(comp), std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename Comp>
+            template <typename ExPolicy, typename Comp, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
             parallel(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp)
+                Comp && comp, Proj && proj)
             {
                 return is_heap_helper()(
                         std::forward<ExPolicy>(policy), first, last,
-                        std::forward<Comp>(comp));
+                        std::forward<Comp>(comp), std::forward<Proj>(proj));
             }
         };
         /// \endcond
@@ -120,10 +145,12 @@ namespace hpx { namespace parallel { inline namespace v1
 
     /// Returns whether the range is max heap. That is, true if the range is
     /// max heap, false otherwise. The function uses the given comparison
-    /// function object comp (defaults to using operator<()).
+    /// function object \a comp (defaults to using operator<()).
     ///
-    /// \note   Complexity: At most last - first
-    ///         applications of the operator<().
+    /// \note   Complexity:
+    ///         Performs at most N applications of the comparison \a comp,
+    ///         at most 2 * N applications of the projection \a proj,
+    ///         where N = last - first.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -134,6 +161,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -141,13 +170,17 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param comp         comp is a callable object. The return value of the
-    ///                     INVOKE operation applied to an object of type Comp,
+    /// \param comp         \a comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type \a Comp,
     ///                     when contextually converted to bool, yields true if
     ///                     the first argument of the call is less than the
     ///                     second, and false otherwise. It is assumed that comp
     ///                     will not apply any non-constant function through the
     ///                     dereferenced iterator.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// \a comp has to induce a strict weak ordering on the values.
     ///
@@ -169,13 +202,19 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           That is, true if the range is max heap, false otherwise.
     ///
     template <typename ExPolicy, typename RandIter, typename Comp = detail::less,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<RandIter>::value)
-    >
+        hpx::traits::is_iterator<RandIter>::value &&
+        traits::is_projected<Proj, RandIter>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, Comp,
+            traits::projected<Proj, RandIter>,
+            traits::projected<Proj, RandIter>
+        >::value)>
     typename util::detail::algorithm_result<ExPolicy, bool>::type
     is_heap(ExPolicy && policy, RandIter first, RandIter last,
-        Comp && comp = Comp())
+        Comp && comp = Comp(), Proj && proj = Proj())
     {
         static_assert(
             (hpx::traits::is_random_access_iterator<RandIter>::value),
@@ -185,7 +224,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return detail::is_heap<RandIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<Comp>(comp));
+                std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -193,11 +232,35 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        // sequential is_heap_until with projection function
+        template <typename RandIter, typename Comp, typename Proj>
+        RandIter
+        sequential_is_heap_until(RandIter first, RandIter last,
+            Comp && comp, Proj && proj)
+        {
+            typedef typename std::iterator_traits<RandIter>::difference_type
+                difference_type;
+
+            difference_type count = last - first;
+
+            for (difference_type i = 1; i < count; ++i)
+            {
+                if (hpx::util::invoke(comp,
+                    hpx::util::invoke(proj, *(first + (i - 1) / 2)),
+                    hpx::util::invoke(proj, *(first + i))))
+                    return first + i;
+            }
+            return last;
+        }
+
         struct is_heap_until_helper
         {
-            template <typename ExPolicy, typename RandIter, typename Comp>
+            template <typename ExPolicy, typename RandIter, typename Comp,
+                typename Proj>
             typename util::detail::algorithm_result<ExPolicy, RandIter>::type
-            operator()(ExPolicy && policy, RandIter first, RandIter last, Comp comp)
+            operator()(ExPolicy && policy, RandIter first, RandIter last,
+                Comp comp, Proj proj)
             {
                 typedef util::detail::algorithm_result<ExPolicy, RandIter> result;
                 typedef typename std::iterator_traits<RandIter>::value_type type;
@@ -215,14 +278,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, RandIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
-                        [tok, first, comp](RandIter it,
+                        [tok, first, comp, proj](RandIter it,
                             std::size_t part_size, std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, first, &comp](type const& v, std::size_t i)
+                                [&tok, first, &comp, &proj](
+                                    type const& v, std::size_t i
+                                ) -> void
                                 {
-                                    if (comp(*(first + i / 2), v))
+                                    if (hpx::util::invoke(comp,
+                                        hpx::util::invoke(proj, *(first + i / 2)),
+                                        hpx::util::invoke(proj, v)))
                                         tok.cancel(i);
                                 });
                         },
@@ -247,37 +314,40 @@ namespace hpx { namespace parallel { inline namespace v1
               : is_heap_until::algorithm("is_heap_until")
             {}
 
-            template <typename ExPolicy, typename Comp>
+            template <typename ExPolicy, typename Comp, typename Proj>
             static RandIter
             sequential(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp)
+                Comp && comp, Proj && proj)
             {
-                return std::is_heap_until(first, last, std::forward<Comp>(comp));
+                return sequential_is_heap_until(first, last,
+                    std::forward<Comp>(comp), std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename Comp>
+            template <typename ExPolicy, typename Comp, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, RandIter
             >::type
             parallel(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp)
+                Comp && comp, Proj && proj)
             {
                 return is_heap_until_helper()(
                     std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Comp>(comp));
+                    std::forward<Comp>(comp), std::forward<Proj>(proj));
             }
         };
         /// \endcond
     }
 
-    /// Returns the upper bound of the largest range beginning at first
-    /// which is a max heap. That is, the last iterator it for
+    /// Returns the upper bound of the largest range beginning at \a first
+    /// which is a max heap. That is, the last iterator \a it for
     /// which range [first, it) is a max heap. The function
-    /// uses the given comparison function object comp (defaults to using
+    /// uses the given comparison function object \a comp (defaults to using
     /// operator<()).
     ///
-    /// \note   Complexity: At most last - first
-    ///         applications of the operator<().
+    /// \note   Complexity:
+    ///         Performs at most N applications of the comparison \a comp,
+    ///         at most 2 * N applications of the projection \a proj,
+    ///         where N = last - first.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -288,6 +358,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -295,13 +367,17 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param comp         comp is a callable object. The return value of the
-    ///                     INVOKE operation applied to an object of type Comp,
+    /// \param comp         \a comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type \a Comp,
     ///                     when contextually converted to bool, yields true if
     ///                     the first argument of the call is less than the
     ///                     second, and false otherwise. It is assumed that comp
     ///                     will not apply any non-constant function through the
     ///                     dereferenced iterator.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// \a comp has to induce a strict weak ordering on the values.
     ///
@@ -321,16 +397,22 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a parallel_task_policy and returns \a RandIter otherwise.
     ///           The \a is_heap_until algorithm returns the upper bound
     ///           of the largest range beginning at first which is a max heap.
-    ///           That is, the last iterator it for which range [first, it) is a max heap.
+    ///           That is, the last iterator \a it for which range [first, it) is a max heap.
     ///
     template <typename ExPolicy, typename RandIter, typename Comp = detail::less,
+        typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<RandIter>::value)
-    >
+        hpx::traits::is_iterator<RandIter>::value &&
+        traits::is_projected<Proj, RandIter>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, Comp,
+            traits::projected<Proj, RandIter>,
+            traits::projected<Proj, RandIter>
+        >::value)>
     typename util::detail::algorithm_result<ExPolicy, RandIter>::type
     is_heap_until(ExPolicy && policy, RandIter first, RandIter last,
-        Comp && comp = Comp())
+        Comp && comp = Comp(), Proj && proj = Proj())
     {
         static_assert(
             (hpx::traits::is_random_access_iterator<RandIter>::value),
@@ -340,7 +422,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return detail::is_heap_until<RandIter>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<Comp>(comp));
+                std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
 }}}
 

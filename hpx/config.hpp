@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
+#include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
@@ -26,21 +27,13 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 105100
+#if BOOST_VERSION < 105500
 // Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than 1.51.0
+#error HPX cannot be compiled with a Boost version earlier than 1.55.0
 #endif
 
-#if BOOST_VERSION == 105400
-#include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
-#endif
-
-#if BOOST_VERSION < 105600
-#include <boost/exception/detail/attribute_noreturn.hpp>
-#endif
-
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 // On Windows, make sure winsock.h is not included even if windows.h is
@@ -329,7 +322,7 @@
 #endif
 
 #if defined(HPX_DEBUG)
-#  define HPX_MANGLE_NAME(n)     BOOST_PP_CAT(n, d)
+#  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, d)
 #  define HPX_MANGLE_STRING(n)   n + "d"
 #else
 #  define HPX_MANGLE_NAME(n)     n
@@ -342,7 +335,7 @@
 #endif
 
 #if !defined(HPX_COMPONENT_STRING)
-#  define HPX_COMPONENT_STRING BOOST_PP_STRINGIZE(HPX_COMPONENT_NAME)
+#  define HPX_COMPONENT_STRING HPX_PP_STRINGIZE(HPX_COMPONENT_NAME)
 #endif
 
 #if !defined(HPX_PLUGIN_COMPONENT_PREFIX)
@@ -359,7 +352,7 @@
 #endif
 
 #if !defined(HPX_PLUGIN_STRING)
-#  define HPX_PLUGIN_STRING BOOST_PP_STRINGIZE(HPX_PLUGIN_NAME)
+#  define HPX_PLUGIN_STRING HPX_PP_STRINGIZE(HPX_PLUGIN_NAME)
 #endif
 
 #if !defined(HPX_PLUGIN_PLUGIN_PREFIX)
@@ -369,7 +362,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_APPLICATION_STRING)
 #  if defined(HPX_APPLICATION_NAME)
-#    define HPX_APPLICATION_STRING BOOST_PP_STRINGIZE(HPX_APPLICATION_NAME)
+#    define HPX_APPLICATION_STRING HPX_PP_STRINGIZE(HPX_APPLICATION_NAME)
 #  else
 #    define HPX_APPLICATION_STRING "unknown HPX application"
 #  endif
@@ -386,15 +379,6 @@
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
 #  define HPX_BUSY_LOOP_COUNT_MAX 2000
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Count number of terminated threads before forcefully cleaning up all of
-// them. Note: terminated threads are cleaned up either when this number is
-// reached for a particular thread queue or if the HPX_BUSY_LOOP_COUNT_MAX is
-// reached, which will clean up the terminated threads for _all_ thread queues.
-#if !defined(HPX_MAX_TERMINATED_THREADS)
-#  define HPX_MAX_TERMINATED_THREADS 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -457,7 +441,7 @@
 #      if defined(__powerpc__) || defined(__INTEL_COMPILER)
 #         define HPX_SMALL_STACK_SIZE  0x20000       // 128kByte
 #      else
-#         define HPX_SMALL_STACK_SIZE  0xC000        // 48kByte
+#         define HPX_SMALL_STACK_SIZE  0x10000        // 64kByte
 #      endif
 #    endif
 #  endif
@@ -495,31 +479,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_MSVC)
-#   define HPX_NOINLINE __declspec(noinline)
-#elif defined(__GNUC__)
-#   if defined(__NVCC__) || defined(__CUDACC__)
-        // nvcc doesn't always parse __noinline
-#       define HPX_NOINLINE __attribute__ ((noinline))
-#   else
-#       define HPX_NOINLINE __attribute__ ((__noinline__))
-#   endif
-#else
-#   define HPX_NOINLINE
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_ATTRIBUTE_NORETURN)
-#  if defined(_MSC_VER)
-#    define HPX_ATTRIBUTE_NORETURN __declspec(noreturn)
-#  elif defined(__GNUC__)
-#    define HPX_ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
-#  else
-#    define HPX_ATTRIBUTE_NORETURN
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Make sure we have support for more than 64 threads for Xeon Phi
 #if defined(__MIC__) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
 #  define HPX_HAVE_MORE_THAN_64_THREADS
@@ -541,28 +500,5 @@
 #define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
 #define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
-
-#if defined(HPX_HAVE_SODIUM)
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB         0x0000000100000001ULL
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB         0x0000000000000005ULL
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL
-// this is made locality specific
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB  0x0000000000000006ULL
-#endif
-
-#if !defined(HPX_NO_DEPRECATED)
-#  define HPX_DEPRECATED_MSG \
-   "This function is deprecated and will be removed in the future."
-#  if defined(HPX_MSVC)
-#    define HPX_DEPRECATED(x) __declspec(deprecated(x))
-#  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
-#    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
-#  elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
-#    define HPX_DEPRECATED(x) __attribute__((__deprecated__))
-#  endif
-#  if !defined(HPX_DEPRECATED)
-#    define HPX_DEPRECATED(x)  /**/
-#  endif
-#endif
 
 #endif

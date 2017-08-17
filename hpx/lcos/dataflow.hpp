@@ -29,6 +29,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
@@ -40,12 +41,11 @@
 #include <hpx/parallel/executors/execution.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iterator>
 #include <type_traits>
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            traits::is_future_or_future_range<Future>::value
+            traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(Future& future) const
         {
             future = Future();
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            traits::is_future_or_future_range<Future>::value
+            traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(boost::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            traits::is_future_or_future_range<Future>::value
+            traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(std::reference_wrapper<Future>& future) const
         {
             future.get() = Future();
@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Future>
         HPX_FORCEINLINE
         typename std::enable_if<
-            !traits::is_future_or_future_range<Future>::value
+            !traits::detail::is_future_or_future_range<Future>::value
         >::type operator()(Future& future) const
         {}
     };
@@ -163,25 +163,25 @@ namespace hpx { namespace lcos { namespace detail
     public:
         typedef typename base_type::init_no_addref init_no_addref;
 
-        template <typename FFunc, typename FFutures>
+        template <typename Policy_, typename FFunc, typename FFutures>
         dataflow_frame(
-            Policy policy
+            Policy_ && policy
           , FFunc && func
           , FFutures && futures)
-              : policy_(std::move(policy))
+              : policy_(std::forward<Policy_>(policy))
               , func_(std::forward<FFunc>(func))
               , futures_(std::forward<FFutures>(futures))
               , done_(false)
         {}
 
-        template <typename FFunc, typename FFutures>
+        template <typename Policy_, typename FFunc, typename FFutures>
         dataflow_frame(
-            Policy policy
+            Policy_ && policy
           , FFunc && func
           , FFutures && futures
           , init_no_addref no_addref)
               : base_type(no_addref)
-              , policy_(std::move(policy))
+              , policy_(std::forward<Policy_>(policy))
               , func_(std::forward<FFunc>(func))
               , futures_(std::forward<FFutures>(futures))
               , done_(false)
@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(std::move(res));
             }
             catch(...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
@@ -227,14 +227,13 @@ namespace hpx { namespace lcos { namespace detail
                 this->set_data(util::unused_type());
             }
             catch(...) {
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
             }
         }
 
         HPX_FORCEINLINE void done()
         {
             hpx::util::annotate_function annotate(func_);
-            (void)annotate;     // suppress warning about unused variable
             execute(indices_type(), is_void());
         }
 
@@ -310,7 +309,7 @@ namespace hpx { namespace lcos { namespace detail
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         // handle executors through their executor_traits
         template <typename Executor>
-        HPX_FORCEINLINE
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) HPX_FORCEINLINE
         typename std::enable_if<
             traits::is_executor<Executor>::value
         >::type
@@ -433,8 +432,8 @@ namespace hpx { namespace lcos { namespace detail
             future_type & f_ = util::get<I>(futures_);
 
             await_range<I>(
-                boost::begin(util::unwrap_ref(f_))
-              , boost::end(util::unwrap_ref(f_))
+                util::begin(util::unwrap_ref(f_))
+              , util::end(util::unwrap_ref(f_))
             );
         }
 
@@ -536,9 +535,11 @@ namespace hpx { namespace lcos { namespace detail
             typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::is_launch_policy<Policy>::value,
+            traits::is_launch_policy<
+                typename std::decay<Policy>::type
+            >::value,
             typename dataflow_frame<
-                Policy
+                typename std::decay<Policy>::type
               , Derived
               , util::tuple<
                     hpx::id_type
@@ -546,13 +547,13 @@ namespace hpx { namespace lcos { namespace detail
                 >
             >::type
         >::type
-        call(Policy launch_policy,
+        call(Policy && launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         {
             typedef
                 dataflow_frame<
-                    Policy
+                    typename std::decay<Policy>::type
                   , Derived
                   , util::tuple<
                         hpx::id_type
@@ -563,7 +564,7 @@ namespace hpx { namespace lcos { namespace detail
             typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
-                    launch_policy
+                    std::forward<Policy>(launch_policy)
                   , Derived()
                   , util::forward_as_tuple(
                         id
@@ -599,18 +600,21 @@ namespace hpx { namespace lcos { namespace detail
     // launch
     template <typename Action, typename Policy>
     struct dataflow_action_dispatch<Action, Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        typename std::enable_if<
+            traits::is_launch_policy<typename std::decay<Policy>::type>::value
+        >::type>
     {
-        template <typename ...Ts>
+        template <typename Policy_, typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
-        call(Policy launch_policy, naming::id_type const& id, Ts &&... ts)
+        call(Policy_ && launch_policy, naming::id_type const& id, Ts &&... ts)
         {
-            return dataflow_dispatch<Action>::call(launch_policy, Action(), id,
+            return dataflow_dispatch<Action>::call(
+                std::forward<Policy_>(launch_policy), Action(), id,
                 std::forward<Ts>(ts)...);
         }
 
@@ -687,18 +691,21 @@ namespace hpx { namespace lcos { namespace detail
                 >::remote_result_type
             >::type result_type;
 
-        template <typename Policy, typename ...Ts>
-        HPX_FORCEINLINE static
-        lcos::future<result_type>
-        call(Policy launch_policy,
-            Action const&, naming::id_type const& id, Ts &&... ts)
+        template <typename Policy, typename... Ts>
+        HPX_FORCEINLINE static lcos::future<result_type>
+        call(Policy && launch_policy, Action const&, naming::id_type const& id,
+            Ts&&... ts)
         {
-            static_assert(traits::is_launch_policy<Policy>::value,
+            static_assert(
+                traits::is_launch_policy<
+                    typename std::decay<Policy>::type
+                >::value,
                 "Policy must be a valid launch policy");
 
             return dataflow_action_dispatch<
                     Action, launch
-                >::call(launch_policy, id, std::forward<Ts>(ts)...);
+                >::call(std::forward<Policy>(launch_policy), id,
+                    std::forward<Ts>(ts)...);
         }
 
 //         template <typename Policy, typename DistPolicy, typename ...Ts>

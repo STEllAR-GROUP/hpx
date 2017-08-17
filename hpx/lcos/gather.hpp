@@ -30,6 +30,11 @@ namespace hpx { namespace lcos
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
+    /// \note       Each gather operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
+    ///             necessary internal facilities used by \a gather_here and
+    ///             \a gather_there
+    ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
     ///             operation has been completed.
@@ -61,6 +66,11 @@ namespace hpx { namespace lcos
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
+    /// \note       Each gather operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
+    ///             necessary internal facilities used by \a gather_here and
+    ///             \a gather_there
+    ///
     /// \returns    This function returns a future which will become ready once
     ///             the gather operation has been completed.
     ///
@@ -88,6 +98,11 @@ namespace hpx { namespace lcos
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       Each gather operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
+    ///             necessary internal facilities used by \a gather_here and
+    ///             \a gather_there
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             gathered values. It will become ready once the gather
@@ -120,6 +135,11 @@ namespace hpx { namespace lcos
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
+    /// \note       Each gather operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
+    ///             necessary internal facilities used by \a gather_here and
+    ///             \a gather_there
+    ///
     /// \returns    This function returns a future which will become ready once
     ///             the gather operation has been completed.
     ///
@@ -128,6 +148,46 @@ namespace hpx { namespace lcos
     gather_there(char const* basename, T && result,
         std::size_t generation = std::size_t(-1), std::size_t root_site = 0,
         std::size_t this_site = std::size_t(-1));
+
+    /// \def HPX_REGISTER_GATHER_DECLARATION(type, name)
+    ///
+    /// \brief Declare a gather object named \a name for a given data type \a type.
+    ///
+    /// The macro \a HPX_REGISTER_GATHER_DECLARATION can be used to declare
+    /// all facilities necessary for a (possibly remote) gather operation.
+    ///
+    /// The parameter \a type specifies for which data type the gather
+    /// operations should be enabled.
+    ///
+    /// The (optional) parameter \a name should be a unique C-style identifier
+    /// which will be internally used to identify a particular gather operation.
+    /// If this defaults to \a \<type\>_gather if not specified.
+    ///
+    /// \note The macro \a HPX_REGISTER_GATHER_DECLARATION can be used with 1
+    ///       or 2 arguments. The second argument is optional and defaults to
+    ///       \a \<type\>_gather.
+    ///
+    #define HPX_REGISTER_GATHER_DECLARATION(type, name)
+
+    /// \def HPX_REGISTER_GATHER(type, name)
+    ///
+    /// \brief Define a gather object named \a name for a given data type \a type.
+    ///
+    /// The macro \a HPX_REGISTER_GATHER can be used to define
+    /// all facilities necessary for a (possibly remote) gather operation.
+    ///
+    /// The parameter \a type specifies for which data type the gather
+    /// operations should be enabled.
+    ///
+    /// The (optional) parameter \a name should be a unique C-style identifier
+    /// which will be internally used to identify a particular gather operation.
+    /// If this defaults to \a \<type\>_gather if not specified.
+    ///
+    /// \note The macro \a HPX_REGISTER_GATHER can be used with 1
+    ///       or 2 arguments. The second argument is optional and defaults to
+    ///       \a \<type\>_gather.
+    ///
+    #define HPX_REGISTER_GATHER(type, name)
 }}
 #else
 
@@ -144,9 +204,10 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/unused.hpp>
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -186,9 +247,16 @@ namespace hpx { namespace lcos
                 HPX_ASSERT(false);  // shouldn't ever be called
             }
 
-            gather_server(std::size_t num_sites)
-              : num_sites_(num_sites), data_(num_sites), gate_(num_sites)
+            gather_server(std::size_t num_sites, std::string const& name,
+                    std::size_t site)
+              : num_sites_(num_sites), data_(num_sites), gate_(num_sites),
+                name_(name), site_(site)
             {}
+
+            ~gather_server()
+            {
+                hpx::unregister_with_basename(name_, site_);
+            }
 
             hpx::future<std::vector<T> > get_result(std::size_t which, T && t)
             {
@@ -228,15 +296,35 @@ namespace hpx { namespace lcos
             std::size_t num_sites_;
             std::vector<T> data_;
             lcos::local::and_gate gate_;
+            std::string name_;
+            std::size_t site_;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        inline hpx::id_type register_gather_name(hpx::future<hpx::id_type> f,
-            std::string const& basename, std::size_t site)
+        inline hpx::future<hpx::id_type> register_gather_name(
+            hpx::future<hpx::id_type> f, std::string const& basename,
+            std::size_t site)
         {
             hpx::id_type target = f.get();
-            hpx::register_with_basename(basename, hpx::unmanaged(target), site);
-            return target;
+
+            // Register unmanaged id to avoid cyclic dependencies, unregister
+            // is done in the destructor of the component above.
+            hpx::future<bool> result = hpx::register_with_basename(
+                basename, hpx::unmanaged(target), site);
+
+            return result.then(
+                [target, basename](hpx::future<bool> && f) -> hpx::id_type
+                {
+                    bool result = f.get();
+                    if (!result)
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "hpx::lcos::detail::register_gather_name",
+                            "the given base name for gather opration was "
+                            "already registered: " + basename);
+                    }
+                    return target;
+                });
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -280,21 +368,21 @@ namespace hpx { namespace lcos
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
-        // create a new gather_server
-        typedef typename util::decay<T>::type result_type;
-        hpx::future<hpx::id_type> id =
-            hpx::new_<detail::gather_server<result_type> >(
-                hpx::find_here(), num_sites);
-
         std::string name(basename);
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
+        // create a new gather_server
+        typedef typename util::decay<T>::type result_type;
+        hpx::future<hpx::id_type> id =
+            hpx::new_<detail::gather_server<result_type> >(
+                hpx::find_here(), num_sites, name, this_site);
+
         // register the gatherer's id using the given basename
         using util::placeholders::_1;
-        return id.then(
-                util::bind(&detail::register_gather_name, _1, name, this_site)
-            );
+        return id.then(util::bind(
+                &detail::register_gather_name, _1, std::move(name), this_site
+            ));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -400,7 +488,7 @@ namespace hpx { namespace lcos
             name += std::to_string(generation) + "/";
 
         return gather_there(
-            hpx::find_from_basename(name, root_site),
+            hpx::find_from_basename(std::move(name), root_site),
             std::move(result), this_site);
     }
 
@@ -438,31 +526,61 @@ namespace hpx { namespace lcos
             name += std::to_string(generation) + "/";
 
         return gather_there(
-            hpx::find_from_basename(name, root_site),
+            hpx::find_from_basename(std::move(name), root_site),
             std::forward<T>(result), this_site);
     }
 }}
 
-#define HPX_REGISTER_GATHER_DECLARATION(type, name)                           \
-    HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::lcos::detail::gather_server<type>::get_result_action,            \
-        BOOST_PP_CAT(gather_get_result_action_, name));                       \
-    HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::lcos::detail::gather_server<type>::set_result_action,            \
-        BOOST_PP_CAT(set_result_action_, name))                               \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_GATHER_DECLARATION(...)                                  \
+    HPX_REGISTER_GATHER_DECLARATION_(__VA_ARGS__)                             \
     /**/
 
-#define HPX_REGISTER_GATHER(type, name)                                       \
+#define HPX_REGISTER_GATHER_DECLARATION_(...)                                 \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_GATHER_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)           \
+    )(__VA_ARGS__))                                                           \
+    /**/
+
+#define HPX_REGISTER_GATHER_DECLARATION_1(type)                               \
+    HPX_REGISTER_GATHER_DECLARATION_2(type, HPX_PP_CAT(type, _gather))        \
+    /**/
+
+#define HPX_REGISTER_GATHER_DECLARATION_2(type, name)                         \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        hpx::lcos::detail::gather_server<type>::get_result_action,            \
+        HPX_PP_CAT(gather_get_result_action_, name));                         \
+    HPX_REGISTER_ACTION_DECLARATION(                                          \
+        hpx::lcos::detail::gather_server<type>::set_result_action,            \
+        HPX_PP_CAT(set_result_action_, name))                                 \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_GATHER(...)                                              \
+    HPX_REGISTER_GATHER_(__VA_ARGS__)                                         \
+    /**/
+
+#define HPX_REGISTER_GATHER_(...)                                             \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_GATHER_, HPX_PP_NARGS(__VA_ARGS__)                       \
+    )(__VA_ARGS__))                                                           \
+    /**/
+
+#define HPX_REGISTER_GATHER_1(type)                                           \
+    HPX_REGISTER_GATHER_2(type, HPX_PP_CAT(type, _gather))                    \
+    /**/
+
+#define HPX_REGISTER_GATHER_2(type, name)                                     \
     HPX_REGISTER_ACTION(                                                      \
         hpx::lcos::detail::gather_server<type>::get_result_action,            \
-        BOOST_PP_CAT(gather_get_result_action_, name));                       \
+        HPX_PP_CAT(gather_get_result_action_, name));                         \
     HPX_REGISTER_ACTION(                                                      \
         hpx::lcos::detail::gather_server<type>::set_result_action,            \
-        BOOST_PP_CAT(set_result_action_, name));                              \
+        HPX_PP_CAT(set_result_action_, name));                                \
     typedef hpx::components::simple_component<                                \
         hpx::lcos::detail::gather_server<type>                                \
-    > BOOST_PP_CAT(gather_, name);                                            \
-    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(gather_, name))                       \
+    > HPX_PP_CAT(gather_, name);                                              \
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(gather_, name))                         \
     /**/
 
 #endif // DOXYGEN

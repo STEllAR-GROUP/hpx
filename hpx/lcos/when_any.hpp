@@ -126,6 +126,7 @@ namespace hpx
 #include <hpx/lcos/when_any.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
@@ -372,9 +373,10 @@ namespace hpx { namespace lcos
     template <typename Range>
     typename std::enable_if<traits::is_future_range<Range>::value,
         lcos::future<when_any_result<typename std::decay<Range>::type> > >::type
-    when_any(Range& lazy_values)
+    when_any(Range&& lazy_values)
     {
-        typedef Range result_type;
+        typedef typename std::decay<Range>::type result_type;
+
         result_type lazy_values_ = traits::acquire_future<result_type>()(lazy_values);
 
         std::shared_ptr<detail::when_any<result_type> > f =
@@ -388,14 +390,6 @@ namespace hpx { namespace lcos
         return p.get_future();
     }
 
-    template <typename Range>
-    typename std::enable_if<traits::is_future_range<Range>::value,
-        lcos::future<when_any_result<typename std::decay<Range>::type> > >::type
-    when_any(Range&& lazy_values)
-    {
-        return lcos::when_any(lazy_values);
-    }
-
     template <typename Iterator, typename Container =
         std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
     lcos::future<when_any_result<Container> >
@@ -406,13 +400,13 @@ namespace hpx { namespace lcos
         typename std::iterator_traits<Iterator>::
             difference_type difference = std::distance(begin, end);
         if (difference > 0)
-            traits::detail::reserve_if_vector(
+            traits::detail::reserve_if_reservable(
                 lazy_values_, static_cast<std::size_t>(difference));
 
         std::transform(begin, end, std::back_inserter(lazy_values_),
             traits::acquire_future_disp());
 
-        return lcos::when_any(lazy_values_);
+        return lcos::when_any(std::move(lazy_values_));
     }
 
     inline lcos::future<when_any_result<util::tuple<> > > //-V524
@@ -430,7 +424,7 @@ namespace hpx { namespace lcos
     when_any_n(Iterator begin, std::size_t count)
     {
         Container lazy_values_;
-        traits::detail::reserve_if_vector(lazy_values_, count);
+        traits::detail::reserve_if_reservable(lazy_values_, count);
 
         traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
@@ -440,18 +434,27 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
-    lcos::future<when_any_result<
-        util::tuple<typename traits::acquire_future<Ts>::type...>
-    > >
-    when_any(Ts&&... ts)
+    template <typename T, typename... Ts>
+    typename std::enable_if<
+        !(traits::is_future_range<T>::value && sizeof...(Ts) == 0),
+        lcos::future<when_any_result<
+            util::tuple<
+                typename traits::acquire_future<T>::type,
+                typename traits::acquire_future<Ts>::type...
+            >
+        > >
+    >::type
+    when_any(T&& t, Ts&&... ts)
     {
         typedef util::tuple<
+                typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...
             > result_type;
 
         traits::acquire_future_disp func;
-        result_type lazy_values(func(std::forward<Ts>(ts))...);
+        result_type lazy_values(
+            func(std::forward<T>(t)),
+            func(std::forward<Ts>(ts))...);
 
         std::shared_ptr<detail::when_any<result_type> > f =
             std::make_shared<detail::when_any<result_type> >(

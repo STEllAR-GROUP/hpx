@@ -30,34 +30,34 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ForwardIter2>
+        template <typename FwdIter2>
         struct swap_ranges
-          : public detail::algorithm<swap_ranges<ForwardIter2>, ForwardIter2>
+          : public detail::algorithm<swap_ranges<FwdIter2>, FwdIter2>
         {
             swap_ranges()
               : swap_ranges::algorithm("swap_ranges")
             {}
 
-            template <typename ExPolicy, typename ForwardIter1>
-            static ForwardIter2
-            sequential(ExPolicy, ForwardIter1 first1, ForwardIter1 last1,
-                ForwardIter2 first2)
+            template <typename ExPolicy, typename FwdIter1>
+            static FwdIter2
+            sequential(ExPolicy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2)
             {
                 return std::swap_ranges(first1, last1, first2);
             }
 
-            template <typename ExPolicy, typename ForwardIter1>
+            template <typename ExPolicy, typename FwdIter1>
             static typename util::detail::algorithm_result<
-                ExPolicy, ForwardIter2
+                ExPolicy, FwdIter2
             >::type
-            parallel(ExPolicy && policy, ForwardIter1 first1,
-                ForwardIter1 last1, ForwardIter2 first2)
+            parallel(ExPolicy && policy, FwdIter1 first1,
+                FwdIter1 last1, FwdIter2 first2)
             {
-                typedef hpx::util::zip_iterator<ForwardIter1, ForwardIter2>
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
                     zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef typename util::detail::algorithm_result<
-                        ExPolicy, ForwardIter2
+                        ExPolicy, FwdIter2
                     >::type result_type;
 
                 return get_iter<1, result_type>(
@@ -65,7 +65,8 @@ namespace hpx { namespace parallel { inline namespace v1
                         std::forward<ExPolicy>(policy), std::false_type(),
                         hpx::util::make_zip_iterator(first1, first2),
                         std::distance(first1, last1),
-                        [](reference t) {
+                        [](reference t) -> void
+                        {
                             using hpx::util::get;
                             std::swap(get<0>(t), get<1>(t));
                         },
@@ -84,11 +85,11 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the swap operations.
-    /// \tparam ForwardIter1 The type of the first range of iterators to swap
+    /// \tparam FwdIter1    The type of the first range of iterators to swap
     ///                     (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam ForwardIter2 The type of the second range of iterators to swap
+    /// \tparam FwdIter2    The type of the second range of iterators to swap
     ///                     (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -114,31 +115,31 @@ namespace hpx { namespace parallel { inline namespace v1
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
-    ///           \a hpx::future<ForwardIter2>  if the execution policy is of
-    ///           type \a parallel_task_policy and returns \a ForwardIter2
+    ///           \a hpx::future<FwdIter2>  if the execution policy is of
+    ///           type \a parallel_task_policy and returns \a FwdIter2
     ///           otherwise.
     ///           The \a swap_ranges algorithm returns iterator to the element
     ///           past the last element exchanged in the range beginning with
     ///           \a first2.
     ///
-    template <typename ExPolicy, typename ForwardIter1, typename ForwardIter2>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, ForwardIter2>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     >::type
-    swap_ranges(ExPolicy && policy, ForwardIter1 first1, ForwardIter1 last1,
-        ForwardIter2 first2)
+    swap_ranges(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2)
     {
         static_assert(
-            (hpx::traits::is_forward_iterator<ForwardIter1>::value),
+            (hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
         static_assert(
-            (hpx::traits::is_forward_iterator<ForwardIter2>::value),
+            (hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::swap_ranges<ForwardIter2>().call(
+        return detail::swap_ranges<FwdIter2>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2);
     }

@@ -85,6 +85,14 @@ integration service tracks the current build status for the master branch:
      :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master
      :alt: HPX master branch build status
 
+The `AppVeyor <https://ci.appveyor.com/project/hkaiser/hpx>`_ contiguous
+integration tracks the status for Windows builds using the native Visual Studio 2017
+toolchain: |appveyor_status|.
+
+.. |appveyor_status| image:: https://ci.appveyor.com/api/projects/status/sd3ehemep05fhaj1/branch/master?svg=true
+     :target: https://ci.appveyor.com/project/hkaiser/hpx/branch/master
+     :alt: HPX master branch Windows build status
+
 In any case, if you happen to run into problems we very much encourage and appreciate
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
@@ -92,6 +100,15 @@ any issue reports through the `issue tracker for this Github project
 Also, if you have any questions feel free to ask it over at
 `stackoverflow <http://stackoverflow.com>`_
 and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
+
+For a full list of support options please see our
+`Support page <https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md>`_.
+
+We have adopted a
+`code of conduct <https://github.com/STEllAR-GROUP/hpx/blob/master/.github/CODE_OF_CONDUCT.md>`_
+for this project. Please refer to this document if you would like to know more
+about the expectations for members of our community, with regard to how they
+will behave toward each other.
 
 ********************
  Build Instructions

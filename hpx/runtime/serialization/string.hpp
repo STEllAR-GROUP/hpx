@@ -20,7 +20,6 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, std::basic_string<Char, CharTraits,
         Allocator> & s, unsigned)
     {
-        typedef std::basic_string<Char, CharTraits, Allocator> string_type;
         std::uint64_t size = 0;
         ar >> size; //-V128
 

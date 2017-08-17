@@ -22,10 +22,9 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <string>
 #include <utility>
-
-#include <boost/exception_ptr.hpp>
 
 namespace hpx { namespace parcelset
 {
@@ -197,17 +196,10 @@ namespace hpx { namespace parcelset
         std::int64_t count = 0;
         for (auto && p : pending_parcels_)
         {
-#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
-            count += hpx::util::get<0>(p.second)->size();
-            HPX_ASSERT(
-                hpx::util::get<0>(p.second)->size() ==
-                hpx::util::get<1>(p.second).size());
-#else
             count += hpx::util::get<0>(p.second).size();
             HPX_ASSERT(
                 hpx::util::get<0>(p.second).size() ==
                 hpx::util::get<1>(p.second).size());
-#endif
         }
         return count;
     }
@@ -285,7 +277,7 @@ namespace hpx { namespace parcelset
     {
         if (ec) {
             // all errors during early parcel handling are fatal
-            boost::exception_ptr exception =
+            std::exception_ptr exception =
                 HPX_GET_EXCEPTION(ec,
                     "early_pending_parcel_handler",
                     "error while handling early parcel: " +

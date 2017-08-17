@@ -19,10 +19,17 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/median.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/max.hpp>
 #include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/rolling_mean.hpp>
+#if BOOST_VERSION >= 105600
+#include <boost/accumulators/statistics/rolling_variance.hpp>
+#endif
+
+#include <hpx/util/rolling_min.hpp>
+#include <hpx/util/rolling_max.hpp>
 
 #if defined(HPX_MSVC)
 #  pragma warning(push)
@@ -163,7 +170,13 @@ namespace hpx { namespace performance_counters { namespace server
               : accum_(boost::accumulators::tag::rolling_window::window_size =
                     parameter2
                 )
-            {}
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
 
             double get_value()
             {
@@ -183,6 +196,48 @@ namespace hpx { namespace performance_counters { namespace server
         private:
             accumulator_type accum_;
         };
+
+#if BOOST_VERSION >= 105600
+        template <>
+        struct counter_type_from_statistic<boost::accumulators::tag::rolling_variance>
+          : counter_type_from_statistic_base
+        {
+            typedef boost::accumulators::tag::rolling_variance aggregating_tag;
+            typedef boost::accumulators::accumulator_set<
+                double, boost::accumulators::stats<aggregating_tag>
+            > accumulator_type;
+
+            counter_type_from_statistic(std::size_t parameter2)
+              : accum_(boost::accumulators::tag::rolling_window::window_size =
+                    parameter2
+                )
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
+
+            double get_value()
+            {
+                return sqrt(boost::accumulators::rolling_variance(accum_));
+            }
+
+            void add_value(double value)
+            {
+                accum_(value);
+            }
+
+            bool need_reset() const
+            {
+                return false;
+            }
+
+        private:
+            accumulator_type accum_;
+        };
+#endif
 
         template <>
         struct counter_type_from_statistic<boost::accumulators::tag::max>
@@ -245,13 +300,94 @@ namespace hpx { namespace performance_counters { namespace server
         private:
             accumulator_type accum_;
         };
+
+        template <>
+        struct counter_type_from_statistic<hpx::util::tag::rolling_min>
+          : counter_type_from_statistic_base
+        {
+            typedef hpx::util::tag::rolling_min aggregating_tag;
+            typedef boost::accumulators::accumulator_set<
+                double, boost::accumulators::stats<aggregating_tag>
+            > accumulator_type;
+
+            counter_type_from_statistic(std::size_t parameter2)
+              : accum_(boost::accumulators::tag::rolling_window::window_size =
+                    parameter2
+                )
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
+
+            double get_value()
+            {
+                return hpx::util::rolling_min(accum_);
+            }
+
+            void add_value(double value)
+            {
+                accum_(value);
+            }
+
+            bool need_reset() const
+            {
+                return false;
+            }
+
+        private:
+            accumulator_type accum_;
+        };
+
+        template <>
+        struct counter_type_from_statistic<hpx::util::tag::rolling_max>
+          : counter_type_from_statistic_base
+        {
+            typedef hpx::util::tag::rolling_max aggregating_tag;
+            typedef boost::accumulators::accumulator_set<
+                double, boost::accumulators::stats<aggregating_tag>
+            > accumulator_type;
+
+            counter_type_from_statistic(std::size_t parameter2)
+              : accum_(boost::accumulators::tag::rolling_window::window_size =
+                    parameter2
+                )
+            {
+                if (parameter2 == 0) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "counter_type_from_statistic<Statistic>",
+                        "base rolling window size is specified to be zero");
+                }
+            }
+
+            double get_value()
+            {
+                return hpx::util::rolling_max(accum_);
+            }
+
+            void add_value(double value)
+            {
+                accum_(value);
+            }
+
+            bool need_reset() const
+            {
+                return false;
+            }
+
+        private:
+            accumulator_type accum_;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Statistic>
     statistics_counter<Statistic>::statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::size_t parameter1, std::size_t parameter2)
+            std::size_t parameter1, std::size_t parameter2,
+            bool reset_base_counter)
       : base_type_holder(info),
         timer_(util::bind(&statistics_counter::evaluate, this_()),
             util::bind(&statistics_counter::on_terminate, this_()),
@@ -259,7 +395,8 @@ namespace hpx { namespace performance_counters { namespace server
         base_counter_name_(ensure_counter_prefix(base_counter_name)),
         value_(new detail::counter_type_from_statistic<Statistic>(parameter2)),
         has_prev_value_(false),
-        parameter1_(parameter1), parameter2_(parameter2)
+        parameter1_(parameter1), parameter2_(parameter2),
+        reset_base_counter_(reset_base_counter)
     {
         if (parameter1 == 0) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -386,7 +523,7 @@ namespace hpx { namespace performance_counters { namespace server
             return false;
 
         value = stubs::performance_counter::get_value(
-            launch::sync, base_counter_id_);
+            launch::sync, base_counter_id_, reset_base_counter_);
 
         if (!has_prev_value_)
         {
@@ -466,6 +603,10 @@ template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::mean>;
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::variance>;
+#if BOOST_VERSION >= 105600
+template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
+    boost::accumulators::tag::rolling_variance>;
+#endif
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::median>;
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
@@ -474,6 +615,10 @@ template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::max>;
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
     boost::accumulators::tag::min>;
+template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
+    hpx::util::tag::rolling_min>;
+template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
+    hpx::util::tag::rolling_max>;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Average
@@ -486,6 +631,20 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     average_count_counter_type, average_count_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
+
+#if BOOST_VERSION >= 105600
+///////////////////////////////////////////////////////////////////////////////
+// Rolling variance
+typedef hpx::components::component<
+    hpx::performance_counters::server::statistics_counter<
+        boost::accumulators::tag::rolling_variance>
+> rolling_variance_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    rolling_variance_count_counter_type, rolling_variance_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(rolling_variance_count_counter_type::wrapped_type)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Variance
@@ -500,7 +659,7 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(variance_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
-// Rooling average
+// Rolling average
 typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::rolling_mean>
@@ -548,6 +707,30 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(min_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
+// Rolling min
+typedef hpx::components::component<
+    hpx::performance_counters::server::statistics_counter<
+        hpx::util::tag::rolling_min>
+> rolling_min_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    rolling_min_count_counter_type, rolling_min_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(rolling_min_count_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
+// Rolling max
+typedef hpx::components::component<
+    hpx::performance_counters::server::statistics_counter<
+        hpx::util::tag::rolling_max>
+> rolling_max_count_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    rolling_max_count_counter_type, rolling_max_count_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(rolling_max_count_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail
 {
     /// Creation function for aggregating performance counters to be registered
@@ -575,22 +758,45 @@ namespace hpx { namespace performance_counters { namespace detail
 
                 std::vector<std::size_t> parameters;
                 if (!paths.parameters_.empty()) {
-                    // try to interpret the additional parameter as interval
-                    // time (ms)
+                    // try to interpret the additional parameters
                     namespace qi = boost::spirit::qi;
                     if (!qi::parse(paths.parameters_.begin(), paths.parameters_.end(),
-                            qi::int_ % ',', parameters))
+                            qi::uint_ % ',', parameters))
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "statistics_counter_creator",
-                            "invalid parameter specification for counter: " +
-                                paths.parameters_);
+                            "invalid parameter specification format for "
+                            "this counter: " + paths.parameters_);
+                        return naming::invalid_gid;
+                    }
+                    if (paths.countername_.find("rolling") != std::string::npos)
+                    {
+                        if (parameters.size() > 3)
+                        {
+                            HPX_THROWS_IF(ec, bad_parameter,
+                                "statistics_counter_creator",
+                                "too many parameter specifications for "
+                                "this counter: " + paths.parameters_);
+                            return naming::invalid_gid;
+                        }
+                    }
+                    else if (parameters.size() > 2)
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter,
+                            "statistics_counter_creator",
+                            "too many parameter specifications for "
+                            "this counter: " + paths.parameters_);
                         return naming::invalid_gid;
                     }
                 }
+                else if (paths.countername_.find("rolling") != std::string::npos) {
+                    parameters.push_back(1000); // sample interval
+                    parameters.push_back(10);   // rolling window
+                    parameters.push_back(0);    // don't reset underlying counter
+                }
                 else {
-                    parameters.push_back(1000);       // sample interval
-                    parameters.push_back(10);         // rolling window
+                    parameters.push_back(1000); // sample interval
+                    parameters.push_back(0);    // don't reset underlying counter
                 }
                 return create_statistics_counter(info, base_name, parameters, ec);
             }

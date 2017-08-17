@@ -25,30 +25,17 @@ set(tests
     new_binpacking
     new_colocated
     unordered_map
-    partitioned_vector_copy
-    partitioned_vector_for_each
-    partitioned_vector_handle_values
-    partitioned_vector_iter
-    partitioned_vector_move
-    partitioned_vector_target
-    partitioned_vector_transform_reduce
-    partitioned_vector_fill
-    partitioned_vector_inclusive_scan
-    partitioned_vector_exclusive_scan
+    partitioned_vector_view
+    partitioned_vector_view_iterator
+    partitioned_vector_subview
+    coarray
+    coarray_all_reduce
    )
 
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
   set(tests ${tests}
       distribution_policy_executor_v1
      )
-endif()
-
-# add dependencies to partitioned_vector_target when Cuda is enabled
-if(HPX_WITH_CUDA)
-  include_directories(${CUDA_INCLUDE_DIRS})
-
-  set(partitioned_vector_target_FLAGS
-      DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
 endif()
 
 # add executable needed for launch_process_test
@@ -118,22 +105,20 @@ set(new__PARAMETERS LOCALITIES 2)
 set(new_binpacking_PARAMETERS LOCALITIES 2)
 set(new_colocated_PARAMETERS LOCALITIES 2)
 
-set(partitioned_vector_copy_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_for_each_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_handle_values_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_iter_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_move_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(partitioned_vector_inclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_inclusive_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
+set(partitioned_vector_view_iterator_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_iterator_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(partitioned_vector_exclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_exclusive_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
+set(partitioned_vector_subview_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_subview_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(coarray_FLAGS DEPENDENCIES partitioned_vector_component)
+set(coarray_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(coarray_all_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(coarray_all_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
@@ -172,4 +157,3 @@ foreach(test ${tests})
 endforeach()
 
 add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
-

@@ -1,22 +1,25 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2016 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACQUIRE_SHARED_STATE_JUN_24_2015_0923AM)
-#define HPX_TRAITS_ACQUIRE_SHARED_STATE_JUN_24_2015_0923AM
+#ifndef HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP
+#define HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/acquire_future.hpp>
+#include <hpx/util/range.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/util/decay.hpp>
+#include <hpx/traits/is_range.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/range/functions.hpp>
 
+#include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -24,7 +27,6 @@
 
 namespace hpx { namespace traits
 {
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename T, typename Enable = void>
@@ -33,7 +35,7 @@ namespace hpx { namespace traits
 
     template <typename T, typename Enable = void>
     struct acquire_shared_state
-      : detail::acquire_shared_state_impl<typename util::decay<T>::type>
+      : detail::acquire_shared_state_impl<typename std::decay<T>::type>
     {};
 
     struct acquire_shared_state_disp
@@ -45,6 +47,76 @@ namespace hpx { namespace traits
             return acquire_shared_state<T>()(std::forward<T>(t));
         }
     };
+
+
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Enable>
+        struct acquire_shared_state_impl
+        {
+            static_assert(!is_future_or_future_range<T>::value, "");
+
+            typedef T type;
+
+            template <typename T_>
+            HPX_FORCEINLINE
+            T operator()(T_ && value) const
+            {
+                return std::forward<T_>(value);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Future>
+        struct acquire_shared_state_impl<
+            Future,
+            typename std::enable_if<
+                is_future<Future>::value
+            >::type
+        >
+        {
+            typedef typename traits::detail::shared_state_ptr<
+                typename traits::future_traits<Future>::type
+            >::type const& type;
+
+            HPX_FORCEINLINE type
+            operator()(Future const& f) const
+            {
+                return traits::future_access<Future>::get_shared_state(f);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Range>
+        struct acquire_shared_state_impl<
+            Range,
+            typename std::enable_if<
+                traits::is_future_range<Range>::value
+            >::type
+        >
+        {
+            typedef typename traits::future_range_traits<Range>::future_type
+                future_type;
+
+            typedef typename traits::detail::shared_state_ptr_for<future_type>::type
+                shared_state_ptr;
+            typedef std::vector<shared_state_ptr> type;
+
+            template <typename Range_>
+            HPX_FORCEINLINE std::vector<shared_state_ptr>
+            operator()(Range_&& futures) const
+            {
+                std::vector<shared_state_ptr> values;
+                detail::reserve_if_random_access_by_range(values, futures);
+
+                std::transform(util::begin(futures), util::end(futures),
+                    std::back_inserter(values), acquire_shared_state_disp());
+
+                return values;
+            }
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -77,64 +149,6 @@ namespace hpx { namespace traits
             }
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename T>
-        struct acquire_shared_state_impl<T,
-            typename std::enable_if<!is_future_or_future_range<T>::value>::type>
-        {
-            typedef T type;
-
-            template <typename T_>
-            HPX_FORCEINLINE
-            T operator()(T_ && value) const
-            {
-                return value;
-            }
-        };
-
-        template <typename T>
-        struct acquire_shared_state_impl<T,
-            typename std::enable_if<is_future<T>::value>::type>
-        {
-            typedef typename traits::detail::shared_state_ptr<
-                typename traits::future_traits<T>::type
-            >::type const& type;
-
-            HPX_FORCEINLINE type
-            operator()(T const& f) const
-            {
-                return traits::future_access<T>::get_shared_state(f);
-            }
-        };
-
-        template <typename Range>
-        struct acquire_shared_state_impl<Range,
-            typename std::enable_if<traits::is_future_range<Range>::value>::type>
-        {
-            typedef typename traits::future_range_traits<Range>::future_type
-                future_type;
-
-            typedef typename traits::detail::shared_state_ptr_for<future_type>::type
-                shared_state_ptr;
-            typedef std::vector<shared_state_ptr> type;
-
-            template <typename Range_>
-            HPX_FORCEINLINE type
-            operator()(Range_&& futures) const
-            {
-                std::vector<shared_state_ptr> values;
-                detail::reserve_if_random_access(values, futures);
-
-                std::transform(boost::begin(futures), boost::end(futures),
-                    std::back_inserter(values), acquire_shared_state_disp());
-
-                return values;
-            }
-        };
-    }
 }}
 
-#endif
+#endif /*HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP*/

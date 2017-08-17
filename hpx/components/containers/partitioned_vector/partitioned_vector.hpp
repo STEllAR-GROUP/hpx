@@ -1167,7 +1167,7 @@ namespace hpx
 //
 //             std::vector<future<void>> assign_lazy_sync;
 //             for (partition_description_type const& p,
-//                 boost::make_iterator_range(partitions_.begin(),
+//                 util::make_iterator_range(partitions_.begin(),
 //                                            partitions_.end() - 1)
 //                 )
 //             {
@@ -1626,53 +1626,41 @@ namespace hpx
         // Return local segment iterator
         local_segment_iterator segment_begin(std::uint32_t id)
         {
-            // local_segement_iterators are only valid on the locality where
-            // the data lives
-            HPX_ASSERT(id == hpx::get_locality_id());
             return local_segment_iterator(partitions_.begin(),
                 partitions_.end(), id);
         }
 
         const_local_segment_iterator segment_begin(std::uint32_t id) const
         {
-            // local_segement_iterators are only valid on the locality where
-            // the data lives
-            HPX_ASSERT(id == hpx::get_locality_id());
             return const_local_segment_iterator(partitions_.cbegin(),
                 partitions_.cend(), id);
         }
 
         const_local_segment_iterator segment_cbegin(std::uint32_t id) const
         {
-            // local_segement_iterators are only valid on the locality where
-            // the data lives
-            HPX_ASSERT(id == hpx::get_locality_id());
             return const_local_segment_iterator(partitions_.cbegin(),
                 partitions_.cend(), id);
         }
 
         local_segment_iterator segment_end(std::uint32_t id)
         {
-            // local_segement_iterators are only valid on the locality where
-            // the data lives
-            HPX_ASSERT(id == hpx::get_locality_id());
-            return local_segment_iterator(partitions_.end());
+            local_segment_iterator it = segment_begin(id);
+            it.unsatisfy_predicate();
+            return it;
         }
 
         const_local_segment_iterator segment_end(std::uint32_t id) const
         {
-            // local_segement_iterators are only valid on the locality where
-            // the data lives
-            HPX_ASSERT(id == hpx::get_locality_id());
-            return const_local_segment_iterator(partitions_.cend());
+            const_local_segment_iterator it = segment_begin(id);
+            it.unsatisfy_predicate();
+            return it;
         }
 
         const_local_segment_iterator segment_cend(std::uint32_t id) const
         {
-            // local_segement_iterators are only valid on the locality where
-            // the data lives
-            HPX_ASSERT(id == hpx::get_locality_id());
-            return const_local_segment_iterator(partitions_.cend());
+            const_local_segment_iterator it = segment_cbegin(id);
+            it.unsatisfy_predicate();
+            return it;
         }
 
         ///////////////////////////////////////////////////////////////////////

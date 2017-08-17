@@ -10,13 +10,12 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct shared_parallel_executor
@@ -82,15 +81,15 @@ void test_bulk_sync()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
     executor exec;
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::sync_bulk_execute(
+    hpx::parallel::execution::bulk_sync_execute(
         exec, &bulk_test, v, tid, 42);
 }
 
@@ -101,18 +100,18 @@ void test_bulk_async()
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
     executor exec;
     std::vector<hpx::shared_future<void> > futs =
-        hpx::parallel::execution::async_bulk_execute(exec,
+        hpx::parallel::execution::bulk_async_execute(exec,
             hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
     hpx::when_all(futs).get();
 
-    futs = hpx::parallel::execution::async_bulk_execute(exec,
+    futs = hpx::parallel::execution::bulk_async_execute(exec,
         &bulk_test, v, tid, 42);
     hpx::when_all(futs).get();
 }

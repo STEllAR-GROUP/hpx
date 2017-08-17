@@ -243,7 +243,7 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     //    shen.interpolate_one_bulk_async(values_ye, values_temp, values_rho,
     //        sheneos::server::partition3d::logpress);
 
-    //std::vector<double> results = hpx::util::unwrapped(bulk_one_tests);
+    //std::vector<double> results = hpx::util::unwrap(bulk_one_tests);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -342,7 +342,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
             }
         }
     }
-    //std::vector<std::vector<double> > results = hpx::util::unwrapped(bulk_tests);
+    //std::vector<std::vector<double> > results = hpx::util::unwrap(bulk_tests);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

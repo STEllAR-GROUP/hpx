@@ -17,10 +17,10 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <mutex>
 #include <utility>
 
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     }
                     else
                     {
-                        boost::rethrow_exception(
+                        std::rethrow_exception(
                             hpx::detail::access_exception(local_ec));
                     }
                     return;

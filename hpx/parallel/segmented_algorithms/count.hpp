@@ -16,9 +16,8 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <list>
 #include <numeric>
@@ -174,7 +173,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    hpx::util::unwrapped([=](std::vector<value_type> && r)
+                    hpx::util::unwrapping([=](std::vector<value_type> && r)
                     {
                         return std::accumulate(r.begin(), r.end(), value_type());
                     }),
@@ -376,7 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     [=](std::vector<shared_future<value_type> > && r) -> value_type
                     {
                         // handle any remote exceptions, will throw on error
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         parallel::util::detail::handle_remote_exceptions<
                             ExPolicy
                         >::call(r, errors);

@@ -34,20 +34,23 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Policy, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename dataflow_frame<
-            Policy
+            typename std::decay<Policy>::type
           , typename std::decay<F>::type
           , util::tuple<
                 typename traits::acquire_future<Ts>::type...
             >
         >::type
-        call(Policy policy, F && f, Ts &&... ts)
+        call(Policy && policy, F && f, Ts &&... ts)
         {
-            static_assert(traits::is_launch_policy<Policy>::value,
+            static_assert(
+                traits::is_launch_policy<
+                    typename std::decay<Policy>::type
+                >::value,
                 "Policy must be a valid launch policy");
 
             typedef
                 dataflow_frame<
-                    Policy
+                    typename std::decay<Policy>::type
                   , typename std::decay<F>::type
                   , util::tuple<
                         typename traits::acquire_future<Ts>::type...
@@ -57,7 +60,7 @@ namespace hpx { namespace lcos { namespace detail
             typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
-                    policy
+                    std::forward<Policy>(policy)
                   , std::forward<F>(f)
                   , util::forward_as_tuple(
                         traits::acquire_future_disp()(
@@ -77,18 +80,22 @@ namespace hpx { namespace lcos { namespace detail
     // launch
     template <typename Policy>
     struct dataflow_dispatch<Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        typename std::enable_if<
+            traits::is_launch_policy<typename std::decay<Policy>::type>::value
+        >::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Policy_, typename F, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(Policy policy, F && f, Ts &&... ts)
+        call(Policy_ && policy, F && f, Ts &&... ts)
         ->  decltype(dataflow_launch_policy_dispatch<
                     typename std::decay<F>::type
-                >::call(policy, std::forward<F>(f), std::forward<Ts>(ts)...))
+                >::call(std::forward<Policy_>(policy), std::forward<F>(f),
+                    std::forward<Ts>(ts)...))
         {
             return dataflow_launch_policy_dispatch<
                     typename std::decay<F>::type
-                >::call(policy, std::forward<F>(f), std::forward<Ts>(ts)...);
+                >::call(std::forward<Policy_>(policy), std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
         }
     };
 
@@ -99,7 +106,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename detail::dataflow_frame<
-            launch
+            hpx::detail::async_policy
           , typename std::decay<F>::type
           , util::tuple<
                 typename traits::acquire_future<Ts>::type...
@@ -216,7 +223,7 @@ namespace hpx
     namespace lcos { namespace local
     {
         template <typename F, typename ...Ts>
-        HPX_FORCEINLINE
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) HPX_FORCEINLINE
         auto dataflow(F && f, Ts &&... ts)
         ->  decltype(lcos::detail::dataflow_dispatch<
                 typename std::decay<F>::type>::call(

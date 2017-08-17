@@ -112,7 +112,7 @@ namespace hpx
     ///          all localities associated with this application. If the function
     ///          is called not from an HPX thread it will fail and return an error
     ///          using the argument \a ec.
-    HPX_EXPORT HPX_ATTRIBUTE_NORETURN void terminate();
+    HPX_EXPORT HPX_NORETURN void terminate();
 
     /// \brief Disconnect this locality from the application.
     ///

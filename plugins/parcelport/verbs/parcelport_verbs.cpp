@@ -8,11 +8,12 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 // util
-#include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
 #include <hpx/runtime.hpp>
@@ -393,7 +394,8 @@ namespace verbs
             parcelport_scheduler.register_thread_nullary(
                     util::bind(&parcelport::background_work_scheduler_thread, this),
                     "background_work_scheduler_thread",
-                    threads::pending, true, threads::thread_priority_critical,
+                    threads::pending, true,
+                    threads::thread_priority_high_recursive,
                     std::size_t(-1), threads::thread_stacksize_default, ec);
 
             FUNC_END_DEBUG_MSG;
@@ -1690,9 +1692,9 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
             "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:"
             HPX_PARCELPORT_VERBS_INTERFACE "}\n"
             "memory_chunk_size = ${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE:"
-            BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
+            HPX_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
             "max_memory_chunks = ${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS:"
-            BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
+            HPX_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
             "zero_copy_optimization = 1\n"
             "io_pool_size = 2\n"
             "use_io_pool = 1\n"

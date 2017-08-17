@@ -63,7 +63,9 @@ namespace hpx { namespace threads
             "suspended",
             "depleted",
             "terminated",
-            "staged"
+            "staged",
+            "pending_do_not_schedule",
+            "pending_boost"
         };
     }
 
@@ -107,14 +109,15 @@ namespace hpx { namespace threads
             "default",
             "low",
             "normal",
-            "critical",
-            "boost"
+            "high (recursive)"
+            "boost",
+            "high (non-recursive)",
         };
     }
 
     char const* get_thread_priority_name(thread_priority priority)
     {
-        if (priority < thread_priority_default || priority > thread_priority_boost)
+        if (priority < thread_priority_default || priority > thread_priority_high)
             return "unknown";
         return strings::thread_priority_names[priority];
     }
@@ -1445,7 +1448,7 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::periodic_priority_queue_scheduler<> >;
 #endif
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
 #include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::throttling_scheduler<> >;

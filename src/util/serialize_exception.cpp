@@ -4,14 +4,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/exception.hpp>
+#include <hpx/exception_info.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <boost/exception/diagnostic_information.hpp>
+#include <boost/exception/exception.hpp>
 #include <boost/version.hpp>
-#include <boost/exception_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
@@ -22,7 +25,7 @@ namespace hpx { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     template <typename Archive>
-    void save(Archive& ar, boost::exception_ptr const& ep, unsigned int)
+    void save(Archive& ar, std::exception_ptr const& ep, unsigned int)
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
@@ -44,99 +47,85 @@ namespace hpx { namespace serialization
         std::string throw_state_;
         std::string throw_auxinfo_;
 
-        // retrieve information related to boost::exception
+        // retrieve information related to exception_info
         try {
-            boost::rethrow_exception(ep);
+            std::rethrow_exception(ep);
         }
-        catch (boost::exception const& e) {
-            char const* const* func =
-                boost::get_error_info<boost::throw_function>(e);
-            if (func) {
-                throw_function_ = *func;
-            }
-            else {
-                std::string const* s =
-                    boost::get_error_info<hpx::detail::throw_function>(e);
-                if (s)
-                    throw_function_ = *s;
-            }
+        catch (exception_info const& xi) {
+            std::string const* function =
+                xi.get<hpx::detail::throw_function>();
+            if (function)
+                throw_function_ = *function;
 
-            char const* const* file =
-                boost::get_error_info<boost::throw_file>(e);
-            if (file) {
+            std::string const* file =
+                xi.get<hpx::detail::throw_file>();
+            if (file)
                 throw_file_ = *file;
-            }
-            else {
-                std::string const* s =
-                    boost::get_error_info<hpx::detail::throw_file>(e);
-                if (s)
-                    throw_file_ = *s;
-            }
 
-            int const* line =
-                boost::get_error_info<boost::throw_line>(e);
+            long const* line =
+                xi.get<hpx::detail::throw_line>();
             if (line)
                 throw_line_ = *line;
 
             std::uint32_t const* locality =
-                boost::get_error_info<hpx::detail::throw_locality>(e);
+                xi.get<hpx::detail::throw_locality>();
             if (locality)
                 throw_locality_ = *locality;
 
             std::string const* hostname_ =
-                boost::get_error_info<hpx::detail::throw_hostname>(e);
+                xi.get<hpx::detail::throw_hostname>();
             if (hostname_)
                 throw_hostname_ = *hostname_;
 
             std::int64_t const* pid_ =
-                boost::get_error_info<hpx::detail::throw_pid>(e);
+                xi.get<hpx::detail::throw_pid>();
             if (pid_)
                 throw_pid_ = *pid_;
 
             std::size_t const* shepherd =
-                boost::get_error_info<hpx::detail::throw_shepherd>(e);
+                xi.get<hpx::detail::throw_shepherd>();
             if (shepherd)
                 throw_shepherd_ = *shepherd;
 
             std::size_t const* thread_id =
-                boost::get_error_info<hpx::detail::throw_thread_id>(e);
+                xi.get<hpx::detail::throw_thread_id>();
             if (thread_id)
                 throw_thread_id_ = *thread_id;
 
             std::string const* thread_name =
-                boost::get_error_info<hpx::detail::throw_thread_name>(e);
+                xi.get<hpx::detail::throw_thread_name>();
             if (thread_name)
                 throw_thread_name_ = *thread_name;
 
             std::string const* back_trace =
-                boost::get_error_info<hpx::detail::throw_stacktrace>(e);
+                xi.get<hpx::detail::throw_stacktrace>();
             if (back_trace)
                 throw_back_trace_ = *back_trace;
 
             std::string const* env_ =
-                boost::get_error_info<hpx::detail::throw_env>(e);
+                xi.get<hpx::detail::throw_env>();
             if (env_)
                 throw_env_ = *env_;
 
             std::string const* config_ =
-                boost::get_error_info<hpx::detail::throw_config>(e);
+                xi.get<hpx::detail::throw_config>();
             if (config_)
                 throw_config_ = *config_;
 
             std::string const* state_ =
-                boost::get_error_info<hpx::detail::throw_state>(e);
+                xi.get<hpx::detail::throw_state>();
             if (state_)
                 throw_state_ = *state_;
 
             std::string const* auxinfo_ =
-                boost::get_error_info<hpx::detail::throw_auxinfo>(e);
+                xi.get<hpx::detail::throw_auxinfo>();
             if (auxinfo_)
                 throw_auxinfo_ = *auxinfo_;
         }
 
         // figure out concrete underlying exception type
         try {
-            boost::rethrow_exception(ep);
+            std::rethrow_exception(ep);
         }
         catch (hpx::thread_interrupted const&) {
             type = hpx::util::hpx_thread_interrupted_exception;
@@ -215,7 +204,7 @@ namespace hpx { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     template <typename Archive>
-    void load(Archive& ar, boost::exception_ptr& e, unsigned int)
+    void load(Archive& ar, std::exception_ptr& e, unsigned int)
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
@@ -376,11 +365,11 @@ namespace hpx { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
     template HPX_EXPORT void
-    save(hpx::serialization::output_archive&, boost::exception_ptr const&,
+    save(hpx::serialization::output_archive&, std::exception_ptr const&,
         unsigned int);
 
     template HPX_EXPORT void
-    load(hpx::serialization::input_archive&, boost::exception_ptr&,
+    load(hpx::serialization::input_archive&, std::exception_ptr&,
         unsigned int);
 }}
 

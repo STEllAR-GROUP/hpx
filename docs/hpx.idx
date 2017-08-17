@@ -1,4 +1,4 @@
-#   Copyright (c) 2001-2016 Hartmut Kaiser
+#   Copyright (c) 2001-2017 Hartmut Kaiser
 #
 #   Distributed under the Boost Software License, Version 1.0. (See accompanying
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -176,6 +176,10 @@ parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 parallel::count                       "count" "hpx\.parallel\.v1\.count$"
 parallel::count_if                    "count_if" "hpx\.parallel\.v1\.count_if.*"
 
+# hpx/parallel/algorithms/destroy.hpp
+parallel::destroy                       "destroy" "hpx\.parallel\.v1\.destroy$.*"
+parallel::destroy_n                     "destroy_n" "hpx\.parallel\.v1\.destroy_n.*"
+
 # hpx/parallel/algorithms/equal.hpp
 parallel::equal                       "equal" "hpx\.parallel\.v1\.equal_id.*"
 
@@ -324,8 +328,20 @@ parallel::uninitialized_copy          "uninitialized_copy" "hpx\.parallel\.v1\.u
 parallel::uninitialized_copy_n        "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
 
 # hpx/parallel/algorithms/uninitialized_fill.hpp
+parallel::uninitialized_default_construct   "uninitialized_default_construct" "hpx\.parallel\.v1\.uninitialized_def_id.*"
+parallel::uninitialized_default_construct_n "uninitialized_default_construct_n" "hpx\.parallel\.v1\.uninitialized_def_id.*"
+
+# hpx/parallel/algorithms/uninitialized_fill.hpp
 parallel::uninitialized_fill          "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
 parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
+
+# hpx/parallel/algorithms/uninitialized_move.hpp
+parallel::uninitialized_move          "uninitialized_move" "hpx\.parallel\.v1\.uninitialized_move$"
+parallel::uninitialized_move_n        "uninitialized_move_n" "hpx\.parallel\.v1\.uninitialized_move_n.*"
+
+# hpx/parallel/algorithms/uninitialized_value_construct.hpp
+parallel::uninitialized_value_construct          "uninitialized_value_construct" "hpx\.parallel\.v1\.uninitialized_val_id.*"
+parallel::uninitialized_value_construct_n        "uninitialized_value_construct_n" "hpx\.parallel\.v1\.uninitialized_val_id.*"
 
 # hpx/runtime/components/colocating_distribution_policy.hpp
 colocating_distribution_policy        "" "hpx\.components\.colocating_distri_id.*"
@@ -462,6 +478,9 @@ broadcast_apply_with_index            "" "header\.hpx\.lcos\.broadcast.*"
 gather_here                           "" "header\.hpx\.lcos\.gather.*"
 gather_there                          "" "header\.hpx\.lcos\.gather.*"
 
+HPX_REGISTER_GATHER_DECLARATION       "" "header\.hpx\.lcos\.gather.*"
+HPX_REGISTER_GATHER                   "" "header\.hpx\.lcos\.gather.*"
+
 # hpx/lcos/reduce.hpp
 reduce                                "" "header\.hpx\.lcos\.reduce.*"
 reduce_with_index                     "" "header\.hpx\.lcos\.reduce.*"
@@ -515,6 +534,19 @@ invoke_r                              "" "header\.hpx\.util\.invoke_r.*"
 invoke_fused                          "" "header\.hpx\.util\.invoke_fused.*"
 invoke_fused_r                        "" "header\.hpx\.util\.invoke_fused_r.*"
 
+# hpx/util/pack_traversal.hpp
+map_pack                              "" "header\.hpx\.util\.pack_traversal.*"
+spread_this                           "" "header\.hpx\.util\.pack_traversal.*"
+traverse_pack                         "" "header\.hpx\.util\.pack_traversal.*"
+
+# hpx/util/unwrap.hpp
+unwrap                                "" "header\.hpx\.util\.unwrap.*"
+unwrap_n                              "" "header\.hpx\.util\.unwrap_n.*"
+unwrap_all                            "" "header\.hpx\.util\.unwrap_all.*"
+unwrapping                            "" "header\.hpx\.util\.unwrapping.*"
+unwrapping_n                          "" "header\.hpx\.util\.unwrapping_n.*"
+unwrapping_all                        "" "header\.hpx\.util\.unwrapping_all.*"
+
 # hpx/util/unwrapped.hpp
 unwrapped                             "" "header\.hpx\.util\.unwrapped.*"
 unwrapped2                            "" "header\.hpx\.util\.unwrapped2.*"
@@ -548,3 +580,4 @@ HPX_PLAIN_ACTION_ID                       "" "HPX_PLAIN_ACTION_ID"
 
 # hpx/runtime/components/component_factory.hpp
 HPX_REGISTER_COMPONENT                    "" "HPX_REGISTER_COMPONENT"
+

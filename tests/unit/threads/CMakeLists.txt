@@ -18,6 +18,10 @@ set(tests
     thread_yield
    )
 
+if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+  set(tests ${tests} thread_stacksize_overflow)
+endif()
+
 if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
@@ -27,6 +31,8 @@ if((NOT MSVC) OR HPX_WITH_VCPKG)
 else()
   set(lockfree_fifo_FLAGS NOLIBS)
 endif()
+
+set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -74,6 +80,9 @@ foreach(test ${tests})
 endforeach()
 
 set_property(TARGET lockfree_fifo_test_exe APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    "HPX_NO_VERSION_CHECK")
+    PROPERTY COMPILE_DEFINITIONS "HPX_NO_VERSION_CHECK")
 
+if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+  set_tests_properties(tests.unit.threads.thread_stacksize_overflow PROPERTIES
+    PASS_REGULAR_EXPRESSION "Stack overflow in coroutine at address 0x[0-9a-fA-F]*")
+endif()

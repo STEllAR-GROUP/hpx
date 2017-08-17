@@ -81,6 +81,12 @@ namespace hpx { namespace parcelset {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         void set_state(state newstate)
         {
+            if (newstate == state_send_pending)
+            {
+                HPX_ASSERT(state_ == state_initialized ||
+                    state_ == state_reinitialized ||
+                    state_ == state_handle_read_ack);
+            }
             state_ = newstate;
         }
 #endif

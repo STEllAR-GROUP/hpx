@@ -7,11 +7,10 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <utility>
 #include <vector>
 
@@ -67,7 +66,7 @@ private:
 std::vector<int> random_fill(std::size_t size)
 {
     std::vector<int> c(size);
-    std::generate(boost::begin(c), boost::end(c), std::rand);
+    std::generate(std::begin(c), std::end(c), std::rand);
     return c;
 }
 
@@ -86,7 +85,7 @@ int hpx_main(int argc, char* argv[])
 
     // run a parallel loop to demonstrate thread safety of safe-object
     safe_object<std::vector<int> > ho;
-    for_each(par, boost::begin(data), boost::end(data),
+    for_each(par, std::begin(data), std::end(data),
         [&ho](int d)
         {
             if (satisfies_criteria(d))

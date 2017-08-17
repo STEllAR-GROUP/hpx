@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
 #include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
 #endif
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
@@ -471,7 +471,6 @@ namespace hpx { namespace threads { namespace executors
     {}
 #endif
 
-
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_executor::local_priority_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
@@ -502,10 +501,7 @@ namespace hpx { namespace threads { namespace executors
     {}
 #endif
 
-
-
-
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
     ///////////////////////////////////////////////////////////////////////////
     throttling_executor::throttling_executor()
       : scheduled_executor(new detail::thread_pool_executor<
@@ -520,8 +516,5 @@ namespace hpx { namespace threads { namespace executors
                 max_punits, min_punits))
     {}
 #endif
-
-
-
 
 }}}

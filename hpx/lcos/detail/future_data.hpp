@@ -28,11 +28,11 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <chrono>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -160,7 +160,7 @@ namespace detail
     struct future_data_storage
     {
         typedef typename future_data_result<R>::type value_type;
-        typedef boost::exception_ptr error_type;
+        typedef std::exception_ptr error_type;
 
         // determine the required alignment, define aligned storage of proper
         // size
@@ -230,11 +230,18 @@ namespace detail
                 return;
             }
 
-            f1_();
-            f2_();
+            {
+                hpx::util::annotate_function annotate(f1_);
+                (void)annotate;
+                f1_();
+            }
+            {
+                hpx::util::annotate_function annotate(f2_);
+                (void)annotate;
+                f2_();
+            }
         }
 
-    private:
         F1 f1_;
         F2 f2_;
     };
@@ -286,7 +293,7 @@ namespace detail
         virtual void wait(error_code& = throws) = 0;
         virtual future_status wait_until(util::steady_clock::time_point const&,
             error_code& = throws) = 0;
-        virtual boost::exception_ptr get_exception_ptr() const = 0;
+        virtual std::exception_ptr get_exception_ptr() const = 0;
 
         enum state
         {
@@ -358,20 +365,20 @@ namespace detail
             state_ = value;
         }
 
-        future_data(boost::exception_ptr const& e, init_no_addref no_addref)
+        future_data(std::exception_ptr const& e, init_no_addref no_addref)
           : future_data<traits::detail::future_data_void>(no_addref)
         {
-            boost::exception_ptr* exception_ptr =
-                reinterpret_cast<boost::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) boost::exception_ptr(e);
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(e);
             state_ = exception;
         }
-        future_data(boost::exception_ptr && e, init_no_addref no_addref)
+        future_data(std::exception_ptr && e, init_no_addref no_addref)
           : future_data<traits::detail::future_data_void>(no_addref)
         {
-            boost::exception_ptr* exception_ptr =
-                reinterpret_cast<boost::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) boost::exception_ptr(std::move(e));
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(std::move(e));
             state_ = exception;
         }
 
@@ -436,12 +443,12 @@ namespace detail
             // and promise::set_exception).
             if (state_ == exception)
             {
-                boost::exception_ptr* exception_ptr =
-                    reinterpret_cast<boost::exception_ptr*>(&storage_);
+                std::exception_ptr* exception_ptr =
+                    reinterpret_cast<std::exception_ptr*>(&storage_);
                 // an error has been reported in the meantime, throw or set
                 // the error code
                 if (&ec == &throws) {
-                    boost::rethrow_exception(*exception_ptr);
+                    std::rethrow_exception(*exception_ptr);
                     // never reached
                 }
                 else {
@@ -478,12 +485,12 @@ namespace detail
             // and promise::set_exception).
             if (state_ == exception)
             {
-                boost::exception_ptr* exception_ptr =
-                    reinterpret_cast<boost::exception_ptr*>(&storage_);
+                std::exception_ptr* exception_ptr =
+                    reinterpret_cast<std::exception_ptr*>(&storage_);
                 // an error has been reported in the meantime, throw or set
                 // the error code
                 if (&ec == &throws) {
-                    boost::rethrow_exception(*exception_ptr);
+                    std::rethrow_exception(*exception_ptr);
                     // never reached
                 }
                 else {
@@ -498,15 +505,14 @@ namespace detail
 
         // deferred execution of a given continuation
         bool run_on_completed(completed_callback_type && on_completed,
-            boost::exception_ptr& ptr)
+            std::exception_ptr& ptr)
         {
             try {
                 hpx::util::annotate_function annotate(on_completed);
-                (void)annotate;     // suppress warning about unused variable
                 on_completed();
             }
             catch (...) {
-                ptr = boost::current_exception();
+                ptr = std::current_exception();
                 return false;
             }
             return true;
@@ -530,7 +536,7 @@ namespace detail
             if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
-                boost::exception_ptr ptr;
+                std::exception_ptr ptr;
                 if (!run_on_completed(std::move(on_completed), ptr))
                 {
                     error_code ec(lightweight);
@@ -543,7 +549,7 @@ namespace detail
                 boost::intrusive_ptr<future_data> this_(this);
 
                 error_code ec(lightweight);
-                boost::exception_ptr ptr;
+                std::exception_ptr ptr;
                 if (!run_on_completed_on_new_thread(
                         util::deferred_call(&future_data::run_on_completed,
                             std::move(this_), std::move(on_completed),
@@ -558,7 +564,7 @@ namespace detail
 
                     // re-throw exception in this context
                     HPX_ASSERT(ptr);        // exception should have been set
-                    boost::rethrow_exception(ptr);
+                    std::rethrow_exception(ptr);
                 }
             }
         }
@@ -626,9 +632,9 @@ namespace detail
             completed_callback_type on_completed = std::move(this->on_completed_);
 
             // set the data
-            boost::exception_ptr* exception_ptr =
-                reinterpret_cast<boost::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) boost::exception_ptr(
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(
                 std::forward<Target>(data));
             state_ = exception;
 
@@ -673,7 +679,7 @@ namespace detail
             }
             catch (...) {
                 // store the error instead
-                return set_exception(boost::current_exception());
+                return set_exception(std::current_exception());
             }
         }
 
@@ -685,7 +691,7 @@ namespace detail
             }
             catch (...) {
                 // store the error code
-                set_exception(boost::current_exception());
+                set_exception(std::current_exception());
             }
         }
 
@@ -707,8 +713,8 @@ namespace detail
             }
             case exception:
             {
-                boost::exception_ptr* exception_ptr =
-                    reinterpret_cast<boost::exception_ptr*>(&storage_);
+                std::exception_ptr* exception_ptr =
+                    reinterpret_cast<std::exception_ptr*>(&storage_);
                 exception_ptr->~exception_ptr();
                 break;
             }
@@ -787,10 +793,10 @@ namespace detail
             return future_status::ready; //-V110
         }
 
-        boost::exception_ptr get_exception_ptr() const
+        std::exception_ptr get_exception_ptr() const
         {
             HPX_ASSERT(state_ == exception);
-            return *reinterpret_cast<boost::exception_ptr const*>(&storage_);
+            return *reinterpret_cast<std::exception_ptr const*>(&storage_);
         }
 
     protected:
@@ -823,11 +829,11 @@ namespace detail
                 other_allocator const& alloc)
           : future_data<Result>(std::move(data), no_addref), alloc_(alloc)
         {}
-        future_data_allocator(boost::exception_ptr const& e,
+        future_data_allocator(std::exception_ptr const& e,
                 init_no_addref no_addref, other_allocator const& alloc)
           : future_data<Result>(e, no_addref), alloc_(alloc)
         {}
-        future_data_allocator(boost::exception_ptr && e,
+        future_data_allocator(std::exception_ptr && e,
                 init_no_addref no_addref, other_allocator const& alloc)
           : future_data<Result>(std::move(e), no_addref), alloc_(alloc)
         {}
@@ -962,12 +968,6 @@ namespace detail
             return started_;
         }
 
-        bool started_test_and_set()
-        {
-            std::lock_guard<mutex_type> l(this->mtx_);
-            return started_test_and_set_locked(l);
-        }
-
         template <typename Lock>
         bool started_test_and_set_locked(Lock& l)
         {
@@ -980,6 +980,12 @@ namespace detail
         }
 
     protected:
+        bool started_test_and_set()
+        {
+            std::lock_guard<mutex_type> l(this->mtx_);
+            return started_test_and_set_locked(l);
+        }
+
         void check_started()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
@@ -1025,7 +1031,7 @@ namespace detail
         }
 
         void set_exception(
-            boost::exception_ptr const& e, error_code& ec = throws)
+            std::exception_ptr const& e, error_code& ec = throws)
         {
             this->future_data<Result>::set_exception(e, ec);
         }
@@ -1139,7 +1145,7 @@ namespace detail
             }
             catch (...) {
                 this->started_ = true;
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
                 throw;
             }
         }
@@ -1149,13 +1155,41 @@ namespace detail
     };
 }}}
 
-namespace hpx { namespace traits { namespace detail
+namespace hpx { namespace traits
 {
-    template <typename R, typename Allocator>
-    struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
+    namespace detail
     {
-        typedef lcos::detail::future_data_allocator<R, Allocator> type;
+        template <typename R, typename Allocator>
+        struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
+        {
+            typedef lcos::detail::future_data_allocator<R, Allocator> type;
+        };
+    }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F1, typename F2>
+    struct get_function_annotation<lcos::detail::compose_cb_impl<F1, F2> >
+    {
+        static char const*
+            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
+        {
+            return get_function_annotation<F1>::call(f.f1_);
+        }
     };
-}}}
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename F1, typename F2>
+    struct get_function_annotation_itt<lcos::detail::compose_cb_impl<F1, F2> >
+    {
+        static char const*
+            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
+        {
+            return get_function_annotation_itt<F1>::call(f.f1_);
+        }
+    };
+#endif
+#endif
+}}
 
 #endif
