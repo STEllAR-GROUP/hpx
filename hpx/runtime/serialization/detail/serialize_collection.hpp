@@ -8,27 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/detail/reserve.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
+#include <memory>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace serialization { namespace detail {
-
-    // default fallbacks
-    template <class Archive, class T>
-    void save_construct_data(Archive&, T*, unsigned)
-    {
-        // a user is not required to provide their own adl-overload
-    }
-
-    template <class Archive, class T>
-    void load_construct_data(Archive&, T* t, unsigned)
-    {
-        // this function is never supposed to be called
-        HPX_ASSERT(false);
-        ::new (t) T;
-    }
-
+namespace hpx { namespace serialization { namespace detail
+{
     template <class Value>
     class save_collection_impl
     {
@@ -86,19 +73,15 @@ namespace hpx { namespace serialization { namespace detail {
                     typename Collection::size_type size)
             {
                 using value_type = typename Collection::value_type;
-                using storage_type = typename std::aligned_storage<
-                    sizeof(value_type), alignof(value_type)>::type;
 
                 collection.clear();
                 hpx::traits::detail::reserve_if_reservable(collection, size);
 
                 while (size-- > 0)
                 {
-                    storage_type storage;
-                    value_type& ref = reinterpret_cast<value_type&>(storage);
-                    load_construct_data(ar, &ref, 0);
-                    ar >> ref;
-                    collection.push_back(std::move(ref));
+                    std::unique_ptr<value_type> data(
+                        constructor_selector<value_type>::create(ar));
+                    collection.push_back(std::move(*data));
                 }
             }
         };

@@ -92,7 +92,7 @@ void serialize(Archive& ar, C<T>& c, unsigned)
 }
 
 template<typename T>
-C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> */*unused*/)
+C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> * /*unused*/)
 {
     C<T> *c = new C<T>(999);
     serialize(ar, *c, 0);
@@ -129,7 +129,7 @@ namespace hpx { namespace serialization {
 } }
 
 template<typename T>
-E<T> *e_factory(hpx::serialization::input_archive& ar, E<T> */*unused*/)
+E<T> *e_factory(hpx::serialization::input_archive& ar, E<T> * /*unused*/)
 {
     E<T> *e = new E<T>(99, 9999);
     serialize(ar, *e, 0);
