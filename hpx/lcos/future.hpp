@@ -12,6 +12,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
@@ -46,6 +47,7 @@
 
 #include <exception>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -60,6 +62,38 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename Archive, typename Future>
+    void serialize_future_load(Archive& ar, Future& f, std::true_type)
+    {
+        typedef typename hpx::traits::future_traits<Future>::type value_type;
+        typedef lcos::detail::future_data<value_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
+
+        value_type value;
+        ar >> value;
+
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(std::move(value), init_no_addref()), false);
+
+        f = hpx::traits::future_access<Future>::create(std::move(p));
+    }
+
+    template <typename Archive, typename Future>
+    void serialize_future_load(Archive& ar, Future& f, std::false_type)
+    {
+        typedef typename hpx::traits::future_traits<Future>::type value_type;
+        typedef lcos::detail::future_data<value_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
+
+        std::unique_ptr<value_type> value(
+            serialization::detail::constructor_selector<value_type>::create(ar));
+
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(std::move(*value), init_no_addref()), false);
+
+        f = hpx::traits::future_access<Future>::create(std::move(p));
+    }
+
+    template <typename Archive, typename Future>
     typename std::enable_if<
         !std::is_void<typename hpx::traits::future_traits<Future>::type>::value
     >::type serialize_future_load(Archive& ar, Future& f)
@@ -72,13 +106,8 @@ namespace hpx { namespace lcos { namespace detail
         ar >> state;
         if (state == future_state::has_value)
         {
-            value_type value;
-            ar >> value;
-
-            boost::intrusive_ptr<shared_state> p(
-                new shared_state(std::move(value), init_no_addref()), false);
-
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            serialize_future_load(ar, f,
+                typename std::is_default_constructible<value_type>::type());
         } else if (state == future_state::has_exception) {
             std::exception_ptr exception;
             ar >> exception;

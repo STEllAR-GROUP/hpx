@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -108,23 +108,6 @@ namespace hpx { namespace detail
         }
     };
 
-    template <typename Action, typename Result>
-    struct sync_local_invoke<Action, lcos::future<Result> >
-    {
-        template <typename ...Ts>
-        HPX_FORCEINLINE static lcos::future<Result>
-        call(naming::id_type const&, naming::address && addr, Ts &&... vs)
-        {
-            HPX_ASSERT(!!addr);
-            HPX_ASSERT(traits::component_type_is_compatible<
-                    typename Action::component_type
-                >::call(addr));
-
-            return Action::execute_function(addr.address_, addr.type_,
-                std::forward<Ts>(vs)...);
-        }
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     struct sync_local_invoke_cb
@@ -148,33 +131,10 @@ namespace hpx { namespace detail
         }
     };
 
-    template <typename Action, typename Result>
-    struct sync_local_invoke_cb<Action, lcos::future<Result> >
-    {
-        template <typename Callback, typename ...Ts>
-        HPX_FORCEINLINE static lcos::future<Result>
-        call(naming::id_type const&, naming::address && addr, Callback && cb,
-            Ts &&... vs)
-        {
-            HPX_ASSERT(!!addr);
-            HPX_ASSERT(traits::component_type_is_compatible<
-                    typename Action::component_type
-                >::call(addr));
-
-            lcos::future<Result> f = Action::execute_function(
-                addr.address_, addr.type_, std::forward<Ts>(vs)...);
-
-            // invoke callback
-            cb(boost::system::error_code(), parcelset::parcel());
-
-            return f;
-        }
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_impl(launch policy, hpx::id_type const& id, Ts&&... vs)
     {
@@ -237,7 +197,7 @@ namespace hpx { namespace detail
 
     template <typename Action, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_impl(hpx::detail::sync_policy, hpx::id_type const& id, Ts&&... vs)
     {
@@ -281,7 +241,7 @@ namespace hpx { namespace detail
 
     template <typename Action, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_impl(hpx::detail::async_policy, hpx::id_type const& id, Ts&&... vs)
     {
@@ -304,7 +264,7 @@ namespace hpx { namespace detail
 
     template <typename Action, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_impl(hpx::detail::deferred_policy, hpx::id_type const& id, Ts&&... vs)
     {
@@ -332,7 +292,7 @@ namespace hpx { namespace detail
     ///
     template <typename Action, typename Callback, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_cb_impl(launch policy, hpx::id_type const& id, Callback&& cb, Ts&&... vs)
     {
@@ -400,7 +360,7 @@ namespace hpx { namespace detail
 
     template <typename Action, typename Callback, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_cb_impl(hpx::detail::sync_policy, hpx::id_type const& id, Callback&& cb,
         Ts&&... vs)
@@ -450,7 +410,7 @@ namespace hpx { namespace detail
 
     template <typename Action, typename Callback, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_cb_impl(hpx::detail::async_policy, hpx::id_type const& id, Callback&& cb,
         Ts&&... vs)
@@ -475,7 +435,7 @@ namespace hpx { namespace detail
 
     template <typename Action, typename Callback, typename ...Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::local_result_type
+        typename hpx::traits::extract_action<Action>::type::local_result_type
     >
     async_cb_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)

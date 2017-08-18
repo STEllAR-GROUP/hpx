@@ -11,7 +11,6 @@
 #define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -83,35 +82,11 @@ namespace hpx { namespace traits
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        // If an action returns a future, we need to do special things
+        // If an action returns void, we need to do special things
         template <>
         struct action_remote_result_customization_point<void>
         {
             typedef util::unused_type type;
-        };
-
-        template <typename Result>
-        struct action_remote_result_customization_point<lcos::future<Result> >
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct action_remote_result_customization_point<lcos::future<void> >
-        {
-            typedef hpx::util::unused_type type;
-        };
-
-        template <typename Result>
-        struct action_remote_result_customization_point<lcos::shared_future<Result> >
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct action_remote_result_customization_point<lcos::shared_future<void> >
-        {
-            typedef hpx::util::unused_type type;
         };
     }
 }}

@@ -7,11 +7,12 @@ add_subdirectory(components)
 
 set(tests
     async_deferred_1523
+    component_action_move_semantics
     make_continuation_1615
     plain_action_1330
     plain_action_1550
     plain_action_move_semantics
-    component_action_move_semantics
+    return_future_2847
    )
 
 set(plain_action_1330_FLAGS
@@ -28,6 +29,8 @@ set(component_action_move_semantics_FLAGS
 set(component_action_move_semantics_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 1)
+
+set(return_future_2847_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources
