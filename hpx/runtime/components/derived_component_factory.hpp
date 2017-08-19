@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
@@ -24,6 +25,7 @@
 
 #include <cstddef>
 #include <string>
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -152,6 +154,22 @@ namespace hpx { namespace components
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
         naming::gid_type create(std::size_t count = 1)
+        {
+            return create<Component>(count,
+                std::is_default_constructible<
+                    typename Component::type_holder>());
+        }
+
+        template <typename Component_>
+        naming::gid_type create(std::size_t count, std::false_type)
+        {
+            // shouldn't ever be called for non-default-constructible types
+            HPX_ASSERT(false);
+            return naming::invalid_gid;
+        }
+
+        template <typename Component_>
+        naming::gid_type create(std::size_t count, std::true_type)
         {
             if (isenabled_)
             {
