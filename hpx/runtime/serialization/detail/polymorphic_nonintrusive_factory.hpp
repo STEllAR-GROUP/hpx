@@ -85,8 +85,7 @@ namespace hpx { namespace serialization { namespace detail
     public:
         static T* create(input_archive& ar)
         {
-            return create(
-                ar, typename std::is_default_constructible<T>::type());
+            return create(ar, std::is_default_constructible<T>());
         }
 
         // is default-constructible

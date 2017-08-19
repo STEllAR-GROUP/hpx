@@ -106,8 +106,9 @@ namespace hpx { namespace lcos { namespace detail
         ar >> state;
         if (state == future_state::has_value)
         {
-            serialize_future_load(ar, f,
-                typename std::is_default_constructible<value_type>::type());
+            serialize_future_load(
+                ar, f, std::is_default_constructible<value_type>());
+
         } else if (state == future_state::has_exception) {
             std::exception_ptr exception;
             ar >> exception;
@@ -158,6 +159,19 @@ namespace hpx { namespace lcos { namespace detail
         }
     }
 
+    template <typename Archive, typename T>
+    void serialize_future_save(Archive& ar, T const& val, std::false_type)
+    {
+        serialization::detail::save_construct_data(ar, &val, 0);
+        ar << val;
+    }
+
+    template <typename Archive, typename T>
+    void serialize_future_save(Archive& ar, T const& val, std::true_type)
+    {
+        ar << val;
+    }
+
     template <typename Archive, typename Future>
     typename std::enable_if<
         !std::is_void<typename hpx::traits::future_traits<Future>::type>::value
@@ -192,7 +206,11 @@ namespace hpx { namespace lcos { namespace detail
             value_type const & value =
                 *hpx::traits::future_access<Future>::
                     get_shared_state(f)->get_result();
-            ar << state << value; //-V128
+            ar << state;
+
+            serialize_future_save(
+                ar, value, std::is_default_constructible<value_type>());
+
         } else if (f.has_exception()) {
             state = future_state::has_exception;
             std::exception_ptr exception = f.get_exception_ptr();
