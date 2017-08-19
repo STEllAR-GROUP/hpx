@@ -551,7 +551,7 @@ namespace hpx { namespace components
 
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
-                    *static_cast<Derived const*>(this), launch::all,
+                    *this, launch::sync,
                     util::bind(&client_base::register_as_helper,
                         util::placeholders::_1, symbolic_name
                     ));
