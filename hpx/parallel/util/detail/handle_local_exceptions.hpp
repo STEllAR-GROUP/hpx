@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c)      2017 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,7 +36,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 throw ba;
             }
             catch (...) {
-                throw;
+                throw exception_list(e);
             }
         }
 
