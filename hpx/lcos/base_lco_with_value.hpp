@@ -233,7 +233,7 @@ namespace hpx { namespace traits
     {
         static components::component_type get()
         {
-            return components::component_base_lco_with_value;
+            return components::component_base_lco_with_value_unmanaged;
         }
 
         static void set(components::component_type)
