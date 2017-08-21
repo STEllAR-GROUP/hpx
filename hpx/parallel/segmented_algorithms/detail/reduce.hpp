@@ -33,9 +33,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
           : seg_reduce::algorithm("reduce")
         {}
 
-        template <typename ExPolicy, typename InIter, typename Reduce>
+        template <typename ExPolicy, typename FwdIter, typename Reduce>
         static T
-        sequential(ExPolicy, InIter first, InIter last, Reduce && r)
+        sequential(ExPolicy, FwdIter first, FwdIter last, Reduce && r)
         {
             return util::accumulate<T>(first, last, r);
         }
@@ -70,13 +70,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
           : seg_transform_reduce::algorithm("transform_reduce")
         {}
 
-        template <typename ExPolicy, typename InIter, typename Reduce,
+        template <typename ExPolicy, typename FwdIter, typename Reduce,
             typename Convert>
         static T
-        sequential(ExPolicy, InIter first, InIter last, Reduce && r,
+        sequential(ExPolicy, FwdIter first, FwdIter last, Reduce && r,
             Convert && conv)
         {
-            typedef typename std::iterator_traits<InIter>::reference
+            typedef typename std::iterator_traits<FwdIter>::reference
                 reference;
             return util::accumulate<T>(first, last,
                 [=](T const& res, reference next) -> T
@@ -118,6 +118,61 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                     auto rfirst = hpx::util::begin(results);
                     auto rlast = hpx::util::end(results);
                     return util::accumulate<T>(rfirst, rlast, r);
+                }));
+        }
+    };
+
+    template <typename T>
+    struct seg_transform_reduce_binary
+      : public detail::algorithm<seg_transform_reduce_binary<T>, T>
+    {
+        seg_transform_reduce_binary()
+          : seg_transform_reduce_binary::algorithm("transform_reduce_binary")
+        {}
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Reduce, typename Convert>
+        static T
+        sequential(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            Reduce && r, Convert && conv)
+        {
+            typedef typename std::iterator_traits<FwdIter1>::reference
+                reference;
+            return util::accumulate<T>(first1, last1, first2,
+                std::forward<Reduce>(r), std::forward<Convert>(conv)
+            );
+        }
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Reduce, typename Convert>
+        static typename util::detail::algorithm_result<ExPolicy, T>::type
+        parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            Reduce && r, Convert && conv)
+        {
+            typedef typename std::iterator_traits<FwdIter1>::reference
+                reference;
+            typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
+                zip_iterator;
+            using hpx::util::make_zip_iterator;
+            return util::partitioner<ExPolicy, T>::call(
+                std::forward<ExPolicy>(policy),
+                make_zip_iterator(first1, first2), std::distance(first1, last1),
+                [&r, &conv](zip_iterator part_begin, std::size_t part_size) -> T
+                {
+                    auto iters = part_begin.get_iterator_tuple();
+                    FwdIter1 it1 = hpx::util::get<0>(iters);
+                    FwdIter2 it2 = hpx::util::get<1>(iters);
+                    FwdIter1 last1 = it1;
+                    std::advance(last1, part_size);
+                    return util::accumulate<T>(it1, last1, it2,
+                        std::forward<Reduce>(r), std::forward<Convert>(conv)
+                    );
+                },
+                hpx::util::unwrapping([r](std::vector<T> && results) -> T
+                {
+                    auto rfirst1 = hpx::util::begin(results);
+                    auto rlast1 = hpx::util::end(results);
+                    return util::accumulate<T>(rfirst1, rlast1, r);
                 }));
         }
     };

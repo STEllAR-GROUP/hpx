@@ -61,6 +61,31 @@ test_transform_reduce_async(ExPolicy && policy,
         );
 }
 
+template <typename ExPolicy, typename T>
+T test_transform_reduce_binary(ExPolicy && policy,
+    hpx::partitioned_vector<T> const& xvalues,
+    hpx::partitioned_vector<T> const& yvalues)
+{
+    return
+        hpx::parallel::transform_reduce(policy,
+            xvalues.begin(), xvalues.end(), yvalues.begin(),
+            T(1), std::plus<T>(), std::multiplies<T>()
+        );
+}
+
+template <typename ExPolicy, typename T>
+hpx::future<T>
+test_transform_reduce_binary_async(ExPolicy && policy,
+    hpx::partitioned_vector<T> & xvalues,
+    hpx::partitioned_vector<T> & yvalues)
+{
+    return
+        hpx::parallel::transform_reduce(policy,
+            xvalues.begin(), xvalues.end(), yvalues.begin(),
+            T(1), std::plus<T>(), std::multiplies<T>()
+        );
+}
+
 template <typename T>
 void transform_reduce_tests(std::size_t num,
     hpx::partitioned_vector<T> const& xvalues,
@@ -86,6 +111,30 @@ void transform_reduce_tests(std::size_t num,
 }
 
 template <typename T>
+void transform_reduce_binary_tests(std::size_t num,
+    hpx::partitioned_vector<T> & xvalues,
+    hpx::partitioned_vector<T> & yvalues)
+{
+    HPX_TEST_EQ(
+        test_transform_reduce_binary(hpx::parallel::execution::seq, xvalues, yvalues),
+        T(num + 1));
+    HPX_TEST_EQ(
+        test_transform_reduce_binary(hpx::parallel::execution::par, xvalues, yvalues),
+        T(num + 1));
+
+    HPX_TEST_EQ(
+        test_transform_reduce_binary_async(
+            hpx::parallel::execution::seq(hpx::parallel::execution::task),
+            xvalues, yvalues).get(),
+        T(num + 1));
+    HPX_TEST_EQ(
+        test_transform_reduce_binary_async(
+            hpx::parallel::execution::par(hpx::parallel::execution::task),
+            xvalues, yvalues).get(),
+        T(num + 1));
+}
+
+template <typename T>
 void transform_reduce_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 10007;
@@ -102,11 +151,30 @@ void transform_reduce_tests(std::vector<hpx::id_type> &localities)
     }
 }
 
+template <typename T>
+void transform_reduce_binary_tests(std::vector<hpx::id_type> &localities)
+{
+    std::size_t const num = 10007;
+    {
+        hpx::partitioned_vector<T> xvalues(num,T(1));
+        hpx::partitioned_vector<T> yvalues(num,T(1));
+        transform_reduce_binary_tests(num, xvalues, yvalues);
+    }
+
+    {
+        hpx::partitioned_vector<T> xvalues(num,T(1),hpx::container_layout(localities));
+        hpx::partitioned_vector<T> yvalues(num,T(1),hpx::container_layout(localities));
+        transform_reduce_binary_tests(num, xvalues, yvalues);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     transform_reduce_tests<int>(localities);
     transform_reduce_tests<double>(localities);
+    transform_reduce_binary_tests<int>(localities);
+    transform_reduce_binary_tests<double>(localities);
     return hpx::util::report_errors();
 }

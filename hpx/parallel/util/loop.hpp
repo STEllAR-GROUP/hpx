@@ -555,6 +555,23 @@ namespace hpx { namespace parallel { namespace util
         }
         return val;
     }
+
+    template <typename T, typename Iter1, typename Iter2, typename Reduce,
+        typename Conv>
+    HPX_FORCEINLINE T
+    accumulate(Iter1 first1, Iter1 last1, Iter2 first2, Reduce && r, Conv && conv)
+    {
+        T val = hpx::util::invoke(conv, *first1, *first2);
+        ++first1;
+        ++first2;
+        while(last1 != first1)
+        {
+            val = hpx::util::invoke(r, val, hpx::util::invoke(conv, *first1, *first2));
+            ++first1;
+            ++first2;
+        }
+        return val;
+    }
 }}}
 
 #endif
