@@ -195,6 +195,14 @@ namespace hpx { namespace util
             "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
 
+            /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
+            /// then apply the test-failure value as default.
+#if defined(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
+            "attach-debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
+#else
+            "attach-debugger = ${HPX_ATTACH_DEBUGGER}",
+#endif
+
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
             "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",

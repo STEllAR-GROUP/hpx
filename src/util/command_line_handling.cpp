@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/util/manage_config.hpp>
@@ -1037,34 +1038,18 @@ namespace hpx { namespace util
         return false;
     }
 
-    void attach_debugger()
-    {
-#if defined(_POSIX_VERSION)
-        volatile int i = 0;
-        std::cerr
-            << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
-            << " ready for attaching debugger. Once attached set i = 1 and continue"
-            << std::endl;
-        while(i == 0)
-        {
-            sleep(1);
-        }
-#elif defined(HPX_WINDOWS)
-        DebugBreak();
-#endif
-    }
-
     void command_line_handling::handle_attach_debugger()
     {
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
         if(vm_.count("hpx:attach-debugger"))
         {
             std::string option = vm_["hpx:attach-debugger"].as<std::string>();
-            if (option != "startup" && option != "exception") {
+            if (option != "startup" && option != "exception" &&
+                option != "test-failure") {
                 std::cerr <<
                     "hpx::init: command line warning: --hpx:attach-debugger: "
                     "invalid option: " << option << ". Allowed values are "
-                    "'startup' or 'exception'" << std::endl;
+                    "'startup', 'exception' or 'test-failure'" << std::endl;
             }
             else {
                 if (option == "startup")
