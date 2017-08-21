@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
-        HPX_ATTRIBUTE_NORETURN static void call(std::exception_ptr const& e)
+        HPX_NORETURN static void call(std::exception_ptr const& e)
         {
             try {
                 std::rethrow_exception(e);
@@ -130,12 +130,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct handle_local_exceptions<execution::parallel_unsequenced_policy>
     {
         ///////////////////////////////////////////////////////////////////////
-        HPX_ATTRIBUTE_NORETURN static void call(std::exception_ptr const&)
+        HPX_NORETURN static void call(std::exception_ptr const&)
         {
             hpx::terminate();
         }
 
-        HPX_ATTRIBUTE_NORETURN static void call(
+        HPX_NORETURN static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             hpx::terminate();

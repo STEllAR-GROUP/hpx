@@ -348,12 +348,12 @@ namespace hpx
             construct_lightweight_exception(Exception const& e);
 
         // HPX_ASSERT handler
-        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_NORETURN HPX_EXPORT
         void assertion_failed(char const* expr, char const* function,
             char const* file, long line);
 
         // HPX_ASSERT_MSG handler
-        HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+        HPX_NORETURN HPX_EXPORT
         void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
 
@@ -369,8 +369,10 @@ namespace hpx
 
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
-        HPX_EXPORT void report_exception_and_terminate(std::exception_ptr const&);
-        HPX_EXPORT void report_exception_and_terminate(hpx::exception const&);
+        HPX_NORETURN HPX_EXPORT void report_exception_and_terminate(
+            std::exception_ptr const&);
+        HPX_NORETURN HPX_EXPORT void report_exception_and_terminate(
+            hpx::exception const&);
 
         // Report an early or late exception and locally exit execution. There
         // isn't anything more we could do. The exception will be re-thrown
@@ -1058,12 +1060,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // \cond NOINTERNAL
     // forwarder for HPX_ASSERT handler
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+    HPX_NORETURN HPX_EXPORT
     void assertion_failed(char const* expr, char const* function,
         char const* file, long line);
 
     // forwarder for HPX_ASSERT_MSG handler
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT
+    HPX_NORETURN HPX_EXPORT
     void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line);
 

@@ -479,8 +479,8 @@ namespace hpx
         }
         else
         {
-            HPX_ASSERT(components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value);
+            HPX_ASSERT(!addr || components::get_base_type(addr.type_) ==
+                    components::component_base_lco_with_value);
 
             typedef typename lcos::base_lco_with_value<
                     local_result_type, remote_result_type,
@@ -515,8 +515,8 @@ namespace hpx
         }
         else
         {
-            HPX_ASSERT(components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value);
+            HPX_ASSERT(!addr || components::get_base_type(addr.type_) ==
+                    components::component_base_lco_with_value);
 
             typedef typename lcos::base_lco_with_value<
                     local_result_type, remote_result_type,

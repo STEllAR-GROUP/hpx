@@ -119,7 +119,7 @@ void run_benchmark(std::size_t vector_size, int test_count, int base_num,
 
     std::cout << "* Running Benchmark..." << std::endl;
 
-    auto pred = [base_num](auto const& t) {
+    auto pred = [base_num](int t) {
         return t < base_num;
     };
 

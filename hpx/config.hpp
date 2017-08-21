@@ -32,10 +32,6 @@
 #error HPX cannot be compiled with a Boost version earlier than 1.55.0
 #endif
 
-#if BOOST_VERSION < 105600
-#include <boost/exception/detail/attribute_noreturn.hpp>
-#endif
-
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 
@@ -480,31 +476,6 @@
 #else
 #define HPX_CONTINUATION_MAX_RECURSION_DEPTH 20
 #endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_MSVC)
-#   define HPX_NOINLINE __declspec(noinline)
-#elif defined(__GNUC__)
-#   if defined(__NVCC__) || defined(__CUDACC__)
-        // nvcc doesn't always parse __noinline
-#       define HPX_NOINLINE __attribute__ ((noinline))
-#   else
-#       define HPX_NOINLINE __attribute__ ((__noinline__))
-#   endif
-#else
-#   define HPX_NOINLINE
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_ATTRIBUTE_NORETURN)
-#  if defined(_MSC_VER)
-#    define HPX_ATTRIBUTE_NORETURN __declspec(noreturn)
-#  elif defined(__GNUC__)
-#    define HPX_ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
-#  else
-#    define HPX_ATTRIBUTE_NORETURN
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

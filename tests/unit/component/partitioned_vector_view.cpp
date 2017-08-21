@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/partitioned_vector_view.hpp>
 #include <hpx/lcos/spmd_block.hpp>
@@ -180,7 +182,8 @@ void async_bulk_test(hpx::lcos::spmd_block block,
     }
 
     block.sync_all(hpx::launch::async)
-        .then([&block, &in, &out, width, height](hpx::future<void> event) {
+        .then([&block, &in, &out, width, height](hpx::future<void> event)
+        {
             event.get();
 
             // Outer Transpose operation
@@ -194,7 +197,8 @@ void async_bulk_test(hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
         .then([&block, &out, local_width, local_height,
-                  local_leading_dimension](hpx::future<void> event) {
+                  local_leading_dimension](hpx::future<void> event)
+        {
             event.get();
 
             // Inner Transpose operation
@@ -211,7 +215,8 @@ void async_bulk_test(hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
         .then([&block, &out, width, height, local_width, local_height,
-                  local_leading_dimension](hpx::future<void> event) {
+                  local_leading_dimension](hpx::future<void> event)
+        {
             event.get();
 
             // Test the result of the computation
@@ -277,7 +282,7 @@ int main()
     auto layout =
         hpx::container_layout(height * width, hpx::find_all_localities());
 
-    // Vector instanciations for test 1
+    // Vector instantiations for test 1
     vector_type in1(raw_size, layout);
     vector_type out1(raw_size, layout);
 
@@ -287,7 +292,7 @@ int main()
     in1.register_as(hpx::launch::sync, in1_name);
     out1.register_as(hpx::launch::sync, out1_name);
 
-    // Vector instanciations for test 2
+    // Vector instantiations for test 2
     vector_type in2(raw_size, layout);
     vector_type out2(raw_size, layout);
 
