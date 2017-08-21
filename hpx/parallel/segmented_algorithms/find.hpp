@@ -331,7 +331,7 @@ namespace hpx { namespace parallel { inline namespace v1
         inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         find_if_not_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             std::false_type);
-  
+
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2, typename Pred>
         typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
