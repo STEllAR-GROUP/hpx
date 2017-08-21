@@ -238,9 +238,50 @@ namespace hpx { namespace parallel { inline namespace v1
                     });
             }
         };
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
+            typename Reduce, typename Convert>
+        typename util::detail::algorithm_result<ExPolicy, T>::type
+        transform_reduce_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op, std::false_type)
+        {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            static_assert(
+                (hpx::traits::is_input_iterator<FwdIter1>::value),
+                "Requires at least input iterator.");
+            static_assert(
+                (hpx::traits::is_input_iterator<FwdIter2>::value),
+                "Requires at least input iterator.");
+
+            typedef std::integral_constant<bool,
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter1>::value ||
+                   !hpx::traits::is_forward_iterator<FwdIter2>::value
+                > is_seq;
+#else
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Requires at least forward iterator.");
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+            return detail::transform_reduce_binary<T>().call(
+                std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+                std::move(init),
+                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+        }
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
+            typename Reduce, typename Convert>
+        typename util::detail::algorithm_result<ExPolicy, T>::type
+        transform_reduce_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op, std::true_type);
         /// \endcond
     }
-
     ///////////////////////////////////////////////////////////////////////////
     /// Returns the result of accumulating init with the inner products of the
     /// pairs formed by the elements of two ranges starting at first1 and
@@ -295,33 +336,10 @@ namespace hpx { namespace parallel { inline namespace v1
     transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter2>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter2>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
-        return detail::transform_reduce_binary<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-            std::move(init), detail::plus(), detail::multiplies());
+        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+        return detail::transform_reduce_(
+            std::forward<ExPolicy>(policy), first1, last1, first2,
+            std::move(init), detail::plus(), detail::multiplies(), is_segmented());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -427,34 +445,11 @@ namespace hpx { namespace parallel { inline namespace v1
     transform_reduce(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op)
     {
-#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter1>::value),
-            "Requires at least input iterator.");
-        static_assert(
-            (hpx::traits::is_input_iterator<FwdIter2>::value),
-            "Requires at least input iterator.");
-
-        typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter1>::value ||
-               !hpx::traits::is_forward_iterator<FwdIter2>::value
-            > is_seq;
-#else
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-#endif
-
-        return detail::transform_reduce_binary<T>().call(
-            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
-            std::move(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+        return detail::transform_reduce_(
+            std::forward<ExPolicy>(policy), first1, last1, first2,
+            std::move(init), std::forward<Reduce>(red_op),
+            std::forward<Convert>(conv_op), is_segmented());
     }
 }}}
 
