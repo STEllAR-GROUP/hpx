@@ -68,6 +68,29 @@ namespace hpx { namespace actions
                 ar & data_;
             }
 
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            Args& data()
+            {
+                HPX_ASSERT(!!data_);
+                return *data_;
+            }
+
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+            HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+            Args const& data() const
+            {
+                return *data_;
+            }
+#else
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            Args const& data() const
+            {
+                HPX_ASSERT(!!data_);
+                return *data_;
+            }
+#endif
+
+        private:
             std::unique_ptr<Args> data_;
         };
     }
@@ -78,40 +101,36 @@ namespace hpx { namespace util
     template <std::size_t I, typename Args>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type&
-    get(hpx::actions::detail::argument_holder<Args>& t) noexcept
+    get(hpx::actions::detail::argument_holder<Args>& t)
     {
-        HPX_ASSERT(!!t.data_);
-        return util::tuple_element<I, Args>::get(*t.data_);
+        return util::tuple_element<I, Args>::get(t.data());
     }
 
     template <std::size_t I, typename Args>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type const&
-    get(hpx::actions::detail::argument_holder<Args> const& t) noexcept
+    get(hpx::actions::detail::argument_holder<Args> const& t)
     {
-        HPX_ASSERT(!!t.data_);
-        return util::tuple_element<I, Args>::get(*t.data_);
+        return util::tuple_element<I, Args>::get(t.data());
     }
 
     template <std::size_t I, typename Args>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type&&
-    get(hpx::actions::detail::argument_holder<Args>&& t) noexcept
+    get(hpx::actions::detail::argument_holder<Args>&& t)
     {
-        HPX_ASSERT(!!t.data_);
         return std::forward<typename util::tuple_element<I, Args>::type>(
-            util::get<I>(*t.data_));
+            util::get<I>(t.data()));
     }
 
     template <std::size_t I, typename Args>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type const&&
-    get(hpx::actions::detail::argument_holder<Args> const&& t) noexcept
+    get(hpx::actions::detail::argument_holder<Args> const&& t)
     {
-        HPX_ASSERT(!!t.data_);
         return std::forward<
                 typename util::tuple_element<I, Args>::type const
-            >(util::get<I>(*t.data_));
+            >(util::get<I>(t.data()));
     }
 }}
 
