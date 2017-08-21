@@ -17,6 +17,7 @@
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
@@ -81,6 +82,17 @@ namespace hpx { namespace lcos
         virtual ~base_lco_with_value() noexcept {}
 
         virtual void set_event()
+        {
+            set_event_nonvirt(std::is_default_constructible<RemoteResult>());
+        }
+
+        void set_event_nonvirt(std::false_type)
+        {
+            // this shouldn't ever be called
+            HPX_ASSERT(false);
+        }
+
+        void set_event_nonvirt(std::true_type)
         {
             set_value(RemoteResult());
         }

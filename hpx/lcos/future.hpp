@@ -162,7 +162,8 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Archive, typename T>
     void serialize_future_save(Archive& ar, T const& val, std::false_type)
     {
-        serialization::detail::save_construct_data(ar, &val, 0);
+        using serialization::detail::save_construct_data;
+        save_construct_data(ar, &val, 0);
         ar << val;
     }
 

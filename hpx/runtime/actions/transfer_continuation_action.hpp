@@ -37,6 +37,7 @@ namespace hpx { namespace actions
 
         typedef transfer_base_action<Action> base_type;
         typedef typename base_type::continuation_type continuation_type;
+
     public:
         // construct an empty transfer_continuation_action to avoid serialization
         // overhead

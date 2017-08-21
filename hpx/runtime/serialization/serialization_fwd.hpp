@@ -30,7 +30,6 @@ namespace hpx { namespace serialization
 
     template <typename T>
     input_archive & operator&(input_archive & ar, T & t);
-
 }}
 
 #define HPX_SERIALIZATION_SPLIT_MEMBER()                                      \

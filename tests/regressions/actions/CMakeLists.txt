@@ -13,6 +13,7 @@ set(tests
     plain_action_1550
     plain_action_move_semantics
     return_future_2847
+    return_non_default_constructible_2847
    )
 
 set(plain_action_1330_FLAGS
@@ -31,6 +32,7 @@ set(component_action_move_semantics_PARAMETERS
     THREADS_PER_LOCALITY 1)
 
 set(return_future_2847_PARAMETERS LOCALITIES 2)
+set(return_non_default_constructible_2847_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources

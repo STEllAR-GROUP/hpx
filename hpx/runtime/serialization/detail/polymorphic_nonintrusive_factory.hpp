@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
@@ -31,22 +32,6 @@
 
 namespace hpx { namespace serialization { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // default fall-backs for constructing non-default-constructable types
-    template <class Archive, class T>
-    void save_construct_data(Archive&, T*, unsigned)
-    {
-        // a user is not required to provide their own adl-overload
-    }
-
-    template <class Archive, class T>
-    void load_construct_data(Archive& ar, T* t, unsigned)
-    {
-        // this function is never supposed to be called
-        HPX_ASSERT(false);
-        ::new (t) T;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct get_serialization_name

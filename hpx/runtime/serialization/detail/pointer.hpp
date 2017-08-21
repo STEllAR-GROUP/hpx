@@ -9,6 +9,7 @@
 
 #include <hpx/runtime/serialization/access.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
+#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -176,7 +177,26 @@ namespace hpx { namespace serialization
             {
                 static void call(output_archive& ar, const Pointer& ptr)
                 {
-                    ar << *ptr;
+                    call(ar, *ptr);
+                }
+
+                template <typename T>
+                static typename std::enable_if<
+                    !std::is_constructible<T>::value
+                >::type
+                call(output_archive& ar, T const& val)
+                {
+                    save_construct_data(ar, &val, 0);
+                    ar << val;
+                }
+
+                template <typename T>
+                static typename std::enable_if<
+                    std::is_constructible<T>::value
+                >::type
+                call(output_archive& ar, T const& val)
+                {
+                    ar << val;
                 }
             };
 
