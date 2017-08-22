@@ -18,12 +18,24 @@ namespace hpx { namespace components {
       : public simple_component<Component>
     {
     public:
+        typedef component<Component> component_type;
+        typedef component_type derived_type;
+
         /// \brief Construct a simple_component instance holding a new wrapped
         ///        instance
         template <typename ...Ts>
         component(Ts&&... vs)
           : simple_component<Component>(std::forward<Ts>(vs)...)
         {}
+
+        /// \brief  The function \a create is used for allocation and
+        ///         initialization of instances of the derived components.
+        static component_type* create(std::size_t count)
+        {
+            // simple components can be created individually only
+            HPX_ASSERT(1 == count);
+            return new component_type();    //-V572
+        }
     };
 }}
 

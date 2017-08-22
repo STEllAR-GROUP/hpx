@@ -110,6 +110,26 @@ namespace hpx
         set_lco_value(id, std::move(addr), std::forward<Result>(t), move_credits);
     }
 
+    /// \brief Set the result value for the (simple unmanaged) LCO referenced by the given id
+    ///
+    /// \param id [in] This represents the id of the LCO which should
+    ///                receive the given value.
+    /// \param t  [in] This is the value which should be sent to the LCO.
+    /// \param move_credits [in] If this is set to \a true then it is ok to
+    ///                     send all credits in \a id along with the generated
+    ///                     message. The default value is \a true.
+    template <typename Result>
+    typename std::enable_if<!std::is_same<typename util::decay<Result>::type,
+        naming::address>::value>::type
+    set_lco_value_simple_unmanaged(
+        naming::id_type const& id, Result&& t, bool move_credits = true)
+    {
+        naming::address addr(nullptr,
+            components::component_base_lco_with_value_simple_unmanaged);
+        set_lco_value(
+            id, std::move(addr), std::forward<Result>(t), move_credits);
+    }
+
     /// \brief Set the result value for the (unmanaged) LCO referenced by the given id
     ///
     /// \param id [in] This represents the id of the LCO which should
@@ -165,6 +185,27 @@ namespace hpx
         naming::address addr(nullptr, components::component_base_lco_with_value);
         set_lco_value(id, std::move(addr), std::forward<Result>(t), cont,
             move_credits);
+    }
+
+    /// \brief Set the result value for the (simple unmanaged) LCO referenced by the given id
+    ///
+    /// \param id   [in] This represents the id of the LCO which should
+    ///                  receive the given value.
+    /// \param t    [in] This is the value which should be sent to the LCO.
+    /// \param cont [in] This represents the LCO to trigger after completion.
+    /// \param move_credits [in] If this is set to \a true then it is ok to
+    ///                     send all credits in \a id along with the generated
+    ///                     message. The default value is \a true.
+    template <typename Result>
+    typename std::enable_if<!std::is_same<typename util::decay<Result>::type,
+        naming::address>::value>::type
+    set_lco_value_simple_unmanaged(naming::id_type const& id, Result&& t,
+        naming::id_type const& cont, bool move_credits = true)
+    {
+        naming::address addr(nullptr,
+            components::component_base_lco_with_value_simple_unmanaged);
+        set_lco_value(
+            id, std::move(addr), std::forward<Result>(t), cont, move_credits);
     }
 
     /// \brief Set the result value for the (unmanaged) LCO referenced by the given id
@@ -467,7 +508,7 @@ namespace hpx
             >::type local_result_type;
 
         if (components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value_unmanaged)
+            components::component_base_lco_with_value_simple_unmanaged)
         {
             typedef typename lcos::base_lco_with_value<
                     local_result_type, remote_result_type,
@@ -476,6 +517,17 @@ namespace hpx
 
             detail::set_lco_value<set_value_action>(id, std::move(addr),
                 std::forward<Result>(t), move_credits);
+        }
+        else if (components::get_base_type(addr.type_) ==
+            components::component_base_lco_with_value_unmanaged)
+        {
+            typedef typename lcos::base_lco_with_value<local_result_type,
+                remote_result_type,
+                traits::detail::component_tag>::set_value_action
+                set_value_action;
+
+            detail::set_lco_value<set_value_action>(
+                id, std::move(addr), std::forward<Result>(t), move_credits);
         }
         else
         {
@@ -502,7 +554,7 @@ namespace hpx
             >::type local_result_type;
 
         if (components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value_unmanaged)
+            components::component_base_lco_with_value_simple_unmanaged)
         {
             typedef typename lcos::base_lco_with_value<
                     local_result_type, remote_result_type,
@@ -512,6 +564,18 @@ namespace hpx
             detail::set_lco_value<
                     local_result_type, remote_result_type, set_value_action
                 >(id, std::move(addr), std::forward<Result>(t), cont, move_credits);
+        }
+        else if (components::get_base_type(addr.type_) ==
+            components::component_base_lco_with_value_unmanaged)
+        {
+            typedef typename lcos::base_lco_with_value<local_result_type,
+                remote_result_type,
+                traits::detail::component_tag>::set_value_action
+                set_value_action;
+
+            detail::set_lco_value<local_result_type, remote_result_type,
+                set_value_action>(id, std::move(addr), std::forward<Result>(t),
+                cont, move_credits);
         }
         else
         {

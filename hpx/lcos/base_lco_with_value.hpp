@@ -12,8 +12,9 @@
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_component.hpp>
@@ -42,7 +43,7 @@ namespace hpx { namespace lcos
         template <typename BaseLco>
         struct base_lco_wrapping_type<traits::detail::component_tag, BaseLco>
         {
-            typedef components::simple_component<BaseLco> type;
+            typedef components::component<BaseLco> type;
         };
 
         template <typename BaseLco>
@@ -174,7 +175,8 @@ namespace hpx { namespace lcos
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
         // component
-        typedef components::managed_component<base_lco_with_value> wrapping_type;
+        typedef typename detail::base_lco_wrapping_type<ComponentTag,
+            base_lco_with_value>::type wrapping_type;
         typedef base_lco_with_value base_type_holder;
 
         // refer to base type for the corresponding implementation
@@ -199,7 +201,7 @@ namespace hpx { namespace traits
     {
         static components::component_type get()
         {
-            return components::component_base_lco_with_value;
+            return components::component_base_lco_with_value_unmanaged;
         }
 
         static void set(components::component_type)
@@ -216,7 +218,7 @@ namespace hpx { namespace traits
     {
         static components::component_type get()
         {
-            return components::component_base_lco_with_value_unmanaged;
+            return components::component_base_lco_with_value_simple_unmanaged;
         }
 
         static void set(components::component_type)

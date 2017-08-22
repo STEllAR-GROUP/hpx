@@ -41,36 +41,39 @@ namespace hpx { namespace components
         component_base_lco = 4,
 
         // Base component for LCOs that produce values.
-        component_base_lco_with_value_unmanaged = 5,
+        component_base_lco_with_value_simple_unmanaged = 5,
+
+        // Base component for LCOs that produce values.
+        component_base_lco_with_value_unmanaged = 6,
 
         // (Managed) base component for LCOs that produce values.
-        component_base_lco_with_value = 6,
+        component_base_lco_with_value = 7,
 
         // Synchronization latch, barrier, and flex_barrier LCOs.
-        component_latch = ((7 << 16) | component_base_lco_with_value),
-        component_barrier = ((8 << 16) | component_base_lco),
-        component_flex_barrier = ((9 << 16) | component_base_lco),
+        component_latch = ((8 << 16) | component_base_lco_with_value),
+        component_barrier = ((9 << 16) | component_base_lco),
+        component_flex_barrier = ((10 << 16) | component_base_lco),
 
         // An LCO representing a value which may not have been computed yet.
-        component_promise = ((10 << 16) | component_base_lco_with_value),
+        component_promise = ((11 << 16) | component_base_lco_with_value),
 
         // AGAS locality services.
-        component_agas_locality_namespace = 11,
+        component_agas_locality_namespace = 12,
 
         // AGAS primary address resolution services.
-        component_agas_primary_namespace = 12,
+        component_agas_primary_namespace = 13,
 
         // AGAS global type system.
-        component_agas_component_namespace = 13,
+        component_agas_component_namespace = 14,
 
         // AGAS symbolic naming services.
-        component_agas_symbol_namespace = 14,
+        component_agas_symbol_namespace = 15,
 
         component_last,
         component_first_dynamic = component_last,
 
         // Force this enum type to be at least 32 bits.
-        component_upper_bound = 0x7fffffffL //-V112
+        component_upper_bound = 0x7fffffffL    //-V112
     };
 
     enum factory_state_enum
