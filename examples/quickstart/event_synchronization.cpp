@@ -6,8 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/apply.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <functional>

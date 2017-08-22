@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +15,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>

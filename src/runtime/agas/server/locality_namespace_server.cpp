@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2015 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>

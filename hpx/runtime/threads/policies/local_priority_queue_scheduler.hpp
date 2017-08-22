@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
@@ -138,12 +139,12 @@ namespace hpx { namespace threads { namespace policies
 #pragma warning(push)
 #pragma warning(disable: 4316) // object allocated on the heap may not be aligned 16
 #endif
-                BOOST_ASSERT(init.num_queues_ != 0);
+                HPX_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
                     queues_[i] = new thread_queue_type(init.max_queue_thread_count_);
 
-                BOOST_ASSERT(init.num_high_priority_queues_ != 0);
-                BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
+                HPX_ASSERT(init.num_high_priority_queues_ != 0);
+                HPX_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
                 for (std::size_t i = 0; i < init.num_high_priority_queues_; ++i) {
                     high_priority_queues_[i] =
                         new thread_queue_type(init.max_queue_thread_count_);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -197,12 +197,13 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/local/and_gate.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>

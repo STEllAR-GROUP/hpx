@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>

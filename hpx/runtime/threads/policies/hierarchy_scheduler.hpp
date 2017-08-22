@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 

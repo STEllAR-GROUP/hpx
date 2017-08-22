@@ -11,7 +11,7 @@
 // on the std::vector's the data is stored in.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_generate.hpp>

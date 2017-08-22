@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/detail/reserve.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <type_traits>
 #include <utility>

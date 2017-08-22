@@ -21,6 +21,7 @@
 # pragma once
 #endif
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging/format_ts.hpp>
 
 // all destinations

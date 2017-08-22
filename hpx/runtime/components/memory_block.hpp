@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/unwrap.hpp>
 

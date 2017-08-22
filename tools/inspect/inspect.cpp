@@ -21,6 +21,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 //  Directories with a file name of the hpx_no_inspect value are not inspected.
 //  Files that contain the hpx_no_inspect value are not inspected.
 
+#include <hpx/config/defines.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,6 +18,7 @@
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <utility>
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -381,7 +381,9 @@ namespace hpx { namespace parcelset
             switch(comptype)
             {
             case components::component_runtime_support:
-                lva = hpx::applier::get_applier().get_runtime_support_raw_gid().get_lsb();
+                lva = hpx::applier::get_applier()
+                          .get_runtime_support_raw_gid()
+                          .get_lsb();
                 break;
 
             case components::component_agas_primary_namespace:

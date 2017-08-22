@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011-2015 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -20,6 +20,7 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
 #include <hpx/util/logging.hpp>

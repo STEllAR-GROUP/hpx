@@ -15,6 +15,7 @@
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/format.hpp>
 

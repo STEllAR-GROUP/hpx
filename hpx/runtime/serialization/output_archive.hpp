@@ -17,8 +17,11 @@
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/util/assert.hpp>
 
+#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
 #include <boost/cstdint.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -297,8 +300,7 @@ namespace hpx { namespace serialization
             save_integral_impl(static_cast<std::uint64_t>(val));
         }
 
-#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
         void save_integral(boost::int128_type t, std::false_type)
         {
             save_integral_impl(t);
