@@ -144,7 +144,7 @@ __hpx__ provides the following segmented containers:
 [section:segmented_iterators Segmented Iterators and Segmented Iterator Traits]
 
 The basic iterator used in the STL library is only suitable for
-one-dimensional structures. The iterators we use in `hpx` must adapt to
+one-dimensional structures. The iterators we use in __hpx__ must adapt to
 the segmented format of our containers. Our iterators are then able to know when
 incrementing themselves if the next element of type `T` is in the same data
 segment or in another segment. In this second case, the iterator will
@@ -221,7 +221,7 @@ in the numerical field whether to perform dense matrix operations
 or to process images. It exist many libraries which implement such object
 classes overloading their basic operators (e.g. `+`, `-`, `*`, `()`, etc.).
 However, such operation becomes more delicate when the underlying data layout
-is segmented or when it is mandatory to use fully-optimimized linear algebra
+is segmented or when it is mandatory to use optimized linear algebra
 subroutines (i.e. BLAS subroutines).
 
 Our solution is thus to relax the level of abstraction by allowing
@@ -233,14 +233,14 @@ access mode.
 
 [section:spmd_block Preface : Why SPMD ?]
 
-Although HPX refutes by design this programming model, the locality plays a
+Although __hpx__ refutes by design this programming model, the locality plays a
 dominant role when it comes to implement vectorized code. To maximize local
-computing and avoid the unneeded data transfer, a parallel section (or Single
+computations and avoid unneeded data transfers, a parallel section (or Single
 Programming Multiple Data section) is required. Because the use of global
 variables is prohibited, this parallel section is created via the RAII idiom.
 
 To define a parallel section, simply write an action taking a `spmd_block`
-variable as the first parameter.
+variable as a first parameter.
 
     #include <hpx/lcos/spmd_block.hpp>
 
@@ -252,10 +252,7 @@ variable as the first parameter.
     }
     HPX_PLAIN_ACTION(bulk_function, bulk_action);
 
-[note In the following paragraphs, we will use the term "image" several times.
-      An image is defined as a lightweight process whose the entry point is a
-      function provided by the user. It's an "image of the function".
-]
+[note In the following paragraphs, we will use the term "image" several times. An image is defined as a lightweight process whose the entry point is a function provided by the user. It's an "image of the function".]
 
 The `spmd_block` class contains the following methods:
 
@@ -291,7 +288,7 @@ Here is a sample code summarizing the features offered by the `spmd_block` class
         // Synchronize images 2, 3 and 4
         block.sync_images(vec_images);
 
-        // Alternate call to synchronize images 2, 3 and 4
+        // Alternative call to synchronize images 2, 3 and 4
         block.sync_images(vec_images.begin(), vec_images.end());
 
         /* Do some code */
@@ -339,15 +336,13 @@ indicating the number of images per locality to create.
 
         return 0;
     }
-[note In principle, the user should never call the `spmd_block` constructor.
-      The `define_spmd_block` function is responsible of instantiating it and
-      broadcasting it to each created image.
+[note In principle, the user should never call the `spmd_block` constructor. The `define_spmd_block` function is responsible of instantiating `spmd_block` objects and broadcasting them to each created image.
 ]
 [endsect]
 
 [section:spmd_views SPMD Multidimensionnal Views]
-Object classes are defined as "container views" when the purpose is to
-observe and/or to modify the values of a container using another perspective
+Some classes are defined as "container views" when the purpose is to
+observe and/or modify the values of a container using another perspective
 than the one that characterizes the container. For example, the values of an
 `std::vector` object can be accessed via the expression `v[i]`. Container views
 can be used, for example, when it is desired for those values to be "viewed" as
@@ -364,6 +359,9 @@ By default, the `partitioned_vector` class integrates 1-D views of its segments 
     //
     ``[macroref HPX_REGISTER_PARTITIONED_VECTOR `HPX_REGISTER_PARTITIONED_VECTOR`]``(double);
 
+    using iterator = hpx::partitioned_vector<double>::iterator;
+    using traits   = hpx::traits::segmented_iterator_traits<iterator>;
+
     hpx::partitioned_vector<double> v;
 
     // Create a 1-D view of the vector of segments
@@ -373,16 +371,13 @@ By default, the `partitioned_vector` class integrates 1-D views of its segments 
     std::vector<double> v = vv[i];
 
 Our views are called "multi-dimensional" in the sense that they generalize
-to N dimensions the purpose of `traits::segments()` in the 1-D case. Note that
+to N dimensions the purpose of `segmented_iterator_traits::segments()` in the 1-D case. Note that
 in a parallel section, the 2-D expression `a(i,j) = b(i,j)` is quite confusing
 because without convention, each of the images invoked will race to execute
 the statement. For this reason, our views are not only multi-dimensional
 but also "spmd-aware".
 
-[note Spmd-awareness: The convention is simple. If an assignment statement
-       contains a view subscript as an l-value, it is only and only the image
-       holding the r-value who is evaluating the statement. (In MPI sense,
-       it is called a Put operation]
+[note Spmd-awareness: The convention is simple. If an assignment statement contains a view subscript as an l-value, it is only and only the image holding the r-value who is evaluating the statement. (In MPI sense, it is called a Put operation)]
 
 [section:Subscripts Subscript-based operations]
 Here are some examples of using subscripts in the 2-D view case:
@@ -443,8 +438,8 @@ Here are some examples of using iterators in the 3-D view case :
         std::size_t sixe_x, size_y, size_z;
 
         // Instanciate the views
-        View_3D vv1(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
-        View_3D vv2(block, v.begin(), v.end(), {sixe_x,size_y,size_z});
+        View_3D vv1(block, v1.begin(), v1.end(), {sixe_x,size_y,size_z});
+        View_3D vv2(block, v2.begin(), v2.end(), {sixe_x,size_y,size_z});
 
         // Save previous segments covered by vv1 into segments covered by vv2
         auto vv2_it = vv2.begin();
@@ -556,12 +551,115 @@ sub-view.
         }
 
     }
-[note The last parameter of the subview constructor is the size of the
-      original view. If one would like to create a subview of the subview and so
-      on, this parameter should stay unchanged. (`{N,N}` for the above example)
+[note The last parameter of the subview constructor is the size of the original view. If one would like to create a subview of the subview and so on, this parameter should stay unchanged. (`{N,N}` for the above example)]
+[endsect]
+[endsect]
+[endsect]
+[section C++ Co-Arrays]
+Fortran has extended its scalar element indexing approach to reference each
+segment of a distributed array. In this extension, a segment is attributed a
+”co-index” and lives in a specific locality. A co-index provides the application
+with enough information to retrieve the corresponding data reference. In C++,
+containers present themselves as a ”smarter” alternative of Fortran arrays but
+there are still no corresponding standardized features similar to the Fortran
+co-indexing approach. We present here an implementation of such features in __hpx__.
+
+[section Preface : Co-array, a segmented container tied to a SPMD Multidimensionnal View]
+As mentioned before, a co-array is a distributed array whose segments
+are accessible through an array -inspired access mode. We have previously seen
+that it is possible to reproduce such access mode using the concept of views.
+Nevertheless, the user must pre-create a segmented container to instanciate this
+view. We illustrate below how a single constructor call can perform those two
+operations :
+
+    #include <hpx/components/containers/coarray/coarray.hpp>
+    #include <hpx/lcos/spmd_block.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // co-creation of 'coarray'
+    //
+    ``[macroref HPX_REGISTER_COARRAY `HPX_REGISTER_COARRAY`]``(double);
+
+    // Parallel section (suppose 'block' an spmd_block instance)
+    {
+        using hpx::container::placeholders::_;
+
+        std::size_t height=32, width=4, segment_size=10;
+
+        hpx::coarray<double,3> a(block, "a", {height,width,_}, segment_size);
+
+        /* Do some code */
+    }
+
+Unlike segmented containers, a co-array object can only be
+instantiated within a parallel section; Here is the description of
+the parameters to provide to the coarray constructor :
+
+[table Parameters of coarray constructor
+    [[Parameter]     [Description]]
+    [[`block`][Reference to a `spmd_block` object]]
+    [[`"a"`][Symbolic name of type `std::string`]]
+    [[`{height,width,_}`][Dimensions of the `coarray` object]]
+    [[`segment_size`][Size of a co-indexed element (i.e. size of the object referenced by the expression `a(i,j,k)`)]]
 ]
+
+Note that the "last dimension size" cannot be set by the user. It only accepts
+the constexpr variable `hpx::container::placeholders::_`. This size, which is
+considered private, is equal to the number of current images (value returned by
+`block.get_num_images()`)
+
+[note An important constraint to remember about coarray objects is that all
+segments sharing the same "last dimension index" are located in the same image]
 [endsect]
 
-[endsect]
+[section Using Co-Arrays]
+The member functions owned by the `coarray` objects are exactly the
+same as those of spmd multidimensional views. These are:
 
+* Subscript-based operations
+* Iterator-based operations
+
+However, one additional functionality is provided. Knowing that the element
+`a(i,j,k)` is in the memory of the `k`th image, the use of local subscripts is
+possible.
+
+[note For spmd multidimensional views, subscripts are only global
+as it still involves potential remote data transfers.]
+
+Here is an example of using local subscripts :
+
+    #include <hpx/components/containers/coarray/coarray.hpp>
+    #include <hpx/lcos/spmd_block.hpp>
+
+    // The following code generates all necessary boiler plate to enable the
+    // co-creation of 'coarray'
+    //
+    ``[macroref HPX_REGISTER_COARRAY `HPX_REGISTER_COARRAY`]``(double);
+
+    // Parallel section (suppose 'block' an spmd_block instance)
+    {
+        using hpx::container::placeholders::_;
+
+        std::size_t height=32, width=4, segment_size=10;
+
+        hpx::coarray<double,3> a(block, "a", {height,width,_}, segment_size);
+
+        double idx = block.this_image()*height*width;
+
+        for (std::size_t j = 0; j<width; j++)
+        for (std::size_t i = 0; i<height; i++)
+        {
+            // Local write operation performed via the use of local subscript
+            a(i,j,_) = std::vector<double>(elt_size,idx);
+            idx++;
+        }
+
+        block.sync_all();
+    }
+
+[note When the "last dimension index" of a subscript is equal to
+`hpx::container::placeholders::_`, local subscript (and not global subscript)
+is used. It is equivalent to a global subscript used with a
+"last dimension index" equal to the value returned by `block.this_image()`.]
+[endsect]
 [endsect]
