@@ -297,7 +297,11 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
-        static component_type* create(std::size_t count)
+        template <typename T = Component>
+        static typename std::enable_if<
+            std::is_default_constructible<T>::value, component_type*
+        >::type
+        create(std::size_t count)
         {
             // simple components can be created individually only
             HPX_ASSERT(1 == count);
