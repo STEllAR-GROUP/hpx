@@ -7,6 +7,7 @@
 #define HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
@@ -89,7 +90,11 @@ namespace hpx { namespace lcos
         void set_event_nonvirt(std::false_type)
         {
             // this shouldn't ever be called
-            HPX_ASSERT(false);
+            HPX_THROW_EXCEPTION(invalid_status,
+                "base_lco_with_value::set_event_nonvirt",
+                "attempt to use a non-default-constructible return type with "
+                "an action in a context where default-construction would be "
+                "required");
         }
 
         void set_event_nonvirt(std::true_type)
