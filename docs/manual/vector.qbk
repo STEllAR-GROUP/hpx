@@ -221,7 +221,7 @@ in the numerical field whether to perform dense matrix operations
 or to process images. It exist many libraries which implement such object
 classes overloading their basic operators (e.g. `+`, `-`, `*`, `()`, etc.).
 However, such operation becomes more delicate when the underlying data layout
-is segmented or when it is mandatory to use optimimized linear algebra
+is segmented or when it is mandatory to use optimized linear algebra
 subroutines (i.e. BLAS subroutines).
 
 Our solution is thus to relax the level of abstraction by allowing
