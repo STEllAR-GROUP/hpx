@@ -18,6 +18,8 @@ set(tests
     partitioned_vector_transform_scan
     partitioned_vector_reduce
     partitioned_vector_all_any_none
+    partitioned_vector_adjacent_difference
+    partitioned_vector_adjacent_find
    )
 
 # add dependencies to partitioned_vector_target when Cuda is enabled

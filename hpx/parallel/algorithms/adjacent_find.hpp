@@ -33,9 +33,9 @@ namespace hpx { namespace parallel { inline namespace v1
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename FwdIter>
+        template <typename Iter>
         struct adjacent_find
-          : public detail::algorithm<adjacent_find<FwdIter>, FwdIter>
+          : public detail::algorithm<adjacent_find<Iter>, Iter>
         {
             adjacent_find()
               : adjacent_find::algorithm("adjacent_find")
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return std::adjacent_find(first, last, op);
             }
 
-            template <typename ExPolicy, typename Pred>
+            template <typename ExPolicy, typename FwdIter, typename Pred>
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
@@ -100,6 +100,27 @@ namespace hpx { namespace parallel { inline namespace v1
                         });
             }
         };
+        template <typename ExPolicy, typename FwdIter,
+            typename Pred>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        adjacent_find_(ExPolicy && policy, FwdIter first, FwdIter last,
+            Pred && op, std::false_type)
+        {
+            static_assert(
+                (hpx::traits::is_forward_iterator<FwdIter>::value),
+                "Requires at least a forward iterator");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+
+            return detail::adjacent_find<FwdIter>().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first, last, std::forward<Pred>(op));
+        }
+        template <typename ExPolicy, typename FwdIter,
+            typename Pred>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        adjacent_find_(ExPolicy && policy, FwdIter first, FwdIter last,
+            Pred && op, std::true_type);
         /// \endcond
     }
 
@@ -175,15 +196,10 @@ namespace hpx { namespace parallel { inline namespace v1
     adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last,
         Pred && op = Pred())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least a forward iterator");
-
-        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-
-        return detail::adjacent_find<FwdIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<Pred>(op));
+        typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
+        return detail::adjacent_find_(
+            std::forward<ExPolicy>(policy),
+            first, last, std::forward<Pred>(op), is_segmented());
     }
 }}}
 
