@@ -18,6 +18,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
@@ -136,7 +137,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
             if (!deferred_initialization)
             {
-                BOOST_ASSERT(init.num_queues_ != 0);
+                HPX_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
                     queues_[i] = new thread_queue_type(init.max_queue_thread_count_);
             }

@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
@@ -183,7 +184,7 @@ namespace threads {
                 victim_queues_.clear();
                 victim_queues_.resize(num_worker_queues);
                 //
-                BOOST_ASSERT(num_worker_queues != 0);
+                HPX_ASSERT(num_worker_queues != 0);
                 for (std::size_t i = 0; i < num_worker_queues; ++i)
                     queues_[i] = new thread_queue_type(max_tasks);
 
