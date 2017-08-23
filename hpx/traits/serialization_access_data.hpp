@@ -96,19 +96,20 @@ namespace hpx { namespace traits
             void* dest = &cont[current];
             switch (count)
             {
+            case 16:
+                std::memcpy(dest, address, 16);
+                break;
+
             case 8:
-                *static_cast<std::uint64_t*>(dest) =
-                    *static_cast<std::uint64_t const*>(address);
+                std::memcpy(dest, address, 8);
                 break;
 
             case 4:
-                *static_cast<std::uint32_t*>(dest) =
-                    *static_cast<std::uint32_t const*>(address);
+                std::memcpy(dest, address, 4);
                 break;
 
             case 2:
-                *static_cast<std::uint16_t*>(dest) =
-                    *static_cast<std::uint16_t const*>(address);
+                std::memcpy(dest, address, 2);
                 break;
 
             case 1:
@@ -135,19 +136,20 @@ namespace hpx { namespace traits
             void const* src = &cont[current];
             switch (count)
             {
+            case 16:
+                std::memcpy(address, src, 16);
+                break;
+
             case 8:
-                *static_cast<std::uint64_t*>(address) =
-                    *static_cast<std::uint64_t const*>(src);
+                std::memcpy(address, src, 8);
                 break;
 
             case 4:
-                *static_cast<std::uint32_t*>(address) =
-                    *static_cast<std::uint32_t const*>(src);
+                std::memcpy(address, src, 4);
                 break;
 
             case 2:
-                *static_cast<std::uint16_t*>(address) =
-                    *static_cast<std::uint16_t const*>(src);
+                std::memcpy(address, src, 2);
                 break;
 
             case 1:
