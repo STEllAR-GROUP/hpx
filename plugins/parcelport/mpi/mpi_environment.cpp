@@ -186,11 +186,11 @@ namespace hpx { namespace util
 
         if(this_rank == 0)
         {
-            cfg.mode_ = hpx::runtime_mode_console;
+            cfg.rtcfg_.mode_ = hpx::runtime_mode_console;
         }
         else
         {
-            cfg.mode_ = hpx::runtime_mode_worker;
+            cfg.rtcfg_.mode_ = hpx::runtime_mode_worker;
         }
 
         cfg.ini_config_ += std::string("hpx.parcel.mpi.rank!=") +

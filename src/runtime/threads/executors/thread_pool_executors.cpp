@@ -317,11 +317,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             ++max_current_concurrency_;
 
-            {
-                std::lock_guard<mutex_type> l(mtx_);
-                scheduler_.add_punit(virt_core, thread_num);
-                scheduler_.on_start_thread(virt_core);
-            }
+//             {
+//                 std::lock_guard<mutex_type> l(mtx_);
+//                 resource::get_partitioner().get_affinity_data().add_punit(
+//                     virt_core, thread_num);
+//                 scheduler_.on_start_thread(virt_core);
+//             }
 
             self_[virt_core] = threads::get_self_ptr();
 

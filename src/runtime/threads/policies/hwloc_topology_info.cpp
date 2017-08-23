@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+#include <string>
 #include <vector>
 
 #include <hwloc.h>
@@ -259,7 +260,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_socket_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     { // {{{
@@ -283,7 +283,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_numa_node_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     { // {{{
@@ -307,7 +306,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_core_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     {
@@ -331,7 +329,6 @@ namespace hpx { namespace threads
 
     mask_cref_type hwloc_topology_info::get_thread_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
       , error_code& ec
         ) const
     { // {{{
@@ -355,16 +352,6 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     void hwloc_topology_info::set_thread_affinity_mask(
-        compat::thread&
-      , mask_cref_type //mask
-      , error_code& ec
-        ) const
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-
-    void hwloc_topology_info::set_thread_affinity_mask(
         mask_cref_type mask
       , error_code& ec
         ) const
@@ -376,6 +363,7 @@ namespace hpx { namespace threads
 
         int const pu_depth =
             hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
+
         for (std::size_t i = 0; i != mask_size(mask); ++i)
         {
             if (test(mask, i))
@@ -770,7 +758,7 @@ namespace hpx { namespace threads
     }
 
     void hwloc_topology_info::print_affinity_mask(std::ostream& os,
-        std::size_t num_thread, mask_type const& m) const
+        std::size_t num_thread, mask_type const& m, std::string pool_name) const
     {
         boost::io::ios_flags_saver ifs(os);
         bool first = true;
@@ -805,6 +793,8 @@ namespace hpx { namespace threads
                 detail::print_info(os, obj->parent, true);
                 obj = obj->parent;
             }
+
+            os << ", on pool \"" << pool_name << "\"";
 
             os << std::endl;
         }
@@ -930,7 +920,7 @@ namespace hpx { namespace threads
 
         if (std::size_t(-1) == num_thread)
         {
-            return get_core_affinity_mask(num_thread, false);
+            return get_core_affinity_mask(num_thread);
         }
 
         std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
@@ -945,7 +935,7 @@ namespace hpx { namespace threads
 
         if (!obj)
         {
-            return get_core_affinity_mask(num_thread, false);
+            return get_core_affinity_mask(num_thread);
         }
 
         HPX_ASSERT(num_pu == detail::get_index(obj));
@@ -1065,8 +1055,9 @@ namespace hpx { namespace threads
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
 #if defined(HPX_MINGW)
-            if (hwloc_get_thread_cpubind(topo, pthread_gethandle(handle.native_handle()),
-                    cpuset, HWLOC_CPUBIND_THREAD))
+            if (hwloc_get_thread_cpubind(topo,
+                    pthread_gethandle(handle.native_handle()), cpuset,
+                    HWLOC_CPUBIND_THREAD))
 #else
             if (hwloc_get_thread_cpubind(topo, handle.native_handle(), cpuset,
                     HWLOC_CPUBIND_THREAD))
@@ -1109,6 +1100,80 @@ namespace hpx { namespace threads
     void hwloc_topology_info::deallocate(void* addr, std::size_t len) const
     {
         hwloc_free(topo, addr, len);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void hwloc_topology_info::print_mask_vector(std::ostream& os,
+        std::vector<mask_type> const& v) const
+    {
+        std::size_t s = v.size();
+        if (s == 0)
+        {
+            os << "(empty)\n";
+            return;
+        }
+
+        for (std::size_t i = 0; i != s; i++)
+        {
+            os << std::hex << HPX_CPU_MASK_PREFIX << v[i] << "\n";
+        }
+        os << "\n";
+    }
+
+    void hwloc_topology_info::print_vector(
+        std::ostream& os, std::vector<std::size_t> const& v) const
+    {
+        std::size_t s = v.size();
+        if (s == 0)
+        {
+            os << "(empty)\n";
+            return;
+        }
+
+        os << v[0];
+        for (std::size_t i = 1; i != s; i++)
+        {
+            os << ", " << std::dec << v[i];
+        }
+        os << "\n";
+    }
+
+    void hwloc_topology_info::print_hwloc(std::ostream& os) const
+    {
+        os << "[HWLOC topology info] number of ...\n" << std::dec
+           << "number of sockets     : " << get_number_of_sockets()
+           << "\n"
+           << "number of numa nodes  : " << get_number_of_numa_nodes()
+           << "\n"
+           << "number of cores       : " << get_number_of_cores() << "\n"
+           << "number of PUs         : " << get_number_of_pus() << "\n"
+           << "hardware concurrency  : "
+           << hpx::threads::hardware_concurrency() << "\n" << std::endl;
+        //! -------------------------------------- topology (affinity masks)
+        os << "[HWLOC topology info] affinity masks :\n"
+           << "machine               : \n"
+           << std::hex << HPX_CPU_MASK_PREFIX
+           << machine_affinity_mask_ << "\n";
+
+        os << "socket                : \n";
+        print_mask_vector(os, socket_affinity_masks_);
+        os << "numa node             : \n";
+        print_mask_vector(os, numa_node_affinity_masks_);
+        os << "core                  : \n";
+        print_mask_vector(os, core_affinity_masks_);
+        os << "PUs (/threads)        : \n";
+        print_mask_vector(os, thread_affinity_masks_);
+
+        //! -------------------------------------- topology (numbers)
+        os << "[HWLOC topology info] resource numbers :\n";
+        os << "socket                : \n";
+        print_vector(os, socket_numbers_);
+        os << "numa node             : \n";
+        print_vector(os, numa_node_numbers_);
+        os << "core                  : \n";
+        print_vector(os, core_numbers_);
+        //os << "PUs (/threads)        : \n";
+        //print_vector(os, pu_numbers_);
     }
 }}
 

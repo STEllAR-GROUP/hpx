@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/steady_clock.hpp>
@@ -78,7 +79,7 @@ namespace hpx { namespace threads { namespace executors
             mask_cref_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
             {
-                return scheduler_.Scheduler::get_pu_mask(topology, num_thread);
+                return hpx::resource::get_partitioner().get_pu_mask(num_thread);
             }
 
             /// Set the new scheduler mode
@@ -167,7 +168,6 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 #endif
-
 
     struct HPX_EXPORT local_priority_queue_executor : public scheduled_executor
     {

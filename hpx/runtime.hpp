@@ -15,7 +15,6 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -67,7 +66,6 @@ namespace hpx
     int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl;
 
     class HPX_EXPORT runtime
@@ -85,9 +83,7 @@ namespace hpx
             std::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(
-            util::runtime_configuration & rtcfg
-          , threads::policies::init_affinity_data const& affinity_init);
+        runtime(util::runtime_configuration & rtcfg);
 
         virtual ~runtime();
 
@@ -194,7 +190,7 @@ namespace hpx
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
         virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
 
-        virtual threads::threadmanager_base& get_thread_manager() = 0;
+        virtual threads::threadmanager& get_thread_manager() = 0;
 
         virtual naming::resolver_client& get_agas_client() = 0;
 
@@ -340,7 +336,7 @@ namespace hpx
         // registered with the library
         boost::scoped_ptr<util::thread_mapper> thread_support_;
 
-        threads::policies::init_affinity_data affinity_init_;
+        // topology and affinity data
         threads::topology& topology_;
 
         // locality basename -> used cores

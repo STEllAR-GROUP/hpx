@@ -255,7 +255,7 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<applier*, applier::tls_tag> applier::applier_;
 
-    applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm)
+    applier::applier(parcelset::parcelhandler &ph, threads::threadmanager& tm)
       : parcel_handler_(ph), thread_manager_(tm)
     {}
 
@@ -280,7 +280,7 @@ namespace hpx { namespace applier
         return parcel_handler_;
     }
 
-    threads::threadmanager_base& applier::get_thread_manager()
+    threads::threadmanager& applier::get_thread_manager()
     {
         return thread_manager_;
     }

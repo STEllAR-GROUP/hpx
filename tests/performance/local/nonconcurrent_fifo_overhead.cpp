@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+// hpxinspect:nodeprecatedname:BOOST_ASSERT
+
 // Makes HPX use BOOST_ASSERT, so that I can use high_resolution_timer without
 // depending on the rest of HPX.
 #define HPX_USE_BOOST_ASSERT

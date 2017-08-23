@@ -242,14 +242,33 @@ namespace hpx { namespace performance_counters
                 bool parentinstance_is_basename = false)
           : counter_type_path_elements(objectname, countername, parameters),
             parentinstancename_(parentname), instancename_(instancename),
+            subinstancename_(),
             parentinstanceindex_(parentindex), instanceindex_(instanceindex),
+            subinstanceindex_(-1),
+            parentinstance_is_basename_(parentinstance_is_basename)
+        {}
+
+        counter_path_elements(std::string const& objectname,
+                std::string const& countername, std::string const& parameters,
+                std::string const& parentname, std::string const& instancename,
+                std::string const& subinstancename,
+                std::int64_t parentindex = -1, std::int64_t instanceindex = -1,
+                std::int64_t subinstanceindex = -1,
+                bool parentinstance_is_basename = false)
+          : counter_type_path_elements(objectname, countername, parameters),
+            parentinstancename_(parentname), instancename_(instancename),
+            subinstancename_(subinstancename),
+            parentinstanceindex_(parentindex), instanceindex_(instanceindex),
+            subinstanceindex_(subinstanceindex),
             parentinstance_is_basename_(parentinstance_is_basename)
         {}
 
         std::string parentinstancename_;  ///< the name of the parent instance
         std::string instancename_;        ///< the name of the object instance
+        std::string subinstancename_;     ///< the name of the object sub-instance
         std::int64_t parentinstanceindex_;    ///< the parent instance index
         std::int64_t instanceindex_;    ///< the instance index
+        std::int64_t subinstanceindex_;    ///< the sub-instance index
         bool parentinstance_is_basename_; ///< the parentinstancename_
                                           ///member holds a base counter name
 
@@ -264,9 +283,10 @@ namespace hpx { namespace performance_counters
             hpx::serialization::base_object_type<
               counter_path_elements, base_type> base =
                 hpx::serialization::base_object<base_type>(*this);
-            ar & base & parentinstancename_ & instancename_ &
-                 parentinstanceindex_ & instanceindex_ &
-                 parentinstance_is_basename_;
+            ar & base &
+                parentinstancename_ & instancename_ & subinstancename_ &
+                parentinstanceindex_ & instanceindex_ & subinstanceindex_ &
+                parentinstance_is_basename_;
         }
     };
 
@@ -623,7 +643,7 @@ namespace hpx { namespace performance_counters
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter name.
     HPX_API_EXPORT lcos::future<naming::id_type>
-        get_counter_async(std::string const& name, error_code& ec = throws);
+        get_counter_async(std::string name, error_code& ec = throws);
 
     inline naming::id_type get_counter(std::string const& name,
         error_code& ec = throws)
