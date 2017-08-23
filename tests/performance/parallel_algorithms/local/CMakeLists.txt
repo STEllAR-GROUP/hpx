@@ -8,15 +8,9 @@ set(
   benchmarks
   benchmark_is_heap
   benchmark_is_heap_until
+  benchmark_partition
+  benchmark_partition_copy
   benchmark_unique_copy)
-
-if(HPX_WITH_CXX14)
-  set(
-    benchmarks
-    ${benchmarks}
-    benchmark_partition
-    benchmark_partition_copy)
-endif()
 
 foreach(benchmark ${benchmarks})
   set(sources

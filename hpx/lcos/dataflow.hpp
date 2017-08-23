@@ -163,25 +163,25 @@ namespace hpx { namespace lcos { namespace detail
     public:
         typedef typename base_type::init_no_addref init_no_addref;
 
-        template <typename FFunc, typename FFutures>
+        template <typename Policy_, typename FFunc, typename FFutures>
         dataflow_frame(
-            Policy policy
+            Policy_ && policy
           , FFunc && func
           , FFutures && futures)
-              : policy_(std::move(policy))
+              : policy_(std::forward<Policy_>(policy))
               , func_(std::forward<FFunc>(func))
               , futures_(std::forward<FFutures>(futures))
               , done_(false)
         {}
 
-        template <typename FFunc, typename FFutures>
+        template <typename Policy_, typename FFunc, typename FFutures>
         dataflow_frame(
-            Policy policy
+            Policy_ && policy
           , FFunc && func
           , FFutures && futures
           , init_no_addref no_addref)
               : base_type(no_addref)
-              , policy_(std::move(policy))
+              , policy_(std::forward<Policy_>(policy))
               , func_(std::forward<FFunc>(func))
               , futures_(std::forward<FFutures>(futures))
               , done_(false)
@@ -535,9 +535,11 @@ namespace hpx { namespace lcos { namespace detail
             typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
-            traits::is_launch_policy<Policy>::value,
+            traits::is_launch_policy<
+                typename std::decay<Policy>::type
+            >::value,
             typename dataflow_frame<
-                Policy
+                typename std::decay<Policy>::type
               , Derived
               , util::tuple<
                     hpx::id_type
@@ -545,13 +547,13 @@ namespace hpx { namespace lcos { namespace detail
                 >
             >::type
         >::type
-        call(Policy launch_policy,
+        call(Policy && launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         {
             typedef
                 dataflow_frame<
-                    Policy
+                    typename std::decay<Policy>::type
                   , Derived
                   , util::tuple<
                         hpx::id_type
@@ -562,7 +564,7 @@ namespace hpx { namespace lcos { namespace detail
             typedef typename frame_type::init_no_addref init_no_addref;
 
             boost::intrusive_ptr<frame_type> p(new frame_type(
-                    launch_policy
+                    std::forward<Policy>(launch_policy)
                   , Derived()
                   , util::forward_as_tuple(
                         id
@@ -598,18 +600,21 @@ namespace hpx { namespace lcos { namespace detail
     // launch
     template <typename Action, typename Policy>
     struct dataflow_action_dispatch<Action, Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        typename std::enable_if<
+            traits::is_launch_policy<typename std::decay<Policy>::type>::value
+        >::type>
     {
-        template <typename ...Ts>
+        template <typename Policy_, typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::traits::extract_action<
                     Action
                 >::remote_result_type
             >::type>
-        call(Policy launch_policy, naming::id_type const& id, Ts &&... ts)
+        call(Policy_ && launch_policy, naming::id_type const& id, Ts &&... ts)
         {
-            return dataflow_dispatch<Action>::call(launch_policy, Action(), id,
+            return dataflow_dispatch<Action>::call(
+                std::forward<Policy_>(launch_policy), Action(), id,
                 std::forward<Ts>(ts)...);
         }
 
@@ -686,18 +691,21 @@ namespace hpx { namespace lcos { namespace detail
                 >::remote_result_type
             >::type result_type;
 
-        template <typename Policy, typename ...Ts>
-        HPX_FORCEINLINE static
-        lcos::future<result_type>
-        call(Policy launch_policy,
-            Action const&, naming::id_type const& id, Ts &&... ts)
+        template <typename Policy, typename... Ts>
+        HPX_FORCEINLINE static lcos::future<result_type>
+        call(Policy && launch_policy, Action const&, naming::id_type const& id,
+            Ts&&... ts)
         {
-            static_assert(traits::is_launch_policy<Policy>::value,
+            static_assert(
+                traits::is_launch_policy<
+                    typename std::decay<Policy>::type
+                >::value,
                 "Policy must be a valid launch policy");
 
             return dataflow_action_dispatch<
                     Action, launch
-                >::call(launch_policy, id, std::forward<Ts>(ts)...);
+                >::call(std::forward<Policy>(launch_policy), id,
+                    std::forward<Ts>(ts)...);
         }
 
 //         template <typename Policy, typename DistPolicy, typename ...Ts>

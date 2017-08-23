@@ -7,6 +7,7 @@
 # Copyright (c) 2014-2016 Andreas Schaefer
 # Copyright (c) 2017      Abhimanyu Rawat
 # Copyright (c) 2017      Google
+# Copyright (c) 2017      Taeguk Kwon
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1100,26 +1101,38 @@ if(HPX_WITH_CUDA)
   endif()
 endif()
 
-# Set default for enabling auto-return type workaround to ON for non-clang CUDA
-# only
-set(HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT ON)
-if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-  set(HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT OFF)
-endif()
-
-hpx_option(HPX_WITH_CXX11_AUTO_RETURN_VALUE BOOL
-  "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
-  ${HPX_CXX11_AUTO_RETURN_VALUE_VALUE_DEFAULT} ADVANCED)
-if(HPX_WITH_CXX11_AUTO_RETURN_VALUE)
-  hpx_add_config_define(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+# Store option value passed by an user for HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION.
+if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_ADVANCED )
+  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_GIVEN ON)
+else()
+  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_ADVANCED ADVANCED)
+  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_GIVEN OFF)
 endif()
 
 ################################################################################
 # C++ feature tests
 ################################################################################
-
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+
+# Exceptional handling for non-clang CUDA.
+if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
+    # means using default value (given value).
+    unset(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+  endif()
+endif()
+
+# HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION
+# Default value is used only when HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION is not defined.
+hpx_option(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION BOOL
+  "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
+  ${HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_GIVEN}
+  ${HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_ADVANCED})
+if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+  hpx_add_config_define(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
+endif()
 
 # HPX_WITH_THREAD_COMPATIBILITY
 hpx_option(HPX_WITH_THREAD_COMPATIBILITY BOOL

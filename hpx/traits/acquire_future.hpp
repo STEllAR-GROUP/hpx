@@ -126,7 +126,7 @@ namespace hpx { namespace traits
             >::type
             transform_future_disp(Range_ && futures, Range& values) const
             {
-                detail::reserve_if_random_access(values, futures);
+                detail::reserve_if_random_access_by_range(values, futures);
                 std::transform(
                     util::begin(futures), util::end(futures),
                     std::back_inserter(values), acquire_future_disp());
@@ -139,7 +139,7 @@ namespace hpx { namespace traits
             >::type
             transform_future_disp(Range_ && futures, Range& values) const
             {
-                detail::reserve_if_random_access(values, futures);
+                detail::reserve_if_random_access_by_range(values, futures);
                 std::transform(util::begin(futures), util::end(futures),
                     util::begin(values), acquire_future_disp());
             }

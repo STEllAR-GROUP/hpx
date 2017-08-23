@@ -31,7 +31,7 @@ HPX_REGISTER_ACTION_ID(
     hpx_lcos_server_latch_wait_action,
     hpx::actions::hpx_lcos_server_latch_wait_action_id)
 
-HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     bool, std::ptrdiff_t, bool_std_ptrdiff,
     hpx::actions::base_lco_with_value_std_bool_ptrdiff_get,
     hpx::actions::base_lco_with_value_std_bool_ptrdiff_set)

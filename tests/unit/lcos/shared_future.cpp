@@ -463,6 +463,7 @@ void promise_set_value(hpx::lcos::local::promise<int>& pi)
         pi.set_value(42);
     }
     catch (...) {
+        HPX_TEST(false);
     }
 }
 
@@ -472,10 +473,11 @@ void test_wait_callback()
     hpx::lcos::local::promise<int> pi;
     hpx::lcos::shared_future<int> fi = pi.get_future();
 
-    fi.then(&wait_callback);
+    hpx::future<void> cbf = fi.then(&wait_callback);
     hpx::thread t(&promise_set_value, std::ref(pi));
 
     fi.wait();
+    cbf.wait();
 
     t.join();
 

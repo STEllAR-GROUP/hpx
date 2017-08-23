@@ -367,7 +367,7 @@ namespace util {
                 dest.reserve(source.size());
             }
             template <typename Dest, typename Source>
-            HPX_CONSTEXPR void reserve_if_possible(
+            void reserve_if_possible(
                 std::false_type, Dest const&, Source const&) noexcept
             {
                 // We do nothing here, since the container doesn't

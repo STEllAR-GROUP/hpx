@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { namespace execution
         struct async_execute_at_tag {};
         struct async_execute_after_tag {};
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         // forward declare customization point implementations
         template <>
         struct customization_point<post_at_tag>
@@ -268,7 +268,7 @@ namespace hpx { namespace parallel { namespace execution
                     std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<post_after_tag>::operator()(
             Executor&& exec, hpx::util::steady_duration const& rel_time, F&& f,
@@ -294,7 +294,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 #endif
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<post_at_tag>::operator()(
             Executor&& exec, hpx::util::steady_time_point const& abs_time,
@@ -320,7 +320,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 #endif
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<sync_execute_after_tag>::
         operator()(Executor&& exec, hpx::util::steady_duration const& rel_time,
@@ -346,7 +346,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 #endif
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<sync_execute_at_tag>::
         operator()(Executor&& exec,
@@ -373,7 +373,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 #endif
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<async_execute_at_tag>::
         operator()(Executor&& exec,
@@ -400,7 +400,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 #endif
 
-#if defined(HPX_HAVE_CXX11_AUTO_RETURN_VALUE)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         template <typename Executor, typename F, typename... Ts>
         HPX_FORCEINLINE auto customization_point<async_execute_after_tag>::
         operator()(Executor&& exec, hpx::util::steady_duration const& rel_time,

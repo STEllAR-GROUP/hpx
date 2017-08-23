@@ -33,6 +33,52 @@ struct A
     }
 };
 
+// non-default constructible
+struct B
+{
+    const int a;
+    short b;
+
+public:
+    B() = delete;
+    B(int a): a(a) {}
+
+    template <class Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar & b;
+    }
+
+    int get_a() const
+    {
+        return a;
+    }
+
+    void set_b(short b)
+    {
+        this->b = b;
+    }
+
+    short get_b() const
+    {
+        return b;
+    }
+};
+
+template <class Archive>
+void save_construct_data(Archive& ar, const B* b, unsigned)
+{
+    ar << b->get_a();
+}
+
+template <class Archive>
+void load_construct_data(Archive& ar, B* b, unsigned)
+{
+    int a = 0;
+    ar >> a;
+    ::new (b) B(a);
+}
+
 void test_bool()
 {
     {
@@ -190,6 +236,36 @@ void test_long_vector_serialization()
         HPX_TEST_EQ(os[i], is[i]);
 }
 
+void test_non_default_constructible()
+{
+    std::vector<char> buffer;
+    hpx::serialization::output_archive oarchive(buffer);
+
+    std::vector<B> os;
+    os.push_back(1);
+    os.push_back(2);
+    os.push_back(3);
+    os.push_back(4);
+
+    short b = 1;
+    for (auto& i: os) {
+        i.set_b(b);
+        ++b;
+    }
+
+    oarchive << os;
+
+    hpx::serialization::input_archive iarchive(buffer);
+    std::vector<B> is;
+    iarchive >> is;
+    HPX_TEST_EQ(os.size(), is.size());
+    for (std::size_t i = 0; i < os.size(); ++i)
+    {
+        HPX_TEST_EQ(os[i].get_a(), is[i].get_a());
+        HPX_TEST_EQ(os[i].get_b(), is[i].get_b());
+    }
+}
+
 int main()
 {
     test_bool();
@@ -228,6 +304,8 @@ int main()
     test_long_vector_serialization<int>();
     test_long_vector_serialization<double>();
     test_long_vector_serialization<std::int64_t>();
+
+    test_non_default_constructible();
 
     return hpx::util::report_errors();
 }

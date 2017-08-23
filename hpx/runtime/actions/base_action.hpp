@@ -74,7 +74,8 @@ namespace hpx { namespace actions
         ///               for a \a thread.
         virtual threads::thread_function_type
             get_thread_function(naming::id_type&& target,
-                naming::address_type lva) = 0;
+                naming::address_type lva,
+                naming::address::component_type comptype) = 0;
 
         /// return the id of the locality of the parent thread
         virtual std::uint32_t get_parent_locality_id() const = 0;
@@ -96,7 +97,7 @@ namespace hpx { namespace actions
 
         /// Perform thread initialization
         virtual void schedule_thread(naming::gid_type const& target,
-            naming::address_type lva,
+            naming::address_type lva, naming::component_type comptype,
             std::size_t num_thread) = 0;
 
         /// Return whether the given object was migrated
@@ -119,7 +120,8 @@ namespace hpx { namespace actions
 
         virtual void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
-            std::size_t num_thread, bool& deferred_schedule) = 0;
+            naming::component_type comptype, std::size_t num_thread,
+            bool& deferred_schedule) = 0;
 
         /// The function \a get_serialization_id returns the id which has been
         /// associated with this action (mainly used for serialization purposes).

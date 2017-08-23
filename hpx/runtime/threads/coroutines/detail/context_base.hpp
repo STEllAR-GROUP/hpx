@@ -430,7 +430,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         // Always throw exit_exception.
         // Never returns from standard control flow.
-        HPX_ATTRIBUTE_NORETURN void exit_self()
+        HPX_NORETURN void exit_self()
         {
             HPX_ASSERT(!pending());
             HPX_ASSERT(running());

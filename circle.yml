@@ -25,7 +25,8 @@ dependencies:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit.build tests.unit.diagnostics tests.unit.actions tests.unit.agas tests.unit.component tests.unit.computeapi tests.unit.lcos tests.unit.parcelset tests.unit.performance_counter tests.unit.serialization tests.unit.threads tests.unit.traits tests.unit.util
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit.parallel
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.headers
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance

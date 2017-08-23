@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/detail/serialize_collection.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
@@ -30,12 +31,7 @@ namespace hpx { namespace serialization
             ar >> size; //-V128
             if (size == 0) return;
 
-            if (vs.size() < size)
-                vs.resize(size);
-            for(std::size_t i = 0; i != size; ++i)
-            {
-                ar >> vs[i];
-            }
+            detail::load_collection(ar, vs, size);
         }
 
         template <typename T, typename Allocator>
@@ -45,18 +41,17 @@ namespace hpx { namespace serialization
             if(ar.disable_array_optimization())
             {
                 load_impl(ar, v, std::false_type());
+                return;
             }
-            else
-            {
-                // bitwise load ...
-                std::uint64_t size;
-                ar >> size; //-V128
-                if(size == 0) return;
 
-                if (v.size() < size)
-                    v.resize(size);
-                ar >> hpx::serialization::make_array(v.data(), v.size());
-            }
+            // bitwise load ...
+            std::uint64_t size;
+            ar >> size; //-V128
+            if(size == 0) return;
+
+            if (v.size() < size)
+                v.resize(size);
+            ar >> hpx::serialization::make_array(v.data(), v.size());
         }
     }
 
@@ -101,11 +96,7 @@ namespace hpx { namespace serialization
             std::false_type)
         {
             // normal save ...
-            typedef typename std::vector<T, Allocator>::value_type value_type;
-            for(const value_type & v : vs)
-            {
-                ar << v;
-            }
+            detail::save_collection(ar, vs);
         }
 
         template <typename T, typename Allocator>
@@ -115,12 +106,11 @@ namespace hpx { namespace serialization
             if(ar.disable_array_optimization())
             {
                 save_impl(ar, v, std::false_type());
+                return;
             }
-            else
-            {
-                // bitwise (zero-copy) save ...
-                ar << hpx::serialization::make_array(v.data(), v.size());
-            }
+
+            // bitwise (zero-copy) save ...
+            ar << hpx::serialization::make_array(v.data(), v.size());
         }
     }
 

@@ -109,7 +109,7 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     int rand_base = std::rand();
 
-    auto pred = [rand_base](auto const& t) {
+    auto pred = [rand_base](int t) {
         return t < rand_base;
     };
 

@@ -2,6 +2,7 @@
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2017 Denis Blank
 # Copyright (c) 2017 Google
+# Copyright (c) 2017 Taeguk Kwon
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -516,6 +517,13 @@ macro(hpx_check_for_cxx11_std_unordered_set)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_noreturn_attribute)
+  add_hpx_config_test(HPX_WITH_CXX11_NORETURN_ATTRIBUTE
+    SOURCE cmake/tests/cxx11_noreturn_attribute.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx14_constexpr)
   add_hpx_config_test(HPX_WITH_CXX14_CONSTEXPR
     SOURCE cmake/tests/cxx14_constexpr.cpp
@@ -570,6 +578,14 @@ macro(hpx_check_for_cxx14_deprecated_attribute)
   add_hpx_config_test(HPX_WITH_CXX14_DEPRECATED_ATTRIBUTE
     SOURCE cmake/tests/cxx14_deprecated_attribute.cpp
     FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_return_type_deduction)
+  add_hpx_config_test(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION
+    SOURCE cmake/tests/cxx14_return_type_deduction.cpp
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_return_type_deduction)
 endmacro()
 
 ###############################################################################

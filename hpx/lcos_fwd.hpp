@@ -8,6 +8,7 @@
 #define HPX_LCOS_FWD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 
@@ -26,11 +27,12 @@ namespace hpx
         class HPX_EXPORT base_lco;
 
         template <typename Result, typename RemoteResult =
-            typename traits::promise_remote_result<Result>::type>
+            typename traits::promise_remote_result<Result>::type,
+            typename ComponentType = traits::detail::managed_component_tag>
         class base_lco_with_value;
 
-        template <>
-        class base_lco_with_value<void, void>;
+        template <typename ComponentType>
+        class base_lco_with_value<void, void, ComponentType>;
 
         template <typename Result, typename RemoteResult =
             typename traits::promise_remote_result<Result>::type>

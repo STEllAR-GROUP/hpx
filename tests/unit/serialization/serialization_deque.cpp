@@ -33,6 +33,52 @@ struct A
     }
 };
 
+// non-default constructible
+struct B
+{
+    const int a;
+    short b;
+
+public:
+    B() = delete;
+    B(int a): a(a) {}
+
+    template <class Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        ar & b;
+    }
+
+    int get_a() const
+    {
+        return a;
+    }
+
+    void set_b(short b)
+    {
+        this->b = b;
+    }
+
+    short get_b() const
+    {
+        return b;
+    }
+};
+
+template <class Archive>
+void save_construct_data(Archive& ar, const B* b, unsigned)
+{
+    ar << b->get_a();
+}
+
+template <class Archive>
+void load_construct_data(Archive& ar, B* b, unsigned)
+{
+    int a = 0;
+    ar >> a;
+    ::new (b) B(a);
+}
+
 void test_bool()
 {
     {
@@ -50,11 +96,9 @@ void test_bool()
         std::deque<bool> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        auto ot = os.begin();
-        auto it = is.begin();
         for(std::size_t i = 0; i < os.size(); ++i)
         {
-            HPX_TEST_EQ(*ot, *it);
+            HPX_TEST_EQ(os[i], is[i]);
         }
     }
     {
@@ -72,11 +116,9 @@ void test_bool()
         std::deque<A<bool> > is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        auto ot = os.begin();
-        auto it = is.begin();
         for(std::size_t i = 0; i < os.size(); ++i)
         {
-            HPX_TEST_EQ(ot->t_, it->t_);
+            HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
     }
 }
@@ -97,11 +139,9 @@ void test(T min, T max)
         std::deque<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        auto ot = os.begin();
-        auto it = is.begin();
         for(std::size_t i = 0; i < os.size(); ++i)
         {
-            HPX_TEST_EQ(*ot, *it);
+            HPX_TEST_EQ(os[i], is[i]);
         }
     }
     {
@@ -117,11 +157,9 @@ void test(T min, T max)
         std::deque<A<T> > is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        auto ot = os.begin();
-        auto it = is.begin();
         for(std::size_t i = 0; i < os.size(); ++i)
         {
-            HPX_TEST_EQ(ot->t_, it->t_);
+            HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
     }
 }
@@ -142,11 +180,9 @@ void test_fp(T min, T max)
         std::deque<T> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        auto ot = os.begin();
-        auto it = is.begin();
         for(std::size_t i = 0; i < os.size(); ++i)
         {
-            HPX_TEST_EQ(*ot, *it);
+            HPX_TEST_EQ(os[i], is[i]);
         }
     }
     {
@@ -162,12 +198,40 @@ void test_fp(T min, T max)
         std::deque<A<T> > is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        auto ot = os.begin();
-        auto it = is.begin();
         for(std::size_t i = 0; i < os.size(); ++i)
         {
-            HPX_TEST_EQ(ot->t_, it->t_);
+            HPX_TEST_EQ(os[i].t_, is[i].t_);
         }
+    }
+}
+
+void test_non_default_constructible()
+{
+    std::vector<char> buffer;
+    hpx::serialization::output_archive oarchive(buffer);
+
+    std::deque<B> os;
+    os.push_back(1);
+    os.push_back(2);
+    os.push_back(3);
+    os.push_back(4);
+
+    short b = 1;
+    for (auto& i: os) {
+        i.set_b(b);
+        ++b;
+    }
+
+    oarchive << os;
+
+    hpx::serialization::input_archive iarchive(buffer);
+    std::deque<B> is;
+    iarchive >> is;
+    HPX_TEST_EQ(os.size(), is.size());
+    for (std::size_t i = 0; i < os.size(); ++i)
+    {
+        HPX_TEST_EQ(os[i].get_a(), is[i].get_a());
+        HPX_TEST_EQ(os[i].get_b(), is[i].get_b());
     }
 }
 
@@ -206,6 +270,8 @@ int main()
     test<double>((std::numeric_limits<double>::max)() - 100,
         (std::numeric_limits<double>::max)()); //it's the same
     test<double>(-100, 100);
+
+    test_non_default_constructible();
 
     return hpx::util::report_errors();
 }

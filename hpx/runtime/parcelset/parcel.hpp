@@ -174,7 +174,7 @@ namespace hpx { namespace parcelset
         void serialize(serialization::input_archive & ar, unsigned);
         void serialize(serialization::output_archive & ar, unsigned);
 
-        naming::address_type determine_lva();
+        std::pair<naming::address_type, naming::component_type> determine_lva();
 
         detail::parcel_data data_;
         std::unique_ptr<actions::base_action> action_;

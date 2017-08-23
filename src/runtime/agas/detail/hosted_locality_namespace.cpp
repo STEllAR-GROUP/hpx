@@ -21,7 +21,7 @@
 #include <vector>
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
-    parcelset::endpoints_type, parcelset_endpoints_type,
+    hpx::parcelset::endpoints_type, parcelset_endpoints_type,
     hpx::actions::base_lco_with_value_parcelset_endpoints_get,
     hpx::actions::base_lco_with_value_parcelset_endpoints_set)
 

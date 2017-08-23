@@ -108,7 +108,7 @@ namespace hpx { namespace traits
             operator()(Range_&& futures) const
             {
                 std::vector<shared_state_ptr> values;
-                detail::reserve_if_random_access(values, futures);
+                detail::reserve_if_random_access_by_range(values, futures);
 
                 std::transform(util::begin(futures), util::end(futures),
                     std::back_inserter(values), acquire_shared_state_disp());
