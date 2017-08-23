@@ -51,6 +51,8 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator1 sit = traits::segment(first);
             segment_iterator1 send = traits::segment(last);
 
+            FwdIter output = last;
+
             if (sit == send)
             {
                 // all elements are on the same partition
@@ -61,9 +63,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     local_iterator_type out =
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, op);
+                    output = traits::compose(sit, out);
                 }
             }
             else {
+                bool found = false;
                 // handle the remaining part of the first partition
                 local_iterator_type beg = traits::local(first);
                 local_iterator_type end = traits::end(sit);
@@ -73,30 +77,48 @@ namespace hpx { namespace parallel { inline namespace v1
                     out = dispatch(traits::get_id(sit), algo, policy,
                         std::true_type(), beg, end, op);
                 }
+                if (out != end)
+                {
+                    found = true;
+                    output = traits::compose(sit, out);
+                }
 
                 // handle all of the full partitions
-                for (++sit; sit != send; ++sit)
+                if(!found)
                 {
-                    beg = traits::begin(sit);
-                    end = traits::end(sit);
-                    if (beg != end)
+                    for (++sit; sit != send; ++sit)
                     {
-                        out = dispatch(traits::get_id(sit), algo, policy,
-                            std::true_type(), beg, end, op);
+                        beg = traits::begin(sit);
+                        end = traits::end(sit);
+                        if (beg != end)
+                        {
+                            out = dispatch(traits::get_id(sit), algo, policy,
+                                std::true_type(), beg, end, op);
+                        }
+                        if (out != end)
+                        {
+                            found = true;
+                            output = traits::compose(sit, out);
+                            break;
+                        }
                     }
                 }
 
                 // handle the beginning of the last partition
                 beg = traits::begin(sit);
                 end = traits::local(last);
-                if (beg != end)
+                if (beg != end && !found)
                 {
                     out = dispatch(traits::get_id(sit), algo, policy,
                         std::true_type(), beg, end, op);
                 }
-                last = traits::compose(sit, out);
+                if (out != end)
+                {
+                    found = true;
+                    output = traits::compose(sit, out);
+                }
             }
-            return result::get(std::move(last));
+            return result::get(std::move(output));
         }
 
         // parallel remote implementation
