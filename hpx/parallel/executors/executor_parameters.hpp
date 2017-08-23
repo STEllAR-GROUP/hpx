@@ -372,6 +372,11 @@ namespace hpx { namespace parallel { inline namespace v3
     HPX_FORCEINLINE
     Param && join_executor_parameters(Param && param)
     {
+        static_assert(
+            hpx::traits::is_executor_parameters<Param>::value,
+            "The passed parameter must be a proper executor parameters "
+            "objects"
+        );
         return std::forward<Param>(param);
     }
 }}}

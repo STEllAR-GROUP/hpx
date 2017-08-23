@@ -517,9 +517,6 @@ namespace hpx { namespace performance_counters
         try {
             typedef components::component<server::raw_counter> counter_t;
             id = components::server::construct<counter_t>(complemented_info, f);
-
-            std::string name(complemented_info.fullname_);
-            ensure_counter_prefix(name);      // pre-pend prefix, if necessary
         }
         catch (hpx::exception const& e) {
             id = naming::invalid_gid;        // reset result
@@ -585,9 +582,6 @@ namespace hpx { namespace performance_counters
         try {
             typedef components::component<server::raw_values_counter> counter_t;
             id = components::server::construct<counter_t>(complemented_info, f);
-
-            std::string name(complemented_info.fullname_);
-            ensure_counter_prefix(name);      // pre-pend prefix, if necessary
         }
         catch (hpx::exception const& e) {
             id = naming::invalid_gid;        // reset result

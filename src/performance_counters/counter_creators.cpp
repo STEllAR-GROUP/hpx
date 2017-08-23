@@ -82,6 +82,68 @@ namespace hpx { namespace performance_counters
         return true;
     }
 
+    /// Default discoverer function for performance counters; to be registered
+    /// with the counter types. It is suitable to be used for all counters
+    /// following the naming scheme:
+    ///
+    ///   /<objectname>(locality#<locality_id>/pool#<pool_name>/total)/<instancename>
+    ///
+    bool locality_pool_counter_discoverer(counter_info const& info,
+        discover_counter_func const& f,
+        discover_counters_mode mode, error_code& ec)
+    {
+        performance_counters::counter_info i = info;
+
+        // compose the counter name templates
+        performance_counters::counter_path_elements p;
+        performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        if (mode == discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
+
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+            else if (p.subinstancename_.empty())
+            {
+                p.subinstancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+
+            p.instancename_ = "pool#*";
+            p.instanceindex_ = -1;
+
+            p.subinstancename_ = "total";
+            p.subinstanceindex_ = -1;
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (!f(i, ec) || ec) {
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return true;
+    }
+
     /// Default discoverer function for AGAS performance counters; to be
     /// registered with the counter types. It is suitable to be used for all
     /// counters following the naming scheme:
@@ -172,6 +234,119 @@ namespace hpx { namespace performance_counters
 
             p.instancename_ = "worker-thread#*";
             p.instanceindex_ = -1;
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (!f(i, ec) || ec) {
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return true;
+    }
+
+    /// Default discoverer function for performance counters; to be registered
+    /// with the counter types. It is suitable to be used for all counters
+    /// following the naming scheme:
+    ///
+    ///   /<objectname>{locality#<locality_id>/pool#<pool_name>/thread#<threadnum>}/<instancename>
+    ///
+    bool locality_pool_thread_counter_discoverer(counter_info const& info,
+        discover_counter_func const& f,
+        discover_counters_mode mode, error_code& ec)
+    {
+        performance_counters::counter_info i = info;
+
+        // compose the counter name templates
+        performance_counters::counter_path_elements p;
+        performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        if (mode == discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty() ||
+            p.subinstancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
+
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+            else if (p.subinstancename_.empty())
+            {
+                p.subinstancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+
+            p.instancename_ = "pool#*";
+            p.instanceindex_ = -1;
+
+            p.subinstancename_ = "worker-thread#*";
+            p.subinstanceindex_ = -1;
+
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+        else if (!f(i, ec) || ec) {
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return true;
+    }
+
+    /// Default discoverer function for performance counters; to be registered
+    /// with the counter types. It is suitable to be used for all counters
+    /// following the naming scheme:
+    ///
+    ///   /<objectname>{locality#<locality_id>/pool#<poolname>/thread#<threadnum>}/<instancename>
+    ///
+    /// This is essentially the same as above just that locality#*/total is not
+    /// supported.
+    bool locality_pool_thread_no_total_counter_discoverer(
+        counter_info const& info, discover_counter_func const& f,
+        discover_counters_mode mode, error_code& ec)
+    {
+        performance_counters::counter_info i = info;
+
+        // compose the counter name templates
+        performance_counters::counter_path_elements p;
+        performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        if (mode == discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty() ||
+            p.subinstancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
+
+            p.instancename_ = "pool#*";
+            p.instanceindex_ = -1;
+
+            p.subinstancename_ = "worker-thread#*";
+            p.subinstanceindex_ = -1;
 
             status = get_counter_name(p, i.fullname_, ec);
             if (!status_is_valid(status) || !f(i, ec) || ec)

@@ -311,11 +311,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         hpx::state expected = state_starting;
         if (state.compare_exchange_strong(expected, state_stopping))
         {
-            {
-                std::unique_lock<mutex_type> l(mtx_);
-                scheduler_.add_punit(0, thread_num_);
-                scheduler_.on_start_thread(0);
-            }
+//             {
+//                 std::unique_lock<mutex_type> l(mtx_);
+//                 resource::get_partitioner().get_affinity_data().add_punit(
+//                     0, thread_num_);
+//                 scheduler_.on_start_thread(0);
+//             }
 
             self_ = threads::get_self_ptr();
 
