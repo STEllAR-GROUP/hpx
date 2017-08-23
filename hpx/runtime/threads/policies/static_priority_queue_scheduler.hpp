@@ -91,7 +91,7 @@ namespace hpx { namespace threads { namespace policies
                 q->increment_num_pending_misses();
 
                 // Give up, we should have work to convert.
-                if (q->get_staged_queue_length(boost::memory_order_relaxed) != 0)
+                if (q->get_staged_queue_length(std::memory_order_relaxed) != 0)
                     return false;
             }
 

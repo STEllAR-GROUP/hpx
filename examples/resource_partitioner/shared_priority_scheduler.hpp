@@ -24,8 +24,7 @@
 #include <plugins/parcelport/parcelport_logging.hpp>
 #endif
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -732,7 +731,7 @@ namespace threads {
                     this_queue->increment_num_pending_misses();
 
                     bool have_staged = this_queue->get_staged_queue_length(
-                                           boost::memory_order_relaxed) != 0;
+                                           std::memory_order_relaxed) != 0;
 
                     // Give up, we should have work to convert.
                     if (have_staged)
@@ -1287,8 +1286,8 @@ namespace threads {
             std::vector<thread_queue_type*> queues_;
             std::vector<thread_queue_type*> high_priority_queues_;
             thread_queue_type low_priority_queue_;
-            boost::atomic<std::size_t> curr_queue_;
-            boost::atomic<std::size_t> curr_hp_queue_;
+            std::atomic<std::size_t> curr_queue_;
+            std::atomic<std::size_t> curr_hp_queue_;
             std::size_t numa_sensitive_;
             std::size_t numa_pinned_;
             std::size_t threads_per_hp_queue_;

@@ -8,8 +8,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -133,8 +132,8 @@ void dispatch_work()
     hpx::lcos::local::channel<int> jobs;
     hpx::lcos::local::channel<> done;
 
-    boost::atomic<int> received_jobs(0);
-    boost::atomic<bool> was_closed(false);
+    std::atomic<int> received_jobs(0);
+    std::atomic<bool> was_closed(false);
 
     hpx::apply(
         [jobs, done, &received_jobs, &was_closed]() mutable
@@ -172,7 +171,7 @@ void dispatch_work()
 ///////////////////////////////////////////////////////////////////////////////
 void channel_range()
 {
-    boost::atomic<int> received_elements(0);
+    std::atomic<int> received_elements(0);
 
     hpx::lcos::local::channel<std::string> queue;
     queue.set("one");
@@ -191,7 +190,7 @@ void channel_range()
 
 void channel_range_void()
 {
-    boost::atomic<int> received_elements(0);
+    std::atomic<int> received_elements(0);
 
     hpx::lcos::local::channel<> queue;
     queue.set();

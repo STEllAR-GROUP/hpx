@@ -8,8 +8,7 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -32,7 +31,7 @@ void test_for_each_n(ExPolicy policy, IteratorTag, Proj && proj)
     std::vector<std::size_t> c(10007);
     std::fill(std::begin(c), std::end(c), std::size_t(42));
 
-    boost::atomic<std::size_t> count(0);
+    std::atomic<std::size_t> count(0);
 
     iterator result =
         hpx::parallel::for_each_n(policy,
@@ -56,7 +55,7 @@ void test_for_each_n_async(ExPolicy p, IteratorTag, Proj && proj)
     std::vector<std::size_t> c(10007);
     std::fill(std::begin(c), std::end(c), std::size_t(42));
 
-    boost::atomic<std::size_t> count(0);
+    std::atomic<std::size_t> count(0);
 
     hpx::future<iterator> f =
         hpx::parallel::for_each_n(p,

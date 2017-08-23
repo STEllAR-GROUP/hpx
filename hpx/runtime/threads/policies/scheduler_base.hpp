@@ -22,9 +22,8 @@
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #endif
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -45,7 +44,7 @@ namespace hpx { namespace threads { namespace policies
     {
         struct reset_on_exit
         {
-            reset_on_exit(boost::atomic<std::int32_t>& counter)
+            reset_on_exit(std::atomic<std::int32_t>& counter)
               : counter_(counter)
             {
                 ++counter_;
@@ -56,7 +55,7 @@ namespace hpx { namespace threads { namespace policies
                 HPX_ASSERT(counter_ > 0);
                 --counter_;
             }
-            boost::atomic<std::int32_t>& counter_;
+            std::atomic<std::int32_t>& counter_;
         };
     }
 #endif
@@ -136,7 +135,7 @@ namespace hpx { namespace threads { namespace policies
         void do_some_work(std::size_t num_thread)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-            wait_count_.store(0, boost::memory_order_release);
+            wait_count_.store(0, std::memory_order_release);
 
             if (num_thread == std::size_t(-1))
                 cond_.notify_all();
@@ -146,12 +145,12 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // allow to access/manipulate states
-        boost::atomic<hpx::state>& get_state(std::size_t num_thread)
+        std::atomic<hpx::state>& get_state(std::size_t num_thread)
         {
             HPX_ASSERT(num_thread < states_.size());
             return states_[num_thread];
         }
-        boost::atomic<hpx::state> const& get_state(std::size_t num_thread) const
+        std::atomic<hpx::state> const& get_state(std::size_t num_thread) const
         {
             HPX_ASSERT(num_thread < states_.size());
             return states_[num_thread];
@@ -159,7 +158,7 @@ namespace hpx { namespace threads { namespace policies
 
         void set_all_states(hpx::state s)
         {
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type& state : states_)
                 state.store(s);
         }
@@ -167,7 +166,7 @@ namespace hpx { namespace threads { namespace policies
         // return whether all states are at least at the given one
         bool has_reached_state(hpx::state s) const
         {
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type const& state : states_)
             {
                 if (state.load() < s)
@@ -178,7 +177,7 @@ namespace hpx { namespace threads { namespace policies
 
         bool is_state(hpx::state s) const
         {
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type const& state : states_)
             {
                 if (state.load() != s)
@@ -192,7 +191,7 @@ namespace hpx { namespace threads { namespace policies
             std::pair<hpx::state, hpx::state> result(
                 last_valid_runtime_state, first_valid_runtime_state);
 
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type const& state_iter : states_)
             {
                 hpx::state s = state_iter.load();
@@ -206,7 +205,7 @@ namespace hpx { namespace threads { namespace policies
         // get/set scheduler mode
         scheduler_mode get_scheduler_mode() const
         {
-            return mode_.load(boost::memory_order_acquire);
+            return mode_.load(std::memory_order_acquire);
         }
 
         void set_scheduler_mode(scheduler_mode mode)
@@ -341,22 +340,22 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         virtual void start_periodic_maintenance(
-            boost::atomic<hpx::state>& global_state)
+            std::atomic<hpx::state>& global_state)
         {}
 
         virtual void reset_thread_distribution() {}
 
     protected:
-        boost::atomic<scheduler_mode> mode_;
+        std::atomic<scheduler_mode> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
         compat::mutex mtx_;
         compat::condition_variable cond_;
-        boost::atomic<std::uint32_t> wait_count_;
+        std::atomic<std::uint32_t> wait_count_;
 #endif
 
-        std::vector<boost::atomic<hpx::state> > states_;
+        std::vector<std::atomic<hpx::state> > states_;
         char const* description_;
 
         // the pool that owns this scheduler

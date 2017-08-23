@@ -11,14 +11,14 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
 
-#include <boost/atomic.hpp>
 #include <boost/range/irange.hpp>
 
-boost::atomic<std::size_t> local_count;
+std::atomic<std::size_t> local_count;
 
 struct spmd_block_helper
 {

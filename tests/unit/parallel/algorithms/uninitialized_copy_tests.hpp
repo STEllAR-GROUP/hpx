@@ -12,8 +12,7 @@
 #include <hpx/include/parallel_uninitialized_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -92,7 +91,7 @@ void test_uninitialized_copy_exception(ExPolicy policy, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
@@ -132,7 +131,7 @@ void test_uninitialized_copy_exception_async(ExPolicy p, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_exception = false;
@@ -184,7 +183,7 @@ void test_uninitialized_copy_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;
@@ -224,7 +223,7 @@ void test_uninitialized_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    boost::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % c.size()); //-V104
     test::count_instances::instance_count.store(0);
 
     bool caught_bad_alloc = false;

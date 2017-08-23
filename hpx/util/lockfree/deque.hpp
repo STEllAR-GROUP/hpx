@@ -46,7 +46,7 @@ template <typename T>
 struct deque_node //-V690
 {
     typedef detail::tagged_ptr<deque_node> pointer;
-    typedef atomic<pointer> atomic_pointer;
+    typedef boost::atomic<pointer> atomic_pointer;
 
     typedef typename pointer::tag_t tag_t;
 

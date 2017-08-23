@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
@@ -120,10 +119,10 @@ void test_timed_async(Executor& exec)
     }
 }
 
-boost::atomic<std::size_t> count_sync(0);
-boost::atomic<std::size_t> count_apply(0);
-boost::atomic<std::size_t> count_sync_at(0);
-boost::atomic<std::size_t> count_apply_at(0);
+std::atomic<std::size_t> count_sync(0);
+std::atomic<std::size_t> count_apply(0);
+std::atomic<std::size_t> count_sync_at(0);
+std::atomic<std::size_t> count_apply_at(0);
 
 template <typename Executor>
 void test_timed_executor(std::array<std::size_t, 4> expected)

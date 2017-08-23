@@ -17,9 +17,8 @@
 #include <hpx/compute/host/block_executor.hpp>
 #include <hpx/compute/host/target.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <array>
+#include <atomic>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -196,7 +195,7 @@ namespace hpx { namespace compute { namespace cuda
     private:
         host_executor_type host_executor_;
         std::vector<cuda_executor_type> cuda_executors_;
-        boost::atomic<std::size_t> current_;
+        std::atomic<std::size_t> current_;
     };
 }}}
 

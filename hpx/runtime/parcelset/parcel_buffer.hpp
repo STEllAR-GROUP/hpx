@@ -12,8 +12,6 @@
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/util/integer/endian.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <utility>
 #include <vector>
 

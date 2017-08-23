@@ -9,9 +9,8 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <array>
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <set>
@@ -22,7 +21,7 @@ std::size_t num_images = 10;
 std::size_t iterations = 20;
 
 void bulk_test_function(hpx::parallel::v2::spmd_block block,
-        boost::atomic<std::size_t> * c)
+        std::atomic<std::size_t> * c)
 {
     HPX_TEST_EQ(block.get_num_images(), num_images);
     HPX_TEST_EQ(block.this_image() < num_images, true);
@@ -91,12 +90,12 @@ int main()
     using hpx::parallel::execution::task;
 
     auto bulk_test =
-        [](hpx::parallel::v2::spmd_block block, boost::atomic<std::size_t> * c)
+        [](hpx::parallel::v2::spmd_block block, std::atomic<std::size_t> * c)
         {
             bulk_test_function(std::move(block),c);
         };
 
-    std::array<boost::atomic<std::size_t>,4> c1, c2, c3;
+    std::array<std::atomic<std::size_t>,4> c1, c2, c3;
 
     for(std::size_t i =0; i<4; i++)
     {

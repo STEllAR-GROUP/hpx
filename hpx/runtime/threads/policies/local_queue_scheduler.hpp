@@ -22,8 +22,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -336,7 +335,7 @@ namespace hpx { namespace threads { namespace policies
                 q->increment_num_pending_misses();
 
                 bool have_staged =
-                    q->get_staged_queue_length(boost::memory_order_relaxed) != 0;
+                    q->get_staged_queue_length(std::memory_order_relaxed) != 0;
 
                 // Give up, we should have work to convert.
                 if (have_staged)
@@ -822,7 +821,7 @@ namespace hpx { namespace threads { namespace policies
     protected:
         std::size_t max_queue_thread_count_;
         std::vector<thread_queue_type*> queues_;
-        boost::atomic<std::size_t> curr_queue_;
+        std::atomic<std::size_t> curr_queue_;
         std::size_t numa_sensitive_;
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only

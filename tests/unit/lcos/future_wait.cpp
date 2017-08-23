@@ -12,8 +12,7 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -41,10 +40,10 @@ using hpx::naming::id_type;
 struct callback
 {
   private:
-    mutable boost::atomic<std::size_t> * calls_;
+    mutable std::atomic<std::size_t> * calls_;
 
   public:
-    callback(boost::atomic<std::size_t> & calls) : calls_(&calls) {}
+    callback(std::atomic<std::size_t> & calls) : calls_(&calls) {}
 
     template <
         typename T
@@ -68,7 +67,7 @@ struct callback
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> void_counter;
+std::atomic<std::size_t> void_counter;
 
 void null_thread()
 {
@@ -78,7 +77,7 @@ void null_thread()
 HPX_PLAIN_ACTION(null_thread, null_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> result_counter;
+std::atomic<std::size_t> result_counter;
 
 bool null_result_thread()
 {
@@ -94,7 +93,7 @@ int hpx_main(
     )
 {
     {
-        boost::atomic<std::size_t> count(0);
+        std::atomic<std::size_t> count(0);
         callback cb(count);
 
         ///////////////////////////////////////////////////////////////////////
