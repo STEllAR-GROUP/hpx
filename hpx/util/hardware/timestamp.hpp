@@ -29,7 +29,9 @@
     #else
         #include <hpx/util/hardware/timestamp/linux_generic.hpp>
     #endif
-#elif (defined(__ANDROID__) && defined(ANDROID)) || defined(__arm__)
+#elif (defined(__ANDROID__) && defined(ANDROID))
+    #include <hpx/util/hardware/timestamp/linux_generic.hpp>
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__)
     #include <hpx/util/hardware/timestamp/linux_generic.hpp>
 #elif defined(__powerpc__)
     #include <hpx/util/hardware/timestamp/linux_generic.hpp>
