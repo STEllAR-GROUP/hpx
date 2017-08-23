@@ -24,8 +24,8 @@ HPX_REGISTER_PARTITIONED_VECTOR(int);
 template <typename T>
 void initialize(hpx::partitioned_vector<T> & xvalues)
 {
-    T init_array[SIZE] = {1,2,3,4, 5,1,1,3, 3,5,5,3, 4,2,3,2, 1,2,3,4, 5,6,5,6,
-        1,2,3,4, 1,1,2,3, 4,5,4,3, 2,1,1,2, 3,4,1,2, 3,1,1,1, 1,1,1,1, 1,7,6,5,
+    T init_array[SIZE] = {1,2,3,4, 5,1,2,3, 1,5,2,3, 4,2,3,2, 1,2,3,4, 5,6,5,6,
+        1,2,3,4, 2,1,2,3, 3,5,4,3, 2,1,1,2, 3,4,1,2, 3,1,1,1, 1,1,1,1, 1,7,6,5,
         7,5,4,2, 3,4,5,2};
     for(int i=0; i<SIZE; i++)
     {
@@ -39,7 +39,7 @@ void test_adjacent_find(ExPolicy && policy,
 {
     auto result = hpx::parallel::adjacent_find(policy, xvalues.begin(),
         xvalues.end());
-    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 5);
+    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 31);
 }
 
 template <typename ExPolicy, typename T>
@@ -48,7 +48,7 @@ void test_adjacent_find_async(ExPolicy && policy,
 {
     auto result = hpx::parallel::adjacent_find(policy, xvalues.begin(),
         xvalues.end()).get();
-    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 5);
+    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 31);
 }
 
 template <typename T>
@@ -70,6 +70,6 @@ int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     adjacent_find_tests<int>(localities);
-    adjacent_find_tests<double>(localities);
+    // adjacent_find_tests<double>(localities);
     return hpx::util::report_errors();
 }

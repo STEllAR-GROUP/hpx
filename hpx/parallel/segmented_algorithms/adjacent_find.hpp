@@ -76,11 +76,17 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     out = dispatch(traits::get_id(sit), algo, policy,
                         std::true_type(), beg, end, op);
+                    if (out != end)
+                    {
+                        found = true;
+                        output = traits::compose(sit, out);
+                    }
                 }
-                if (out != end)
+                FwdIter ending = traits::compose(sit, std::prev(end));
+                if(hpx::util::invoke(op, *ending, *std::next(ending)) && !found)
                 {
                     found = true;
-                    output = traits::compose(sit, out);
+                    output = traits::compose(sit, std::prev(end));
                 }
 
                 // handle all of the full partitions
@@ -94,11 +100,19 @@ namespace hpx { namespace parallel { inline namespace v1
                         {
                             out = dispatch(traits::get_id(sit), algo, policy,
                                 std::true_type(), beg, end, op);
+                            if (out != end)
+                            {
+                                found = true;
+                                output = traits::compose(sit, out);
+                                break;
+                            }
                         }
-                        if (out != end)
+                        ending = traits::compose(sit, std::prev(end));
+                        if(hpx::util::invoke(op, *ending, *std::next(ending)) &&
+                            !found)
                         {
                             found = true;
-                            output = traits::compose(sit, out);
+                            output = traits::compose(sit, std::prev(end));
                             break;
                         }
                     }
@@ -111,11 +125,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     out = dispatch(traits::get_id(sit), algo, policy,
                         std::true_type(), beg, end, op);
-                }
-                if (out != end)
-                {
-                    found = true;
-                    output = traits::compose(sit, out);
+                    if (out != end)
+                    {
+                        found = true;
+                        output = traits::compose(sit, out);
+                    }
                 }
             }
             return result::get(std::move(output));
@@ -143,7 +157,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
             typedef std::vector<future<FwdIter> > segment_type;
             segment_type segments;
+            std::vector<FwdIter> between_segments;
             segments.reserve(std::distance(sit, send));
+            between_segments.reserve(2*std::distance(sit, send));
 
             if (sit == send)
             {
@@ -184,6 +200,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                 else
                                     return last;
                             }));
+                    between_segments.push_back(traits::compose(sit,std::prev(end)));
                 }
 
                 // handle all of the full partitions
@@ -193,6 +210,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     end = traits::end(sit);
                     if (beg != end)
                     {
+                        between_segments.push_back(traits::compose(sit,beg));
                         segments.push_back(
                             hpx::make_future<FwdIter>(
                                 dispatch_async(traits::get_id(sit), algo,
@@ -205,6 +223,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                     else
                                         return last;
                                 }));
+                        between_segments.push_back(traits::compose(sit,std::prev(end)));
                     }
                 }
 
@@ -213,6 +232,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 end = traits::local(last);
                 if (beg != end)
                 {
+                    between_segments.push_back(traits::compose(sit,beg));
                     segments.push_back(
                         hpx::make_future<FwdIter>(
                             dispatch_async(traits::get_id(sit), algo,
@@ -240,11 +260,16 @@ namespace hpx { namespace parallel { inline namespace v1
                         std::vector<FwdIter> res =
                             hpx::util::unwrap(std::move(r));
                         auto it = res.begin();
+                        int i = 0;
                         while(it!=res.end())
                         {
                             if(*it != last)
                                 return *it;
-                            it++;
+                            if(hpx::util::invoke(op, *(between_segments[i]),
+                                *(between_segments[i+1])))
+                                return between_segments[i];
+                            ++it;
+                            i+=2;
                         }
                         return res.back();
                     },
