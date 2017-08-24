@@ -563,6 +563,7 @@ namespace hpx { namespace threads { namespace detail
 
         return executed_threads - reset_executed_threads;
     }
+#endif
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_executed_threads() const
@@ -583,6 +584,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
     }
 
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_executed_thread_phases(
         std::size_t num, bool reset)
@@ -618,6 +620,7 @@ namespace hpx { namespace threads { namespace detail
 
         return executed_phases - reset_executed_phases;
     }
+#endif
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
     template <typename Scheduler>
@@ -1392,5 +1395,3 @@ namespace hpx { namespace threads { namespace detail
         resource::get_partitioner().unassign_pu(id_.name(), virt_core);
     }
 }}}
-
-#endif
