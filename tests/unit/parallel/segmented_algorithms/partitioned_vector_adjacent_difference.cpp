@@ -6,7 +6,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_adjacent_difference.hpp>
-// #include <hpx/include/parallel_scan.hpp>
+#include <hpx/include/parallel_scan.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
@@ -32,7 +32,7 @@ void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
         HPX_TEST_EQ(*it, val);
     }
 
-    HPX_TEST_EQ(size, v.size());
+    HPX_TEST_EQ(++size, v.size());
 }
 
 template <typename ExPolicy, typename T>
@@ -58,35 +58,35 @@ void test_adjacent_difference_async(ExPolicy && policy, hpx::partitioned_vector<
 template <typename T>
 void adjacent_difference_tests(std::vector<hpx::id_type> &localities)
 {
-    std::size_t const length = 100;
+    std::size_t const length = 12;
 
     {
         hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
         hpx::partitioned_vector<T> w(length,hpx::container_layout(localities));
         test_adjacent_difference(hpx::parallel::execution::seq, v, w, T(0));
-        // test_adjacent_difference(hpx::parallel::execution::par, v, w, T(0));
-        // test_adjacent_difference_async(
-        //     hpx::parallel::execution::seq(hpx::parallel::execution::task),
-        //     v, w, T(0));
-        // test_adjacent_difference_async(
-        //     hpx::parallel::execution::par(hpx::parallel::execution::task),
-        //     v, w, T(0));
+        test_adjacent_difference(hpx::parallel::execution::par, v, w, T(0));
+        test_adjacent_difference_async(
+            hpx::parallel::execution::seq(hpx::parallel::execution::task),
+            v, w, T(0));
+        test_adjacent_difference_async(
+            hpx::parallel::execution::par(hpx::parallel::execution::task),
+            v, w, T(0));
     }
 
-    // {
-    //     hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
-    //     hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, v.begin(),
-    //         v.end(), v.begin());
-    //     hpx::partitioned_vector<T> w(length,hpx::container_layout(localities));
-    //     test_adjacent_difference(hpx::parallel::execution::seq, v, w, T(1));
-    //     test_adjacent_difference(hpx::parallel::execution::par, v, w, T(1));
-    //     test_adjacent_difference_async(
-    //         hpx::parallel::execution::seq(hpx::parallel::execution::task),
-    //         v, w, T(1));
-    //     test_adjacent_difference_async(
-    //         hpx::parallel::execution::par(hpx::parallel::execution::task),
-    //         v, w, T(1));
-    // }
+    {
+        hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
+        hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, v.begin(),
+            v.end(), v.begin());
+        hpx::partitioned_vector<T> w(length,hpx::container_layout(localities));
+        test_adjacent_difference(hpx::parallel::execution::seq, v, w, T(1));
+        test_adjacent_difference(hpx::parallel::execution::par, v, w, T(1));
+        test_adjacent_difference_async(
+            hpx::parallel::execution::seq(hpx::parallel::execution::task),
+            v, w, T(1));
+        test_adjacent_difference_async(
+            hpx::parallel::execution::par(hpx::parallel::execution::task),
+            v, w, T(1));
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////
 
