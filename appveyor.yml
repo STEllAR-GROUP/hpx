@@ -9,8 +9,10 @@ environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       MSVC_GENERATOR: Visual Studio 14 2015
+      MSVC_GENERATOR_SHORT: VS2015
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       MSVC_GENERATOR: Visual Studio 15 2017
+      MSVC_GENERATOR_SHORT: VS2017
 
 configuration:
   - Debug
@@ -33,11 +35,28 @@ before_build:
 
 build_script:
   - cmd: cmake --build build --config %CONFIGURATION% --target core -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
+  - cmd: |
+      7z a "hpx-master-redist-%MSVC_GENERATOR_SHORT%-%CONFIGURATION%.7z" -y "build\Debug\bin\*.dll" "build\Debug\bin\hpx\*.dll" "build\Debug\bin\*.pdb" "build\Debug\bin\hpx\*.pdb" >NUL
+      7z a "hpx-master-redist-%MSVC_GENERATOR_SHORT%-%CONFIGURATION%.7z" -y "build\Debug\lib\*.lib" "build\Debug\lib\hpx\*.lib" "build\src\hpx_init.dir\Debug\hpx_init.pdb" >NUL
+      7z a "hpx-master-redist-%MSVC_GENERATOR_SHORT%-%CONFIGURATION%.7z" -y "build\lib\cmake\HPX\*.cmake" "build\hpx\config\*.hpp" "build\hpx\runtime\parcelset\*.hpp" "hpx" "cmake\*.cmake" >NUL
   - cmd: cmake --build build --config %CONFIGURATION% --target examples -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
-#  - cmd: cmake --build build --config %CONFIGURATION% --target tests/regressions -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:minimal /maxcpucount:2 /nologo
 
 test_script:
   - cmd: |
       set PATH=%PATH%;C:\projects\vcpkg\installed\x64-windows\debug\bin
       python build\bin\hpxrun.py -l2 -t2 build\Debug\bin\hello_world.exe -- --hpx:bind=none
 
+artifacts:
+  - path: hpx-master-redist-$(MSVC_GENERATOR_SHORT)-$(configuration).7z
+    name: hpx-master-redist-$(MSVC_GENERATOR_SHORT)-$(configuration)
+
+deploy:
+  provider: FTP
+  on:
+    branch: master
+  protocol: ftp
+  host: ftp.stellar-group.org
+  username: appveyor-ci@stellar-group.org
+  password:
+    secure: tsfxuDuvSntD/aqRcuxSvkU4lqQck85OI7e7nhDhIr4=
+  beta: true
