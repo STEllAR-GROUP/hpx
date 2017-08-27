@@ -20,8 +20,8 @@
 namespace hpx { namespace performance_counters { namespace server
 {
     class base_performance_counter
-      : public hpx::performance_counters::performance_counter_base
-      , public hpx::traits::detail::simple_component_tag
+        : public hpx::performance_counters::performance_counter_base,
+          public hpx::traits::detail::component_tag
     {
     protected:
         /// the following functions are not implemented by default, they will
@@ -48,7 +48,8 @@ namespace hpx { namespace performance_counters { namespace server
         virtual counter_values_array get_counter_values_array(bool reset)
         {
             HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
-                "get_counter_values_array is not implemented for this counter");
+                "get_counter_values_array is not implemented for this "
+                "counter");
             return counter_values_array();
         }
 
@@ -68,20 +69,28 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     public:
-        base_performance_counter() : invocation_count_(0) {}
+        base_performance_counter()
+          : invocation_count_(0)
+        {
+        }
         base_performance_counter(counter_info const& info)
-          : info_(info), invocation_count_(0)
-        {}
+          : info_(info)
+          , invocation_count_(0)
+        {
+        }
 
         // components must contain a typedef for wrapping_type defining the
         // component type used to encapsulate instances of this
         // component
-        typedef components::component<base_performance_counter> wrapping_type;
+        typedef components::component<base_performance_counter>
+            wrapping_type;
         typedef base_performance_counter base_type_holder;
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize() {}
+        void finalize()
+        {
+        }
 
         static components::component_type get_component_type()
         {
@@ -145,7 +154,8 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_values_array_nonvirt, get_counter_values_array_action);
+            get_counter_values_array_nonvirt,
+            get_counter_values_array_action);
 
         /// The \a set_counter_value_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
@@ -156,12 +166,12 @@ namespace hpx { namespace performance_counters { namespace server
             reset_counter_value_nonvirt, reset_counter_value_action);
 
         /// The \a start_action
-        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            start_nonvirt, start_action);
+        HPX_DEFINE_COMPONENT_ACTION(
+            base_performance_counter, start_nonvirt, start_action);
 
         /// The \a stop_action
-        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            stop_nonvirt, stop_action);
+        HPX_DEFINE_COMPONENT_ACTION(
+            base_performance_counter, stop_nonvirt, stop_action);
 
     protected:
         hpx::performance_counters::counter_info info_;
