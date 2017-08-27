@@ -368,6 +368,45 @@ static void test_async_move_only_traversal()
     }
 }
 
+struct invalidate_visitor : async_counter_base<invalidate_visitor>
+{
+    bool operator()(async_traverse_visit_tag, std::shared_ptr<int>& i) const
+    {
+        HPX_TEST_EQ(*i, 22);
+        return false;
+    }
+
+    template <typename N>
+    void operator()(async_traverse_detach_tag,
+        std::shared_ptr<int>& i,
+        N&& next)
+    {
+        HPX_UNUSED(i);
+
+        std::forward<N>(next)();
+    }
+
+    // Test whether the passed pack was passed as r-value reference
+    void operator()(async_traverse_complete_tag,
+        tuple<std::shared_ptr<int>>&& pack) const
+    {
+        // Invalidate the moved object
+        tuple<std::shared_ptr<int>> moved = std::move(pack);
+
+        HPX_UNUSED(moved);
+    }
+};
+
+// Check whether the arguments are invalidated (moved out) when called
+static void test_async_complete_invalidation()
+{
+    auto value = std::make_shared<int>(22);
+
+    auto frame = traverse_pack_async(invalidate_visitor{}, value);
+
+    HPX_TEST_EQ(value.use_count(), 1U);
+}
+
 int main(int, char**)
 {
     test_async_traversal();
@@ -375,6 +414,7 @@ int main(int, char**)
     test_async_tuple_like_traversal();
     test_async_mixed_traversal();
     test_async_move_only_traversal();
+    test_async_complete_invalidation();
 
     return hpx::util::report_errors();
 }

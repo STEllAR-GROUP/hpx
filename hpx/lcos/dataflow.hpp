@@ -22,13 +22,11 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
@@ -64,54 +62,6 @@ namespace hpx { namespace lcos { namespace detail
     // dispatch point used for launch_policy implementations
     template <typename Action, typename Enable = void>
     struct dataflow_launch_policy_dispatch;
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct reset_dataflow_future
-    {
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(Future& future) const
-        {
-            future = Future();
-        }
-
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(boost::reference_wrapper<Future>& future) const
-        {
-            future.get() = Future();
-        }
-
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(std::reference_wrapper<Future>& future) const
-        {
-            future.get() = Future();
-        }
-
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            !traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(Future& future) const
-        {}
-    };
-
-    /// Helper to invalidate the futures contained in the given pack in order
-    /// to break cycles.
-    template<typename T>
-    void invalidate_futures(T&& futures)
-    {
-        // Invalidate all futures which are contained recursively inside
-        // the given tuple of futures and non futures.
-        util::traverse_pack(reset_dataflow_future{}, std::forward<T>(futures));
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Args, typename Enable = void>
@@ -186,9 +136,6 @@ namespace hpx { namespace lcos { namespace detail
                 result_type res =
                     util::invoke_fused(func_, std::move(futures));
 
-                // Reassigning a moved value isn't UB
-                invalidate_futures(std::move(futures));
-
                 this->set_data(std::move(res));
             }
             catch(...) {
@@ -203,9 +150,6 @@ namespace hpx { namespace lcos { namespace detail
         {
             try {
                 util::invoke_fused(func_, std::move(futures));
-
-                // Reassigning a moved value isn't UB
-                invalidate_futures(std::move(futures));
 
                 this->set_data(util::unused_type());
             }
