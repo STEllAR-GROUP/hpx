@@ -188,8 +188,6 @@ namespace hpx { namespace parallel { inline namespace v1
                         ++part_begin, part_size,
                         [&dest](zip_iterator it) mutable
                         {
-                            using hpx::util::invoke;
-
                             if (!get<1>(*it))
                                 *dest++ = get<0>(*it);
                         });
@@ -402,6 +400,140 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<Proj>(proj)));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Pred, typename Proj>
+        typename util::detail::algorithm_result<
+            ExPolicy, FwdIter2
+        >::type
+        unique_helper(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, Pred && pred, Proj && proj)
+        {
+            typedef hpx::util::zip_iterator<FwdIter1, bool*> zip_iterator;
+            typedef hpx::util::zip_iterator<FwdIter2, zip_iterator> f3_result;
+            typedef util::detail::algorithm_result<
+                ExPolicy, FwdIter2
+            > algorithm_result;
+            typedef typename std::iterator_traits<FwdIter1>::difference_type
+                difference_type;
+
+            difference_type count = std::distance(first, last);
+
+            if (count == 0)
+                return algorithm_result::get(std::move(dest));
+
+            *dest++ = *first;
+
+            if (count == 1)
+                return algorithm_result::get(std::move(dest));
+
+            boost::shared_array<bool> flags(new bool[count - 1]);
+            std::size_t init = 0;
+
+            using hpx::util::get;
+            using hpx::util::make_zip_iterator;
+            typedef util::scan_partitioner<
+                    ExPolicy, FwdIter2, std::size_t, f3_result
+                > scan_partitioner_type;
+
+            auto f1 =
+                [pred, proj, flags, policy]
+                (
+                    zip_iterator part_begin, std::size_t part_size
+                )   -> std::size_t
+                {
+                    HPX_UNUSED(flags);
+                    HPX_UNUSED(policy);
+
+                    FwdIter1 base = get<0>(part_begin.get_iterator_tuple());
+                    std::size_t curr = 0;
+
+                    // MSVC complains if pred or proj is captured by ref below
+                    util::loop_n<ExPolicy>(
+                        ++part_begin, part_size,
+                        [base, pred, proj, &curr](zip_iterator it) mutable
+                        {
+                            using hpx::util::invoke;
+
+                            bool f = invoke(pred,
+                                invoke(proj, *base),
+                                invoke(proj, get<0>(*it)));
+
+                            if (!(get<1>(*it) = f))
+                            {
+                                base = get<0>(it.get_iterator_tuple());
+                                ++curr;
+                            }
+                        });
+
+                    return curr;
+                };
+            auto f3 =
+                [dest, flags, policy](
+                    zip_iterator part_begin, std::size_t part_size,
+                    hpx::shared_future<std::size_t> curr,
+                    hpx::shared_future<std::size_t> next
+                ) mutable -> f3_result
+                {
+                    HPX_UNUSED(flags);
+                    HPX_UNUSED(policy);
+
+                    next.get();     // rethrow exceptions
+
+                    std::advance(dest, curr.get());
+                    util::loop_n<ExPolicy>(
+                        ++part_begin, part_size - 1,
+                        [&dest](zip_iterator it) mutable
+                        {
+                            if (!get<1>(*it))
+                                *dest++ = std::move(get<0>(*it));
+                        });
+
+                    return make_zip_iterator(dest,
+                        std::next(part_begin, part_size - 1));
+                };
+
+            return scan_partitioner_type::call(
+                std::forward<ExPolicy>(policy),
+                make_zip_iterator(first, flags.get() - 1),
+                count - 1, init,
+                // step 1 performs first part of scan algorithm
+                std::move(f1),
+                // step 2 propagates the partition results from left
+                // to right
+                hpx::util::unwrapping(std::plus<std::size_t>()),
+                // step 3 runs final accumulation on each partition
+                std::move(f3),
+                // step 4 use this return value
+                [first, last, flags, count](
+                    std::vector<hpx::shared_future<std::size_t> > &&,
+                    std::vector<hpx::future<f3_result> > && fitems) mutable
+                ->  FwdIter2
+                {
+                    HPX_UNUSED(flags);
+
+                    for (auto fitems_iter = std::begin(fitems);
+                        fitems_iter != std::end(fitems) - 1;
+                        ++fitems_iter)
+                    {
+                        f3_result result = fitems_iter->get();
+                        FwdIter2 dest = get<0>(result.get_iterator_tuple());
+                        zip_iterator it = get<1>(result.get_iterator_tuple());
+
+                        if (!get<1>(*it))
+                            *dest = std::move(get<0>(*it));
+                    }
+
+                    f3_result result = fitems.back().get();
+                    FwdIter2 dest = get<0>(result.get_iterator_tuple());
+                    zip_iterator it = get<1>(result.get_iterator_tuple());
+
+                    if (!get<1>(*it))
+                        *dest++ = std::move(get<0>(*it));
+
+                    return dest;
+                });
+        }
+
         template <typename Iter>
         struct unique : public detail::algorithm<unique<Iter>, Iter>
         {
@@ -440,8 +572,6 @@ namespace hpx { namespace parallel { inline namespace v1
                         typedef typename std::iterator_traits<FwdIter>::value_type
                             value_type;
 
-                        using hpx::util::get;
-
                         difference_type count = std::distance(first, last);
 
                         std::vector<value_type> temp;
@@ -450,14 +580,12 @@ namespace hpx { namespace parallel { inline namespace v1
                         for(auto it = first; it != last; ++it)
                             temp.push_back(std::move(*it));
 
-                        auto unique_copy_result =
-                            unique_copy_helper(
+                        return hpx::util::unwrap(
+                            unique_helper(
                                 std::forward<ExPolicy>(policy),
                                 std::begin(temp), std::end(temp), first,
                                 std::forward<Pred>(pred),
-                                std::forward<Proj>(proj));
-
-                        return get<1>(hpx::util::unwrap(unique_copy_result));
+                                std::forward<Proj>(proj)));
                     });
 
                 return algorithm_result::get(std::move(result));
@@ -526,7 +654,7 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \note The type of dereferenced \a FwdIter must meet the requirements
-    ///       of \a CopyAssignable and \a MoveConstructible if the execution
+    ///       of \a MoveAssignable and \a MoveConstructible if the execution
     ///       policy implies parallel execution, and must meet the
     ///       requirements of \a MoveAssignable otherwise.
     ///

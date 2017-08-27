@@ -185,7 +185,7 @@ namespace hpx { namespace parallel { inline namespace v1
     /// within each thread.
     ///
     /// \note The type of dereferenced \a FwdIter must meet the requirements
-    ///       of \a CopyAssignable and \a MoveConstructible if the execution
+    ///       of \a MoveAssignable and \a MoveConstructible if the execution
     ///       policy implies parallel execution, and must meet the
     ///       requirements of \a MoveAssignable otherwise.
     ///
