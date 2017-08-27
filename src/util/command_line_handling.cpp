@@ -1044,12 +1044,12 @@ namespace hpx { namespace util
         if(vm_.count("hpx:attach-debugger"))
         {
             std::string option = vm_["hpx:attach-debugger"].as<std::string>();
-            if (option != "startup" && option != "exception" &&
-                option != "test-failure") {
+            if (option != "off" && option != "startup" &&
+                option != "exception" && option != "test-failure") {
                 std::cerr <<
                     "hpx::init: command line warning: --hpx:attach-debugger: "
                     "invalid option: " << option << ". Allowed values are "
-                    "'startup', 'exception' or 'test-failure'" << std::endl;
+                    "'off', 'startup', 'exception' or 'test-failure'" << std::endl;
             }
             else {
                 if (option == "startup")
