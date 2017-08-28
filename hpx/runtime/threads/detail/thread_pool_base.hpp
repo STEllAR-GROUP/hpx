@@ -231,7 +231,7 @@ namespace hpx { namespace threads { namespace detail
         ///////////////////////////////////////////////////////////////////////
         virtual bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown)
+            thread_state_enum state = unknown) const
         {
             return false;
         }
