@@ -571,8 +571,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (count < 2)
                     return algorithm_result::get(std::move(last));
 
-                boost::shared_array<bool> flags(new bool[count - 1]);
+                boost::shared_array<bool> flags(new bool[count]);
                 std::size_t init = 0;
+
+                flags[0] = false;
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
@@ -615,9 +617,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     };
 
                 std::shared_ptr<FwdIter> dest_ptr =
-                    std::make_shared<FwdIter>(std::next(first));
+                    std::make_shared<FwdIter>(first);
                 auto f3 =
-                    [first, dest_ptr, flags, policy](
+                    [dest_ptr, flags, policy](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
                         hpx::shared_future<std::size_t> next
@@ -631,7 +633,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         FwdIter& dest = *dest_ptr;
 
                         util::loop_n<ExPolicy>(
-                            ++part_begin, part_size,
+                            part_begin, part_size,
                             [&dest](zip_iterator it) mutable
                             {
                                 if(!get<1>(*it)) {
@@ -642,7 +644,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 return scan_partitioner_type::call(
                     std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first, flags.get() - 1),
+                    make_zip_iterator(first, flags.get()),
                     count - 1, init,
                     // step 1 performs first part of scan algorithm
                     std::move(f1),
@@ -652,12 +654,16 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [dest_ptr, flags](
+                    [dest_ptr, first, count, flags](
                         std::vector<hpx::shared_future<std::size_t> > &&,
                         std::vector<hpx::future<void> > &&) mutable
                     ->  FwdIter
                     {
-                        HPX_UNUSED(flags);
+                        if (!flags[count - 1])
+                        {
+                            std::advance(first, count - 1);
+                            *(*dest_ptr)++ = std::move(*first);
+                        }
                         return *dest_ptr;
                     });
             }
