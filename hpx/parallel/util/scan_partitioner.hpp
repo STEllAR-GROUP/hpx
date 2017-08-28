@@ -249,7 +249,7 @@ namespace hpx { namespace parallel { namespace util
                     }
                     else
                     {
-                        auto const& elem = *shape_iter++;
+                        auto elem = *shape_iter++;
                         FwdIter it = hpx::util::get<0>(elem);
                         std::size_t size = hpx::util::get<1>(elem);
 
@@ -265,7 +265,7 @@ namespace hpx { namespace parallel { namespace util
                          shape_iter != std::end(shape);
                          ++shape_iter, ++widx)
                     {
-                        auto const& elem = *shape_iter;
+                        auto elem = *shape_iter;
                         FwdIter it = hpx::util::get<0>(elem);
                         std::size_t size = hpx::util::get<1>(elem);
 
