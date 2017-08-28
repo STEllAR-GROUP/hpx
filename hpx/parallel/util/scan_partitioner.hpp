@@ -96,8 +96,6 @@ namespace hpx { namespace parallel { namespace util
 
                     // schedule every chunk on a separate thread
                     std::size_t size = hpx::util::size(shape);
-                    workitems.reserve(size + 1);
-                    finalitems.reserve(size);
 
                     // If the size of count was enough to warrant testing for a
                     // chunk, pre-initialize second intermediate result and
@@ -106,12 +104,20 @@ namespace hpx { namespace parallel { namespace util
                     {
                         HPX_ASSERT(count_ > count);
 
+                        workitems.reserve(size + 2);
+                        finalitems.reserve(size + 1);
+
                         hpx::shared_future<Result1> curr = workitems[1];
                         finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, first_, count_ - count, workitems[0], curr));
 
                         workitems[1] = dataflow(hpx::launch::sync,
                             f2, workitems[0], curr);
+                    }
+                    else
+                    {
+                        workitems.reserve(size + 1);
+                        finalitems.reserve(size);
                     }
 
                     // Schedule first step of scan algorithm, step 2 is
@@ -206,17 +212,23 @@ namespace hpx { namespace parallel { namespace util
 
                     // schedule every chunk on a separate thread
                     std::size_t size = hpx::util::size(shape);
-                    workitems.reserve(size + 1);
-                    //finalitems.reserve(size);
 
                     // If the size of count was enough to warrant testing for a
                     // chunk, pre-initialize second intermediate result.
                     if (workitems.size() == 2)
                     {
+                        workitems.reserve(size + 2);
+                        finalitems.reserve(size + 1);
+
                         hpx::shared_future<Result1> curr = workitems[1];
                         workitems[1] = dataflow(hpx::launch::sync,
                             f2, workitems[0], curr);
                         tested = true;
+                    }
+                    else
+                    {
+                        workitems.reserve(size + 1);
+                        finalitems.reserve(size);
                     }
 
                     // Schedule first step of scan algorithm, step 2 is
