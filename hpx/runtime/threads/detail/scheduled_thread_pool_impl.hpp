@@ -66,20 +66,23 @@ namespace hpx { namespace threads { namespace detail
                 std::size_t pool_thread_num, std::size_t offset)
           : pool_(pool)
           , thread_num_(pool_thread_num)
+          , thread_manager_(nullptr)
         {
             pool.notifier_.on_start_thread(pool_thread_num);
-            threads::get_thread_manager().init_tss(pool_thread_num + offset);
+            thread_manager_ = &threads::get_thread_manager();
+            thread_manager_->init_tss(pool_thread_num + offset);
             pool.sched_->Scheduler::on_start_thread(pool_thread_num);
         }
         ~init_tss_helper()
         {
             pool_.sched_->Scheduler::on_stop_thread(thread_num_);
-            threads::get_thread_manager().deinit_tss();
+            thread_manager_->deinit_tss();
             pool_.notifier_.on_stop_thread(thread_num_);
         }
 
         scheduled_thread_pool<Scheduler>& pool_;
         std::size_t thread_num_;
+        threadmanager* thread_manager_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
