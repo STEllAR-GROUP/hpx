@@ -44,24 +44,43 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-struct heavy_type
+struct vector_type
 {
-    heavy_type() = default;
-    heavy_type(int rand_no)
+    vector_type() = default;
+    vector_type(int rand_no)
     {
         vec_.reserve(vec_size_);
         for (std::size_t i = 0u; i < vec_size_; ++i)
             vec_.push_back(rand_no);
     }
 
-    bool operator==(heavy_type const & t) const
+    bool operator==(vector_type const & t) const
     {
         return std::equal(std::begin(vec_), std::end(vec_),
             std::begin(t.vec_), std::end(t.vec_));
     }
 
     std::vector<int> vec_;
-    static const std::size_t vec_size_{ 50 };
+    static const std::size_t vec_size_{ 30 };
+};
+
+struct array_type
+{
+    array_type() = default;
+    array_type(int rand_no)
+    {
+        for (std::size_t i = 0u; i < arr_size_; ++i)
+            arr_[i] = rand_no;
+    }
+
+    bool operator==(array_type const & t) const
+    {
+        return std::equal(std::begin(arr_), std::end(arr_),
+            std::begin(t.arr_), std::end(t.arr_));
+    }
+
+    static const std::size_t arr_size_{ 30 };
+    std::array<int, arr_size_> arr_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,12 +189,15 @@ void run_benchmark(std::size_t vector_size, int test_count,
     std::size_t random_range,
     IteratorTag iterator_tag, std::string const& data_type_str)
 {
-    if (data_type_str == "light")
+    if (data_type_str == "int")
         run_benchmark(vector_size, test_count, random_range,
             iterator_tag, int());
-    else // heavy
+    else if (data_type_str == "vector")
         run_benchmark(vector_size, test_count, random_range,
-            iterator_tag, heavy_type());
+            iterator_tag, vector_type());
+    else // array
+        run_benchmark(vector_size, test_count, random_range,
+            iterator_tag, array_type());
 }
 
 void run_benchmark(std::size_t vector_size, int test_count,
@@ -206,9 +228,10 @@ std::string correct_iterator_tag_str(std::string const& iterator_tag)
 
 std::string correct_data_type_str(std::string const& data_type)
 {
-    if (data_type != "light" &&
-        data_type != "heavy")
-        return "light";
+    if (data_type != "int" &&
+        data_type != "vector" &&
+        data_type != "array")
+        return "int";
     else
         return data_type;
 }
@@ -270,7 +293,7 @@ int main(int argc, char* argv[])
             "the kind of iterator tag (random/bidirectional/forward)")
         ("data_type",
             boost::program_options::value<std::string>()->default_value("light"),
-            "the kind of data type (light/heavy)")
+            "the kind of data type (int/vector/array)")
         ("test_count",
             boost::program_options::value<int>()->default_value(10),
             "number of tests to be averaged (default: 10)")
