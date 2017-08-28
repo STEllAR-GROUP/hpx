@@ -166,7 +166,7 @@ namespace hpx { namespace parallel { inline namespace v1
                                 [&dest](zip_iterator it)
                                 {
                                     if(!get<1>(*it))
-                                    { 
+                                    {
                                         if (dest != get<0>(it.get_iterator_tuple()))
                                             *dest++ = std::move(get<0>(*it));
                                         else

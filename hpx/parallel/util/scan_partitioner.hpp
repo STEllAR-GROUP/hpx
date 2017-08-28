@@ -234,7 +234,7 @@ namespace hpx { namespace parallel { namespace util
                         workitems.push_back(dataflow(hpx::launch::sync,
                             f2, prev, curr));
                     }
-                    
+
                     // In the code below, performs step 3 sequentially.
                     auto shape_iter = std::begin(shape);
 

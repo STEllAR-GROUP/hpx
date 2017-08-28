@@ -17,12 +17,13 @@
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
 
+#include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
-#include <vector>
-#include <algorithm>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "test_utils.hpp"
 
