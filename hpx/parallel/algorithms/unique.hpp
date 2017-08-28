@@ -158,13 +158,33 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         FwdIter& dest = *dest_ptr;
 
-                        util::loop_n<ExPolicy>(
-                            part_begin, part_size,
-                            [&dest](zip_iterator it) mutable
-                            {
-                                if(!get<1>(*it))
-                                    *dest++ = std::move(get<0>(*it));
-                            });
+                        if (dest == get<0>(part_begin.get_iterator_tuple()))
+                        {
+                            // Self-assignment must be detected.
+                            util::loop_n<ExPolicy>(
+                                part_begin, part_size,
+                                [&dest](zip_iterator it)
+                                {
+                                    if(!get<1>(*it))
+                                    { 
+                                        if (dest != get<0>(it.get_iterator_tuple()))
+                                            *dest++ = std::move(get<0>(*it));
+                                        else
+                                            ++dest;
+                                    }
+                                });
+                        }
+                        else
+                        {
+                            // Self-assignment can't be performed.
+                            util::loop_n<ExPolicy>(
+                                part_begin, part_size,
+                                [&dest](zip_iterator it)
+                                {
+                                    if(!get<1>(*it))
+                                        *dest++ = std::move(get<0>(*it));
+                                });
+                        }
                     };
 
                 return scan_partitioner_type::call(
@@ -196,7 +216,10 @@ namespace hpx { namespace parallel { inline namespace v1
                         if (!flags[count - 1])
                         {
                             std::advance(first, count - 1);
-                            *(*dest_ptr)++ = std::move(*first);
+                            if (first != (*dest_ptr))
+                                *(*dest_ptr)++ = std::move(*first);
+                            else
+                                ++(*dest_ptr);
                         }
                         return *dest_ptr;
                     });
