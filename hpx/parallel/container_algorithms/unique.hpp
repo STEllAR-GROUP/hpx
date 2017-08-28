@@ -184,11 +184,6 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note The type of dereferenced \a FwdIter must meet the requirements
-    ///       of \a MoveAssignable and \a MoveConstructible if the execution
-    ///       policy implies parallel execution, and must meet the
-    ///       requirements of \a MoveAssignable otherwise.
-    ///
     /// \returns  The \a unique algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and

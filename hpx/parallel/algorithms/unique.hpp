@@ -559,36 +559,107 @@ namespace hpx { namespace parallel { inline namespace v1
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 Pred && pred, Proj && proj)
             {
+                typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
                 typedef util::detail::algorithm_result<
                     ExPolicy, FwdIter
                 > algorithm_result;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
-                hpx::future<FwdIter> result = execution::async_execute(
-                    policy.executor(),
-                    [&policy, &pred, &proj, first, last]() -> FwdIter
+                difference_type count = std::distance(first, last);
+
+                if (count < 2)
+                    return algorithm_result::get(std::move(last));
+
+                boost::shared_array<bool> flags(new bool[count - 1]);
+                std::size_t init = 0;
+
+                using hpx::util::get;
+                using hpx::util::make_zip_iterator;
+                typedef util::scan_partitioner<
+                        ExPolicy, FwdIter, std::size_t, void,
+                        util::scan_partitioner_sequential_f3_tag
+                    > scan_partitioner_type;
+
+                auto f1 =
+                    [pred, proj, flags, policy]
+                    (
+                       zip_iterator part_begin, std::size_t part_size
+                    )   -> std::size_t
                     {
-                        typedef typename std::iterator_traits<FwdIter>::difference_type
-                            difference_type;
-                        typedef typename std::iterator_traits<FwdIter>::value_type
-                            value_type;
+                        HPX_UNUSED(flags);
+                        HPX_UNUSED(policy);
 
-                        difference_type count = std::distance(first, last);
+                        FwdIter base = get<0>(part_begin.get_iterator_tuple());
+                        std::size_t curr = 0;
 
-                        std::vector<value_type> temp;
-                        temp.reserve(count);
-                
-                        for(auto it = first; it != last; ++it)
-                            temp.push_back(std::move(*it));
+                        // MSVC complains if pred or proj is captured by ref below
+                        util::loop_n<ExPolicy>(
+                            ++part_begin, part_size,
+                            [base, pred, proj, &curr](zip_iterator it) mutable
+                            {
+                                using hpx::util::invoke;
 
-                        return hpx::util::unwrap(
-                            unique_helper(
-                                std::forward<ExPolicy>(policy),
-                                std::begin(temp), std::end(temp), first,
-                                std::forward<Pred>(pred),
-                                std::forward<Proj>(proj)));
+                                bool f = invoke(pred,
+                                    invoke(proj, *base),
+                                    invoke(proj, get<0>(*it)));
+
+                                if (!(get<1>(*it) = f))
+                                {
+                                    base = get<0>(it.get_iterator_tuple());
+                                    ++curr;
+                                }
+                            });
+
+                        return curr;
+                    };
+
+                std::shared_ptr<FwdIter> dest_ptr =
+                    std::make_shared<FwdIter>(std::next(first));
+                auto f3 =
+                    [first, dest_ptr, flags, policy](
+                        zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<std::size_t> curr,
+                        hpx::shared_future<std::size_t> next
+                    ) mutable -> void
+                    {
+                        HPX_UNUSED(flags);
+                        HPX_UNUSED(policy);
+
+                        next.get();     // rethrow exceptions
+
+                        FwdIter& dest = *dest_ptr;
+
+                        util::loop_n<ExPolicy>(
+                            ++part_begin, part_size,
+                            [&dest](zip_iterator it) mutable
+                            {
+                                if(!get<1>(*it)) {
+                                    *dest++ = std::move(get<0>(*it));
+                                }
+                            });
+                    };
+
+                return scan_partitioner_type::call(
+                    std::forward<ExPolicy>(policy),
+                    make_zip_iterator(first, flags.get() - 1),
+                    count - 1, init,
+                    // step 1 performs first part of scan algorithm
+                    std::move(f1),
+                    // step 2 propagates the partition results from left
+                    // to right
+                    hpx::util::unwrapping(std::plus<std::size_t>()),
+                    // step 3 runs final accumulation on each partition
+                    std::move(f3),
+                    // step 4 use this return value
+                    [dest_ptr, flags](
+                        std::vector<hpx::shared_future<std::size_t> > &&,
+                        std::vector<hpx::future<void> > &&) mutable
+                    ->  FwdIter
+                    {
+                        HPX_UNUSED(flags);
+                        return *dest_ptr;
                     });
-
-                return algorithm_result::get(std::move(result));
             }
         };
         /// \endcond
@@ -652,11 +723,6 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
-    ///
-    /// \note The type of dereferenced \a FwdIter must meet the requirements
-    ///       of \a MoveAssignable and \a MoveConstructible if the execution
-    ///       policy implies parallel execution, and must meet the
-    ///       requirements of \a MoveAssignable otherwise.
     ///
     /// \returns  The \a unique algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
