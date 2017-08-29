@@ -1253,7 +1253,6 @@ namespace threads {
                             hp_victim_queues_[i]);
                         debug::output("hp_xnuma_queues " + std::string(buff) + " ",
                             hp_xnuma_queues_[i]);
-                        i++;
                     }
                 }
             }

@@ -200,9 +200,9 @@ int hpx_main(boost::program_options::variables_map& vm)
               << std::endl;
     thread_set.clear();
 
-    auto high_priority_async_policy =
-        hpx::launch::async_policy(hpx::threads::thread_priority_critical);
-    auto normal_priority_async_policy = hpx::launch::async_policy();
+//     auto high_priority_async_policy =
+//         hpx::launch::async_policy(hpx::threads::thread_priority_critical);
+//     auto normal_priority_async_policy = hpx::launch::async_policy();
 
     // test a parallel algorithm on custom pool with high priority
     hpx::parallel::for_loop_strided(
