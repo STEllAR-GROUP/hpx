@@ -26,6 +26,7 @@
 
 #include <boost/atomic.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -38,7 +39,7 @@
 #include <vector>
 
 #if !defined(HPX_MSVC)
-static std::chrono::steady_clock::time_point log_t_start =
+static std::chrono::high_resolution_clock::time_point log_t_start =
     std::chrono::high_resolution_clock::now();
 
 #define LOG_CUSTOM_WORKER(x)                                                   \
