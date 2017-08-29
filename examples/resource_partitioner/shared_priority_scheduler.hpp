@@ -38,15 +38,15 @@
 #include <vector>
 
 #if !defined(HPX_MSVC)
-static std::chrono::system_clock::time_point log_t_start =
+static std::chrono::steady_clock::time_point log_t_start =
     std::chrono::high_resolution_clock::now();
 
 #define LOG_CUSTOM_WORKER(x)                                                   \
     dummy << "<CUSTOM> " << THREAD_ID << " time " << decimal(16) << nowt       \
           << ' ';                                                              \
-    if (parent_pool_)                                                           \
+    if (parent_pool_)                                                          \
         dummy << "pool " << std::setfill(' ') << std::setw(8)                  \
-              << parent_pool_->get_pool_name() << " " << x << std::endl;        \
+              << parent_pool_->get_pool_name() << " " << x << std::endl;       \
     else                                                                       \
         dummy << "pool (unset) " << x << std::endl;                            \
     std::cout << dummy.str().c_str();
