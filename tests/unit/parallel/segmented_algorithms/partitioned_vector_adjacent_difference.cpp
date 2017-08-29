@@ -12,27 +12,49 @@
 
 #include <cstddef>
 #include <vector>
+#include <iostream>
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(double);
 HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
+
+struct op
+{
+    template <typename T>
+    T operator()(const T &curr, const T &prev) const
+    {
+        return curr;
+    }
+};
+
 template <typename ExPolicy, typename T>
 void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
     T const& val)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
-
     std::size_t size = 0;
-
     const_iterator end = v.end();
-    for (const_iterator it = std::next(v.begin()); it != end; ++it, ++size)
+    for (const_iterator it = v.begin(); it != end; ++it, ++size)
     {
         HPX_TEST_EQ(*it, val);
     }
+    HPX_TEST_EQ(size, v.size());
+}
 
-    HPX_TEST_EQ(++size, v.size());
+template <typename ExPolicy, typename T>
+void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v)
+{
+    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
+    std::size_t size = 0;
+    T val = 1;
+    const_iterator end = v.end();
+    for (const_iterator it = v.begin(); it != end; ++it, ++size)
+    {
+        HPX_TEST_EQ(*it, val++);
+    }
+    HPX_TEST_EQ(size, v.size());
 }
 
 template <typename ExPolicy, typename T>
@@ -40,8 +62,9 @@ void test_adjacent_difference(ExPolicy && policy, hpx::partitioned_vector<T>& v,
     hpx::partitioned_vector<T>& w, T val)
 {
     hpx::parallel::adjacent_difference(policy, v.begin(), v.end(), w.begin());
-
     verify_values(policy, w, val);
+    hpx::parallel::adjacent_difference(policy, v.begin(), v.end(), w.begin(), op());
+    verify_values(policy, v);
 }
 
 template <typename ExPolicy, typename T>
@@ -50,8 +73,10 @@ void test_adjacent_difference_async(ExPolicy && policy, hpx::partitioned_vector<
 {
     hpx::parallel::adjacent_difference(policy, v.begin(), v.end(),
         w.begin()).get();
-
     verify_values(policy, w, val);
+    hpx::parallel::adjacent_difference(policy, v.begin(), v.end(),
+        w.begin(), op()).get();
+    verify_values(policy, w);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,34 +84,18 @@ template <typename T>
 void adjacent_difference_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const length = 12;
-
-    {
-        hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
-        hpx::partitioned_vector<T> w(length,hpx::container_layout(localities));
-        test_adjacent_difference(hpx::parallel::execution::seq, v, w, T(0));
-        test_adjacent_difference(hpx::parallel::execution::par, v, w, T(0));
-        test_adjacent_difference_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v, w, T(0));
-        test_adjacent_difference_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v, w, T(0));
-    }
-
-    {
-        hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
-        hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, v.begin(),
-            v.end(), v.begin());
-        hpx::partitioned_vector<T> w(length,hpx::container_layout(localities));
-        test_adjacent_difference(hpx::parallel::execution::seq, v, w, T(1));
-        test_adjacent_difference(hpx::parallel::execution::par, v, w, T(1));
-        test_adjacent_difference_async(
-            hpx::parallel::execution::seq(hpx::parallel::execution::task),
-            v, w, T(1));
-        test_adjacent_difference_async(
-            hpx::parallel::execution::par(hpx::parallel::execution::task),
-            v, w, T(1));
-    }
+    hpx::partitioned_vector<T> v(length,T(1),hpx::container_layout(localities));
+    hpx::parallel::inclusive_scan(hpx::parallel::execution::seq, v.begin(),
+        v.end(), v.begin());
+    hpx::partitioned_vector<T> w(length,hpx::container_layout(localities));
+    test_adjacent_difference(hpx::parallel::execution::seq, v, w, T(1));
+    test_adjacent_difference(hpx::parallel::execution::par, v, w, T(1));
+    test_adjacent_difference_async(
+        hpx::parallel::execution::seq(hpx::parallel::execution::task),
+        v, w, T(1));
+    test_adjacent_difference_async(
+        hpx::parallel::execution::par(hpx::parallel::execution::task),
+        v, w, T(1));
 }
 ///////////////////////////////////////////////////////////////////////////////
 

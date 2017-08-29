@@ -83,7 +83,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     }
                 }
                 FwdIter ending = traits::compose(sit, std::prev(end));
-                if(hpx::util::invoke(op, *ending, *std::next(ending)) && !found)
+                if(!found && hpx::util::invoke(op, *ending, *std::next(ending)))
                 {
                     found = true;
                     output = traits::compose(sit, std::prev(end));

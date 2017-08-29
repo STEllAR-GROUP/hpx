@@ -119,7 +119,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            std::vector<shared_future<bool> > segments;
+            std::vector<future<bool> > segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    [=](std::vector<shared_future<bool> > && r)
+                    [=](std::vector<future<bool> > && r)
                         ->  bool
                     {
                         // handle any remote exceptions, will throw on error
@@ -181,14 +181,12 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
                         std::vector<bool> res =
                             hpx::util::unwrap(std::move(r));
-                        auto it = res.begin();
-                        while (it != res.end())
-                        {
-                            if(*it == false)
-                                return false;
-                            it++;
-                        }
-                        return true;
+                        return std::none_of(res.begin(), res.end(),
+                                [](bool a) -> bool
+                                {
+                                    return !a;
+                                }
+                            );
                     },
                     std::move(segments)));
         }
@@ -302,7 +300,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            std::vector<shared_future<bool> > segments;
+            std::vector<future<bool> > segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -354,7 +352,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    [=](std::vector<shared_future<bool> > && r)
+                    [=](std::vector<future<bool> > && r)
                         ->  bool
                     {
                         // handle any remote exceptions, will throw on error
@@ -364,14 +362,12 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
                         std::vector<bool> res =
                             hpx::util::unwrap(std::move(r));
-                        auto it = res.begin();
-                        while (it != res.end())
-                        {
-                            if(*it == true)
-                                return true;
-                            it++;
-                        }
-                        return false;
+                        return std::any_of(res.begin(), res.end(),
+                                [](bool a) -> bool
+                                {
+                                    return a;
+                                }
+                            );
                     },
                     std::move(segments)));
         }
@@ -485,7 +481,7 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            std::vector<shared_future<bool> > segments;
+            std::vector<future<bool> > segments;
             segments.reserve(std::distance(sit, send));
 
             if (sit == send)
@@ -537,7 +533,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return result::get(
                 dataflow(
-                    [=](std::vector<shared_future<bool> > && r)
+                    [=](std::vector<future<bool> > && r)
                         ->  bool
                     {
                         // handle any remote exceptions, will throw on error
@@ -547,14 +543,12 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::call(r, errors);
                         std::vector<bool> res =
                             hpx::util::unwrap(std::move(r));
-                        auto it = res.begin();
-                        while (it != res.end())
-                        {
-                            if(*it == false)
-                                return false;
-                            it++;
-                        }
-                        return true;
+                        return std::all_of(res.begin(), res.end(),
+                                [](bool a) -> bool
+                                {
+                                    return a;
+                                }
+                            );
                     },
                     std::move(segments)));
         }
