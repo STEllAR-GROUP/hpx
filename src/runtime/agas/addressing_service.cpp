@@ -1905,7 +1905,6 @@ bool addressing_service::get_cache_entry(
     {
         return false;
     }
-    HPX_ASSERT(hpx::threads::get_self_ptr());
     gva_cache_key k(gid);
     gva_cache_key idbase_key;
 
