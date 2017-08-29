@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/util/find_prefix.hpp>
 
 #include <boost/program_options.hpp>
 
