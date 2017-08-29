@@ -46,10 +46,16 @@ namespace hpx
         class abstract_simple_component_base;
 
         template <typename Component = detail::this_type>
-        class simple_component_base;
+        class component_base;
 
         template <typename Component>
-        class simple_component;
+        class component;
+
+        template <typename Component>
+        using simple_component = component<Component>;
+
+        template <typename Component>
+        using simple_component_base = component_base<Component>;
 
         template <typename Component, typename Derived = detail::this_type>
         class abstract_managed_component_base;

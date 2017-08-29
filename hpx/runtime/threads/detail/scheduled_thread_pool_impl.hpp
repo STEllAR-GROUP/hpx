@@ -66,20 +66,23 @@ namespace hpx { namespace threads { namespace detail
                 std::size_t pool_thread_num, std::size_t offset)
           : pool_(pool)
           , thread_num_(pool_thread_num)
+          , thread_manager_(nullptr)
         {
             pool.notifier_.on_start_thread(pool_thread_num);
-            threads::get_thread_manager().init_tss(pool_thread_num + offset);
+            thread_manager_ = &threads::get_thread_manager();
+            thread_manager_->init_tss(pool_thread_num + offset);
             pool.sched_->Scheduler::on_start_thread(pool_thread_num);
         }
         ~init_tss_helper()
         {
             pool_.sched_->Scheduler::on_stop_thread(thread_num_);
-            threads::get_thread_manager().deinit_tss();
+            thread_manager_->deinit_tss();
             pool_.notifier_.on_stop_thread(thread_num_);
         }
 
         scheduled_thread_pool<Scheduler>& pool_;
         std::size_t thread_num_;
+        threadmanager* thread_manager_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -563,6 +566,7 @@ namespace hpx { namespace threads { namespace detail
 
         return executed_threads - reset_executed_threads;
     }
+#endif
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_executed_threads() const
@@ -583,6 +587,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
     }
 
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_executed_thread_phases(
         std::size_t num, bool reset)
@@ -618,6 +623,7 @@ namespace hpx { namespace threads { namespace detail
 
         return executed_phases - reset_executed_phases;
     }
+#endif
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
     template <typename Scheduler>
@@ -1392,5 +1398,3 @@ namespace hpx { namespace threads { namespace detail
         resource::get_partitioner().unassign_pu(id_.name(), virt_core);
     }
 }}}
-
-#endif

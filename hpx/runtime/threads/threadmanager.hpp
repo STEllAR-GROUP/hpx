@@ -2,12 +2,11 @@
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c)      2017 Shoshana Jakobovits
-//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_IMPL_HPP)
-#define HPX_THREADMANAGER_IMPL_HPP
+#if !defined(HPX_THREADMANAGER_HPP)
+#define HPX_THREADMANAGER_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/compat/barrier.hpp>
@@ -21,7 +20,6 @@
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/io_service_pool.hpp>
