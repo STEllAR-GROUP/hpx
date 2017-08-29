@@ -48,6 +48,8 @@ namespace hpx { namespace resource { namespace detail
         boost::program_options::options_description desc_cmdline(
             std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
 
+        util::set_hpx_prefix(HPX_PREFIX);
+
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::vector<std::string>(),
             rpmode, mode, check);
@@ -61,6 +63,8 @@ namespace hpx { namespace resource { namespace detail
         boost::program_options::options_description desc_cmdline(
             std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
 
+        util::set_hpx_prefix(HPX_PREFIX);
+
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::move(ini_config),
             rpmode, mode, check);
@@ -73,6 +77,8 @@ namespace hpx { namespace resource { namespace detail
         resource::partitioner_mode rpmode = resource::mode_default,
         runtime_mode mode = runtime_mode_default, bool check = true)
     {
+        util::set_hpx_prefix(HPX_PREFIX);
+
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::vector<std::string>(),
             rpmode, mode, check);
@@ -84,6 +90,8 @@ namespace hpx { namespace resource { namespace detail
         resource::partitioner_mode rpmode = resource::mode_default,
         runtime_mode mode = runtime_mode_default, bool check = true)
     {
+        util::set_hpx_prefix(HPX_PREFIX);
+
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode,
             check);

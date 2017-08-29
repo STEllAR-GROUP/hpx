@@ -7,6 +7,8 @@ set(tests
     resource_partitioner
 )
 
+set(resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
