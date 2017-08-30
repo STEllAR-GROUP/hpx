@@ -8,8 +8,6 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <cstddef>
 #include <iostream>
 #include <iterator>

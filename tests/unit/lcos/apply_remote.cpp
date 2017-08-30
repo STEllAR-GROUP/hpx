@@ -9,8 +9,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 #include <mutex>
 #include <vector>
@@ -29,7 +28,7 @@ void receive_result(std::int32_t i)
 HPX_PLAIN_ACTION(receive_result);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::int32_t> accumulator;
+std::atomic<std::int32_t> accumulator;
 
 void increment(hpx::id_type const& there, std::int32_t i)
 {

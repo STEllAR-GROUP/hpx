@@ -390,6 +390,14 @@ macro(hpx_check_for_cxx11_std_array)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_atomic)
+  add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
+    SOURCE cmake/tests/cxx11_std_atomic.cpp
+    LIBRARIES "-latomic"
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_chrono)
   add_hpx_config_test(HPX_WITH_CXX11_CHRONO
     SOURCE cmake/tests/cxx11_std_chrono.cpp

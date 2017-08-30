@@ -16,9 +16,9 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/program_options.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <iosfwd>
 #include <string>
@@ -200,7 +200,7 @@ namespace hpx { namespace resource { namespace detail
 
         ////////////////////////////////////////////////////////////////////////
         // counter for instance numbers
-        static boost::atomic<int> instance_number_counter_;
+        static std::atomic<int> instance_number_counter_;
 
         // holds all of the command line switches
         util::command_line_handling cfg_;

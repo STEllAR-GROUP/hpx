@@ -10,8 +10,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -273,7 +272,7 @@ int hpx_main()
             hpx::async(policy1, hpx::util::bind(&increment, _1), 42);
         HPX_TEST_EQ(f2.get(), 43);
 
-        boost::atomic<int> count(0);
+        std::atomic<int> count(0);
         auto policy2 =
             hpx::launch::select([&count]() -> hpx::launch
             {

@@ -16,9 +16,9 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -80,8 +80,8 @@ struct HPX_EXPORT symbol_namespace
               , time_(0)
             {}
 
-            boost::atomic<std::int64_t> count_;
-            boost::atomic<std::int64_t> time_;
+            std::atomic<std::int64_t> count_;
+            std::atomic<std::int64_t> time_;
         };
 
         counter_data()

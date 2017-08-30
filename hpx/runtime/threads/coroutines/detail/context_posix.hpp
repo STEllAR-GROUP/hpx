@@ -47,8 +47,6 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/atomic.hpp>
-
 #if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) \
             && _XOPEN_VERSION >= 500)
 
@@ -162,6 +160,7 @@ namespace posix { namespace ucontext
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
 #include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <atomic>
 #include <signal.h>                 // SIGSTKSZ
 
 namespace hpx { namespace threads { namespace coroutines
@@ -335,7 +334,7 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
 
-            typedef boost::atomic<std::int64_t> counter_type;
+            typedef std::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_unbind_counter()
             {

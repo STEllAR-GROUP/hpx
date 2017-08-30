@@ -10,12 +10,11 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <utility>
 
-#include <boost/atomic.hpp>
-
-boost::atomic<bool> was_run(false);
+std::atomic<bool> was_run(false);
 
 void do_more_work()
 {

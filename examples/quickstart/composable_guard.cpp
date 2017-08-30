@@ -4,7 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #include <hpx/lcos/local/composable_guard.hpp>
 #include <hpx/hpx_init.hpp>
-#include <boost/atomic.hpp>
+
+#include <atomic>
 #include <iostream>
 #include <memory>
 
@@ -27,7 +28,7 @@
 // To use guards, call the run_guarded() method, supplying it with
 // a guard or guard set, and a task to be performed.
 
-typedef boost::atomic<int> int_atomic;
+typedef std::atomic<int> int_atomic;
 int_atomic i1(0), i2(0);
 hpx::lcos::local::guard_set guards;
 std::shared_ptr<hpx::lcos::local::guard> l1(new hpx::lcos::local::guard());

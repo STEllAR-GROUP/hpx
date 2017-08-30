@@ -17,15 +17,13 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
-
-#include <boost/atomic.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -86,8 +84,8 @@ struct HPX_EXPORT locality_namespace
               , time_(0)
             {}
 
-            boost::atomic<std::int64_t> count_;
-            boost::atomic<std::int64_t> time_;
+            std::atomic<std::int64_t> count_;
+            std::atomic<std::int64_t> time_;
         };
 
         counter_data()

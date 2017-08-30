@@ -21,6 +21,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/logging.hpp>
 
@@ -30,10 +31,10 @@
 #  include <unistd.h>
 #endif
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -60,7 +61,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // For testing purposes we sometime expect to see exceptions, allow those
     // to go through without attaching a debugger.
-    boost::atomic<bool> expect_exception_flag(false);
+    std::atomic<bool> expect_exception_flag(false);
 
     bool expect_exception(bool flag)
     {
@@ -371,7 +372,7 @@ namespace hpx { namespace detail
     HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
         std::string const& file, long line)
     {
-        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+        if (!expect_exception_flag.load(std::memory_order_relaxed) &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
         {
             util::attach_debugger();
@@ -445,7 +446,7 @@ namespace hpx { namespace detail
     void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {
-        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+        if (!expect_exception_flag.load(std::memory_order_relaxed) &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
         {
             util::attach_debugger();
@@ -492,7 +493,7 @@ namespace hpx { namespace detail
     // report an early or late exception and abort
     void report_exception_and_continue(std::exception_ptr const& e)
     {
-        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+        if (!expect_exception_flag.load(std::memory_order_relaxed) &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
         {
             util::attach_debugger();
@@ -503,7 +504,7 @@ namespace hpx { namespace detail
 
     void report_exception_and_continue(hpx::exception const& e)
     {
-        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+        if (!expect_exception_flag.load(std::memory_order_relaxed) &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
         {
             util::attach_debugger();

@@ -22,8 +22,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -52,7 +51,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    boost::atomic<std::size_t>
+    std::atomic<std::size_t>
         thread_pool_os_executor<Scheduler>::os_executor_count_(0);
 
     ///////////////////////////////////////////////////////////////////////////

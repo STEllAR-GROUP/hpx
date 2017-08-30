@@ -90,8 +90,6 @@ namespace hpx { namespace util
 #endif
 
     void handle_list_parcelports();
-
-    void HPX_EXPORT attach_debugger();
 }}
 
 #endif /*HPX_UTIL_COMMAND_LINE_HANDLING_HPP*/

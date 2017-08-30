@@ -823,6 +823,14 @@ hpx_option(HPX_WITH_THREAD_DESCRIPTION_FULL BOOL
   OFF
   CATEGORY "Debugging" ADVANCED)
 
+hpx_option(HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE BOOL
+  "Break the debugger if a test has failed  (default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+if(HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE)
+  hpx_add_config_define(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
+endif()
+
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
@@ -1187,6 +1195,10 @@ if(NOT WIN32)
   ##############################################################################
   # System libraries
   ##############################################################################
+  if(NOT MSVC)
+    hpx_libraries(atomic)
+  endif()
+
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     hpx_libraries(dl)
   endif()

@@ -20,8 +20,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -532,7 +531,7 @@ namespace hpx { namespace threads { namespace policies
                 this_queue->increment_num_pending_misses();
 
                 bool have_staged = this_queue->
-                    get_staged_queue_length(boost::memory_order_relaxed) != 0;
+                    get_staged_queue_length(std::memory_order_relaxed) != 0;
 
                 // Give up, we should have work to convert.
                 if (have_staged)
@@ -1149,7 +1148,7 @@ namespace hpx { namespace threads { namespace policies
         std::vector<thread_queue_type*> queues_;
         std::vector<thread_queue_type*> high_priority_queues_;
         thread_queue_type low_priority_queue_;
-        boost::atomic<std::size_t> curr_queue_;
+        std::atomic<std::size_t> curr_queue_;
         std::size_t numa_sensitive_;
 
         std::vector<std::vector<std::size_t> > victim_threads_;

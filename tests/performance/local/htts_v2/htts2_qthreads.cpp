@@ -8,8 +8,6 @@
 
 #include "htts2.hpp"
 
-#include <boost/atomic.hpp>
-
 #include <qthread/qthread.h>
 #include <qthread/qloop.h>
 

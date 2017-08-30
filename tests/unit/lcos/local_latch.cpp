@@ -8,8 +8,7 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <vector>
@@ -17,7 +16,7 @@
 #define NUM_THREADS std::size_t(100)
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> num_threads(0);
+std::atomic<std::size_t> num_threads(0);
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_count_down_and_wait(hpx::lcos::local::latch& l)

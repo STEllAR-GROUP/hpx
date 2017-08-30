@@ -9,13 +9,12 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 // The atomic variable 'counter' ensures the thread safety of the counter.
-boost::atomic<std::int64_t> counter(0);
+std::atomic<std::int64_t> counter(0);
 
 std::int64_t some_performance_data(bool reset)
 {

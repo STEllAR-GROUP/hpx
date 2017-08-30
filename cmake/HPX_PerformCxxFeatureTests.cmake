@@ -83,6 +83,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_array(
     DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
 
+  hpx_check_for_cxx11_std_atomic(
+    REQUIRED "HPX needs support for C++11 std::atomic")
+
   hpx_check_for_cxx11_std_chrono(
     REQUIRED "HPX needs support for C++11 std::chrono")
 

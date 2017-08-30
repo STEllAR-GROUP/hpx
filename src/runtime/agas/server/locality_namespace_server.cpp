@@ -24,9 +24,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/scoped_timer.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -170,7 +170,7 @@ std::uint32_t locality_namespace::allocate(
   , naming::gid_type suggested_prefix
     )
 { // {{{ allocate implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.allocate_.time_
     );
     counter_data_.increment_allocate_count();
@@ -273,7 +273,7 @@ std::uint32_t locality_namespace::allocate(
 parcelset::endpoints_type locality_namespace::resolve_locality(
     naming::gid_type locality)
 { // {{{ resolve_locality implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_locality_.time_
     );
     counter_data_.increment_resolve_locality_count();
@@ -294,7 +294,7 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
 
 void locality_namespace::free(naming::gid_type locality)
 { // {{{ free implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.free_.time_
     );
     counter_data_.increment_free_count();
@@ -366,7 +366,7 @@ void locality_namespace::free(naming::gid_type locality)
 
 std::vector<std::uint32_t> locality_namespace::localities()
 { // {{{ localities implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.localities_.time_
     );
     counter_data_.increment_localities_count();
@@ -390,7 +390,7 @@ std::vector<std::uint32_t> locality_namespace::localities()
 
 std::uint32_t locality_namespace::get_num_localities()
 { // {{{ get_num_localities implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.num_localities_.time_
     );
     counter_data_.increment_num_localities_count();

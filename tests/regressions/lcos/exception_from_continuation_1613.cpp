@@ -11,8 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <vector>
 
@@ -46,8 +45,8 @@ void test_exception_from_continuation2()
     std::vector<hpx::shared_future<void> > results;
     results.reserve(NUM_FUTURES+1);
 
-    boost::atomic<std::size_t> recursion_level(0);
-    boost::atomic<std::size_t> exceptions_thrown(0);
+    std::atomic<std::size_t> recursion_level(0);
+    std::atomic<std::size_t> exceptions_thrown(0);
 
     results.push_back(p.get_future());
     for (std::size_t i = 0; i != NUM_FUTURES; ++i)

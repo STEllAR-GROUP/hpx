@@ -10,8 +10,6 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/async.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>

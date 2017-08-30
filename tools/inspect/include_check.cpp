@@ -153,8 +153,10 @@ namespace boost
       // algorithm
       { "(\\bstd\\s*::\\s*swap_ranges\\b)", "std::swap_ranges", "algorithm" },
       { "(\\bstd\\s*::\\s*iter_swap\\b)", "std::iter_swap", "algorithm" },
+      // atomic
+      { "(\\bstd\\s*::\\s*atomic\\b)", "std::atomic", "atomic" },
+      { "(\\bstd\\s*::\\s*(memory_order_*)\\b)", "std::\\2", "atomic" },
       // boost
-      { "(\\bboost\\s*::\\s*atomic\\b)", "boost::atomic", "boost/atomic.hpp" },
       { "(\\bboost\\s*::\\s*intrusive_ptr\\b)", "boost::intrusive_ptr", "boost/intrusive_ptr.hpp" },
       // macros
       { "(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT", "hpx/util/detail/pp/cat.hpp" },

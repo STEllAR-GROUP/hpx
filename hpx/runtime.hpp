@@ -24,9 +24,9 @@
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -330,7 +330,7 @@ namespace hpx
         std::shared_ptr<util::query_counters> active_counters_;
 
         long instance_number_;
-        static boost::atomic<int> instance_number_counter_;
+        static std::atomic<int> instance_number_counter_;
 
         // certain components (such as PAPI) require all threads to be
         // registered with the library
@@ -343,7 +343,7 @@ namespace hpx
         typedef std::map<std::string, std::uint32_t> used_cores_map_type;
         used_cores_map_type used_cores_map_;
 
-        boost::atomic<state> state_;
+        std::atomic<state> state_;
 
         boost::scoped_ptr<components::server::memory> memory_;
         boost::scoped_ptr<components::server::runtime_support> runtime_support_;

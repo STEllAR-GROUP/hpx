@@ -10,8 +10,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/iterator_range.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <utility>
@@ -31,7 +30,7 @@ void test_for_each(ExPolicy && policy, IteratorTag, Proj && proj)
     std::vector<std::size_t> c(10007);
     std::fill(std::begin(c), std::end(c), std::size_t(42));
 
-    boost::atomic<std::size_t> count(0);
+    std::atomic<std::size_t> count(0);
 
     iterator result =
         hpx::parallel::for_each(std::forward<ExPolicy>(policy),
@@ -57,7 +56,7 @@ void test_for_each_async(ExPolicy && p, IteratorTag, Proj && proj)
     std::vector<std::size_t> c(10007);
     std::fill(std::begin(c), std::end(c), std::size_t(42));
 
-    boost::atomic<std::size_t> count(0);
+    std::atomic<std::size_t> count(0);
 
     hpx::future<iterator> f =
         hpx::parallel::for_each(std::forward<ExPolicy>(p),
