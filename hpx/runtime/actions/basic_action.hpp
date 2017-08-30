@@ -48,8 +48,7 @@
 #include <hpx/util/itt_notify.hpp>
 #endif
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -489,7 +488,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        static boost::atomic<std::int64_t> invocation_count_;
+        static std::atomic<std::int64_t> invocation_count_;
 
     protected:
         static void increment_invocation_count()
@@ -499,7 +498,7 @@ namespace hpx { namespace actions
     };
 
     template <typename Component, typename R, typename ...Args, typename Derived>
-    boost::atomic<std::int64_t>
+    std::atomic<std::int64_t>
         basic_action<Component, R(Args...), Derived>::invocation_count_(0);
 
     namespace detail

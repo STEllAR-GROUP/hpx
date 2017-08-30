@@ -27,8 +27,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -254,7 +253,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // Give invoking context a chance to catch up with its tasks, but only
         // if this scheduler is currently in running state (this scheduler is
         // always in stopping state as it has to exit as early as possible).
-        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_stopping;
         if (state.compare_exchange_strong(expected, state_suspended))
         {
@@ -307,15 +306,16 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // Set the state to 'state_stopping' only if it's still in
         // 'state_starting' state, otherwise our destructor is currently being
         // executed, which means we need to still execute all threads.
-        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_starting;
         if (state.compare_exchange_strong(expected, state_stopping))
         {
-            {
-                std::unique_lock<mutex_type> l(mtx_);
-                scheduler_.add_punit(0, thread_num_);
-                scheduler_.on_start_thread(0);
-            }
+//             {
+//                 std::unique_lock<mutex_type> l(mtx_);
+//                 resource::get_partitioner().get_affinity_data().add_punit(
+//                     0, thread_num_);
+//                 scheduler_.on_start_thread(0);
+//             }
 
             self_ = threads::get_self_ptr();
 
@@ -407,7 +407,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_num_ = thread_num;
         orig_thread_num_ = threads::detail::thread_num_tss_.get_worker_thread_num();
 
-        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_initialized;
         bool result = state.compare_exchange_strong(expected, state_starting);
         HPX_ASSERT(result);
@@ -422,7 +422,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) != thread_num_);
 
         // inform the scheduler to stop the virtual core
-        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state oldstate = state.exchange(state_stopped);
         HPX_ASSERT(oldstate == state_suspended || oldstate == state_stopped);
 

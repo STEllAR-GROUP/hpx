@@ -23,8 +23,8 @@
 #include <hpx/util/steady_clock.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
-#include <boost/atomic.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <functional>
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type const& thrd, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
         thread_id_type const& timer_id,
-        std::shared_ptr<boost::atomic<bool> > const& triggered)
+        std::shared_ptr<std::atomic<bool> > const& triggered)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -294,8 +294,8 @@ namespace hpx { namespace threads { namespace detail
         // allowing the deadline_timer to go out of scope gracefully
         thread_id_type self_id = get_self_id();
 
-        std::shared_ptr<boost::atomic<bool> > triggered(
-            std::make_shared<boost::atomic<bool> >(false));
+        std::shared_ptr<std::atomic<bool> > triggered(
+            std::make_shared<std::atomic<bool> >(false));
 
         thread_init_data data(
             util::bind(&wake_timer_thread,

@@ -28,9 +28,9 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/detail/endian.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -746,7 +746,7 @@ namespace hpx { namespace parcelset
 
         bool trigger_pending_work()
         {
-            if (0 == num_parcel_destinations_.load(boost::memory_order_relaxed))
+            if (0 == num_parcel_destinations_.load(std::memory_order_relaxed))
                 return true;
 
             std::vector<locality> destinations;
@@ -962,7 +962,7 @@ namespace hpx { namespace parcelset
         int archive_flags_;
         hpx::util::atomic_count operations_in_flight_;
 
-        boost::atomic<std::size_t> num_thread_;
+        std::atomic<std::size_t> num_thread_;
         std::size_t const max_background_thread_;
     };
 }}

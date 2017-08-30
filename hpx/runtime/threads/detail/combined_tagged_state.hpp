@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace detail
 
     public:
         ///////////////////////////////////////////////////////////////////////
-        combined_tagged_state()
+        combined_tagged_state() noexcept
           : state_(0)
         {}
 

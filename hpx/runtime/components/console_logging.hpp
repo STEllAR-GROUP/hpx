@@ -16,7 +16,7 @@
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/atomic.hpp>
+#include <atomic>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -54,8 +54,8 @@ namespace hpx { namespace components
         queue_mutex_type queue_mtx_;
         messages_type queue_;
 
-        boost::atomic<bool> activated_;
-        boost::atomic<bool> is_sending_;
+        std::atomic<bool> activated_;
+        std::atomic<bool> is_sending_;
     };
 
     struct pending_logs_tag {};

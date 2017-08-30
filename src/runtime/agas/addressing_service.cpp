@@ -224,7 +224,6 @@ void addressing_service::launch_bootstrap(
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
     HPX_ASSERT(pp ? pp->here() == pp->agas_locality(cfg) : true);
-    rt.assign_cores();
 
     naming::id_type const locality_gid = locality_ns_->gid();
     gva locality_gva(here,

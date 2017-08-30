@@ -19,12 +19,11 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/atomic.hpp>
-
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -423,7 +422,7 @@ namespace hpx { namespace threads { namespace detail
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
         scheduling_counters& counters, scheduling_callbacks& params)
     {
-        boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
+        std::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
         util::itt::stack_context ctx;        // helper for itt support
         util::itt::domain domain = hpx::get_thread_itt_domain();
@@ -461,7 +460,7 @@ namespace hpx { namespace threads { namespace detail
             // Get the next HPX thread from the queue
             thrd = next_thrd;
             bool running = this_state.load(
-                boost::memory_order_relaxed) < state_stopping;
+                std::memory_order_relaxed) < state_stopping;
 
             if (HPX_LIKELY(thrd ||
                     scheduler.SchedulingPolicy::get_next_thread(

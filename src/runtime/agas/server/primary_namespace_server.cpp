@@ -31,9 +31,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -226,7 +226,7 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
 std::pair<naming::id_type, naming::address>
 primary_namespace::begin_migration(naming::gid_type id)
 {
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.begin_migration_.time_
     );
     counter_data_.increment_begin_migration_count();
@@ -268,7 +268,7 @@ primary_namespace::begin_migration(naming::gid_type id)
 // migration of the given object is complete
 bool primary_namespace::end_migration(naming::gid_type id)
 {
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.end_migration_.time_
     );
     counter_data_.increment_end_migration_count();
@@ -321,7 +321,7 @@ bool primary_namespace::bind_gid(
   , naming::gid_type locality
     )
 { // {{{ bind_gid implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.bind_gid_.time_
     );
     counter_data_.increment_bind_gid_count();
@@ -480,7 +480,7 @@ bool primary_namespace::bind_gid(
 
 primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type id)
 { // {{{ resolve_gid implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_gid_.time_
     );
     counter_data_.increment_resolve_gid_count();
@@ -526,7 +526,7 @@ naming::address primary_namespace::unbind_gid(
   , naming::gid_type id
     )
 { // {{{ unbind_gid implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.unbind_gid_.time_
     );
     counter_data_.increment_unbind_gid_count();
@@ -579,7 +579,7 @@ std::int64_t primary_namespace::increment_credit(
   , naming::gid_type upper
     )
 { // increment_credit implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.increment_credit_.time_
     );
     counter_data_.increment_increment_credit_count();
@@ -613,7 +613,7 @@ std::vector<std::int64_t> primary_namespace::decrement_credit(
     > requests
     )
 { // decrement_credit implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.decrement_credit_.time_
     );
     counter_data_.increment_decrement_credit_count();
@@ -657,7 +657,7 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
     std::uint64_t count
     )
 { // {{{ allocate implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.allocate_.time_
     );
     counter_data_.increment_allocate_count();

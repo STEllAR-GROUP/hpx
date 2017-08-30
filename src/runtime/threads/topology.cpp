@@ -58,7 +58,7 @@ namespace hpx { namespace threads
     {
         // We bind the service threads to the first NUMA domain. This is useful
         // as the first NUMA domain is likely to have the PCI controllers etc.
-        mask_cref_type machine_mask = this->get_numa_node_affinity_mask(0, true, ec);
+        mask_cref_type machine_mask = this->get_numa_node_affinity_mask(0, ec);
         if (ec || !any(machine_mask))
             return mask_type();
 
@@ -78,7 +78,7 @@ namespace hpx { namespace threads
         tid = syscall(SYS_gettid);
         if (setpriority(PRIO_PROCESS, tid, 19))
         {
-            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",
+            HPX_THROWS_IF(ec, no_success, "topology::reduce_thread_priority",
                 "setpriority returned an error");
             return false;
         }
@@ -86,7 +86,7 @@ namespace hpx { namespace threads
 
         if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
         {
-            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",
+            HPX_THROWS_IF(ec, no_success, "topology::reduce_thread_priority",
                 "SetThreadPriority returned an error");
             return false;
         }

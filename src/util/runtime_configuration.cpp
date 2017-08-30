@@ -196,6 +196,14 @@ namespace hpx { namespace util
             "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
 
+            /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
+            /// then apply the test-failure value as default.
+#if defined(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
+            "attach-debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
+#else
+            "attach-debugger = ${HPX_ATTACH_DEBUGGER}",
+#endif
+
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
             "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",
@@ -240,7 +248,7 @@ namespace hpx { namespace util
             "min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}",
             "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
             "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
-            "max_terminated_threads = ${HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS:"
+            "max_terminated_threads = ${HPX_SCHEDULER_MAX_TERMINATED_THREADS:"
               HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_SCHEDULER_MAX_TERMINATED_THREADS)) "}",
 
             "[hpx.commandline]",
@@ -468,15 +476,16 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration(char const* argv0_)
-      : num_localities(0),
+    runtime_configuration::runtime_configuration(char const* argv0_, runtime_mode mode)
+      : mode_(mode),
+        num_localities(0),
         small_stacksize(HPX_SMALL_STACK_SIZE),
         medium_stacksize(HPX_MEDIUM_STACK_SIZE),
         large_stacksize(HPX_LARGE_STACK_SIZE),
         huge_stacksize(HPX_HUGE_STACK_SIZE),
         need_to_call_pre_initialize(true)
 #if defined(__linux) || defined(linux) || defined(__linux__)
-      , argv0(argv0_)
+        , argv0(argv0_)
 #endif
     {
         pre_initialize_ini();

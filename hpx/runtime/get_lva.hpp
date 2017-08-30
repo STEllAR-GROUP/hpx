@@ -21,10 +21,11 @@ namespace hpx
     {
         template <typename Component>
         struct is_simple_or_fixed_component
-          : std::integral_constant<bool,
-                std::is_base_of<traits::detail::simple_component_tag, Component>::value
-             || std::is_base_of<traits::detail::fixed_component_tag, Component>::value
-            >
+            : std::integral_constant<bool,
+                  std::is_base_of<traits::detail::component_tag,
+                      Component>::value ||
+                      std::is_base_of<traits::detail::fixed_component_tag,
+                          Component>::value>
         {};
     }
 

@@ -9,8 +9,7 @@
 #include <hpx/include/parallel_execution_policy.hpp>
 #include <hpx/include/util.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <numeric>
@@ -120,15 +119,15 @@ namespace test
         }
 
         T value_;
-        static boost::atomic<std::size_t> instance_count;
-        static boost::atomic<std::size_t> max_instance_count;
+        static std::atomic<std::size_t> instance_count;
+        static std::atomic<std::size_t> max_instance_count;
     };
 
     template <typename T>
-    boost::atomic<std::size_t> count_instances_v<T>::instance_count(0);
+    std::atomic<std::size_t> count_instances_v<T>::instance_count(0);
 
     template <typename T>
-    boost::atomic<std::size_t> count_instances_v<T>::max_instance_count(0);
+    std::atomic<std::size_t> count_instances_v<T>::max_instance_count(0);
 
     using count_instances = count_instances_v<std::size_t>;
 

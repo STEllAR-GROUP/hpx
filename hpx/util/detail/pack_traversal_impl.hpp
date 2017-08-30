@@ -40,7 +40,7 @@ namespace util {
                 {
                 }
 
-                HPX_CONSTEXPR tuple<T...> unbox()
+                tuple<T...> unbox()
                 {
                     return std::move(boxed_);
                 }
@@ -56,7 +56,7 @@ namespace util {
                 {
                 }
 
-                HPX_CONSTEXPR tuple<> unbox() noexcept
+                HPX_CONSTEXPR tuple<> unbox() const noexcept
                 {
                     return tuple<>{};
                 }

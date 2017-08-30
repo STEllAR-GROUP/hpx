@@ -21,7 +21,7 @@ set(tests
     this_thread_executors
     thread_pool_attached_executors
     thread_pool_executors
-    thread_pool_os_executors
+#    thread_pool_os_executors
     timed_parallel_executor
     timed_this_thread_executors
     timed_thread_pool_executors
@@ -43,7 +43,7 @@ if(HPX_WITH_EXECUTOR_COMPATIBILITY)
       this_thread_executors_v1
       thread_pool_attached_executors_v1
       thread_pool_executors_v1
-      thread_pool_os_executors_v1
+#      thread_pool_os_executors_v1
       timed_parallel_executor_v1
       timed_this_thread_executors_v1
       timed_thread_pool_executors_v1

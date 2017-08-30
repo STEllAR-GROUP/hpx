@@ -32,7 +32,6 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
-#include <boost/atomic.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -11,8 +11,7 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <functional>
 #include <mutex>
 
@@ -49,8 +48,8 @@ struct wait_for_flag
         ++woken;
     }
 
-    boost::atomic<bool> flag;
-    boost::atomic<unsigned> woken;
+    std::atomic<bool> flag;
+    std::atomic<unsigned> woken;
 };
 
 void test_condition_with_mutex()

@@ -26,7 +26,6 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #endif
 
-#include <boost/atomic.hpp>
 #include <boost/version.hpp>
 
 #if BOOST_VERSION < 106100
@@ -35,6 +34,7 @@
 #include <boost/context/detail/fcontext.hpp>
 #endif
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -288,7 +288,7 @@ namespace hpx { namespace threads { namespace coroutines
             HPX_EXPORT void reset_stack();
             HPX_EXPORT void rebind_stack();
 
-            typedef boost::atomic<std::int64_t> counter_type;
+            typedef std::atomic<std::int64_t> counter_type;
 
             HPX_EXPORT static counter_type& get_stack_unbind_counter();
             HPX_EXPORT static std::uint64_t get_stack_unbind_count(bool

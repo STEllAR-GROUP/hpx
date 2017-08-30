@@ -31,9 +31,9 @@
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/dynamic_bitset.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -117,7 +117,7 @@ public:
     symbol_namespace symbol_ns_;
     primary_namespace primary_ns_;
 
-    boost::atomic<hpx::state> state_;
+    std::atomic<hpx::state> state_;
     naming::gid_type locality_;
 
     mutable mutex_type resolved_localities_mtx_;

@@ -26,9 +26,9 @@
 #   include <hpx/util/tick_counter.hpp>
 #endif
 
-#include <boost/atomic.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -67,7 +67,7 @@ namespace hpx { namespace threads { namespace policies
     // We control whether to collect queue wait times using this global bool.
     // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.
-    extern bool maintain_queue_wait_times;
+    extern HPX_EXPORT bool maintain_queue_wait_times;
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
@@ -624,7 +624,7 @@ namespace hpx { namespace threads { namespace policies
 
         // This returns the current length of the staged queue
         std::int64_t get_staged_queue_length(
-            boost::memory_order order = boost::memory_order_seq_cst) const
+            std::memory_order order = std::memory_order_seq_cst) const
         {
             return new_tasks_count_.load(order);
         }
@@ -836,13 +836,13 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        /// Return the next thread to be executed, return false if non is
+        /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(threads::thread_data*& thrd,
             bool allow_stealing = false, bool steal = false) HPX_HOT
         {
             std::int64_t work_items_count =
-                work_items_count_.load(boost::memory_order_relaxed);
+                work_items_count_.load(std::memory_order_relaxed);
 
             if (allow_stealing && min_tasks_to_steal_pending > work_items_count)
             {
@@ -1010,7 +1010,7 @@ namespace hpx { namespace threads { namespace policies
         {
             // try to generate new threads from task lists, but only if our
             // own list of threads is empty
-            if (0 == work_items_count_.load(boost::memory_order_relaxed))
+            if (0 == work_items_count_.load(std::memory_order_relaxed))
             {
                 // see if we can avoid grabbing the lock below
                 if (addfrom)
@@ -1018,7 +1018,7 @@ namespace hpx { namespace threads { namespace policies
                     // don't try to steal if there are only a few tasks left on
                     // this queue
                     if (running && min_tasks_to_steal_staged >
-                        addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
+                        addfrom->new_tasks_count_.load(std::memory_order_relaxed))
                     {
                         return false;
                     }
@@ -1026,7 +1026,7 @@ namespace hpx { namespace threads { namespace policies
                 else
                 {
                     if (running &&
-                        0 == new_tasks_count_.load(boost::memory_order_relaxed))
+                        0 == new_tasks_count_.load(std::memory_order_relaxed))
                     {
                         return false;
                     }
@@ -1092,22 +1092,22 @@ namespace hpx { namespace threads { namespace policies
 
         thread_map_type thread_map_;
         ///< mapping of thread id's to HPX-threads
-        boost::atomic<std::int64_t> thread_map_count_;
+        std::atomic<std::int64_t> thread_map_count_;
         ///< overall count of work items
 
         work_items_type work_items_;
         ///< list of active work items
-        boost::atomic<std::int64_t> work_items_count_;
+        std::atomic<std::int64_t> work_items_count_;
         ///< count of active work items
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        boost::atomic<std::int64_t> work_items_wait_;
+        std::atomic<std::int64_t> work_items_wait_;
         ///< overall wait time of work items
-        boost::atomic<std::int64_t> work_items_wait_count_;
+        std::atomic<std::int64_t> work_items_wait_count_;
         ///< overall number of work items in queue
 #endif
         terminated_items_type terminated_items_;     ///< list of terminated threads
-        boost::atomic<std::int64_t> terminated_items_count_;
+        std::atomic<std::int64_t> terminated_items_count_;
         ///< count of terminated items
 
         std::size_t max_count_;
@@ -1115,12 +1115,12 @@ namespace hpx { namespace threads { namespace policies
         task_items_type new_tasks_;
         ///< list of new tasks to run
 
-        boost::atomic<std::int64_t> new_tasks_count_;
+        std::atomic<std::int64_t> new_tasks_count_;
         ///< count of new tasks to run
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        boost::atomic<std::int64_t> new_tasks_wait_;
+        std::atomic<std::int64_t> new_tasks_wait_;
         ///< overall wait time of new tasks
-        boost::atomic<std::int64_t> new_tasks_wait_count_;
+        std::atomic<std::int64_t> new_tasks_wait_count_;
         ///< overall number tasks waited
 #endif
 
@@ -1139,18 +1139,18 @@ namespace hpx { namespace threads { namespace policies
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         // # of times our associated worker-thread couldn't find work in work_items
-        boost::atomic<std::int64_t> pending_misses_;
+        std::atomic<std::int64_t> pending_misses_;
 
         // # of times our associated worker-thread looked for work in work_items
-        boost::atomic<std::int64_t> pending_accesses_;
+        std::atomic<std::int64_t> pending_accesses_;
 
-        boost::atomic<std::int64_t> stolen_from_pending_;
+        std::atomic<std::int64_t> stolen_from_pending_;
         ///< count of work_items stolen from this queue
-        boost::atomic<std::int64_t> stolen_from_staged_;
+        std::atomic<std::int64_t> stolen_from_staged_;
         ///< count of new_tasks stolen from this queue
-        boost::atomic<std::int64_t> stolen_to_pending_;
+        std::atomic<std::int64_t> stolen_to_pending_;
         ///< count of work_items stolen to this queue from other queues
-        boost::atomic<std::int64_t> stolen_to_staged_;
+        std::atomic<std::int64_t> stolen_to_staged_;
         ///< count of new_tasks stolen to this queue from other queues
 #endif
 

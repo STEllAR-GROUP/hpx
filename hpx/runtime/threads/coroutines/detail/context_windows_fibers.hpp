@@ -39,10 +39,10 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 
@@ -238,7 +238,7 @@ namespace hpx { namespace threads { namespace coroutines
                 increment_stack_recycle_count();
             }
 
-            typedef boost::atomic<std::int64_t> counter_type;
+            typedef std::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_recycle_counter()
             {

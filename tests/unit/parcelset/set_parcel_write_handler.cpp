@@ -7,8 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <utility>
 #include <vector>
@@ -21,7 +20,7 @@ void test(hpx::id_type const& id)
 HPX_PLAIN_ACTION(test);     // defines test_action
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> write_handler_called(0);
+std::atomic<std::size_t> write_handler_called(0);
 
 bool is_test_action(hpx::parcelset::parcel const& p)
 {

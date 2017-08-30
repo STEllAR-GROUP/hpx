@@ -23,7 +23,6 @@ using boost::program_options::value;
 
 using hpx::lcos::local::barrier;
 
-using hpx::threads::threadmanager_base;
 using hpx::threads::pending;
 using hpx::threads::thread_priority_normal;
 
