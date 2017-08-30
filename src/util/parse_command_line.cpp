@@ -507,7 +507,7 @@ namespace hpx { namespace util
                 ("hpx:attach-debugger",
                   value<std::string>()->implicit_value("startup"),
                   "wait for a debugger to be attached, possible values: "
-                  "startup or exception (default: startup)")
+                  "off, startup, exception or test-failure (default: startup)")
 #endif
                 ("hpx:list-parcel-ports", "list all available parcel-ports")
             ;

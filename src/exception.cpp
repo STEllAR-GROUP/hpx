@@ -21,6 +21,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/logging.hpp>
 
