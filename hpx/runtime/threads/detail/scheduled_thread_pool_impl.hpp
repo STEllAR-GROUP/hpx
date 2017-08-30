@@ -25,10 +25,10 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/system/system_error.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <numeric>
 #include <cstddef>
 #include <cstdint>
@@ -45,7 +45,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct manage_active_thread_count
     {
-        manage_active_thread_count(boost::atomic<long>& counter)
+        manage_active_thread_count(std::atomic<long>& counter)
           : counter_(counter)
         {
         }
@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace detail
             --counter_;
         }
 
-        boost::atomic<long>& counter_;
+        std::atomic<long>& counter_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -367,7 +367,7 @@ namespace hpx { namespace threads { namespace detail
             << " starting OS thread: " << thread_num;    //-V128
 
         // set state to running
-        boost::atomic<hpx::state>& state =
+        std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(thread_num);
         hpx::state oldstate = state.exchange(state_running);
 
@@ -1385,7 +1385,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // inform the scheduler to stop the virtual core
-        boost::atomic<hpx::state>& state =
+        std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
         hpx::state oldstate = state.exchange(state_stopped);
 

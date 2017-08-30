@@ -13,8 +13,7 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <iosfwd>
 #include <stdexcept>
@@ -1108,5 +1107,5 @@ namespace hpx { namespace resource { namespace detail
     }
 
     ////////////////////////////////////////////////////////////////////////
-    boost::atomic<int> partitioner::instance_number_counter_(-1);
+    std::atomic<int> partitioner::instance_number_counter_(-1);
 }}}

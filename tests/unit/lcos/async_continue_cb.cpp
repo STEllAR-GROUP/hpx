@@ -9,8 +9,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 #include <vector>
 
@@ -35,7 +34,7 @@ std::int32_t mult2(std::int32_t i)
 HPX_PLAIN_ACTION(mult2);      // defines mult2_action
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<int> callback_called(0);
+std::atomic<int> callback_called(0);
 
 void cb(boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)

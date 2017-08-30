@@ -9,8 +9,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -77,7 +76,7 @@ struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
 
     std::string name_;
     std::uint64_t time_;
-    boost::atomic<std::size_t> count_;
+    std::atomic<std::size_t> count_;
 };
 
 void test_timer_hooks()

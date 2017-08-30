@@ -12,10 +12,10 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -354,5 +354,5 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return (num_pu + offset) % hardware_concurrency;
     }
 
-    boost::atomic<int> affinity_data::instance_number_counter_(-1);
+    std::atomic<int> affinity_data::instance_number_counter_(-1);
 }}}}

@@ -6,8 +6,7 @@
 #if !defined(HPX_UTIL_GET_AND_RESET_VALUE_FEB_27_2012_0248PM)
 #define HPX_UTIL_GET_AND_RESET_VALUE_FEB_27_2012_0248PM
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 
 namespace hpx { namespace util
@@ -30,7 +29,7 @@ namespace hpx { namespace util
     }
 
     template <typename T>
-    inline T get_and_reset_value(boost::atomic<T>& value, bool reset)
+    inline T get_and_reset_value(std::atomic<T>& value, bool reset)
     {
         T result = value.load();
         if (reset)

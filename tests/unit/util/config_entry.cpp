@@ -7,9 +7,8 @@
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <atomic>
 #include <string>
-
-#include <boost/atomic.hpp>
 
 void test_get_entry()
 {
@@ -22,7 +21,7 @@ void test_get_entry()
     HPX_TEST_EQ(boost::lexical_cast<int>(val), 1);
 }
 
-boost::atomic<bool> invoked_callback(false);
+std::atomic<bool> invoked_callback(false);
 
 void config_entry_callback(std::string const& key, std::string const& val)
 {

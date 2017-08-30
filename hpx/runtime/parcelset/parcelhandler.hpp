@@ -24,9 +24,8 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -482,8 +481,8 @@ namespace hpx { namespace parcelset
         /// Allow to use alternative parcel-ports (this is enabled only after
         /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
-        boost::atomic<bool> use_alternative_parcelports_;
-        boost::atomic<bool> enable_parcel_handling_;
+        std::atomic<bool> use_alternative_parcelports_;
+        std::atomic<bool> enable_parcel_handling_;
 
         /// Store message handlers for actions
         mutex_type handlers_mtx_;
@@ -491,7 +490,7 @@ namespace hpx { namespace parcelset
         bool const load_message_handlers_;
 
         /// Count number of (outbound) parcels routed
-        boost::atomic<std::int64_t> count_routed_;
+        std::atomic<std::int64_t> count_routed_;
 
         /// global exception handler for unhandled exceptions thrown from the
         /// parcel layer

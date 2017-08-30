@@ -40,10 +40,10 @@
 #endif
 #include <hpx/parallel/executors/execution.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/ref.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <functional>
@@ -521,7 +521,7 @@ namespace hpx { namespace lcos { namespace detail
         Policy policy_;
         Func func_;
         Futures futures_;
-        boost::atomic<bool> done_;
+        std::atomic<bool> done_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

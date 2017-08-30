@@ -27,14 +27,14 @@
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -263,7 +263,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::atomic<int> runtime::instance_number_counter_(-1);
+    std::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     util::thread_specific_ptr<runtime*, runtime::tls_tag> runtime::runtime_;

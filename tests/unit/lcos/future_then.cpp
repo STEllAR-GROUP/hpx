@@ -11,8 +11,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -182,7 +181,7 @@ void test_complex_then_chain_one()
 
 void test_complex_then_chain_one_launch()
 {
-    boost::atomic<int> count(0);
+    std::atomic<int> count(0);
     auto policy =
         hpx::launch::select(
             [&count]() -> hpx::launch

@@ -12,8 +12,7 @@
 #include <hpx/include/parallel_uninitialized_default_construct.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -170,7 +169,7 @@ void test_uninitialized_default_construct_exception(ExPolicy policy, IteratorTag
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
     std::memset(p, 0xcd, data_size * sizeof(data_type));
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);
@@ -215,7 +214,7 @@ void test_uninitialized_default_construct_exception_async(
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
     std::memset(p, 0xcd, data_size * sizeof(data_type));
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);
@@ -272,7 +271,7 @@ void test_uninitialized_default_construct_bad_alloc(ExPolicy policy, IteratorTag
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
     std::memset(p, 0xcd, data_size * sizeof(data_type));
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);
@@ -318,7 +317,7 @@ void test_uninitialized_default_construct_bad_alloc_async(
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
     std::memset(p, 0xcd, data_size * sizeof(data_type));
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);

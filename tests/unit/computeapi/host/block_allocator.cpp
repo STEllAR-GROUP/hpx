@@ -7,8 +7,7 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <string>
@@ -55,8 +54,8 @@ void test_bulk_allocator(std::size_t count)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> construction_count(0);
-boost::atomic<std::size_t> destruction_count(0);
+std::atomic<std::size_t> construction_count(0);
+std::atomic<std::size_t> destruction_count(0);
 
 struct test
 {

@@ -9,13 +9,13 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/unwrap.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ std::uint64_t distribute_at = 2;
 int num_repeats = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> serial_execution_count(0);
+std::atomic<std::size_t> serial_execution_count(0);
 
 std::size_t get_serial_execution_count()
 {
@@ -33,7 +33,7 @@ std::size_t get_serial_execution_count()
 HPX_PLAIN_ACTION(get_serial_execution_count);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> next_locality(0);
+std::atomic<std::size_t> next_locality(0);
 std::vector<hpx::id_type> localities;
 hpx::id_type here;
 

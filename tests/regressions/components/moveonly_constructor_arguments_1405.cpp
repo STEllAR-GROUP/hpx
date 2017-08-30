@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
+#include <atomic>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct moveonly
@@ -32,8 +32,8 @@ struct moveable
     moveable& operator=(moveable const&) { return *this; }
 };
 
-boost::atomic<int> constructed_from_moveonly(0);
-boost::atomic<int> constructed_from_moveable(0);
+std::atomic<int> constructed_from_moveonly(0);
+std::atomic<int> constructed_from_moveable(0);
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server

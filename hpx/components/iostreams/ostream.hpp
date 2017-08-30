@@ -16,9 +16,9 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/util/register_locks.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/iostreams/stream.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <ios>
 #include <iostream>
@@ -168,7 +168,7 @@ namespace hpx { namespace iostreams
 
     private:
         using detail::buffer::mtx_;
-        boost::atomic<std::uint64_t> generational_count_;
+        std::atomic<std::uint64_t> generational_count_;
 
         // Performs a lazy streaming operation.
         template <typename T>

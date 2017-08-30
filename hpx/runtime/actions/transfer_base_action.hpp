@@ -29,8 +29,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -308,7 +307,7 @@ namespace hpx { namespace actions
         threads::thread_stacksize stacksize_;
 
     private:
-        static boost::atomic<std::int64_t> invocation_count_;
+        static std::atomic<std::int64_t> invocation_count_;
 
     protected:
         static void increment_invocation_count()
@@ -318,7 +317,7 @@ namespace hpx { namespace actions
     };
 
     template <typename Action>
-    boost::atomic<std::int64_t>
+    std::atomic<std::int64_t>
         transfer_base_action<Action>::invocation_count_(0);
 
     namespace detail

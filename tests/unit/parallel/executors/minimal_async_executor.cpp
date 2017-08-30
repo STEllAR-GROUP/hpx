@@ -8,8 +8,9 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <array>
 #include <algorithm>
+#include <array>
+#include <atomic>
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
@@ -19,8 +20,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/atomic.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id async_test(int passed_through)
@@ -111,11 +110,11 @@ void test_bulk_async(Executor& exec)
     ).get();
 }
 
-boost::atomic<std::size_t> count_apply(0);
-boost::atomic<std::size_t> count_sync(0);
-boost::atomic<std::size_t> count_async(0);
-boost::atomic<std::size_t> count_bulk_sync(0);
-boost::atomic<std::size_t> count_bulk_async(0);
+std::atomic<std::size_t> count_apply(0);
+std::atomic<std::size_t> count_sync(0);
+std::atomic<std::size_t> count_async(0);
+std::atomic<std::size_t> count_bulk_sync(0);
+std::atomic<std::size_t> count_bulk_async(0);
 
 template <typename Executor>
 void test_executor(std::array<std::size_t, 5> expected)

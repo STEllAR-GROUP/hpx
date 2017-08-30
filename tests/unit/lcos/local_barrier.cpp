@@ -11,8 +11,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <string>
@@ -32,7 +31,7 @@ using hpx::finalize;
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-void local_barrier_test(barrier& b, boost::atomic<std::size_t>& c)
+void local_barrier_test(barrier& b, std::atomic<std::size_t>& c)
 {
     ++c;
     // wait for all threads to enter the barrier
@@ -57,7 +56,7 @@ int hpx_main(variables_map& vm)
         // create a barrier waiting on 'count' threads
         barrier b(pxthreads + 1);
 
-        boost::atomic<std::size_t> c(0);
+        std::atomic<std::size_t> c(0);
 
         // create the threads which will wait on the barrier
         for (std::size_t i = 0; i < pxthreads; ++i)

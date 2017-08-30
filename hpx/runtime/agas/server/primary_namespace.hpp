@@ -23,8 +23,7 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -165,8 +164,8 @@ struct HPX_EXPORT primary_namespace
               , time_(0)
             {}
 
-            boost::atomic<std::int64_t> count_;
-            boost::atomic<std::int64_t> time_;
+            std::atomic<std::int64_t> count_;
+            std::atomic<std::int64_t> time_;
         };
 
         counter_data()

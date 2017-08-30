@@ -9,8 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <utility>
@@ -85,7 +84,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::vector<mask_type> affinity_masks_;
         std::vector<std::size_t> pu_nums_;
         mask_type no_affinity_;                             ///< mask of processing units which have no affinity
-        static boost::atomic<int> instance_number_counter_; ///< counter for instance numbers
+        static std::atomic<int> instance_number_counter_; ///< counter for instance numbers
     };
 }}}}
 

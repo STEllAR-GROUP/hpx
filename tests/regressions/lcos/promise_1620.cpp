@@ -8,8 +8,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 
 struct test
@@ -19,10 +18,10 @@ struct test
     test& operator=(test const & t) { ++count; return *this; }
     ~test() { --count; }
 
-    static boost::atomic<int> count;
+    static std::atomic<int> count;
 };
 
-boost::atomic<int> test::count(0);
+std::atomic<int> test::count(0);
 
 test call() { return test(); }
 HPX_PLAIN_ACTION(call);

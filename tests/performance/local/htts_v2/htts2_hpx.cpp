@@ -14,6 +14,7 @@
 
 #include "htts2.hpp"
 
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -213,7 +214,7 @@ struct hpx_driver : htts2::driver
             ;
     }
 
-//    boost::atomic<std::uint64_t> count_;
+//    std::atomic<std::uint64_t> count_;
 };
 
 int main(int argc, char** argv)
