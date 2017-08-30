@@ -13,10 +13,10 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/random.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <ctime>
@@ -32,7 +32,7 @@ using std::chrono::milliseconds;
 int main()
 {
     std::vector<hpx::thread> threads;
-    boost::atomic<bool> ready(false);
+    std::atomic<bool> ready(false);
     hpx::lcos::local::shared_mutex stm;
 
     for (int i = 0; i < writers; ++i)

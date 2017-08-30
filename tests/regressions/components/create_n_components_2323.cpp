@@ -13,8 +13,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <vector>
 
@@ -22,7 +21,7 @@
 std::size_t const test_array_size = 1000ull;
 std::size_t const test_num_components = 100ull;
 
-boost::atomic<std::size_t> count(0);
+std::atomic<std::size_t> count(0);
 
 struct component_server : hpx::components::component_base<component_server>
 {

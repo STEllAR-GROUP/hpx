@@ -10,11 +10,11 @@
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/atomic.hpp>
 #include <boost/random.hpp>
 
-#include <array>
 #include <algorithm>
+#include <array>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -133,10 +133,10 @@
 // global vars
 //----------------------------------------------------------------------------
 std::vector<std::vector<hpx::future<int> > > ActiveFutures;
-std::array<boost::atomic<int>, MAX_RANKS>    FuturesWaiting;
+std::array<std::atomic<int>, MAX_RANKS>    FuturesWaiting;
 
 #if defined(USE_CLEANING_THREAD) || defined(USE_PARCELPORT_THREAD)
- boost::atomic<bool>                        FuturesActive;
+ std::atomic<bool>                        FuturesActive;
  hpx::lcos::local::spinlock                 FuturesMutex;
 #endif
 

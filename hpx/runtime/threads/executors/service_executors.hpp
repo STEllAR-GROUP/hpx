@@ -16,8 +16,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -74,7 +73,7 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             util::io_service_pool* pool_;
-            boost::atomic<std::uint64_t> task_count_;
+            std::atomic<std::uint64_t> task_count_;
             lcos::local::counting_semaphore shutdown_sem_;
         };
     }

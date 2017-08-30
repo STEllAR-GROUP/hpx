@@ -16,10 +16,10 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/format.hpp>
-#include <boost/atomic.hpp>
 
 #include <apex_api.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <iostream>
 
@@ -31,7 +31,7 @@ std::uint64_t fibonacci(std::uint64_t n);
 // invocation to work.
 HPX_PLAIN_ACTION(fibonacci, fibonacci_action);
 
-boost::atomic<std::uint64_t> count(0);
+std::atomic<std::uint64_t> count(0);
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t fibonacci(std::uint64_t n)

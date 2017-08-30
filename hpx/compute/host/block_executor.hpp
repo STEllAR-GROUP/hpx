@@ -20,9 +20,8 @@
 #include <hpx/util/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <iterator>
@@ -239,7 +238,7 @@ namespace hpx { namespace compute { namespace host
             }
         }
         std::vector<host::target> targets_;
-        boost::atomic<std::size_t> current_;
+        std::atomic<std::size_t> current_;
         std::vector<Executor> executors_;
     };
 }}}

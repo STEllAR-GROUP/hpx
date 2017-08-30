@@ -30,8 +30,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -258,7 +257,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         // give invoking context a chance to catch up with its tasks, but only
         // if this scheduler is currently in running state
-        boost::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
+        std::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
         hpx::state expected = state_running;
         if (state.compare_exchange_strong(expected, state_suspended))
         {
@@ -280,7 +279,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct on_run_exit
     {
-        on_run_exit(boost::atomic<std::size_t>& current_concurrency,
+        on_run_exit(std::atomic<std::size_t>& current_concurrency,
                 lcos::local::counting_semaphore& shutdown_sem,
                 threads::thread_self* self)
           : current_concurrency_(current_concurrency),
@@ -298,7 +297,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             shutdown_sem_.signal();
         }
 
-        boost::atomic<std::size_t>& current_concurrency_;
+        std::atomic<std::size_t>& current_concurrency_;
         lcos::local::counting_semaphore& shutdown_sem_;
         threads::thread_self* self_;
     };
@@ -311,7 +310,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // Set the state to 'state_running' only if it's still in 'state_starting'
         // state, otherwise our destructor is currently being executed, which
         // means we need to still execute all threads.
-        boost::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
+        std::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
         hpx::state expected = state_starting;
         if (state.compare_exchange_strong(expected, state_running))
         {
@@ -407,7 +406,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void thread_pool_executor<Scheduler>::add_processing_unit(
         std::size_t virt_core, std::size_t thread_num, error_code& ec)
     {
-        boost::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
+        std::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
         hpx::state expected = state_initialized;
         if (state.compare_exchange_strong(expected, state_starting))
         {
@@ -429,7 +428,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::size_t virt_core, error_code& ec)
     {
         // inform the scheduler to stop the virtual core
-        boost::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
+        std::atomic<hpx::state>& state = scheduler_.get_state(virt_core);
         hpx::state oldstate = state.exchange(state_stopped);
         HPX_ASSERT(oldstate == state_starting ||
             oldstate == state_running || oldstate == state_suspended ||

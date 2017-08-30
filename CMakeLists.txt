@@ -1187,6 +1187,10 @@ if(NOT WIN32)
   ##############################################################################
   # System libraries
   ##############################################################################
+  if(NOT MSVC)
+    hpx_libraries(atomic)
+  endif()
+
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     hpx_libraries(dl)
   endif()

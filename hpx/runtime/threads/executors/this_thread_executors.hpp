@@ -19,8 +19,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -119,8 +118,8 @@ namespace hpx { namespace threads { namespace executors
             std::size_t orig_thread_num_;
 
             // collect statistics
-            boost::atomic<std::uint64_t> tasks_scheduled_;
-            boost::atomic<std::uint64_t> tasks_completed_;
+            std::atomic<std::uint64_t> tasks_scheduled_;
+            std::atomic<std::uint64_t> tasks_completed_;
 
             // resource manager registration
             std::size_t cookie_;

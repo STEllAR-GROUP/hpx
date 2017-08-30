@@ -33,10 +33,10 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
@@ -55,7 +55,7 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Applications globals.
-boost::atomic<std::uint64_t> donecount(0);
+std::atomic<std::uint64_t> donecount(0);
 
 // Command-line variables.
 std::uint64_t tasks = 500000;

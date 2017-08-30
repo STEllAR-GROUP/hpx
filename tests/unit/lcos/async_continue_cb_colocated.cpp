@@ -10,8 +10,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 #include <utility>
 #include <vector>
@@ -57,7 +56,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<int> callback_called(0);
+std::atomic<int> callback_called(0);
 
 void cb(boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)

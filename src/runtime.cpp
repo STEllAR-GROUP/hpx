@@ -33,8 +33,7 @@
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -263,7 +262,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::atomic<int> runtime::instance_number_counter_(-1);
+    std::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     util::thread_specific_ptr<runtime*, runtime::tls_tag> runtime::runtime_;

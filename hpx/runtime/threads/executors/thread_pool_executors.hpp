@@ -16,8 +16,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -126,15 +125,15 @@ namespace hpx { namespace threads { namespace executors
             lcos::local::counting_semaphore shutdown_sem_;
 
             // collect statistics
-            boost::atomic<std::size_t> current_concurrency_;
-            boost::atomic<std::size_t> max_current_concurrency_;
-            boost::atomic<std::uint64_t> tasks_scheduled_;
-            boost::atomic<std::uint64_t> tasks_completed_;
+            std::atomic<std::size_t> current_concurrency_;
+            std::atomic<std::size_t> max_current_concurrency_;
+            std::atomic<std::uint64_t> tasks_scheduled_;
+            std::atomic<std::uint64_t> tasks_completed_;
 
             // policy elements
             std::size_t const max_punits_;
             std::size_t const min_punits_;
-            boost::atomic<std::size_t> curr_punits_;
+            std::atomic<std::size_t> curr_punits_;
 
             // resource manager registration
             std::size_t cookie_;

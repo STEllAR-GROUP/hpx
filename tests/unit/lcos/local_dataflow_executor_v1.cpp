@@ -12,8 +12,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/unwrap.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -42,22 +41,22 @@ using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> void_f_count;
-boost::atomic<std::uint32_t> int_f_count;
+std::atomic<std::uint32_t> void_f_count;
+std::atomic<std::uint32_t> int_f_count;
 
 void void_f() {++void_f_count;}
 int int_f() {++int_f_count; return 42; }
 
-boost::atomic<std::uint32_t> void_f1_count;
-boost::atomic<std::uint32_t> int_f1_count;
+std::atomic<std::uint32_t> void_f1_count;
+std::atomic<std::uint32_t> int_f1_count;
 
 void void_f1(int) {++void_f1_count;}
 int int_f1(int i) {++int_f1_count; return i+42; }
 
-boost::atomic<std::uint32_t> int_f2_count;
+std::atomic<std::uint32_t> int_f2_count;
 int int_f2(int l, int r) {++int_f2_count; return l + r; }
 
-boost::atomic<std::uint32_t> int_f_vector_count;
+std::atomic<std::uint32_t> int_f_vector_count;
 
 int int_f_vector(std::vector<int> const & vf)
 {
@@ -132,8 +131,8 @@ void function_pointers(Executor& exec)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> future_void_f1_count;
-boost::atomic<std::uint32_t> future_void_f2_count;
+std::atomic<std::uint32_t> future_void_f1_count;
+std::atomic<std::uint32_t> future_void_f2_count;
 
 void future_void_f1(future<void> f1)
 {
@@ -154,8 +153,8 @@ void future_void_f2(future<void> f1, future<void> f2)
     ++future_void_f2_count;
 }
 
-boost::atomic<std::uint32_t> future_int_f1_count;
-boost::atomic<std::uint32_t> future_int_f2_count;
+std::atomic<std::uint32_t> future_int_f1_count;
+std::atomic<std::uint32_t> future_int_f2_count;
 
 int future_int_f1(future<void> f1)
 {
@@ -171,7 +170,7 @@ int future_int_f2(future<int> f1, future<int> f2)
     return f1.get() + f2.get();
 }
 
-boost::atomic<std::uint32_t> future_int_f_vector_count;
+std::atomic<std::uint32_t> future_int_f_vector_count;
 
 int future_int_f_vector(std::vector<future<int> >& vf)
 {
@@ -251,14 +250,14 @@ void future_function_pointers(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::uint32_t> void_f4_count;
-boost::atomic<std::uint32_t> int_f4_count;
+std::atomic<std::uint32_t> void_f4_count;
+std::atomic<std::uint32_t> int_f4_count;
 
 void void_f4(int) { ++void_f4_count; }
 int int_f4(int i) { ++int_f4_count; return i+42; }
 
-boost::atomic<std::uint32_t> void_f5_count;
-boost::atomic<std::uint32_t> int_f5_count;
+std::atomic<std::uint32_t> void_f5_count;
+std::atomic<std::uint32_t> int_f5_count;
 
 void void_f5(int, hpx::future<int>) { ++void_f5_count; }
 int int_f5(int i, hpx::future<int> j) { ++int_f5_count; return i+j.get()+42; }

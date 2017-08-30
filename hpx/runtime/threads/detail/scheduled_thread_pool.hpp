@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -23,8 +24,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/atomic.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -313,8 +312,8 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::int64_t> idle_loop_counts_, busy_loop_counts_;
 
         // support detail::manage_executor interface
-        boost::atomic<long> thread_count_;
-        boost::atomic<std::int64_t> tasks_scheduled_;
+        std::atomic<long> thread_count_;
+        std::atomic<std::int64_t> tasks_scheduled_;
     };
 }}}    // namespace hpx::threads::detail
 
