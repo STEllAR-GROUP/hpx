@@ -19,7 +19,12 @@
 #include <hpx/util/detail/pp/stringize.hpp>
 //
 #include <boost/preprocessor.hpp>
-#include <sched.h>
+#if defined(__linux) || defined(__linux__)
+# include <sched.h>
+#else
+# define sched_getcpu() '#'
+#endif
+
 
 // ------------------------------------------------------------------
 // Set flags to help simplify the log defines
