@@ -18,7 +18,7 @@
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/array.hpp>
+#include <array>
 
 #include <cstddef>
 #include <cstdint>
@@ -130,7 +130,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
     private:
-        boost::array<char, data_size_> data_;
+        std::array<char, data_size_> data_;
 
         template <std::size_t Pos, typename T>
         void set(T const & t)
