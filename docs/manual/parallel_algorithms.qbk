@@ -339,6 +339,11 @@ __hpx__ provides implementations of the following parallel algorithms:
 
 [table Set operations on sorted sequences (In Header: `<hpx/include/parallel_algorithm.hpp>`)
     [[Name]     [Description]   [In Header] [Algorithm page at cppreference.com]]
+    [[ [algoref merge] ]
+     [Merges two sorted ranges.]
+     [`<hpx/include/parallel_merge.hpp>`]
+     [[cpprefalgodocs merge]]
+    ]
     [[ [algoref includes] ]
      [Returns true if one set is a subset of another.]
      [`<hpx/include/parallel_set_operations.hpp>`]
