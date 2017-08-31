@@ -95,7 +95,7 @@ namespace hpx { namespace threads { namespace detail
         auto const& rp = resource::get_partitioner();
         for (std::size_t i = 0; i != pool_threads; ++i)
         {
-            bit_or(used_processing_units_, rp.get_pu_mask(threads_offset + i));
+            used_processing_units_ |= rp.get_pu_mask(threads_offset + i);
         }
     }
 }}}

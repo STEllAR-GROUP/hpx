@@ -170,6 +170,9 @@ namespace hpx {
         // now create all threadmanager pools
         thread_manager_->create_pools();
 
+        // this initializes the used_processing_units_ mask
+        thread_manager_->init();
+
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
             parcel_handler_, std::uint64_t(runtime_support_.get()),
