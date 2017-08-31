@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/multi_array.hpp>
@@ -166,7 +165,6 @@ void test_boost_array(T first)
     }
 }
 
-#ifdef HPX_HAVE_CXX11_STD_ARRAY
 template <class T, std::size_t N>
 void test_std_array(T first)
 {
@@ -203,7 +201,6 @@ void test_std_array(T first)
         }
     }
 }
-#endif
 
 template <class T>
 void test_multi_array(T first)
@@ -315,11 +312,9 @@ int main()
     test_boost_array<double, 40U>((std::numeric_limits<double>::min)());
     test_boost_array<float, 100U>(0.f);
 
-#ifdef HPX_HAVE_CXX11_STD_ARRAY
     test_std_array<char, 100U>('\0');
     test_std_array<double, 40U>((std::numeric_limits<double>::min)());
     test_std_array<float, 100U>(0.f);
-#endif
 
     test_multi_array(0);
     test_multi_array(0.);
@@ -332,5 +327,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-
-#endif

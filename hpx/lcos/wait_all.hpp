@@ -122,9 +122,7 @@ namespace hpx
 #include <boost/ref.hpp>
 
 #include <algorithm>
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -170,12 +168,10 @@ namespace hpx { namespace lcos
           : is_future_or_shared_state<T>
         {};
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
         template <typename T, std::size_t N>
         struct is_future_or_shared_state_range<std::array<T, N> >
           : is_future_or_shared_state<T>
         {};
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
@@ -390,7 +386,6 @@ namespace hpx { namespace lcos
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
     void wait_all(std::array<Future, N> const& values)
@@ -416,7 +411,6 @@ namespace hpx { namespace lcos
     {
         lcos::wait_all(const_cast<std::array<Future, N> const&>(values));
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
