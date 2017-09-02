@@ -236,7 +236,7 @@ void test_plain_array()
     T oarray[N];
 
     for(std::size_t i = 0; i < N; ++i) {
-        iarray[i] = i * i;
+        iarray[i] = static_cast<T>(i * i);
         oarray[i] = -1;
     }
 
@@ -261,7 +261,7 @@ void test_array_of_vectors()
 
     for(std::size_t i = 0; i < N; ++i) {
         for (std::size_t j = 0; j < i; ++j) {
-            iarray[i].push_back(i * i);
+            iarray[i].push_back(static_cast<T>(i * i));
         }
     }
 
