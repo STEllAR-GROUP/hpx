@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if defined(HPX_HAVE_CUDA)
 #include <hpx/traits/executor_traits.hpp>
 
 #include <hpx/compute/cuda/concurrent_executor_parameters.hpp>

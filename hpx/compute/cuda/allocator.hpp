@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if defined(HPX_HAVE_CUDA)
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/compute/cuda/target.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace compute { namespace cuda
         typedef T value_type;
         typedef target_ptr<T> pointer;
         typedef target_ptr<T const> const_pointer;
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
         typedef T& reference;
         typedef T const& const_reference;
 #else
@@ -80,7 +80,7 @@ namespace hpx { namespace compute { namespace cuda
         // operator&
         pointer address(reference x) const noexcept
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return &x;
 #else
             return pointer(x.device_ptr(), target_);
@@ -89,7 +89,7 @@ namespace hpx { namespace compute { namespace cuda
 
         const_pointer address(const_reference x) const noexcept
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return &x;
 #else
             return pointer(x.device_ptr(), target_);
@@ -104,7 +104,7 @@ namespace hpx { namespace compute { namespace cuda
         pointer allocate(size_type n,
             std::allocator<void>::const_pointer hint = nullptr)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             pointer result;
 #else
             value_type *p = nullptr;
@@ -130,7 +130,7 @@ namespace hpx { namespace compute { namespace cuda
         // originally produced p; otherwise, the behavior is undefined.
         void deallocate(pointer p, size_type n)
         {
-#if !defined(__CUDA_ARCH__)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             detail::scoped_active_target active(target_);
 
             cudaError_t error = cudaFree(p.device_ptr());

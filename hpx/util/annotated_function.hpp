@@ -35,7 +35,7 @@ namespace hpx { namespace util
 {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
-#if (!defined(__NVCC__) && !defined(__CUDACC__))
+#if defined(HPX_COMPUTE_DEVICE_CODE)
     struct annotate_function
     {
         HPX_NON_COPYABLE(annotate_function);
@@ -45,7 +45,7 @@ namespace hpx { namespace util
         explicit HPX_HOST_DEVICE annotate_function(F && f) {}
 
         // add empty (but non-trivial) destructor to silence warnings
-        ~annotate_function() {}
+        HPX_HOST_DEVICE ~annotate_function() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
     struct annotate_function
@@ -187,7 +187,7 @@ namespace hpx { namespace util
         explicit HPX_HOST_DEVICE annotate_function(F && f) {}
 
         // add empty (but non-trivial) destructor to silence warnings
-        ~annotate_function() {}
+        HPX_HOST_DEVICE ~annotate_function() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
