@@ -8,6 +8,8 @@
 #if !defined(HPX_COMPONENTS_BINPACKING_DISTRIBUTION_POLICY_APR_10_2015_0344PM)
 #define HPX_COMPONENTS_BINPACKING_DISTRIBUTION_POLICY_APR_10_2015_0344PM
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 #include <hpx/config.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -484,5 +486,7 @@ namespace hpx
     }
 }
 /// \endcond
+
+#endif
 
 #endif
