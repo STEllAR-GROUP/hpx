@@ -11,11 +11,11 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hwloc.h>
 
-#include <boost/format.hpp>
 #include <boost/variant.hpp>
 
 // #define BOOST_SPIRIT_DEBUG
@@ -371,9 +371,9 @@ namespace hpx { namespace threads { namespace detail
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "extract_socket_or_numanode_mask",
-                boost::str(boost::format(
-                    "unexpected specification type %s"
-                ) % spec_type::type_name(s.type_)));
+                hpx::util::format(
+                    "unexpected specification type %s",
+                    spec_type::type_name(s.type_)));
             break;
         }
 
@@ -443,9 +443,9 @@ namespace hpx { namespace threads { namespace detail
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "extract_core_mask",
-                boost::str(boost::format(
-                    "unexpected specification type %s"
-                ) % spec_type::type_name(s.type_)));
+                hpx::util::format(
+                    "unexpected specification type %s",
+                    spec_type::type_name(s.type_)));
             break;
         }
 
@@ -529,9 +529,9 @@ namespace hpx { namespace threads { namespace detail
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "extract_pu_mask",
-                boost::str(boost::format(
-                    "unexpected specification type %s"
-                ) % spec_type::type_name(s.type_)));
+                hpx::util::format(
+                    "unexpected specification type %s",
+                    spec_type::type_name(s.type_)));
             break;
         }
 
@@ -554,9 +554,9 @@ namespace hpx { namespace threads { namespace detail
         if (b.begin() == b.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
-                boost::str(boost::format(
-                    "no %1% mapping bounds are specified"
-                ) % spec_type::type_name(fmt.first.type_)));
+                hpx::util::format(
+                    "no %1% mapping bounds are specified",
+                    spec_type::type_name(fmt.first.type_)));
             return;
         }
 
@@ -737,10 +737,10 @@ namespace hpx { namespace threads { namespace detail
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "decode_compact_distribution",
-                            boost::str(boost::format(
+                            hpx::util::format(
                                 "affinity mask for thread %1% has "
-                                "already been set"
-                            ) % num_thread));
+                                "already been set",
+                                num_thread));
                         return;
                     }
                     affinities[num_thread] = t.init_thread_affinity_mask(
@@ -773,10 +773,10 @@ namespace hpx { namespace threads { namespace detail
                 {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "decode_scatter_distribution",
-                        boost::str(boost::format(
+                        hpx::util::format(
                             "affinity mask for thread %1% has "
-                            "already been set"
-                        ) % num_thread));
+                            "already been set",
+                            num_thread));
                     return;
                 }
 
@@ -827,10 +827,10 @@ namespace hpx { namespace threads { namespace detail
                 {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "decode_balanced_distribution",
-                        boost::str(boost::format(
+                        hpx::util::format(
                             "affinity mask for thread %1% has "
-                            "already been set"
-                        ) % num_thread));
+                            "already been set",
+                            num_thread));
                     return;
                 }
                 num_pus[num_thread] = t.get_pu_number(num_core + used_cores, num_pu);
@@ -909,9 +909,9 @@ namespace hpx { namespace threads
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "parse_affinity_options",
-                            boost::str(boost::format(
-                                "bind specification (%1%) is ill formatted"
-                            ) % spec));
+                            hpx::util::format(
+                                "bind specification (%1%) is ill formatted",
+                                spec));
                         return;
                     }
 
@@ -919,9 +919,9 @@ namespace hpx { namespace threads
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "parse_affinity_options",
-                            boost::str(boost::format(
-                                "bind specification (%1%) is ill formatted"
-                            ) % spec));
+                            hpx::util::format(
+                                "bind specification (%1%) is ill formatted",
+                                spec));
                         return;
                     }
 
@@ -931,9 +931,9 @@ namespace hpx { namespace threads
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "parse_affinity_options",
-                            boost::str(boost::format(
-                                "bind specification (%1%) is ill formatted"
-                            ) % spec));
+                            hpx::util::format(
+                                "bind specification (%1%) is ill formatted",
+                                spec));
                         return;
                     }
 

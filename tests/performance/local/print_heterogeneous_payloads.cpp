@@ -10,7 +10,6 @@
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
 
 #include <boost/bind.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstddef>

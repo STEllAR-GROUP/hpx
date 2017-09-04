@@ -13,8 +13,6 @@
 
 #include <vector>
 
-#include <boost/format.hpp>
-
 #include "EasyBMP/EasyBMP.h"
 #include "EasyBMP/EasyBMP.cpp"
 

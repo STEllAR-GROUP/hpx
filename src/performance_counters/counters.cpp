@@ -17,13 +17,12 @@
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/util/bind.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
-
-#include <boost/format.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
@@ -409,7 +408,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                boost::str(boost::format("invalid counter name format: %s") % name));
+                hpx::util::format("invalid counter name format: %s", name));
             return status_invalid_data;
         }
 
@@ -464,9 +463,8 @@ namespace hpx { namespace performance_counters
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "get_counter_path_elements",
-                            boost::str(boost::format(
-                                "invalid counter name format: %s") % name
-                            ));
+                            hpx::util::format(
+                                "invalid counter name format: %s", name));
                         return status_invalid_data;
                     }
                 }
@@ -507,7 +505,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
-                boost::str(boost::format("invalid counter name format: %s") % name));
+                hpx::util::format("invalid counter name format: %s", name));
             return status_invalid_data;
         }
 
@@ -1233,8 +1231,9 @@ namespace hpx { namespace performance_counters
                 if (&ec == &throws)
                     throw;
                 ec = make_error_code(e.get_error(), e.what());
-                LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
-                    % remove_counter_prefix(complemented_info.fullname_) % e.what());
+                LPCS_(warning) << hpx::util::format(
+                    "failed to create counter %s (%s)",
+                    remove_counter_prefix(complemented_info.fullname_), e.what());
                 return lcos::future<naming::id_type>();
             }
         }

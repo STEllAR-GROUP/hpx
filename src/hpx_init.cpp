@@ -27,6 +27,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/logging.hpp>
@@ -34,7 +35,6 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <boost/program_options/options_description.hpp>
@@ -203,11 +203,11 @@ namespace hpx { namespace detail
               << performance_counters::get_counter_type_name(info.type_)
               << '\n';
 
-        boost::format fmt("%d.%d.%d\n");
-        strm << "version:  "        // 0xMMmmrrrr
-              << boost::str(fmt % (info.version_ / 0x1000000) %
-                    (info.version_ / 0x10000 % 0x100) %
-                    (info.version_ % 0x10000));
+        strm << "version:  ";        // 0xMMmmrrrr
+        hpx::util::format_to(strm, "%d.%d.%d\n",
+            info.version_ / 0x1000000,
+            info.version_ / 0x10000 % 0x100,
+            info.version_ % 0x10000);
         strm << std::string(78, '-') << '\n';
 
         print(strm.str(), ec);
@@ -271,8 +271,8 @@ namespace hpx { namespace detail
     void list_component_type(std::string const& name,
         components::component_type ctype)
     {
-        print(boost::str(boost::format("%1%, %|40t|%2%") %
-            name % components::get_component_type_name(ctype)));
+        print(hpx::util::format("%1%, %|40t|%2%",
+            name, components::get_component_type_name(ctype)));
     }
 
     void list_component_types()

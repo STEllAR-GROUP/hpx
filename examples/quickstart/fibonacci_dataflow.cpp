@@ -11,8 +11,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/util.hpp>
 
 #include <hpx/util/unwrap.hpp>
 
@@ -20,8 +20,6 @@
 #include <iostream>
 #include <utility>
 #include <string>
-
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t threshold = 2;
@@ -94,7 +92,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
-        std::cout << (boost::format(fmt) % n % r % (d / max_runs));
+        hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
         executed_one = true;
     }
@@ -115,7 +113,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_await(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
-        std::cout << (boost::format(fmt) % n % r % (d / max_runs));
+        hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
         executed_one = true;
     }

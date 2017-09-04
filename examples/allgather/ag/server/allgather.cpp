@@ -10,8 +10,6 @@
 
 #include "allgather.hpp"
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <fstream>
 #include <iostream>

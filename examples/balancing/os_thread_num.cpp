@@ -8,6 +8,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <cstddef>
@@ -111,15 +112,15 @@ int hpx_main(variables_map& vm)
         for (sorter::value_type const& result : sort)
         {
             if (csv)
-                cout << ( boost::format("%1%,%2%\n")
-                        % result.second
-                        % result.first)
-                     << flush;
+                hpx::util::format_to(cout,
+                    "%1%,%2%\n",
+                    result.second,
+                    result.first) << flush;
             else
-                cout << ( boost::format("OS-thread %1% ran %2% PX-threads\n")
-                        % result.second
-                        % result.first)
-                     << flush;
+                hpx::util::format_to(cout,
+                    "OS-thread %1% ran %2% PX-threads\n",
+                    result.second,
+                    result.first) << flush;
         }
     }
 

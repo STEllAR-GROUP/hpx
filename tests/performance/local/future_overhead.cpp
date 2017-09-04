@@ -9,11 +9,10 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <stdexcept>
@@ -81,15 +80,15 @@ void measure_action_futures(std::uint64_t count, bool csv)
     const double duration = walltime.elapsed();
 
     if (csv)
-        cout << ( boost::format("%1%,%2%\n")
-                % count
-                % duration)
-              << flush;
+        hpx::util::format_to(cout,
+            "%1%,%2%\n",
+            count,
+            duration) << flush;
     else
-        cout << ( boost::format("invoked %1% futures (actions) in %2% seconds\n")
-                % count
-                % duration)
-              << flush;
+        hpx::util::format_to(cout,
+            "invoked %1% futures (actions) in %2% seconds\n",
+            count,
+            duration) << flush;
 }
 
 void measure_function_futures(std::uint64_t count, bool csv)
@@ -110,15 +109,15 @@ void measure_function_futures(std::uint64_t count, bool csv)
     const double duration = walltime.elapsed();
 
     if (csv)
-        cout << ( boost::format("%1%,%2%\n")
-                % count
-                % duration)
-              << flush;
+        hpx::util::format_to(cout,
+            "%1%,%2%\n",
+            count,
+            duration) << flush;
     else
-        cout << ( boost::format("invoked %1% futures (functions) in %2% seconds\n")
-                % count
-                % duration)
-              << flush;
+        hpx::util::format_to(cout,
+            "invoked %1% futures (functions) in %2% seconds\n",
+            count,
+            duration) << flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

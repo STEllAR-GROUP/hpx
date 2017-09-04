@@ -10,9 +10,9 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -197,8 +197,8 @@ int hpx_main(
                 char const* fmt =
                     "%016u, %.7g,%|31t| %.7g%|41t| [steps/second]\n";
 
-                std::cout << (boost::format(fmt) % i % d % step_speed)
-                          << std::flush;
+                hpx::util::format_to(std::cout, fmt, i, d, step_speed)
+                    << std::flush;
 
             }
         }

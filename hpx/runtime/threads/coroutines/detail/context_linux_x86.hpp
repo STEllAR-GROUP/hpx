@@ -19,6 +19,7 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <atomic>
@@ -27,8 +28,6 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <sys/param.h>
-
-#include <boost/format.hpp>
 
 #if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
 
@@ -195,15 +194,15 @@ namespace hpx { namespace threads { namespace coroutines
                 if (0 != (m_stack_size % EXEC_PAGESIZE))
                 {
                     throw std::runtime_error(
-                        boost::str(boost::format(
-                            "stack size of %1% is not page aligned, page size is %2%")
-                            % m_stack_size % EXEC_PAGESIZE));
+                        hpx::util::format(
+                            "stack size of %1% is not page aligned, page size is %2%",
+                            m_stack_size, EXEC_PAGESIZE));
                 }
 
                 if (0 >= m_stack_size)
                 {
                     throw std::runtime_error(
-                        boost::str(boost::format("stack size of %1% is invalid") %
+                        hpx::util::format("stack size of %1% is invalid",
                             m_stack_size));
                 }
 

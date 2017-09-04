@@ -5,12 +5,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/util/format.hpp>
 
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter_factory.hpp>
 #include <hpx/plugins/binary_filter/zlib_serialization_filter.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -96,9 +95,9 @@ namespace hpx { namespace plugins { namespace compression
         {
             HPX_THROW_EXCEPTION(serialization_error,
                 "zlib_serialization_filter::load",
-                boost::str(boost::format("decompression failure, number of "
-                    "bytes expected: %d, number of bytes decoded: %d") %
-                        size % s) );
+                hpx::util::format("decompression failure, number of "
+                    "bytes expected: %d, number of bytes decoded: %d",
+                    size, s));
             return 0;
         }
 

@@ -9,10 +9,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_unique.hpp>
 #include <hpx/include/parallel_generate.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <algorithm>
@@ -126,10 +126,10 @@ void run_benchmark(std::size_t vector_size, int test_count,
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
     auto fmt = "unique_copy (%1%) : %2%(sec)";
-    std::cout << (boost::format(fmt) % "std" % time_std) << std::endl;
-    std::cout << (boost::format(fmt) % "seq" % time_seq) << std::endl;
-    std::cout << (boost::format(fmt) % "par" % time_par) << std::endl;
-    std::cout << (boost::format(fmt) % "par_unseq" % time_par_unseq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq) << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 }
 

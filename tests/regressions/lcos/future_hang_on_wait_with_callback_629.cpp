@@ -10,9 +10,9 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/unwrap.hpp>
 
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -156,8 +156,8 @@ int hpx_main(
             d += null_act(here, 0, children, 1, max_depth, delay_iterations);
 
             if (verbose)
-                std::cout << (boost::format("%016u : %f\n") % i % d)
-                          << std::flush;
+                hpx::util::format_to(std::cout, "%016u : %f\n", i, d)
+                    << std::flush;
         }
     }
 
