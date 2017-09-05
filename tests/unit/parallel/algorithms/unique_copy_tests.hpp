@@ -10,12 +10,11 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/random.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -103,8 +102,8 @@ struct random_fill
         return dist(gen);
     }
 
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> dist;
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 set(example_programs
    )
 
-if(Boost_RANDOM_FOUND)
+if(HPX_HAVE_CXX11_STD_RANDOM)
   set(example_programs
       ${example_programs}
       rnd_future_reduce)

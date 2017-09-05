@@ -10,7 +10,6 @@
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/random.hpp>
 
 #include <algorithm>
 #include <array>
@@ -20,12 +19,13 @@
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <simple_profiler.hpp>
@@ -484,8 +484,8 @@ int reduce(hpx::future<std::vector<hpx::future<int> > > futvec)
 // Test speed of write/put
 void test_write(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
-    boost::random::uniform_int_distribution<>& random_slot,
+    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
+    std::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -706,8 +706,8 @@ static void transfer_data(general_buffer_type recv,
 // Test speed of read/get
 void test_read(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
-    boost::random::uniform_int_distribution<>& random_slot,
+    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
+    std::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -960,9 +960,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::terminate();
     }
     //
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
-    boost::random::uniform_int_distribution<> random_slot(0,
+    std::mt19937 gen;
+    std::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
+    std::uniform_int_distribution<> random_slot(0,
         (int)num_transfer_slots - 1);
     //
     ActiveFutures.reserve(nranks);

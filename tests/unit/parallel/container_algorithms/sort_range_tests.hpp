@@ -30,9 +30,6 @@
 //
 #include "test_utils.hpp"
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-
 #if !defined(HPX_SORT_TEST_SIZE_STRINGS)
 #define HPX_SORT_TEST_SIZE_STRINGS 1000000
 #endif
@@ -47,8 +44,8 @@ template <typename T>
 void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 {
     // use the default random engine and an uniform distribution
-    boost::random::mt19937 eng(static_cast<unsigned int>(seed));
-    boost::random::uniform_real_distribution<double> distr(lower, upper);
+    std::mt19937 eng(static_cast<unsigned int>(seed));
+    std::uniform_real_distribution<double> distr(lower, upper);
 
     for (auto &elem : V) {
         elem = static_cast<T>(distr(eng));

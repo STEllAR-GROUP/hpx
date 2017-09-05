@@ -9,7 +9,6 @@
 #include <hpx/hpx.hpp>
 
 #include <boost/format.hpp>
-#include <boost/random.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
@@ -17,6 +16,7 @@
 #include <cstdint>
 #include <ctime>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -157,8 +157,8 @@ double perform_2n_iterations()
     coroutines.reserve(contexts);
     indices.reserve(iterations);
 
-    boost::random::mt19937_64 prng(seed);
-    boost::random::uniform_int_distribution<std::uint64_t>
+    std::mt19937_64 prng(seed);
+    std::uniform_int_distribution<std::uint64_t>
         dist(0, contexts - 1);
 
     kernel k;

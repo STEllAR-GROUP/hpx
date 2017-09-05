@@ -9,8 +9,7 @@
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/reduce_by_key.hpp>
 //
-#include <boost/random/uniform_int_distribution.hpp>
-//
+#include <random>
 #include <utility>
 #include <vector>
 #ifdef EXTRA_DEBUG
@@ -83,12 +82,12 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distr(rnd_min, rnd_max);
+    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distrk(0, 256);
+    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
     int keysize = 0;
@@ -180,12 +179,12 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distr(rnd_min, rnd_max);
+    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distrk(0, 256);
+    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
     int keysize = 0;
@@ -280,12 +279,12 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distr(rnd_min, rnd_max);
+    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distrk(0, 256);
+    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
     int keysize = 0;
