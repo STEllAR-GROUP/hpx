@@ -96,6 +96,7 @@ namespace hpx { namespace compute { namespace cuda
             static void call(cuda::target const& target, F && f,
                 Shape const& shape, Ts &&... ts)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 typedef typename hpx::traits::range_traits<Shape>::value_type
                     value_type;
 
@@ -126,6 +127,11 @@ namespace hpx { namespace compute { namespace cuda
                         std::forward<F>(f), std::forward<Ts>(ts)...
                     );
                 }
+#else
+                HPX_THROW_EXCEPTION(hpx::not_implemented,
+                    "hpx::compute::cuda::detail::bulk_launch_helper",
+                    "Trying to launch a CUDA kernel, but did not compile in CUDA mode");
+#endif
             }
         };
     }
