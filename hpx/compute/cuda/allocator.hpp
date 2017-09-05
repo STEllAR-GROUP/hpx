@@ -175,7 +175,7 @@ namespace hpx { namespace compute { namespace cuda
             {
                 ::new (p + idx) T (std::forward<Args>(args)...);
             }
-#else
+#elif defined(HPX_COMPUTE_HOST_CODE)
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block - 1) / threads_per_block);
@@ -222,7 +222,7 @@ namespace hpx { namespace compute { namespace cuda
             {
                 (p + idx)->~T();
             }
-#else
+#elif defined(HPX_COMPUTE_HOST_CODE)
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
