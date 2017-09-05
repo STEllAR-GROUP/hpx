@@ -7,7 +7,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
@@ -75,6 +74,3 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
 }
-
-#endif
-

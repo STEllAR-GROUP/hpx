@@ -14,9 +14,7 @@
 
 #include <boost/array.hpp>
 
-#ifdef HPX_HAVE_CXX11_STD_ARRAY
 #include <array>
-#endif
 #include <cstddef>
 #include <type_traits>
 
@@ -101,14 +99,12 @@ namespace hpx { namespace serialization
         ar & hpx::serialization::make_array(a.begin(), a.size());
     }
 
-#ifdef HPX_HAVE_CXX11_STD_ARRAY
-  // implement serialization for std::array
+    // implement serialization for std::array
     template <class Archive, class T, std::size_t N>
     void serialize(Archive& ar, std::array<T,N>& a, const unsigned int /* version */)
     {
         ar & hpx::serialization::make_array(a.data(), a.size());
     }
-#endif
 
     // allow our array to be serialized as prvalue
     // compiler should support good ADL implementation

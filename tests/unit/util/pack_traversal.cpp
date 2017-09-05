@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/pack_traversal.hpp>
 
+#include <array>
 #include <algorithm>
 #include <functional>
 #include <list>
@@ -16,10 +17,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
-#include <array>
-#endif
 
 using hpx::util::tuple;
 using hpx::util::get;
@@ -717,7 +714,6 @@ static void test_strategic_tuple_like_traverse()
         HPX_TEST((res == expected));
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     // Fixed size homogeneous container
     {
         std::array<int, 3> values{{1, 2, 3}};
@@ -725,7 +721,6 @@ static void test_strategic_tuple_like_traverse()
 
         HPX_TEST((res == std::array<float, 3>{{1.f, 1.f, 1.f}}));
     }
-#endif
 
     // Make it possible to pass tuples containing move only objects
     // in as reference, while returning those as reference.
@@ -830,7 +825,6 @@ static void test_spread_tuple_like_traverse()
         static_assert(std::is_void<Result>::value, "Failed...");
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     // 1:2 mappings (multiple arguments)
     {
         std::array<int, 4> res =
@@ -847,7 +841,6 @@ static void test_spread_tuple_like_traverse()
             decltype(map_pack(zero_mapper{}, std::array<int, 2>{{1, 2}}));
         static_assert(std::is_void<Result>::value, "Failed...");
     }
-#endif
 }
 
 int main(int, char**)

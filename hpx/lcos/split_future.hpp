@@ -60,9 +60,7 @@ namespace hpx
 
 #include <boost/intrusive_ptr.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 #include <cstddef>
 #include <exception>
 #include <type_traits>
@@ -261,7 +259,6 @@ namespace hpx { namespace lcos
             return hpx::traits::future_access<hpx::future<T> >::create(p);
         }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
         template <std::size_t N, typename T, typename Future>
         inline std::array<hpx::future<T>, N>
         split_future_helper_array(Future && f)
@@ -273,7 +270,6 @@ namespace hpx { namespace lcos
 
             return result;
         }
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -325,7 +321,6 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     template <std::size_t N, typename T>
     HPX_FORCEINLINE std::array<hpx::future<T>, N>
     split_future(hpx::future<std::array<T, N> > && f)
@@ -357,7 +352,6 @@ namespace hpx { namespace lcos
         result[0] = hpx::make_future<void>(std::move(f));
         return result;
     }
-#endif
 }}
 
 namespace hpx

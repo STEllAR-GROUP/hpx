@@ -17,14 +17,11 @@
 #include <boost/array.hpp>
 #include <boost/type_traits/integral_constant.hpp>
 
+#include <array>
 #include <algorithm>
 #include <cstddef> // for size_t
 #include <type_traits>
 #include <utility>
-
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
-#include <array>
-#endif
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
@@ -575,12 +572,10 @@ namespace hpx { namespace util
       : boost::integral_constant<std::size_t, Size>
     {};
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     template <typename Type, std::size_t Size>
     struct tuple_size<std::array<Type, Size> >
       : boost::integral_constant<std::size_t, Size>
     {};
-#endif
 
     // template <size_t I, class Tuple>
     // class tuple_element
@@ -675,7 +670,6 @@ namespace hpx { namespace util
         }
     };
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     template <std::size_t I, typename Type, std::size_t Size>
     struct tuple_element<I, std::array<Type, Size> >
     {
@@ -693,7 +687,6 @@ namespace hpx { namespace util
             return tuple[I];
         }
     };
-#endif
 
     // 20.4.2.6, element access
 
