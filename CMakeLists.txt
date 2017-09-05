@@ -1196,6 +1196,7 @@ if(NOT WIN32)
   # System libraries
   ##############################################################################
   if(NOT MSVC)
+    hpx_add_compile_flag_if_available(-pthread)
     hpx_libraries(atomic)
   endif()
 
