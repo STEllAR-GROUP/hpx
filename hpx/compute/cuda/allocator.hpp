@@ -168,8 +168,14 @@ namespace hpx { namespace compute { namespace cuda
         // Constructs count objects of type T in allocated uninitialized
         // storage pointed to by p, using placement-new
         template <typename ... Args>
-        void bulk_construct(pointer p, std::size_t count, Args &&... args)
+        HPX_HOST_DEVICE void bulk_construct(pointer p, std::size_t count, Args &&... args)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            for (std::size_t idx = 0; idx < count; ++idx)
+            {
+                ::new (p + idx) T (std::forward<Args>(args)...);
+            }
+#else
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block - 1) / threads_per_block);
@@ -186,13 +192,17 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), count, std::forward<Args>(args)...);
             target_.synchronize();
+#endif
         }
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
         template <typename ... Args>
-        void construct(pointer p, Args &&... args)
+        HPX_HOST_DEVICE void construct(pointer p, Args &&... args)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            ::new (p) T (std::forward<Args>(args)...);
+#else
             detail::launch(
                 target_, 1, 1,
                 [] HPX_DEVICE (T* p, Args const&... args)
@@ -201,11 +211,18 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), std::forward<Args>(args)...);
             target_.synchronize();
+#endif
         }
 
         // Calls the destructor of count objects pointed to by p
-        void bulk_destroy(pointer p, std::size_t count)
+        HPX_HOST_DEVICE void bulk_destroy(pointer p, std::size_t count)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            for (std::size_t idx = 0; idx < count; ++idx)
+            {
+                (p + idx)->~T();
+            }
+#else
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
@@ -222,10 +239,11 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), count);
             target_.synchronize();
+#endif
         }
 
         // Calls the destructor of the object pointed to by p
-        void destroy(pointer p)
+        HPX_HOST_DEVICE void destroy(pointer p)
         {
             bulk_destroy(p, 1);
         }

@@ -97,7 +97,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             static_assert(sizeof(Closure) < 256,
                 "We currently require the closure to be less than 256 bytes");
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_HOST_CODE)
             detail::scoped_active_target active(tgt);
 
             launch_function<<<gridDim, blockDim, 0, active.stream()>>>(

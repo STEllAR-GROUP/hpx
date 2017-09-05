@@ -92,26 +92,39 @@ namespace hpx { namespace compute { namespace cuda
 
         // Constructs default target
         HPX_HOST_DEVICE target()
-          : handle_(), locality_(hpx::find_here())
+          : handle_()
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+          , locality_(hpx::find_here())
+#endif
         {}
 
         // Constructs target from a given device ID
         explicit HPX_HOST_DEVICE target(int device)
-          : handle_(device), locality_(hpx::find_here())
+          : handle_(device)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+          , locality_(hpx::find_here())
+#endif
         {}
 
         HPX_HOST_DEVICE target(hpx::id_type const& locality, int device)
-          : handle_(device), locality_(locality)
+          : handle_(device)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+          , locality_(locality)
+#endif
         {}
 
         HPX_HOST_DEVICE target(target const& rhs) noexcept
-          : handle_(rhs.handle_),
-            locality_(rhs.locality_)
+          : handle_(rhs.handle_)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+          , locality_(rhs.locality_)
+#endif
         {}
 
         HPX_HOST_DEVICE target(target && rhs) noexcept
-          : handle_(std::move(rhs.handle_)),
-            locality_(std::move(rhs.locality_))
+          : handle_(std::move(rhs.handle_))
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+          , locality_(std::move(rhs.locality_))
+#endif
         {}
 
         HPX_HOST_DEVICE target& operator=(target const& rhs) noexcept
@@ -119,7 +132,9 @@ namespace hpx { namespace compute { namespace cuda
             if (&rhs != this)
             {
                 handle_ = rhs.handle_;
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
                 locality_ = rhs.locality_;
+#endif
             }
             return *this;
         }
@@ -129,7 +144,9 @@ namespace hpx { namespace compute { namespace cuda
             if (&rhs != this)
             {
                 handle_ = std::move(rhs.handle_);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
                 locality_ = std::move(rhs.locality_);
+#endif
             }
             return *this;
         }
