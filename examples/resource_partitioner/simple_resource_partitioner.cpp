@@ -141,8 +141,10 @@ int hpx_main(boost::program_options::variables_map& vm)
                 }
             }
             // the last futures we made are stored in here
-            future_4.get();
-            future_5.get();
+            if (future_4.valid())
+                future_4.get();
+            if (future_5.valid())
+                future_5.get();
         });
 
     future_3.get();

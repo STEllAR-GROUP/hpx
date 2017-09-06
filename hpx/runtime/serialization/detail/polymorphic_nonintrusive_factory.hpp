@@ -11,9 +11,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/pp/strip_parens.hpp>
@@ -30,6 +32,7 @@
 
 namespace hpx { namespace serialization { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct get_serialization_name
 #ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
@@ -65,12 +68,45 @@ namespace hpx { namespace serialization { namespace detail
     class constructor_selector
     {
     public:
-        static T *create(input_archive& ar)
+        static T* create(input_archive& ar)
         {
-            T *t = new T;
-            try {
-                load_polymorphic(t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
-            } catch (...) {
+            return create(ar, std::is_default_constructible<T>());
+        }
+
+        // is default-constructible
+        static T* create(input_archive& ar, std::true_type)
+        {
+            T* t = new T;
+            try
+            {
+                load_polymorphic(
+                    t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
+            }
+            catch (...)
+            {
+                delete t;
+                throw;
+            }
+            return t;
+        }
+
+        // is non-default-constructible
+        static T* create(input_archive& ar, std::false_type)
+        {
+            using storage_type = typename std::aligned_storage<
+                sizeof(T), alignof(T)>::type;
+
+            storage_type* storage = new storage_type;
+            T* t = reinterpret_cast<T*>(storage);
+            load_construct_data(ar, t, 0);
+
+            try
+            {
+                load_polymorphic(
+                    t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
+            }
+            catch (...)
+            {
                 delete t;
                 throw;
             }
@@ -78,12 +114,12 @@ namespace hpx { namespace serialization { namespace detail
         }
 
     private:
-        static void load_polymorphic(T *t, input_archive& ar, std::true_type)
+        static void load_polymorphic(T* t, input_archive& ar, std::true_type)
         {
             serialize(ar, *t, 0);
         }
 
-        static void load_polymorphic(T *t, input_archive& ar, std::false_type)
+        static void load_polymorphic(T* t, input_archive& ar, std::false_type)
         {
             ar >> *t;
         }

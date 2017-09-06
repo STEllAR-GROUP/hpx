@@ -19,6 +19,7 @@
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
@@ -26,16 +27,115 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace actions
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // If one or more arguments of the action are non-default-constructible,
+    // the transfer_action does not store the argument tuple directly but a
+    // unique_ptr to the tuple instead.
+    namespace detail
+    {
+        template <typename Args>
+        struct argument_holder
+        {
+            argument_holder() = default;
+
+            explicit argument_holder(Args && args)
+              : data_(new Args(std::move(args)))
+            {}
+
+            template <typename ... Ts>
+            argument_holder(Ts && ... ts)
+              : data_(new Args(std::forward<Ts>(ts)...))
+            {}
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned int const)
+            {
+                ar & data_;
+            }
+
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            Args& data()
+            {
+                HPX_ASSERT(!!data_);
+                return *data_;
+            }
+
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+            HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+            Args const& data() const
+            {
+                return *data_;
+            }
+#else
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            Args const& data() const
+            {
+                HPX_ASSERT(!!data_);
+                return *data_;
+            }
+#endif
+
+        private:
+            std::unique_ptr<Args> data_;
+        };
+    }
+}}
+
+namespace hpx { namespace util
+{
+    template <std::size_t I, typename Args>
+    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename util::tuple_element<I, Args>::type&
+    get(hpx::actions::detail::argument_holder<Args>& t)
+    {
+        return util::tuple_element<I, Args>::get(t.data());
+    }
+
+    template <std::size_t I, typename Args>
+    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename util::tuple_element<I, Args>::type const&
+    get(hpx::actions::detail::argument_holder<Args> const& t)
+    {
+        return util::tuple_element<I, Args>::get(t.data());
+    }
+
+    template <std::size_t I, typename Args>
+    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename util::tuple_element<I, Args>::type&&
+    get(hpx::actions::detail::argument_holder<Args>&& t)
+    {
+        return std::forward<typename util::tuple_element<I, Args>::type>(
+            util::get<I>(t.data()));
+    }
+
+    template <std::size_t I, typename Args>
+    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    typename util::tuple_element<I, Args>::type const&&
+    get(hpx::actions::detail::argument_holder<Args> const&& t)
+    {
+        return std::forward<
+                typename util::tuple_element<I, Args>::type const
+            >(util::get<I>(t.data()));
+    }
+}}
+
+namespace hpx { namespace actions
+{
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct transfer_base_action : base_action
     {
@@ -46,7 +146,12 @@ namespace hpx { namespace actions
         typedef typename Action::component_type component_type;
         typedef typename Action::derived_type derived_type;
         typedef typename Action::result_type result_type;
-        typedef typename Action::arguments_type arguments_type;
+        typedef typename Action::arguments_type arguments_base_type;
+        typedef typename std::conditional<
+                std::is_constructible<arguments_base_type>::value,
+                    arguments_base_type,
+                    detail::argument_holder<arguments_base_type>
+            >::type arguments_type;
         typedef typename Action::continuation_type continuation_type;
 
         // This is the priority value this action has been instantiated with

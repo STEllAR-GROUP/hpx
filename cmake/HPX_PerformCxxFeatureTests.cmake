@@ -81,7 +81,7 @@ macro(hpx_perform_cxx_feature_tests)
 
   # Check the availability of certain C++11 library features
   hpx_check_for_cxx11_std_array(
-    DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
+    REQUIRED "HPX needs support for C++11 std::array")
 
   hpx_check_for_cxx11_std_atomic(
     REQUIRED "HPX needs support for C++11 std::atomic")

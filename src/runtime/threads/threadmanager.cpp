@@ -711,7 +711,36 @@ namespace hpx { namespace threads
 
             case resource::throttle:
             {
-#if !defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
+
+                // instantiate the scheduler
+                typedef hpx::threads::policies::throttling_scheduler<>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    1000, numa_sensitive, "throttling_scheduler");
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
+
+                // instantiate the pool
+                std::unique_ptr<detail::thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<
+                            local_sched_type
+                        >(std::move(sched),
+                        notifier_, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset));
+                pools_.push_back(std::move(pool));
+
+#else
                 throw hpx::detail::command_line_error(
                     "Command line option "
                     "--hpx:queuing=throttle "

@@ -5,7 +5,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
@@ -206,5 +205,3 @@ int main(int argc, char* argv[])
       "HPX main exited with non-zero status");
     return report_errors();
 }
-
-#endif
