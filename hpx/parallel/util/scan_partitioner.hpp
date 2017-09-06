@@ -48,15 +48,15 @@ namespace hpx { namespace parallel { namespace util
         // each available core.
         template <typename R, typename Result1, typename Result2,
             typename ScanPartTag>
-        struct static_scan_partitioner_async;
+        struct static_scan_partitioner_helper;
 
         template <typename R, typename Result1, typename Result2>
-        struct static_scan_partitioner_async<R, Result1, Result2,
+        struct static_scan_partitioner_helper<R, Result1, Result2,
             scan_partitioner_normal_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3, typename F4>
-            static hpx::future<R> call(ExPolicy && policy, FwdIter first,
+            static R call(ExPolicy && policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 F4 && f4)
             {
@@ -70,10 +70,7 @@ namespace hpx { namespace parallel { namespace util
                     scoped_executor_parameters;
 
                 // inform parameter traits
-                std::shared_ptr<scoped_executor_parameters>
-                    scoped_param(std::make_shared<
-                            scoped_executor_parameters
-                        >(policy.parameters()));
+                scoped_executor_parameters scoped_param(policy.parameters());
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
@@ -139,39 +136,37 @@ namespace hpx { namespace parallel { namespace util
                             f2, prev, curr));
                     }
                 }
-                catch (std::bad_alloc const&) {
-                    return hpx::make_exceptional_future<R>(
-                        std::current_exception());
-                }
                 catch (...) {
-                    errors.push_back(std::current_exception());
+                    handle_local_exceptions<ExPolicy>::call(
+                        std::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
-                return dataflow(
-                    [errors, f4, scoped_param](
-                        std::vector<hpx::shared_future<Result1> >&& witems,
-                        std::vector<hpx::future<Result2> >&& fitems
-                    ) mutable -> R
-                    {
-                        HPX_UNUSED(scoped_param);
+                hpx::wait_all(workitems, finalitems);
 
-                        handle_local_exceptions<ExPolicy>::call(witems, errors);
-                        handle_local_exceptions<ExPolicy>::call(fitems, errors);
+                // always rethrow if 'errors' is not empty or 'workitems' or
+                // 'finalitems' have an exceptional future
+                handle_local_exceptions<ExPolicy>::call(workitems, errors);
+                handle_local_exceptions<ExPolicy>::call(finalitems, errors);
 
-                        return f4(std::move(witems), std::move(fitems));
-                    },
-                    std::move(workitems), std::move(finalitems));
+                try {
+                    return f4(std::move(workitems), std::move(finalitems));
+                }
+                catch (...) {
+                    // rethrow either bad_alloc or exception_list
+                    handle_local_exceptions<ExPolicy>::call(
+                        std::current_exception());
+                }
             }
         };
 
         template <typename R, typename Result1, typename Result2>
-        struct static_scan_partitioner_async<R, Result1, Result2,
+        struct static_scan_partitioner_helper<R, Result1, Result2,
             scan_partitioner_sequential_f3_tag>
         {
             template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3, typename F4>
-            static hpx::future<R> call(ExPolicy && policy, FwdIter first,
+            static R call(ExPolicy && policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 F4 && f4)
             {
@@ -185,10 +180,7 @@ namespace hpx { namespace parallel { namespace util
                     scoped_executor_parameters;
 
                 // inform parameter traits
-                std::shared_ptr<scoped_executor_parameters>
-                    scoped_param(std::make_shared<
-                            scoped_executor_parameters
-                        >(policy.parameters()));
+                scoped_executor_parameters scoped_param(policy.parameters());
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
@@ -289,29 +281,27 @@ namespace hpx { namespace parallel { namespace util
                             workitems[widx], workitems[widx + 1]));
                     }
                 }
-                catch (std::bad_alloc const&) {
-                    return hpx::make_exceptional_future<R>(
-                        std::current_exception());
-                }
                 catch (...) {
-                    errors.push_back(std::current_exception());
+                    handle_local_exceptions<ExPolicy>::call(
+                        std::current_exception(), errors);
                 }
 
                 // wait for all tasks to finish
-                return dataflow(
-                    [errors, f4, scoped_param](
-                        std::vector<hpx::shared_future<Result1> >&& witems,
-                        std::vector<hpx::future<Result2> >&& fitems
-                    ) mutable -> R
-                    {
-                        HPX_UNUSED(scoped_param);
+                hpx::wait_all(workitems, finalitems);
 
-                        handle_local_exceptions<ExPolicy>::call(witems, errors);
-                        handle_local_exceptions<ExPolicy>::call(fitems, errors);
+                // always rethrow if 'errors' is not empty or 'workitems' or
+                // 'finalitems' have an exceptional future
+                handle_local_exceptions<ExPolicy>::call(workitems, errors);
+                handle_local_exceptions<ExPolicy>::call(finalitems, errors);
 
-                        return f4(std::move(witems), std::move(fitems));
-                    },
-                    std::move(workitems), std::move(finalitems));
+                try {
+                    return f4(std::move(workitems), std::move(finalitems));
+                }
+                catch (...) {
+                    // rethrow either bad_alloc or exception_list
+                    handle_local_exceptions<ExPolicy>::call(
+                        std::current_exception());
+                }
             }
         };
 
@@ -325,13 +315,13 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 F4 && f4)
             {
-                return static_scan_partitioner_async<
+                return static_scan_partitioner_helper<
                         R, Result1, Result2, ScanPartTag
                     >::call(
                         std::forward<ExPolicy>(policy),
                         first, count, std::forward<T>(init),
                         std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<F3>(f3), std::forward<F4>(f4)).get();
+                        std::forward<F3>(f3), std::forward<F4>(f4));
             }
         };
 
@@ -346,13 +336,30 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, T && init, F1 && f1,
                 F2 && f2, F3 && f3, F4 && f4)
             {
-                return static_scan_partitioner_async<
-                        R, Result1, Result2, ScanPartTag
-                    >::call(
-                        std::forward<ExPolicy>(policy),
-                        first, count, std::forward<T>(init),
-                        std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<F3>(f3), std::forward<F4>(f4));
+                hpx::future<R> f = execution::async_execute(
+                    policy.executor(),
+                    [=]() mutable -> R
+                    {
+                        return static_scan_partitioner_helper<
+                                R, Result1, Result2, ScanPartTag
+                            >::call(policy, first, count, init,
+                                f1, f2, f3, f4);
+                    });
+
+                if (f.has_exception())
+                {
+                    try {
+                        std::rethrow_exception(f.get_exception_ptr());
+                    }
+                    catch (std::bad_alloc const& ba) {
+                        throw ba;
+                    }
+                    catch (...) {
+                        return hpx::make_exceptional_future<R>(std::current_exception());
+                    }
+                }
+
+                return f;
             }
         };
 
