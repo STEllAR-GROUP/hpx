@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::future<T> > const& workitems,
-            std::list<std::exception_ptr>& errors)
+            std::list<std::exception_ptr>& errors, bool throw_errors = true)
         {
             for (hpx::future<T> const& f: workitems)
             {
@@ -64,14 +64,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     call(f.get_exception_ptr(), errors);
             }
 
-            if (!errors.empty())
+            if (throw_errors && !errors.empty())
                 throw exception_list(std::move(errors));
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         static void call(std::vector<hpx::shared_future<T> > const& workitems,
-            std::list<std::exception_ptr>& errors)
+            std::list<std::exception_ptr>& errors, bool throw_errors = true)
         {
             for (hpx::shared_future<T> const& f: workitems)
             {
@@ -79,13 +79,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     call(f.get_exception_ptr(), errors);
             }
 
-            if (!errors.empty())
+            if (throw_errors && !errors.empty())
                 throw exception_list(std::move(errors));
         }
 
         template <typename T, typename Cleanup>
         static void call(std::vector<hpx::future<T> >& workitems,
-            std::list<std::exception_ptr>& errors, Cleanup && cleanup)
+            std::list<std::exception_ptr>& errors, Cleanup && cleanup,
+            bool throw_errors = true)
         {
             bool has_exception = false;
             std::exception_ptr bad_alloc_exception;
@@ -122,7 +123,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             if (bad_alloc_exception)
                 std::rethrow_exception(bad_alloc_exception);
 
-            if (!errors.empty())
+            if (throw_errors && !errors.empty())
                 throw exception_list(std::move(errors));
         }
     };
@@ -144,7 +145,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::future<T> > const& workitems,
-            std::list<std::exception_ptr>&)
+            std::list<std::exception_ptr>&, bool = true)
         {
             for (hpx::future<T> const& f: workitems)
             {
@@ -155,7 +156,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::shared_future<T> > const& workitems,
-            std::list<std::exception_ptr>&)
+            std::list<std::exception_ptr>&, bool = true)
         {
             for (hpx::shared_future<T> const& f: workitems)
             {
@@ -166,7 +167,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T, typename Cleanup>
         static void call(std::vector<hpx::future<T> > const& workitems,
-            std::list<std::exception_ptr>&, Cleanup &&)
+            std::list<std::exception_ptr>&, Cleanup &&, bool = true)
         {
             for (hpx::future<T> const& f: workitems)
             {
