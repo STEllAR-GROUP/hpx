@@ -128,7 +128,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return tmp;
         }
 
-        HPX_ATTRIBUTE_NORETURN void exit()
+        HPX_NORETURN void exit()
         {
             m_pimpl->exit_self();
             std::terminate(); // FIXME: replace with hpx::terminate();

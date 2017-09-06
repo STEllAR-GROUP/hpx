@@ -111,7 +111,7 @@ struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     }
 
     /** uninitialized constructor */
-    tagged_ptr_pair(): pair_(0) {}
+    tagged_ptr_pair() noexcept: pair_(0) {}
 
     template <typename IntegralL>
     tagged_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag):
@@ -122,15 +122,14 @@ struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         pair_(pack_ptr_pair(lptr, rptr, ltag, rtag)) {}
 
     /** copy constructors */
-    tagged_ptr_pair(tagged_ptr_pair const& p): pair_(p.pair_) {}
+    tagged_ptr_pair(tagged_ptr_pair const& p) = default;
 
     tagged_ptr_pair(Left* lptr, Right* rptr):
         pair_(pack_ptr_pair(lptr, rptr, 0, 0)) {}
 
     /** unsafe set operations */
     /* @{ */
-    void operator= (tagged_ptr_pair const& p)
-    { pair_ = p.pair_; }
+    void operator= (tagged_ptr_pair const& p) = default;
 
     void set(Left* lptr, Right* rptr)
     { pair_ = pack_ptr_pair(lptr, rptr, 0, 0); }
@@ -292,7 +291,7 @@ struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     }
 
     /** uninitialized constructor */
-    tagged_ptr_pair() { pair_.left = 0; pair_.right = 0; }
+    tagged_ptr_pair() noexcept { pair_.left = 0; pair_.right = 0; }
 
     template <typename IntegralL>
     tagged_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag)
@@ -303,23 +302,14 @@ struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     { pack_ptr_pair(pair_, lptr, rptr, ltag, rtag); }
 
     /** copy constructors */
-    tagged_ptr_pair(tagged_ptr_pair const& p)
-    {
-        pair_.left = p.pair_.left;
-        pair_.right = p.pair_.right;
-    }
+    tagged_ptr_pair(tagged_ptr_pair const& p) = default;
 
     tagged_ptr_pair(Left* lptr, Right* rptr)
     { pack_ptr_pair(pair_, lptr, rptr, 0, 0); }
 
     /** unsafe set operations */
     /* @{ */
-    tagged_ptr_pair& operator= (tagged_ptr_pair const& p)
-    {
-        pair_.left = p.pair_.left;
-        pair_.right = p.pair_.right;
-        return *this;
-    }
+    tagged_ptr_pair& operator= (tagged_ptr_pair const& p) = default;
 
     void set(Left* lptr, Right* rptr)
     { pack_ptr_pair(pair_, lptr, rptr, 0, 0); }

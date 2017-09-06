@@ -27,14 +27,14 @@
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -56,7 +56,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_ATTRIBUTE_NORETURN void handle_termination(char const* reason)
+    HPX_NORETURN void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
         {
@@ -112,7 +112,7 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT HPX_ATTRIBUTE_NORETURN void termination_handler(int signum)
+    HPX_EXPORT HPX_NORETURN void termination_handler(int signum)
     {
         if (signum != SIGINT &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -231,13 +231,11 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration & rtcfg
-          , threads::policies::init_affinity_data const& affinity_init)
+    runtime::runtime(util::runtime_configuration & rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
-        affinity_init_(affinity_init),
-        topology_(threads::create_topology()),
+        topology_(resource::get_partitioner().get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
@@ -265,7 +263,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::atomic<int> runtime::instance_number_counter_(-1);
+    std::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     util::thread_specific_ptr<runtime*, runtime::tls_tag> runtime::runtime_;
@@ -283,7 +281,7 @@ namespace hpx
             runtime::uptime_.reset(new std::uint64_t);
             *runtime::uptime_.get() = util::high_resolution_clock::now();
 
-            threads::thread_self::init_self();
+            threads::thread_self::init_self(); // done in resource_partitioner
         }
     }
 
@@ -326,7 +324,7 @@ namespace hpx
         return *thread_support_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
     void runtime::register_query_counters(
         std::shared_ptr<util::query_counters> const& active_counters)
     {
@@ -661,15 +659,15 @@ namespace hpx
 
     std::uint32_t runtime::assign_cores()
     {
-        // initialize thread affinity settings in the scheduler
-        if (affinity_init_.used_cores_ == 0) {
-            // correct used_cores from config data if appropriate
-            affinity_init_.used_cores_ = std::size_t(
-                this->get_config().get_first_used_core());
-        }
+        // adjust thread assignments to allow for more than one locality per
+        // node
+        std::size_t first_core = this->get_config().get_first_used_core();
+        std::size_t cores_needed =
+            hpx::resource::get_partitioner().assign_cores(first_core);
 
-        return static_cast<std::uint32_t>(
-            this->get_thread_manager().init(affinity_init_));
+        // this initializes the used_processing_units_ mask
+        get_thread_manager().init();
+        return static_cast<std::uint32_t>(cores_needed);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -760,45 +758,62 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     std::string get_config_entry(std::string const& key, std::string const& dflt)
     {
-        if (nullptr == get_runtime_ptr())
-            return dflt;
-        return get_runtime().get_config().get_entry(key, dflt);
+        //! FIXME runtime_configuration should probs be a member of
+        // hpx::runtime only, not command_line_handling
+        //! FIXME change functions in this section accordingly
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime().get_config().get_entry(key, dflt);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return std::to_string(dflt);
-        return get_runtime().get_config().get_entry(key, dflt);
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime().get_config().get_entry(key, dflt);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     // set entries
     void set_config_entry(std::string const& key, std::string const& value)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_entry(key, value);
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime_ptr()->get_config().add_entry(key, value);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.add_entry(key, value);
     }
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_entry(key, std::to_string(value));
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime_ptr()->get_config().add_entry(
+                key, std::to_string(value));
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.
+                add_entry(key, std::to_string(value));
     }
 
     void set_config_entry_callback(std::string const& key,
-        util::function_nonser<
-            void(std::string const&, std::string const&)
-        > const& callback)
+        util::function_nonser<void(
+            std::string const&, std::string const&)> const& callback)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_notification_callback(key, callback);
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime_ptr()->get_config().add_notification_callback(
+                key, callback);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches()
+            .rtcfg_.add_notification_callback(key, callback);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1171,7 +1186,7 @@ namespace hpx { namespace parcelset
 namespace hpx { namespace threads
 {
     // shortcut for get_applier().get_thread_manager()
-    threadmanager_base& get_thread_manager()
+    threadmanager& get_thread_manager()
     {
         return get_runtime().get_thread_manager();
     }
@@ -1201,11 +1216,6 @@ namespace hpx { namespace threads
         get_runtime().get_thread_manager().set_scheduler_mode(m);
     }
 
-    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(
-        threads::topology& topo, std::size_t thread_num)
-    {
-        return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);
-    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1352,4 +1362,3 @@ namespace hpx
         if (nullptr != rt) rt->stop_evaluating_counters();
     }
 }
-

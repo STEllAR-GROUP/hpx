@@ -20,9 +20,9 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/scoped_timer.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -177,7 +177,7 @@ components::component_type component_namespace::bind_prefix(
   , std::uint32_t prefix
     )
 { // {{{ bind_prefix implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.bind_prefix_.time_
     );
     counter_data_.increment_bind_prefix_count();
@@ -272,7 +272,7 @@ components::component_type component_namespace::bind_name(
     std::string const& key
     )
 { // {{{ bind_name implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.bind_name_.time_
     );
     counter_data_.increment_bind_name_count();
@@ -314,7 +314,7 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
     components::component_type key
     )
 { // {{{ resolve_id implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_id_.time_
     );
     counter_data_.increment_resolve_id_count();
@@ -363,7 +363,7 @@ bool component_namespace::unbind(
     std::string const& key
     )
 { // {{{ unbind implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.unbind_name_.time_
     );
     counter_data_.increment_unbind_name_count();
@@ -399,7 +399,7 @@ void component_namespace::iterate_types(
     iterate_types_function_type const& f
     )
 { // {{{ iterate implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.iterate_types_.time_
     );
     counter_data_.increment_iterate_types_count();
@@ -433,7 +433,7 @@ std::string component_namespace::get_component_type_name(
     components::component_type t
     )
 { // {{{ get_component_type_name implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.get_component_type_name_.time_
     );
     counter_data_.increment_get_component_type_name_count();
@@ -479,7 +479,7 @@ std::uint32_t component_namespace::get_num_localities(
     components::component_type key
     )
 { // {{{ get_num_localities implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.num_localities_.time_
     );
     counter_data_.increment_num_localities_count();

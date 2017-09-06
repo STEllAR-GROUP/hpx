@@ -43,13 +43,11 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/void_guard.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -350,26 +348,15 @@ namespace hpx { namespace actions
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        typedef traits::is_future<result_type> is_future_pred;
-
         struct sync_invoke
         {
             template <typename IdOrPolicy, typename Policy, typename ...Ts>
             HPX_FORCEINLINE static result_type call(
-                std::false_type, Policy policy, IdOrPolicy const& id_or_policy,
+                Policy const& policy, IdOrPolicy const& id_or_policy,
                 error_code& ec, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...).get(ec);
-            }
-
-            template <typename IdOrPolicy, typename Policy, typename ...Ts>
-            HPX_FORCEINLINE static result_type call(
-                std::true_type, Policy policy,
-                IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
-            {
-                return hpx::async<basic_action>(policy, id_or_policy,
-                    std::forward<Ts>(vs)...);
             }
         };
 
@@ -380,18 +367,15 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(
-                    is_future_pred(), policy, id, ec, std::forward<Ts>(vs)...);
+            return sync_invoke::call(policy, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(is_future_pred(), launch::sync, id, ec,
-                    std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
@@ -399,18 +383,16 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
-                    std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, id, throws, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
-                    std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, id, throws, std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -423,11 +405,8 @@ namespace hpx { namespace actions
         operator()(launch policy,
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(
-                    is_future_pred(), policy, dist_policy, ec,
-                    std::forward<Ts>(vs)...
-                );
+            return sync_invoke::call(
+                policy, dist_policy, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename DistPolicy, typename ...Ts>
@@ -489,7 +468,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        static boost::atomic<std::int64_t> invocation_count_;
+        static std::atomic<std::int64_t> invocation_count_;
 
     protected:
         static void increment_invocation_count()
@@ -499,7 +478,7 @@ namespace hpx { namespace actions
     };
 
     template <typename Component, typename R, typename ...Args, typename Derived>
-    boost::atomic<std::int64_t>
+    std::atomic<std::int64_t>
         basic_action<Component, R(Args...), Derived>::invocation_count_(0);
 
     namespace detail

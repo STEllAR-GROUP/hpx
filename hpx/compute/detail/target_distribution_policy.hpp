@@ -17,8 +17,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/atomic.hpp>
-
 namespace hpx { namespace compute { namespace detail
 {
     /// This class specifies the parameters for a simple distribution policy

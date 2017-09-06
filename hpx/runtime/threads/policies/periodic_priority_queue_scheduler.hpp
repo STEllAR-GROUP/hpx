@@ -17,8 +17,7 @@
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -50,7 +49,7 @@ namespace hpx { namespace threads { namespace policies
         typedef std::true_type has_periodic_maintenance;
 
         void start_periodic_maintenance(
-            boost::atomic<hpx::state>& global_state)
+            std::atomic<hpx::state>& global_state)
         {
             threads::detail::start_periodic_maintenance(*this, global_state,
                 has_periodic_maintenance());

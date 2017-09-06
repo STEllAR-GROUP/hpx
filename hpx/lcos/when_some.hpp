@@ -240,9 +240,8 @@ namespace hpx
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -319,7 +318,7 @@ namespace hpx { namespace lcos
                 >::type* = nullptr) const
             {
                 std::size_t counter =
-                    when_.count_.load(boost::memory_order_seq_cst);
+                    when_.count_.load(std::memory_order_seq_cst);
                 if (counter < when_.needed_count_)
                 {
                     // handle future only if not enough futures are ready
@@ -463,14 +462,14 @@ namespace hpx { namespace lcos
                 }
 
                 // at least N futures should be ready
-                HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
+                HPX_ASSERT(count_.load(std::memory_order_seq_cst) >= needed_count_);
 
                 return std::move(lazy_values_);
             }
 
             mutable mutex_type mtx_;
             when_some_result<Sequence> lazy_values_;
-            boost::atomic<std::size_t> count_;
+            std::atomic<std::size_t> count_;
             std::size_t needed_count_;
             bool goal_reached_on_calling_thread_;
         };

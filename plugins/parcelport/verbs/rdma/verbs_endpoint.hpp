@@ -21,12 +21,12 @@
 #include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 //
 #include <inttypes.h>
+#include <atomic>
+#include <iomanip>
+#include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
-#include <memory>
-#include <iostream>
-#include <iomanip>
-#include <atomic>
 
 #define HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS 1024
 

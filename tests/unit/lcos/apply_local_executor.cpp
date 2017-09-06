@@ -10,15 +10,14 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::int32_t> accumulator;
+std::atomic<std::int32_t> accumulator;
 hpx::lcos::local::condition_variable_any result_cv;
 
 void increment(std::int32_t i)

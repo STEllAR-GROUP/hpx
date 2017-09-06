@@ -224,7 +224,6 @@ void addressing_service::launch_bootstrap(
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
     HPX_ASSERT(pp ? pp->here() == pp->agas_locality(cfg) : true);
-    rt.assign_cores();
 
     naming::id_type const locality_gid = locality_ns_->gid();
     gva locality_gva(here,
@@ -1725,7 +1724,8 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     lcos::promise<naming::id_type, naming::gid_type> p;
     auto result_f = p.get_future();
 
-    hpx::future<bool> f = symbol_ns_.on_event(name, call_for_past_events, p.get_id());
+    hpx::future<bool> f =
+        symbol_ns_.on_event(name, call_for_past_events, p.get_id());
 
     using util::placeholders::_1;
     return f.then(util::bind(
@@ -1905,7 +1905,6 @@ bool addressing_service::get_cache_entry(
     {
         return false;
     }
-    HPX_ASSERT(hpx::threads::get_self_ptr());
     gva_cache_key k(gid);
     gva_cache_key idbase_key;
 

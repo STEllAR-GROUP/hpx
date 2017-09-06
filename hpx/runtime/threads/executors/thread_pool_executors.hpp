@@ -9,14 +9,14 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace executors
             mask_cref_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
             {
-                return scheduler_.Scheduler::get_pu_mask(topology, num_thread);
+                return hpx::resource::get_partitioner().get_pu_mask(num_thread);
             }
 
             /// Set the new scheduler mode
@@ -125,15 +125,15 @@ namespace hpx { namespace threads { namespace executors
             lcos::local::counting_semaphore shutdown_sem_;
 
             // collect statistics
-            boost::atomic<std::size_t> current_concurrency_;
-            boost::atomic<std::size_t> max_current_concurrency_;
-            boost::atomic<std::uint64_t> tasks_scheduled_;
-            boost::atomic<std::uint64_t> tasks_completed_;
+            std::atomic<std::size_t> current_concurrency_;
+            std::atomic<std::size_t> max_current_concurrency_;
+            std::atomic<std::uint64_t> tasks_scheduled_;
+            std::atomic<std::uint64_t> tasks_completed_;
 
             // policy elements
             std::size_t const max_punits_;
             std::size_t const min_punits_;
-            boost::atomic<std::size_t> curr_punits_;
+            std::atomic<std::size_t> curr_punits_;
 
             // resource manager registration
             std::size_t cookie_;
@@ -167,7 +167,6 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 #endif
-
 
     struct HPX_EXPORT local_priority_queue_executor : public scheduled_executor
     {

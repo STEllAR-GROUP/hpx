@@ -36,9 +36,9 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -194,13 +194,13 @@ namespace hpx { namespace components { namespace server
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        HPX_ATTRIBUTE_NORETURN void terminate(
+        HPX_NORETURN void terminate(
             naming::id_type const& respond_to);
 
         void terminate_act(naming::id_type const& id) { terminate(id); }
 
         /// \brief Shutdown runtime system instances on all localities
-        HPX_ATTRIBUTE_NORETURN void terminate_all();
+        HPX_NORETURN void terminate_all();
 
         void terminate_all_act() { terminate_all(); }
 
@@ -424,7 +424,7 @@ namespace hpx { namespace components { namespace server
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
-        boost::atomic<bool> shutdown_all_invoked_;
+        std::atomic<bool> shutdown_all_invoked_;
 
         typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;

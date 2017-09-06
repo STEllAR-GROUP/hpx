@@ -39,7 +39,7 @@ namespace hpx { namespace detail
         >::value
       , lcos::future<typename util::detail::invoke_deferred_result<F>::type>
     >::type
-    call_sync(F&& f, std::false_type)
+    call_sync(F && f, std::false_type)
     {
         typedef typename util::detail::invoke_deferred_result<F>::type result_type;
         try
@@ -59,7 +59,7 @@ namespace hpx { namespace detail
         >::value
       , lcos::future<typename util::detail::invoke_deferred_result<F>::type>
     >::type
-    call_sync(F&& f, std::false_type) //-V659
+    call_sync(F && f, std::false_type) //-V659
     {
         typedef typename util::detail::invoke_deferred_result<F>::type result_type;
         try
@@ -74,7 +74,7 @@ namespace hpx { namespace detail
     template <typename F>
     HPX_FORCEINLINE
     lcos::future<typename util::detail::invoke_deferred_result<F>::type>
-    call_sync(F&& f, std::true_type)
+    call_sync(F && f, std::true_type)
     {
         try
         {
@@ -125,6 +125,21 @@ namespace hpx { namespace detail
             }
             return p.get_future();
         }
+
+//         template <typename Pred, typename F, typename ...Ts>
+//         HPX_FORCEINLINE static
+//         typename std::enable_if<
+//             traits::detail::is_deferred_invocable<F, Ts...>::value,
+//             hpx::future<
+//                 typename util::detail::invoke_deferred_result<F, Ts...>::type
+//             >
+//         >::type
+//         call(hpx::detail::lazy_policy<Pred> const& policy, F && f,
+//             Ts&&... ts)
+//         {
+//             return call(policy.policy(), std::forward<F>(f),
+//                 std::forward<Ts>(ts)...);
+//         }
 
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
@@ -194,7 +209,7 @@ namespace hpx { namespace detail
                 typename util::detail::invoke_deferred_result<F, Ts...>::type
             >
         >::type
-        call(hpx::detail::deferred_policy, F && f, Ts&&... ts)
+        call(hpx::detail::deferred_policy, F && f, Ts &&... ts)
         {
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
                 result_type;
@@ -219,7 +234,7 @@ namespace hpx { namespace detail
                 typename util::detail::invoke_deferred_result<F, Ts...>::type
             >
         >::type
-        call(F&& f, Ts&&... ts)
+        call(F && f, Ts &&... ts)
         {
             return async_dispatch<hpx::detail::async_policy>::call(
                 launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -241,7 +256,7 @@ namespace hpx { namespace detail
                 typename util::detail::invoke_deferred_result<F, Ts...>::type
             >
         >::type
-        call(Executor_ && sched, F&& f, Ts&&... ts)
+        call(Executor_ && sched, F && f, Ts &&... ts)
         {
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
                 result_type;
@@ -270,7 +285,7 @@ namespace hpx { namespace detail
                 typename util::detail::invoke_deferred_result<F, Ts...>::type
             >
         >::type
-        call(Executor& exec, F&& f, Ts&&... ts)
+        call(Executor& exec, F && f, Ts &&... ts)
         {
             return parallel::executor_traits<Executor>::async_execute(
                 exec, std::forward<F>(f), std::forward<Ts>(ts)...);

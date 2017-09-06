@@ -20,8 +20,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -105,7 +104,7 @@ namespace hpx { namespace threads { namespace policies
 
         struct flag_type
         {
-            boost::atomic<bool> v;
+            std::atomic<bool> v;
             flag_type() { v = false; }
             flag_type(flag_type const & f) { v.store(f.v.load()); }
             flag_type & operator=(flag_type const & f)

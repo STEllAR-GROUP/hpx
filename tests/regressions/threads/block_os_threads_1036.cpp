@@ -14,18 +14,18 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/scoped_array.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 void blocker(
-    boost::atomic<std::uint64_t>* entered
-  , boost::atomic<std::uint64_t>* started
-  , boost::scoped_array<boost::atomic<std::uint64_t> >* blocked_threads
+    std::atomic<std::uint64_t>* entered
+  , std::atomic<std::uint64_t>* started
+  , boost::scoped_array<std::atomic<std::uint64_t> >* blocked_threads
   , std::uint64_t worker
     )
 {
@@ -58,14 +58,14 @@ int hpx_main()
     {
         ///////////////////////////////////////////////////////////////////////
         // Block all other OS threads.
-        boost::atomic<std::uint64_t> entered(0);
-        boost::atomic<std::uint64_t> started(0);
+        std::atomic<std::uint64_t> entered(0);
+        std::atomic<std::uint64_t> started(0);
 
         std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
-        boost::scoped_array<boost::atomic<std::uint64_t> >
+        boost::scoped_array<std::atomic<std::uint64_t> >
             blocked_threads(
-                new boost::atomic<std::uint64_t>[os_thread_count]);
+                new std::atomic<std::uint64_t>[os_thread_count]);
 
         for (std::uint64_t i = 0; i < os_thread_count; ++i)
             blocked_threads[i].store(0);

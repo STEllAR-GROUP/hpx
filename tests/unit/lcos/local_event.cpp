@@ -10,8 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <string>
@@ -35,7 +34,7 @@ using hpx::finalize;
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-void local_event_test(event& b, boost::atomic<std::size_t>& c)
+void local_event_test(event& b, std::atomic<std::size_t>& c)
 {
     ++c;
     // Wait for the event to occur.
@@ -59,7 +58,7 @@ int hpx_main(variables_map& vm)
     {
         event e;
 
-        boost::atomic<std::size_t> c(0);
+        std::atomic<std::size_t> c(0);
 
         std::vector<hpx::future<void> > futs;
         futs.reserve(pxthreads);

@@ -9,8 +9,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 #include <vector>
 
@@ -34,7 +33,7 @@ HPX_REGISTER_ACTION_DECLARATION(call_action);
 HPX_REGISTER_ACTION(call_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<int> callback_called(0);
+std::atomic<int> callback_called(0);
 
 void cb(boost::system::error_code const& ec,
     hpx::parcelset::parcel const& p)

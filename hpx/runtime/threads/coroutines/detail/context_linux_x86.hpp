@@ -21,13 +21,13 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
 #include <sys/param.h>
 
-#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 
 #if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
@@ -317,7 +317,7 @@ namespace hpx { namespace threads { namespace coroutines
                     context_size;
             }
 
-            typedef boost::atomic<std::int64_t> counter_type;
+            typedef std::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_unbind_counter()
             {

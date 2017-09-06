@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Marcin Copik
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -54,6 +54,10 @@ namespace hpx { namespace parallel { inline namespace v3
         struct unwrapper : T
         {
             // default constructor is needed for serialization purposes
+            template <typename Dependent = void, typename Enable =
+                typename std::enable_if<
+                    std::is_constructible<T>::value, Dependent
+                >::type>
             unwrapper() : T() {}
 
             // generic poor-man's forwarding constructor
@@ -310,11 +314,17 @@ namespace hpx { namespace parallel { inline namespace v3
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(maximal_number_of_chunks);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(reset_thread_distribution);
 
+            template <typename Dependent = void, typename Enable =
+                typename std::enable_if<
+                    hpx::util::detail::all_of<
+                        std::is_constructible<Params>...
+                    >::value, Dependent
+                >::type>
             executor_parameters()
               : unwrapper<Params>()...
             {}
 
-            template <typename ... Params_, typename T =
+            template <typename ... Params_, typename Enable =
                 typename std::enable_if<
                     hpx::util::detail::pack<Params...>::size ==
                         hpx::util::detail::pack<Params_...>::size
@@ -372,6 +382,11 @@ namespace hpx { namespace parallel { inline namespace v3
     HPX_FORCEINLINE
     Param && join_executor_parameters(Param && param)
     {
+        static_assert(
+            hpx::traits::is_executor_parameters<Param>::value,
+            "The passed parameter must be a proper executor parameters "
+            "objects"
+        );
         return std::forward<Param>(param);
     }
 }}}

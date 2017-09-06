@@ -59,31 +59,9 @@ struct fixture
     {
     }
 
-    void increment(counter_type c)
-    {
-        switch (c)
-        {
-            case counter_sanity:
-                ++sanity_failures_; return;
-            case counter_test:
-                ++test_failures_; return;
-            default:
-                { HPX_ASSERT(false); return; }
-        }
-    }
+    void increment(counter_type c);
 
-    std::size_t get(counter_type c) const
-    {
-        switch (c)
-        {
-            case counter_sanity:
-                return sanity_failures_;
-            case counter_test:
-                return test_failures_;
-            default:
-                { HPX_ASSERT(false); return 0; }
-        }
-    }
+    std::size_t get(counter_type c) const;
 
     template <typename T>
     bool check(char const* file, int line, char const* function,

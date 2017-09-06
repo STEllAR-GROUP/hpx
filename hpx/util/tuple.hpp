@@ -9,6 +9,7 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -16,14 +17,11 @@
 #include <boost/array.hpp>
 #include <boost/type_traits/integral_constant.hpp>
 
+#include <array>
 #include <algorithm>
 #include <cstddef> // for size_t
 #include <type_traits>
 #include <utility>
-
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
-#include <array>
-#endif
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
@@ -68,6 +66,10 @@ namespace hpx { namespace util
         struct tuple_member //-V690
         {
         public:
+            template <typename U = T,
+                typename EnableDefault = typename std::enable_if<
+                    std::is_constructible<U>::value
+                >::type>
             HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member()
               : _value()
             {}
@@ -206,6 +208,13 @@ namespace hpx { namespace util
           : tuple_member<Is, Ts>...
         {
             // 20.4.2.1, tuple construction
+            template <typename Dependent = void,
+                typename Enable = typename std::enable_if<
+                    hpx::util::detail::all_of<
+                        std::is_constructible<Ts>...
+                    >::value,
+                    Dependent
+                >::type>
             HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl()
               : tuple_member<Is, Ts>()...
             {}
@@ -304,6 +313,28 @@ namespace hpx { namespace util
                 };
                 (void)_sequencer;
             }
+
+            template <typename Archive>
+            friend void load_construct_data(
+                Archive& ar, tuple_impl* t, unsigned int const version)
+            {
+                using serialization::detail::load_construct_data;
+                int const _sequencer[] = {
+                    (load_construct_data(ar, &t->get<Is>(), version), 0)...
+                };
+                (void)_sequencer;
+            }
+
+            template <typename Archive>
+            friend void save_construct_data(
+                Archive& ar, tuple_impl const* t, unsigned int const version)
+            {
+                using serialization::detail::save_construct_data;
+                int const _sequencer[] = {
+                    (save_construct_data(ar, &t->get<Is>(), version), 0)...
+                };
+                (void)_sequencer;
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -377,6 +408,11 @@ namespace hpx { namespace util
 
         // constexpr tuple();
         // Value initializes each element.
+        template <typename Dependent = void,
+            typename Enable = typename std::enable_if<
+               hpx::util::detail::all_of<std::is_constructible<Ts>...>::value,
+               Dependent
+            >::type>
         HPX_CONSTEXPR HPX_HOST_DEVICE tuple()
           : _impl()
         {}
@@ -536,12 +572,10 @@ namespace hpx { namespace util
       : boost::integral_constant<std::size_t, Size>
     {};
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     template <typename Type, std::size_t Size>
     struct tuple_size<std::array<Type, Size> >
       : boost::integral_constant<std::size_t, Size>
     {};
-#endif
 
     // template <size_t I, class Tuple>
     // class tuple_element
@@ -636,7 +670,6 @@ namespace hpx { namespace util
         }
     };
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     template <std::size_t I, typename Type, std::size_t Size>
     struct tuple_element<I, std::array<Type, Size> >
     {
@@ -654,7 +687,6 @@ namespace hpx { namespace util
             return tuple[I];
         }
     };
-#endif
 
     // 20.4.2.6, element access
 
@@ -1060,6 +1092,26 @@ namespace hpx { namespace serialization
       , unsigned int const version = 0
     )
     {}
+
+    template <typename Archive, typename ...Ts>
+    HPX_FORCEINLINE
+    void load_construct_data(
+        Archive& ar
+      , ::hpx::util::tuple<Ts...>* t
+      , unsigned int const version = 0)
+    {
+        load_construct_data(ar, &(t->_impl), version);
+    }
+
+    template <typename Archive, typename ...Ts>
+    HPX_FORCEINLINE
+    void save_construct_data(
+        Archive& ar
+      , ::hpx::util::tuple<Ts...> const* t
+      , unsigned int const version = 0)
+    {
+        save_construct_data(ar, &(t->_impl), version);
+    }
 }}
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)

@@ -467,20 +467,20 @@ namespace hpx
             >::type local_result_type;
 
         if (components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value_unmanaged)
+            components::component_base_lco_with_value_unmanaged)
         {
-            typedef typename lcos::base_lco_with_value<
-                    local_result_type, remote_result_type,
-                    traits::detail::simple_component_tag
-                >::set_value_action set_value_action;
+            typedef typename lcos::base_lco_with_value<local_result_type,
+                remote_result_type,
+                traits::detail::component_tag>::set_value_action
+                set_value_action;
 
-            detail::set_lco_value<set_value_action>(id, std::move(addr),
-                std::forward<Result>(t), move_credits);
+            detail::set_lco_value<set_value_action>(
+                id, std::move(addr), std::forward<Result>(t), move_credits);
         }
         else
         {
-            HPX_ASSERT(components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value);
+            HPX_ASSERT(!addr || components::get_base_type(addr.type_) ==
+                    components::component_base_lco_with_value);
 
             typedef typename lcos::base_lco_with_value<
                     local_result_type, remote_result_type,
@@ -502,21 +502,21 @@ namespace hpx
             >::type local_result_type;
 
         if (components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value_unmanaged)
+            components::component_base_lco_with_value_unmanaged)
         {
-            typedef typename lcos::base_lco_with_value<
-                    local_result_type, remote_result_type,
-                    traits::detail::simple_component_tag
-                >::set_value_action set_value_action;
+            typedef typename lcos::base_lco_with_value<local_result_type,
+                remote_result_type,
+                traits::detail::component_tag>::set_value_action
+                set_value_action;
 
-            detail::set_lco_value<
-                    local_result_type, remote_result_type, set_value_action
-                >(id, std::move(addr), std::forward<Result>(t), cont, move_credits);
+            detail::set_lco_value<local_result_type, remote_result_type,
+                set_value_action>(id, std::move(addr), std::forward<Result>(t),
+                cont, move_credits);
         }
         else
         {
-            HPX_ASSERT(components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value);
+            HPX_ASSERT(!addr || components::get_base_type(addr.type_) ==
+                    components::component_base_lco_with_value);
 
             typedef typename lcos::base_lco_with_value<
                     local_result_type, remote_result_type,

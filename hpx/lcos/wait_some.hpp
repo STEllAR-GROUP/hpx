@@ -188,12 +188,9 @@ namespace hpx
 #include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
+#include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -224,7 +221,7 @@ namespace hpx { namespace lcos
                 >::type* = nullptr) const
             {
                 std::size_t counter =
-                    wait_.count_.load(boost::memory_order_seq_cst);
+                    wait_.count_.load(std::memory_order_seq_cst);
                 if (counter < wait_.needed_count_ &&
                     shared_state.get() != nullptr && !shared_state->is_ready())
                 {
@@ -342,11 +339,11 @@ namespace hpx { namespace lcos
                 }
 
                 // at least N futures should be ready
-                HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
+                HPX_ASSERT(count_.load(std::memory_order_seq_cst) >= needed_count_);
             }
 
             argument_type lazy_values_;
-            boost::atomic<std::size_t> count_;
+            std::atomic<std::size_t> count_;
             std::size_t const needed_count_;
             bool goal_reached_on_calling_thread_;
         };
@@ -409,7 +406,6 @@ namespace hpx { namespace lcos
             n, const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
     void wait_some(std::size_t n,
@@ -466,7 +462,6 @@ namespace hpx { namespace lcos
         return lcos::wait_some(
             n, const_cast<std::array<Future, N> const&>(lazy_values), ec);
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>

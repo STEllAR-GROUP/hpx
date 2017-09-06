@@ -132,14 +132,6 @@ namespace hpx { namespace traits
                 typename std::enable_if<is_client<Derived>::value>::type>
           : shared_state_ptr<typename traits::future_traits<Derived>::type>
         {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct action_remote_result_customization_point<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
-        {
-            typedef id_type type;
-        };
     }
 }}
 
@@ -551,7 +543,7 @@ namespace hpx { namespace components
 
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
-                    *static_cast<Derived const*>(this), launch::all,
+                    *this, launch::sync,
                     util::bind(&client_base::register_as_helper,
                         util::placeholders::_1, symbolic_name
                     ));

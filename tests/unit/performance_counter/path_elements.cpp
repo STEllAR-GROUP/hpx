@@ -31,7 +31,8 @@ namespace test
                 "",
                 "parentinstancename",
                 "instancename",
-                2, 1, false)
+                "",
+                2, 1, -1, false)
         },
         {   "/objectname{parentinstancename#*/instancename#*}/countername",
             "/objectname/countername",
@@ -41,7 +42,8 @@ namespace test
                 "",
                 "parentinstancename#*",
                 "instancename#*",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename#2/instancename#1}/countername@parameter",
             "/objectname/countername",
@@ -51,7 +53,8 @@ namespace test
                 "parameter",
                 "parentinstancename",
                 "instancename",
-                2, 1, false)
+                "",
+                2, 1, -1, false)
         },
         {   "/objectname{parentinstancename#*/instancename#*}/countername@parameter",
             "/objectname/countername",
@@ -61,7 +64,8 @@ namespace test
                 "parameter",
                 "parentinstancename#*",
                 "instancename#*",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname{/objectname{parentinstancename#2/instancename#1}"
             "/countername}/countername",
@@ -72,7 +76,8 @@ namespace test
                 "",
                 "/objectname{parentinstancename#2/instancename#1}/countername",
                 "",
-                -1, -1, true)
+                "",
+                -1, -1, -1, true)
         },
         {   "/objectname{/objectname{parentinstancename#2/instancename#1}"
             "/countername}/countername@parameter",
@@ -83,7 +88,8 @@ namespace test
                 "parameter",
                 "/objectname{parentinstancename#2/instancename#1}/countername",
                 "",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename#2/instancename#1}"
             "/countername/morecountername",
@@ -94,7 +100,8 @@ namespace test
                 "",
                 "parentinstancename",
                 "instancename",
-                2, 1, false)
+                "",
+                2, 1, -1, false)
         },
         {   "/objectname{parentinstancename#*/instancename#*}"
             "/countername/morecountername",
@@ -105,7 +112,8 @@ namespace test
                 "",
                 "parentinstancename#*",
                 "instancename#*",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename#2/instancename#1}"
             "/countername/morecountername@parameter",
@@ -116,7 +124,8 @@ namespace test
                 "parameter",
                 "parentinstancename",
                 "instancename",
-                2, 1, false)
+                "",
+                2, 1, -1, false)
         },
         {   "/objectname{parentinstancename#*/instancename#*}"
             "/countername/morecountername@parameter",
@@ -127,7 +136,8 @@ namespace test
                 "parameter",
                 "parentinstancename#*",
                 "instancename#*",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename/instancename#1}/countername",
             "/objectname/countername",
@@ -137,7 +147,8 @@ namespace test
                 "",
                 "parentinstancename",
                 "instancename",
-                -1, 1, false)
+                "",
+                -1, 1, -1, false)
         },
         {   "/objectname{parentinstancename/instancename#1}/countername@parameter",
             "/objectname/countername",
@@ -147,7 +158,8 @@ namespace test
                 "parameter",
                 "parentinstancename",
                 "instancename",
-                -1, 1, false)
+                "",
+                -1, 1, -1, false)
         },
         {   "/objectname{parentinstancename/moreparent/instancename#1}/countername",
             "/objectname/countername",
@@ -156,8 +168,9 @@ namespace test
                 "countername",
                 "",
                 "parentinstancename",
-                "moreparent/instancename",
-                -1, 1, false)
+                "moreparent",
+                "instancename",
+                -1, -1, 1, false)
         },
         {   "/objectname{parentinstancename/moreparent/instancename#*}/countername",
             "/objectname/countername",
@@ -166,8 +179,9 @@ namespace test
                 "countername",
                 "",
                 "parentinstancename",
-                "moreparent/instancename#*",
-                -1, -1, false)
+                "moreparent",
+                "instancename#*",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename/moreparent/instancename#1}"
             "/countername@parameter",
@@ -177,8 +191,9 @@ namespace test
                 "countername",
                 "parameter",
                 "parentinstancename",
-                "moreparent/instancename",
-                -1, 1, false)
+                "moreparent",
+                "instancename",
+                -1, -1, 1, false)
         },
         {   "/objectname{parentinstancename/moreparent/instancename#*}"
             "/countername@parameter",
@@ -188,8 +203,55 @@ namespace test
                 "countername",
                 "parameter",
                 "parentinstancename",
-                "moreparent/instancename#*",
-                -1, -1, false)
+                "moreparent",
+                "instancename#*",
+                -1, -1, -1, false)
+        },
+        {   "/objectname{parentinstancename/moreparent#2/instancename#1}/countername",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "",
+                "parentinstancename",
+                "moreparent",
+                "instancename",
+                -1, 2, 1, false)
+        },
+        {   "/objectname{parentinstancename/moreparent#*/instancename#*}/countername",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "",
+                "parentinstancename",
+                "moreparent#*",
+                "instancename#*",
+                -1, -1, -1, false)
+        },
+        {   "/objectname{parentinstancename/moreparent#2/instancename#1}"
+            "/countername@parameter",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "parameter",
+                "parentinstancename",
+                "moreparent",
+                "instancename",
+                -1, 2, 1, false)
+        },
+        {   "/objectname{parentinstancename/moreparent#*/instancename#*}"
+            "/countername@parameter",
+            "/objectname/countername",
+            hpx::performance_counters::counter_path_elements(
+                "objectname",
+                "countername",
+                "parameter",
+                "parentinstancename",
+                "moreparent#*",
+                "instancename#*",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename/instancename}/countername",
             "/objectname/countername",
@@ -199,10 +261,10 @@ namespace test
                 "",
                 "parentinstancename",
                 "instancename",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
-        {   "/objectname{parentinstancename/instancename}"
-            "/countername@parameter",
+        {   "/objectname{parentinstancename/instancename}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -210,18 +272,19 @@ namespace test
                 "parameter",
                 "parentinstancename",
                 "instancename",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
-        {   "/objectname{parentinstancename/moreparent"
-            "/instancename}/countername",
+        {   "/objectname{parentinstancename/moreparent/instancename}/countername",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
                 "countername",
                 "",
                 "parentinstancename",
-                "moreparent/instancename",
-                -1, -1, false)
+                "moreparent",
+                "instancename",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename/moreparent/instancename}"
             "/countername@parameter",
@@ -231,8 +294,9 @@ namespace test
                 "countername",
                 "parameter",
                 "parentinstancename",
-                "moreparent/instancename",
-                -1, -1, false)
+                "moreparent",
+                "instancename",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename#1}/countername",
             "/objectname/countername",
@@ -242,7 +306,8 @@ namespace test
                 "",
                 "parentinstancename",
                 "",
-                1, -1, false)
+                "",
+                1, -1, -1, false)
         },
         {   "/objectname{parentinstancename#1}/countername@parameter",
             "/objectname/countername",
@@ -252,7 +317,8 @@ namespace test
                 "parameter",
                 "parentinstancename",
                 "",
-                1, -1, false)
+                "",
+                1, -1, -1, false)
         },
         {   "/objectname{parentinstancename}/countername",
             "/objectname/countername",
@@ -262,7 +328,8 @@ namespace test
                 "",
                 "parentinstancename",
                 "",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname{parentinstancename}/countername@parameter",
             "/objectname/countername",
@@ -272,7 +339,8 @@ namespace test
                 "parameter",
                 "parentinstancename",
                 "",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname/countername",
             "/objectname/countername",
@@ -282,7 +350,8 @@ namespace test
                 "",
                 "",
                 "",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname/countername@parameter",
             "/objectname/countername",
@@ -292,7 +361,8 @@ namespace test
                 "parameter",
                 "",
                 "",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname",
             "/objectname",
@@ -302,7 +372,8 @@ namespace test
                 "",
                 "",
                 "",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "/objectname@parameter",
             "/objectname",
@@ -312,7 +383,8 @@ namespace test
                 "parameter",
                 "",
                 "",
-                -1, -1, false)
+                "",
+                -1, -1, -1, false)
         },
         {   "", "", hpx::performance_counters::counter_path_elements() }
     };
@@ -343,7 +415,9 @@ namespace test
             HPX_TEST(p.objectname_ == t->path_.objectname_);
             HPX_TEST(p.parentinstancename_ == t->path_.parentinstancename_);
             HPX_TEST(p.instancename_ == t->path_.instancename_);
+            HPX_TEST(p.subinstancename_ == t->path_.subinstancename_);
             HPX_TEST(p.instanceindex_ == t->path_.instanceindex_);
+            HPX_TEST(p.subinstanceindex_ == t->path_.subinstanceindex_);
             HPX_TEST(p.countername_ == t->path_.countername_);
 
             fullname.erase();
@@ -394,7 +468,8 @@ namespace test
         "/{parentinstancename/instancename#1}/countername",
         "/objectname{parentinstancename/instancename#1/countername",
         "/objectname{parentinstancename#/instancename#1}/countername",
-        "/objectname{parentinstancename/instancename#1/badindex}/countername/badname",
+        "/objectname{parentinstancename/instancename#/badindex}/countername/badname",
+        "/objectname{parentinstancename/instancename/badindex#}/countername/badname",
         "//countername",
         "/objectname{}/countername",
         "/{}/countername",

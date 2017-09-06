@@ -28,7 +28,7 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             typedef Result type;
 
-            HPX_ATTRIBUTE_NORETURN static Result call()
+            HPX_NORETURN static Result call()
             {
                 try {
                     throw; //-V667
@@ -174,20 +174,20 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             typedef Result type;
 
-            HPX_ATTRIBUTE_NORETURN static Result call()
+            HPX_NORETURN static Result call()
             {
                 // any exceptions thrown by algorithms executed with the
                 // parallel_unsequenced_policy are to call terminate.
                 hpx::terminate();
             }
 
-            HPX_ATTRIBUTE_NORETURN
+            HPX_NORETURN
             static hpx::future<Result> call(hpx::future<Result> &&)
             {
                 hpx::terminate();
             }
 
-            HPX_ATTRIBUTE_NORETURN
+            HPX_NORETURN
             static hpx::future<Result> call(std::exception_ptr const&)
             {
                 hpx::terminate();

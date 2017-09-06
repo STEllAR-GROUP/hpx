@@ -12,8 +12,6 @@
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <cstdint>
 #include <string>
 #include <unordered_map>

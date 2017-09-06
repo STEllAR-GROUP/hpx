@@ -43,6 +43,7 @@ namespace boost
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
       { "boost/preprocessor/cat\\.hpp", "hpx/util/detail/pp/cat.hpp" },
       { "boost/preprocessor/stringize\\.hpp", "hpx/util/detail/pp/stringize.hpp" },
+      { "boost/atomic\\.hpp", "atomic" },
       { nullptr, nullptr }
     };
 

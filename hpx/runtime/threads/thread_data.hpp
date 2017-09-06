@@ -26,9 +26,9 @@
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <stack>
@@ -133,7 +133,7 @@ namespace hpx { namespace threads
         ///                 by using the function \a threadmanager#get_state.
         thread_state get_state() const
         {
-            return current_state_.load(boost::memory_order_acquire);
+            return current_state_.load(std::memory_order_acquire);
         }
 
         /// The set_state function changes the state of this thread instance.
@@ -152,7 +152,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum state_ex = wait_unknown)
         {
             thread_state prev_state =
-                current_state_.load(boost::memory_order_acquire);
+                current_state_.load(std::memory_order_acquire);
 
             for (;;) {
                 thread_state tmp = prev_state;
@@ -221,7 +221,7 @@ namespace hpx { namespace threads
 
             // ignore the state_ex while compare-exchanging
             thread_state_ex_enum state_ex =
-                current_state_.load(boost::memory_order_relaxed).state_ex();
+                current_state_.load(std::memory_order_relaxed).state_ex();
 
             thread_state old_tmp(old_state.state(), state_ex, old_state.tag());
             thread_state new_tmp(new_state.state(), state_ex, tag);
@@ -254,7 +254,7 @@ namespace hpx { namespace threads
         thread_state_ex_enum set_state_ex(thread_state_ex_enum new_state)
         {
             thread_state prev_state =
-                current_state_.load(boost::memory_order_acquire);
+                current_state_.load(std::memory_order_acquire);
 
             for (;;) {
                 thread_state tmp = prev_state;
@@ -682,7 +682,7 @@ namespace hpx { namespace threads
 #endif
         }
 
-        mutable boost::atomic<thread_state> current_state_;
+        mutable std::atomic<thread_state> current_state_;
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information

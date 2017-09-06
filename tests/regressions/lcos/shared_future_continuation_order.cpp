@@ -10,9 +10,9 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
+#include <atomic>
 
-boost::atomic<int> invocation_count(0);
+std::atomic<int> invocation_count(0);
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

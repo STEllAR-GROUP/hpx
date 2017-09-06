@@ -12,8 +12,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <map>
 #include <memory>
@@ -109,7 +108,7 @@ namespace hpx { namespace  threads
 
     private:
         mutable mutex_type mtx_;
-        boost::atomic<std::size_t> next_cookie_;
+        std::atomic<std::size_t> next_cookie_;
 
         ///////////////////////////////////////////////////////////////////////
         // Store information about the physical processing units available to

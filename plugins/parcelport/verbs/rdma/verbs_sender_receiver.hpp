@@ -14,12 +14,12 @@
 #include <rdma/rdma_cma.h>
 #include <infiniband/verbs.h>
 //
-#include <sstream>
-#include <iostream>
-#include <iomanip>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <string>
 
 // Base connection class for RDMA operations with a remote partner.

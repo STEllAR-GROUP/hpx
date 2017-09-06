@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_UNIQUE_JUL_07_2017_1940PM)
-#define HPX_PARALLEL_TEST_UNIQUE_JUL_07_2017_1940PM
+#if !defined(HPX_PARALLEL_TEST_UNIQUE_COPY_JUL_07_2017_1940PM)
+#define HPX_PARALLEL_TEST_UNIQUE_COPY_JUL_07_2017_1940PM
 
 #include <hpx/include/parallel_unique.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -45,7 +45,10 @@ struct throw_bad_alloc
 struct user_defined_type
 {
     user_defined_type() = default;
-    user_defined_type(int rand_no) : val(rand_no) {}
+     user_defined_type(int rand_no)
+      : val(rand_no),
+        name(name_list[std::rand() % name_list.size()])
+    {}
 
     bool operator<(user_defined_type const& t) const
     {
@@ -72,25 +75,26 @@ struct user_defined_type
         return this->name == t.name && this->val == t.val;
     }
 
-    user_defined_type const& operator++()
+    bool operator==(int rand_no) const
     {
-        static const std::vector<std::string> name_list = {
-            "ABB", "ABC", "ACB", "BCA", "CAA", "CAAA", "CAAB"
-        };
-        name = name_list[std::rand() % name_list.size()];
-        ++val;
-        return *this;
+        return this->val == rand_no;
     }
 
-    std::string name;
+    static const std::vector<std::string> name_list;
+
     int val;
+    std::string name;
+};
+
+const std::vector<std::string> user_defined_type::name_list{
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
 };
 
 struct random_fill
 {
     random_fill() = default;
     random_fill(int rand_base, int range)
-        : gen(std::rand()),
+      : gen(std::rand()),
         dist(rand_base - range / 2, rand_base + range / 2)
     {}
 
@@ -364,15 +368,17 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag,
     // Test sequential_unique_copy with input_iterator_tag.
     {
         typedef test::test_iterator<base_iterator,
-            std::input_iterator_tag> iterator;
+            std::input_iterator_tag> input_iterator;
+        typedef test::test_iterator<base_iterator,
+            std::output_iterator_tag> output_iterator;
 
         auto result = hpx::parallel::v1::detail::sequential_unique_copy(
-            iterator(std::begin(c)), iterator(std::end(c)),
-            std::begin(dest_res),
+            input_iterator(std::begin(c)), input_iterator(std::end(c)),
+            output_iterator(std::begin(dest_res)),
             [](DataType const& a, DataType const& b) -> bool {
                 return a == b;
             },
-            [](DataType& t) -> DataType& {
+            [](DataType const& t) -> DataType const& {
                 return t;
             },
             std::false_type());
@@ -380,7 +386,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag,
             std::begin(dest_sol));
 
         bool equality = std::equal(
-            std::begin(dest_res), get<1>(result),
+            std::begin(dest_res), get<1>(result).base(),
             std::begin(dest_sol), solution);
 
         HPX_TEST(equality);
@@ -457,6 +463,10 @@ void test_unique_copy()
 
     ////////// Another test cases for justifying the implementation.
     test_unique_copy_etc(execution::seq, IteratorTag(),
+        user_defined_type(), rand_base);
+    test_unique_copy_etc(execution::par, IteratorTag(),
+        user_defined_type(), rand_base);
+    test_unique_copy_etc(execution::par_unseq, IteratorTag(),
         user_defined_type(), rand_base);
 }
 

@@ -87,8 +87,7 @@
 #include <hpx/util_fwd.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <utility>
@@ -125,7 +124,7 @@ namespace hpx { namespace lcos { namespace local
 
         struct guard_task;
 
-        typedef boost::atomic<guard_task*> guard_atomic;
+        typedef std::atomic<guard_task*> guard_atomic;
 
         HPX_API_EXPORT void free(guard_task* task);
 

@@ -55,8 +55,8 @@ namespace hpx
             apply<Action>(
                 hpx::actions::typed_continuation<
                         result_type, continuation_result_type
-                >(p.get_id(), std::forward<Cont>(cont))
-              , target, std::forward<Ts>(vs)...);
+                >(p.get_id(), std::forward<Cont>(cont)),
+                    target, std::forward<Ts>(vs)...);
 
             return f;
         }

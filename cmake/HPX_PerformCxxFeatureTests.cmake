@@ -81,7 +81,10 @@ macro(hpx_perform_cxx_feature_tests)
 
   # Check the availability of certain C++11 library features
   hpx_check_for_cxx11_std_array(
-    DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
+    REQUIRED "HPX needs support for C++11 std::array")
+
+  hpx_check_for_cxx11_std_atomic(
+    REQUIRED "HPX needs support for C++11 std::atomic")
 
   hpx_check_for_cxx11_std_chrono(
     REQUIRED "HPX needs support for C++11 std::chrono")
@@ -136,6 +139,9 @@ macro(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_unordered_set(
     REQUIRED "HPX needs support for C++11 std::unordered_set")
+
+  hpx_check_for_cxx11_noreturn_attribute(
+    DEFINITIONS HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
 
   if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
     # Check the availability of certain C++14 language features

@@ -186,7 +186,7 @@ namespace hpx
         };
     }
 
-    template <typename E> HPX_ATTRIBUTE_NORETURN
+    template <typename E> HPX_NORETURN
     void throw_with_info(E&& e, exception_info&& xi = exception_info())
     {
         using ED = typename std::decay<E>::type;
@@ -204,7 +204,7 @@ namespace hpx
         throw detail::exception_with_info<ED>(std::forward<E>(e), std::move(xi));
     }
 
-    template <typename E> HPX_ATTRIBUTE_NORETURN
+    template <typename E> HPX_NORETURN
     void throw_with_info(E&& e, exception_info const& xi)
     {
         throw_with_info(std::forward<E>(e), exception_info(xi));
