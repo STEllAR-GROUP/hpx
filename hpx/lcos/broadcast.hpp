@@ -506,7 +506,9 @@ namespace hpx { namespace lcos
         std::vector<Result>
         wrap_into_vector(hpx::future<Result> r)
         {
-            return std::vector<Result>(1, r.get());
+            std::vector<Result> result;
+            result.push_back(r.get());
+            return result;
         }
 
         template <
