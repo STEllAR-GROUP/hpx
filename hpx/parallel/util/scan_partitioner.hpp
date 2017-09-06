@@ -146,7 +146,7 @@ namespace hpx { namespace parallel { namespace util
 
                 // always rethrow if 'errors' is not empty or 'workitems' or
                 // 'finalitems' have an exceptional future
-                handle_local_exceptions<ExPolicy>::call(workitems, errors);
+                handle_local_exceptions<ExPolicy>::call(workitems, errors, false);
                 handle_local_exceptions<ExPolicy>::call(finalitems, errors);
 
                 try {
@@ -291,7 +291,7 @@ namespace hpx { namespace parallel { namespace util
 
                 // always rethrow if 'errors' is not empty or 'workitems' or
                 // 'finalitems' have an exceptional future
-                handle_local_exceptions<ExPolicy>::call(workitems, errors);
+                handle_local_exceptions<ExPolicy>::call(workitems, errors, false);
                 handle_local_exceptions<ExPolicy>::call(finalitems, errors);
 
                 try {
