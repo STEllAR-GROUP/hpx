@@ -214,12 +214,13 @@ namespace hpx { namespace util { namespace detail
 #endif
         }
 
-        char const* get_function_annotation_itt() const
+        util::itt::string_handle get_function_annotation_itt() const
         {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             return vptr->get_function_annotation_itt(object);
 #else
-            return nullptr;
+            static util::itt::string_handle sh;
+            return sh;
 #endif
         }
 

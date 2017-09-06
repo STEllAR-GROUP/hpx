@@ -129,14 +129,15 @@ namespace hpx { namespace util
             }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            char const* get_function_annotation_itt() const
+            util::itt::string_handle get_function_annotation_itt() const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation_itt<
                         typename util::decay_unwrap<F>::type
                     >::call(_f);
 #else
-                return nullptr;
+                static util::itt::string_handle sh("deferred");
+                return sh;
 #endif
             }
 #endif
@@ -202,7 +203,7 @@ namespace hpx { namespace traits
     template <typename Sig>
     struct get_function_annotation_itt<util::detail::deferred<Sig> >
     {
-        static char const*
+        static util::itt::string_handle
             call(util::detail::deferred<Sig> const& f) noexcept
         {
             return f.get_function_annotation_itt();

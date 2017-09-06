@@ -38,11 +38,12 @@ namespace hpx { namespace util { namespace detail
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         template <typename T>
-        HPX_FORCEINLINE static char const* _get_function_annotation_itt(void** f)
+        HPX_FORCEINLINE static util::itt::string_handle
+            _get_function_annotation_itt(void** f)
         {
             return traits::get_function_annotation_itt<T>::call(vtable::get<T>(f));
         }
-        char const* (*get_function_annotation_itt)(void**);
+        util::itt::string_handle (*get_function_annotation_itt)(void**);
 #endif
 #endif
 
