@@ -5,9 +5,11 @@
 
 set(tests
     resource_partitioner
+    throttle
 )
 
 set(resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4)
+set(throttle_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources

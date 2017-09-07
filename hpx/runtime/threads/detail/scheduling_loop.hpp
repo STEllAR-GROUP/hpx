@@ -462,6 +462,7 @@ namespace hpx { namespace threads { namespace detail
             bool running = this_state.load(
                 std::memory_order_relaxed) < state_stopping;
 
+
             if (HPX_LIKELY(thrd ||
                     scheduler.SchedulingPolicy::get_next_thread(
                         num_thread, running, idle_loop_count, thrd)))
@@ -680,6 +681,15 @@ namespace hpx { namespace threads { namespace detail
                         may_exit = true;
                     }
                 }
+                // In the case of dynamic reassining of cores this branch is
+                // taken and causes the scheduling loop to stop.
+                else
+                {
+                    if(!running)
+                    {
+                        may_exit = true;
+                    }
+                }
 
                 // let our background threads terminate
                 if (background_running)
@@ -742,19 +752,18 @@ namespace hpx { namespace threads { namespace detail
                 if (!params.outer_.empty())
                     params.outer_();
 
+                // We just call cleanup_terminated and ignore the return value
+                // in case of dynamic assigning of PU, this always returns
+                // false in a running application due to thread_map_ not
+                // being empty. We perform a similar check in the termination
+                // detection anyways...
+                scheduler.SchedulingPolicy::cleanup_terminated(true);
+
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
-                    {
-                        this_state.store(state_stopped);
-                        break;
-                    }
-                    may_exit = false;
-                }
-                else
-                {
-                    scheduler.SchedulingPolicy::cleanup_terminated(true);
+                    this_state.store(state_stopped);
+                    break;
                 }
             }
         }

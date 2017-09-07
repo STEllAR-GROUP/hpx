@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
 
 namespace hpx { namespace threads { namespace detail
@@ -46,6 +47,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     mask_cref_type thread_pool_base::get_used_processing_units() const
     {
+        std::lock_guard<pu_mutex_type> l(used_processing_units_mtx_);
         return used_processing_units_;
     }
 
