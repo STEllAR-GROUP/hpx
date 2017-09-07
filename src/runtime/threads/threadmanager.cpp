@@ -941,14 +941,34 @@ namespace hpx { namespace threads
         thread_id_type& id, thread_state_enum initial_state, bool run_now,
         error_code& ec)
     {
-        default_pool().create_thread(data, id, initial_state, run_now, ec);
+        detail::thread_pool_base *pool = nullptr;
+        if (get_self_ptr())
+        {
+            auto tid = get_self_id();
+            pool = tid->get_scheduler_base()->get_parent_pool();
+        }
+        else
+        {
+            pool = &default_pool();
+        }
+        pool->create_thread(data, id, initial_state, run_now, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void threadmanager::register_work(
         thread_init_data& data, thread_state_enum initial_state, error_code& ec)
     {
-        default_pool().create_work(data, initial_state, ec);
+        detail::thread_pool_base *pool = nullptr;
+        if (get_self_ptr())
+        {
+            auto tid = get_self_id();
+            pool = tid->get_scheduler_base()->get_parent_pool();
+        }
+        else
+        {
+            pool = &default_pool();
+        }
+        pool->create_work(data, initial_state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
