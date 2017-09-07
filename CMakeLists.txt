@@ -1699,11 +1699,6 @@ macro(generate_config_defines_header TARGET_DIRECTORY)
     FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
 endmacro()
 
-###############################################################################
-# Perform the on framework CXX feature tests
-###############################################################################
-hpx_perform_on_framework_cxx_feature_tests()
-
 ################################################################################
 # Set basic search paths for the generated HPX headers
 ################################################################################

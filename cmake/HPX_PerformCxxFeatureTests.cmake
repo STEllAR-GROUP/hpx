@@ -191,13 +191,3 @@ macro(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
   endif()
 endmacro()
-
-################################################################################
-# C++ feature tests which require 3. party libraries
-# and a present config file to work.
-#
-# This tests are meant for testing the compiler on the capability
-# to compile parts of HPX directly without relying on generic feature tests.
-################################################################################
-macro(hpx_perform_on_framework_cxx_feature_tests)
-endmacro()
