@@ -7,6 +7,7 @@
 #define HPX_UTIL_DETAIL_PACK_TRAVERSAL_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_range.hpp>
 #include <hpx/traits/is_tuple_like.hpp>
@@ -346,34 +347,6 @@ namespace util {
             {
             };
 
-            /// Deduces to a true type if the given parameter T
-            /// supports a `reserve` method.
-            template <typename T, typename = void>
-            struct is_reservable : std::false_type
-            {
-            };
-            template <typename T>
-            struct is_reservable<T,
-                typename always_void<decltype(std::declval<T>().reserve(
-                    std::declval<std::size_t>()))>::type> : std::true_type
-            {
-            };
-
-            template <typename Dest, typename Source>
-            void reserve_if_possible(
-                std::true_type, Dest& dest, Source const& source)
-            {
-                // Reserve the mapped size
-                dest.reserve(source.size());
-            }
-            template <typename Dest, typename Source>
-            void reserve_if_possible(
-                std::false_type, Dest const&, Source const&) noexcept
-            {
-                // We do nothing here, since the container doesn't
-                // support reserve
-            }
-
             /// Rebind the given allocator to NewType
             template <typename NewType, typename Allocator>
             auto rebind_allocator(Allocator&& allocator) ->
@@ -553,7 +526,7 @@ namespace util {
             {
                 static_assert(has_push_back<typename std::decay<T>::type,
                                   element_of_t<T>>::value,
-                    "Can only remap containers, that provide a push_back "
+                    "Can only remap containers that provide a push_back "
                     "method!");
 
                 // Create the new container, which is capable of holding
@@ -563,8 +536,7 @@ namespace util {
 
                 // We try to reserve the original size from the source
                 // container to the destination container.
-                reserve_if_possible(
-                    is_reservable<decltype(remapped)>{}, remapped, container);
+                traits::detail::reserve_if_reservable(remapped, container.size());
 
                 // Perform the actual value remapping from the source to
                 // the destination.
