@@ -615,15 +615,10 @@ namespace util {
             /// Remaps the content of the given container with type T,
             /// to a container of the same type which may contain
             /// different types.
-            template <typename T, typename M
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
-                // Support for skipping completely untouched types
+            template <typename T, typename M>
+            auto remap(strategy_remap_tag, T&& container, M&& mapper,
                 typename std::enable_if<
-                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr
-#endif
-                >
-            auto remap(strategy_remap_tag, T&& container, M&& mapper)
+                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr)
                 -> decltype(remap_container(container_category_of_t<T, M>{},
                     std::forward<M>(mapper), std::forward<T>(container)))
             {
@@ -632,15 +627,10 @@ namespace util {
             }
 
             /// Just call the visitor with the content of the container
-            template <typename T, typename M
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
-                // Support for skipping completely untouched types
+            template <typename T, typename M>
+            void remap(strategy_traverse_tag, T&& container, M&& mapper,
                 typename std::enable_if<
-                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr
-#endif
-                >
-            void remap(strategy_traverse_tag, T&& container, M&& mapper)
+                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr)
             {
                 for (auto&& element : std::forward<T>(container))
                 {
@@ -653,26 +643,18 @@ namespace util {
         /// Provides utilities for remapping the whole content of a
         /// tuple like type to the same type holding different types.
         namespace tuple_like_remapping {
-            template <typename Strategy, typename Mapper, typename T
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
-                typename = void
-#endif
-                >
+            template <typename Strategy, typename Mapper, typename T,
+                typename Enable = void>
             struct tuple_like_remapper;
 
             /// Specialization for std::tuple like types which contain
             /// an arbitrary amount of heterogenous arguments.
             template <typename M, template <typename...> class Base,
                 typename... OldArgs>
-            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArgs...>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArgs...>,
                 // Support for skipping completely untouched types
                 typename std::enable_if<
-                    is_effective_any_of_t<M, OldArgs...>::value>::type
-#endif
-                >
+                    is_effective_any_of_t<M, OldArgs...>::value>::type>
             {
                 M mapper_;
 
@@ -688,14 +670,10 @@ namespace util {
             template <typename M, template <typename...> class Base,
                 typename... OldArgs>
             struct tuple_like_remapper<strategy_traverse_tag, M,
-                Base<OldArgs...>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+                Base<OldArgs...>,
                 // Support for skipping completely untouched types
                 typename std::enable_if<
-                    is_effective_any_of_t<M, OldArgs...>::value>::type
-#endif
-                >
+                    is_effective_any_of_t<M, OldArgs...>::value>::type>
             {
                 M mapper_;
 
@@ -713,13 +691,9 @@ namespace util {
             /// compile-time known amount of homogeneous types.
             template <typename M, template <typename, std::size_t> class Base,
                 typename OldArg, std::size_t Size>
-            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArg, Size>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArg, Size>,
                 // Support for skipping completely untouched types
-                typename std::enable_if<is_effective_t<M, OldArg>::value>::type
-#endif
-                >
+                typename std::enable_if<is_effective_t<M, OldArg>::value>::type>
             {
                 M mapper_;
 
@@ -735,13 +709,9 @@ namespace util {
             template <typename M, template <typename, std::size_t> class Base,
                 typename OldArg, std::size_t Size>
             struct tuple_like_remapper<strategy_traverse_tag, M,
-                Base<OldArg, Size>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+                Base<OldArg, Size>,
                 // Support for skipping completely untouched types
-                typename std::enable_if<is_effective_t<M, OldArg>::value>::type
-#endif
-                >
+                typename std::enable_if<is_effective_t<M, OldArg>::value>::type>
             {
                 M mapper_;
 
