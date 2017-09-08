@@ -391,10 +391,27 @@ endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_atomic)
+  # Sometimes linking against libatomic is required for atomic ops, if
+  # the platform doesn't support lock-free atomics.
+
+  # First check if atomics work without the library.
   add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
     SOURCE cmake/tests/cxx11_std_atomic.cpp
-    LIBRARIES "-latomic"
     FILE ${ARGN})
+
+  # If not, check if the library exists, and atomics work with it.
+  if(NOT HPX_WITH_CXX11_ATOMIC)
+    check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
+    if(HPX_HAVE_LIBATOMIC)
+      add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
+        SOURCE cmake/tests/cxx11_std_atomic.cpp
+        LIBRARIES "atomic"
+        FILE ${ARGN})
+    else()
+      message(FATAL_ERROR
+        "Host compiler appears to require libatomic, but cannot find it.")
+    endif()
+  endif()
 endmacro()
 
 ###############################################################################

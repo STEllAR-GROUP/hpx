@@ -1182,7 +1182,7 @@ namespace hpx { namespace traits
     template <typename F1, typename F2>
     struct get_function_annotation_itt<lcos::detail::compose_cb_impl<F1, F2> >
     {
-        static char const*
+        static util::itt::string_handle
             call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
         {
             return get_function_annotation_itt<F1>::call(f.f1_);

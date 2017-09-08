@@ -126,7 +126,7 @@ namespace hpx { namespace traits
     template <typename Sig, bool Serializable>
     struct get_function_annotation_itt<util::unique_function<Sig, Serializable> >
     {
-        static char const*
+        static util::itt::string_handle
             call(util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation_itt();

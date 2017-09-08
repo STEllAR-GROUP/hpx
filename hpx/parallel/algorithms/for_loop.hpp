@@ -1172,7 +1172,7 @@ namespace hpx { namespace traits
     struct get_function_annotation_itt<
         parallel::v2::detail::part_iterations<F, S, Tuple> >
     {
-        static char const* call(
+        static util::itt::string_handle call(
             parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
                 noexcept
         {
