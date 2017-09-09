@@ -122,6 +122,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_reference_wrapper(
     REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
 
+  hpx_check_for_cxx11_std_regex(
+    REQUIRED "HPX needs support for C++11 std::regex")
+
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
 

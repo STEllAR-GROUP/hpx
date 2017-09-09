@@ -66,7 +66,6 @@ set(__boost_libraries
   atomic
   filesystem
   program_options
-  regex
   system)
 
 find_package(Boost 1.55 REQUIRED COMPONENTS ${__boost_libraries})
@@ -93,6 +92,13 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   else()
     hpx_error("Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or HPX_WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including the iostreams library")
   endif()
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+endif()
+
+# attempt to load Boost.Regex (if available), it's needed for inspect
+find_package(Boost 1.55 QUIET COMPONENTS regex)
+if(Boost_REGEX_FOUND)
+  hpx_info("  regex")
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 

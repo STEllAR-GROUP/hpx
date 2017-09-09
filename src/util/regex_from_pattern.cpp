@@ -9,8 +9,6 @@
 
 #include <string>
 
-#include <boost/regex.hpp>
-
 namespace hpx { namespace util
 {
     namespace detail
