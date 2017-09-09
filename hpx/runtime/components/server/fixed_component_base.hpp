@@ -18,6 +18,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <cstddef>

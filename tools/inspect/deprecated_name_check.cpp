@@ -8,6 +8,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include <algorithm>
 
 #include "deprecated_name_check.hpp"
@@ -93,6 +95,7 @@ namespace boost
       { "\\b(BOOST_PP_CAT)\\b", "HPX_PP_CAT" },
       { "\\b(BOOST_PP_STRINGIZE)\\b", "HPX_PP_STRINGIZE" },
       { "\\b(BOOST_STRINGIZE)\\b", "HPX_PP_STRINGIZE(HPX_PP_EXPAND())" },
+      { "\\b(BOOST_ASSERT)\\b", "HPX_ASSERT" },
       { nullptr, nullptr }
     };
 

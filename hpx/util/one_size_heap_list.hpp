@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2015 Hartmut Kaiser
+//  Copyright (c) 1998-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/util/logging.hpp>

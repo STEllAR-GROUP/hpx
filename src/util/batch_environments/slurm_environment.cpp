@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/util/batch_environments/slurm_environment.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3

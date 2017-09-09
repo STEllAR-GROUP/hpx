@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/util/bind.hpp>

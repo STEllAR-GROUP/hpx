@@ -18,6 +18,7 @@
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <utility>
 

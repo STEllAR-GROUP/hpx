@@ -10,21 +10,22 @@
 // config
 #include <hpx/config.hpp>
 // util
-#include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
-#include <hpx/runtime.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/runtime/parcelset/encode_parcels.hpp>
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/parcelset/decode_parcels.hpp>
+#include <hpx/runtime/parcelset/encode_parcels.hpp>
+#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
+#include <hpx/util/assert.hpp>
 #include <hpx/util/debug/thread_stacktrace.hpp>
 //
 #include <boost/asio/ip/host_name.hpp>

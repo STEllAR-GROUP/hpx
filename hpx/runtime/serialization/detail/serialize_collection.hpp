@@ -7,8 +7,8 @@
 #define HPX_SERIALIZATION_DETAIL_SERIALIZE_COLLECTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 
 #include <memory>
 #include <type_traits>

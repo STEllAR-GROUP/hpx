@@ -26,6 +26,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>

@@ -5,6 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <list>
 

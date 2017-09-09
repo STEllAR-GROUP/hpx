@@ -17,6 +17,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 

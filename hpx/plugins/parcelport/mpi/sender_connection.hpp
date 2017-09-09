@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 
