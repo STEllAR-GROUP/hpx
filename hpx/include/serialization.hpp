@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/complex.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/map.hpp>
+#include <hpx/runtime/serialization/list.hpp>
 #include <hpx/runtime/serialization/multi_array.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/runtime/serialization/set.hpp>
