@@ -14,15 +14,15 @@
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/random.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <vector>
-#include <algorithm>
-#include <limits>
 #include <iostream>
+#include <limits>
+#include <random>
 #include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
@@ -37,8 +37,8 @@ struct random_fill
         return dist(gen);
     }
 
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> dist;
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned)

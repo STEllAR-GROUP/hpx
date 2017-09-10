@@ -87,6 +87,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*atomic\\b)", "std::atomic" },
       { "(\\bboost\\s*::\\s*memory_order_((relaxed)|(acquire)|(release)|"
         "(acq_rel)|(seq_cst))\\b)", "std::memory_order_\\2" },
+      { "(\\bboost\\s*::\\s*random\\s*::\\s*([^\\s]*)\\b)", "std::\\2" },
       /////////////////////////////////////////////////////////////////////////
       { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
