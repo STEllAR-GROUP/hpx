@@ -6,14 +6,15 @@
 ###############################################################################
 set(root "${PROJECT_SOURCE_DIR}/hpx/components/containers/partitioned_vector")
 
-add_definitions(-DHPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
-
 add_hpx_component(partitioned_vector
   FOLDER "Core/Components/Containers"
   HEADER_ROOT ${root}
   AUTOGLOB
   ESSENTIAL)
 
+target_compile_definitions(partitioned_vector_component
+  PRIVATE HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
+
 add_hpx_pseudo_dependencies(
-    components.containers_.partitioned_vector partitioned_vector_component)
+  components.containers_.partitioned_vector partitioned_vector_component)
 
