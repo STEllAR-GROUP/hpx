@@ -99,6 +99,11 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Denis Blank, who re-wrote our __unwrapped__ function to accept plain values
+  arbitrary containers, and properly deal with nested futures.
+* Ajai V. George, who implemented several of the parallel algorithms.
+* Taeguk Kwon, who worked on implementing parallel algorithms as well as 
+  adapting the parallel algorithms to the Ranges TS.
 * Khalid Hasanov, who contributed changes which allowed to run HPX on 64Bit
   power-pc architectures.
 * Zahra Khatami, who contributed the prefetching iterators and the persistent
