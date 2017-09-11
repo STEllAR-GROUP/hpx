@@ -471,7 +471,8 @@ namespace hpx { namespace threads { namespace policies
             while (true)
             {
                 auto const& rp = resource::get_partitioner();
-                auto mask = rp.get_pu_mask(num_thread + parent_pool_->get_thread_offset());
+                auto mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
                 if(bit_and(mask, parent_pool_->get_used_processing_units()))
                     break;
                 else

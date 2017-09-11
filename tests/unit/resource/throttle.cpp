@@ -10,11 +10,17 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <cstddef>
+#include <string>
+#include <utility>
+#include <vector>
+
 int hpx_main(int argc, char* argv[])
 {
     HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_threads("default"));
 
-    hpx::threads::detail::thread_pool_base& tp = hpx::resource::get_thread_pool("default");
+    hpx::threads::detail::thread_pool_base& tp =
+        hpx::resource::get_thread_pool("default");
 
     HPX_TEST_EQ(hpx::threads::count(tp.get_used_processing_units()), std::size_t(4));
 
@@ -101,7 +107,8 @@ int hpx_main(int argc, char* argv[])
         }
         else
         {
-            tp.add_processing_unit(num_thread - 1, num_thread + tp.get_thread_offset() - 1);
+            tp.add_processing_unit(
+                num_thread - 1, num_thread + tp.get_thread_offset() - 1);
             --num_thread;
             if (num_thread == 0)
             {
