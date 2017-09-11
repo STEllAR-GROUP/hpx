@@ -45,7 +45,6 @@
 #include <hpx/lcos/broadcast.hpp>
 
 #include <boost/format.hpp>
-#include <boost/icl/closed_interval.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -60,69 +59,71 @@
 
 namespace hpx { namespace agas
 {
-struct addressing_service::gva_cache_key
-{ // {{{ gva_cache_key implementation
-  private:
-    typedef boost::icl::closed_interval<naming::gid_type, std::less>
-        key_type;
+    struct addressing_service::gva_cache_key
+    {    // {{{ gva_cache_key implementation
+    private:
+        typedef std::pair<naming::gid_type, naming::gid_type> key_type;
 
-    key_type key_;
+        key_type key_;
 
-  public:
-    gva_cache_key()
-      : key_()
-    {}
+    public:
+        gva_cache_key()
+          : key_()
+        {
+        }
 
-    explicit gva_cache_key(
-        naming::gid_type const& id_
-      , std::uint64_t count_ = 1
-        )
-      : key_(naming::detail::get_stripped_gid(id_)
-           , naming::detail::get_stripped_gid(id_) + (count_ - 1))
-    {
-        HPX_ASSERT(count_);
-    }
+        explicit gva_cache_key(
+                naming::gid_type const& id, std::uint64_t count = 1)
+          : key_(naming::detail::get_stripped_gid(id),
+                naming::detail::get_stripped_gid(id) + (count - 1))
+        {
+            HPX_ASSERT(count);
+        }
 
-    naming::gid_type get_gid() const
-    {
-        return boost::icl::lower(key_);
-    }
+        naming::gid_type get_gid() const
+        {
+            return key_.first;
+        }
 
-    std::uint64_t get_count() const
-    {
-        naming::gid_type const size = boost::icl::length(key_);
-        HPX_ASSERT(size.get_msb() == 0);
-        return size.get_lsb();
-    }
+        std::uint64_t get_count() const
+        {
+            naming::gid_type const size = key_.second - key_.first;
+            HPX_ASSERT(size.get_msb() == 0);
+            return size.get_lsb();
+        }
 
-    friend bool operator<(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
-    }
+        friend bool operator<(
+            gva_cache_key const& lhs, gva_cache_key const& rhs)
+        {
+            return lhs.key_.second < rhs.key_.first;
+        }
 
-    friend bool operator==(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        // Direct hit
-        if(lhs.key_ == rhs.key_)
-            return true;
+        friend bool operator==(
+            gva_cache_key const& lhs, gva_cache_key const& rhs)
+        {
+            // Direct hit
+            if (lhs.key_ == rhs.key_)
+            {
+                return true;
+            }
 
-        // Is lhs in rhs?
-        if (1 == lhs.get_count() && 1 != rhs.get_count())
-            return boost::icl::contains(rhs.key_, lhs.key_);
+            // Is lhs in rhs?
+            if (1 == lhs.get_count() && 1 != rhs.get_count())
+            {
+                return rhs.key_.first <= lhs.key_.first &&
+                    lhs.key_.second <= rhs.key_.second;
+            }
 
-        // Is rhs in lhs?
-        else if (1 != lhs.get_count() && 1 == rhs.get_count())
-            return boost::icl::contains(lhs.key_, rhs.key_);
+            // Is rhs in lhs?
+            else if (1 != lhs.get_count() && 1 == rhs.get_count())
+            {
+                return lhs.key_.first <= rhs.key_.first &&
+                    rhs.key_.second <= lhs.key_.second;
+            }
 
-        return false;
-    }
-}; // }}}
+            return false;
+        }
+    }; // }}}
 
 addressing_service::addressing_service(
     parcelset::parcelhandler& ph
