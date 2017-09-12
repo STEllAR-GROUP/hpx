@@ -859,9 +859,17 @@ namespace hpx { namespace threads { namespace detail
             num_cores_numa[n] = t.get_number_of_numa_node_cores(n);
             cores_t += num_cores_numa[n];
         }
+
         // how many threads should go on each domain
+        std::size_t cores_t2 = 0;
         for (std::size_t n=0; n<num_numas; ++n) {
-            num_threads_numa[n] = num_threads*num_cores_numa[n]/cores_t;
+            std::size_t temp =
+                std::floor(0.5 +double(num_threads)*num_cores_numa[n]/cores_t);
+            // due to rounding up, we might have too many threads
+            if ((cores_t2+temp)>num_threads)
+                temp = num_threads - cores_t2;
+            cores_t2 += temp;
+            num_threads_numa[n] = temp;
         }
 
         // assign threads to cores on each numa domain
