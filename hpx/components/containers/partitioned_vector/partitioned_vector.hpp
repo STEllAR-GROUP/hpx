@@ -186,6 +186,10 @@ namespace hpx
                 server::partitioned_vector_config_data::partition_data
                 base_type;
 
+            partition_data()
+              : base_type()
+            {}
+
             partition_data(id_type const& part, std::size_t size,
                     std::uint32_t locality_id)
               : base_type(part, size, locality_id)
@@ -291,7 +295,7 @@ namespace hpx
                     );
                 }
             }
-            wait_all(ptrs);
+            when_all(ptrs).get();
 
             partition_size_ = get_partition_size();
             this->base_type::reset(std::move(id));
@@ -558,6 +562,11 @@ namespace hpx
             std::size_t allocated_size = 0;
 
             std::size_t l = 0;
+
+            // Fixing the size of partitions to avoid race conditions between
+            // possible reallocations during push back and the continuation
+            // to set the local partition data
+            partitions_.resize(num_parts);
             for (bulk_locality_result const& r: f.get())
             {
                 using naming::get_locality_id_from_id;
@@ -565,7 +574,7 @@ namespace hpx
                 for (hpx::id_type const& id: r.second)
                 {
                     std::size_t size = (std::min)(part_size, size_-allocated_size);
-                    partitions_.push_back(partition_data(id, size, locality));
+                    partitions_[l] = partition_data(id, size, locality);
 
                     if (locality == this_locality)
                     {
@@ -579,6 +588,7 @@ namespace hpx
                             )
                         );
                     }
+
                     ++l;
 
                     allocated_size += size;
@@ -590,7 +600,7 @@ namespace hpx
                         if (size != part_size)
                         {
                             partitioned_vector_partition_client(
-                                    partitions_.back().partition_
+                                    partitions_[l - 1].partition_
                                 ).resize(size);
                         }
                         break;
@@ -599,10 +609,13 @@ namespace hpx
                     {
                         HPX_ASSERT(size == part_size);
                     }
+
+                    HPX_ASSERT(l < num_parts);
                 }
             }
+            HPX_ASSERT(l == num_parts);
 
-            wait_all(ptrs);
+            when_all(ptrs).get();
 
             // cache our partition size
             partition_size_ = get_partition_size();
@@ -652,13 +665,16 @@ namespace hpx
             std::vector<future<void> > ptrs;
 
             partitions_vector_type partitions;
-            partitions.reserve(rhs.partitions_.size());
+            // Fixing the size of partitions to avoid race conditions between
+            // possible reallocations during push back and the continuation
+            // to set the local partition data
+            partitions.resize(rhs.partitions_.size());
             for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
             {
                 std::uint32_t locality = rhs.partitions_[i].locality_id_;
 
-                partitions.push_back(partition_data(objs[i].get(),
-                    rhs.partitions_[i].size_, locality));
+                partitions[i] = partition_data(objs[i].get(),
+                    rhs.partitions_[i].size_, locality);
 
                 if (locality == this_locality)
                 {
@@ -670,7 +686,7 @@ namespace hpx
                 }
             }
 
-            wait_all(ptrs);
+            when_all(ptrs).get();
 
             size_ = rhs.size_;
             partition_size_ = rhs.partition_size_;
