@@ -1,6 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2015 Hartmut Kaiser
-    Copyright (C) 2016 Adrian Serio
+    Copyright (C) 2016-2017 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -87,7 +87,7 @@ our tables below.
   [[Name]                    [Institution]        [email]]
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
-  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
+  [[Bryce Adelstein-Lelbach] [__lbnl__]           [[$./images/emails/balelbach.png]]]
   [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
   [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
@@ -194,8 +194,8 @@ the project through discussions, pull requests, documentation patches, etc.
   replacing Boost.Serialization inside __hpx__.
 * Pyry Jahkola, who contributed the Mac OS build system and build documentation
   on how to build __hpx__ using Clang and libc++.
-* Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library, and
-  who submitted several test cases allowing us to reproduce and fix problems
+* Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library,
+  and who submitted several test cases allowing us to reproduce and fix problems
   in __hpx__.
 * Rekha Raj, who contributed changes to the description of the Windows build
   instructions.
@@ -203,11 +203,13 @@ the project through discussions, pull requests, documentation patches, etc.
 * Alex Nagelberg for his work on implementing a C wrapper API for __hpx__.
 * Chen Guo, helvihartmann, Nicholas Pezolano, and John West who added
   and improved examples in __hpx__.
-* Markus Elfring, Kirill Kropivyansky, Alexander Neundorf, and BryantLam
-  who improved our CMake. 
-* Element-126, ShmuelLevine, Aalekh Nigam, HadrienG2, Prayag Verma, and
+* Joseph Kleinhenz, Markus Elfring, Kirill Kropivyansky, Alexander Neundorf, 
+  and BryantLam who improved our CMake. 
+* Praveen Velliengiri, Element-126, ShmuelLevine, Aalekh Nigam, 
+  HadrienG2, Prayag Verma, and
   Avyav Kumar who improved the documentation.
-* Christopher Hinz, Brandon Kohn, and woodmeister123 who contributed to the 
+* J. F. Bastien, Christopher Hinz, Brandon Kohn, hendrx, Dekken, and 
+  woodmeister123 who contributed to the 
   general improvement of __hpx__
 
 In addition to the people who worked directly with __hpx__ development we would
