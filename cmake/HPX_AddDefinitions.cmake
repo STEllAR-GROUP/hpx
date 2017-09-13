@@ -15,7 +15,10 @@ set_property(GLOBAL PROPERTY HPX_CONFIG_COND_DEFINITIONS "")
 
 function(hpx_add_config_define definition)
 
-  if(ARGN)
+  # if(ARGN) ignores an argument "0"
+  set(Args ${ARGN})
+  list(LENGTH Args ArgsLen)
+  if(ArgsLen GREATER 0)
     set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_DEFINITIONS "${definition} ${ARGN}")
   else()
     set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_DEFINITIONS "${definition}")
@@ -25,7 +28,10 @@ endfunction()
 
 function(hpx_add_config_cond_define definition)
 
-  if(ARGN)
+  # if(ARGN) ignores an argument "0"
+  set(Args ${ARGN})
+  list(LENGTH Args ArgsLen)
+  if(ArgsLen GREATER 0)
     set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS "${definition} ${ARGN}")
   else()
     set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS "${definition}")
