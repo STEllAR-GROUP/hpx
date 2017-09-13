@@ -110,7 +110,7 @@ the project through discussions, pull requests, documentation patches, etc.
   opened tickets and contributed to the __hpx__ examples.
 * Daniel Estermann, for his work porting __hpx__ to the Raspberry Pi.
 * Alireza Kheirkhahan, who built and administered our local cluster as well
-  as his work in distribued IO.
+  as his work in distributed IO.
 * Abhimanyu Rawat, who worked on stack overflow detection.
 * David Pfander, who improved signal handling in __hpx__, provided his
   optimization expertise, and worked on incorporating the Vc 
