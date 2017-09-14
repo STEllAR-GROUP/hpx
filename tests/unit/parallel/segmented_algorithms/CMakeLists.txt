@@ -11,6 +11,7 @@ set(tests
     partitioned_vector_move
     partitioned_vector_target
     partitioned_vector_transform
+    partitioned_vector_transform_binary
     partitioned_vector_transform_reduce
     partitioned_vector_fill
     partitioned_vector_inclusive_scan
