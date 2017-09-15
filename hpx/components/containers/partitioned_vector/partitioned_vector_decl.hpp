@@ -187,6 +187,10 @@ namespace hpx
                 server::partitioned_vector_config_data::partition_data
                 base_type;
 
+            partition_data()
+              : base_type()
+            {}
+
             partition_data(id_type const& part, std::size_t size,
                     std::uint32_t locality_id)
               : base_type(part, size, locality_id)
