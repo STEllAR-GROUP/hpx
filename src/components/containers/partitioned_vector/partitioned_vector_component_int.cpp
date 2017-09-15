@@ -22,9 +22,8 @@ template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<int, std::vector<int>>;
 template HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
-        size_type, hpx::container_distribution_policy const&, void*);
+        size_type, hpx::container_distribution_policy const&);
 template HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
-        size_type, int const&, hpx::container_distribution_policy const&,
-        void*);
+        size_type, int const&, hpx::container_distribution_policy const&);
 

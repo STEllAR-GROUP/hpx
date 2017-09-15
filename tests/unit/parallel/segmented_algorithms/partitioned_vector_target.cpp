@@ -70,7 +70,7 @@ void allocation_tests()
 int main()
 {
     allocation_tests<double>();
-//     allocation_tests<int>();
+    allocation_tests<int>();
 
     return 0;
 }

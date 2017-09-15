@@ -512,12 +512,10 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    template <typename DistPolicy>
+    template <typename DistPolicy, typename U>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector<T, Data>::partitioned_vector(size_type size,
-        DistPolicy const& policy,
-        typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value>::type*)
+            DistPolicy const& policy)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
@@ -526,12 +524,10 @@ namespace hpx
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
-    template <typename DistPolicy>
+    template <typename DistPolicy, typename U>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector<T, Data>::partitioned_vector(size_type size, T const& val,
-        DistPolicy const& policy,
-        typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value>::type* /*= nullptr*/)
+            DistPolicy const& policy)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
