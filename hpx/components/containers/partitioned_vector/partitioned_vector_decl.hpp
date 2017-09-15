@@ -397,11 +397,11 @@ namespace hpx
         /// \param symbolic_name    The (optional) name to register the newly
         ///                         created vector
         ///
-        template <typename DistPolicy,
-            typename U = typename std::enable_if<
-                traits::is_distribution_policy<DistPolicy>::value
-            >::type>
-        partitioned_vector(size_type size, DistPolicy const& policy);
+        template <typename DistPolicy>
+        partitioned_vector(size_type size, DistPolicy const& policy,
+                typename std::enable_if<
+                    traits::is_distribution_policy<DistPolicy>::value
+                >::type* = nullptr);
 
         /// Constructor which create and initialize vector with the
         /// given \a where all elements are initialized with \a val and
@@ -413,11 +413,12 @@ namespace hpx
         /// \param symbolic_name    The (optional) name to register the newly
         ///                         created vector
         ///
-        template <typename DistPolicy,
-            typename U = typename std::enable_if<
+        template <typename DistPolicy>
+        partitioned_vector(size_type size, T const& val,
+            DistPolicy const& policy,
+            typename std::enable_if<
                 traits::is_distribution_policy<DistPolicy>::value
-            >::type>
-        partitioned_vector(size_type size, T const& val, DistPolicy const& policy);
+            >::type* = nullptr);
 
         /// Copy construction performs a deep copy of the right hand side
         /// vector.
