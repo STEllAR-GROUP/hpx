@@ -322,16 +322,16 @@ namespace hpx { namespace server
 /**/
 
 #define HPX_REGISTER_VECTOR_1(type)                                            \
-    HPX_REGISTER_VECTOR_2(type, std::vector<type>)    \
+    HPX_REGISTER_VECTOR_3(type, std::vector<type>, HPX_PP_CAT(std_vector_, type))\
 /**/
 #define HPX_REGISTER_VECTOR_2(type, data)                                      \
-    HPX_REGISTER_VECTOR_3(type, data, type)    \
+    HPX_REGISTER_VECTOR_3(type, data, HPX_PP_CAT(type, data))                  \
 /**/
 #define HPX_REGISTER_VECTOR_3(type, data, name)                                \
     typedef ::hpx::server::partitioned_vector<type, data> HPX_PP_CAT(          \
         __partitioned_vector_, HPX_PP_CAT(type, name));                        \
     HPX_REGISTER_VECTOR_IMPL(                                                  \
-        HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name)), name)    \
+        HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name)), name)       \
 /**/
 
 namespace hpx
