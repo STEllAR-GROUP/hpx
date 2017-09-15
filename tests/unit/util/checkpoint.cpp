@@ -11,6 +11,10 @@
 #include <hpx/util/checkpoint.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+using hpx::util::checkpoint;
+using hpx::util::save_checkpoint;
+using hpx::util::restore_checkpoint;
+
 // Main
 int main()
 {
@@ -118,8 +122,8 @@ int main()
     std::vector<float> vec7{1.02, 1.03, 1.04, 1.05};
     hpx::future<checkpoint> fut_7=save_checkpoint(vec7);
     checkpoint archive7 = fut_7.get();
-    test_file_14.write(archive7.data.data(),archive14.size());
-    test_file_14.close();
+    test_file_7.write(archive7.data.data(),archive7.size());
+    test_file_7.close();
 
     std::vector<float> vec7_1;
     checkpoint archive7_1;

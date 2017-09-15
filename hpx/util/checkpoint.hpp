@@ -64,21 +64,27 @@ namespace util
 
         std::vector<char> data;
 
-        //Serialization Definition
-        friend class hpx::serialization::access;
-        template <typename Volume>
-        void serialize(Volume& vol, const unsigned int version)
-        {
-            vol& data;
-        };
-
         checkpoint& operator=(checkpoint const& c)
         {
             data = c.data;
+            return *this;
         }
         checkpoint& operator=(checkpoint&& c)
         {
             data = std::move(c.data);
+            return *this;
+        }
+
+        bool operator==(checkpoint const& c) const
+        {
+            if(data == c.data)
+            {
+                 return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         void load(std::string file_name)
@@ -98,6 +104,15 @@ namespace util
         {
             return data.size();
         }
+
+        //Serialization Definition
+        friend class hpx::serialization::access;
+        template <typename Volume>
+        void serialize(Volume& vol, const unsigned int version)
+        {
+            vol& data;
+        };
+
     };
 
     //Function object for save_checkpoint
@@ -113,6 +128,7 @@ namespace util
              //Serialize data
              int const sequencer[] = { //Trick to expand the variable pack
                  (ar << ts, 0)...};    //Takes advantage of the comma operator
+             (void)sequencer;          // Suppress unused param. warnings
              return c;
          }
      };
@@ -244,6 +260,7 @@ namespace util
             ar >> t;
             int const sequencer[] = {//Trick to exand the variable pack
                (ar >> ts, 0)...};    //Takes advantage of the comma operator
+            (void)sequencer;         //Suppress unused param. warnings
         }
     }
 } //End Util Namespace
