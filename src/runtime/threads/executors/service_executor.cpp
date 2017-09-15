@@ -26,6 +26,8 @@
 #include <string>
 #include <utility>
 
+#include <iostream>
+
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -44,7 +46,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     service_executor::~service_executor()
     {
         std::unique_lock<mutex_type> l(mtx_);
-        while (task_count_ != 0)
+        while (task_count_ > 0)
         {
             shutdown_cv_.wait(l);
         }
@@ -56,11 +58,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // By hanging on to the lock during notify_all, we ensure that the
         // destructor is only completed after this function returned
-        std::unique_lock<mutex_type> l(mtx_);
         {
+            std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(task_count_ > 0);
             if (--task_count_ == 0)
+            {
                 shutdown_cv_.notify_all();
+            }
         }
     }
 

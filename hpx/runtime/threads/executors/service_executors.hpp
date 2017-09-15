@@ -8,18 +8,20 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -73,10 +75,10 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             util::io_service_pool* pool_;
-            typedef hpx::lcos::local::spinlock mutex_type;
+            typedef std::mutex mutex_type;
             mutex_type mtx_;
-            std::atomic<std::uint64_t> task_count_;
-            lcos::local::condition_variable_any shutdown_cv_;
+            hpx::util::atomic_count task_count_;
+            std::condition_variable_any shutdown_cv_;
         };
     }
 
