@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/throw_exception.hpp>
@@ -73,8 +73,10 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             util::io_service_pool* pool_;
+            typedef hpx::lcos::local::spinlock mutex_type;
+            mutex_type mtx_;
             std::atomic<std::uint64_t> task_count_;
-            lcos::local::counting_semaphore shutdown_sem_;
+            lcos::local::condition_variable_any shutdown_cv_;
         };
     }
 
