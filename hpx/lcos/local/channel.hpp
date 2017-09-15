@@ -207,14 +207,16 @@ namespace hpx { namespace lcos { namespace local
 
                 {
                     util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
-                    e = HPX_GET_EXCEPTION(hpx::future_cancelled,
+                    e = HPX_GET_EXCEPTION(
+                            hpx::future_cancelled, hpx::lightweight,
                             "hpx::lcos::local::close",
                             "canceled waiting on this entry");
                 }
 
                 // all pending requests which can't be satisfied have to be
-                // canceled at this point
-                buffer_.cancel_waiting(e);
+                // canceled at this point, force deleting possibly waiting
+                // requests
+                buffer_.cancel_waiting(e, true);
             }
 
         private:
