@@ -14,6 +14,13 @@
 
 HPX_REGISTER_PARTITIONED_VECTOR(double);
 
+// an out-of-line definition of a member of a class template cannot have default
+// arguments
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 5037)
+#endif
+
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::server::partitioned_vector<double, std::vector<double>>;
 template class HPX_PARTITIONED_VECTOR_EXPORT
@@ -22,8 +29,13 @@ template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<double, std::vector<double>>;
 template HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<double, std::vector<double>>::partitioned_vector(
-        size_type, hpx::container_distribution_policy const&);
+        size_type, hpx::container_distribution_policy const&, void*);
 template HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<double, std::vector<double>>::partitioned_vector(
-        size_type, double const&, hpx::container_distribution_policy const&);
+        size_type, double const&, hpx::container_distribution_policy const&,
+        void*);
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
