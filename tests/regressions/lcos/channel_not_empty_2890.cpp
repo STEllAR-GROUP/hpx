@@ -16,13 +16,13 @@ int main()
     {
         hpx::lcos::local::channel<int> ch;
         ch.set(0);
-        ch.close();
+        ch.close(true);
     }
 
     {
         hpx::lcos::channel<int> ch (hpx::find_here());
         ch.set(0);
-        ch.close();
+        ch.close(true);
     }
 
     return hpx::util::report_errors();

@@ -285,24 +285,25 @@ namespace hpx { namespace lcos
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void close(launch::apply_policy)
+        void close(launch::apply_policy, bool force_delete_entries = false)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
-            hpx::apply(action_type(), this->get_id());
+            hpx::apply(action_type(), this->get_id(), force_delete_entries);
         }
-        hpx::future<void> close(launch::async_policy)
+        hpx::future<void> close(
+            launch::async_policy, bool force_delete_entries = false)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
-            return hpx::async(action_type(), this->get_id());
+            return hpx::async(action_type(), this->get_id(), force_delete_entries);
         }
-        void close(launch::sync_policy)
+        void close(launch::sync_policy, bool force_delete_entries = false)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
-            action_type()(this->get_id());
+            action_type()(this->get_id(), force_delete_entries);
         }
-        void close()
+        void close(bool force_delete_entries = false)
         {
-            close(launch::sync);
+            close(launch::sync, force_delete_entries);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -522,24 +523,25 @@ namespace hpx { namespace lcos
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void close(launch::apply_policy)
+        void close(launch::apply_policy, bool force_delete_entries = false)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
-            hpx::apply(action_type(), this->get_id());
+            hpx::apply(action_type(), this->get_id(), force_delete_entries);
         }
-        hpx::future<void> close(launch::async_policy)
+        hpx::future<void> close(
+            launch::async_policy, bool force_delete_entries = false)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
-            return hpx::async(action_type(), this->get_id());
+            return hpx::async(action_type(), this->get_id(), force_delete_entries);
         }
-        void close(launch::sync_policy)
+        void close(launch::sync_policy, bool force_delete_entries = false)
         {
             typedef typename lcos::server::channel<T>::close_action action_type;
-            action_type()(this->get_id());
+            action_type()(this->get_id(), force_delete_entries);
         }
-        void close()
+        void close(bool force_delete_entries = false)
         {
-            close(launch::sync);
+            close(launch::sync, force_delete_entries);
         }
     };
 }}
