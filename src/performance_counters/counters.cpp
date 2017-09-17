@@ -1096,20 +1096,17 @@ namespace hpx { namespace performance_counters
             // now expand "pool#*"
             if (detail::is_pool_kind(p.instancename_))
             {
+                bool expand_threads = detail::is_thread_kind(p.subinstancename_);
+
                 counter_info i = info;
                 p.instancename_ = detail::get_pool_kind(p.instancename_);
-                if (!detail::expand_counter_info_threads(i, p, f, ec))
-                    return false;
-
-                if (detail::is_thread_kind(p.subinstancename_))
+                if (expand_threads)
                 {
-                    counter_info i = info;
-                    p.subinstancename_ =
-                        detail::get_thread_kind(p.subinstancename_) + "-thread";
-                    return detail::expand_counter_info_threads(i, p, f, ec);
+                    p.subinstancename_ = detail::get_thread_kind(
+                        p.subinstancename_) + "-thread";
                 }
-
-                return true;
+                return detail::expand_counter_info_pools(
+                    expand_threads, i, p, f, ec);
             }
 
             if (detail::is_thread_kind(p.instancename_))
