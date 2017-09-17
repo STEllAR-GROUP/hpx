@@ -31,9 +31,9 @@
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <atomic>
@@ -82,22 +82,22 @@ void print_results(
                      "Maximum Delay (iterations),Total Delay (iterations),"
                      "Total Walltime (seconds),Walltime per Task (seconds)\n";
 
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const seed_str  = boost::str(boost::format("%lu,") % seed);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+    std::string const cores_str = hpx::util::format("%lu,", cores);
+    std::string const seed_str  = hpx::util::format("%lu,", seed);
+    std::string const tasks_str = hpx::util::format("%lu,", tasks);
 
     std::string const min_delay_str
-        = boost::str(boost::format("%lu,") % min_delay);
+        = hpx::util::format("%lu,", min_delay);
     std::string const max_delay_str
-        = boost::str(boost::format("%lu,") % max_delay);
+        = hpx::util::format("%lu,", max_delay);
     std::string const total_delay_str
-        = boost::str(boost::format("%lu,") % total_delay);
+        = hpx::util::format("%lu,", total_delay);
 
-    std::cout <<
-        ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %10.12s\n")
-        % cores_str % seed_str % tasks_str
-        % min_delay_str % max_delay_str % total_delay_str
-        % walltime % (walltime / tasks));
+    hpx::util::format_to(std::cout,
+        "%-21s %-21s %-21s %-21s %-21s %-21s %10.12s\n",
+        cores_str, seed_str, tasks_str,
+        min_delay_str, max_delay_str, total_delay_str,
+        walltime, walltime / tasks);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

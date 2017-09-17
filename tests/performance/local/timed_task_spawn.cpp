@@ -14,10 +14,10 @@
 #include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/format.hpp>
 #include <boost/math/common_factor.hpp>
 
 #include <chrono>
@@ -147,20 +147,21 @@ void print_results(
         }
     }
 
-    cout << ( boost::format("%lu, %lu, %lu, %lu, %.14g, %.14g")
-            % delay
-            % tasks
-            % suspended_tasks
-            % cores
-            % walltime
-            % warmup_estimate
-            );
+    hpx::util::format_to(cout,
+        "%lu, %lu, %lu, %lu, %.14g, %.14g",
+        delay,
+        tasks,
+        suspended_tasks,
+        cores,
+        walltime,
+        warmup_estimate
+    );
 
     if (ac)
     {
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            cout << ( boost::format(", %.14g")
-                    % counter_values[i].get_value<double>());
+            hpx::util::format_to(cout, ", %.14g",
+                counter_values[i].get_value<double>());
     }
 
     cout << "\n";

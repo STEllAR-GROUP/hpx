@@ -23,6 +23,7 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
 
 #if defined(HPX_WINDOWS)
@@ -30,8 +31,6 @@
 #elif defined(HPX_HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
-
-#include <boost/format.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -210,7 +209,7 @@ namespace hpx { namespace detail
 
         std::sort(env.begin(), env.end());
 
-        std::string retval = boost::str(boost::format("%d entries:\n") % env.size());
+        std::string retval = hpx::util::format("%d entries:\n", env.size());
         for (std::string const& s : env)
         {
             retval += "  " + s + "\n";
@@ -604,7 +603,7 @@ namespace hpx
         std::size_t const* thread_id =
             xi.get<hpx::detail::throw_thread_id>();
         if (thread_id && *thread_id)
-            strm << (boost::format("{thread-id}: %016x\n") % *thread_id);
+            hpx::util::format_to(strm, "{thread-id}: %016x\n", *thread_id);
 
         std::string const* thread_description =
             xi.get<hpx::detail::throw_thread_name>();

@@ -36,6 +36,7 @@
 #include "worker_timed.hpp"
 
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <tbb/task.h>
@@ -46,7 +47,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 using boost::program_options::variables_map;
@@ -74,13 +74,14 @@ void print_results(
         std::cout << "OS-threads,Tasks,Delay (iterations),"
                      "Total Walltime (seconds),Walltime per Task (seconds)\n";
 
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    std::string const cores_str = hpx::util::format("%lu,", cores);
+    std::string const tasks_str = hpx::util::format("%lu,", tasks);
+    std::string const delay_str = hpx::util::format("%lu,", delay);
 
-    std::cout << ( boost::format("%-21s %-21s %-21s %10.12s, %10.12s\n")
-                 % cores_str % tasks_str % delay_str
-                 % walltime % (walltime / tasks));
+    hpx::util::format_to(std::cout,
+        "%-21s %-21s %-21s %10.12s, %10.12s\n",
+        cores_str, tasks_str, delay_str,
+        walltime, walltime / tasks);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -503,10 +504,9 @@ namespace hpx { namespace performance_counters { namespace server
                 // base counter could not be retrieved
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "statistics_counter<Statistic>::evaluate_base_counter",
-                    boost::str(boost::format(
-                        "could not get or create performance counter: '%s'") %
-                            base_counter_name_)
-                    );
+                    hpx::util::format(
+                        "could not get or create performance counter: '%s'",
+                        base_counter_name_));
                 return false;
             }
         }

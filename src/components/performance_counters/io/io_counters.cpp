@@ -9,11 +9,11 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/components/performance_counters/io/io_counters.hpp>
 
-#include <boost/format.hpp>
 #include <hpx/exception.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -50,8 +50,6 @@ HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace io
 {
-#define PROC_IO_PATH "/proc/%1%/io"
-
     namespace qi = boost::spirit::qi;
     namespace ascii = boost::spirit::ascii;
 
@@ -80,15 +78,14 @@ namespace hpx { namespace performance_counters { namespace io
     ///////////////////////////////////////////////////////////////////////////
     void parse_proc_io(proc_io& pio)
     {
-        boost::format fmt(PROC_IO_PATH);
         pid_t pid = getpid();
-        std::string fn = boost::str(fmt % pid);
+        std::string fn = hpx::util::format("/proc/%1%/io", pid);
         std::ifstream ins(fn);
 
         if (!ins.is_open())
             HPX_THROW_EXCEPTION(hpx::no_success,
                 "hpx::performance_counters::io::parse_proc_io",
-                boost::str(boost::format("failed to open " PROC_IO_PATH) % pid));
+                hpx::util::format("failed to open /proc/%1%/io", pid));
 
         typedef boost::spirit::basic_istream_iterator<char> iterator;
         iterator it(ins), end;
@@ -97,7 +94,7 @@ namespace hpx { namespace performance_counters { namespace io
         if (!qi::phrase_parse(it, end, p, ascii::space, pio))
             HPX_THROW_EXCEPTION(hpx::no_success,
                 "hpx::performance_counters::io::parse_proc_io",
-                boost::str(boost::format("failed to parse " PROC_IO_PATH) % pid));
+                hpx::util::format("failed to parse /proc/%1%/io", pid));
     }
 
     std::uint64_t get_pio_riss(bool)

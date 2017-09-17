@@ -11,8 +11,6 @@
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <iterator>

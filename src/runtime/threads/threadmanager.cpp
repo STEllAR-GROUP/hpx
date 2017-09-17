@@ -34,8 +34,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <functional>

@@ -7,8 +7,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/format.hpp>
 
-#include <boost/format.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
@@ -114,22 +114,22 @@ void print_results(
         ;
 */
 
-    cout << ( boost::format("%lu %lu %lu %lu %lu %.14g")
-            % payload
-            % os_thread_count
-            % contexts
-            % iterations
-            % seed
-            % (((O/(2*iterations*os_thread_count))*1e9))
-//            % (((walltime/(2*iterations*os_thread_count))*1e9)
-            );
+    hpx::util::format_to(cout, "%lu %lu %lu %lu %lu %.14g",
+        payload,
+        os_thread_count,
+        contexts,
+        iterations,
+        seed,
+        (O/(2*iterations*os_thread_count))*1e9
+//      ((walltime/(2*iterations*os_thread_count))*1e9
+    );
 
 /*
     if (ac)
     {
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            cout << ( boost::format(" %.14g")
-                    % counter_values[i].get_value<double>());
+            hpx::util::format_to(cout, " %.14g",
+                counter_values[i].get_value<double>());
     }
 */
 

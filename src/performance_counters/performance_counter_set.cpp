@@ -13,9 +13,8 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/unwrap.hpp>
-
-#include <boost/format.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -88,9 +87,9 @@ namespace hpx { namespace performance_counters
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counter_set::find_counter",
-                boost::str(boost::format(
-                    "unknown performance counter: '%1%' (%2%)") %
-                    info.fullname_ % ec.get_message()));
+                hpx::util::format(
+                    "unknown performance counter: '%1%' (%2%)",
+                    info.fullname_, ec.get_message()));
             return false;
         }
 

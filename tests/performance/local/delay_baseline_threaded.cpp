@@ -9,6 +9,7 @@
 
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/thread.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <chrono>
@@ -20,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 char const* benchmark_name = "Delay Baseline";
@@ -81,11 +81,11 @@ void print_results(
                 ;
     }
 
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    std::string const tasks_str = hpx::util::format("%lu,", tasks);
+    std::string const delay_str = hpx::util::format("%lu,", delay);
 
-    cout << ( boost::format("%lu %lu %lu %.14g\n")
-            % delay % tasks % threads % mean_);
+    hpx::util::format_to(cout, "%lu %lu %lu %.14g\n",
+        delay, tasks, threads, mean_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
