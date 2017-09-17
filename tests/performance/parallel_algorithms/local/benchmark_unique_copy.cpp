@@ -21,9 +21,8 @@
 #include <iostream>
 #include <random>
 #include <string>
-#include <vector>
 
-#include "test_utils.hpp"
+#include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
@@ -83,11 +82,13 @@ void run_benchmark(std::size_t vector_size, int test_count,
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
-    typedef typename std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test_container<IteratorTag> test_container;
+    typedef typename test_container::type container;
+    typedef typename container::iterator iterator;
 
-    std::vector<int> v(vector_size);
-    std::vector<int> result(v.size());
+    container v = test_container::get_container(vector_size);
+    container result = test_container::get_container(vector_size);
+
     iterator first = iterator(std::begin(v));
     iterator last = iterator(std::end(v));
     iterator dest = iterator(std::begin(result));
@@ -98,7 +99,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
         random_fill(random_range));
 
     auto dest_dist = std::distance(std::begin(result),
-        std::unique_copy(first, last, dest).base());
+        std::unique_copy(first, last, dest));
 
     std::cout << "*** Destination iterator distance : "
         << dest_dist << std::endl << std::endl;

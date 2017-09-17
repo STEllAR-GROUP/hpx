@@ -21,9 +21,8 @@
 #include <iostream>
 #include <random>
 #include <string>
-#include <vector>
 
-#include "test_utils.hpp"
+#include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
@@ -83,11 +82,13 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
-    typedef typename std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test_container<IteratorTag> test_container;
+    typedef typename test_container::type container;
+    typedef typename container::iterator iterator;
 
-    std::vector<int> src1(vector_size1), src2(vector_size2);
-    std::vector<int> result(vector_size1 + vector_size2);
+    container src1 = test_container::get_container(vector_size1);
+    container src2 = test_container::get_container(vector_size2);
+    container result = test_container::get_container(vector_size1 + vector_size2);
 
     iterator first1 = iterator(std::begin(src1));
     iterator last1 = iterator(std::end(src1));
