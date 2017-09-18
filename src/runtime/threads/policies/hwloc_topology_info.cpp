@@ -594,17 +594,39 @@ namespace hpx { namespace threads
 
     std::size_t hwloc_topology_info::get_number_of_cores() const
     {
-        int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
-        // If num_cores is smaller 0, we have an error, it should never be zero
-        // either to avoid division by zero, we should always have at least one
-        // core
-        if(0 >= nobjs)
+        int nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        // If num_cores is smaller 0, we have an error
+        if (0 > nobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::hwloc_topology_info::get_number_of_cores"
-              , "hwloc_get_nbobjs_by_type failed");
+              , "hwloc_get_nbobjs_by_type(HWLOC_OBJ_CORE) failed");
             return std::size_t(nobjs);
         }
+        else if (0 == nobjs)
+        {
+            // some platforms report zero cores but might still report the
+            // number of PUs
+            nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+            if (0 > nobjs)
+            {
+                HPX_THROW_EXCEPTION(kernel_error
+                  , "hpx::threads::hwloc_topology_info::get_number_of_cores"
+                  , "hwloc_get_nbobjs_by_type(HWLOC_OBJ_PU) failed");
+                return std::size_t(nobjs);
+            }
+        }
+
+        // the number of reported cores/pus should never be zero either to
+        // avoid division by zero, we should always have at least one core
+        if (0 == nobjs)
+        {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::hwloc_topology_info::get_number_of_cores"
+              , "hwloc_get_nbobjs_by_type reports zero cores/pus");
+            return std::size_t(nobjs);
+        }
+
         return std::size_t(nobjs);
     }
 
