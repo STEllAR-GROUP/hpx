@@ -255,12 +255,12 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             registers(info),
             info.long_descr);
 
-        if (strlen((*it)->note) > 0)
+        if (strlen(info.note) > 0)
         {
-            std::cout << "Note:\n" << (*it)->note << "\n";
+            std::cout << "Note:\n" << info.note << "\n";
         }
 
-        std::cout << std::string(79, '-')+'\n');
+        std::cout << std::string(79, '-')+'\n';
     }
 
     void list_native()
