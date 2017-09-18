@@ -330,6 +330,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [include manual/build_system.qbk]
 [include manual/testing.qbk]
 [include manual/init.qbk]
+[include manual/utilities.qbk]
 [include manual/system_components.qbk]
 
 [include manual/applications.qbk]
