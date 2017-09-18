@@ -215,7 +215,6 @@ namespace hpx { namespace resource { namespace detail
     partitioner::partitioner()
         : first_core_(std::size_t(-1))
         , cores_needed_(std::size_t(-1))
-        , topology_(threads::create_topology())
         , mode_(mode_default)
     {
         // allow only one partitioner instance
@@ -240,10 +239,12 @@ namespace hpx { namespace resource { namespace detail
 
     void partitioner::fill_topology_vectors()
     {
+        threads::topology& topo = get_topology();
+
         std::size_t pid = 0;
-        std::size_t num_numa_nodes = topology_.get_number_of_numa_nodes();
+        std::size_t num_numa_nodes = topo.get_number_of_numa_nodes();
         if (num_numa_nodes == 0)
-            num_numa_nodes = topology_.get_number_of_sockets();
+            num_numa_nodes = topo.get_number_of_sockets();
         numa_domains_.reserve(num_numa_nodes);
 
         // loop on the numa-domains
@@ -252,8 +253,7 @@ namespace hpx { namespace resource { namespace detail
             numa_domains_.emplace_back(i);    // add a numa domain
             numa_domain &nd = numa_domains_.back();     // numa-domain just added
 
-            std::size_t numa_node_cores =
-                topology_.get_number_of_numa_node_cores(i);
+            std::size_t numa_node_cores = topo.get_number_of_numa_node_cores(i);
             nd.cores_.reserve(numa_node_cores);
 
             bool numa_domain_contains_exposed_cores = false;
@@ -264,7 +264,7 @@ namespace hpx { namespace resource { namespace detail
                 nd.cores_.emplace_back(j, &nd);
                 core &c = nd.cores_.back();
 
-                std::size_t core_pus = topology_.get_number_of_core_pus(j);
+                std::size_t core_pus = topo.get_number_of_core_pus(j);
                 c.pus_.reserve(core_pus);
 
                 bool core_contains_exposed_pus = false;
@@ -315,7 +315,8 @@ namespace hpx { namespace resource { namespace detail
         if (first_core_ != first_core)
         {
             std::size_t offset = first_core;
-            std::size_t num_pus_core = topology_.get_number_of_core_pus(offset);
+            std::size_t num_pus_core =
+                get_topology().get_number_of_core_pus(offset);
 
             if (first_core_ != std::size_t(-1))
             {
@@ -754,7 +755,7 @@ namespace hpx { namespace resource { namespace detail
 
     threads::topology &partitioner::get_topology() const
     {
-        return topology_;
+        return threads::create_topology();
     }
 
     util::command_line_handling &
