@@ -7,6 +7,8 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_SERVICE_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -18,10 +20,8 @@
 
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
-#include <mutex>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -75,10 +75,10 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             util::io_service_pool* pool_;
-            typedef std::mutex mutex_type;
+            typedef compat::mutex mutex_type;
             mutex_type mtx_;
             hpx::util::atomic_count task_count_;
-            std::condition_variable_any shutdown_cv_;
+            compat::condition_variable shutdown_cv_;
         };
     }
 

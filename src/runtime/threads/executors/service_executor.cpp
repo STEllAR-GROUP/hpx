@@ -48,7 +48,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::unique_lock<mutex_type> l(mtx_);
         while (task_count_ > 0)
         {
-            shutdown_cv_.wait(l);
+            // We need to cancel the wait process here, since we might block
+            // other running HPX threads.
+            shutdown_cv_.wait_for(l, std::chrono::seconds(1));
+            if (hpx::threads::get_self_ptr())
+            {
+                hpx::this_thread::suspend();
+            }
         }
     }
 
