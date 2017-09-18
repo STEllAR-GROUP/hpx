@@ -221,7 +221,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 std::cout << "Note:\n" << (*it)->note << "\n";
             }
 
-            std::cout << std::string(79, '-')+'\n');
+            std::cout << std::string(79, '-')+'\n';
         }
     }
 
