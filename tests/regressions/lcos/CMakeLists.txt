@@ -14,6 +14,7 @@ set(tests
     broadcast_unwrap_future_2885
     broadcast_wait_for_2822
     call_promise_get_gid_more_than_once
+    channel_not_empty_2890
     channel_register_as_2722
     dataflow_791
     dataflow_action_2008

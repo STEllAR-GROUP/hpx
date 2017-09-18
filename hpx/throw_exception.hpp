@@ -12,6 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 
 #include <boost/current_function.hpp>
 #include <boost/system/error_code.hpp>
@@ -100,8 +103,20 @@ namespace hpx
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_GET_EXCEPTION(errcode, f, msg)                                    \
-    hpx::detail::get_exception(errcode, msg, hpx::plain, f,                   \
+#define HPX_GET_EXCEPTION(...)                                                \
+    HPX_GET_EXCEPTION_(__VA_ARGS__)                                           \
+/**/
+
+#define HPX_GET_EXCEPTION_(...)                                               \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_GET_EXCEPTION_, HPX_PP_NARGS(__VA_ARGS__)                         \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_GET_EXCEPTION_3(errcode, f, msg)                                  \
+    HPX_GET_EXCEPTION_4(errcode, hpx::plain, f, msg)                          \
+/**/
+#define HPX_GET_EXCEPTION_4(errcode, mode, f, msg)                            \
+    hpx::detail::get_exception(errcode, msg, mode, f,                         \
         __FILE__, __LINE__)                                                   \
 /**/
 
