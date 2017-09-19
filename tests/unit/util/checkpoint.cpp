@@ -18,26 +18,14 @@ using hpx::util::restore_checkpoint;
 // Main
 int main()
 {
+    //[check_test_1
     char character = 'd';
-    char character2;
-    char character3;
     int integer = 10;
-    int integer2;
-    int integer3;
     float flt = 10.01;
-    float flt2;
-    float flt3;
     bool boolean = true;
-    bool boolean2;
-    bool boolean3;
     std::string str = "I am a string of characters";
-    std::string str2;
-    std::string str3;
     std::vector<char> vec(str.begin(), str.end());
-    std::vector<char> vec2;
-    std::vector<char> vec3;
     checkpoint archive;
-    checkpoint archive2;
 
     //Test 1
     // test basic functionality
@@ -48,8 +36,18 @@ int main()
                                          , boolean
                                          , str
                                          , vec);
+    //]
+    //[check_test_2 
+    char character2;
+    int integer2;
+    float flt2;
+    bool boolean2;
+    std::string str2;
+    std::vector<char> vec2;
+
     restore_checkpoint(
         f_archive.get(), character2, integer2, flt2, boolean2, str2, vec2);
+    //]
 
     HPX_TEST_EQ(character, character2);
     HPX_TEST_EQ(integer, integer2);
@@ -60,6 +58,14 @@ int main()
 
     //Test 2
     // test asignment operator
+    char character3;
+    int integer3;
+    float flt3;
+    bool boolean3;
+    std::string str3;
+    std::vector<char> vec3;
+    checkpoint archive2;
+
     archive2 = f_archive.get();
     restore_checkpoint(
         archive2, character3, integer3, flt3, boolean3, str3, vec3);
