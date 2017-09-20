@@ -128,7 +128,10 @@ int main()
     std::vector<float> vec7{1.02, 1.03, 1.04, 1.05};
     hpx::future<checkpoint> fut_7=save_checkpoint(vec7);
     checkpoint archive7 = fut_7.get();
-    test_file_7.write(archive7.data.data(),archive7.size());
+    std::copy(
+        archive7.begin()                           // Write data to ofstream
+      , archive7.end()                             // ie. the file
+      , std::ostream_iterator<char>(test_file_7));
     test_file_7.close();
 
     std::vector<float> vec7_1;

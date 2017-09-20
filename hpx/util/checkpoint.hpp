@@ -79,6 +79,17 @@ namespace util
                 return false;
             }
         }
+        
+        // Expose iterators to access data held by checkpoint
+        using const_iterator = std::vector<char>::const_iterator;
+        const_iterator begin() const
+        {
+            return data.begin();
+        }
+        const_iterator end() const
+        {
+            return data.end();
+        }
 
         void load(std::string file_name)
         {
