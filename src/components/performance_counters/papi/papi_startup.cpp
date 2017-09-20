@@ -22,7 +22,6 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/exception.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <cctype>

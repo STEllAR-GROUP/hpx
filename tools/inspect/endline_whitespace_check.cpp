@@ -1,10 +1,12 @@
-﻿//  extra_whitespace_check implementation  ----------------------------------//
+//  extra_whitespace_check implementation  ----------------------------------//
 
 //  Copyright (c) 2015 Brandon Cordes
 //  Based on the apple_macro_check checker by Marshall Clow
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/config/defines.hpp>
 
 #include "endline_whitespace_check.hpp"
 #include "function_hyper.hpp"

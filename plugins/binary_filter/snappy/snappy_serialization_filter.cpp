@@ -10,8 +10,6 @@
 #include <hpx/plugins/binary_filter_factory.hpp>
 #include <hpx/plugins/binary_filter/snappy_serialization_filter.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <cstring>
 

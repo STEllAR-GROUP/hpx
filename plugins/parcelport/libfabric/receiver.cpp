@@ -6,15 +6,16 @@
 
 #include <plugins/parcelport/libfabric/receiver.hpp>
 
-#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
-#include <plugins/parcelport/rma_memory_pool.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
+#include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/sender.hpp>
+#include <plugins/parcelport/rma_memory_pool.hpp>
 //
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
+#include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 //
 #include <utility>

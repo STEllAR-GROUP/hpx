@@ -11,18 +11,18 @@
 // on the std::vector's the data is stored in.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_generate.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/random.hpp>
 
 #include <cstddef>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -155,8 +155,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             f1.get();
         }
 
-        boost::random::mt19937 gen(std::rand());
-        boost::random::uniform_int_distribution<> dist;
+        std::mt19937 gen(std::rand());
+        std::uniform_int_distribution<> dist;
 
         // fill the vector with random numbers
         partitioned_vector_view<int> view(v);

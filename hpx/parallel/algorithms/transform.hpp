@@ -965,7 +965,7 @@ namespace hpx { namespace traits
     struct get_function_annotation_itt<
         parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> >
     {
-        static char const* call(
+        static util::itt::string_handle call(
             parallel::v1::detail::transform_iteration<ExPolicy, F, Proj> const& f)
                 noexcept
         {

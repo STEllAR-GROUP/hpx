@@ -13,7 +13,6 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/random.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <atomic>
@@ -21,6 +20,7 @@
 #include <cstdint>
 #include <ctime>
 #include <mutex>
+#include <random>
 #include <vector>
 
 int const writers = 3;
@@ -40,9 +40,9 @@ int main()
         threads.emplace_back(
             [&ready, &stm, i]
             {
-                boost::random::mt19937 urng(
+                std::mt19937 urng(
                     static_cast<std::uint32_t>(std::time(nullptr)));
-                boost::random::uniform_int_distribution<int> dist(1, 1000);
+                std::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }
 
@@ -68,9 +68,9 @@ int main()
             [&ready, &stm, k, i]
             {
                 HPX_UNUSED(k);
-                boost::random::mt19937 urng(
+                std::mt19937 urng(
                     static_cast<std::uint32_t>(std::time(nullptr)));
-                boost::random::uniform_int_distribution<int> dist(1, 1000);
+                std::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }
 

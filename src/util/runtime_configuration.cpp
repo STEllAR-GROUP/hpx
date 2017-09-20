@@ -9,6 +9,7 @@
 #include <hpx/config/defaults.hpp>
 // TODO: move parcel ports into plugins
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>

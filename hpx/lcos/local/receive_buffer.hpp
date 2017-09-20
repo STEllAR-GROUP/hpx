@@ -198,7 +198,8 @@ namespace hpx { namespace lcos { namespace local
             return buffer_map_.empty();
         }
 
-        void cancel_waiting(std::exception_ptr const& e)
+        void cancel_waiting(std::exception_ptr const& e,
+            bool force_delete_entries = false)
         {
             std::lock_guard<mutex_type> l(mtx_);
 
@@ -206,7 +207,7 @@ namespace hpx { namespace lcos { namespace local
             for (iterator it = buffer_map_.begin(); it != end; /**/)
             {
                 iterator to_delete = it++;
-                if (to_delete->second->cancel(e))
+                if (to_delete->second->cancel(e) || force_delete_entries)
                 {
                     buffer_map_.erase(to_delete);
                 }
@@ -411,7 +412,8 @@ namespace hpx { namespace lcos { namespace local
             return buffer_map_.empty();
         }
 
-        void cancel_waiting(std::exception_ptr const& e)
+        void cancel_waiting(std::exception_ptr const& e,
+            bool force_delete_entries = false)
         {
             std::lock_guard<mutex_type> l(mtx_);
 
@@ -419,7 +421,7 @@ namespace hpx { namespace lcos { namespace local
             for (iterator it = buffer_map_.begin(); it != end; /**/)
             {
                 iterator to_delete = it++;
-                if (to_delete->second->cancel(e))
+                if (to_delete->second->cancel(e) || force_delete_entries)
                 {
                     buffer_map_.erase(to_delete);
                 }

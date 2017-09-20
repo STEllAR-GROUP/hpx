@@ -10,12 +10,11 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 
-
-#include <boost/format.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/generator_iterator.hpp>
 
@@ -200,34 +199,29 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     void list_presets()
     {
-        boost::format fmt = boost::format(
-            std::string("Event        : %s\n"
-                        "Type         : %s\n"
-                        "Code         : 0x%x\n"
-                        "Derived from : %s\n"
-                        "Description  : %s\n"
-                        "%s")+                 // optional note
-                            std::string(79, '-')+'\n');
-
-
         // collect available events and print their descriptions
         avail_preset_info_gen gen;
         boost::generator_iterator_generator<avail_preset_info_gen>::type it;
         for (it = boost::make_generator_iterator(gen); *it != 0; ++it)
         {
-            std::string note;
+            hpx::util::format_to(std::cout,
+                "Event        : %s\n"
+                "Type         : %s\n"
+                "Code         : 0x%x\n"
+                "Derived from : %s\n"
+                "Description  : %s\n",
+                (*it)->symbol,
+                decode_preset_type((*it)->event_type),
+                (*it)->event_code,
+                dependencies(**it),
+                (*it)->long_descr);
+
             if (strlen((*it)->note) > 0)
             { // is this actually provided anywhere??
-                note = "Note:\n";
-                note += (*it)->note;
-                note += "\n";
+                std::cout << "Note:\n" << (*it)->note << "\n";
             }
-            std::cout << fmt % (*it)->symbol
-                             % decode_preset_type((*it)->event_type)
-                             % (*it)->event_code
-                             % dependencies(**it)
-                             % (*it)->long_descr
-                             % note;
+
+            std::cout << std::string(79, '-')+'\n';
         }
     }
 
@@ -240,8 +234,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             if (info.name[i][0])
             {
                 if (!regs.empty()) regs += std::string(15, ' ');
-                boost::format fmt("reg[%d] name: %-20s value: 0x%16x\n");
-                regs += boost::str(fmt % i % info.name[i] % info.code[i]);
+                regs += hpx::util::format(
+                    "reg[%d] name: %-20s value: 0x%16x\n",
+                    i, info.name[i], info.code[i]);
             }
         }
         return regs;
@@ -249,26 +244,23 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     void print_native_info(PAPI_event_info_t const& info)
     {
-        boost::format fmt = boost::format(
-            std::string("Event        : %s\n"
-                        "Type         : native\n"
-                        "Code         : 0x%x\n"
-                        "Registers    : %s\n"
-                        "Description  : %s\n"
-                        "%s")+                 // optional note
-                            std::string(79, '-')+'\n');
-        std::string note;
+        hpx::util::format_to(std::cout,
+            "Event        : %s\n"
+            "Type         : native\n"
+            "Code         : 0x%x\n"
+            "Derived from : %s\n"
+            "Description  : %s\n",
+            info.symbol,
+            info.event_code,
+            registers(info),
+            info.long_descr);
+
         if (strlen(info.note) > 0)
         {
-            note = "Note:\n";
-            note += info.note;
-            note += "\n";
+            std::cout << "Note:\n" << info.note << "\n";
         }
-        std::cout << fmt % info.symbol
-                         % info.event_code
-                         % registers(info)
-                         % info.long_descr
-                         % note;
+
+        std::cout << std::string(79, '-')+'\n';
     }
 
     void list_native()
@@ -294,13 +286,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         std::string hdr("PAPI events available on ");
         if (!host.empty())
         {
-            boost::format fmt("%s (locality %d):");
-            hdr += boost::str(fmt % host % hpx::get_locality_id());
+            hdr += hpx::util::format("%s (locality %d):", host, hpx::get_locality_id());
         }
         else
         {
-            boost::format fmt("locality %d:");
-            hdr += boost::str(fmt % hpx::get_locality_id());
+            hdr += hpx::util::format("locality %d:", hpx::get_locality_id());
         }
         std::cout << hdr << std::endl
                   << std::string(hdr.length(), '=') << std::endl;
@@ -318,8 +308,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         }
         else
         {
-            boost::format lab("%s#%d");
-            label = boost::str(lab % cpe.instancename_ % cpe.instanceindex_);
+            label = hpx::util::format("%s#%d", cpe.instancename_, cpe.instanceindex_);
         }
         return tm.get_thread_index(label);
     }

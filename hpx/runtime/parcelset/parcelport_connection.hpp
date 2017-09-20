@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 #define HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <memory>

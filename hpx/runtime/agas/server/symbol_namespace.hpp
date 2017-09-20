@@ -16,8 +16,6 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/format.hpp>
-
 #include <atomic>
 #include <cstdint>
 #include <map>

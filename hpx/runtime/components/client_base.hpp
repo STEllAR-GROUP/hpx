@@ -22,6 +22,7 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

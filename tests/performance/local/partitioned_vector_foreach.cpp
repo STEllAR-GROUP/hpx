@@ -8,10 +8,8 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -24,8 +22,8 @@
 #include "worker_timed.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Define the vector types to be used.
-HPX_REGISTER_PARTITIONED_VECTOR(int);
+// The vector types to be used are defined in partitioned_vector module.
+// HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
 int delay = 1000;

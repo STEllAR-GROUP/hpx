@@ -13,6 +13,7 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -16,6 +16,7 @@
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/format.hpp>
 
 #include <string>
 
@@ -40,8 +41,8 @@ public:
         {
             HPX_THROW_EXCEPTION(kernel_error,
                 "process::on_CreateProcess_error",
-                boost::str(boost::format("format message failed with %x (while "
-                    "retrieving message for %x)") % GetLastError() % hr));
+                hpx::util::format("format message failed with %x (while "
+                    "retrieving message for %x)", GetLastError(), hr));
             return;
         }
 

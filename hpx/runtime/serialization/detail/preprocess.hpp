@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2017 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,7 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/traits/serialization_access_data.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <map>

@@ -6,9 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstddef>
@@ -118,22 +118,20 @@ int hpx_main(boost::program_options::variables_map& vm)
              << hpx::endl;
     }
 
-    std::string const tasks_str = boost::str(boost::format("%lu") % num_tasks);
-    std::string const chunks_str = boost::str(boost::format("%lu") % num_chunks);
-    std::string const delay_str = boost::str(boost::format("%lu") % delay);
+    std::string const tasks_str = hpx::util::format("%lu", num_tasks);
+    std::string const chunks_str = hpx::util::format("%lu", num_chunks);
+    std::string const delay_str = hpx::util::format("%lu", delay);
 
-    hpx::cout
-        << (boost::format("%10s,%10s,%10s,%10.12s,%10.12s")
-            % tasks_str % std::string("1") % delay_str
-            % elapsed_seq % (elapsed_seq / num_tasks))
-        << hpx::endl;
+    hpx::util::format_to(hpx::cout,
+        "%10s,%10s,%10s,%10.12s,%10.12s",
+        tasks_str, std::string("1"), delay_str,
+        elapsed_seq, elapsed_seq / num_tasks) << hpx::endl;
     if (num_chunks != 1)
     {
-        hpx::cout
-            << (boost::format("%10s,%10s,%10s,%10.12s,%10.12s")
-                % tasks_str % chunks_str % delay_str
-                % elapsed_chunks % (elapsed_chunks / num_tasks))
-            << hpx::endl;
+        hpx::util::format_to(hpx::cout,
+            "%10s,%10s,%10s,%10.12s,%10.12s",
+            tasks_str, chunks_str, delay_str,
+            elapsed_chunks, elapsed_chunks / num_tasks) << hpx::endl;
     }
     return hpx::finalize();
 }

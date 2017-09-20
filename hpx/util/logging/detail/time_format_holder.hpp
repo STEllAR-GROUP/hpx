@@ -21,7 +21,9 @@
 # pragma once
 #endif
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
+
 #include <algorithm>
 #include <cstdio>
 #include <sstream>

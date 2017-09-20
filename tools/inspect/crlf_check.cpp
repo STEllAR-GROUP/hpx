@@ -8,6 +8,8 @@
 
 //  Contributed by Joerg Walter
 
+#include <hpx/config/defines.hpp>
+
 #include "crlf_check.hpp"
 #include "function_hyper.hpp"
 

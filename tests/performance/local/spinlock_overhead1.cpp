@@ -10,12 +10,11 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -228,22 +227,22 @@ int hpx_main(
                 const double duration = walltime.elapsed();
 
                 if (vm.count("csv"))
-                    cout << ( boost::format("%3%,%4%,%2%\n")
-                            % count
-                            % duration
-                            % k1
-                            % k2
-                            )
-                         << flush;
+                    hpx::util::format_to(cout,
+                        "%3%,%4%,%2%\n",
+                        count,
+                        duration,
+                        k1,
+                        k2
+                    ) << flush;
                 else
-                    cout << ( boost::format("invoked %1% futures in %2% seconds \
-                             (k1 = %3%, k2 = %4%)\n")
-                            % count
-                            % duration
-                            % k1
-                            % k2
-                            )
-                         << flush;
+                    hpx::util::format_to(cout,
+                        "invoked %1% futures in %2% seconds "
+                        "(k1 = %3%, k2 = %4%)\n",
+                        count,
+                        duration,
+                        k1,
+                        k2
+                    ) << flush;
             }
         }
     }

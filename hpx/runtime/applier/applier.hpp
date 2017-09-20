@@ -18,6 +18,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>

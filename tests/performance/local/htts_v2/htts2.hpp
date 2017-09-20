@@ -11,8 +11,6 @@
 #include <hpx/config.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/format.hpp>
-#include <boost/mpl/or.hpp>
 
 #include <chrono>
 #include <cmath>

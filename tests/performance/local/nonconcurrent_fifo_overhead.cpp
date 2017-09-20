@@ -13,9 +13,9 @@
 
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/thread.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/format.hpp>
 #include <boost/lockfree/queue.hpp>
 #include <boost/program_options.hpp>
 
@@ -95,25 +95,27 @@ void print_results(
     }
 
     if (iterations != 0)
-        std::cout << ( boost::format("%lu %lu %lu %.14g %.14g %.14g %.14g\n")
-                % iterations
-                % blocksize
-                % threads
-                % ((elapsed_lockfree.first / (threads*iterations)) * 1e9)
-                % ((elapsed_lockfree.second / (threads*iterations)) * 1e9)
-                % ((elapsed_control.first / (threads*iterations)) * 1e9)
-                % ((elapsed_control.second / (threads*iterations)) * 1e9)
-                );
+        hpx::util::format_to(std::cout,
+            "%lu %lu %lu %.14g %.14g %.14g %.14g\n",
+            iterations,
+            blocksize,
+            threads,
+            (elapsed_lockfree.first / (threads*iterations)) * 1e9,
+            (elapsed_lockfree.second / (threads*iterations)) * 1e9,
+            (elapsed_control.first / (threads*iterations)) * 1e9,
+            (elapsed_control.second / (threads*iterations)) * 1e9
+        );
     else
-        std::cout << ( boost::format("%lu %lu %lu %.14g %.14g %.14g %.14g\n")
-                % iterations
-                % blocksize
-                % threads
-                % (elapsed_lockfree.first * 1e9)
-                % (elapsed_lockfree.second * 1e9)
-                % (elapsed_control.first * 1e9)
-                % (elapsed_control.second * 1e9)
-                );
+        hpx::util::format_to(std::cout,
+            "%lu %lu %lu %.14g %.14g %.14g %.14g\n",
+            iterations,
+            blocksize,
+            threads,
+            elapsed_lockfree.first * 1e9
+            elapsed_lockfree.second * 1e9,
+            elapsed_control.first * 1e9,
+            elapsed_control.second * 1e9
+        );
 }
 
 ///////////////////////////////////////////////////////////////////////////////

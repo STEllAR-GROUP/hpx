@@ -17,8 +17,6 @@
 #include <cstdint>
 #include <iostream>
 
-#include <boost/format.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t factorial(std::uint64_t m);
 
@@ -47,10 +45,10 @@ int hpx_main(boost::program_options::variables_map& vm)
             hpx::async<factorial_action>(hpx::find_here(), n).get();
 
         double elapsed = t.elapsed();
-        std::cout
-            << ( boost::format("factorial(%1%) == %2%\n"
-                               "elapsed time == %3% [s]\n")
-               % n % r % elapsed);
+        hpx::util::format_to(std::cout,
+            "factorial(%1%) == %2%\n"
+            "elapsed time == %3% [s]\n",
+            n, r, elapsed);
     }
 
     return hpx::finalize();

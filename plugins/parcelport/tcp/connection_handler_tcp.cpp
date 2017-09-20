@@ -11,13 +11,14 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/compat/thread.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
-#include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>
+#include <hpx/plugins/parcelport/tcp/sender.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
