@@ -666,8 +666,6 @@ namespace hpx
         std::size_t cores_needed =
             hpx::resource::get_partitioner().assign_cores(first_core);
 
-        // this initializes the used_processing_units_ mask
-        get_thread_manager().init();
         return static_cast<std::uint32_t>(cores_needed);
     }
 
