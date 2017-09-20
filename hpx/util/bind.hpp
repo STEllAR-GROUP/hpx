@@ -337,14 +337,15 @@ namespace hpx { namespace util
             }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            char const* get_function_annotation_itt() const
+            util::itt::string_handle get_function_annotation_itt() const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation_itt<
                         typename std::decay<F>::type
                     >::call(_f);
 #else
-                return nullptr;
+                static util::itt::string_handle sh("bound");
+                return sh;
 #endif
             }
 #endif
@@ -452,12 +453,13 @@ namespace hpx { namespace util
             }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            char const* get_function_annotation_itt() const
+            util::itt::string_handle get_function_annotation_itt() const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation_itt<F>::call(_f);
 #else
-                return nullptr;
+                static util::itt::string_handle sh("one_shot_wrapper");
+                return sh;
 #endif
             }
 #endif
@@ -544,7 +546,7 @@ namespace hpx { namespace traits
     template <typename Sig>
     struct get_function_annotation_itt<util::detail::bound<Sig> >
     {
-        static char const*
+        static util::itt::string_handle
             call(util::detail::bound<Sig> const& f) noexcept
         {
             return f.get_function_annotation_itt();
@@ -554,7 +556,7 @@ namespace hpx { namespace traits
     template <typename F>
     struct get_function_annotation_itt<util::detail::one_shot_wrapper<F> >
     {
-        static char const*
+        static util::itt::string_handle
             call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_annotation_itt();

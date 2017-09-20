@@ -13,6 +13,7 @@
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
 #include <cstdint>
@@ -77,9 +78,9 @@ namespace hpx { namespace agas {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "symbol_namespace::get_service_instance",
-                boost::str(boost::format(
-                        "can't retrieve a valid locality id from global address (%1%): "
-                    ) % dest));
+                hpx::util::format(
+                    "can't retrieve a valid locality id from global address (%1%): ",
+                    dest));
             return naming::gid_type();
         }
         return get_service_instance(service_locality_id);

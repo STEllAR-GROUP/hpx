@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -36,8 +37,6 @@
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -418,10 +417,10 @@ void register_worker(registration_header const& header)
     {
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
-            , boost::str(
-                boost::format("worker node (%s) can't suggest locality_id zero, "
-                "this is reserved for the console") %
-                    header.endpoints));
+            , hpx::util::format(
+                "worker node (%s) can't suggest locality_id zero, "
+                "this is reserved for the console",
+                header.endpoints));
         return;
     }
 
@@ -429,9 +428,9 @@ void register_worker(registration_header const& header)
     {
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
-            , boost::str(
-                boost::format("attempt to register locality %s more than once") %
-                    header.endpoints));
+            , hpx::util::format(
+                "attempt to register locality %s more than once",
+                header.endpoints));
         return;
     }
 
@@ -551,8 +550,8 @@ void notify_worker(notification_header const& header)
     agas_client.set_local_locality(header.prefix);
     agas_client.register_console(header.agas_endpoints);
     cfg.parse("assigned locality",
-        boost::str(boost::format("hpx.locality!=%1%")
-                  % naming::get_locality_id_from_gid(header.prefix)));
+        hpx::util::format("hpx.locality!=%1%",
+            naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service
     agas_client.component_ns_.reset(

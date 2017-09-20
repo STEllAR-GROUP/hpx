@@ -23,15 +23,11 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_container_algorithm.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/iterator_range.hpp>
 //
-#include <boost/format.hpp>
-//
 #include "test_utils.hpp"
-
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
 
 #if !defined(HPX_SORT_TEST_SIZE_STRINGS)
 #define HPX_SORT_TEST_SIZE_STRINGS 1000000
@@ -47,8 +43,8 @@ template <typename T>
 void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 {
     // use the default random engine and an uniform distribution
-    boost::random::mt19937 eng(static_cast<unsigned int>(seed));
-    boost::random::uniform_real_distribution<double> distr(lower, upper);
+    std::mt19937 eng(static_cast<unsigned int>(seed));
+    std::uniform_real_distribution<double> distr(lower, upper);
 
     for (auto &elem : V) {
         elem = static_cast<T>(distr(eng));
@@ -101,18 +97,17 @@ int verify(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
             it != A.end(); ++it)
         {
             if (comp((*it), temp)) {
-                if (print) std::cout << "fail "
-                  << boost::format("%8.6f") % (elapsed / 1e9)
-                  << A.size() << std::endl;
+                if (print)
+                    hpx::util::format_to(std::cout, "fail %8.6f", elapsed / 1e9)
+                      << A.size() << std::endl;
                 return 0;
             }
             temp = (*it);
         }
     }
-    if (print) std::cout
-      << "OK "
-      << boost::format("%8.6f") % (elapsed / 1e9)
-      << A.size() << std::endl;
+    if (print)
+        hpx::util::format_to(std::cout, "OK %8.6f", elapsed / 1e9)
+          << A.size() << std::endl;
     return 1;
 }
 

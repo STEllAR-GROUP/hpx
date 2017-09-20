@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
@@ -213,13 +215,13 @@ namespace hpx { namespace actions
 
         if (deferred_schedule)
         {
-            // If this is a direct action and deferred schedule was requested, that
-            // is we are not the last parcel, return immediately
+            // If this is a direct action and deferred schedule was requested,
+            // that is we are not the last parcel, return immediately
             if (base_type::direct_execution::value)
                 return;
 
-            // If this is not a direct action, we can safely set deferred_schedule
-            // to false
+            // If this is not a direct action, we can safely set
+            // deferred_schedule to false
             deferred_schedule = false;
         }
 
@@ -236,5 +238,7 @@ namespace hpx { namespace traits
     {};
     /// \endcond
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif /*HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP*/

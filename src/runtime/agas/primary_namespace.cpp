@@ -15,8 +15,8 @@
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-
-#include <boost/format.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 
 #include <cstdint>
 #include <string>
@@ -126,9 +126,9 @@ namespace hpx { namespace agas {
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "primary_namespace::get_service_instance",
-                boost::str(boost::format(
-                        "can't retrieve a valid locality id from global address (%1%): "
-                    ) % dest));
+                hpx::util::format(
+                    "can't retrieve a valid locality id from global address (%1%): ",
+                    dest));
             return naming::gid_type();
         }
         return get_service_instance(service_locality_id);

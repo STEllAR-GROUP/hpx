@@ -15,6 +15,7 @@
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/cstdint.hpp>
 

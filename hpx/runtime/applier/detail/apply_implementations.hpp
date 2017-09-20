@@ -18,8 +18,7 @@
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/is_continuation.hpp>
-
-#include <boost/format.hpp>
+#include <hpx/util/format.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -35,9 +34,9 @@ namespace hpx { namespace detail
     {
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
+                hpx::util::format(
+                    "the target (destination) does not match the action type (%s)",
+                    hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
 
@@ -83,9 +82,9 @@ namespace hpx { namespace detail
         {
             if (!traits::action_is_target_valid<Action>::call(id)) {
                 HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                    boost::str(boost::format(
-                        "the target (destination) does not match the action type (%s)"
-                    ) % hpx::actions::detail::get_action_name<Action>()));
+                    hpx::util::format(
+                        "the target (destination) does not match the action type (%s)",
+                        hpx::actions::detail::get_action_name<Action>()));
                 return false;
             }
 
@@ -131,9 +130,9 @@ namespace hpx { namespace detail
     {
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
+                hpx::util::format(
+                    "the target (destination) does not match the action type (%s)",
+                    hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
 
@@ -175,9 +174,9 @@ namespace hpx { namespace detail
         {
             if (!traits::action_is_target_valid<Action>::call(id)) {
                 HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                    boost::str(boost::format(
-                        "the target (destination) does not match the action type (%s)"
-                    ) % hpx::actions::detail::get_action_name<Action>()));
+                    hpx::util::format(
+                        "the target (destination) does not match the action type (%s)",
+                        hpx::actions::detail::get_action_name<Action>()));
                 return false;
             }
 
@@ -221,9 +220,9 @@ namespace hpx { namespace detail
     {
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_cb_impl",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
+                hpx::util::format(
+                    "the target (destination) does not match the action type (%s)",
+                    hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
 
@@ -273,9 +272,9 @@ namespace hpx { namespace detail
     {
         if (!traits::action_is_target_valid<Action>::call(id)) {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_cb_impl",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
+                hpx::util::format(
+                    "the target (destination) does not match the action type (%s)",
+                    hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
 

@@ -16,6 +16,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/format.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
 #include <boost/range/irange.hpp>
@@ -24,8 +25,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -49,8 +48,7 @@ hpx::naming::id_type counter_id;
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     std::uint32_t const prefix = hpx::get_locality_id();
-    boost::format active_threads(counter_name);
-    id_type id = get_counter(boost::str(active_threads % prefix));
+    id_type id = get_counter(hpx::util::format(counter_name, prefix));
     return id;
 }
 

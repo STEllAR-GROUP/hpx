@@ -23,7 +23,7 @@
 #include <hpx/util/iterator_facade.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 
 #include <boost/integer.hpp>
 

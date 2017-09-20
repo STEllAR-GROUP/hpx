@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,7 @@
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
@@ -665,8 +666,6 @@ namespace hpx
         std::size_t cores_needed =
             hpx::resource::get_partitioner().assign_cores(first_core);
 
-        // this initializes the used_processing_units_ mask
-        get_thread_manager().init();
         return static_cast<std::uint32_t>(cores_needed);
     }
 

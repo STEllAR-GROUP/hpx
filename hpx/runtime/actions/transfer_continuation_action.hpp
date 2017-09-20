@@ -24,6 +24,8 @@
 #include <cstdint>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
@@ -37,6 +39,7 @@ namespace hpx { namespace actions
 
         typedef transfer_base_action<Action> base_type;
         typedef typename base_type::continuation_type continuation_type;
+
     public:
         // construct an empty transfer_continuation_action to avoid serialization
         // overhead
@@ -247,5 +250,7 @@ namespace hpx { namespace traits
     {};
     /// \endcond
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif /*HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP*/

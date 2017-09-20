@@ -13,6 +13,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap.hpp>
 
+#include <array>
 #include <atomic>
 #include <cstddef>
 #include <numeric>
@@ -20,10 +21,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
-#include <array>
-#endif
 
 using hpx::util::tuple;
 using hpx::util::get;
@@ -310,7 +307,6 @@ void test_development_regressions(FutureProvider&& futurize)
         static_assert(std::is_void<Result>::value, "Failed...");
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     // Unwrap single tuple like types back.
     {
         std::array<FutureType<int>, 2> in{{futurize(1), futurize(2)}};
@@ -332,7 +328,6 @@ void test_development_regressions(FutureProvider&& futurize)
 
         HPX_TEST_EQ((unwrapper(in)), 3);
     }
-#endif
 }
 
 /// The unit test for the original impleementation `unwrapped`
@@ -433,7 +428,6 @@ void test_legacy_requirements(FutureProvider&& futurize)
             void_counter.store(0);
         }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
         // Sync wait, array of futures, void return.
         {
             std::array<FutureType<void>, 64> futures;
@@ -447,7 +441,6 @@ void test_legacy_requirements(FutureProvider&& futurize)
 
             void_counter.store(0);
         }
-#endif
 
         // Sync wait, vector of futures, non-void return.
         {
@@ -470,7 +463,6 @@ void test_legacy_requirements(FutureProvider&& futurize)
             result_counter.store(0);
         }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
         // Sync wait, array of futures, non-void return.
         {
             std::array<FutureType<bool>, 64> futures;
@@ -487,7 +479,6 @@ void test_legacy_requirements(FutureProvider&& futurize)
 
             result_counter.store(0);
         }
-#endif
 
         // Sync wait, vector of futures, non-void return ignored.
         {
@@ -504,7 +495,6 @@ void test_legacy_requirements(FutureProvider&& futurize)
             result_counter.store(0);
         }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
         // Sync wait, array of futures, non-void return ignored.
         {
             std::array<FutureType<bool>, 64> futures;
@@ -518,7 +508,6 @@ void test_legacy_requirements(FutureProvider&& futurize)
 
             result_counter.store(0);
         }
-#endif
 
         // Functional wrapper, single future
         {

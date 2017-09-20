@@ -189,9 +189,7 @@ namespace hpx
 #include <hpx/util/tuple.hpp>
 
 #include <algorithm>
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 #include <atomic>
 #include <cstddef>
 #include <iterator>
@@ -408,7 +406,6 @@ namespace hpx { namespace lcos
             n, const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
     void wait_some(std::size_t n,
@@ -465,7 +462,6 @@ namespace hpx { namespace lcos
         return lcos::wait_some(
             n, const_cast<std::array<Future, N> const&>(lazy_values), ec);
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>

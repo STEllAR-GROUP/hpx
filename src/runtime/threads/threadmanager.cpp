@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/error_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -32,8 +33,6 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -419,8 +418,7 @@ namespace hpx { namespace threads
 
 #else
                 throw detail::command_line_error(
-                    "Command line option "
-                    "--hpx:queuing=local "
+                    "Command line option --hpx:queuing=local "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local'.");
 #endif
@@ -536,8 +534,7 @@ namespace hpx { namespace threads
 
 #else
                 throw detail::command_line_error(
-                    "Command line option "
-                    "--hpx:queuing=static "
+                    "Command line option --hpx:queuing=static "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static'.");
 #endif
@@ -583,8 +580,7 @@ namespace hpx { namespace threads
 
 #else
                 throw detail::command_line_error(
-                    "Command line option "
-                    "--hpx:queuing=static-priority "
+                    "Command line option --hpx:queuing=static-priority "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static-priority'.");
 #endif
@@ -625,8 +621,7 @@ namespace hpx { namespace threads
                 pools_.push_back(std::move(pool));
 #else
                 throw detail::command_line_error(
-                    "Command line option "
-                    "--hpx:queuing=abp-priority "
+                    "Command line option --hpx:queuing=abp-priority "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
 #endif
@@ -666,8 +661,7 @@ namespace hpx { namespace threads
                 pools_.push_back(std::move(pool));
 #else
                 throw detail::command_line_error(
-                    "Command line option "
-                    "--hpx:queuing=hierarchy "
+                    "Command line option --hpx:queuing=hierarchy "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=hierarchy'.");
 #endif
@@ -676,6 +670,7 @@ namespace hpx { namespace threads
 
             case resource::periodic_priority:
             {
+#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
@@ -705,16 +700,49 @@ namespace hpx { namespace threads
                             policies::delay_exit),
                         thread_offset));
                 pools_.push_back(std::move(pool));
-
+#else
+                throw detail::command_line_error(
+                    "Command line option --hpx:queuing=periodic-priority "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=periodic-priority'.");
+#endif
                 break;
             }
 
             case resource::throttle:
             {
-#if !defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                std::string affinity_desc;
+                std::size_t numa_sensitive =
+                    hpx::detail::get_affinity_description(cfg_, affinity_desc);
+
+                // instantiate the scheduler
+                typedef hpx::threads::policies::throttling_scheduler<>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    1000, numa_sensitive, "throttling_scheduler");
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
+
+                // instantiate the pool
+                std::unique_ptr<detail::thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<
+                            local_sched_type
+                        >(std::move(sched),
+                        notifier_, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset));
+                pools_.push_back(std::move(pool));
+
+#else
                 throw hpx::detail::command_line_error(
-                    "Command line option "
-                    "--hpx:queuing=throttle "
+                    "Command line option --hpx:queuing=throttle "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle "
                     "-DHPX_WITH_APEX'.");

@@ -102,7 +102,8 @@ namespace hpx { namespace parcelset
                 return
                     parcelset::locality(
                         locality(
-                            util::mpi_environment::rank()
+                            util::mpi_environment::enabled() ?
+                            util::mpi_environment::rank() : -1
                         )
                     );
             }

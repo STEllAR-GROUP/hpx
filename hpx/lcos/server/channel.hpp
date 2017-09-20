@@ -104,9 +104,9 @@ namespace hpx { namespace lcos { namespace server
         }
         HPX_DEFINE_COMPONENT_ACTION(channel, set_generation);
 
-        void close()
+        void close(bool force_delete_entries)
         {
-            channel_.close();
+            channel_.close(force_delete_entries);
         }
         HPX_DEFINE_COMPONENT_ACTION(channel, close);
 
@@ -143,7 +143,7 @@ namespace hpx { namespace lcos { namespace server
         HPX_PP_CAT(__channel_close_action,                                    \
             HPX_PP_CAT(type, name)))                                          \
     HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(                             \
-        type, type, name, hpx::traits::detail::component_tag)                 \
+        type, type, name, component_tag)                                      \
 /**/
 
 #define HPX_REGISTER_CHANNEL(...)                                             \
@@ -180,8 +180,7 @@ namespace hpx { namespace lcos { namespace server
         hpx::lcos::server::channel< type>::close_action,                      \
         HPX_PP_CAT(__channel_close_action,                                    \
             HPX_PP_CAT(type, name)))                                          \
-    HPX_REGISTER_BASE_LCO_WITH_VALUE(                                         \
-        type, type, name, hpx::traits::detail::component_tag)                 \
+    HPX_REGISTER_BASE_LCO_WITH_VALUE(type, type, name, component_tag)         \
 /**/
 
 #endif

@@ -7,12 +7,12 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/util/format.hpp>
 
 #include "throttle/throttle.hpp"
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/format.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -30,9 +30,8 @@ using hpx::naming::get_agas_client;
 int hpx_main(variables_map& vm)
 {
     try {
-        std::cout << ( boost::format("prefix: %d")
-                     % hpx::naming::get_locality_id_from_id(hpx::find_here()))
-                  << std::endl;
+        hpx::util::format_to(std::cout, "prefix: %d",
+            hpx::naming::get_locality_id_from_id(hpx::find_here())) << std::endl;
 
         // Try to connect to existing throttle instance, create a new one if
         // this fails.

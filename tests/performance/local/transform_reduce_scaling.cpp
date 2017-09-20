@@ -17,8 +17,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/format.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 int test_count = 100;
 

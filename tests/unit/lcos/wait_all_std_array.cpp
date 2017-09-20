@@ -5,7 +5,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -22,4 +21,3 @@ int main()
 
     return 0;
 }
-#endif

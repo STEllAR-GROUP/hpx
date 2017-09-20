@@ -13,13 +13,13 @@
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <boost/format.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -275,9 +275,9 @@ namespace hpx { namespace threads
 
         HPX_THROWS_IF(ec, bad_parameter
           , "hpx::threads::hwloc_topology_info::get_socket_affinity_mask"
-          , boost::str(boost::format(
-                "thread number %1% is out of range")
-                % num_thread));
+          , hpx::util::format(
+                "thread number %1% is out of range",
+                num_thread));
         return empty_mask;
     } // }}}
 
@@ -298,9 +298,9 @@ namespace hpx { namespace threads
 
         HPX_THROWS_IF(ec, bad_parameter
           , "hpx::threads::hwloc_topology_info::get_numa_node_affinity_mask"
-          , boost::str(boost::format(
-                "thread number %1% is out of range")
-                % num_thread));
+          , hpx::util::format(
+                "thread number %1% is out of range",
+                num_thread));
         return empty_mask;
     } // }}}
 
@@ -321,9 +321,9 @@ namespace hpx { namespace threads
 
         HPX_THROWS_IF(ec, bad_parameter
           , "hpx::threads::hwloc_topology_info::get_core_affinity_mask"
-          , boost::str(boost::format(
-                "thread number %1% is out of range")
-                % num_thread));
+          , hpx::util::format(
+                "thread number %1% is out of range",
+                num_thread));
         return empty_mask;
     }
 
@@ -344,9 +344,9 @@ namespace hpx { namespace threads
 
         HPX_THROWS_IF(ec, bad_parameter
           , "hpx::threads::hwloc_topology_info::get_thread_affinity_mask"
-          , boost::str(boost::format(
-                "thread number %1% is out of range")
-                % num_thread));
+          , hpx::util::format(
+                "thread number %1% is out of range",
+                num_thread));
         return empty_mask;
     } // }}}
 
@@ -391,10 +391,10 @@ namespace hpx { namespace threads
 
                     HPX_THROWS_IF(ec, kernel_error
                       , "hpx::threads::hwloc_topology_info::set_thread_affinity_mask"
-                      , boost::str(boost::format(
+                      , hpx::util::format(
                             "failed to set thread affinity mask ("
-                            HPX_CPU_MASK_PREFIX "%x) for cpuset %s")
-                            % mask % buffer.get()));
+                            HPX_CPU_MASK_PREFIX "%x) for cpuset %s",
+                            mask, buffer.get()));
 
                     if (ec)
                         return;

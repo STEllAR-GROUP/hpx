@@ -15,13 +15,12 @@
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <memory>
 #include <utility>
-
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace functional
@@ -38,9 +37,9 @@ namespace hpx { namespace util { namespace functional
             {
                 HPX_THROW_EXCEPTION(hpx::no_success,
                     "extract_locality::operator()",
-                    boost::str(boost::format(
-                        "could not resolve colocated locality for id(%1%)"
-                    ) % id));
+                    hpx::util::format(
+                        "could not resolve colocated locality for id(%1%)",
+                        id));
                 return naming::invalid_id;
             }
             return locality_id;

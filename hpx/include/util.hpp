@@ -18,6 +18,7 @@
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/pp/strip_parens.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/high_resolution_clock.hpp>

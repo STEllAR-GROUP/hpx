@@ -22,7 +22,6 @@
 #include <hpx/include/performance_counters.hpp>
 
 #include <boost/range/irange.hpp>
-#include <boost/format.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -16,9 +16,7 @@
 #include <hpx/traits/is_range.hpp>
 
 #include <algorithm>
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 #include <cstddef>
 #include <cstddef>
 #include <iterator>
@@ -132,7 +130,6 @@ namespace hpx { namespace traits
                     std::back_inserter(values), acquire_future_disp());
             }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
             template <typename Range_>
             typename std::enable_if<
                 !has_push_back<typename std::decay<Range_>::type>::value
@@ -143,7 +140,6 @@ namespace hpx { namespace traits
                 std::transform(util::begin(futures), util::end(futures),
                     util::begin(values), acquire_future_disp());
             }
-#endif
 
             template <typename Range_>
             HPX_FORCEINLINE Range

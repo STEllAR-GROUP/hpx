@@ -29,8 +29,6 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <iostream>
 #include <iterator>

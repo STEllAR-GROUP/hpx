@@ -8,7 +8,6 @@
 #if defined(__APPLE__)
 
 #include <hpx/exception.hpp>
-#include <boost/format.hpp>
 
 #include <cstdint>
 

@@ -9,9 +9,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 
@@ -32,14 +31,14 @@ struct ViewRegistrationListener
     ViewRegistrationListener(const string &name) :
         name(name)
     {
-        cout << boost::format("constructed server listener %1% (%2%)")
-            % name % this << endl;
+        hpx::util::format_to(cout, "constructed server listener %1% (%2%)",
+            name, this) << endl;
     }
 
     void register_view()
     {
-        cout << boost::format("register view at listener %1% (%2%)")
-            % name % this << endl;
+        hpx::util::format_to(cout, "register view at listener %1% (%2%)",
+            name, this) << endl;
     }
     HPX_DEFINE_COMPONENT_ACTION(ViewRegistrationListener, register_view);
 

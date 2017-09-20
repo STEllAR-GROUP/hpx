@@ -10,6 +10,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
@@ -572,8 +573,8 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1",
         "hpx.numa_sensitive=2",  // no-cross NUMA stealing
         // block all cores of requested number of NUMA-domains
-        boost::str(boost::format("hpx.cores=%d") % (numa_nodes * num_cores)),
-        boost::str(boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second))
+        hpx::util::format("hpx.cores=%d", numa_nodes * num_cores),
+        hpx::util::format("hpx.os_threads=%d", numa_nodes * pus.second)
     };
 
     std::string node_name("numanode");
@@ -587,11 +588,11 @@ int main(int argc, char* argv[])
             bind_desc += ";";
 
         std::size_t base_thread = i * pus.second;
-        bind_desc += boost::str(
-            boost::format("thread:%d-%d=%s:%d.core:0-%d.pu:0")
-              % base_thread % (base_thread+pus.second-1)  // thread:%d-%d
-              % node_name % i                             // %s:%d
-              % (pus.second-1)                            // core:0-%d
+        bind_desc += hpx::util::format(
+            "thread:%d-%d=%s:%d.core:0-%d.pu:0",
+            base_thread, (base_thread+pus.second-1), // thread:%d-%d
+            node_name, i,                            // %s:%d
+            pus.second-1                             // core:0-%d
         );
     }
     cfg.push_back(bind_desc);

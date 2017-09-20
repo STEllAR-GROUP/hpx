@@ -1201,7 +1201,10 @@ if(NOT WIN32)
   # System libraries
   ##############################################################################
   if(NOT MSVC)
-    hpx_libraries(atomic)
+    hpx_add_compile_flag_if_available(-pthread)
+    if(HPX_HAVE_LIBATOMIC)
+      hpx_libraries(atomic)
+    endif()
   endif()
 
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")

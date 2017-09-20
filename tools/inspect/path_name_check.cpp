@@ -7,6 +7,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include "path_name_check.hpp"
 
 #include "boost/filesystem/operations.hpp"

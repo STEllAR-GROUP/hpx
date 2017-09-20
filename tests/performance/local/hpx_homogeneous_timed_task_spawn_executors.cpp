@@ -4,12 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/thread_executors.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -54,13 +52,14 @@ void print_results(
                 "Total Walltime (seconds),Walltime per Task (seconds)\n"
              << flush;
 
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    std::string const cores_str = hpx::util::format("%lu,", cores);
+    std::string const tasks_str = hpx::util::format("%lu,", tasks);
+    std::string const delay_str = hpx::util::format("%lu,", delay);
 
-    cout << ( boost::format("%-21s %-21s %-21s %10.12s, %10.12s\n")
-            % cores_str % tasks_str % delay_str
-            % walltime % (walltime / tasks)) << flush;
+    hpx::util::format_to(cout,
+        "%-21s %-21s %-21s %10.12s, %10.12s\n",
+        cores_str, tasks_str, delay_str,
+        walltime, walltime / tasks) << flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -28,7 +29,6 @@
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
@@ -485,8 +485,8 @@ namespace hpx { namespace util
 
             // Check for parsing failures
             if (!iftransform) {
-                throw hpx::detail::command_line_error(boost::str(boost::format(
-                    "Could not parse --hpx:iftransform argument '%1%'") %
+                throw hpx::detail::command_line_error(hpx::util::format(
+                    "Could not parse --hpx:iftransform argument '%1%'",
                     vm["hpx:iftransform"].as<std::string>()));
             }
 
@@ -528,8 +528,8 @@ namespace hpx { namespace util
                     std::cerr << "failed opening: " << node_file << std::endl;
 
                 // raise hard error if node file could not be opened
-                throw hpx::detail::command_line_error(boost::str(boost::format(
-                    "Could not open nodefile: '%s'") % node_file));
+                throw hpx::detail::command_line_error(hpx::util::format(
+                    "Could not open nodefile: '%s'", node_file));
             }
         }
         else if (vm.count("hpx:nodes")) {
@@ -931,10 +931,10 @@ namespace hpx { namespace util
                     continue;
                 }
 
-                throw hpx::detail::command_line_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(hpx::util::format(
                     "Invalid argument for option --hpx:print-counter-at: "
                     "'%1%', allowed values: 'startup', 'shutdown' (default), "
-                    "'noshutdown'") % s));
+                    "'noshutdown'", s));
             }
         }
 
@@ -1030,9 +1030,9 @@ namespace hpx { namespace util
                 ini_config_ += "hpx.cmd_line_help_option!=" + help_option;
             }
             else {
-                throw hpx::detail::command_line_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(hpx::util::format(
                     "Invalid argument for option --hpx:help: '%1%', allowed values: "
-                    "'minimal' (default) and 'full'") % help_option));
+                    "'minimal' (default) and 'full'", help_option));
             }
         }
         return false;
@@ -1112,14 +1112,13 @@ namespace hpx { namespace util
                     std::string pu_mask_str = threads::to_string(pu_mask);
                     HPX_THROW_EXCEPTION(invalid_status,
                         "handle_print_bind",
-                        boost::str(
-                            boost::format(
-                                "unexpected mismatch between locality %1%: "
-                                "binding "
-                                "reported from HWLOC(%2%) and HPX(%3%) on "
-                                "thread %4%") %
-                            hpx::get_locality_id() % boundcpu_str %
-                            pu_mask_str % i));
+                        hpx::util::format(
+                            "unexpected mismatch between locality %1%: "
+                            "binding "
+                            "reported from HWLOC(%2%) and HPX(%3%) on "
+                            "thread %4%",
+                            hpx::get_locality_id(), boundcpu_str,
+                            pu_mask_str, i));
                 }
             }
 

@@ -7,6 +7,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
 
 #include <algorithm>
 
@@ -164,6 +165,8 @@ namespace boost
       { "(\\bHPX_PP_NARGS\\b)", "HPX_PP_NARGS", "hpx/util/detail/pp/nargs.hpp" },
       { "(\\bHPX_PP_STRINGIZE\\b)", "HPX_PP_STRINGIZE", "hpx/util/detail/pp/stringize.hpp" },
       { "(\\bHPX_PP_STRIP_PARENS\\b)", "HPX_PP_STRIP_PARENS", "hpx/util/detail/pp/strip_parens.hpp" },
+      //
+      { "(\\HPX_ASSERT\\b)", "HPX_ASSERT", "hpx/util/assert.hpp" },
       { nullptr, nullptr, nullptr }
     };
 
@@ -207,7 +210,17 @@ namespace boost
       const path & full_path,      // example: c:/foo/boost/filesystem/path.hpp
       const string & contents)     // contents of file to be inspected
     {
-      if (contents.find( "hpxinspect:" "noinclude" ) != string::npos) return;
+      std::string::size_type p = contents.find( "hpxinspect:" "noinclude" );
+      if (p != string::npos)
+      {
+        // ignore this directive here (it is handled below) if it is followed
+        // by a ':'
+        if (p == contents.size() - 20 ||
+            (contents.size() > p + 20 && contents[p + 20] != ':'))
+        {
+          return;
+        }
+      }
 
       // first, collect all #includes in this file
       std::set<std::string> includes;
@@ -222,6 +235,10 @@ namespace boost
         else if (m[2].matched)
           includes.insert(std::string(m[2].first, m[2].second));
       }
+
+      // if one of the includes is <hpx/hpx.hpp> assume all is well
+      if (includes.find("hpx/hpx.hpp") != includes.end())
+        return;
 
       // for all given names, check whether corresponding include was found
       std::set<std::string> checked_includes;
@@ -245,6 +262,10 @@ namespace boost
             if (found_names.find(found_name) != found_names.end())
                 continue;
             found_names.insert(found_name);
+
+            std::string tag("hpxinspect:" "noinclude:" + found_name);
+            if (contents.find(tag) != string::npos)
+                continue;
 
             auto include_it = includes.find(m.format(d.data->include));
             if (include_it == includes.end())
