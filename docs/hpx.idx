@@ -526,6 +526,9 @@ when_each_n                           "" "header\.hpx\.lcos\.when_each.*"
 wait_each                             "" "header\.hpx\.lcos\.wait_each.*"
 wait_each_n                           "" "header\.hpx\.lcos\.wait_each.*"
 
+# hpx/util/checkpoint.hpp
+checkpoint                            "" "hpx\.util\.checkpoint"
+
 # hpx/util/debugging.hpp
 attach_debugger                       "" "header\.hpx\.util\.attach_debugger.*"
 

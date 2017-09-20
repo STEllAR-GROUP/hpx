@@ -3,27 +3,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// This header defines the save_checkpoint and restore_checkpoint functions. 
-// These functions are designed to help HPX application developers checkpoint 
-// thier applications. Save_checkpoint serializes one or more objects and saves 
-// them as a byte stream. Restore_checkpoint converts the byte stream back into 
-// instances of the objects.
+/// This header defines the save_checkpoint and restore_checkpoint functions. 
+/// These functions are designed to help HPX application developers checkpoint 
+/// thier applications. Save_checkpoint serializes one or more objects and saves 
+/// them as a byte stream. Restore_checkpoint converts the byte stream back into 
+/// instances of the objects.
 //
-// Save_checkpoint takes a any number of objects which a user may wish 
-// to store and returns a future to a checkpoint object. 
-// Additionally the function can take a policy as a first object which 
-// changes its behaviour depending on the policy passed to it. Most
-// notably, if a sync policy is used save_checkpoint will simply return a 
-// checkpoint object.
-//
-// Restore_checkpoint takes a checkpoint object as a first argument and the 
-// containers which will be filled from the byte stream (in the same order
-// as they were placed in save_checkpoint).
-//
-// Checkpoint is the container object which is produced by save_checkpoint 
-// and is consumed by a restore_checkpoint. A checkpoint may be moved into
-// the save_checkpoint object to write the byte stream to the pre-created 
-// checkpoint object.
+
+/// \file hpx/util/checkpoint.hpp
 
 #if !defined(CHECKPOINT_HPP_07262017)
 #define CHECKPOINT_HPP_07262017
@@ -38,7 +25,13 @@ namespace hpx
 {
 namespace util
 {
-    //Checkpoint Object
+    ///////////////////////////////////
+    /// Checkpoint Object
+    ///
+    /// Checkpoint is the container object which is produced by save_checkpoint 
+    /// and is consumed by a restore_checkpoint. A checkpoint may be moved into
+    /// the save_checkpoint object to write the byte stream to the pre-created 
+    /// checkpoint object.
     struct checkpoint
     {
         checkpoint()
@@ -134,7 +127,38 @@ namespace util
      };
     }
 
-    //Save_checkpoint function 
+    ///////////////////////////////////
+    /// Save_checkpoint
+    ///
+    /// \tparam T            Containers passed to save_checkpoint to be 
+    ///                      serialized and placed into a checkpoint object.
+    ///
+    /// \tparam Ts           More containers passed to save_checkpoint 
+    ///                      to be serialized and placed into a 
+    ///                      checkpoint object.
+    ///                      
+    /// \tparam U            This parameter is used to make sure that T
+    ///                      is not a launch policy or a checkpoint. This
+    ///                      forces the compiler to choose the correct overload.
+    /// 
+    /// \param t             A container to restore.
+    ///
+    /// \param ts            Other containers to restore Containers
+    ///                      must be in the same order that they were
+    ///                      inserted into the checkpoint.
+    ///
+    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// to store and returns a future to a checkpoint object. 
+    /// Additionally the function can take a policy as a first object which 
+    /// changes its behaviour depending on the policy passed to it. Most
+    /// notably, if a sync policy is used save_checkpoint will simply return a 
+    /// checkpoint object.
+    ///
+    /// \returns Save_checkpoint returns a future to a checkpoint with one 
+    ///          exeption: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpiont will simply return
+    ///          a checkpoint.
+
     template <typename T
             , typename... Ts
             , typename U = typename std::enable_if<
@@ -153,9 +177,40 @@ namespace util
         }
     }
     
-    //Save_checkpoint function - Take a pre-initialized checkpoint
+    ///////////////////////////////////
+    /// Save_checkpoint - Take a pre-initialized checkpoint
+    ///
+    /// \tparam T            Containers passed to save_checkpoint to be 
+    ///                      serialized and placed into a checkpoint object.
+    ///
+    /// \tparam Ts           More containers passed to save_checkpoint 
+    ///                      to be serialized and placed into a 
+    ///                      checkpoint object.
+    /// 
+    /// \param c             Takes a pre-initialized checkpint to copy
+    ///                      data into.
+    ///
+    /// \param t             A container to restore.
+    ///
+    /// \param ts            Other containers to restore Containers
+    ///                      must be in the same order that they were
+    ///                      inserted into the checkpoint.
+    ///
+    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// to store and returns a future to a checkpoint object. 
+    /// Additionally the function can take a policy as a first object which 
+    /// changes its behaviour depending on the policy passed to it. Most
+    /// notably, if a sync policy is used save_checkpoint will simply return a 
+    /// checkpoint object.
+    ///
+    /// \returns Save_checkpoint returns a future to a checkpoint with one 
+    ///          exeption: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpiont will simply return
+    ///          a checkpoint.
+
     template <typename T, typename... Ts>
-    hpx::future<checkpoint> save_checkpoint(checkpoint&& c
+    hpx::future<checkpoint> save_checkpoint(
+          checkpoint&& c
         , T&& t
         , Ts&&... ts)
     {
@@ -168,8 +223,38 @@ namespace util
         }
     }
     
-    
-    //Store function - Policy overload
+    ///////////////////////////////////
+    /// Save_checkpoint - Policy overload
+    ///
+    /// \tparam T            Containers passed to save_checkpoint to be 
+    ///                      serialized and placed into a checkpoint object.
+    ///
+    /// \tparam Ts           More containers passed to save_checkpoint 
+    ///                      to be serialized and placed into a 
+    ///                      checkpoint object.
+    /// 
+    /// \param p             Takes an HPX launch policy. Allows the user
+    ///                      to change the way the function is launched
+    ///                      i.e. async, sync, etc.
+    ///
+    /// \param t             A container to restore.
+    ///
+    /// \param ts            Other containers to restore Containers
+    ///                      must be in the same order that they were
+    ///                      inserted into the checkpoint.
+    ///
+    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// to store and returns a future to a checkpoint object. 
+    /// Additionally the function can take a policy as a first object which 
+    /// changes its behaviour depending on the policy passed to it. Most
+    /// notably, if a sync policy is used save_checkpoint will simply return a 
+    /// checkpoint object.
+    ///
+    /// \returns Save_checkpoint returns a future to a checkpoint with one 
+    ///          exeption: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpiont will simply return
+    ///          a checkpoint.
+
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(
           hpx::launch p
@@ -186,7 +271,41 @@ namespace util
         }
     }
 
-    //Store function - Policy overload & pre-initialized checkpoint
+    ///////////////////////////////////
+    /// Save_checkpoint - Policy overload & pre-initialized checkpoint
+    ///
+    /// \tparam T            Containers passed to save_checkpoint to be 
+    ///                      serialized and placed into a checkpoint object.
+    ///
+    /// \tparam Ts           More containers passed to save_checkpoint 
+    ///                      to be serialized and placed into a 
+    ///                      checkpoint object.
+    /// 
+    /// \param p             Takes an HPX launch policy. Allows the user
+    ///                      to change the way the function is launched
+    ///                      i.e. async, sync, etc.
+    ///
+    /// \param c             Takes a pre-initialized checkpint to copy
+    ///                      data into.
+    ///
+    /// \param t             A container to restore.
+    ///
+    /// \param ts            Other containers to restore Containers
+    ///                      must be in the same order that they were
+    ///                      inserted into the checkpoint.
+    ///
+    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// to store and returns a future to a checkpoint object. 
+    /// Additionally the function can take a policy as a first object which 
+    /// changes its behaviour depending on the policy passed to it. Most
+    /// notably, if a sync policy is used save_checkpoint will simply return a 
+    /// checkpoint object.
+    ///
+    /// \returns Save_checkpoint returns a future to a checkpoint with one 
+    ///          exeption: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpiont will simply return
+    ///          a checkpoint.
+
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(
           hpx::launch p
@@ -204,7 +323,39 @@ namespace util
         }
     }
 
-    //Save_checkpoint function - With sync policy
+    ///////////////////////////////////
+    /// Save_checkpoint - Sync_policy overload
+    ///
+    /// \tparam T            Containers passed to save_checkpoint to be 
+    ///                      serialized and placed into a checkpoint object.
+    ///
+    /// \tparam Ts           More containers passed to save_checkpoint 
+    ///                      to be serialized and placed into a 
+    ///                      checkpoint object.
+    /// 
+    /// \tparam U            This parameter is used to make sure that T
+    ///                      is not a checkpoint. This forces the compiler 
+    ///                      to choose the correct overload.
+    /// 
+    /// \param sync_p        hpx::launch::sync_policy
+    ///
+    /// \param t             A container to restore.
+    ///
+    /// \param ts            Other containers to restore Containers
+    ///                      must be in the same order that they were
+    ///                      inserted into the checkpoint.
+    ///
+    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// to store and returns a future to a checkpoint object. 
+    /// Additionally the function can take a policy as a first object which 
+    /// changes its behaviour depending on the policy passed to it. Most
+    /// notably, if a sync policy is used save_checkpoint will simply return a 
+    /// checkpoint object.
+    ///
+    /// \returns Save_checkpoint which is passed hpx::launch::sync_policy 
+    ///          will return a checkpoint which contains the serialized
+    ///          values checkpoint.
+
     template <typename T
             , typename... Ts
             , typename U = typename std::enable_if<
@@ -228,7 +379,37 @@ namespace util
         }
     }
 
-    //Save_checkpoint function - With sync policy & pre-init. checkpoint
+    ///////////////////////////////////
+    /// Save_checkpoint - Sync_policy overload & pre-init. checkpoint
+    ///
+    /// \tparam T            Containers passed to save_checkpoint to be 
+    ///                      serialized and placed into a checkpoint object.
+    ///
+    /// \tparam Ts           More containers passed to save_checkpoint 
+    ///                      to be serialized and placed into a 
+    ///                      checkpoint object.
+    /// 
+    /// \param sync_p        hpx::launch::sync_policy
+    ///
+    /// \param c             Takes a pre-initialized checkpint to copy
+    ///                      data into.
+    ///
+    /// \param t             A container to restore.
+    ///
+    /// \param ts            Other containers to restore Containers
+    ///                      must be in the same order that they were
+    ///                      inserted into the checkpoint.
+    ///
+    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// to store and returns a future to a checkpoint object. 
+    /// Additionally the function can take a policy as a first object which 
+    /// changes its behaviour depending on the policy passed to it. Most
+    /// notably, if a sync policy is used save_checkpoint will simply return a 
+    /// checkpoint object.
+    ///
+    /// \returns Save_checkpoint which is passed hpx::launch::sync_policy 
+    ///          will return a checkpoint which contains the serialized
+    ///          values checkpoint.
     template <typename T, typename... Ts>
     checkpoint save_checkpoint(
           hpx::launch::sync_policy sync_p
@@ -248,7 +429,28 @@ namespace util
         }
     }
 
-    //Resurrect Function
+    ///////////////////////////////////
+    /// Resurrect
+    ///
+    /// Restore_checkpoint takes a checkpoint object as a first argument and the 
+    /// containers which will be filled from the byte stream (in the same order
+    /// as they were placed in save_checkpoint).
+    ///
+    /// \tparam T           A container to restore.
+    ///                     
+    /// \tparam Ts          Other continters to restore. Containers 
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpiont.
+    ///                     
+    /// \param c            The checkpoint to restore.
+    ///
+    /// \param t            A container to restore.
+    ///
+    /// \param ts           Other containers to restore Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    /// 
+    /// \returns Restore_checkpoint returns void.
     template <typename T, typename... Ts>
     void restore_checkpoint(checkpoint const& c, T& t, Ts& ... ts)
     {
@@ -263,6 +465,7 @@ namespace util
             (void)sequencer;         //Suppress unused param. warnings
         }
     }
+
 } //End Util Namespace
 } //End HPX Namespace
 
