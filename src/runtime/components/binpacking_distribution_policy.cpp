@@ -5,6 +5,12 @@
 
 #include <hpx/runtime/components/binpacking_distribution_policy.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace hpx { namespace components
 {
     namespace detail
