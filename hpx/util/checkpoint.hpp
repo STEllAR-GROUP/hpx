@@ -15,16 +15,26 @@
 #if !defined(CHECKPOINT_HPP_07262017)
 #define CHECKPOINT_HPP_07262017
 
-#include <type_traits>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/dataflow.hpp>
+#include <hpx/lcos/future.hpp>
 
-#include <hpx/include/serialization.hpp>
-
+#include <cstddef>
 #include <fstream>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace hpx
 {
 namespace util
 {
+namespace detail
+{
+struct save_funct_obj;
+}
+
     ///////////////////////////////////
     /// Checkpoint Object
     ///
@@ -32,11 +42,23 @@ namespace util
     /// and is consumed by a restore_checkpoint. A checkpoint may be moved into
     /// the save_checkpoint object to write the byte stream to the pre-created 
     /// checkpoint object.
-    struct checkpoint
+    class checkpoint
     {
-        checkpoint()
+        std::vector<char> data;
+
+        //Serialization Definition
+        friend class hpx::serialization::access;
+        template <typename Archive>
+        void serialize(Archive& arch, const unsigned int version)
         {
-        }
+            arch& data;
+        };
+        friend struct detail::save_funct_obj;
+        template <typename T, typename... Ts>
+        friend void restore_checkpoint(checkpoint const& c, T& t, Ts& ... ts);
+        
+    public:
+        checkpoint() = default;
         checkpoint(checkpoint const& c)
           : data(c.data)
         {
@@ -45,39 +67,42 @@ namespace util
          : data(std::move(c.data))
         {
         }
-        ~checkpoint()
-        {
-        }
+        ~checkpoint() = default;
 
         //Other Constructors
-        checkpoint(std::string file_name)
+        checkpoint(char* stream, std::size_t count)
         {
-            this->load(file_name);
+            for (std::size_t i=0;i<count;i++)
+            {
+                data.push_back(*stream);
+                stream++;
+            }
         }
-
-        std::vector<char> data;
 
         checkpoint& operator=(checkpoint const& c)
         {
-            data = c.data;
+            if (&c!=this)
+            {
+                data = c.data;
+            }
             return *this;
         }
         checkpoint& operator=(checkpoint&& c)
         {
-            data = std::move(c.data);
+            if (&c!=this)
+            {
+                data = std::move(c.data);
+            }
             return *this;
         }
 
         bool operator==(checkpoint const& c) const
         {
-            if(data == c.data)
-            {
-                 return true;
-            }
-            else
-            {
-                return false;
-            }
+            return data == c.data;
+        }
+        bool operator!=(checkpoint const& c) const
+        {
+            return !(data == c.data);
         }
         
         // Expose iterators to access data held by checkpoint
@@ -108,14 +133,6 @@ namespace util
         {
             return data.size();
         }
-
-        //Serialization Definition
-        friend class hpx::serialization::access;
-        template <typename Volume>
-        void serialize(Volume& vol, const unsigned int version)
-        {
-            vol& data;
-        };
 
     };
 

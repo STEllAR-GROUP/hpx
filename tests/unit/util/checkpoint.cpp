@@ -135,8 +135,17 @@ int main()
     test_file_7.close();
 
     std::vector<float> vec7_1;
-    checkpoint archive7_1;
-    archive7_1.load("checkpoint_test_file.txt");
+    std::vector<char>char_vec;
+    std::ifstream test_file_7_1("checkpoint_test_file.txt");
+    if(test_file_7_1)
+    {
+        test_file_7_1.seekg(0,test_file_7_1.end);
+        int length = test_file_7_1.tellg();
+        test_file_7_1.seekg(0, test_file_7_1.beg);
+        char_vec.resize(length);
+        test_file_7_1.read(char_vec.data(), length);
+    }
+    checkpoint archive7_1(char_vec.data(),char_vec.size());
     restore_checkpoint(archive7_1, vec7_1);
 
     HPX_TEST(vec7==vec7_1);
@@ -154,6 +163,9 @@ int main()
     HPX_TEST(a8==a8_2);
     HPX_TEST(b8==b8_2);
     HPX_TEST(c8==c8_2);
+
+    //Cleanup
+    std::remove("checkpoint_test_file.txt");
 
     return 0;
 }
