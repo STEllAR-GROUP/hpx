@@ -23,9 +23,8 @@
 #include <limits>
 #include <random>
 #include <string>
-#include <vector>
 
-#include "test_utils.hpp"
+#include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 const int random_fill_range = (std::min)(100000, RAND_MAX);
@@ -102,10 +101,13 @@ void run_benchmark(std::size_t vector_size, int test_count, int base_num,
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
-    typedef typename std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test_container<IteratorTag> test_container;
+    typedef typename test_container::type container;
+    typedef typename container::iterator iterator;
 
-    std::vector<int> v(vector_size), org_v;
+    container v = test_container::get_container(vector_size);
+    container org_v;
+
     iterator first = iterator(std::begin(v));
     iterator last = iterator(std::end(v));
 
