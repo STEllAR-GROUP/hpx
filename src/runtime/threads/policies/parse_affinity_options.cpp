@@ -899,11 +899,11 @@ namespace hpx { namespace threads { namespace detail
                     if (any(affinities[num_thread]))
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
-                            "decode_balancednuma_distribution",
-                            boost::str(boost::format(
+                            "decode_numabalanced_distribution",
+                            hpx::util::format(
                                 "affinity mask for thread %1% has "
-                                "already been set"
-                            ) % num_thread));
+                                "already been set",
+                                num_thread));
                         return;
                     }
                     num_pus[num_thread] = t.get_pu_number(num_core + used_cores, num_pu);
