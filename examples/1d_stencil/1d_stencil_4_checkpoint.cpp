@@ -171,9 +171,12 @@ struct backup
         std::ofstream file_archive(file_name_);
         if (file_archive.is_open())
         {
+            file_archive<<archive_data;
+/*
             file_archive.write(
                 archive_data.data.data()
               , archive_data.data.size());
+*/
         }
         else
         {
@@ -186,7 +189,9 @@ struct backup
         std::size_t nx)
     {
         hpx::util::checkpoint temp_archive;
-        temp_archive.load(file_name_);
+//        temp_archive.load(file_name_);
+        std::ifstream ist(file_name_);
+        ist>>temp_archive;
         hpx::util::restore_checkpoint(temp_archive, bin);        
         for (std::size_t i = 0; i < U[0].size(); i++)
         {
