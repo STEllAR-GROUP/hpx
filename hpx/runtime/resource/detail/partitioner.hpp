@@ -213,7 +213,6 @@ namespace hpx { namespace resource { namespace detail
         std::vector<detail::init_pool_data> initial_thread_pools_;
 
         // reference to the topology and affinity data
-        threads::topology &topology_;
         hpx::threads::policies::detail::affinity_data affinity_data_;
 
         // contains the internal topology back-end used to add resources to
