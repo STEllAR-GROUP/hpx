@@ -21,6 +21,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <vector>
 
 #include "utils.hpp"
 
