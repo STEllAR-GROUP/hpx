@@ -23,9 +23,8 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
-#include <vector>
 
-#include "test_utils.hpp"
+#include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
@@ -133,12 +132,14 @@ void run_benchmark(std::size_t vector_size, int test_count,
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test_container<IteratorTag, DataType> test_container;
+    typedef typename test_container::type container;
 
-    std::vector<DataType> v(vector_size), org_v;
-    iterator first = iterator(std::begin(v));
-    iterator last = iterator(std::end(v));
+    container v = test_container::get_container(vector_size);
+    container org_v;
+
+    auto first = std::begin(v);
+    auto last = std::end(v);
 
     // initialize data
     using namespace hpx::parallel;
@@ -146,8 +147,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
         random_fill(random_range));
     org_v = v;
 
-    auto dest_dist = std::distance(first.base(),
-        std::unique(first, last).base());
+    auto dest_dist = std::distance(first, std::unique(first, last));
 
     auto org_first = std::begin(org_v);
     auto org_last = std::end(org_v);
