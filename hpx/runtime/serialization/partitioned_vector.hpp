@@ -7,7 +7,7 @@
 #define HPX_SERIALIZATION_PARTITIONED_VECTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/throw_exception.hpp>
 

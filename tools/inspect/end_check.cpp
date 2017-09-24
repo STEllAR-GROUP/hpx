@@ -7,6 +7,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include "end_check.hpp"
 #include "function_hyper.hpp"
 #include <string>

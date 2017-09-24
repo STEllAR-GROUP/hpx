@@ -10,13 +10,13 @@
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/registry.hpp>
+#include <hpx/util/format.hpp>
 
 #include <cstdint>
 #include <string>
 #include <unordered_set>
 #include <utility>
 
-#include <boost/format.hpp>
 #include <boost/regex.hpp>
 
 namespace hpx { namespace parcelset { namespace detail
@@ -135,9 +135,9 @@ namespace hpx { namespace parcelset { namespace detail
 
                 HPX_THROWS_IF(ec, bad_parameter,
                     "per_action_data_counter_registry::counter_discoverer",
-                    boost::str(boost::format(
+                    hpx::util::format(
                         "action type %s does not match any known type, "
-                        "known action types: \n%s") % p.parameters_ % types));
+                        "known action types: \n%s", p.parameters_, types));
                 return false;
             }
 
@@ -161,9 +161,9 @@ namespace hpx { namespace parcelset { namespace detail
 
             HPX_THROWS_IF(ec, bad_parameter,
                 "per_action_data_counter_registry::counter_discoverer",
-                boost::str(boost::format(
+                hpx::util::format(
                     "action type %s does not match any known type, "
-                    "known action types: \n%s") % p.parameters_ % types));
+                    "known action types: \n%s", p.parameters_, types));
             return false;
         }
 

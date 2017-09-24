@@ -6,8 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
-
-#include <boost/format.hpp>
+#include <hpx/util/format.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -80,30 +79,30 @@ class simple_profiler {
               level_totals[level] += std::get<0>(p->second);
               if (level<last_level) {
                 if (_output) hpx::cout << std::string(52,' ')
-                    << std::string (last_level*9, ' ')
+                    << std::string(last_level*9, ' ')
                     << "------\n";
-                if (_output) hpx::cout << (boost::format(fmt2)
-                  % std::string (last_level*9, ' ')
-                  % (100.0*level_totals[last_level]/elapsed)) << "\n";
+                if (_output) hpx::util::format_to(hpx::cout, fmt2,
+                    std::string(last_level*9, ' '),
+                    100.0*level_totals[last_level]/elapsed) << "\n";
                 last_level = level;
               }
               else if (level>last_level) {
                 last_level = level;
               }
-              if (_output) hpx::cout << (boost::format(fmt1)
-                  % p->first
-                  % level
-                  % std::get<2>(p->second)
-                  % std::get<0>(p->second)
-                  % std::string (level*9, ' ')
-                  % (100.0*std::get<0>(p->second)/elapsed)) << "\n";
+              if (_output) hpx::util::format_to(hpx::cout, fmt1,
+                  p->first,
+                  level,
+                  std::get<2>(p->second),
+                  std::get<0>(p->second),
+                  std::string(level*9, ' '),
+                  100.0*std::get<0>(p->second)/elapsed) << "\n";
               if ((++p)==this->_profiles.end()) {
                 if (_output) hpx::cout << std::string(52,' ')
-                    << std::string (last_level*9, ' ')
+                    << std::string(last_level*9, ' ')
                     << "------\n";
-                if (_output) hpx::cout << (boost::format(fmt2)
-                  % std::string (last_level*9, ' ')
-                  % (100.0*level_totals[last_level]/elapsed)) << "\n";
+                if (_output) hpx::util::format_to(hpx::cout, fmt2,
+                    std::string(last_level*9, ' '),
+                    100.0*level_totals[last_level]/elapsed) << "\n";
                 last_level = level;
               }
           }

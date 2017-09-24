@@ -11,6 +11,7 @@
 #include "grid.hpp"
 
 #include <hpx/include/naming.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstddef>
 #include <utility>

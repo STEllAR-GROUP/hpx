@@ -13,6 +13,7 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>

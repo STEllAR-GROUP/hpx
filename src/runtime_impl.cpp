@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -169,6 +170,9 @@ namespace hpx {
 
         // now create all threadmanager pools
         thread_manager_->create_pools();
+
+        // this initializes the used_processing_units_ mask
+        thread_manager_->init();
 
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(

@@ -10,6 +10,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/unused.hpp>
 

@@ -10,9 +10,8 @@
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
-
-#include <boost/format.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -158,10 +157,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             if (num_initialized != num_threads_) {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "affinity_data::affinity_data",
-                    boost::str(
-                        boost::format("The number of OS threads requested "
-                            "(%1%) does not match the number of threads to "
-                            "bind (%2%)") % num_threads_ % num_initialized));
+                    hpx::util::format(
+                        "The number of OS threads requested "
+                        "(%1%) does not match the number of threads to "
+                        "bind (%2%)", num_threads_, num_initialized));
             }
         }
         else if (pu_offset == std::size_t(-1))

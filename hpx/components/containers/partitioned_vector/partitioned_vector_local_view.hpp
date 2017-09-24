@@ -8,8 +8,8 @@
 #ifndef HPX_PARTITIONED_VECTOR_LOCAL_VIEW_HPP
 #define HPX_PARTITIONED_VECTOR_LOCAL_VIEW_HPP
 
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view_iterator.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 
 #include <cstddef>
 
@@ -18,73 +18,72 @@
 
 namespace hpx
 {
-    template<typename T, std::size_t N, typename Data>
+    template <typename T, std::size_t N, typename Data>
     struct partitioned_vector_local_view
-    : public hpx::partitioned_vector_view<T,N,Data>
+      : public hpx::partitioned_vector_view<T, N, Data>
     {
     private:
-        using base_type = hpx::partitioned_vector_view<T,N,Data>;
+        using base_type = hpx::partitioned_vector_view<T, N, Data>;
         using base_iterator = typename base_type::iterator;
         using const_base_iterator = typename base_type::const_iterator;
 
     public:
         using value_type = T;
-        using iterator = typename
-            hpx::partitioned_vector_local_view_iterator<Data, base_iterator>;
-        using const_iterator = typename
-            hpx::const_partitioned_vector_local_view_iterator<
-                Data, const_base_iterator>;
+        using iterator = typename hpx::partitioned_vector_local_view_iterator<
+            Data, base_iterator>;
+        using const_iterator =
+            typename hpx::const_partitioned_vector_local_view_iterator<Data,
+                const_base_iterator>;
 
-        explicit partitioned_vector_local_view(base_type const & global_pview )
-        : base_type(global_pview)
-        {}
+        explicit partitioned_vector_local_view(base_type const& global_pview)
+          : base_type(global_pview)
+        {
+        }
 
-    // Iterator interfaces
+        // Iterator interfaces
         iterator begin()
         {
-            base_type & base(*this);
+            base_type& base(*this);
             return iterator(base.begin(), base.end());
         }
 
         iterator end()
         {
-            base_type & base(*this);
-            return iterator( base.end(), base.end() );
+            base_type& base(*this);
+            return iterator(base.end(), base.end());
         }
 
         const_iterator begin() const
         {
-            base_type const & base(*this);
+            base_type const& base(*this);
             return const_iterator(base.begin(), base.end());
         }
 
         const_iterator end() const
         {
-            base_type const & base(*this);
-            return const_iterator( base.end(), base.end() );
+            base_type const& base(*this);
+            return const_iterator(base.end(), base.end());
         }
 
         const_iterator cbegin() const
         {
-            base_type const & base(*this);
+            base_type const& base(*this);
             return const_iterator(base.begin(), base.end());
         }
 
         const_iterator cend() const
         {
-            base_type const & base(*this);
-            return const_iterator( base.end(), base.end() );
+            base_type const& base(*this);
+            return const_iterator(base.end(), base.end());
         }
-
     };
 
-    template<typename T, std::size_t N, typename Data>
-    partitioned_vector_local_view<T,N,Data>
-    local_view(hpx::partitioned_vector_view<T,N,Data> const & base)
+    template <typename T, std::size_t N, typename Data>
+    partitioned_vector_local_view<T, N, Data> local_view(
+        hpx::partitioned_vector_view<T, N, Data> const& base)
     {
-        return partitioned_vector_local_view<T,N,Data>( base );
+        return partitioned_vector_local_view<T, N, Data>(base);
     }
-
 }
 
-#endif // PARTITIONED_VECTOR_LOCAL_VIEW_HPP
+#endif    // PARTITIONED_VECTOR_LOCAL_VIEW_HPP

@@ -10,15 +10,14 @@
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
 
 #include <boost/bind.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/random.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <stdexcept>
 #include <vector>
 
@@ -39,7 +38,7 @@ std::uint64_t seed = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t shuffler(
-    boost::random::mt19937_64& prng
+    std::mt19937_64& prng
   , std::uint64_t high
     )
 {
@@ -47,7 +46,7 @@ std::uint64_t shuffler(
         throw std::logic_error("high value was 0");
 
     // Our range is [0, x).
-    boost::random::uniform_int_distribution<std::uint64_t>
+    std::uniform_int_distribution<std::uint64_t>
         dist(0, high - 1);
 
     return dist(prng);
@@ -95,10 +94,10 @@ int app_main(
     std::vector<std::uint64_t> payloads;
     payloads.reserve(tasks);
 
-    // For random numbers, we use a 64-bit specialization of Boost.Random's
+    // For random numbers, we use a 64-bit specialization of stdlib's
     // mersenne twister engine (good uniform distribution up to 311
     // dimensions, cycle length 2 ^ 19937 - 1)
-    boost::random::mt19937_64 prng(seed);
+    std::mt19937_64 prng(seed);
 
     std::uint64_t current_sum = 0;
 
@@ -122,7 +121,7 @@ int app_main(
             = (high_calc > max_delay) ? max_delay : high_calc;
 
         // Our range is [low, high].
-        boost::random::uniform_int_distribution<std::uint64_t>
+        std::uniform_int_distribution<std::uint64_t>
             dist(low, high);
 
         std::uint64_t const payload = dist(prng);

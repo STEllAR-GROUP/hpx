@@ -8,6 +8,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include <algorithm>
 
 #include "deprecated_include_check.hpp"
@@ -44,6 +46,9 @@ namespace boost
       { "boost/preprocessor/cat\\.hpp", "hpx/util/detail/pp/cat.hpp" },
       { "boost/preprocessor/stringize\\.hpp", "hpx/util/detail/pp/stringize.hpp" },
       { "boost/atomic\\.hpp", "atomic" },
+      { "boost/nondet_random.hpp", "random" },
+      { "boost/random/([^\\s]*)\\.hpp", "random" },
+      { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { nullptr, nullptr }
     };
 

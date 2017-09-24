@@ -5,8 +5,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/thread_description.hpp>
 
 #include <iostream>
 #include <sstream>

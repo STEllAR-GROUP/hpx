@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2012 Hartmut Kaiser
+//  Copyright (c) 1998-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>

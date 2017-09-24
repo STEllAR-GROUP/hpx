@@ -7,15 +7,16 @@
 #ifndef HPX_PARCELSET_POLICIES_LIBFABRIC_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_LIBFABRIC_SENDER_HPP
 
+#include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
+#include <plugins/parcelport/libfabric/rma_base.hpp>
 #include <plugins/parcelport/performance_counter.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
-#include <plugins/parcelport/libfabric/pinned_memory_vector.hpp>
-#include <plugins/parcelport/libfabric/header.hpp>
-#include <plugins/parcelport/libfabric/rma_base.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/unique_function.hpp>
 

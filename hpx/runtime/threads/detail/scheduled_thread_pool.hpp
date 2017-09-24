@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <cstddef>

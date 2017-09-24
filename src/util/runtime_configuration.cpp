@@ -9,6 +9,7 @@
 #include <hpx/config/defaults.hpp>
 // TODO: move parcel ports into plugins
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -88,7 +89,7 @@ namespace hpx { namespace threads { namespace policies
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
     // startup code
-    bool minimal_deadlock_detection = true;
+    HPX_EXPORT bool minimal_deadlock_detection = true;
 #endif
 }}}
 

@@ -18,6 +18,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/range.hpp>

@@ -31,6 +31,7 @@
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -43,9 +44,6 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/broadcast.hpp>
-
-#include <boost/format.hpp>
-#include <boost/icl/closed_interval.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -60,69 +58,71 @@
 
 namespace hpx { namespace agas
 {
-struct addressing_service::gva_cache_key
-{ // {{{ gva_cache_key implementation
-  private:
-    typedef boost::icl::closed_interval<naming::gid_type, std::less>
-        key_type;
+    struct addressing_service::gva_cache_key
+    {    // {{{ gva_cache_key implementation
+    private:
+        typedef std::pair<naming::gid_type, naming::gid_type> key_type;
 
-    key_type key_;
+        key_type key_;
 
-  public:
-    gva_cache_key()
-      : key_()
-    {}
+    public:
+        gva_cache_key()
+          : key_()
+        {
+        }
 
-    explicit gva_cache_key(
-        naming::gid_type const& id_
-      , std::uint64_t count_ = 1
-        )
-      : key_(naming::detail::get_stripped_gid(id_)
-           , naming::detail::get_stripped_gid(id_) + (count_ - 1))
-    {
-        HPX_ASSERT(count_);
-    }
+        explicit gva_cache_key(
+                naming::gid_type const& id, std::uint64_t count = 1)
+          : key_(naming::detail::get_stripped_gid(id),
+                naming::detail::get_stripped_gid(id) + (count - 1))
+        {
+            HPX_ASSERT(count);
+        }
 
-    naming::gid_type get_gid() const
-    {
-        return boost::icl::lower(key_);
-    }
+        naming::gid_type get_gid() const
+        {
+            return key_.first;
+        }
 
-    std::uint64_t get_count() const
-    {
-        naming::gid_type const size = boost::icl::length(key_);
-        HPX_ASSERT(size.get_msb() == 0);
-        return size.get_lsb();
-    }
+        std::uint64_t get_count() const
+        {
+            naming::gid_type const size = key_.second - key_.first;
+            HPX_ASSERT(size.get_msb() == 0);
+            return size.get_lsb();
+        }
 
-    friend bool operator<(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
-    }
+        friend bool operator<(
+            gva_cache_key const& lhs, gva_cache_key const& rhs)
+        {
+            return lhs.key_.second < rhs.key_.first;
+        }
 
-    friend bool operator==(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        // Direct hit
-        if(lhs.key_ == rhs.key_)
-            return true;
+        friend bool operator==(
+            gva_cache_key const& lhs, gva_cache_key const& rhs)
+        {
+            // Direct hit
+            if (lhs.key_ == rhs.key_)
+            {
+                return true;
+            }
 
-        // Is lhs in rhs?
-        if (1 == lhs.get_count() && 1 != rhs.get_count())
-            return boost::icl::contains(rhs.key_, lhs.key_);
+            // Is lhs in rhs?
+            if (1 == lhs.get_count() && 1 != rhs.get_count())
+            {
+                return rhs.key_.first <= lhs.key_.first &&
+                    lhs.key_.second <= rhs.key_.second;
+            }
 
-        // Is rhs in lhs?
-        else if (1 != lhs.get_count() && 1 == rhs.get_count())
-            return boost::icl::contains(lhs.key_, rhs.key_);
+            // Is rhs in lhs?
+            else if (1 != lhs.get_count() && 1 == rhs.get_count())
+            {
+                return lhs.key_.first <= rhs.key_.first &&
+                    rhs.key_.second <= lhs.key_.second;
+            }
 
-        return false;
-    }
-}; // }}}
+            return false;
+        }
+    }; // }}}
 
 addressing_service::addressing_service(
     parcelset::parcelhandler& ph
@@ -246,8 +246,8 @@ void addressing_service::launch_bootstrap(
             symbol_ns_.ptr());
 
     rt.get_config().parse("assigned locality",
-        boost::str(boost::format("hpx.locality!=%1%")
-                  % naming::get_locality_id_from_gid(here)));
+        hpx::util::format("hpx.locality!=%1%",
+            naming::get_locality_id_from_gid(here)));
 
     std::uint32_t num_threads = hpx::util::get_entry_as<std::uint32_t>(
         ini_, "hpx.os_threads", 1u);
@@ -284,10 +284,10 @@ void addressing_service::adjust_local_cache_size(std::size_t cache_size)
         std::size_t previous = gva_cache_->size();
             gva_cache_->reserve(cache_size);
 
-        LAGAS_(info) << (boost::format(
+        LAGAS_(info) << hpx::util::format(
             "addressing_service::adjust_local_cache_size, previous size: %1%, "
-            "new size: %3%")
-            % previous % cache_size);
+            "new size: %2%",
+            previous, cache_size);
     }
 } // }}}
 
@@ -505,11 +505,10 @@ bool addressing_service::get_console_locality(
                 }
             }
 
-            LAGAS_(debug) <<
-                ( boost::format(
-                  "addressing_server::get_console_locality, "
-                  "caching console locality, prefix(%1%)")
-                % console);
+            LAGAS_(debug) << hpx::util::format(
+                "addressing_server::get_console_locality, "
+                "caching console locality, prefix(%1%)",
+                console);
 
             return true;
         }
@@ -1133,14 +1132,13 @@ bool addressing_service::resolve_cached(
             ec = make_success_code();
 
 /*
-        LAGAS_(debug) <<
-            ( boost::format(
-                "addressing_service::resolve_cached, "
-                "cache hit for address %1%, lva %2% (base %3%, lva %4%)")
-            % id
-            % reinterpret_cast<void*>(addr.address_)
-            % idbase.get_gid()
-            % reinterpret_cast<void*>(g.lva()));
+        LAGAS_(debug) << hpx::util::format(
+            "addressing_service::resolve_cached, "
+            "cache hit for address %1%, lva %2% (base %3%, lva %4%)",
+            id,
+            reinterpret_cast<void*>(addr.address_),
+            idbase.get_gid(),
+            reinterpret_cast<void*>(g.lva()));
 */
 
         return true;
@@ -1149,11 +1147,10 @@ bool addressing_service::resolve_cached(
     if (&ec != &throws)
         ec = make_success_code();
 
-    LAGAS_(debug) <<
-        ( boost::format(
-            "addressing_service::resolve_cached, "
-            "cache miss for address %1%")
-        % id);
+    LAGAS_(debug) << hpx::util::format(
+        "addressing_service::resolve_cached, "
+        "cache miss for address %1%",
+        id);
 
     return false;
 } // }}}
@@ -1449,7 +1446,7 @@ lcos::future<std::int64_t> addressing_service::incref_async(
     {
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
-          , boost::str(boost::format("invalid credit count of %1%") % credit));
+          , hpx::util::format("invalid credit count of %1%", credit));
         return lcos::future<std::int64_t>();
     }
 
@@ -1565,7 +1562,7 @@ void addressing_service::decref(
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "addressing_service::decref"
-          , boost::str(boost::format("invalid credit count of %1%") % credit));
+          , hpx::util::format("invalid credit count of %1%", credit));
         return;
     }
 
@@ -1592,8 +1589,8 @@ void addressing_service::decref(
 
                 HPX_THROWS_IF(ec, bad_parameter
                   , "addressing_service::decref"
-                  , boost::str(boost::format("couldn't insert decref request "
-                        "for %1% (%2%)") % raw % credit));
+                  , hpx::util::format("couldn't insert decref request "
+                        "for %1% (%2%)", raw, credit));
                 return;
             }
         }
@@ -1848,10 +1845,9 @@ void addressing_service::update_cache_entry(
         // so we convert it to 1 here so that the cache doesn't break.
         const std::uint64_t count = (g.count ? g.count : 1);
 
-        LAGAS_(debug) <<
-            ( boost::format(
-            "addressing_service::update_cache_entry, gid(%1%), count(%2%)"
-            ) % gid % count);
+        LAGAS_(debug) << hpx::util::format(
+            "addressing_service::update_cache_entry, gid(%1%), count(%2%)",
+            gid, count);
 
         const gva_cache_key key(gid, count);
 
@@ -1875,12 +1871,11 @@ void addressing_service::update_cache_entry(
                         return;
                     }
 
-                    LAGAS_(warning) <<
-                        ( boost::format(
-                            "addressing_service::update_cache_entry, "
-                            "aborting update due to key collision in cache, "
-                            "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                        ) % gid % count % idbase.get_gid() % idbase.get_count());
+                    LAGAS_(warning) << hpx::util::format(
+                        "addressing_service::update_cache_entry, "
+                        "aborting update due to key collision in cache, "
+                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)",
+                        gid, count, idbase.get_gid(), idbase.get_count());
                 }
             }
         }
@@ -2447,9 +2442,9 @@ void addressing_service::send_refcnt_requests(
         HPX_ASSERT(l.owns_lock());
 
         std::stringstream ss;
-        ss << ( boost::format(
-              "%1%, dumping client-side refcnt table, requests(%2%):")
-              % func_name % requests.size());
+        hpx::util::format_to(ss,
+            "%1%, dumping client-side refcnt table, requests(%2%):",
+            func_name, requests.size());
 
         typedef addressing_service::refcnt_requests_type::const_reference
             const_reference;
@@ -2458,10 +2453,10 @@ void addressing_service::send_refcnt_requests(
         {
             // The [client] tag is in there to make it easier to filter
             // through the logs.
-            ss << ( boost::format(
-                  "\n  [client] gid(%1%), credits(%2%)")
-                  % e.first
-                  % e.second);
+            hpx::util::format_to(ss,
+                "\n  [client] gid(%1%), credits(%2%)",
+                e.first,
+                e.second);
         }
 
         LAGAS_(debug) << ss.str();
@@ -2489,10 +2484,10 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         l.unlock();
 
-        LAGAS_(info) << (boost::format(
+        LAGAS_(info) << hpx::util::format(
             "addressing_service::send_refcnt_requests_non_blocking, "
-            "requests(%1%)")
-            % p->size());
+            "requests(%1%)",
+            p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
@@ -2562,10 +2557,10 @@ addressing_service::send_refcnt_requests_async(
 
     l.unlock();
 
-    LAGAS_(info) << (boost::format(
+    LAGAS_(info) << hpx::util::format(
         "addressing_service::send_refcnt_requests_async, "
-        "requests(%1%)")
-        % p->size());
+        "requests(%1%)",
+        p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))

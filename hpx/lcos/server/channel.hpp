@@ -104,9 +104,9 @@ namespace hpx { namespace lcos { namespace server
         }
         HPX_DEFINE_COMPONENT_ACTION(channel, set_generation);
 
-        void close()
+        void close(bool force_delete_entries)
         {
-            channel_.close();
+            channel_.close(force_delete_entries);
         }
         HPX_DEFINE_COMPONENT_ACTION(channel, close);
 

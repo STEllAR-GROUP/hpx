@@ -9,8 +9,7 @@
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/reduce_by_key.hpp>
 //
-#include <boost/random/uniform_int_distribution.hpp>
-//
+#include <random>
 #include <utility>
 #include <vector>
 #ifdef EXTRA_DEBUG
@@ -60,6 +59,44 @@ namespace debug {
         << std::setw(40) << c << std::setw(30) \
         << std::setw(8)  << #d << "\t";
 
+struct almost_equal
+{
+    template <typename T>
+    bool operator()(T lhs, T rhs) const
+    {
+        return lhs == rhs;
+    }
+    bool operator()(float lhs, float rhs) const
+    {
+        return std::abs(lhs - rhs) < 1e-10f;
+    }
+    bool operator()(double lhs, double rhs) const
+    {
+        return std::abs(lhs - rhs) < 1e-10;
+    }
+    template <typename T>
+    bool operator()(T lhs, double rhs) const
+    {
+        return std::abs(lhs - rhs) < 1e-10;
+    }
+    template <typename T>
+    bool operator()(double lhs, T rhs) const
+    {
+        return std::abs(lhs - rhs) < 1e-10;
+    }
+    template <typename T>
+    bool operator()(T lhs, float rhs) const
+    {
+        return std::abs(lhs - rhs) < 1e-10f;
+    }
+    template <typename T>
+    bool operator()(float lhs, T rhs) const
+    {
+        return std::abs(lhs - rhs) < 1e-10;
+    }
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////
 template<typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
 void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const Op &op,
@@ -83,12 +120,12 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distr(rnd_min, rnd_max);
+    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distrk(0, 256);
+    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
     int keysize = 0;
@@ -127,7 +164,8 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
         op);
     double elapsed = t.elapsed();
 
-    bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
+    bool is_equal = std::equal(values.begin(), result.second, check_values.begin(),
+        almost_equal());
     HPX_TEST(is_equal);
     if (is_equal) {
         if (benchmark) {
@@ -145,7 +183,7 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
 #if defined(EXTRA_DEBUG)
         for (std::size_t i = 0; i != check_values.size(); ++i)
         {
-            if (values[i] != check_values[i])
+            if (!almost_equal()(values[i],check_values[i]))
             {
                 std::cout
                     << i << ": "
@@ -180,12 +218,12 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distr(rnd_min, rnd_max);
+    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distrk(0, 256);
+    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
     int keysize = 0;
@@ -227,7 +265,8 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
         op);
     double elapsed = t.elapsed();
 
-    bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
+    bool is_equal = std::equal(values.begin(), result.second, check_values.begin(),
+        almost_equal());
     HPX_TEST(is_equal);
     if (is_equal) {
         if (benchmark) {
@@ -280,12 +319,12 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    boost::random::mt19937 eng(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distr(rnd_min, rnd_max);
+    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    boost::random::mt19937 engk(static_cast<unsigned int>(std::rand()));
-    boost::random::uniform_real_distribution<double> distrk(0, 256);
+    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
     int keysize = 0;
@@ -327,7 +366,8 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
     double sync_seconds= t.elapsed();
 
     std::cout << "Async time " << async_seconds << " Sync time " << sync_seconds << "\n";
-    bool is_equal = std::equal(values.begin(), result.second, check_values.begin());
+    bool is_equal = std::equal(values.begin(), result.second, check_values.begin(),
+        almost_equal());
     HPX_TEST(is_equal);
     if (is_equal) {
         //std::cout << "Test Passed\n";
@@ -373,26 +413,29 @@ void test_reduce_by_key1()
         //
         // default comparison operator (std::equal_to)
         test_reduce_by_key1(execution::seq, int(), double(), false,
-            std::equal_to<double>(),
+            almost_equal(),
             [](int key) {return key;});
         test_reduce_by_key1(execution::par, int(), double(), false,
-            std::equal_to<double>(),
+            almost_equal(),
             [](int key) {return key;});
         test_reduce_by_key1(execution::par_unseq, int(), double(), false,
-            std::equal_to<double>(),
+            almost_equal(),
             [](int key) {return key;});
         //
         //
         test_reduce_by_key1(execution::seq, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
+            [](double a, double b) {
+                return std::abs(std::floor(a) - std::floor(b)) < 1e-15;}, //-V550
             [](double a) {return std::floor(a);}
             );
         test_reduce_by_key1(execution::par, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
+            [](double a, double b) {
+                return std::abs(std::floor(a) - std::floor(b)) < 1e-15;}, //-V550
             [](double a) {return std::floor(a);}
             );
         test_reduce_by_key1(execution::par_unseq, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
+            [](double a, double b) {
+                return std::abs(std::floor(a) - std::floor(b)) < 1e-15;}, //-V550
             [](double a) {return std::floor(a);}
             );
     } while (t.elapsed() < 2);
@@ -405,11 +448,12 @@ void test_reduce_by_key1()
         //
         // default comparison operator (std::equal_to)
         test_reduce_by_key_const(execution::seq, int(), double(), false,
-            std::equal_to<double>(),
+            almost_equal(),
             [](int key) {return key;});
         //
         test_reduce_by_key_const(execution::seq, double(), double(), false,
-            [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
+            [](double a, double b) {
+                return std::abs(std::floor(a) - std::floor(b)) < 1e-15;}, //-V550
             [](double a) {return std::floor(a);}
             );
     } while (t3.elapsed() < 0.5);
@@ -424,16 +468,17 @@ void test_reduce_by_key1()
             [](int key) {return key;});
         //
         test_reduce_by_key_async(execution::seq(execution::task), int(), double(),
-            std::equal_to<double>(),
+            almost_equal(),
             [](int key) {return key;});
         test_reduce_by_key_async(execution::par(execution::task), int(), double(),
-            std::equal_to<double>(),
+            almost_equal(),
             [](int key) {return key;});
     } while (t2.elapsed() < 2);
 
     // one last test with timing output enabled
     test_reduce_by_key1(execution::par, double(), double(), true,
-        [](double a, double b) {return std::floor(a)==std::floor(b);}, //-V550
+        [](double a, double b) {
+            return std::abs(std::floor(a) - std::floor(b)) < 1e-15;}, //-V550
         [](double a) {return std::floor(a);}
         );
 }

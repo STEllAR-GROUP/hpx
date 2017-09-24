@@ -9,6 +9,7 @@
 
 #include "worker_timed.hpp"
 
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <chrono>
@@ -18,7 +19,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 char const* benchmark_name = "Delay Baseline";
@@ -77,11 +77,11 @@ void print_results(
                 ;
     }
 
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    std::string const tasks_str = hpx::util::format("%lu,", tasks);
+    std::string const delay_str = hpx::util::format("%lu,", delay);
 
-    cout << ( boost::format("%lu %lu %.14g\n")
-                 % delay % tasks % mean_);
+    hpx::util::format_to(cout, "%lu %lu %.14g\n",
+        delay, tasks, mean_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -12,8 +12,6 @@
 
 #include "allgather_and_gate.hpp"
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <fstream>
 #include <iostream>
