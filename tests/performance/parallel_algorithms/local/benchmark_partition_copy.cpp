@@ -92,16 +92,15 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     typedef test_container<IteratorTag> test_container;
     typedef typename test_container::type container;
-    typedef typename container::iterator iterator;
 
     container v = test_container::get_container(vector_size);
     container result_true = test_container::get_container(vector_size);
     container result_false = test_container::get_container(vector_size);
 
-    iterator first = iterator(std::begin(v));
-    iterator last = iterator(std::end(v));
-    iterator dest_true = iterator(std::begin(result_true));
-    iterator dest_false = iterator(std::begin(result_false));
+    auto first = std::begin(v);
+    auto last = std::end(v);
+    auto dest_true = std::begin(result_true);
+    auto dest_false = std::begin(result_false);
 
     // initialize data
     using namespace hpx::parallel;
