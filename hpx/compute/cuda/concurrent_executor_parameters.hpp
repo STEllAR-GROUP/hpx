@@ -12,11 +12,11 @@
 #include <hpx/traits/is_executor_parameters.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 namespace hpx { namespace compute { namespace cuda
 {
     struct concurrent_executor_parameters
-        : parallel::execution::executor_parameters_tag
     {
         template <typename Executor, typename F>
         std::size_t get_chunk_size(
@@ -26,6 +26,14 @@ namespace hpx { namespace compute { namespace cuda
         }
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_executor_parameters<compute::cuda::concurrent_executor_parameters>
+      : std::true_type
+    {};
+}}
 
 #endif
 #endif

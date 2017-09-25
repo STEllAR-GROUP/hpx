@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { namespace execution
 
     public:
         using type = hpx::util::detected_or_t<
-            parallel::static_chunk_size, parameters_type, Executor>;
+            parallel::execution::static_chunk_size, parameters_type, Executor>;
     };
 }}}
 

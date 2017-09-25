@@ -118,14 +118,14 @@ void test_persistent_auto_chunk_size()
     }
 
     {
-        hpx::parallel::persistent_auto_chunk_size pacs(
+        hpx::parallel::execution::persistent_auto_chunk_size pacs(
             std::chrono::milliseconds(0),
             std::chrono::milliseconds(1));
         parameters_test(pacs);
     }
 
     {
-        hpx::parallel::persistent_auto_chunk_size pacs(
+        hpx::parallel::execution::persistent_auto_chunk_size pacs(
             std::chrono::milliseconds(0));
         parameters_test(pacs);
     }
@@ -160,7 +160,7 @@ namespace hpx { namespace traits
 void test_combined_hooks()
 {
     timer_hooks_parameters pacs("time_hooks");
-    hpx::parallel::auto_chunk_size acs;
+    hpx::parallel::execution::auto_chunk_size acs;
 
     parameters_test(acs, pacs);
     parameters_test(pacs, acs);

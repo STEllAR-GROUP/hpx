@@ -21,7 +21,7 @@ using hpx::parallel::execution::parallel_policy;
 using hpx::parallel::execution::parallel_task_policy;
 using hpx::parallel::execution::parallel_policy_shim;
 using hpx::parallel::execution::parallel_task_policy_shim;
-using hpx::parallel::static_chunk_size;
+using hpx::parallel::execution::static_chunk_size;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>

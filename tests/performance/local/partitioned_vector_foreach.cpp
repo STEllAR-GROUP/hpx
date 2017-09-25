@@ -80,7 +80,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     else {
         // create executor parameters object
-        hpx::parallel::static_chunk_size cs(chunk_size);
+        hpx::parallel::execution::static_chunk_size cs(chunk_size);
 
         // retrieve reference time
         std::vector<int> ref(vector_size);
