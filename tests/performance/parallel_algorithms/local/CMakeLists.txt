@@ -10,6 +10,7 @@ set(benchmarks
     benchmark_merge
     benchmark_partition
     benchmark_partition_copy
+    benchmark_unique
     benchmark_unique_copy
    )
 

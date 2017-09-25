@@ -21,6 +21,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <vector>
 
 #include "utils.hpp"
 
@@ -84,17 +85,16 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 
     typedef test_container<IteratorTag> test_container;
     typedef typename test_container::type container;
-    typedef typename container::iterator iterator;
 
     container src1 = test_container::get_container(vector_size1);
     container src2 = test_container::get_container(vector_size2);
     container result = test_container::get_container(vector_size1 + vector_size2);
 
-    iterator first1 = iterator(std::begin(src1));
-    iterator last1 = iterator(std::end(src1));
-    iterator first2 = iterator(std::begin(src2));
-    iterator last2 = iterator(std::end(src2));
-    iterator dest = iterator(std::begin(result));
+    auto first1 = std::begin(src1);
+    auto last1 = std::end(src1);
+    auto first2 = std::begin(src2);
+    auto last2 = std::end(src2);
+    auto dest = std::begin(result);
 
     // initialize data
     using namespace hpx::parallel;
