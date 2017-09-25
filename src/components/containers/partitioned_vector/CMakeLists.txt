@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Hartmut Kaiser
+# Copyright (c) 2015-2017 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,9 @@ add_hpx_component(partitioned_vector
   AUTOGLOB
   ESSENTIAL)
 
+target_compile_definitions(partitioned_vector_component
+  PRIVATE HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
+
 add_hpx_pseudo_dependencies(
-    components.containers_.partitioned_vector partitioned_vector_component)
+  components.containers_.partitioned_vector partitioned_vector_component)
 

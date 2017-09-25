@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,11 +17,11 @@
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -105,7 +105,7 @@ namespace hpx { namespace threads { namespace policies
 
         struct flag_type
         {
-            boost::atomic<bool> v;
+            std::atomic<bool> v;
             flag_type() { v = false; }
             flag_type(flag_type const & f) { v.store(f.v.load()); }
             flag_type & operator=(flag_type const & f)

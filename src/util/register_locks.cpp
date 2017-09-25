@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,11 +6,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 
 #include <map>
 #include <string>

@@ -8,6 +8,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include <algorithm>
 
 #include "deprecated_name_check.hpp"
@@ -81,6 +83,12 @@ namespace boost
       { "(\\bboost\\s*::\\s*enable_error_info\\b)", "hpx::throw_with_info" },
       { "(\\bboost\\s*::\\s*iterator_range\\b)", "hpx::util::iterator_range" },
       { "(\\bboost\\s*::\\s*make_iterator_range\\b)", "hpx::util::make_iterator_range" },
+      { "(\\bboost\\s*::\\s*atomic_flag\\b)", "std::atomic_flag" },
+      { "(\\bboost\\s*::\\s*atomic\\b)", "std::atomic" },
+      { "(\\bboost\\s*::\\s*memory_order_((relaxed)|(acquire)|(release)|"
+        "(acq_rel)|(seq_cst))\\b)", "std::memory_order_\\2" },
+      { "(\\bboost\\s*::\\s*random\\s*::\\s*([^\\s]*)\\b)", "std::\\2" },
+      { "(\\bboost\\s*::\\s*format\\b)", "hpx::util::format[_to]" },
       /////////////////////////////////////////////////////////////////////////
       { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
@@ -89,6 +97,7 @@ namespace boost
       { "\\b(BOOST_PP_CAT)\\b", "HPX_PP_CAT" },
       { "\\b(BOOST_PP_STRINGIZE)\\b", "HPX_PP_STRINGIZE" },
       { "\\b(BOOST_STRINGIZE)\\b", "HPX_PP_STRINGIZE(HPX_PP_EXPAND())" },
+      { "\\b(BOOST_ASSERT)\\b", "HPX_ASSERT" },
       { nullptr, nullptr }
     };
 

@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -99,6 +100,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_ASSERT(!handler_);
             HPX_ASSERT(!postprocess_handler_);
             HPX_ASSERT(!buffer_.data_.empty());
+            buffer_.data_point_.time_ = util::high_resolution_clock::now();
             request_ptr_ = nullptr;
             chunks_idx_ = 0;
             tag_ = acquire_tag(sender_);

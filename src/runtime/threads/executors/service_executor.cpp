@@ -10,6 +10,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/steady_clock.hpp>
@@ -25,13 +26,15 @@
 #include <string>
 #include <utility>
 
+#include <iostream>
+
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     service_executor::service_executor(
             char const* pool_name, char const* pool_name_suffix)
       : pool_(get_thread_pool(pool_name, pool_name_suffix)),
-        task_count_(0), shutdown_sem_(0)
+        task_count_(0)
     {
         if (!pool_) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -42,16 +45,33 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     service_executor::~service_executor()
     {
-        if (task_count_ != 0)
-            shutdown_sem_.wait();
+        std::unique_lock<mutex_type> l(mtx_);
+        while (task_count_ > 0)
+        {
+            // We need to cancel the wait process here, since we might block
+            // other running HPX threads.
+            shutdown_cv_.wait_for(l, std::chrono::seconds(1));
+            if (hpx::threads::get_self_ptr())
+            {
+                hpx::this_thread::suspend();
+            }
+        }
     }
 
     void service_executor::thread_wrapper(closure_type&& f) //-V669
     {
         f();                          // execute the actual thread function
 
-        if (--task_count_ == 0)
-            shutdown_sem_.signal();
+        // By hanging on to the lock during notify_all, we ensure that the
+        // destructor is only completed after this function returned
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            HPX_ASSERT(task_count_ > 0);
+            if (--task_count_ == 0)
+            {
+                shutdown_cv_.notify_all();
+            }
+        }
     }
 
     struct thread_wrapper_helper

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,10 +13,11 @@
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
+#include <hpx/util/assert.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/dynamic_bitset.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -109,7 +110,7 @@ namespace hpx { namespace lcos
 
             template <typename F_>
             wait_each(argument_type const& lazy_values, F_ && f,
-                    boost::atomic<std::size_t>* success_counter)
+                    std::atomic<std::size_t>* success_counter)
               : lazy_values_(lazy_values),
                 ready_count_(0),
                 f_(std::forward<F>(f)),
@@ -118,7 +119,7 @@ namespace hpx { namespace lcos
 
             template <typename F_>
             wait_each(argument_type && lazy_values, F_ && f,
-                    boost::atomic<std::size_t>* success_counter)
+                    std::atomic<std::size_t>* success_counter)
               : lazy_values_(std::move(lazy_values)),
                 ready_count_(0),
                 f_(std::forward<F>(f)),
@@ -185,9 +186,9 @@ namespace hpx { namespace lcos
             }
 
             std::vector<Future> lazy_values_;
-            boost::atomic<std::size_t> ready_count_;
+            std::atomic<std::size_t> ready_count_;
             typename std::remove_reference<F>::type f_;
-            boost::atomic<std::size_t>* success_counter_;
+            std::atomic<std::size_t>* success_counter_;
             bool goal_reached_on_calling_thread_;
         };
     }
@@ -240,7 +241,7 @@ namespace hpx { namespace lcos
             std::back_inserter(lazy_values_),
             detail::wait_acquire_future<Future>());
 
-        boost::atomic<std::size_t> success_counter(0);
+        std::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p(
             detail::wait_each<Future, F>(std::move(lazy_values_),
                 std::forward<F>(f), &success_counter));
@@ -275,7 +276,7 @@ namespace hpx { namespace lcos
             std::back_inserter(lazy_values_),
             detail::wait_acquire_future<Future>());
 
-        boost::atomic<std::size_t> success_counter(0);
+        std::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p(
             detail::wait_each<Future, F>(std::move(lazy_values_),
                 std::forward<F>(f), &success_counter));

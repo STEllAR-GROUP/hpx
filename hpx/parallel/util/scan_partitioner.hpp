@@ -12,6 +12,7 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
@@ -52,9 +53,9 @@ namespace hpx { namespace parallel { namespace util
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 F4 && f4)
             {
-                typedef typename execution::extract_executor_parameters<
-                        hpx::util::decay<ExPolicy>::type::executor_type
-                    >::type parameters_type;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                    parameters_type;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -153,9 +154,9 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, T && init, F1 && f1,
                 F2 && f2, F3 && f3, F4 && f4)
             {
-                typedef typename execution::extract_executor_parameters<
-                        hpx::util::decay<ExPolicy>::type::executor_type
-                    >::type parameters_type;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                    parameters_type;
 
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;

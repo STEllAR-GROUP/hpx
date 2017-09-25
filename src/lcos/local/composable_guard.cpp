@@ -11,8 +11,6 @@
 
 #include <hpx/lcos/local/composable_guard.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <memory>

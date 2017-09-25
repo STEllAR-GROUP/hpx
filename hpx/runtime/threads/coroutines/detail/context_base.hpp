@@ -48,8 +48,7 @@
 #include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -78,12 +77,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             }
         }
 
-        boost::atomic_uint64_t& get(std::size_t i)
+        std::atomic<std::uint64_t>& get(std::size_t i)
         {
             return m_allocation_counter[i % HPX_COROUTINE_NUM_ALL_HEAPS];
         }
 
-        boost::atomic_uint64_t m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
+        std::atomic<std::uint64_t> m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
     };
 
     /////////////////////////////////////////////////////////////////////////////
@@ -634,7 +633,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         ctx_type m_caller;
 
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
-        mutable boost::atomic_uint64_t m_counter;
+        mutable std::atomic<std::uint64_t> m_counter;
 #endif
         static HPX_EXPORT allocation_counters m_allocation_counters;
         deleter_type* m_deleter;

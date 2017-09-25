@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <deque>
 #include <mutex>

@@ -8,8 +8,7 @@
 #include <hpx/include/parallel_destroy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -22,7 +21,7 @@
 
 #include "test_utils.hpp"
 
-boost::atomic<std::size_t> destruct_count(0);
+std::atomic<std::size_t> destruct_count(0);
 
 struct destructable
 {
@@ -161,7 +160,7 @@ void test_destroy_n_exception(ExPolicy policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_exception = false;
@@ -216,7 +215,7 @@ void test_destroy_n_exception_async(
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_exception = false;
@@ -313,7 +312,7 @@ void test_destroy_n_bad_alloc(ExPolicy policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_bad_alloc = false;
@@ -368,7 +367,7 @@ void test_destroy_n_bad_alloc_async(
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    boost::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_bad_alloc = false;

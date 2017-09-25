@@ -565,7 +565,7 @@ namespace hpx { namespace traits
     struct get_function_annotation_itt<
         parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> >
     {
-        static char const* call(
+        static util::itt::string_handle call(
             parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const& f)
                 noexcept
         {

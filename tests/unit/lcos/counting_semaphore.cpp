@@ -10,15 +10,14 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<int> count(0);
+std::atomic<int> count(0);
 
 void worker(hpx::lcos::local::counting_semaphore& sem)
 {

@@ -33,9 +33,9 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/archive/basic_archive.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <memory>
@@ -102,7 +102,8 @@ namespace hpx { namespace parcelset
                 return
                     parcelset::locality(
                         locality(
-                            util::mpi_environment::rank()
+                            util::mpi_environment::enabled() ?
+                            util::mpi_environment::rank() : -1
                         )
                     );
             }
@@ -198,7 +199,7 @@ namespace hpx { namespace parcelset
         private:
             typedef lcos::local::spinlock mutex_type;
 
-            boost::atomic<bool> stopped_;
+            std::atomic<bool> stopped_;
 
             sender sender_;
             receiver<parcelport> receiver_;

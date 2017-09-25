@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_reduce.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -13,10 +13,11 @@
 
 #include <cstddef>
 #include <vector>
+
 ///////////////////////////////////////////////////////////////////////////////
-// Define the vector types to be used.
-HPX_REGISTER_PARTITIONED_VECTOR(double);
-HPX_REGISTER_PARTITIONED_VECTOR(int);
+// The vector types to be used are defined in partitioned_vector module.
+// HPX_REGISTER_PARTITIONED_VECTOR(double);
+// HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename T>

@@ -10,15 +10,14 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-void barrier_test(std::size_t num, std::size_t rank, boost::atomic<std::size_t>& c)
+void barrier_test(std::size_t num, std::size_t rank, std::atomic<std::size_t>& c)
 {
     hpx::lcos::barrier b("local_barrier_test", num, rank);
     ++c;
@@ -41,7 +40,7 @@ void local_tests(boost::program_options::variables_map& vm)
     hpx::id_type here = hpx::find_here();
     for (std::size_t i = 0; i < iterations; ++i)
     {
-        boost::atomic<std::size_t> c(0);
+        std::atomic<std::size_t> c(0);
         for (std::size_t j = 0; j < pxthreads; ++j)
         {
             hpx::async(hpx::util::bind(&barrier_test, pxthreads + 1, j, std::ref(c)));

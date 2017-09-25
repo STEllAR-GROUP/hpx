@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +15,7 @@
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <exception>
@@ -467,15 +468,15 @@ namespace hpx
             >::type local_result_type;
 
         if (components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value_unmanaged)
+            components::component_base_lco_with_value_unmanaged)
         {
-            typedef typename lcos::base_lco_with_value<
-                    local_result_type, remote_result_type,
-                    traits::detail::simple_component_tag
-                >::set_value_action set_value_action;
+            typedef typename lcos::base_lco_with_value<local_result_type,
+                remote_result_type,
+                traits::detail::component_tag>::set_value_action
+                set_value_action;
 
-            detail::set_lco_value<set_value_action>(id, std::move(addr),
-                std::forward<Result>(t), move_credits);
+            detail::set_lco_value<set_value_action>(
+                id, std::move(addr), std::forward<Result>(t), move_credits);
         }
         else
         {
@@ -502,16 +503,16 @@ namespace hpx
             >::type local_result_type;
 
         if (components::get_base_type(addr.type_) ==
-                components::component_base_lco_with_value_unmanaged)
+            components::component_base_lco_with_value_unmanaged)
         {
-            typedef typename lcos::base_lco_with_value<
-                    local_result_type, remote_result_type,
-                    traits::detail::simple_component_tag
-                >::set_value_action set_value_action;
+            typedef typename lcos::base_lco_with_value<local_result_type,
+                remote_result_type,
+                traits::detail::component_tag>::set_value_action
+                set_value_action;
 
-            detail::set_lco_value<
-                    local_result_type, remote_result_type, set_value_action
-                >(id, std::move(addr), std::forward<Result>(t), cont, move_credits);
+            detail::set_lco_value<local_result_type, remote_result_type,
+                set_value_action>(id, std::move(addr), std::forward<Result>(t),
+                cont, move_credits);
         }
         else
         {

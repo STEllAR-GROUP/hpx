@@ -49,9 +49,9 @@ namespace hpx { namespace parallel { namespace util
             static FwdIter call(ExPolicy && policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename execution::extract_executor_parameters<
-                        hpx::util::decay<ExPolicy>::type::executor_type
-                    >::type parameters_type;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                    parameters_type;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -110,9 +110,9 @@ namespace hpx { namespace parallel { namespace util
             static hpx::future<FwdIter> call(ExPolicy && policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2)
             {
-                typedef typename execution::extract_executor_parameters<
-                        hpx::util::decay<ExPolicy>::type::executor_type
-                    >::type parameters_type;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                    parameters_type;
 
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;

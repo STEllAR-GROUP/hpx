@@ -24,6 +24,7 @@
 #endif
 
 #include <cstddef>
+#include <string>
 
 namespace hpx { namespace threads
 {
@@ -45,6 +46,16 @@ public:
         return std::size_t(-1);
     }
 
+    std::size_t get_socket_number(
+        std::size_t num_thread
+      , error_code& ec) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return std::size_t(-1);
+    }
+
     mask_cref_type get_machine_affinity_mask(
         error_code& ec = throws
         ) const
@@ -57,7 +68,6 @@ public:
 
     mask_cref_type get_socket_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive
       , error_code& ec = throws
         ) const
     {
@@ -69,7 +79,6 @@ public:
 
     mask_cref_type get_numa_node_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive
       , error_code& ec = throws
         ) const
     {
@@ -88,7 +97,6 @@ public:
 
     mask_cref_type get_core_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive
       , error_code& ec = throws
         ) const
     {
@@ -100,7 +108,6 @@ public:
 
     mask_cref_type get_thread_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive = false
       , error_code& ec = throws
         ) const
     {
@@ -108,16 +115,6 @@ public:
             ec = make_success_code();
 
         return empty_mask;
-    }
-
-    void set_thread_affinity_mask(
-        compat::thread& thrd
-      , mask_cref_type mask
-      , error_code& ec = throws
-        ) const
-    {
-        if (&ec != &throws)
-            ec = make_success_code();
     }
 
     void set_thread_affinity_mask(
@@ -216,7 +213,7 @@ public:
     }
 
     void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-        mask_type const& m) const
+        mask_type const& m, std::string pool_name) const
     {
     }
 
@@ -236,6 +233,8 @@ public:
     {
         ::operator delete(addr/*, len*/);
     }
+
+    void print_hwloc(std::ostream&) const {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////

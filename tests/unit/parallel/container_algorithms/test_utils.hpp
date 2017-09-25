@@ -9,8 +9,7 @@
 #include <hpx/include/parallel_execution_policy.hpp>
 #include <hpx/include/util.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <numeric>
@@ -154,10 +153,10 @@ namespace test
         }
 
         std::size_t value_;
-        static boost::atomic<std::size_t> instance_count;
+        static std::atomic<std::size_t> instance_count;
     };
 
-    boost::atomic<std::size_t> count_instances::instance_count(0);
+    std::atomic<std::size_t> count_instances::instance_count(0);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename IteratorTag>

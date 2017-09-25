@@ -650,6 +650,21 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   unset(_all)
 endforeach()
 
+## Experimental settings
+hpx_option(HPX_WITH_IO_POOL BOOL
+  "Disable internal IO thread pool, do not change if not absolutely necessary (default: ON)"
+  ON CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_IO_POOL)
+  hpx_add_config_define(HPX_HAVE_IO_POOL)
+endif()
+
+hpx_option(HPX_WITH_TIMER_POOL BOOL
+  "Disable internal timer thread pool, do not change if not absolutely necessary (default: ON)"
+  ON CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_TIMER_POOL)
+  hpx_add_config_define(HPX_HAVE_TIMER_POOL)
+endif()
+
 ## AGAS related build options
 hpx_option(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)"
@@ -811,6 +826,14 @@ hpx_option(HPX_WITH_THREAD_DESCRIPTION_FULL BOOL
   "Use function address for thread description (default: OFF)"
   OFF
   CATEGORY "Debugging" ADVANCED)
+
+hpx_option(HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE BOOL
+  "Break the debugger if a test has failed  (default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED)
+if(HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE)
+  hpx_add_config_define(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
+endif()
 
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
@@ -1176,6 +1199,13 @@ if(NOT WIN32)
   ##############################################################################
   # System libraries
   ##############################################################################
+  if(NOT MSVC)
+    hpx_add_compile_flag_if_available(-pthread)
+    if(HPX_HAVE_LIBATOMIC)
+      hpx_libraries(atomic)
+    endif()
+  endif()
+
   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     hpx_libraries(dl)
   endif()

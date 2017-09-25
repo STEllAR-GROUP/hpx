@@ -20,11 +20,11 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <sstream>
@@ -59,9 +59,9 @@ namespace hpx
 
     std::string full_version_as_string()
     {
-        return boost::str(
-            boost::format("%d.%d.%d") % //-V609
-            HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
+        return hpx::util::format("%d.%d.%d", //-V609
+            HPX_VERSION_MAJOR,
+            HPX_VERSION_MINOR,
             HPX_VERSION_SUBMINOR);
     }
 
@@ -186,28 +186,29 @@ namespace hpx
 
     std::string build_string()
     {
-        return boost::str(
-            boost::format("V%s%s (AGAS: V%d.%d), Git: %.10s") % //-V609
-                full_version_as_string() % HPX_VERSION_TAG %
-                (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
-                HPX_HAVE_GIT_COMMIT);
+        return hpx::util::format("V%s%s (AGAS: V%d.%d), Git: %.10s", //-V609
+            full_version_as_string(), HPX_VERSION_TAG,
+            HPX_AGAS_VERSION / 0x10, HPX_AGAS_VERSION % 0x10,
+            HPX_HAVE_GIT_COMMIT);
     }
 
     std::string boost_version()
     {
         // BOOST_VERSION: 105700
-        return boost::str(boost::format("V%d.%d.%d") %
-            (BOOST_VERSION / 100000) % (BOOST_VERSION / 100 % 1000) %
-            (BOOST_VERSION % 100));
+        return hpx::util::format("V%d.%d.%d",
+            BOOST_VERSION / 100000,
+            BOOST_VERSION / 100 % 1000,
+            BOOST_VERSION % 100);
     }
 
 #if defined(HPX_HAVE_HWLOC)
     std::string hwloc_version()
     {
         // HWLOC_API_VERSION: 0x00010700
-        return boost::str(boost::format("V%d.%d.%d") %
-            (HWLOC_API_VERSION / 0x10000) % (HWLOC_API_VERSION / 0x100 % 0x100) %
-            (HWLOC_API_VERSION % 0x100));
+        return hpx::util::format("V%d.%d.%d",
+            HWLOC_API_VERSION / 0x10000,
+            HWLOC_API_VERSION / 0x100 % 0x100,
+            HWLOC_API_VERSION % 0x100);
     }
 #endif
 
@@ -235,7 +236,7 @@ namespace hpx
 
     std::string complete_version()
     {
-        boost::format logo(
+        std::string version = hpx::util::format(
             "Versions:\n"
             "  HPX: %s\n"
             "  Boost: %s\n"
@@ -251,28 +252,26 @@ namespace hpx
             "  Date: %s\n"
             "  Platform: %s\n"
             "  Compiler: %s\n"
-            "  Standard Library: %s\n");
-
-        std::string version = boost::str(logo %
-            build_string() %
-            boost_version() %
+            "  Standard Library: %s\n",
+            build_string(),
+            boost_version(),
 #if defined(HPX_HAVE_HWLOC)
-            hwloc_version() %
+            hwloc_version(),
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            mpi_version() %
+            mpi_version(),
 #endif
-            build_type() %
-            build_date_time() %
-            boost_platform() %
-            boost_compiler() %
+            build_type(),
+            build_date_time(),
+            boost_platform(),
+            boost_compiler(),
             boost_stdlib());
 
 #if defined(HPX_HAVE_MALLOC)
-            version += "  Allocator: " + malloc_version() + "\n";
+        version += "  Allocator: " + malloc_version() + "\n";
 #endif
 
-            return version;
+        return version;
     }
 
     std::string build_type()
@@ -292,7 +291,7 @@ namespace hpx
         std::ostringstream strm;
 
         // runtime mode
-        strm << "  {mode}: " << get_runtime_mode_name(cfg.mode_) << "\n";
+        strm << "  {mode}: " << get_runtime_mode_name(cfg.rtcfg_.mode_) << "\n";
 
         if (cfg.num_localities_ != 1)
             strm << "  {localities}: " << cfg.num_localities_ << "\n";

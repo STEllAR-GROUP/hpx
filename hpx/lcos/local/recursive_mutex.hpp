@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Part of this code has been adopted from code published under the BSL by:
 //
@@ -12,9 +12,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/assert.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 
@@ -67,8 +67,8 @@ namespace hpx { namespace lcos { namespace local
             typedef typename thread_id_from_mutex<Mutex>::thread_id_type
                 thread_id_type;
 
-            boost::atomic<std::uint64_t> recursion_count;
-            boost::atomic<thread_id_type> locking_thread_id;
+            std::atomic<std::uint64_t> recursion_count;
+            std::atomic<thread_id_type> locking_thread_id;
             Mutex mtx;
 
         public:
@@ -174,7 +174,7 @@ namespace hpx { namespace lcos { namespace local
         private:
             bool try_recursive_lock(thread_id_type current_thread_id)
             {
-                if (locking_thread_id.load(boost::memory_order_acquire) ==
+                if (locking_thread_id.load(std::memory_order_acquire) ==
                     current_thread_id)
                 {
                     if (++recursion_count == 1)

@@ -6,11 +6,11 @@
 #include <hpx/config.hpp>
 
 #include <hpx/compat/thread.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <boost/config.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstdint>
@@ -109,15 +109,17 @@ int main(
     ///////////////////////////////////////////////////////////////////////////
     // output results
     if (vm.count("csv"))
-        std::cout << ( boost::format("%1%,%2%,%3%\n")
-                     % updates
-                     % threads
-                     % duration);
+        hpx::util::format_to(std::cout,
+            "%1%,%2%,%3%\n",
+            updates,
+            threads,
+            duration);
     else
-        std::cout << ( boost::format("ran %1% updates per OS-thread on %2% "
-                                     "OS-threads in %3% seconds\n")
-                     % updates
-                     % threads
-                     % duration);
+        hpx::util::format_to(std::cout,
+            "ran %1% updates per OS-thread on %2% "
+            "OS-threads in %3% seconds\n",
+            updates,
+            threads,
+            duration);
 }
 

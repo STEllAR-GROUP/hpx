@@ -14,8 +14,7 @@
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -49,7 +48,7 @@ void verify_resource_allocation(std::size_t num_execs, std::size_t num_pus)
 template <typename Executor>
 void test_executors(std::size_t processing_units, std::size_t num_pus)
 {
-    boost::atomic<std::size_t> count_invocations(0);
+    std::atomic<std::size_t> count_invocations(0);
     std::size_t const num_tasks = 100;
 
     typedef hpx::parallel::executor_information_traits<Executor> infotraits;
@@ -121,7 +120,7 @@ void test_executors(std::size_t num_pus)
 template <typename Executor>
 void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
 {
-    boost::atomic<std::size_t> count_invocations(0);
+    std::atomic<std::size_t> count_invocations(0);
     std::size_t const num_tasks = 100;
 
     typedef hpx::parallel::executor_information_traits<Executor> infotraits;

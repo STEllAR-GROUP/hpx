@@ -18,7 +18,6 @@
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 #include <hpx/exception.hpp>
 
-#include <boost/format.hpp>
 #include <boost/version.hpp>
 
 #include <cstdint>

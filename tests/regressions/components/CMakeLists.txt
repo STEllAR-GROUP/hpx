@@ -7,11 +7,13 @@ set(tests
     create_n_components_2323
     create_remote_component_2334
     moveonly_constructor_arguments_1405
+    new_2848
     partitioned_vector_2201
     returned_client_2150
    )
 
 set(create_remote_component_2334_PARAMETERS LOCALITIES 2)
+set(new_2848_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources

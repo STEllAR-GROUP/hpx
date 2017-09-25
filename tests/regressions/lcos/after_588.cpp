@@ -8,8 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <vector>
 
@@ -49,7 +48,7 @@ struct test
 
     HPX_DEFINE_COMPONENT_ACTION(test, ping);
 
-    boost::atomic<bool> finished;
+    std::atomic<bool> finished;
 };
 
 typedef hpx::components::managed_component<test> test_component;

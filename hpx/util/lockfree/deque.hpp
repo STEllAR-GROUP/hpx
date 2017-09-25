@@ -15,6 +15,9 @@
 //  contention, all operations have a constant complexity, except for the dtor.
 ////////////////////////////////////////////////////////////////////////////////
 
+// hpxinspect:nodeprecatedinclude:boost/atomic.hpp
+// hpxinspect:nodeprecatedname:boost::atomic
+
 #if !defined(HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0)
 #define HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0
 
@@ -46,7 +49,7 @@ template <typename T>
 struct deque_node //-V690
 {
     typedef detail::tagged_ptr<deque_node> pointer;
-    typedef atomic<pointer> atomic_pointer;
+    typedef boost::atomic<pointer> atomic_pointer;
 
     typedef typename pointer::tag_t tag_t;
 

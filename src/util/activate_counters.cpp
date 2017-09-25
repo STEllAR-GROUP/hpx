@@ -10,6 +10,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/activate_counters.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/unwrap.hpp>
@@ -17,8 +18,6 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/lcos/wait_all.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <fstream>
@@ -49,9 +48,9 @@ namespace hpx { namespace util
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "activate_counters::find_counter",
-                boost::str(boost::format(
-                    "unknown performance counter: '%1%' (%2%)") %
-                    info.fullname_ % ec.get_message()));
+                hpx::util::format(
+                    "unknown performance counter: '%1%' (%2%)",
+                    info.fullname_, ec.get_message()));
             return false;
         }
 

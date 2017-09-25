@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2016 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,15 +17,15 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/scoped_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -58,10 +58,6 @@ void symbol_namespace::register_counter_types(
 {
     using util::placeholders::_1;
     using util::placeholders::_2;
-    boost::format help_count(
-        "returns the number of invocations of the AGAS service '%s'");
-    boost::format help_time(
-        "returns the overall execution time of the AGAS service '%s'");
     performance_counters::create_counter_func creator(
         util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::symbol_namespace_service_name));
@@ -79,10 +75,15 @@ void symbol_namespace::register_counter_types(
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
-        if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
-            help = boost::str(help_count % name.substr(p+1));
+        if (detail::symbol_namespace_services[i].target_
+            == detail::counter_target_count)
+            help = hpx::util::format(
+                "returns the number of invocations of the AGAS service '%s'",
+                name.substr(p+1));
         else
-            help = boost::str(help_time % name.substr(p+1));
+            help = hpx::util::format(
+                "returns the overall execution time of the AGAS service '%s'",
+                name.substr(p+1));
 
         performance_counters::install_counter_type(
             agas::performance_counter_basename + name
@@ -184,7 +185,7 @@ bool symbol_namespace::bind(
     )
 { // {{{ bind implementation
     // parameters
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.bind_.time_
     );
     counter_data_.increment_bind_count();
@@ -205,12 +206,12 @@ bool symbol_namespace::bind(
         // increase reference count
         if (raw_gid == gid)
         {
-            LAGAS_(info) << (boost::format(
+            LAGAS_(info) << hpx::util::format(
                 "symbol_namespace::bind, key(%1%), gid(%2%), old_credit(%3%), "
-                "new_credit(%4%)")
-                % key % gid
-                % naming::detail::get_credit_from_gid(*(it->second))
-                % (naming::detail::get_credit_from_gid(*(it->second)) + credits));
+                "new_credit(%4%)",
+                key, gid,
+                naming::detail::get_credit_from_gid(*(it->second)),
+                naming::detail::get_credit_from_gid(*(it->second)) + credits);
 
             // REVIEW: do we need to add the credit of the argument to the table?
             naming::detail::add_credit_to_gid(*(it->second), credits);
@@ -221,9 +222,9 @@ bool symbol_namespace::bind(
         if (LAGAS_ENABLED(info))
         {
             naming::detail::add_credit_to_gid(gid, credits);
-            LAGAS_(info) << (boost::format(
-                "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)")
-                % key % gid);
+            LAGAS_(info) << hpx::util::format(
+                "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)",
+                key, gid);
         }
 
         return false;
@@ -291,9 +292,9 @@ bool symbol_namespace::bind(
 
     l.unlock();
 
-    LAGAS_(info) << (boost::format(
-        "symbol_namespace::bind, key(%1%), gid(%2%)")
-        % key % gid);
+    LAGAS_(info) << hpx::util::format(
+        "symbol_namespace::bind, key(%1%), gid(%2%)",
+        key, gid);
 
     return true;
 } // }}}
@@ -301,7 +302,7 @@ bool symbol_namespace::bind(
 naming::gid_type symbol_namespace::resolve(std::string const& key)
 { // {{{ resolve implementation
     // parameters
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_.time_
     );
     counter_data_.increment_resolve_count();
@@ -313,9 +314,9 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
 
     if (it == end)
     {
-        LAGAS_(info) << (boost::format(
-            "symbol_namespace::resolve, key(%1%), response(no_success)")
-            % key);
+        LAGAS_(info) << hpx::util::format(
+            "symbol_namespace::resolve, key(%1%), response(no_success)",
+            key);
 
         return naming::invalid_gid;
     }
@@ -326,16 +327,16 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
     l.unlock();
     naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid).get();
 
-    LAGAS_(info) << (boost::format(
-        "symbol_namespace::resolve, key(%1%), gid(%2%)")
-        % key % gid);
+    LAGAS_(info) << hpx::util::format(
+        "symbol_namespace::resolve, key(%1%), gid(%2%)",
+        key, gid);
 
     return gid;
 } // }}}
 
 naming::gid_type symbol_namespace::unbind(std::string const& key)
 { // {{{ unbind implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.unbind_.time_
     );
     counter_data_.increment_unbind_count();
@@ -347,9 +348,9 @@ naming::gid_type symbol_namespace::unbind(std::string const& key)
 
     if (it == end)
     {
-        LAGAS_(info) << (boost::format(
-            "symbol_namespace::unbind, key(%1%), response(no_success)")
-            % key);
+        LAGAS_(info) << hpx::util::format(
+            "symbol_namespace::unbind, key(%1%), response(no_success)",
+            key);
 
         return naming::invalid_gid;
     }
@@ -358,9 +359,9 @@ naming::gid_type symbol_namespace::unbind(std::string const& key)
 
     gids_.erase(it);
 
-    LAGAS_(info) << (boost::format(
-        "symbol_namespace::unbind, key(%1%), gid(%2%)")
-        % key % gid);
+    LAGAS_(info) << hpx::util::format(
+        "symbol_namespace::unbind, key(%1%), gid(%2%)",
+        key, gid);
 
     return gid;
 } // }}}
@@ -370,7 +371,7 @@ void symbol_namespace::iterate(
     symbol_namespace::iterate_names_function_type const& f
     )
 { // {{{ iterate implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.iterate_names_.time_
     );
     counter_data_.increment_iterate_names_count();
@@ -399,7 +400,7 @@ bool symbol_namespace::on_event(
   , hpx::id_type lco
     )
 { // {{{ on_event implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.on_event_.time_
     );
     counter_data_.increment_on_event_count();
@@ -440,9 +441,9 @@ bool symbol_namespace::on_event(
 
         if (it == on_event_data_.end())
         {
-            LAGAS_(info) << (boost::format(
-                "symbol_namespace::on_event, name(%1%), response(no_success)")
-                % name);
+            LAGAS_(info) << hpx::util::format(
+                "symbol_namespace::on_event, name(%1%), response(no_success)",
+                name);
 
             return false;
         }

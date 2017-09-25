@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <string>

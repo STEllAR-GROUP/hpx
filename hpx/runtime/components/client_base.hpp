@@ -22,6 +22,7 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -132,14 +133,6 @@ namespace hpx { namespace traits
                 typename std::enable_if<is_client<Derived>::value>::type>
           : shared_state_ptr<typename traits::future_traits<Derived>::type>
         {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct action_remote_result_customization_point<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
-        {
-            typedef id_type type;
-        };
     }
 }}
 

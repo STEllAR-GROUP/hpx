@@ -14,6 +14,7 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <map>

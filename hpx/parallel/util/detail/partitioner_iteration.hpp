@@ -87,7 +87,7 @@ namespace hpx { namespace traits
     struct get_function_annotation_itt<
         parallel::util::detail::partitioner_iteration<Result, F> >
     {
-        static char const* call(
+        static util::itt::string_handle call(
             parallel::util::detail::partitioner_iteration<Result, F> const& f)
                 noexcept
         {

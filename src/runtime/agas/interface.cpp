@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <algorithm>
 #include <cstddef>

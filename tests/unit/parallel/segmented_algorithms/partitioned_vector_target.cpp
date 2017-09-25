@@ -16,10 +16,12 @@
 // Define the vector types to be used.
 typedef hpx::compute::host::block_allocator<int> target_allocator_int;
 typedef hpx::compute::vector<int, target_allocator_int> target_vector_int;
+HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int, target_vector_int);
 HPX_REGISTER_PARTITIONED_VECTOR(int, target_vector_int);
 
 typedef hpx::compute::host::block_allocator<double> target_allocator_double;
 typedef hpx::compute::vector<double, target_allocator_double> target_vector_double;
+HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double, target_vector_double);
 HPX_REGISTER_PARTITIONED_VECTOR(double, target_vector_double);
 
 ///////////////////////////////////////////////////////////////////////////////

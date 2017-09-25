@@ -22,14 +22,14 @@ namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    class simple_component;
+    class component;
 
     template <typename Component>
     class abstract_simple_component_base
       : private traits::detail::component_tag
     {
     private:
-        typedef simple_component<Component> outer_wrapping_type;
+        typedef component<Component> outer_wrapping_type;
 
     public:
         virtual ~abstract_simple_component_base() {}

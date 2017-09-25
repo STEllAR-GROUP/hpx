@@ -17,6 +17,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -516,7 +517,11 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         //          initialization of arrays of wrappers.
-        static value_type* create(std::size_t count = 1)
+        template <typename T = Component>
+        static typename std::enable_if<
+            std::is_default_constructible<T>::value, value_type*
+        >::type
+        create(std::size_t count = 1)
         {
             // allocate the memory
             void* p = heap_type::alloc(count);

@@ -20,6 +20,7 @@
 //
 #include <plugins/parcelport/unordered_map.hpp>
 //
+#include <atomic>
 #include <memory>
 #include <deque>
 #include <chrono>

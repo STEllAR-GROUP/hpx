@@ -9,8 +9,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 #include <vector>
 
@@ -168,7 +167,7 @@ void test_remote_async(hpx::id_type const& target)
         hpx::shared_future<std::int32_t> f =
             hpx::async(policy1, hpx::util::bind(&increment, 42));
 
-        boost::atomic<int> count(0);
+        std::atomic<int> count(0);
         auto policy2 =
             hpx::launch::select([&count]() -> hpx::launch
             {

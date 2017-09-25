@@ -7,6 +7,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  Make HPX inspect tool happy: hpxinspect:noassert_macro
+//                               hpxinspect:noinclude:HPX_ASSERT
+//                               hpxinspect:nodeprecatedname:BOOST_ASSERT
+
 //  Note: There are no include guards. This is intentional.
 
 #if defined(HPX_USE_BOOST_ASSERT)

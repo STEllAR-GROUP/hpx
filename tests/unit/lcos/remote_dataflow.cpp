@@ -9,14 +9,13 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/unwrap.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstdint>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::uint32_t> void_f_count;
+std::atomic<std::uint32_t> void_f_count;
 
 void void_f(hpx::future<int> &&) { ++void_f_count; }
 HPX_PLAIN_ACTION(void_f);
@@ -104,7 +103,7 @@ void plain_actions(hpx::id_type const& there)
         HPX_TEST_EQ(void_f_count, 2u);
     }
 
-    boost::atomic<int> count(0);
+    std::atomic<int> count(0);
     auto policy2 =
         hpx::launch::select([&count]() -> hpx::launch
         {

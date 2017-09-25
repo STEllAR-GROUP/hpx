@@ -16,11 +16,10 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/unlock_guard.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -150,7 +149,7 @@ namespace hpx { namespace util
             *out  << "," << value.count_ << ",";
 
             double elapsed = static_cast<double>(value.time_) * 1e-9;
-            *out << boost::str(boost::format("%.6f") % elapsed)
+            *out << hpx::util::format("%.6f", elapsed)
                 << ",[s]," << val;
             if (!uom.empty())
                 *out << ",[" << uom << "]";
@@ -176,7 +175,7 @@ namespace hpx { namespace util
         *out << "," << value.count_ << ",";
 
         double elapsed = static_cast<double>(value.time_) * 1e-9;
-        *out << boost::str(boost::format("%.6f") % elapsed) << ",[s],";
+        *out << hpx::util::format("%.6f", elapsed) << ",[s],";
 
         bool first = true;
         for (std::int64_t val : value.values_)

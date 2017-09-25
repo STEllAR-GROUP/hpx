@@ -29,6 +29,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
@@ -36,9 +37,9 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/program_options/options_description.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -424,7 +425,7 @@ namespace hpx { namespace components { namespace server
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
-        boost::atomic<bool> shutdown_all_invoked_;
+        std::atomic<bool> shutdown_all_invoked_;
 
         typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;

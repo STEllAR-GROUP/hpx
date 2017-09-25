@@ -81,7 +81,10 @@ macro(hpx_perform_cxx_feature_tests)
 
   # Check the availability of certain C++11 library features
   hpx_check_for_cxx11_std_array(
-    DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
+    REQUIRED "HPX needs support for C++11 std::array")
+
+  hpx_check_for_cxx11_std_atomic(
+    REQUIRED "HPX needs support for C++11 std::atomic")
 
   hpx_check_for_cxx11_std_chrono(
     REQUIRED "HPX needs support for C++11 std::chrono")
@@ -106,6 +109,9 @@ macro(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_lock_guard(
     REQUIRED "HPX needs support for C++11 std::lock_guard")
+
+  hpx_check_for_cxx11_std_random(
+    DEFINITIONS HPX_HAVE_CXX11_STD_RANDOM)
 
   hpx_check_for_cxx11_std_range_access(
     REQUIRED "HPX needs support for C++11 std::begin/end")

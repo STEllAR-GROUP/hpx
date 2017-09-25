@@ -1,5 +1,5 @@
 //  Copyright (c) 2013-2014 Thomas Heller
-//  Copyright (c) 2013-2014 Hartmut Kaiser
+//  Copyright (c) 2013-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -145,11 +145,12 @@ namespace hpx { namespace lcos
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/calculate_fanout.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
-#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <cstddef>
@@ -506,7 +507,9 @@ namespace hpx { namespace lcos
         std::vector<Result>
         wrap_into_vector(hpx::future<Result> r)
         {
-            return std::vector<Result>(1, r.get());
+            std::vector<Result> result;
+            result.push_back(r.get());
+            return result;
         }
 
         template <

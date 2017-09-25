@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -19,17 +19,18 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/detail/endian.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -745,7 +746,7 @@ namespace hpx { namespace parcelset
 
         bool trigger_pending_work()
         {
-            if (0 == num_parcel_destinations_.load(boost::memory_order_relaxed))
+            if (0 == num_parcel_destinations_.load(std::memory_order_relaxed))
                 return true;
 
             std::vector<locality> destinations;
@@ -961,7 +962,7 @@ namespace hpx { namespace parcelset
         int archive_flags_;
         hpx::util::atomic_count operations_in_flight_;
 
-        boost::atomic<std::size_t> num_thread_;
+        std::atomic<std::size_t> num_thread_;
         std::size_t const max_background_thread_;
     };
 }}

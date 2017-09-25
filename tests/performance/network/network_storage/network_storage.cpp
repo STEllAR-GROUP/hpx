@@ -8,24 +8,25 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
+#include <hpx/util/format.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/atomic.hpp>
-#include <boost/random.hpp>
 
-#include <array>
 #include <algorithm>
+#include <array>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <simple_profiler.hpp>
@@ -133,10 +134,10 @@
 // global vars
 //----------------------------------------------------------------------------
 std::vector<std::vector<hpx::future<int> > > ActiveFutures;
-std::array<boost::atomic<int>, MAX_RANKS>    FuturesWaiting;
+std::array<std::atomic<int>, MAX_RANKS>    FuturesWaiting;
 
 #if defined(USE_CLEANING_THREAD) || defined(USE_PARCELPORT_THREAD)
- boost::atomic<bool>                        FuturesActive;
+ std::atomic<bool>                        FuturesActive;
  hpx::lcos::local::spinlock                 FuturesMutex;
 #endif
 
@@ -484,8 +485,8 @@ int reduce(hpx::future<std::vector<hpx::future<int> > > futvec)
 // Test speed of write/put
 void test_write(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
-    boost::random::uniform_int_distribution<>& random_slot,
+    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
+    std::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -676,9 +677,10 @@ void test_write(
             "%1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, "
             "IOPS/s, %6%, BW(MB/s), %7%, ";
         if (!options.warmup) {
-            std::cout << (boost::format(msg) % options.network
-                % nranks % options.threads % writeMB % options.transfer_size_B
-                % IOPs_s % writeBW ) << std::endl;
+            hpx::util::format_to(std::cout, msg,
+                options.network,
+                nranks, options.threads, writeMB, options.transfer_size_B,
+                IOPs_s, writeBW ) << std::endl;
         }
         std::cout << std::endl;
     }
@@ -706,8 +708,8 @@ static void transfer_data(general_buffer_type recv,
 // Test speed of read/get
 void test_read(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
-    boost::random::uniform_int_distribution<>& random_slot,
+    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
+    std::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -892,9 +894,9 @@ void test_read(
         char const* msg = "CSVData, read, network, %1%, ranks, "
             "%2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, "
             "BW(MB/s), %7%, ";
-        std::cout << (boost::format(msg) % options.network % nranks
-            % options.threads % readMB % options.transfer_size_B
-          % IOPs_s % readBW ) << std::endl;
+        hpx::util::format_to(std::cout, msg, options.network, nranks,
+            options.threads, readMB, options.transfer_size_B,
+            IOPs_s, readBW) << std::endl;
     }
 }
 
@@ -923,8 +925,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     char const* msg = "hello world from OS-thread %1% on locality "
         "%2% rank %3% hostname %4%";
-    std::cout << (boost::format(msg) % current % hpx::get_locality_id()
-        % rank % name.c_str()) << std::endl;
+    hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
+        rank, name.c_str()) << std::endl;
     //
     // extract command line argument
     test_options options;
@@ -960,9 +962,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::terminate();
     }
     //
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
-    boost::random::uniform_int_distribution<> random_slot(0,
+    std::mt19937 gen;
+    std::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
+    std::uniform_int_distribution<> random_slot(0,
         (int)num_transfer_slots - 1);
     //
     ActiveFutures.reserve(nranks);

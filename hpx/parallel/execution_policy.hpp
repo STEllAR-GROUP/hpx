@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -322,6 +322,12 @@ namespace hpx { namespace parallel { namespace execution
         HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
+        template <typename Dependent = void, typename Enable =
+            typename std::enable_if<
+                std::is_constructible<Executor>::value &&
+                    std::is_constructible<Parameters>::value,
+                Dependent
+            >::type>
         HPX_CONSTEXPR sequenced_task_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
@@ -357,7 +363,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -619,6 +625,12 @@ namespace hpx { namespace parallel { namespace execution
         HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
+        template <typename Dependent = void, typename Enable =
+            typename std::enable_if<
+                std::is_constructible<Executor>::value &&
+                    std::is_constructible<Parameters>::value,
+                Dependent
+            >::type>
         HPX_CONSTEXPR sequenced_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
@@ -658,7 +670,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -917,6 +929,12 @@ namespace hpx { namespace parallel { namespace execution
         HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
+        template <typename Dependent = void, typename Enable =
+            typename std::enable_if<
+                std::is_constructible<Executor>::value &&
+                    std::is_constructible<Parameters>::value,
+                Dependent
+            >::type>
         HPX_CONSTEXPR parallel_task_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
@@ -952,7 +970,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -1206,6 +1224,12 @@ namespace hpx { namespace parallel { namespace execution
         HPX_CONSTEXPR Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
+        template <typename Dependent = void, typename Enable =
+            typename std::enable_if<
+                std::is_constructible<Executor>::value &&
+                    std::is_constructible<Parameters>::value,
+                Dependent
+            >::type>
         HPX_CONSTEXPR parallel_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
@@ -1241,7 +1265,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 

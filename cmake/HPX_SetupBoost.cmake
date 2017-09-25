@@ -96,13 +96,6 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
-# attempt to load Boost.Random (if available), it's needed for one example only
-find_package(Boost 1.55 QUIET COMPONENTS random)
-if(Boost_RANDOM_FOUND)
-  hpx_info("  random")
-  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-endif()
-
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
 
 # If we compile natively for the MIC, we need some workarounds for certain

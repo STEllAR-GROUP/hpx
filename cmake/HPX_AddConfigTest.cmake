@@ -390,6 +390,31 @@ macro(hpx_check_for_cxx11_std_array)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_atomic)
+  # Sometimes linking against libatomic is required for atomic ops, if
+  # the platform doesn't support lock-free atomics.
+
+  # First check if atomics work without the library.
+  add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
+    SOURCE cmake/tests/cxx11_std_atomic.cpp
+    FILE ${ARGN})
+
+  # If not, check if the library exists, and atomics work with it.
+  if(NOT HPX_WITH_CXX11_ATOMIC)
+    check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
+    if(HPX_HAVE_LIBATOMIC)
+      add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
+        SOURCE cmake/tests/cxx11_std_atomic.cpp
+        LIBRARIES "atomic"
+        FILE ${ARGN})
+    else()
+      message(FATAL_ERROR
+        "Host compiler appears to require libatomic, but cannot find it.")
+    endif()
+  endif()
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_chrono)
   add_hpx_config_test(HPX_WITH_CXX11_CHRONO
     SOURCE cmake/tests/cxx11_std_chrono.cpp
@@ -442,6 +467,13 @@ endmacro()
 macro(hpx_check_for_cxx11_std_lock_guard)
   add_hpx_config_test(HPX_WITH_CXX11_LOCK_GUARD
     SOURCE cmake/tests/cxx11_std_lock_guard.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_random)
+  add_hpx_config_test(HPX_WITH_CXX11_RANDOM
+    SOURCE cmake/tests/cxx11_std_random.cpp
     FILE ${ARGN})
 endmacro()
 

@@ -12,13 +12,13 @@
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/format.hpp>
 
 #include <cstdint>
 #include <cstring>
 #include <string>
 #include <vector>
 
-#include <boost/format.hpp>
 #include <boost/generator_iterator.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -41,9 +41,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     {
         if (rc != ok)
         {
-            boost::format err("%s (%s)");
             HPX_THROW_EXCEPTION(hpx::no_success, fname,
-                                boost::str(err % info % PAPI_strerror(rc)));
+                hpx::util::format("%s (%s)", info, PAPI_strerror(rc)));
         }
     }
     inline void papi_call(int rc, std::string const& info, char const *fname,

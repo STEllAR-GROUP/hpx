@@ -10,8 +10,7 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <utility>
 
 struct test_server
@@ -20,13 +19,13 @@ struct test_server
     test_server() { alive++; }
     ~test_server() { alive--; }
 
-    static boost::atomic<int> alive;
+    static std::atomic<int> alive;
 };
 
 typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, test_server);
 
-boost::atomic<int> test_server::alive(0);
+std::atomic<int> test_server::alive(0);
 
 hpx::id_type test(hpx::future<hpx::id_type> fid)
 {

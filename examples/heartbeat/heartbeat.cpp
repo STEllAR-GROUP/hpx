@@ -14,8 +14,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
-
-#include <boost/format.hpp>
+#include <hpx/util/format.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -45,18 +44,18 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
     hpx::naming::id_type id = hpx::performance_counters::get_counter(name);
     if (!id)
     {
-        std::cout << (boost::format(
-            "error: performance counter not found (%s)")
-            % name) << std::endl;
+        hpx::util::format_to(std::cout,
+            "error: performance counter not found (%s)",
+            name) << std::endl;
         return 1;
     }
 
     std::uint32_t const locality_id = hpx::get_locality_id();
     if (locality_id == hpx::naming::get_locality_id_from_gid(id.get_gid()))
     {
-        std::cout << (boost::format(
-            "error: cannot query performance counters on its own locality (%s)")
-            % name) << std::endl;
+        hpx::util::format_to(std::cout,
+            "error: cannot query performance counters on its own locality (%s)",
+            name) << std::endl;
         return 1;
     }
 
@@ -86,11 +85,12 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
             if (!zero_time)
                 zero_time = value.time_;
 
-            std::cout << (boost::format("  %s,%d,%d[s],%d\n")
-                         % name
-                         % value.count_
-                         % double((value.time_ - zero_time) * 1e-9)
-                         % value.value_);
+            hpx::util::format_to(std::cout,
+                "  %s,%d,%d[s],%d\n",
+                name,
+                value.count_,
+                double((value.time_ - zero_time) * 1e-9),
+                value.value_);
 
 #if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
             update_windows_counters(value.value_);

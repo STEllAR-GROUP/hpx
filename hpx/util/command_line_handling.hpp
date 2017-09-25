@@ -7,6 +7,7 @@
 #define HPX_UTIL_COMMAND_LINE_HANDLING_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/manage_config.hpp>
@@ -26,23 +27,19 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
-        command_line_handling(hpx::runtime_mode mode,
-                util::function_nonser<
-                    int(boost::program_options::variables_map& vm)
-                > const& f,
-                std::vector<std::string> && ini_config,
-                char const* argv0)
-          : rtcfg_(argv0),
-            mode_(mode),
-            ini_config_(std::move(ini_config)),
-            hpx_main_f_(f),
+        command_line_handling()
+          : rtcfg_(nullptr, runtime_mode_default),
             node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
             num_localities_(1),
             pu_step_(1),
             pu_offset_(std::size_t(-1)),
-            numa_sensitive_(0)
+            numa_sensitive_(0),
+            cmd_line_parsed_(false),
+            info_printed_(false),
+            version_printed_(false),
+            parse_terminate_(false)
         {}
 
         int call(boost::program_options::options_description const& desc_cmdline,
@@ -51,7 +48,6 @@ namespace hpx { namespace util
         boost::program_options::variables_map vm_;
         util::runtime_configuration rtcfg_;
 
-        hpx::runtime_mode mode_;
         std::vector<std::string> ini_config_;
         util::function_nonser<
             int(boost::program_options::variables_map& vm)
@@ -67,6 +63,10 @@ namespace hpx { namespace util
         std::string affinity_domain_;
         std::string affinity_bind_;
         std::size_t numa_sensitive_;
+        bool cmd_line_parsed_;
+        bool info_printed_;
+        bool version_printed_;
+        bool parse_terminate_;
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,
@@ -89,8 +89,6 @@ namespace hpx { namespace util
 #endif
 
     void handle_list_parcelports();
-
-    void HPX_EXPORT attach_debugger();
 }}
 
 #endif /*HPX_UTIL_COMMAND_LINE_HANDLING_HPP*/

@@ -11,8 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <functional>
 #include <vector>
@@ -28,7 +27,7 @@ void force_recursion_test1()
     std::vector<hpx::shared_future<void> > results;
     results.reserve(NUM_FUTURES+1);
 
-    boost::atomic<std::size_t> executed_dataflow(0);
+    std::atomic<std::size_t> executed_dataflow(0);
 
     results.push_back(first_promise.get_future());
     for (std::size_t i = 0; i != NUM_FUTURES; ++i)
@@ -60,7 +59,7 @@ void make_ready_continue(
     std::size_t i,
     std::vector<hpx::lcos::local::promise<void> >& promises,
     std::vector<hpx::shared_future<void> > & futures,
-    boost::atomic<std::size_t> & executed_continuations)
+    std::atomic<std::size_t> & executed_continuations)
 {
     if (i >= NUM_FUTURES)
         return;
@@ -89,7 +88,7 @@ void force_recursion_test2()
         futures.push_back(promises[i].get_future());
     }
 
-    boost::atomic<std::size_t> executed_continuations(0);
+    std::atomic<std::size_t> executed_continuations(0);
     make_ready_continue(0, promises, futures, executed_continuations);
 
     hpx::wait_all(futures);

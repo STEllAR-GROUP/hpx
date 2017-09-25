@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { namespace execution
         struct customization_point<get_chunk_size_tag>
         {
         public:
-            template <typename Executor, typename Parameters>
+            template <typename Executor, typename Parameters, typename F>
             HPX_FORCEINLINE auto operator()(Parameters&& params,
                     Executor&& exec, F&& f, std::size_t cores,
                     std::size_t num_tasks) const
@@ -195,7 +195,9 @@ namespace hpx { namespace parallel { namespace execution
                     std::size_t num_tasks) const
             ->  decltype(has_pending_closures(std::forward<Executor>(exec)))
             {
-                return maximal_number_of_chunks(std::forward<Executor>(exec));
+                return maximal_number_of_chunks(
+                    std::forward<Parameters>(params),
+                    std::forward<Executor>(exec), cores, num_tasks);
             }
         };
 #endif

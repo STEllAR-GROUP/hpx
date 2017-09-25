@@ -11,8 +11,6 @@
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <iterator>

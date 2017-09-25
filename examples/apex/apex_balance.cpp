@@ -9,8 +9,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/util.hpp>
 
 #include <apex_api.hpp>
 
@@ -20,8 +20,6 @@
 #include <list>
 #include <random>
 #include <vector>
-
-#include <boost/format.hpp>
 
 double do_work(std::uint64_t n);
 
@@ -87,7 +85,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 
     char const* fmt = "elapsed time: %1% [s]\n";
-    std::cout << (boost::format(fmt) % t.elapsed());
+    hpx::util::format_to(std::cout, fmt, t.elapsed());
 
     return hpx::finalize(); // Handles HPX shutdown
 }

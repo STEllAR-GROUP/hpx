@@ -135,10 +135,10 @@ namespace hpx
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/utility/swap.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -222,7 +222,7 @@ namespace hpx { namespace lcos
                 >::type* = nullptr) const
             {
                 std::size_t index =
-                    when_.index_.load(boost::memory_order_seq_cst);
+                    when_.index_.load(std::memory_order_seq_cst);
                 if (index == when_any_result<Sequence>::index_error())
                 {
                     typedef typename traits::detail::shared_state_ptr_for<
@@ -364,7 +364,7 @@ namespace hpx { namespace lcos
             }
 
             when_any_result<Sequence> lazy_values_;
-            boost::atomic<std::size_t> index_;
+            std::atomic<std::size_t> index_;
             bool goal_reached_on_calling_thread_;
         };
     }

@@ -12,8 +12,6 @@
 #include <hpx/util/iterator_range.hpp>
 #include <hpx/util/protect.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstddef>
 #include <iostream>
 #include <iterator>

@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 // util
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -60,16 +61,17 @@
 # include <boost/container/small_vector.hpp>
 #endif
 //
-#include <unordered_map>
-#include <memory>
-#include <mutex>
-#include <sstream>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <list>
+#include <memory>
+#include <mutex>
+#include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -235,7 +237,7 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
             boost::log::keywords::format =
                 (
                     boost::log::expressions::stream
-                    // << (boost::format("%05d") % expr::attr< unsigned int >("LineID"))
+                    // << hpx::util::format("%05d", expr::attr< unsigned int >("LineID"))
                     << boost::log::expressions::attr< unsigned int >("LineID")
                     << ": <" << boost::log::trivial::severity
                     << "> " << boost::log::expressions::smessage

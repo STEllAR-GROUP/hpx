@@ -7,7 +7,7 @@
 #ifndef HPX_STENCIL_PRINT_TIME_HPP
 #define HPX_STENCIL_PRINT_TIME_HPP
 
-#include <boost/format.hpp>
+#include <hpx/util/format.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -30,15 +30,15 @@ void print_time_results(
                 "Points_per_Partition,Partitions,Time_Steps\n"
              << std::flush;
 
-    std::string const locs_str = boost::str(boost::format("%u,") % num_localities);
-    std::string const threads_str = boost::str(boost::format("%lu,") % num_os_threads);
-    std::string const nx_str = boost::str(boost::format("%lu,") % nx);
-    std::string const np_str = boost::str(boost::format("%lu,") % np);
-    std::string const nt_str = boost::str(boost::format("%lu ") % nt);
+    std::string const locs_str = hpx::util::format("%u,", num_localities);
+    std::string const threads_str = hpx::util::format("%lu,", num_os_threads);
+    std::string const nx_str = hpx::util::format("%lu,", nx);
+    std::string const np_str = hpx::util::format("%lu,", np);
+    std::string const nt_str = hpx::util::format("%lu ", nt);
 
-    std::cout << ( boost::format("%-6s %-6s %.14g, %-21s %-21s %-21s\n")
-            % locs_str % threads_str % (elapsed / 1e9) %nx_str % np_str
-            % nt_str) << std::flush;
+    hpx::util::format_to(std::cout, "%-6s %-6s %.14g, %-21s %-21s %-21s\n",
+        locs_str, threads_str, elapsed / 1e9, nx_str, np_str,
+        nt_str) << std::flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,14 +56,14 @@ void print_time_results(
                 "Points_per_Partition,Partitions,Time_Steps\n"
              << std::flush;
 
-    std::string const threads_str = boost::str(boost::format("%lu,") % num_os_threads);
-    std::string const nx_str = boost::str(boost::format("%lu,") % nx);
-    std::string const np_str = boost::str(boost::format("%lu,") % np);
-    std::string const nt_str = boost::str(boost::format("%lu ") % nt);
+    std::string const threads_str = hpx::util::format("%lu,", num_os_threads);
+    std::string const nx_str = hpx::util::format("%lu,", nx);
+    std::string const np_str = hpx::util::format("%lu,", np);
+    std::string const nt_str = hpx::util::format("%lu ", nt);
 
-    std::cout << ( boost::format("%-21s %.14g, %-21s %-21s %-21s\n")
-            % threads_str % (elapsed / 1e9) %nx_str % np_str
-            % nt_str) << std::flush;
+    hpx::util::format_to(std::cout, "%-21s %.14g, %-21s %-21s %-21s\n",
+        threads_str, elapsed / 1e9, nx_str, np_str,
+        nt_str) << std::flush;
 }
 
 void print_time_results(
@@ -79,12 +79,12 @@ void print_time_results(
                 "Grid_Points,Time_Steps\n"
              << std::flush;
 
-    std::string const threads_str = boost::str(boost::format("%lu,") % num_os_threads);
-    std::string const nx_str = boost::str(boost::format("%lu,") % nx);
-    std::string const nt_str = boost::str(boost::format("%lu ") % nt);
+    std::string const threads_str = hpx::util::format("%lu,", num_os_threads);
+    std::string const nx_str = hpx::util::format("%lu,", nx);
+    std::string const nt_str = hpx::util::format("%lu ", nt);
 
-    std::cout << ( boost::format("%-21s %10.12s, %-21s %-21s\n")
-            % threads_str % (elapsed / 1e9) %nx_str % nt_str) << std::flush;
+    hpx::util::format_to(std::cout, "%-21s %10.12s, %-21s %-21s\n",
+        threads_str, elapsed / 1e9, nx_str, nt_str) << std::flush;
 }
 
 #endif

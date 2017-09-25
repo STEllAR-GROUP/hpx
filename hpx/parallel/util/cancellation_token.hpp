@@ -8,9 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
+#include <atomic>
 #include <functional>
 #include <memory>
 
@@ -30,7 +29,7 @@ namespace hpx { namespace parallel { namespace util
     class cancellation_token
     {
     private:
-        typedef boost::atomic<T> flag_type;
+        typedef std::atomic<T> flag_type;
         std::shared_ptr<flag_type> was_cancelled_;
 
     public:
@@ -40,24 +39,24 @@ namespace hpx { namespace parallel { namespace util
 
         bool was_cancelled(T data) const noexcept
         {
-            return Pred()(was_cancelled_->load(boost::memory_order_relaxed), data);
+            return Pred()(was_cancelled_->load(std::memory_order_relaxed), data);
         }
 
         void cancel(T data) noexcept
         {
-            T old_data = was_cancelled_->load(boost::memory_order_relaxed);
+            T old_data = was_cancelled_->load(std::memory_order_relaxed);
 
             do {
                 if (Pred()(old_data, data))
                     break;      // if we already have a closer one, break
 
             } while (!was_cancelled_->compare_exchange_strong(old_data, data,
-                boost::memory_order_relaxed));
+                std::memory_order_relaxed));
         }
 
         T get_data() const noexcept
         {
-            return was_cancelled_->load(boost::memory_order_relaxed);
+            return was_cancelled_->load(std::memory_order_relaxed);
         }
     };
 
@@ -67,7 +66,7 @@ namespace hpx { namespace parallel { namespace util
     class cancellation_token<detail::no_data, std::less_equal<detail::no_data> >
     {
     private:
-        typedef boost::atomic<bool> flag_type;
+        typedef std::atomic<bool> flag_type;
         std::shared_ptr<flag_type> was_cancelled_;
 
     public:
@@ -77,12 +76,12 @@ namespace hpx { namespace parallel { namespace util
 
         bool was_cancelled() const noexcept
         {
-            return was_cancelled_->load(boost::memory_order_relaxed);
+            return was_cancelled_->load(std::memory_order_relaxed);
         }
 
         void cancel() noexcept
         {
-            was_cancelled_->store(true, boost::memory_order_relaxed);
+            was_cancelled_->store(true, std::memory_order_relaxed);
         }
     };
 }}}

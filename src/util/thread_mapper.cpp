@@ -9,8 +9,6 @@
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstdint>
 #include <mutex>
 #include <string>

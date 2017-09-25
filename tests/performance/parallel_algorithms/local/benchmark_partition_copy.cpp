@@ -9,22 +9,21 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_partition.hpp>
 #include <hpx/include/parallel_generate.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/random.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <vector>
-#include <algorithm>
-#include <limits>
 #include <iostream>
+#include <limits>
+#include <random>
 #include <string>
 
-#include "test_utils.hpp"
+#include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
@@ -39,8 +38,8 @@ struct random_fill
         return dist(gen);
     }
 
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> dist;
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
@@ -91,11 +90,14 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
-    typedef typename std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test_container<IteratorTag> test_container;
+    typedef typename test_container::type container;
+    typedef typename container::iterator iterator;
 
-    std::vector<int> v(vector_size);
-    std::vector<int> result_true(v.size()), result_false(v.size());
+    container v = test_container::get_container(vector_size);
+    container result_true = test_container::get_container(vector_size);
+    container result_false = test_container::get_container(vector_size);
+
     iterator first = iterator(std::begin(v));
     iterator last = iterator(std::end(v));
     iterator dest_true = iterator(std::begin(result_true));
@@ -135,10 +137,10 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
     auto fmt = "partition_copy (%1%) : %2%(sec)";
-    std::cout << (boost::format(fmt) % "std" % time_std) << std::endl;
-    std::cout << (boost::format(fmt) % "seq" % time_seq) << std::endl;
-    std::cout << (boost::format(fmt) % "par" % time_par) << std::endl;
-    std::cout << (boost::format(fmt) % "par_unseq" % time_par_unseq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq) << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 }
 

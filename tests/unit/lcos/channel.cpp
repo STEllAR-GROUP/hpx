@@ -10,8 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <numeric>
 #include <string>
 #include <utility>
@@ -159,7 +158,7 @@ void dispatch_work(hpx::id_type const& loc)
 ///////////////////////////////////////////////////////////////////////////////
 void channel_range(hpx::id_type const& loc)
 {
-    boost::atomic<int> received_elements(0);
+    std::atomic<int> received_elements(0);
 
     hpx::lcos::channel<std::string> queue(loc);
     queue.set("one");
@@ -178,7 +177,7 @@ void channel_range(hpx::id_type const& loc)
 
 void channel_range_void(hpx::id_type const& loc)
 {
-    boost::atomic<int> received_elements(0);
+    std::atomic<int> received_elements(0);
 
     hpx::lcos::channel<> queue(loc);
     queue.set();

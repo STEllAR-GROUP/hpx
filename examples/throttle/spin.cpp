@@ -5,8 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-
-#include <boost/format.hpp>
+#include <hpx/util/format.hpp>
 
 #include <iostream>
 #include <string>
@@ -49,17 +48,17 @@ int hpx_main(variables_map& vm)
                 {
                     address addr = hpx::agas::resolve(locality_).get();
 
-                    std::cout << ( boost::format("  [%1%] %2%\n")
-                                 % get_locality_id_from_gid(locality_.get_gid())
-                                 % addr.locality_);
+                    hpx::util::format_to(std::cout, "  [%1%] %2%\n",
+                        get_locality_id_from_gid(locality_.get_gid()),
+                        addr.locality_);
                 }
 
                 continue;
             }
 
             else if (0 != std::string("help").find(arg))
-                std::cout << ( boost::format("error: unknown command '%1%'\n")
-                             % arg);
+                hpx::util::format_to(std::cout, "error: unknown command '%1%'\n",
+                    arg);
 
             std::cout << "commands: localities, help, quit\n";
         }

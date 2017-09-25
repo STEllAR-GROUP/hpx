@@ -12,14 +12,13 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/util/format.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/format.hpp>
-#include <boost/atomic.hpp>
-
 #include <apex_api.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <iostream>
 
@@ -31,7 +30,7 @@ std::uint64_t fibonacci(std::uint64_t n);
 // invocation to work.
 HPX_PLAIN_ACTION(fibonacci, fibonacci_action);
 
-boost::atomic<std::uint64_t> count(0);
+std::atomic<std::uint64_t> count(0);
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t fibonacci(std::uint64_t n)
@@ -72,7 +71,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::uint64_t r = fib(hpx::find_here(), n);
 
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
-        std::cout << (boost::format(fmt) % n % r % t.elapsed());
+        hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
     return hpx::finalize(); // Handles HPX shutdown

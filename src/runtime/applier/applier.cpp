@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_description.hpp>
 
@@ -255,7 +256,7 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<applier*, applier::tls_tag> applier::applier_;
 
-    applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm)
+    applier::applier(parcelset::parcelhandler &ph, threads::threadmanager& tm)
       : parcel_handler_(ph), thread_manager_(tm)
     {}
 
@@ -280,7 +281,7 @@ namespace hpx { namespace applier
         return parcel_handler_;
     }
 
-    threads::threadmanager_base& applier::get_thread_manager()
+    threads::threadmanager& applier::get_thread_manager()
     {
         return thread_manager_;
     }

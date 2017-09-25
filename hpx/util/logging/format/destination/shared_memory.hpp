@@ -23,7 +23,9 @@
 
 #if 0
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
+
 #include <boost/shmem/shmem_named_shared_object.hpp>
 
 #include <cstddef>

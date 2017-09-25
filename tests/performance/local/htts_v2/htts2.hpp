@@ -6,11 +6,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:BOOST_ASSERT
+
 #include <hpx/config.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/format.hpp>
-#include <boost/mpl/or.hpp>
 
 #include <chrono>
 #include <cmath>
