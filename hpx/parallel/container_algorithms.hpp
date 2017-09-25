@@ -21,5 +21,6 @@
 #include <hpx/parallel/container_algorithms/rotate.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
+#include <hpx/parallel/container_algorithms/unique.hpp>
 
 #endif
