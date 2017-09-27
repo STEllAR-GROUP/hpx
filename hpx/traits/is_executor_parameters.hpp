@@ -79,6 +79,11 @@ namespace hpx { namespace parallel { namespace execution
           : std::false_type
         {};
 
+        template <>
+        struct is_executor_parameters<sequential_executor_parameters>
+          : std::true_type
+        {};
+
         template <typename T>
         struct is_executor_parameters< ::std::reference_wrapper<T> >
           : hpx::traits::is_executor_parameters<T>
@@ -103,7 +108,6 @@ namespace hpx { namespace parallel { namespace execution
     template <typename T>
     constexpr bool is_executor_parameters_v = is_executor_parameters<T>::value;
 #endif
-
 }}}
 
 namespace hpx { namespace traits

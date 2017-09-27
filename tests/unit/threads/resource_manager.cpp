@@ -28,7 +28,7 @@ namespace test
         dummy_parameters() = default;
     };
 
-    static const dummy_parameters dummy;
+    static dummy_parameters HPX_CONSTEXPR_OR_CONST dummy{};
 }
 
 namespace hpx { namespace traits

@@ -322,7 +322,7 @@ namespace hpx { namespace parallel { inline namespace v3
     /// timed scheduling functionality (in addition to what is supported
     /// execution agents generated using execution_traits type).
     ///
-    template <typename Executor, typename Enable>
+    template <typename Executor, typename Enable = void>
     struct timed_executor_traits : executor_traits<Executor>
     {
         /// The type of the executor associated with this instance of
@@ -561,7 +561,9 @@ namespace hpx { namespace parallel { inline namespace v3
     ///    is_timed_executor is undefined.
     ///
     template <typename T>
-    struct is_timed_executor;   // defined in hpx/traits/is_timed_executor.hpp
+    struct is_timed_executor
+      : hpx::traits::is_timed_executor<T>
+    {};
 }}}
 
 #endif
