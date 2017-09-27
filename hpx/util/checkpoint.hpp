@@ -36,7 +36,8 @@ namespace util
 
 // Forward declarations
 class checkpoint;
-std::istream& operator>>(std::istream& ist, checkpoint ckp);
+std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp);
+std::istream& operator>>(std::istream& ist, checkpoint& ckp);
 namespace detail
 {
 struct save_funct_obj;
@@ -53,7 +54,8 @@ struct save_funct_obj;
     {
         std::vector<char> data;
 
-        friend std::istream& operator>>(std::istream& ist, checkpoint ckp);
+        friend std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp);
+        friend std::istream& operator>>(std::istream& ist, checkpoint& ckp);
         //Serialization Definition
         friend class hpx::serialization::access;
         template <typename Archive>
@@ -151,15 +153,15 @@ struct save_funct_obj;
         int64_t size = ckp.size();
         ost.write(reinterpret_cast<char const *>(&size), sizeof(int64_t));
         // Write the file to the stream
-        std::copy(ckp.begin(), ckp.end(), std::ostream_iterator<char>(ost));
+        ost.write(ckp.data.data(), ckp.size());
         return ost;
     }
-    std::istream& operator>>(std::istream& ist, checkpoint ckp)
+    std::istream& operator>>(std::istream& ist, checkpoint& ckp)
     {
         // Read in the size of the next checkpoint
         int64_t length;
         ist.read(reinterpret_cast<char *>(&length), sizeof(int64_t));
-        ckp.data.reserve(length);
+        ckp.data.resize(length);
         // Read in the next checkpoint
         ist.read(ckp.data.data(), length);
         return ist;

@@ -172,11 +172,6 @@ struct backup
         if (file_archive.is_open())
         {
             file_archive<<archive_data;
-/*
-            file_archive.write(
-                archive_data.data.data()
-              , archive_data.data.size());
-*/
         }
         else
         {
@@ -189,14 +184,12 @@ struct backup
         std::size_t nx)
     {
         hpx::util::checkpoint temp_archive;
-//        temp_archive.load(file_name_);
         std::ifstream ist(file_name_);
         ist>>temp_archive;
         hpx::util::restore_checkpoint(temp_archive, bin);        
         for (std::size_t i = 0; i < U[0].size(); i++)
         {
             partition_data temp(nx, double(i));
-std::cout<<"I made it here!"<<std::endl;
             hpx::util::restore_checkpoint(bin[i], temp);
             //Check
             for (std::size_t e = 0; e < temp.size(); e++)
