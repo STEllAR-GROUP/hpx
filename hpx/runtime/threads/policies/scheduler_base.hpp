@@ -88,6 +88,12 @@ namespace hpx { namespace threads { namespace policies
         {
         }
 
+        threads::detail::thread_pool_base *get_parent_pool()
+        {
+            HPX_ASSERT(parent_pool_ != nullptr);
+            return parent_pool_;
+        }
+
         void set_parent_pool(threads::detail::thread_pool_base *p)
         {
             HPX_ASSERT(parent_pool_ == nullptr);

@@ -9,16 +9,14 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/util.hpp>
 
 #include <apex_api.hpp>
 
 #include <cstdint>
 #include <iostream>
-
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // forward declaration of the Fibonacci function
@@ -65,7 +63,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::uint64_t r = fib(hpx::find_here(), n);
 
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
-        std::cout << (boost::format(fmt) % n % r % t.elapsed());
+        hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
     return hpx::finalize(); // Handles HPX shutdown

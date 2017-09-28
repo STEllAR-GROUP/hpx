@@ -7,10 +7,10 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/performance_counters/registry.hpp>
+#include <hpx/util/format.hpp>
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
-#include <boost/format.hpp>
 #include <boost/regex.hpp>
 
 #include <cstdint>
@@ -309,9 +309,9 @@ namespace hpx { namespace plugins { namespace parcel
 
                 HPX_THROWS_IF(ec, bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
-                    boost::str(boost::format(
+                    hpx::util::format(
                         "action type %s does not match any known type, "
-                        "known action types: \n%s") % p.parameters_ % types));
+                        "known action types: \n%s", p.parameters_, types));
                 return false;
             }
 
@@ -339,9 +339,9 @@ namespace hpx { namespace plugins { namespace parcel
                 l.unlock();
                 HPX_THROWS_IF(ec, bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
-                    boost::str(boost::format(
+                    hpx::util::format(
                         "action type %s does not match any known type, "
-                        "known action types: \n%s") % p.parameters_ % types));
+                        "known action types: \n%s", p.parameters_, types));
                 return false;
             }
         }

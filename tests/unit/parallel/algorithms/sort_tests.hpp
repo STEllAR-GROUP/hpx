@@ -23,9 +23,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_sort.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/lightweight_test.hpp>
-//
-#include <boost/format.hpp>
 //
 #include "test_utils.hpp"
 
@@ -98,18 +97,17 @@ int verify(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
             it != A.end(); ++it)
         {
             if (comp((*it), temp)) {
-                if (print) std::cout << "fail "
-                  << boost::format("%8.6f") % (elapsed / 1e9)
-                  << A.size() << std::endl;
+                if (print)
+                    hpx::util::format_to(std::cout, "fail %8.6f", elapsed / 1e9)
+                      << A.size() << std::endl;
                 return 0;
             }
             temp = (*it);
         }
     }
-    if (print) std::cout
-      << "OK "
-      << boost::format("%8.6f") % (elapsed / 1e9)
-      << A.size() << std::endl;
+    if (print)
+        hpx::util::format_to(std::cout, "OK %8.6f", elapsed / 1e9)
+          << A.size() << std::endl;
     return 1;
 }
 

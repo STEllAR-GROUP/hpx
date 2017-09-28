@@ -5,9 +5,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/format.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -25,14 +25,13 @@ int hpx_main(boost::program_options::variables_map&)
 
     std::uint32_t const prefix = hpx::get_locality_id();
     // use floating point instructions here to avoid measuring runtime side effects
-    boost::format cnt_name("/papi{locality#%d/worker-thread#0}/PAPI_FP_INS");
-
     using hpx::naming::id_type;
     using hpx::performance_counters::get_counter;
     using hpx::performance_counters::stubs::performance_counter;
     using hpx::performance_counters::counter_value;
 
-    id_type id = get_counter(boost::str(cnt_name % prefix));
+    id_type id = get_counter(hpx::util::format(
+        "/papi{locality#%d/worker-thread#0}/PAPI_FP_INS", prefix));
 
     performance_counter::start(hpx::launch::sync, id);
 

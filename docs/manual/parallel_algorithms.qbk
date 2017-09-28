@@ -330,8 +330,15 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_transform.hpp>`]
      [[cpprefalgodocs transform]]
     ]
-	[[ [algoref unique_copy] ]
-     [Applies a function to a range of elements.]
+    [[ [algoref unique_copy] ]
+     [Eliminates all but the first element from every consecutive group of
+      equivalent elements from a range.]
+     [`<hpx/include/parallel_unique.hpp>`]
+     [[cpprefalgodocs unique]]
+    ]
+    [[ [algoref unique_copy] ]
+     [Eliminates all but the first element from every consecutive group of
+      equivalent elements from a range.]
      [`<hpx/include/parallel_unique.hpp>`]
      [[cpprefalgodocs unique_copy]]
     ]

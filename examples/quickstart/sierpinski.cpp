@@ -25,8 +25,6 @@
 #include <cstdint>
 #include <iostream>
 
-#include <boost/format.hpp>
-
 
 // Class representing a Sierpinski triangle
 class sierpinski{

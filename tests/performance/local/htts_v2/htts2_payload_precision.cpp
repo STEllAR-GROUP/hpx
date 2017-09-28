@@ -8,6 +8,7 @@
 #define HPX_NO_VERSION_CHECK
 
 #include "htts2.hpp"
+#include <hpx/util/format.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -180,17 +181,16 @@ struct payload_precision_driver : htts2::driver
                 << "Amortized Overhead per Task Uncertainty [nanoseconds/task]"
                 << "\n";
 
-        std::cout
-            << ( boost::format("%lu,%lu,%lu,%.14g,%.14g,%.14g,%.14g\n")
-               % this->osthreads_
-               % this->tasks_
-               % this->payload_duration_
-               % results.average_precision_
-               % results.precision_uncertainty_
-               % results.amortized_overhead_
-               % results.overhead_uncertainty_
-               )
-            ;
+        hpx::util::format_to(std::cout,
+            "%lu,%lu,%lu,%.14g,%.14g,%.14g,%.14g\n",
+            this->osthreads_,
+            this->tasks_,
+            this->payload_duration_,
+            results.average_precision_,
+            results.precision_uncertainty_,
+            results.amortized_overhead_,
+            results.overhead_uncertainty_
+        );
     }
 };
 

@@ -9,8 +9,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/format.hpp>
-
 #include <cstdint>
 
 #include "server/sine.hpp"

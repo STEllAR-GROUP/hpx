@@ -8,18 +8,16 @@
 // Naive SMP version implemented with futures.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/performance_counters.hpp>
+#include <hpx/include/util.hpp>
 
 #include <apex_api.hpp>
 
 #include <cstdint>
 #include <iostream>
-
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // forward declaration of the Fibonacci function
@@ -65,11 +63,11 @@ id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     std::uint32_t const prefix = hpx::get_locality_id();
     /*
-    boost::format
-      active_threads("/threads{locality#%d/total}/count/instantaneous/active");
+    id_type id = get_counter(hpx::util::format(
+        "/threads{locality#%d/total}/count/instantaneous/active",
+        prefix));
     */
-    boost::format active_threads(counter_name);
-    id_type id = get_counter(boost::str(active_threads % prefix));
+    id_type id = get_counter(hpx::util::format(counter_name, prefix));
     return id;
 }
 
@@ -107,7 +105,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::uint64_t r = fib(hpx::find_here(), n);
 
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
-        std::cout << (boost::format(fmt) % n % r % t.elapsed());
+        hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
     return hpx::finalize(); // Handles HPX shutdown

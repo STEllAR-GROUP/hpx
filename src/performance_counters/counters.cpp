@@ -17,13 +17,12 @@
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/util/bind.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
-
-#include <boost/format.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
@@ -409,7 +408,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                boost::str(boost::format("invalid counter name format: %s") % name));
+                hpx::util::format("invalid counter name format: %s", name));
             return status_invalid_data;
         }
 
@@ -464,9 +463,8 @@ namespace hpx { namespace performance_counters
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "get_counter_path_elements",
-                            boost::str(boost::format(
-                                "invalid counter name format: %s") % name
-                            ));
+                            hpx::util::format(
+                                "invalid counter name format: %s", name));
                         return status_invalid_data;
                     }
                 }
@@ -507,7 +505,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
-                boost::str(boost::format("invalid counter name format: %s") % name));
+                hpx::util::format("invalid counter name format: %s", name));
             return status_invalid_data;
         }
 
@@ -1098,20 +1096,17 @@ namespace hpx { namespace performance_counters
             // now expand "pool#*"
             if (detail::is_pool_kind(p.instancename_))
             {
+                bool expand_threads = detail::is_thread_kind(p.subinstancename_);
+
                 counter_info i = info;
                 p.instancename_ = detail::get_pool_kind(p.instancename_);
-                if (!detail::expand_counter_info_threads(i, p, f, ec))
-                    return false;
-
-                if (detail::is_thread_kind(p.subinstancename_))
+                if (expand_threads)
                 {
-                    counter_info i = info;
-                    p.subinstancename_ =
-                        detail::get_thread_kind(p.subinstancename_) + "-thread";
-                    return detail::expand_counter_info_threads(i, p, f, ec);
+                    p.subinstancename_ = detail::get_thread_kind(
+                        p.subinstancename_) + "-thread";
                 }
-
-                return true;
+                return detail::expand_counter_info_pools(
+                    expand_threads, i, p, f, ec);
             }
 
             if (detail::is_thread_kind(p.instancename_))
@@ -1233,8 +1228,9 @@ namespace hpx { namespace performance_counters
                 if (&ec == &throws)
                     throw;
                 ec = make_error_code(e.get_error(), e.what());
-                LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
-                    % remove_counter_prefix(complemented_info.fullname_) % e.what());
+                LPCS_(warning) << hpx::util::format(
+                    "failed to create counter %s (%s)",
+                    remove_counter_prefix(complemented_info.fullname_), e.what());
                 return lcos::future<naming::id_type>();
             }
         }

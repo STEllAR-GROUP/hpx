@@ -9,10 +9,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_unique.hpp>
 #include <hpx/include/parallel_generate.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <algorithm>
@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
+#include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
@@ -83,14 +83,15 @@ void run_benchmark(std::size_t vector_size, int test_count,
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
-    typedef typename std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test_container<IteratorTag> test_container;
+    typedef typename test_container::type container;
 
-    std::vector<int> v(vector_size);
-    std::vector<int> result(v.size());
-    iterator first = iterator(std::begin(v));
-    iterator last = iterator(std::end(v));
-    iterator dest = iterator(std::begin(result));
+    container v = test_container::get_container(vector_size);
+    container result = test_container::get_container(vector_size);
+
+    auto first = std::begin(v);
+    auto last = std::end(v);
+    auto dest = std::begin(result);
 
     // initialize data
     using namespace hpx::parallel;
@@ -98,7 +99,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
         random_fill(random_range));
 
     auto dest_dist = std::distance(std::begin(result),
-        std::unique_copy(first, last, dest).base());
+        std::unique_copy(first, last, dest));
 
     std::cout << "*** Destination iterator distance : "
         << dest_dist << std::endl << std::endl;
@@ -126,10 +127,10 @@ void run_benchmark(std::size_t vector_size, int test_count,
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
     auto fmt = "unique_copy (%1%) : %2%(sec)";
-    std::cout << (boost::format(fmt) % "std" % time_std) << std::endl;
-    std::cout << (boost::format(fmt) % "seq" % time_seq) << std::endl;
-    std::cout << (boost::format(fmt) % "par" % time_par) << std::endl;
-    std::cout << (boost::format(fmt) % "par_unseq" % time_par_unseq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq) << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 }
 

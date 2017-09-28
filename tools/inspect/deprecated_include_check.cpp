@@ -48,6 +48,7 @@ namespace boost
       { "boost/atomic\\.hpp", "atomic" },
       { "boost/nondet_random.hpp", "random" },
       { "boost/random/([^\\s]*)\\.hpp", "random" },
+      { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { nullptr, nullptr }
     };
 

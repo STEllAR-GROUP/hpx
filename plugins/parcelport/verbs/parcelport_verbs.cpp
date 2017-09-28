@@ -13,6 +13,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
@@ -1662,7 +1663,7 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
             boost::log::keywords::format =
                 (
                     boost::log::expressions::stream
-                    // << (boost::format("%05d") % expr::attr< unsigned int >("LineID"))
+                    // << hpx::util::format("%05d", expr::attr< unsigned int >("LineID"))
                     << boost::log::expressions::attr< unsigned int >("LineID")
                     << ": <" << boost::log::trivial::severity
                     << "> " << boost::log::expressions::smessage

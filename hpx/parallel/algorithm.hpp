@@ -40,6 +40,7 @@
 #include <hpx/parallel/algorithms/set_union.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
+#include <hpx/parallel/algorithms/unique.hpp>
 
 // Parallelism TS V2
 #include <hpx/parallel/algorithms/for_loop.hpp>

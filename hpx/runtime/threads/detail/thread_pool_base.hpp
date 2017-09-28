@@ -13,6 +13,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
@@ -286,6 +287,8 @@ namespace hpx { namespace threads { namespace detail
 
         // Stores the mask identifying all processing units used by this
         // thread pool.
+        typedef hpx::lcos::local::spinlock pu_mutex_type;
+        mutable pu_mutex_type used_processing_units_mtx_;
         threads::mask_type used_processing_units_;
 
         // Mode of operation of the pool

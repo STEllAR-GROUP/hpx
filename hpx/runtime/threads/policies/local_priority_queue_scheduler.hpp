@@ -467,6 +467,18 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
+            // Select a OS thread which hasn't been disabled
+            while (true)
+            {
+                auto const& rp = resource::get_partitioner();
+                auto mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+                if(bit_and(mask, parent_pool_->get_used_processing_units()))
+                    break;
+                else
+                    num_thread = (num_thread + 1) % queue_size;
+            }
+
             // now create the thread
             if (data.priority == thread_priority_high_recursive ||
                 data.priority == thread_priority_high)

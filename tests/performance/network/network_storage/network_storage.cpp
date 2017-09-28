@@ -8,6 +8,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
+#include <hpx/util/format.hpp>
 
 #include <boost/assert.hpp>
 
@@ -676,9 +677,10 @@ void test_write(
             "%1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, "
             "IOPS/s, %6%, BW(MB/s), %7%, ";
         if (!options.warmup) {
-            std::cout << (boost::format(msg) % options.network
-                % nranks % options.threads % writeMB % options.transfer_size_B
-                % IOPs_s % writeBW ) << std::endl;
+            hpx::util::format_to(std::cout, msg,
+                options.network,
+                nranks, options.threads, writeMB, options.transfer_size_B,
+                IOPs_s, writeBW ) << std::endl;
         }
         std::cout << std::endl;
     }
@@ -892,9 +894,9 @@ void test_read(
         char const* msg = "CSVData, read, network, %1%, ranks, "
             "%2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, "
             "BW(MB/s), %7%, ";
-        std::cout << (boost::format(msg) % options.network % nranks
-            % options.threads % readMB % options.transfer_size_B
-          % IOPs_s % readBW ) << std::endl;
+        hpx::util::format_to(std::cout, msg, options.network, nranks,
+            options.threads, readMB, options.transfer_size_B,
+            IOPs_s, readBW) << std::endl;
     }
 }
 
@@ -923,8 +925,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     char const* msg = "hello world from OS-thread %1% on locality "
         "%2% rank %3% hostname %4%";
-    std::cout << (boost::format(msg) % current % hpx::get_locality_id()
-        % rank % name.c_str()) << std::endl;
+    hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
+        rank, name.c_str()) << std::endl;
     //
     // extract command line argument
     test_options options;

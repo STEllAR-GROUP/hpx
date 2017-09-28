@@ -252,7 +252,9 @@ variable as a first parameter.
     }
     HPX_PLAIN_ACTION(bulk_function, bulk_action);
 
-[note In the following paragraphs, we will use the term "image" several times. An image is defined as a lightweight process whose the entry point is a function provided by the user. It's an "image of the function".]
+[note In the following paragraphs, we will use the term "image" several times.
+    An image is defined as a lightweight process whose the entry point is a
+    function provided by the user. It's an "image of the function".]
 
 The `spmd_block` class contains the following methods:
 
@@ -336,8 +338,11 @@ indicating the number of images per locality to create.
 
         return 0;
     }
-[note In principle, the user should never call the `spmd_block` constructor. The `define_spmd_block` function is responsible of instantiating `spmd_block` objects and broadcasting them to each created image.
-]
+
+[note In principle, the user should never call the `spmd_block` constructor.
+      The `define_spmd_block` function is responsible of instantiating
+      `spmd_block` objects and broadcasting them to each created image.]
+
 [endsect]
 
 [section:spmd_views SPMD Multidimensionnal Views]
@@ -377,7 +382,10 @@ because without convention, each of the images invoked will race to execute
 the statement. For this reason, our views are not only multi-dimensional
 but also "spmd-aware".
 
-[note Spmd-awareness: The convention is simple. If an assignment statement contains a view subscript as an l-value, it is only and only the image holding the r-value who is evaluating the statement. (In MPI sense, it is called a Put operation)]
+[note SPMD-awareness: The convention is simple. If an assignment statement
+    contains a view subscript as an l-value, it is only and only the image
+    holding the r-value who is evaluating the statement. (In MPI sense, it is
+    called a Put operation)]
 
 [section:Subscripts Subscript-based operations]
 Here are some examples of using subscripts in the 2-D view case:
@@ -413,6 +421,7 @@ Here are some examples of using subscripts in the 2-D view case:
         // assignment : oops! race between all participating images.
         vv(2,3) = std::vector<double>(4,1.0);
     }
+
 [endsect]
 
 [section:ViewIterators Iterator-based operations]
@@ -506,6 +515,7 @@ owned by the current image :
         }
 
     }
+
 [endsect]
 
 [section:SubViews Instanciating Sub-views]
@@ -551,16 +561,21 @@ sub-view.
         }
 
     }
-[note The last parameter of the subview constructor is the size of the original view. If one would like to create a subview of the subview and so on, this parameter should stay unchanged. (`{N,N}` for the above example)]
+
+[note The last parameter of the subview constructor is the size of the original
+    view. If one would like to create a subview of the subview and so on, this
+    parameter should stay unchanged. (`{N,N}` for the above example)]
+
 [endsect]
 [endsect]
 [endsect]
+
 [section C++ Co-Arrays]
 Fortran has extended its scalar element indexing approach to reference each
 segment of a distributed array. In this extension, a segment is attributed a
-”co-index” and lives in a specific locality. A co-index provides the application
+?co-index? and lives in a specific locality. A co-index provides the application
 with enough information to retrieve the corresponding data reference. In C++,
-containers present themselves as a ”smarter” alternative of Fortran arrays but
+containers present themselves as a ?smarter? alternative of Fortran arrays but
 there are still no corresponding standardized features similar to the Fortran
 co-indexing approach. We present here an implementation of such features in __hpx__.
 
@@ -661,5 +676,7 @@ Here is an example of using local subscripts :
 `hpx::container::placeholders::_`, local subscript (and not global subscript)
 is used. It is equivalent to a global subscript used with a
 "last dimension index" equal to the value returned by `block.this_image()`.]
+
+[endsect]
 [endsect]
 [endsect]

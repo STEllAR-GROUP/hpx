@@ -7,10 +7,10 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/performance_counters/registry.hpp>
+#include <hpx/util/format.hpp>
 
 #include <string>
 
-#include <boost/format.hpp>
 #include <boost/regex.hpp>
 
 namespace hpx { namespace actions { namespace detail
@@ -141,9 +141,9 @@ namespace hpx { namespace actions { namespace detail
 
                 HPX_THROWS_IF(ec, bad_parameter,
                     "invocation_count_registry::counter_discoverer",
-                    boost::str(boost::format(
+                    hpx::util::format(
                         "action type %s does not match any known type, "
-                        "known action types: \n%s") % p.parameters_ % types));
+                        "known action types: \n%s", p.parameters_, types));
                 return false;
             }
 
@@ -167,9 +167,9 @@ namespace hpx { namespace actions { namespace detail
 
             HPX_THROWS_IF(ec, bad_parameter,
                 "invocation_count_registry::counter_discoverer",
-                boost::str(boost::format(
+                hpx::util::format(
                     "action type %s does not match any known type, "
-                    "known action types: \n%s") % p.parameters_ % types));
+                    "known action types: \n%s", p.parameters_, types));
             return false;
         }
 

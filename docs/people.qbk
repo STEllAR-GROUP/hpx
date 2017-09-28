@@ -70,15 +70,13 @@ our tables below.
   [[John Biddiscombe]        [__cscs__]           [[$./images/emails/biddisco.png]]]
   [[Anton Bikineev]          [__cct__, __lsu__]   [[$./images/emails/antbikineev.png]]]
   [[Martin Stumpf]           [__inf3__, __fau__]  [[$./images/emails/martinhstumpf.png]]]
-  [[Bryce Adelstein-Lelbach] [__lbnl__]           [[$./images/emails/balelbach.png]]]
+  [[Bryce Adelstein Lelbach] [__nvidia__]         [[$./images/emails/blelbach.png]]]
   [[Shuangyang Yang]         [__cct__, __lsu__]   [[$./images/emails/syang16.png]]]
   [[Jeroen Habraken]         [__tue__]            [[$./images/emails/vexocide.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
-  [[Andrew Kemp]             [__cct__, __lsu__]   [[$./images/emails/akemp.png]]]
+  [[Antoine Tran Tan]        [__cct__, __lsu__]   [[$./images/emails/atrantan.png]]]
   [[Adrian Serio]            [__cct__, __lsu__]   [[$./images/emails/aserio.png]]]
   [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
-  [[Matthew Anderson]        [__crest__, __iu__]  [[$./images/emails/manderson.png]]]
-  [[Dylan Stark]             [__sandia__]         [[$./images/emails/dstark.png]]]
 ]
 
 [heading Contributors to this Document]
@@ -87,7 +85,7 @@ our tables below.
   [[Name]                    [Institution]        [email]]
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
-  [[Bryce Adelstein-Lelbach] [__lbnl__]           [[$./images/emails/balelbach.png]]]
+  [[Bryce Adelstein Lelbach] [__nvidia__]         [[$./images/emails/blelbach.png]]]
   [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
   [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
@@ -208,9 +206,9 @@ the project through discussions, pull requests, documentation patches, etc.
 * Praveen Velliengiri, Element-126, ShmuelLevine, Aalekh Nigam, 
   HadrienG2, Prayag Verma, and
   Avyav Kumar who improved the documentation.
-* J. F. Bastien, Christopher Hinz, Brandon Kohn, hendrx, Dekken, and 
-  woodmeister123 who contributed to the 
-  general improvement of __hpx__
+* J. F. Bastien, Christopher Hinz, Brandon Kohn, hendrx, Dekken, 
+  woodmeister123, Andrew Kemp, Dylan Stark, and Matthew Anderson who 
+  contributed to the general improvement of __hpx__
 
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and

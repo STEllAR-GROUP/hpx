@@ -9,10 +9,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/include/parallel_generate.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <algorithm>
@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
+#include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
@@ -83,17 +83,18 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
 
-    typedef typename std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test_container<IteratorTag> test_container;
+    typedef typename test_container::type container;
 
-    std::vector<int> src1(vector_size1), src2(vector_size2);
-    std::vector<int> result(vector_size1 + vector_size2);
+    container src1 = test_container::get_container(vector_size1);
+    container src2 = test_container::get_container(vector_size2);
+    container result = test_container::get_container(vector_size1 + vector_size2);
 
-    iterator first1 = iterator(std::begin(src1));
-    iterator last1 = iterator(std::end(src1));
-    iterator first2 = iterator(std::begin(src2));
-    iterator last2 = iterator(std::end(src2));
-    iterator dest = iterator(std::begin(result));
+    auto first1 = std::begin(src1);
+    auto last1 = std::end(src1);
+    auto first2 = std::begin(src2);
+    auto last2 = std::end(src2);
+    auto dest = std::begin(result);
 
     // initialize data
     using namespace hpx::parallel;
@@ -125,10 +126,10 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
     auto fmt = "merge (%1%) : %2%(sec)";
-    std::cout << (boost::format(fmt) % "std" % time_std) << std::endl;
-    std::cout << (boost::format(fmt) % "seq" % time_seq) << std::endl;
-    std::cout << (boost::format(fmt) % "par" % time_par) << std::endl;
-    std::cout << (boost::format(fmt) % "par_unseq" % time_par_unseq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq) << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 }
 

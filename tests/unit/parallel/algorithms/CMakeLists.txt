@@ -122,6 +122,7 @@ set(tests
     uninitialized_moven
     uninitialized_value_construct
     uninitialized_value_constructn
+    unique
     unique_copy
    )
 

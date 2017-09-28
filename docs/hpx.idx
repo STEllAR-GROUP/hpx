@@ -343,6 +343,10 @@ parallel::uninitialized_move_n        "uninitialized_move_n" "hpx\.parallel\.v1\
 parallel::uninitialized_value_construct          "uninitialized_value_construct" "hpx\.parallel\.v1\.uninitialized_val_id.*"
 parallel::uninitialized_value_construct_n        "uninitialized_value_construct_n" "hpx\.parallel\.v1\.uninitialized_val_id.*"
 
+# hpx/parallel/algorithms/uninitialized_value_construct.hpp
+parallel::unique                      "unique"      "hpx\.parallel\.v1\.unique_id.*"
+parallel::unique_copy                 "unique_copy" "hpx\.parallel\.v1\.unique_copy_id.*"
+
 # hpx/runtime/components/colocating_distribution_policy.hpp
 colocating_distribution_policy        "" "hpx\.components\.colocating_distri_id.*"
 colocated                             "" "hpx\.components\.colocated.*"

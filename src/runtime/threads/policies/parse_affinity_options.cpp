@@ -11,11 +11,11 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hwloc.h>
 
-#include <boost/format.hpp>
 #include <boost/variant.hpp>
 
 // #define BOOST_SPIRIT_DEBUG
@@ -118,6 +118,7 @@ namespace hpx { namespace threads { namespace detail
                     partlit("compact") >> qi::attr(compact)
                 |   partlit("scatter") >> qi::attr(scatter)
                 |   partlit("balanced") >> qi::attr(balanced)
+                |   partlit("numa-balanced") >> qi::attr(numa_balanced)
                 ;
 
             thread_spec =
@@ -371,9 +372,9 @@ namespace hpx { namespace threads { namespace detail
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "extract_socket_or_numanode_mask",
-                boost::str(boost::format(
-                    "unexpected specification type %s"
-                ) % spec_type::type_name(s.type_)));
+                hpx::util::format(
+                    "unexpected specification type %s",
+                    spec_type::type_name(s.type_)));
             break;
         }
 
@@ -443,9 +444,9 @@ namespace hpx { namespace threads { namespace detail
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "extract_core_mask",
-                boost::str(boost::format(
-                    "unexpected specification type %s"
-                ) % spec_type::type_name(s.type_)));
+                hpx::util::format(
+                    "unexpected specification type %s",
+                    spec_type::type_name(s.type_)));
             break;
         }
 
@@ -529,9 +530,9 @@ namespace hpx { namespace threads { namespace detail
 
         default:
             HPX_THROWS_IF(ec, bad_parameter, "extract_pu_mask",
-                boost::str(boost::format(
-                    "unexpected specification type %s"
-                ) % spec_type::type_name(s.type_)));
+                hpx::util::format(
+                    "unexpected specification type %s",
+                    spec_type::type_name(s.type_)));
             break;
         }
 
@@ -554,9 +555,9 @@ namespace hpx { namespace threads { namespace detail
         if (b.begin() == b.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
-                boost::str(boost::format(
-                    "no %1% mapping bounds are specified"
-                ) % spec_type::type_name(fmt.first.type_)));
+                hpx::util::format(
+                    "no %1% mapping bounds are specified",
+                    spec_type::type_name(fmt.first.type_)));
             return;
         }
 
@@ -737,10 +738,10 @@ namespace hpx { namespace threads { namespace detail
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "decode_compact_distribution",
-                            boost::str(boost::format(
+                            hpx::util::format(
                                 "affinity mask for thread %1% has "
-                                "already been set"
-                            ) % num_thread));
+                                "already been set",
+                                num_thread));
                         return;
                     }
                     affinities[num_thread] = t.init_thread_affinity_mask(
@@ -773,10 +774,10 @@ namespace hpx { namespace threads { namespace detail
                 {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "decode_scatter_distribution",
-                        boost::str(boost::format(
+                        hpx::util::format(
                             "affinity mask for thread %1% has "
-                            "already been set"
-                        ) % num_thread));
+                            "already been set",
+                            num_thread));
                     return;
                 }
 
@@ -819,18 +820,18 @@ namespace hpx { namespace threads { namespace detail
         // Iterate over the cores and assigned pus per core. this additional
         // loop is needed so that we have consecutive worker thread numbers
         std::size_t num_thread = 0;
-        for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
+        for (std::size_t num_core = 0; num_core != num_cores; ++num_core)
         {
-            for(std::size_t num_pu = 0; num_pu != num_pus_cores[num_core]; ++num_pu)
+            for (std::size_t num_pu = 0; num_pu != num_pus_cores[num_core]; ++num_pu)
             {
                 if (any(affinities[num_thread]))
                 {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "decode_balanced_distribution",
-                        boost::str(boost::format(
+                        hpx::util::format(
                             "affinity mask for thread %1% has "
-                            "already been set"
-                        ) % num_thread));
+                            "already been set",
+                            num_thread));
                     return;
                 }
                 num_pus[num_thread] = t.get_pu_number(num_core + used_cores, num_pu);
@@ -838,6 +839,80 @@ namespace hpx { namespace threads { namespace detail
                     num_core + used_cores, num_pu);
                 ++num_thread;
             }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void decode_numabalanced_distribution(hwloc_topology_info& t,
+        std::vector<mask_type>& affinities,
+        std::size_t used_cores, std::size_t max_cores,
+        std::vector<std::size_t>& num_pus, error_code& ec)
+    {
+        std::size_t num_threads = affinities.size();
+        num_pus.resize(num_threads);
+        // numa nodes
+        std::size_t num_numas = (std::max)(std::size_t(1),t.get_number_of_numa_nodes());
+        std::vector<std::size_t> num_cores_numa(num_numas, 0);
+        std::vector<std::size_t> num_threads_numa(num_numas, 0);
+        std::size_t cores_t = 0;
+        for (std::size_t n=0; n<num_numas; ++n) {
+            num_cores_numa[n] = t.get_number_of_numa_node_cores(n);
+            cores_t += num_cores_numa[n];
+        }
+
+        // how many threads should go on each domain
+        std::size_t cores_t2 = 0;
+        for (std::size_t n=0; n<num_numas; ++n) {
+            std::size_t temp =
+                std::floor(0.5 +double(num_threads)*num_cores_numa[n]/cores_t);
+            // due to rounding up, we might have too many threads
+            if ((cores_t2+temp)>num_threads)
+                temp = num_threads - cores_t2;
+            cores_t2 += temp;
+            num_threads_numa[n] = temp;
+        }
+
+        // assign threads to cores on each numa domain
+        std::size_t num_thread = 0;
+        std::size_t offset = 0;
+        for (std::size_t n = 0; n != num_numas; ++n)
+        {
+            std::vector<std::size_t> num_pus_cores(num_cores_numa[n], 0);
+
+            // iterate once and count pus/core
+            for (std::size_t thrd = 0; thrd != num_threads_numa[n]; /**/)
+            {
+                for(std::size_t c = 0; c != num_cores_numa[n]; ++c)
+                {
+                    num_pus_cores[c]++;
+                    if (++thrd == num_threads_numa[n])
+                        break;
+                }
+            }
+
+            // Iterate over the cores and assigned pus per core. this additional
+            // loop is needed so that we have consecutive worker thread numbers
+            for (std::size_t num_core = 0; num_core != num_cores_numa[n]; ++num_core)
+            {
+                for (std::size_t num_pu = 0; num_pu != num_pus_cores[num_core]; ++num_pu)
+                {
+                    if (any(affinities[num_thread]))
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter,
+                            "decode_numabalanced_distribution",
+                            hpx::util::format(
+                                "affinity mask for thread %1% has "
+                                "already been set",
+                                num_thread));
+                        return;
+                    }
+                    num_pus[num_thread] = t.get_pu_number(num_core + used_cores, num_pu);
+                    affinities[num_thread] = t.init_thread_affinity_mask(
+                        num_core + used_cores + offset, num_pu);
+                    ++num_thread;
+                }
+            }
+            offset += num_cores_numa[n];
         }
     }
 
@@ -861,6 +936,11 @@ namespace hpx { namespace threads { namespace detail
 
         case balanced:
             decode_balanced_distribution(t, affinities, used_cores, max_cores,
+                num_pus, ec);
+            break;
+
+        case numa_balanced:
+            decode_numabalanced_distribution(t, affinities, used_cores, max_cores,
                 num_pus, ec);
             break;
 
@@ -909,9 +989,9 @@ namespace hpx { namespace threads
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "parse_affinity_options",
-                            boost::str(boost::format(
-                                "bind specification (%1%) is ill formatted"
-                            ) % spec));
+                            hpx::util::format(
+                                "bind specification (%1%) is ill formatted",
+                                spec));
                         return;
                     }
 
@@ -919,9 +999,9 @@ namespace hpx { namespace threads
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "parse_affinity_options",
-                            boost::str(boost::format(
-                                "bind specification (%1%) is ill formatted"
-                            ) % spec));
+                            hpx::util::format(
+                                "bind specification (%1%) is ill formatted",
+                                spec));
                         return;
                     }
 
@@ -931,9 +1011,9 @@ namespace hpx { namespace threads
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "parse_affinity_options",
-                            boost::str(boost::format(
-                                "bind specification (%1%) is ill formatted"
-                            ) % spec));
+                            hpx::util::format(
+                                "bind specification (%1%) is ill formatted",
+                                spec));
                         return;
                     }
 
