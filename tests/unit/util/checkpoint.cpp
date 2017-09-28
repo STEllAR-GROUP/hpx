@@ -123,7 +123,8 @@ int main()
 
     //Test 7
     // test writing to a file
-    // test .load()
+    // test .begin() and .end() iterators
+    //[check_test_4
     std::ofstream test_file_7("checkpoint_test_file.txt");
     std::vector<float> vec7{1.02, 1.03, 1.04, 1.05};
     hpx::future<checkpoint> fut_7=save_checkpoint(vec7);
@@ -147,6 +148,7 @@ int main()
     }
     checkpoint archive7_1(char_vec.data(),char_vec.size());
     restore_checkpoint(archive7_1, vec7_1);
+    //]
 
     HPX_TEST(vec7==vec7_1);
     
@@ -166,6 +168,29 @@ int main()
 
     //Cleanup
     std::remove("checkpoint_test_file.txt");
+
+    //Test 9
+    // test operator<< and operator>> overloads
+    //[check_test_3
+    double a9=1.0, b9=1.1, c9=1.2;
+    std::ofstream test_file_9("test_file_9.txt");
+    hpx::future<checkpoint>f_9=save_checkpoint(a9, b9, c9);
+    test_file_9<<f_9.get();
+    test_file_9.close();
+
+    double a9_1, b9_1, c9_1;
+    std::ifstream test_file_9_1("test_file_9.txt");
+    checkpoint archive9;
+    test_file_9_1>>archive9;
+    restore_checkpoint(archive9, a9_1, b9_1, c9_1);
+    //]
+
+    HPX_TEST(a9==a9_1);
+    HPX_TEST(b9==b9_1);
+    HPX_TEST(c9==c9_1);
+    
+    //Cleanup
+    std::remove("test_file_9.txt");
 
     return 0;
 }

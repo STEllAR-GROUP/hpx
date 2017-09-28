@@ -75,6 +75,52 @@ below:
 
 [check_test_2] 
 
+[h2 Writing to a File]
+
+The core utility of [^checkpoint] is in its ability to make certain
+data persistent. Often this means that the data is needed to be 
+stored in an object, such as a file, for later use. 
+For these cases we have provided two solutions: stream 
+operator overloads and access iterators.
+
+We have created the two stream overleads 
+[^operator<<] and [^operator>>] to stream data
+out of and into [^checkpoint]. You can see an 
+example of the overloads in use below:
+
+[check_test_3] 
+
+This is the primary way to move data into and out of [^checkpoint]s 
+which expose stream operators. It is important to note, however,
+a feature of these functions. Both [^operator<<] and [^operator>>]
+rely on a [^.write()] and a [^.read()] funtion respectively. 
+In order to know how much data to read from the [^std::istream],
+the [^operator<<] will write the size of the [^checkpoint] before writing 
+the [^checkpoint] data. Correspondingly, the [^operator>>] will 
+read the size of the stored data before reading 
+the data into new instance of [^checkpoint]. As long as the 
+user employs the  [^operator<<] and [^operator>>] 
+to stream the data this detail can be ignored.
+If the user tries to use another method to read or write 
+data to the checkpoint with either of the
+overloads she should be aware of this hazardous attribute!
+
+[important  Be careful when mixing [^operator<<] and [^operator>>]
+            with other facilities to read and write to a [^checkpoint].
+            [^operator<<] writes and extra variable and
+            [^operator>>] reads this variable back separatly.
+            Used together the user will not see this and therefore can ignore
+            this detail. However if the user tries to read or write 
+            using another method and then tries to stream that data 
+            back he must take this into account!]
+
+
+Users may also move the data into and out of a [^checkpoint]
+using the exposed [^.begin()] and [^.end()] iterators.
+An example of this usecase is illustrated below.
+
+[check_test_4]
+
 [endsect]
 
 [endsect]

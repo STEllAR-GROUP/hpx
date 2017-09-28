@@ -125,20 +125,6 @@ struct save_funct_obj;
         {
             return data.end();
         }
-/*
-        void load(std::string file_name)
-        {
-            std::ifstream ifs(file_name);
-            if(ifs)                               //Check fstream is open
-            {
-                ifs.seekg(0, ifs.end);
-                int length = ifs.tellg();         //Get length of file
-                ifs.seekg(0, ifs.beg);
-                data.resize(length);
-                ifs.read(data.data(), length);
-            }
-        }
-*/
         size_t size() const
         {
             return data.size();
@@ -147,6 +133,25 @@ struct save_funct_obj;
     };
 
     //Stream Overloads
+    ///////////////////////////////////
+    /// Operator<< Overload
+    ///
+    /// \param ost           Output stream to write to.
+    ///
+    /// \param ckp           Checkpoint to copy from.
+    ///                      
+    /// This overload is the main way to write data from a 
+    /// checkpoint to an object such as a file. Inside
+    /// the function, the size of the checkpoint will
+    /// be written to the stream before the checkpoint's
+    /// data. The operator>> overload uses this to read
+    /// the correct number of bytes. Be mindful of this 
+    /// additional write and read when you use different 
+    /// facitlites to write out or read in data to a 
+    /// checkpoint!
+    ///
+    /// \returns Operator<< returns the ostream object. 
+    ///          
     std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp)
     {
         // Write the size of the checkpoint to the file
@@ -156,6 +161,28 @@ struct save_funct_obj;
         ost.write(ckp.data.data(), ckp.size());
         return ost;
     }
+    ///////////////////////////////////
+    /// Operator>> Overload
+    ///
+    /// \param ist           Input stream to write from.
+    ///
+    /// \param ckp           Checkpoint to write to.
+    ///                      
+    /// This overload is the main way to read in data from a 
+    /// object such as a file to a checkpoint. 
+    /// It is important to note that inside
+    /// the function, the first variable to be read is 
+    /// the size of the checkpoint.
+    /// This size variable is written to 
+    /// to the stream before the checkpoint's
+    /// data in the operator<< overload.
+    /// Be mindful of this 
+    /// additional read and write when you use different 
+    /// facitlites to read in or write out data from a 
+    /// checkpoint!
+    ///
+    /// \returns Operator>> returns the ostream object. 
+    ///          
     std::istream& operator>>(std::istream& ist, checkpoint& ckp)
     {
         // Read in the size of the next checkpoint
