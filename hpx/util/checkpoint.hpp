@@ -4,8 +4,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 /// This header defines the save_checkpoint and restore_checkpoint functions. 
-/// These functions are designed to help HPX application developers checkpoint 
-/// thier applications. Save_checkpoint serializes one or more objects and saves 
+/// These functions are designed to help HPX application developer's checkpoint 
+/// their applications. Save_checkpoint serializes one or more objects and saves 
 /// them as a byte stream. Restore_checkpoint converts the byte stream back into 
 /// instances of the objects.
 //
@@ -147,7 +147,7 @@ struct save_funct_obj;
     /// data. The operator>> overload uses this to read
     /// the correct number of bytes. Be mindful of this 
     /// additional write and read when you use different 
-    /// facitlites to write out or read in data to a 
+    /// facilities to write out or read in data to a 
     /// checkpoint!
     ///
     /// \returns Operator<< returns the ostream object. 
@@ -168,17 +168,17 @@ struct save_funct_obj;
     ///
     /// \param ckp           Checkpoint to write to.
     ///                      
-    /// This overload is the main way to read in data from a 
+    /// This overload is the main way to read in data from an 
     /// object such as a file to a checkpoint. 
     /// It is important to note that inside
     /// the function, the first variable to be read is 
     /// the size of the checkpoint.
     /// This size variable is written to 
-    /// to the stream before the checkpoint's
+    /// the stream before the checkpoint's
     /// data in the operator<< overload.
     /// Be mindful of this 
     /// additional read and write when you use different 
-    /// facitlites to read in or write out data from a 
+    /// facilities to read in or write out data from a 
     /// checkpoint!
     ///
     /// \returns Operator>> returns the ostream object. 
@@ -233,16 +233,16 @@ struct save_funct_obj;
     ///                      must be in the same order that they were
     ///                      inserted into the checkpoint.
     ///
-    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// Save_checkpoint takes any number of objects which a user may wish 
     /// to store and returns a future to a checkpoint object. 
     /// Additionally the function can take a policy as a first object which 
-    /// changes its behaviour depending on the policy passed to it. Most
+    /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a 
     /// checkpoint object.
     ///
     /// \returns Save_checkpoint returns a future to a checkpoint with one 
-    ///          exeption: if you pass hpx::launch::sync as the first
-    ///          argument. In this case save_checkpiont will simply return
+    ///          exception: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpoint will simply return
     ///          a checkpoint.
 
     template <typename T
@@ -273,7 +273,7 @@ struct save_funct_obj;
     ///                      to be serialized and placed into a 
     ///                      checkpoint object.
     /// 
-    /// \param c             Takes a pre-initialized checkpint to copy
+    /// \param c             Takes a pre-initialized checkpoint to copy
     ///                      data into.
     ///
     /// \param t             A container to restore.
@@ -282,16 +282,16 @@ struct save_funct_obj;
     ///                      must be in the same order that they were
     ///                      inserted into the checkpoint.
     ///
-    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// Save_checkpoint takes any number of objects which a user may wish 
     /// to store and returns a future to a checkpoint object. 
     /// Additionally the function can take a policy as a first object which 
-    /// changes its behaviour depending on the policy passed to it. Most
+    /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a 
     /// checkpoint object.
     ///
     /// \returns Save_checkpoint returns a future to a checkpoint with one 
-    ///          exeption: if you pass hpx::launch::sync as the first
-    ///          argument. In this case save_checkpiont will simply return
+    ///          exception: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpoint will simply return
     ///          a checkpoint.
 
     template <typename T, typename... Ts>
@@ -329,16 +329,16 @@ struct save_funct_obj;
     ///                      must be in the same order that they were
     ///                      inserted into the checkpoint.
     ///
-    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// Save_checkpoint takes any number of objects which a user may wish 
     /// to store and returns a future to a checkpoint object. 
     /// Additionally the function can take a policy as a first object which 
-    /// changes its behaviour depending on the policy passed to it. Most
+    /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a 
     /// checkpoint object.
     ///
     /// \returns Save_checkpoint returns a future to a checkpoint with one 
-    ///          exeption: if you pass hpx::launch::sync as the first
-    ///          argument. In this case save_checkpiont will simply return
+    ///          exception: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpoint will simply return
     ///          a checkpoint.
 
     template <typename T, typename... Ts>
@@ -371,7 +371,7 @@ struct save_funct_obj;
     ///                      to change the way the function is launched
     ///                      i.e. async, sync, etc.
     ///
-    /// \param c             Takes a pre-initialized checkpint to copy
+    /// \param c             Takes a pre-initialized checkpoint to copy
     ///                      data into.
     ///
     /// \param t             A container to restore.
@@ -380,16 +380,16 @@ struct save_funct_obj;
     ///                      must be in the same order that they were
     ///                      inserted into the checkpoint.
     ///
-    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// Save_checkpoint takes any number of objects which a user may wish 
     /// to store and returns a future to a checkpoint object. 
     /// Additionally the function can take a policy as a first object which 
-    /// changes its behaviour depending on the policy passed to it. Most
+    /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a 
     /// checkpoint object.
     ///
     /// \returns Save_checkpoint returns a future to a checkpoint with one 
-    ///          exeption: if you pass hpx::launch::sync as the first
-    ///          argument. In this case save_checkpiont will simply return
+    ///          exception: if you pass hpx::launch::sync as the first
+    ///          argument. In this case save_checkpoint will simply return
     ///          a checkpoint.
 
     template <typename T, typename... Ts>
@@ -431,10 +431,10 @@ struct save_funct_obj;
     ///                      must be in the same order that they were
     ///                      inserted into the checkpoint.
     ///
-    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// Save_checkpoint takes any number of objects which a user may wish 
     /// to store and returns a future to a checkpoint object. 
     /// Additionally the function can take a policy as a first object which 
-    /// changes its behaviour depending on the policy passed to it. Most
+    /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a 
     /// checkpoint object.
     ///
@@ -477,7 +477,7 @@ struct save_funct_obj;
     /// 
     /// \param sync_p        hpx::launch::sync_policy
     ///
-    /// \param c             Takes a pre-initialized checkpint to copy
+    /// \param c             Takes a pre-initialized checkpoint to copy
     ///                      data into.
     ///
     /// \param t             A container to restore.
@@ -486,10 +486,10 @@ struct save_funct_obj;
     ///                      must be in the same order that they were
     ///                      inserted into the checkpoint.
     ///
-    /// Save_checkpoint takes a any number of objects which a user may wish 
+    /// Save_checkpoint takes any number of objects which a user may wish 
     /// to store and returns a future to a checkpoint object. 
     /// Additionally the function can take a policy as a first object which 
-    /// changes its behaviour depending on the policy passed to it. Most
+    /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a 
     /// checkpoint object.
     ///
@@ -524,9 +524,9 @@ struct save_funct_obj;
     ///
     /// \tparam T           A container to restore.
     ///                     
-    /// \tparam Ts          Other continters to restore. Containers 
+    /// \tparam Ts          Other containers to restore. Containers 
     ///                     must be in the same order that they were
-    ///                     inserted into the checkpiont.
+    ///                     inserted into the checkpoint.
     ///                     
     /// \param c            The checkpoint to restore.
     ///
