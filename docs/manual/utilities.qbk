@@ -18,12 +18,12 @@ This practice provides resiliency and potential restart points in code.
 We have developed the concept of a [^checkpoint] to support this 
 use case.
 
-Found in [^hpx/util/checkpoint.hpp] [^checkpoint]s are defined as 
+Found in [^hpx/util/checkpoint.hpp], [^checkpoint]s are defined as 
 objects which hold a serialized version of an object or set of objects
 at a particular moment in time.
 This representation can be stored in memory for later use or it can 
 be written to disk for storage and/or recovery at a later point.
-In order to create and fill this object with its data we use a 
+In order to create and fill this object with data we use a 
 function called [^save_checkpoint]. In code the function looks
 like this:
 
@@ -58,7 +58,7 @@ policies passed to [^save_checkpoint] will return a [^future] to a [^checkpoint]
 Sometimes [^checkpoint]s must be declared before they are used.
 [^save_checkpoint] allows users to move pre-created [^checkpoint]s into
 the function as long as they are the first container passing into the 
-function (In the case where a launch policy is used the [^checkpoint]
+function (In the case where a launch policy is used, the [^checkpoint]
 will immediately follow the launch policy). An example of these features
 can be found below:
 
@@ -66,7 +66,7 @@ can be found below:
 [check_test_1]
 
 Now that we can create [^checkpoint]s we now must be able to restore 
-the objects they contain in memory. This is accomplished by the 
+the objects they contain into memory. This is accomplished by the 
 function [^restore_checkpoint]. This function takes a [^checkpoint]
 and fills its data into the containers it is provided. It is important
 to remember that the containers must be ordered in the same way 
@@ -90,9 +90,11 @@ example of the overloads in use below:
 
 [check_test_3] 
 
-This is the primary way to move data into and out of [^checkpoint]s 
-which expose stream operators. It is important to note, however,
-a feature of these functions. Both [^operator<<] and [^operator>>]
+This is the primary way to move data into and out of a [^checkpoint]. 
+It is important to note, however, that users should be cautious 
+when using a stream operator to load data an another function to 
+remove it (or vice versa).
+Both [^operator<<] and [^operator>>]
 rely on a [^.write()] and a [^.read()] function respectively. 
 In order to know how much data to read from the [^std::istream],
 the [^operator<<] will write the size of the [^checkpoint] before writing 
@@ -101,18 +103,13 @@ read the size of the stored data before reading
 the data into new instance of [^checkpoint]. As long as the 
 user employs the  [^operator<<] and [^operator>>] 
 to stream the data this detail can be ignored.
-If the user tries to use another method to read or write 
-data to the checkpoint with either of the
-overloads she should be aware of this hazardous attribute!
 
 [important  Be careful when mixing [^operator<<] and [^operator>>]
             with other facilities to read and write to a [^checkpoint].
             [^operator<<] writes and extra variable and
             [^operator>>] reads this variable back separately.
-            Used together the user will not see this and therefore can ignore
-            this detail. However if the user tries to read or write 
-            using another method and then tries to stream that data 
-            back he must take this into account!]
+            Used together the user will not encounter any issues 
+            and can safely ignore this detail.]
 
 
 Users may also move the data into and out of a [^checkpoint]
