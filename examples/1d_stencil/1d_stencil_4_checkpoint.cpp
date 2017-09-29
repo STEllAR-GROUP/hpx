@@ -14,8 +14,8 @@
 // enables tuning the performance for the optimal grain size of the
 // computation. This example is still fully local but demonstrates nice
 // scalability on SMP machines.
-// 
-// In this variation of stencil we use the save_checkpoint and 
+//
+// In this variation of stencil we use the save_checkpoint and
 // revive_checkpint functions to back up the state of the applicaton
 // every n timesteps.
 //
@@ -165,8 +165,8 @@ struct backup
 
     void write()
     {
-        hpx::util::checkpoint archive_data = 
-            hpx::util::save_checkpoint(hpx::launch::sync 
+        hpx::util::checkpoint archive_data =
+            hpx::util::save_checkpoint(hpx::launch::sync
                                   , bin);
         std::ofstream file_archive(file_name_);
         if (file_archive.is_open())
@@ -186,7 +186,7 @@ struct backup
         hpx::util::checkpoint temp_archive;
         std::ifstream ist(file_name_);
         ist>>temp_archive;
-        hpx::util::restore_checkpoint(temp_archive, bin);        
+        hpx::util::restore_checkpoint(temp_archive, bin);
         for (std::size_t i = 0; i < U[0].size(); i++)
         {
             partition_data temp(nx, double(i));
