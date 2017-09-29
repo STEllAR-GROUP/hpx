@@ -3,9 +3,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// This example tests the functionality of save_checkpoint and 
+// This example tests the functionality of save_checkpoint and
 // restore_checkpoint.
 //
+
+#include <fstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/checkpoint.hpp>
@@ -37,7 +42,7 @@ int main()
                                          , str
                                          , vec);
     //]
-    //[check_test_2 
+    //[check_test_2
     char character2;
     int integer2;
     float flt2;
@@ -98,7 +103,7 @@ int main()
                                         , test_vec);
     std::vector<int> test_vec2;
     restore_checkpoint(archive4, test_vec2);
-    
+
     HPX_TEST(test_vec==test_vec2);
 
     //Test 5
@@ -111,7 +116,7 @@ int main()
         save_checkpoint(std::move(archive5), test_vec2_future);
     hpx::future<std::vector<int>> test_vec3_future;
     restore_checkpoint(f_check.get(), test_vec3_future);
-    
+
     HPX_TEST(test_vec2 == test_vec3_future.get());
 
     //Test 6
@@ -151,7 +156,7 @@ int main()
     //]
 
     HPX_TEST(vec7==vec7_1);
-    
+
     //Test 8
     // test policies
     int a8=10, b8=20, c8=30;
@@ -188,7 +193,7 @@ int main()
     HPX_TEST(a9==a9_1);
     HPX_TEST(b9==b9_1);
     HPX_TEST(c9==c9_1);
-    
+
     //Cleanup
     std::remove("test_file_9.txt");
 
