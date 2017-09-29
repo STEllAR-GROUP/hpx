@@ -15,10 +15,10 @@
 #if !defined(CHECKPOINT_HPP_07262017)
 #define CHECKPOINT_HPP_07262017
 
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <cstddef>
 #include <fstream>
@@ -29,19 +29,16 @@
 #include <utility>
 #include <vector>
 
-namespace hpx
-{
-namespace util
-{
+namespace hpx {
+namespace util {
 
-// Forward declarations
-class checkpoint;
-std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp);
-std::istream& operator>>(std::istream& ist, checkpoint& ckp);
-namespace detail
-{
-struct save_funct_obj;
-}
+    // Forward declarations
+    class checkpoint;
+    std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp);
+    std::istream& operator>>(std::istream& ist, checkpoint& ckp);
+    namespace detail {
+        struct save_funct_obj;
+    }
 
     ///////////////////////////////////
     /// Checkpoint Object
@@ -54,7 +51,8 @@ struct save_funct_obj;
     {
         std::vector<char> data;
 
-        friend std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp);
+        friend std::ostream& operator<<(
+            std::ostream& ost, checkpoint const& ckp);
         friend std::istream& operator>>(std::istream& ist, checkpoint& ckp);
         //Serialization Definition
         friend class hpx::serialization::access;
@@ -65,8 +63,8 @@ struct save_funct_obj;
         };
         friend struct detail::save_funct_obj;
         template <typename T, typename... Ts>
-        friend void restore_checkpoint(checkpoint const& c, T& t, Ts& ... ts);
- 
+        friend void restore_checkpoint(checkpoint const& c, T& t, Ts&... ts);
+
     public:
         checkpoint() = default;
         checkpoint(checkpoint const& c)
@@ -74,7 +72,7 @@ struct save_funct_obj;
         {
         }
         checkpoint(checkpoint&& c)
-         : data(std::move(c.data))
+          : data(std::move(c.data))
         {
         }
         ~checkpoint() = default;
@@ -82,7 +80,7 @@ struct save_funct_obj;
         //Other Constructors
         checkpoint(char* stream, std::size_t count)
         {
-            for (std::size_t i=0;i<count;i++)
+            for (std::size_t i = 0; i < count; i++)
             {
                 data.push_back(*stream);
                 stream++;
@@ -91,7 +89,7 @@ struct save_funct_obj;
 
         checkpoint& operator=(checkpoint const& c)
         {
-            if (&c!=this)
+            if (&c != this)
             {
                 data = c.data;
             }
@@ -99,7 +97,7 @@ struct save_funct_obj;
         }
         checkpoint& operator=(checkpoint&& c)
         {
-            if (&c!=this)
+            if (&c != this)
             {
                 data = std::move(c.data);
             }
@@ -129,7 +127,6 @@ struct save_funct_obj;
         {
             return data.size();
         }
-
     };
 
     //Stream Overloads
@@ -151,12 +148,12 @@ struct save_funct_obj;
     /// checkpoint!
     ///
     /// \returns Operator<< returns the ostream object.
-    /// 
+    ///
     std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp)
     {
         // Write the size of the checkpoint to the file
         int64_t size = ckp.size();
-        ost.write(reinterpret_cast<char const *>(&size), sizeof(int64_t));
+        ost.write(reinterpret_cast<char const*>(&size), sizeof(int64_t));
         // Write the file to the stream
         ost.write(ckp.data.data(), ckp.size());
         return ost;
@@ -167,7 +164,7 @@ struct save_funct_obj;
     /// \param ist           Input stream to write from.
     ///
     /// \param ckp           Checkpoint to write to.
-    /// 
+    ///
     /// This overload is the main way to read in data from an
     /// object such as a file to a checkpoint.
     /// It is important to note that inside
@@ -182,12 +179,12 @@ struct save_funct_obj;
     /// checkpoint!
     ///
     /// \returns Operator>> returns the ostream object.
-    /// 
+    ///
     std::istream& operator>>(std::istream& ist, checkpoint& ckp)
     {
         // Read in the size of the next checkpoint
         int64_t length;
-        ist.read(reinterpret_cast<char *>(&length), sizeof(int64_t));
+        ist.read(reinterpret_cast<char*>(&length), sizeof(int64_t));
         ckp.data.resize(length);
         // Read in the next checkpoint
         ist.read(ckp.data.data(), length);
@@ -195,22 +192,22 @@ struct save_funct_obj;
     }
 
     //Function object for save_checkpoint
-    namespace detail
-    {
+    namespace detail {
         struct save_funct_obj
-     {
-         template <typename... Ts>
-         checkpoint operator()(checkpoint&& c, Ts&&... ts) const
-         {
-             //Create serialization archive from checkpoint data member
-             hpx::serialization::output_archive ar(c.data);
-             //Serialize data
-             int const sequencer[] = { //Trick to expand the variable pack
-                 (ar << ts, 0)...};    //Takes advantage of the comma operator
-             (void)sequencer;          // Suppress unused param. warnings
-             return c;
-         }
-     };
+        {
+            template <typename... Ts>
+            checkpoint operator()(checkpoint&& c, Ts&&... ts) const
+            {
+                //Create serialization archive from checkpoint data member
+                hpx::serialization::output_archive ar(c.data);
+                //Serialize data
+                int const sequencer[] = {//Trick to expand the variable pack
+                    (ar << ts,
+                        0)...};      //Takes advantage of the comma operator
+                (void) sequencer;    // Suppress unused param. warnings
+                return c;
+            }
+        };
     }
 
     ///////////////////////////////////
@@ -222,7 +219,7 @@ struct save_funct_obj;
     /// \tparam Ts           More containers passed to save_checkpoint
     ///                      to be serialized and placed into a
     ///                      checkpoint object.
-    /// 
+    ///
     /// \tparam U            This parameter is used to make sure that T
     ///                      is not a launch policy or a checkpoint. This
     ///                      forces the compiler to choose the correct overload.
@@ -245,24 +242,20 @@ struct save_funct_obj;
     ///          argument. In this case save_checkpoint will simply return
     ///          a checkpoint.
 
-    template <typename T
-            , typename... Ts
-            , typename U = typename std::enable_if<
-                    !hpx::traits::is_launch_policy<T>::value &&
-                    !std::is_same<typename std::decay<T>::type,checkpoint>::value
-                >::type
-             >
+    template <typename T, typename... Ts,
+        typename U =
+            typename std::enable_if<!hpx::traits::is_launch_policy<T>::value &&
+                !std::is_same<typename std::decay<T>::type,
+                    checkpoint>::value>::type>
     hpx::future<checkpoint> save_checkpoint(T&& t, Ts&&... ts)
     {
         {
-            return hpx::dataflow(
-                detail::save_funct_obj()
-              , std::move(checkpoint())
-              , std::forward<T>(t)
-              , std::forward<Ts>(ts)...);
+            return hpx::dataflow(detail::save_funct_obj(),
+                std::move(checkpoint()), std::forward<T>(t),
+                std::forward<Ts>(ts)...);
         }
     }
- 
+
     ///////////////////////////////////
     /// Save_checkpoint - Take a pre-initialized checkpoint
     ///
@@ -295,20 +288,14 @@ struct save_funct_obj;
     ///          a checkpoint.
 
     template <typename T, typename... Ts>
-    hpx::future<checkpoint> save_checkpoint(
-          checkpoint&& c
-        , T&& t
-        , Ts&&... ts)
+    hpx::future<checkpoint> save_checkpoint(checkpoint&& c, T&& t, Ts&&... ts)
     {
         {
-            return hpx::dataflow(
-                detail::save_funct_obj()
-              , std::move(c)
-              , std::forward<T>(t)
-              , std::forward<Ts>(ts)...);
+            return hpx::dataflow(detail::save_funct_obj(), std::move(c),
+                std::forward<T>(t), std::forward<Ts>(ts)...);
         }
     }
- 
+
     ///////////////////////////////////
     /// Save_checkpoint - Policy overload
     ///
@@ -342,18 +329,12 @@ struct save_funct_obj;
     ///          a checkpoint.
 
     template <typename T, typename... Ts>
-    hpx::future<checkpoint> save_checkpoint(
-          hpx::launch p
-        , T&& t
-        , Ts&&... ts)
+    hpx::future<checkpoint> save_checkpoint(hpx::launch p, T&& t, Ts&&... ts)
     {
         {
-            return hpx::dataflow(
-                  p
-                , detail::save_funct_obj()
-                , std::move(checkpoint())
-                , std::forward<T>(t)
-                , std::forward<Ts>(ts)...);
+            return hpx::dataflow(p, detail::save_funct_obj(),
+                std::move(checkpoint()), std::forward<T>(t),
+                std::forward<Ts>(ts)...);
         }
     }
 
@@ -394,18 +375,11 @@ struct save_funct_obj;
 
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(
-          hpx::launch p
-        , checkpoint&& c
-        , T&& t
-        , Ts&&... ts)
+        hpx::launch p, checkpoint&& c, T&& t, Ts&&... ts)
     {
         {
-            return hpx::dataflow(
-                  p
-                , detail::save_funct_obj()
-                , std::move(c)
-                , std::forward<T>(t)
-                , std::forward<Ts>(ts)...);
+            return hpx::dataflow(p, detail::save_funct_obj(), std::move(c),
+                std::forward<T>(t), std::forward<Ts>(ts)...);
         }
     }
 
@@ -442,25 +416,16 @@ struct save_funct_obj;
     ///          will return a checkpoint which contains the serialized
     ///          values checkpoint.
 
-    template <typename T
-            , typename... Ts
-            , typename U = typename std::enable_if<
-                    !std::is_same<typename std::decay<T>::type,checkpoint>::value
-                >::type
-             >
+    template <typename T, typename... Ts,
+        typename U = typename std::enable_if<!std::is_same<
+            typename std::decay<T>::type, checkpoint>::value>::type>
     checkpoint save_checkpoint(
-          hpx::launch::sync_policy sync_p
-        , T&& t
-        , Ts&&... ts)
+        hpx::launch::sync_policy sync_p, T&& t, Ts&&... ts)
     {
         {
-            hpx::future<checkpoint> f_chk =
-                hpx::dataflow(
-                      sync_p
-                    , detail::save_funct_obj()
-                    , std::move(checkpoint())
-                    , std::forward<T>(t)
-                    , std::forward<Ts>(ts)...);
+            hpx::future<checkpoint> f_chk = hpx::dataflow(sync_p,
+                detail::save_funct_obj(), std::move(checkpoint()),
+                std::forward<T>(t), std::forward<Ts>(ts)...);
             return f_chk.get();
         }
     }
@@ -498,19 +463,12 @@ struct save_funct_obj;
     ///          values checkpoint.
     template <typename T, typename... Ts>
     checkpoint save_checkpoint(
-          hpx::launch::sync_policy sync_p
-        , checkpoint&& c
-        , T&& t
-        , Ts&&... ts)
+        hpx::launch::sync_policy sync_p, checkpoint&& c, T&& t, Ts&&... ts)
     {
         {
             hpx::future<checkpoint> f_chk =
-                hpx::dataflow(
-                      sync_p
-                    , detail::save_funct_obj()
-                    , std::move(c)
-                    , std::forward<T>(t)
-                    , std::forward<Ts>(ts)...);
+                hpx::dataflow(sync_p, detail::save_funct_obj(), std::move(c),
+                    std::forward<T>(t), std::forward<Ts>(ts)...);
             return f_chk.get();
         }
     }
@@ -523,11 +481,11 @@ struct save_funct_obj;
     /// as they were placed in save_checkpoint).
     ///
     /// \tparam T           A container to restore.
-    /// 
+    ///
     /// \tparam Ts          Other containers to restore. Containers
     ///                     must be in the same order that they were
     ///                     inserted into the checkpoint.
-    /// 
+    ///
     /// \param c            The checkpoint to restore.
     ///
     /// \param t            A container to restore.
@@ -538,22 +496,21 @@ struct save_funct_obj;
     ///
     /// \returns Restore_checkpoint returns void.
     template <typename T, typename... Ts>
-    void restore_checkpoint(checkpoint const& c, T& t, Ts& ... ts)
+    void restore_checkpoint(checkpoint const& c, T& t, Ts&... ts)
     {
         {
             //Create seriaalization archive
             hpx::serialization::input_archive ar(c.data, c.size());
- 
+
             //De-serialize data
             ar >> t;
-            int const sequencer[] = {//Trick to exand the variable pack
-               (ar >> ts, 0)...};    //Takes advantage of the comma operator
-            (void)sequencer;         //Suppress unused param. warnings
+            int const sequencer[] = { //Trick to exand the variable pack
+                (ar >> ts, 0)...};    //Takes advantage of the comma operator
+            (void) sequencer;         //Suppress unused param. warnings
         }
     }
 
-} //End Util Namespace
-} //End HPX Namespace
+}    //End Util Namespace
+}    //End HPX Namespace
 
 #endif
-

@@ -23,8 +23,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/util/checkpoint.hpp>
 
 #include <boost/range/irange.hpp>
@@ -154,28 +154,25 @@ struct backup
       , file_name_(old.file_name_)
     {
     }
-    ~backup()
-    {
-    }
+    ~backup() {}
 
     void save(partition_data const& status, std::size_t index)
     {
-        bin[index]=hpx::util::save_checkpoint(hpx::launch::sync, status);
+        bin[index] = hpx::util::save_checkpoint(hpx::launch::sync, status);
     }
 
     void write()
     {
         hpx::util::checkpoint archive_data =
-            hpx::util::save_checkpoint(hpx::launch::sync
-                                  , bin);
+            hpx::util::save_checkpoint(hpx::launch::sync, bin);
         std::ofstream file_archive(file_name_);
         if (file_archive.is_open())
         {
-            file_archive<<archive_data;
+            file_archive << archive_data;
         }
         else
         {
-            hpx::cout<<"Error opening file!"<<std::endl;
+            hpx::cout << "Error opening file!" << std::endl;
         }
         file_archive.close();
     }
@@ -185,7 +182,7 @@ struct backup
     {
         hpx::util::checkpoint temp_archive;
         std::ifstream ist(file_name_);
-        ist>>temp_archive;
+        ist >> temp_archive;
         hpx::util::restore_checkpoint(temp_archive, bin);
         for (std::size_t i = 0; i < U[0].size(); i++)
         {
