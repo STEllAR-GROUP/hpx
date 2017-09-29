@@ -216,7 +216,7 @@ Which is equivalent to:
 [//////////////////////////////////////////////////////////////////////////////]
 [section:partitioned_vector_views Using Views]
 
-The use of multi-dimensional arrays is quite common
+The use of multidimensional arrays is quite common
 in the numerical field whether to perform dense matrix operations
 or to process images. It exist many libraries which implement such object
 classes overloading their basic operators (e.g. `+`, `-`, `*`, `()`, etc.).
@@ -228,7 +228,7 @@ Our solution is thus to relax the level of abstraction by allowing
 the user to work not directly on n-dimensionnal data, but on "n-dimensionnal
 collections of 1-D arrays". The use of well-accepted techniques on contiguous
 data is thus preserved at the segment level, and the composability of the
-segments is made possible thanks to multi-dimensional array -inspired
+segments is made possible thanks to multidimensional array-inspired
 access mode.
 
 [section:spmd_block Preface : Why SPMD ?]
@@ -345,7 +345,7 @@ indicating the number of images per locality to create.
 
 [endsect]
 
-[section:spmd_views SPMD Multidimensionnal Views]
+[section:spmd_views SPMD Multidimensional Views]
 Some classes are defined as "container views" when the purpose is to
 observe and/or modify the values of a container using another perspective
 than the one that characterizes the container. For example, the values of an
@@ -375,11 +375,11 @@ By default, the `partitioned_vector` class integrates 1-D views of its segments 
     // Access segment i
     std::vector<double> v = vv[i];
 
-Our views are called "multi-dimensional" in the sense that they generalize
+Our views are called "multidimensional" in the sense that they generalize
 to N dimensions the purpose of `segmented_iterator_traits::segment()` in the 1-D case. Note that
 in a parallel section, the 2-D expression `a(i,j) = b(i,j)` is quite confusing
 because without convention, each of the images invoked will race to execute
-the statement. For this reason, our views are not only multi-dimensional
+the statement. For this reason, our views are not only multidimensional
 but also "spmd-aware".
 
 [note SPMD-awareness: The convention is simple. If an assignment statement
@@ -579,9 +579,9 @@ containers present themselves as a ?smarter? alternative of Fortran arrays but
 there are still no corresponding standardized features similar to the Fortran
 co-indexing approach. We present here an implementation of such features in __hpx__.
 
-[section Preface : Co-array, a segmented container tied to a SPMD Multidimensionnal View]
+[section Preface : Co-array, a segmented container tied to a SPMD Multidimensional View]
 As mentioned before, a co-array is a distributed array whose segments
-are accessible through an array -inspired access mode. We have previously seen
+are accessible through an array-inspired access mode. We have previously seen
 that it is possible to reproduce such access mode using the concept of views.
 Nevertheless, the user must pre-create a segmented container to instanciate this
 view. We illustrate below how a single constructor call can perform those two
