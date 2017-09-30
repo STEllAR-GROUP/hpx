@@ -29,6 +29,8 @@
 
 #include <boost/system/system_error.hpp>
 
+#include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
+
 #include <algorithm>
 #include <atomic>
 #include <numeric>
@@ -127,6 +129,7 @@ namespace hpx { namespace threads { namespace detail
            << "\n"
            << "is running on PUs : \n";
         os << std::hex << HPX_CPU_MASK_PREFIX << used_processing_units_ << '\n';
+        os << "on numa domains : \n" << used_numa_domains_ << '\n';
     }
 
     template <typename Scheduler>

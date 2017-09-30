@@ -92,6 +92,15 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::ostream& operator<<(std::ostream& os, hpx_hwloc_bitmap_wrapper const* bmp)
+    {
+        char buffer[256];
+        hwloc_bitmap_snprintf(buffer, 256, bmp->bmp_);
+        os << buffer;
+        return os;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     mask_type hwloc_topology_info::empty_mask = mask_type();
 
     hwloc_topology_info::hwloc_topology_info()
@@ -1136,10 +1145,7 @@ namespace hpx { namespace threads
         hwloc_bitmap_ptr bitmap,
         hpx_hwloc_membind_policy policy, int flags) const
     {
-        char strp[256];
-        hwloc_bitmap_snprintf((char*)(strp), 256, bitmap->bmp_);
-        std::cout << "Calling hwloc_alloc_membind with bitmap "
-                  << strp << std::endl;
+        std::cout << "Calling hwloc_alloc_membind with bitmap " << bitmap << std::endl;
 
         return hwloc_alloc_membind_nodeset(topo, len, bitmap->bmp_,
             (hwloc_membind_policy_t)(policy), flags);
