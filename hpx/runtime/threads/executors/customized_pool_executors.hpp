@@ -30,6 +30,13 @@ namespace hpx { namespace threads { namespace executors
         public:
             customized_pool_executor(const std::string& pool_name);
 
+            customized_pool_executor(const std::string& pool_name,
+                    thread_stacksize stacksize);
+
+            customized_pool_executor(const std::string& pool_name,
+                    thread_priority priority,
+                    thread_stacksize stacksize = thread_stacksize_default);
+
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
@@ -75,6 +82,10 @@ namespace hpx { namespace threads { namespace executors
             // the scheduler used by this executor
             pool_type& pool_;
 
+            // task properties
+            thread_stacksize stacksize_;
+            thread_priority priority_;
+
             // protect scheduler initialization
             typedef compat::mutex mutex_type;
             mutable mutex_type mtx_;
@@ -85,6 +96,13 @@ namespace hpx { namespace threads { namespace executors
     struct HPX_EXPORT customized_pool_executor : public scheduled_executor
     {
         customized_pool_executor(const std::string& pool_name);
+
+        customized_pool_executor(const std::string& pool_name,
+                thread_stacksize stacksize);
+
+        customized_pool_executor(const std::string& pool_name,
+                thread_priority priority,
+                thread_stacksize stacksize = thread_stacksize_default);
     };
 }}}
 

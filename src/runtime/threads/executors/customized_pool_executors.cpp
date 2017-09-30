@@ -20,12 +20,24 @@ namespace hpx { namespace threads { namespace executors
     {
         customized_pool_executor::customized_pool_executor(
                 std::string const& pool_name)
-          : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
-        {
-            //! FIXME
-            //! throw exception if name = default: tell them to use default_executor
-            //! throw exception if above = nullptr
-        }
+            : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+            , stacksize_(thread_stacksize_default)
+            , priority_(thread_priority_default)
+        {}
+
+        customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+                thread_stacksize stacksize)
+            : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+            , stacksize_(stacksize)
+            , priority_(thread_priority_default)
+        {}
+
+        customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+                thread_priority priority, thread_stacksize stacksize)
+            : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+            , stacksize_(stacksize)
+            , priority_(priority)
+            {}
 
         threads::thread_result_type
         customized_pool_executor::thread_function_nullary(closure_type func)
@@ -62,7 +74,11 @@ namespace hpx { namespace threads { namespace executors
                         &customized_pool_executor::thread_function_nullary),
                     std::move(f)),
                 desc);
+
+            if (stacksize == threads::thread_stacksize_default)
+                stacksize = stacksize_;
             data.stacksize = threads::get_stack_size(stacksize);
+            data.priority = priority_;
 
             threads::thread_id_type id = threads::invalid_thread_id;
             pool_.create_thread(data, id, initial_state, run_now, ec);
@@ -90,7 +106,11 @@ namespace hpx { namespace threads { namespace executors
                         &customized_pool_executor::thread_function_nullary),
                     std::move(f)),
                 desc);
+
+            if (stacksize == threads::thread_stacksize_default)
+                stacksize = stacksize_;
             data.stacksize = threads::get_stack_size(stacksize);
+            data.priority = priority_;
 
             threads::thread_id_type id = threads::invalid_thread_id;
             pool_.create_thread(data, id, suspended, true, ec);
@@ -146,6 +166,18 @@ namespace hpx { namespace threads { namespace executors
     customized_pool_executor::customized_pool_executor(
         const std::string& pool_name)
       : scheduled_executor(new detail::customized_pool_executor(pool_name))
-    {
-    }
+    {}
+
+    customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+            thread_stacksize stacksize)
+        : scheduled_executor(new detail::customized_pool_executor(pool_name, stacksize))
+    {}
+
+    customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+            thread_priority priority, thread_stacksize stacksize)
+        : scheduled_executor(
+              new detail::customized_pool_executor(pool_name, priority, stacksize))
+    {}
+
+
 }}}
