@@ -184,6 +184,11 @@ namespace hpx { namespace resource
         HPX_EXPORT void create_thread_pool(std::string const& name,
             scheduler_function scheduler_creation);
 
+        // allow the default pool to be renamed to something else
+        HPX_EXPORT void set_default_pool_name(std::string const& name);
+
+        HPX_EXPORT const std::string & get_default_pool_name() const;
+
         ///////////////////////////////////////////////////////////////////////
         // Functions to add processing units to thread pools via
         // the pu/core/numa_domain API
