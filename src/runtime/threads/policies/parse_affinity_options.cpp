@@ -850,23 +850,29 @@ namespace hpx { namespace threads { namespace detail
     {
         std::size_t num_threads = affinities.size();
         num_pus.resize(num_threads);
+
         // numa nodes
-        std::size_t num_numas = (std::max)(std::size_t(1),t.get_number_of_numa_nodes());
+        std::size_t num_numas =
+            (std::max)(std::size_t(1), t.get_number_of_numa_nodes());
         std::vector<std::size_t> num_cores_numa(num_numas, 0);
         std::vector<std::size_t> num_threads_numa(num_numas, 0);
         std::size_t cores_t = 0;
-        for (std::size_t n=0; n<num_numas; ++n) {
+        for (std::size_t n = 0; n != num_numas; ++n)
+        {
             num_cores_numa[n] = t.get_number_of_numa_node_cores(n);
             cores_t += num_cores_numa[n];
         }
 
         // how many threads should go on each domain
         std::size_t cores_t2 = 0;
-        for (std::size_t n=0; n<num_numas; ++n) {
-            std::size_t temp =
-                std::floor(0.5 +double(num_threads)*num_cores_numa[n]/cores_t);
+        for (std::size_t n = 0; n != num_numas; ++n)
+        {
+            std::size_t temp = static_cast<std::size_t>(std::floor(0.5 +
+                static_cast<double>(num_threads) * num_cores_numa[n] /
+                    cores_t));
+
             // due to rounding up, we might have too many threads
-            if ((cores_t2+temp)>num_threads)
+            if ((cores_t2 + temp) > num_threads)
                 temp = num_threads - cores_t2;
             cores_t2 += temp;
             num_threads_numa[n] = temp;
@@ -892,9 +898,11 @@ namespace hpx { namespace threads { namespace detail
 
             // Iterate over the cores and assigned pus per core. this additional
             // loop is needed so that we have consecutive worker thread numbers
-            for (std::size_t num_core = 0; num_core != num_cores_numa[n]; ++num_core)
+            for (std::size_t num_core = 0; num_core != num_cores_numa[n];
+                 ++num_core)
             {
-                for (std::size_t num_pu = 0; num_pu != num_pus_cores[num_core]; ++num_pu)
+                for (std::size_t num_pu = 0; num_pu != num_pus_cores[num_core];
+                     ++num_pu)
                 {
                     if (any(affinities[num_thread]))
                     {
@@ -906,7 +914,8 @@ namespace hpx { namespace threads { namespace detail
                                 num_thread));
                         return;
                     }
-                    num_pus[num_thread] = t.get_pu_number(num_core + used_cores, num_pu);
+                    num_pus[num_thread] =
+                        t.get_pu_number(num_core + used_cores, num_pu);
                     affinities[num_thread] = t.init_thread_affinity_mask(
                         num_core + used_cores + offset, num_pu);
                     ++num_thread;
