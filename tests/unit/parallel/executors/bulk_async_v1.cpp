@@ -6,7 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/deferred_call.hpp>
 

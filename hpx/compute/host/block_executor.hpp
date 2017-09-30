@@ -32,7 +32,7 @@
 namespace hpx { namespace compute { namespace host
 {
     /// The block executor can be used to build NUMA aware programs.
-    /// It will distribute work evenly accross the passed targets
+    /// It will distribute work evenly across the passed targets
     ///
     /// \tparam Executor The underlying executor to use
     template <typename Executor =
@@ -40,7 +40,8 @@ namespace hpx { namespace compute { namespace host
     struct block_executor
     {
     public:
-        typedef hpx::parallel::static_chunk_size executor_parameters_type;
+        typedef hpx::parallel::execution::static_chunk_size
+            executor_parameters_type;
 
         block_executor(std::vector<host::target> const& targets)
           : targets_(targets)

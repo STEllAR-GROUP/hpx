@@ -10,8 +10,7 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/execution_policy_fwd.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/executor_parameters.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/executors/sequenced_executor.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
@@ -42,7 +41,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -100,10 +99,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor>::value ||
+                hpx::traits::is_executor_any<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 dataseq_task_policy, Executor,
@@ -240,10 +245,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor_>::value ||
+                hpx::traits::is_executor_any<Executor_>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor_>::value || "
+                "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename rebind_executor<
                 dataseq_task_policy_shim, Executor_,
@@ -328,7 +339,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -385,10 +396,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor>::value ||
+                hpx::traits::is_executor_any<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 dataseq_policy, Executor, executor_parameters_type
@@ -521,10 +538,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor_>::value ||
+                hpx::traits::is_executor_any<Executor_>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor_>::value || "
+                "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename rebind_executor<
                 dataseq_policy_shim, Executor_,
@@ -612,7 +635,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -668,10 +691,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor>::value ||
+                hpx::traits::is_executor_any<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 datapar_task_policy, Executor,
@@ -745,7 +774,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -797,10 +826,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor>::value ||
-                hpx::traits::is_threads_executor<Executor>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor>::value ||
+                hpx::traits::is_executor_any<Executor>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor>::value || "
-                "hpx::traits::is_threads_executor<Executor>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor>::value || "
+                "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename rebind_executor<
                 datapar_policy, Executor, executor_parameters_type
@@ -931,10 +966,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor_>::value ||
+                hpx::traits::is_executor_any<Executor_>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor_>::value || "
+                "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename rebind_executor<
                 datapar_policy_shim, Executor_,
@@ -1074,10 +1115,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 hpx::traits::is_executor<Executor_>::value ||
-                hpx::traits::is_threads_executor<Executor_>::value,
+#endif
+                hpx::traits::is_threads_executor<Executor_>::value ||
+                hpx::traits::is_executor_any<Executor_>::value,
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
                 "hpx::traits::is_executor<Executor_>::value || "
-                "hpx::traits::is_threads_executor<Executor_>::value");
+#endif
+                "hpx::traits::is_threads_executor<Executor_>::value || "
+                "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename rebind_executor<
                 datapar_task_policy_shim, Executor_,

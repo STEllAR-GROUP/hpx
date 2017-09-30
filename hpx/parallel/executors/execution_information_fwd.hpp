@@ -92,14 +92,13 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        // post_at dispatch point
+        // processing_units_count dispatch point
         template <typename Executor, typename Parameters>
         HPX_FORCEINLINE auto
         processing_units_count(Executor && exec, Parameters& params)
         -> decltype(processing_units_count_fn_helper<
                     typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), params)
-            )
+                >::call(0, std::forward<Executor>(exec), params))
         {
             return processing_units_count_fn_helper<
                     typename std::decay<Executor>::type
@@ -131,14 +130,13 @@ namespace hpx { namespace parallel { namespace execution
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        // post_at dispatch point
+        // has_pending_closures dispatch point
         template <typename Executor>
         HPX_FORCEINLINE auto
         has_pending_closures(Executor && exec)
         -> decltype(has_pending_closures_fn_helper<
                     typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec))
-            )
+                >::call(0, std::forward<Executor>(exec)))
         {
             return has_pending_closures_fn_helper<
                     typename std::decay<Executor>::type
@@ -167,17 +165,16 @@ namespace hpx { namespace parallel { namespace execution
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        // post_at dispatch point
+        // get_pu_mask dispatch point
         template <typename Executor>
         HPX_FORCEINLINE auto
         get_pu_mask(Executor && exec, threads::topology& topo,
                 std::size_t thread_num)
         -> decltype(get_pu_mask_fn_helper<
                     typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), topo, thread_num)
-            )
+                >::call(0, std::forward<Executor>(exec), topo, thread_num))
         {
-            return has_pending_closures_fn_helper<
+            return get_pu_mask_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(0, std::forward<Executor>(exec), topo, thread_num);
         }
@@ -198,8 +195,8 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor>
             HPX_FORCEINLINE auto operator()(Executor&& exec,
                 threads::topology& topo, std::size_t thread_num) const
-                -> decltype(
-                    get_pu_mask(std::forward<Executor>(exec), topo, thread_num))
+            -> decltype(get_pu_mask(std::forward<Executor>(exec), topo,
+                    thread_num))
             {
                 return get_pu_mask(
                     std::forward<Executor>(exec), topo, thread_num);
@@ -207,14 +204,13 @@ namespace hpx { namespace parallel { namespace execution
         };
 #endif
 
-        // post_at dispatch point
+        // set_scheduler_mode dispatch point
         template <typename Executor, typename Mode>
         HPX_FORCEINLINE auto
         set_scheduler_mode(Executor && exec, Mode const& mode)
         -> decltype(set_scheduler_mode_fn_helper<
                     typename std::decay<Executor>::type
-                >::call(0, std::forward<Executor>(exec), mode)
-            )
+                >::call(0, std::forward<Executor>(exec), mode))
         {
             return set_scheduler_mode_fn_helper<
                     typename std::decay<Executor>::type
@@ -236,8 +232,7 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename Mode>
             HPX_FORCEINLINE auto operator()(
                 Executor&& exec, Mode const& mode) const
-                -> decltype(
-                    set_scheduler_mode(std::forward<Executor>(exec), mode))
+            -> decltype(set_scheduler_mode(std::forward<Executor>(exec), mode))
             {
                 return set_scheduler_mode(std::forward<Executor>(exec), mode);
             }

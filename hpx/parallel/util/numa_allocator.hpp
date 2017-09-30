@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { namespace util
                     hpx::parallel::for_each(
                         hpx::parallel::execution::par(hpx::parallel::execution::task)
                             .on(executors_[i])
-                            .with(hpx::parallel::static_chunk_size()),
+                            .with(hpx::parallel::execution::static_chunk_size()),
                         begin, end,
 #if defined(HPX_DEBUG)
                         [this, i]

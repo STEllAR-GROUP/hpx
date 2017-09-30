@@ -18,7 +18,7 @@
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -52,8 +52,6 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-                typedef executor_parameter_traits<parameters_type>
-                    parameters_traits;
 
                 // inform parameter traits
                 scoped_executor_parameters<parameters_type> scoped_param(
@@ -66,8 +64,9 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    typedef typename parameters_traits::has_variable_chunk_size
-                        has_variable_chunk_size;
+                    typedef typename execution::extract_has_variable_chunk_size<
+                            parameters_type
+                        >::type has_variable_chunk_size;
 
                     auto shapes =
                         get_bulk_iteration_shape_idx(
@@ -114,8 +113,6 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-                typedef executor_parameter_traits<parameters_type>
-                    parameters_traits;
 
                 typedef scoped_executor_parameters<parameters_type>
                     scoped_executor_parameters;
@@ -133,8 +130,9 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    typedef typename parameters_traits::has_variable_chunk_size
-                        has_variable_chunk_size;
+                    typedef typename execution::extract_has_variable_chunk_size<
+                            parameters_type
+                        >::type has_variable_chunk_size;
 
                     auto shapes =
                         get_bulk_iteration_shape_idx(

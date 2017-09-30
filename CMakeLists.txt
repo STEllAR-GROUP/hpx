@@ -92,6 +92,10 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
+# print initial diagnostics
+hpx_info("CMake version: " ${CMAKE_VERSION})
+hpx_info("HPX version: " ${HPX_VERSION})
+
 ################################################################################
 # Fortran compiler detection
 #

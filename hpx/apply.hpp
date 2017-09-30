@@ -20,8 +20,8 @@
 #include <hpx/util/thread_description.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
 

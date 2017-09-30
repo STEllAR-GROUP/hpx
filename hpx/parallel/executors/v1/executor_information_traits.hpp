@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -22,7 +22,7 @@
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -228,8 +228,9 @@ namespace hpx { namespace parallel { inline namespace v3
     processing_units_count(Executor && exec, Parameters& params)
     {
         typedef typename std::decay<Executor>::type executor_type;
-        return executor_information_traits<executor_type>::processing_units_count(
-            std::forward<Executor>(exec), params);
+        return executor_information_traits<
+            executor_type>::processing_units_count(std::forward<Executor>(exec),
+            params);
     }
 
     // has_pending_closures()

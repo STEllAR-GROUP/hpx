@@ -16,7 +16,7 @@
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
 
 #include <algorithm>
@@ -60,14 +60,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
         FwdIter& begin, std::size_t& count, Stride s, std::false_type)
     {
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_parameters_type
-            parameters_type;
-        typedef executor_parameter_traits<parameters_type> traits;
-
         std::size_t const cores = execution::processing_units_count(
             policy.executor(), policy.parameters());
 
-        std::size_t max_chunks = traits::maximal_number_of_chunks(
+        std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
         HPX_ASSERT(0 != max_chunks);
 
@@ -100,7 +96,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             };
 
         std::size_t chunk_size =
-            traits::get_chunk_size(policy.parameters(),
+            execution::get_chunk_size(policy.parameters(),
                 policy.executor(), test_function, cores, count);
 
         // we should not consider more chunks than we have elements
@@ -133,15 +129,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
         FwdIter& first, std::size_t& count, Stride s, std::true_type)
     {
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_parameters_type
-            parameters_type;
-        typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<FwdIter, std::size_t> tuple_type;
 
         std::size_t const cores = execution::processing_units_count(
             policy.executor(), policy.parameters());
 
-        std::size_t max_chunks = traits::maximal_number_of_chunks(
+        std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
         HPX_ASSERT(0 != max_chunks);
 
@@ -154,7 +147,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         while (count != 0)
         {
             std::size_t chunk_size =
-                traits::get_chunk_size(policy.parameters(),
+                execution::get_chunk_size(policy.parameters(),
                     policy.executor(), [](){ return 0; }, cores, count);
 
             // we should not make chunks smaller than what's determined by the
@@ -216,14 +209,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
         FwdIter begin, std::size_t count, Stride s, std::false_type)
     {
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_parameters_type
-            parameters_type;
-        typedef executor_parameter_traits<parameters_type> traits;
-
         std::size_t const cores = execution::processing_units_count(
             policy.executor(), policy.parameters());
 
-        std::size_t max_chunks = traits::maximal_number_of_chunks(
+        std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
         HPX_ASSERT(0 != max_chunks);
 
@@ -258,7 +247,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             };
 
         std::size_t chunk_size =
-            traits::get_chunk_size(policy.parameters(),
+            execution::get_chunk_size(policy.parameters(),
                 policy.executor(), test_function, cores, count);
 
         // we should not consider more chunks than we have elements
@@ -291,15 +280,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         ExPolicy && policy, std::vector<Future>& workitems, F1 && f1,
         FwdIter first, std::size_t count, Stride s, std::true_type)
     {
-        typedef typename hpx::util::decay<ExPolicy>::type::executor_parameters_type
-            parameters_type;
-        typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<FwdIter, std::size_t, std::size_t> tuple_type;
 
         std::size_t const cores = execution::processing_units_count(
             policy.executor(), policy.parameters());
 
-        std::size_t max_chunks = traits::maximal_number_of_chunks(
+        std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
         HPX_ASSERT(0 != max_chunks);
 
@@ -313,7 +299,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         while (count != 0)
         {
             std::size_t chunk_size =
-                traits::get_chunk_size(policy.parameters(),
+                execution::get_chunk_size(policy.parameters(),
                     policy.executor(), [](){ return 0; }, cores, count);
 
             // we should not make chunks smaller than what's determined by the

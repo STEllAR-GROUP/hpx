@@ -7,17 +7,21 @@
 // hpxinspect:nodeprecatedinclude:boost/ref.hpp
 // hpxinspect:nodeprecatedname:boost::reference_wrapper
 
-#if !defined(HPX_PARALLEL_EXECUTOR_PARAMETERS)
-#define HPX_PARALLEL_EXECUTOR_PARAMETERS
+#if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM)
+#define HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
+
+#include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/execution_parameters_fwd.hpp>
 
 #include <boost/ref.hpp>
 
@@ -27,8 +31,244 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v3
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parallel { namespace execution
 {
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+
+        ///////////////////////////////////////////////////////////////////////
+        // customization point for interface get_chunk_size()
+        template <typename Parameters, typename Enable>
+        struct get_chunk_size_fn_helper
+        {
+            template <typename AnyParameters, typename Executor, typename F>
+            HPX_FORCEINLINE static std::size_t
+            call(hpx::traits::detail::wrap_int, AnyParameters&& params,
+                    Executor&& exec, F&& f, std::size_t cores,
+                    std::size_t num_tasks)
+            {
+                return num_tasks;       // assume sequential execution
+            }
+
+            template <typename AnyParameters, typename Executor, typename F>
+            HPX_FORCEINLINE static auto
+            call(int, AnyParameters&& params, Executor&& exec, F&& f,
+                    std::size_t cores, std::size_t num_tasks)
+            ->  decltype(params.get_chunk_size(params,
+                    std::forward<Executor>(exec), std::forward<F>(f), cores,
+                    num_tasks))
+            {
+                return params.get_chunk_size(params,
+                    std::forward<Executor>(exec), std::forward<F>(f), cores,
+                    num_tasks);
+            }
+
+            template <typename Executor, typename F>
+            HPX_FORCEINLINE static std::size_t
+            call(Parameters& params, Executor&& exec, F&& f,
+                    std::size_t cores, std::size_t num_tasks)
+            {
+                return call(0, params, std::forward<Executor>(exec),
+                    std::forward<F>(f), cores, num_tasks);
+            }
+
+            template <typename AnyParameters, typename Executor, typename F>
+            HPX_FORCEINLINE static std::size_t
+            call(AnyParameters params, Executor&& exec, F&& f,
+                    std::size_t cores, std::size_t num_tasks)
+            {
+                return call(0, static_cast<Parameters&>(params),
+                    std::forward<Executor>(exec), std::forward<F>(f), cores,
+                    num_tasks);
+            }
+        };
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
+
+        ///////////////////////////////////////////////////////////////////////
+        // customization point for interface maximal_number_of_chunks()
+        template <typename Parameters, typename Enable>
+        struct maximal_number_of_chunks_fn_helper
+        {
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static std::size_t
+            call(hpx::traits::detail::wrap_int, AnyParameters &&, Executor &&,
+                std::size_t cores, std::size_t num_tasks)
+            {
+                return 4 * cores;       // assume 4 times the number of cores
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static auto call(int, AnyParameters&& params,
+                    Executor&& exec, std::size_t cores, std::size_t num_tasks)
+            ->  decltype(params.maximal_number_of_chunks(
+                    std::forward<Executor>(exec), cores, num_tasks))
+            {
+                return params.maximal_number_of_chunks(
+                    std::forward<Executor>(exec), cores, num_tasks);
+            }
+
+            template <typename Executor>
+            HPX_FORCEINLINE static std::size_t
+            call(Parameters& params, Executor && exec, std::size_t cores,
+                std::size_t num_tasks)
+            {
+                return call(0, params, std::forward<Executor>(exec), cores,
+                    num_tasks);
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static std::size_t call(AnyParameters params,
+                Executor&& exec, std::size_t cores, std::size_t num_tasks)
+            {
+                return call(static_cast<Parameters&>(params),
+                    std::forward<Executor>(exec), cores, num_tasks);
+            }
+        };
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks);
+
+        ///////////////////////////////////////////////////////////////////////
+        // customization point for interface reset_thread_distribution()
+        template <typename Parameters, typename Enable>
+        struct reset_thread_distribution_fn_helper
+        {
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static void call(
+                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
+            {
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static auto call(int, AnyParameters && params,
+                    Executor && exec)
+            ->  decltype(params.reset_thread_distribution(
+                    std::forward<Executor>(exec)))
+            {
+                params.reset_thread_distribution(std::forward<Executor>(exec));
+            }
+
+            template <typename Executor>
+            HPX_FORCEINLINE static void call(Parameters& params,
+                Executor && exec)
+            {
+                call(0, params, std::forward<Executor>(exec));
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static void call(AnyParameters params,
+                Executor && exec)
+            {
+                call(static_cast<Parameters&>(params),
+                    std::forward<Executor>(exec));
+            }
+        };
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution);
+
+        ///////////////////////////////////////////////////////////////////////
+        // customization point for interface count_processing_units()
+        template <typename Parameters, typename Enable>
+        struct count_processing_units_fn_helper
+        {
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static std::size_t call(hpx::traits::detail::wrap_int,
+                AnyParameters && params)
+            {
+                return hpx::get_os_thread_count();
+            }
+
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static auto call(int, AnyParameters && params)
+            ->  decltype(params.processing_units_count())
+            {
+                return params.processing_units_count();
+            }
+
+            HPX_FORCEINLINE static std::size_t call(Parameters& params)
+            {
+                return call(0, params);
+            }
+
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static std::size_t call(AnyParameters params)
+            {
+                return call(static_cast<Parameters&>(params));
+            }
+        };
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(count_processing_units);
+
+        ///////////////////////////////////////////////////////////////////////
+        // customization point for interface mark_begin_execution()
+        template <typename Parameters, typename Enable>
+        struct mark_begin_execution_fn_helper
+        {
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
+                AnyParameters &&)
+            {
+            }
+
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static auto call(int, AnyParameters && params)
+            ->  decltype(params.mark_begin_execution())
+            {
+                params.mark_begin_execution();
+            }
+
+            HPX_FORCEINLINE static void call(Parameters& params)
+            {
+                call(0, params);
+            }
+
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static void call(AnyParameters params)
+            {
+                call(static_cast<Parameters&>(params));
+            }
+        };
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution);
+
+        ///////////////////////////////////////////////////////////////////////
+        // customization point for interface mark_end_execution()
+        template <typename Parameters, typename Enable>
+        struct mark_end_execution_fn_helper
+        {
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
+                AnyParameters &&)
+            {
+            }
+
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static auto call(int, AnyParameters && params)
+            ->  decltype(params.mark_end_execution())
+            {
+                params.mark_end_execution();
+            }
+
+            HPX_FORCEINLINE static void call(Parameters& params)
+            {
+                call(0, params);
+            }
+
+            template <typename AnyParameters>
+            HPX_FORCEINLINE static void call(AnyParameters params)
+            {
+                call(static_cast<Parameters&>(params));
+            }
+        };
+
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution);
+
+        /// \endcond
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         /// \cond NOINTERNAL
@@ -84,10 +324,10 @@ namespace hpx { namespace parallel { inline namespace v3
 
             template <typename Executor>
             HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
-                Executor && exec, std::size_t cores)
+                Executor && exec, std::size_t cores, std::size_t num_tasks)
             {
                 return wrap_.get().maximal_number_of_chunks(
-                    std::forward<Executor>(exec), cores);
+                    std::forward<Executor>(exec), cores, num_tasks);
             }
 
         private:
@@ -111,10 +351,10 @@ namespace hpx { namespace parallel { inline namespace v3
 
             template <typename Executor, typename F>
             HPX_FORCEINLINE std::size_t get_chunk_size(Executor && exec, F && f,
-                std::size_t num_tasks)
+                std::size_t cores, std::size_t num_tasks)
             {
                 return wrap_.get().get_chunk_size(std::forward<Executor>(exec),
-                    std::forward<F>(f), num_tasks);
+                    std::forward<F>(f), cores, num_tasks);
             }
 
         private:
@@ -179,7 +419,7 @@ namespace hpx { namespace parallel { inline namespace v3
         template <typename T, typename Wrapper>
         struct processing_units_count_call_helper<T, Wrapper,
             typename std::enable_if<
-                has_processing_units_count<T>::value
+                has_count_processing_units<T>::value
             >::type>
         {
             processing_units_count_call_helper(Wrapper& wrap)
@@ -286,7 +526,7 @@ namespace hpx { namespace parallel { inline namespace v3
 #define HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(func)                       \
     static_assert(                                                            \
         parameters_type_counter<                                              \
-            HPX_PP_CAT(hpx::parallel::v3::detail::has_, func)<                \
+            HPX_PP_CAT(hpx::parallel::execution::detail::has_, func)<         \
                 typename hpx::util::decay_unwrap<Params>::type>::value...     \
         >::value <= 1,                                                        \
         "Passing more than one executor parameters type exposing "            \
@@ -298,11 +538,12 @@ namespace hpx { namespace parallel { inline namespace v3
         {
             static_assert(
                 hpx::util::detail::all_of<
-                    hpx::traits::is_executor_parameters<Params>...
+                    hpx::traits::is_executor_parameters<
+                        typename std::decay<Params>::type
+                    >...
                 >::value,
                 "All passed parameters must be a proper executor parameters "
-                "objects"
-            );
+                "objects");
             static_assert(sizeof...(Params) >= 2,
                 "This type is meant to be used with at least 2 parameters "
                 "objects");
@@ -310,7 +551,7 @@ namespace hpx { namespace parallel { inline namespace v3
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(get_chunk_size);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_begin_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_execution);
-            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(processing_units_count);
+            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(count_processing_units);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(maximal_number_of_chunks);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(reset_thread_distribution);
 
@@ -383,10 +624,11 @@ namespace hpx { namespace parallel { inline namespace v3
     Param && join_executor_parameters(Param && param)
     {
         static_assert(
-            hpx::traits::is_executor_parameters<Param>::value,
-            "The passed parameter must be a proper executor parameters "
-            "objects"
-        );
+            hpx::traits::is_executor_parameters<
+                typename std::decay<Param>::type
+            >::value,
+            "The passed parameter must be a proper executor parameters object");
+
         return std::forward<Param>(param);
     }
 }}}

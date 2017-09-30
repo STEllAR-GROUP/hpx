@@ -13,7 +13,7 @@
 #include <hpx/parallel/datapar/execution_policy.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/executor_parameters.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/rebind_executor.hpp>
 #include <hpx/parallel/executors/sequenced_executor.hpp>
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -363,7 +363,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -670,7 +670,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -970,7 +970,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 
@@ -1265,7 +1265,7 @@ namespace hpx { namespace parallel { namespace execution
 
         /// The type of the associated executor parameters object which is
         /// associated with this execution policy
-        typedef v3::detail::extract_executor_parameters<
+        typedef execution::extract_executor_parameters<
                 executor_type
             >::type executor_parameters_type;
 

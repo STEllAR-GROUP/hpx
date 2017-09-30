@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_COMPONENTS_SERVER_EXECUTOR_COMPONENT_FEB_09_2017_0839PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/executors.hpp>

@@ -22,7 +22,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 #endif
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
