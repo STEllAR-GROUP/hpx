@@ -237,6 +237,15 @@ namespace hpx { namespace resource
         partitioner_.create_thread_pool(name, scheduler_creation);
     }
 
+    void partitioner::set_default_pool_name(std::string const& name)
+    {
+        partitioner_.set_default_pool_name(name);
+    }
+
+    const std::string & partitioner::get_default_pool_name() const {
+        return partitioner_.get_default_pool_name();
+    }
+
     void partitioner::add_resource(pu const& p, std::string const& pool_name,
         bool exclusive, std::size_t num_threads /*= 1*/)
     {

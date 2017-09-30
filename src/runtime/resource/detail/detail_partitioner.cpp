@@ -367,7 +367,7 @@ namespace hpx { namespace resource { namespace detail
                         // exclusively if dynamic pools are enabled.
                         // Also, by default, the first PU is always exclusive
                         // (to avoid deadlocks).
-                        add_resource(p, "default",
+                        add_resource(p, initial_thread_pools_[0].pool_name_,
                             first || !(mode_ & mode_allow_dynamic_pools));
                         first = false;
                     }
@@ -378,11 +378,12 @@ namespace hpx { namespace resource { namespace detail
         std::unique_lock<mutex_type> l(mtx_);
 
         // @TODO allow empty pools
-        if (get_pool_data("default").num_threads_ == 0)
+        if (get_pool_data(initial_thread_pools_[0].pool_name_).num_threads_ == 0)
         {
             l.unlock();
             throw_runtime_error("partitioner::setup_pools",
-                "Default pool has no threads assigned. Please rerun with "
+                "Default pool " + initial_thread_pools_[0].pool_name_
+                + " has no threads assigned. Please rerun with "
                 "--hpx:threads=X and check the pool thread assignment");
         }
 
@@ -553,9 +554,9 @@ namespace hpx { namespace resource { namespace detail
 
         std::unique_lock<mutex_type> l(mtx_);
 
-        if (pool_name == "default")
+        if (pool_name==initial_thread_pools_[0].pool_name_)
         {
-            initial_thread_pools_[0] = detail::init_pool_data("default", sched);
+            initial_thread_pools_[0] = detail::init_pool_data(initial_thread_pools_[0].pool_name_, sched);
             return;
         }
 
@@ -597,10 +598,10 @@ namespace hpx { namespace resource { namespace detail
 
         std::unique_lock<mutex_type> l(mtx_);
 
-        if (pool_name == "default")
+        if (pool_name==initial_thread_pools_[0].pool_name_)
         {
             initial_thread_pools_[0] = detail::init_pool_data(
-                "default", std::move(scheduler_creation));
+                initial_thread_pools_[0].pool_name_, std::move(scheduler_creation));
             return;
         }
 
@@ -1048,9 +1049,13 @@ namespace hpx { namespace resource { namespace detail
     std::size_t partitioner::get_pool_index(
         std::string const& pool_name) const
     {
+        // the default pool is always index 0, it may be renamed
+        // but the user can always ask for "default"
+        if (pool_name == "default") {
+            return 0;
+        }
         {
             std::lock_guard<mutex_type> l(mtx_);
-
             std::size_t num_pools = initial_thread_pools_.size();
             for (std::size_t i = 0; i < num_pools; i++)
             {
