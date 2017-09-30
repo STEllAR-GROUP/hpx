@@ -3,14 +3,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
+
 #include <boost/program_options.hpp>
 
 #include <cstddef>
+#include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -110,13 +115,46 @@ namespace hpx { namespace resource
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        compat::mutex& partitioner_mtx()
+        {
+            static compat::mutex mtx;
+            return mtx;
+        }
+
+        std::unique_ptr<detail::partitioner>& partitioner_ref()
+        {
+            static std::unique_ptr<detail::partitioner> part;
+            return part;
+        }
+
+        std::unique_ptr<detail::partitioner>& get_partitioner()
+        {
+            std::lock_guard<compat::mutex> l(partitioner_mtx());
+            std::unique_ptr<detail::partitioner>& part = partitioner_ref();
+            if (!part)
+                part.reset(new detail::partitioner);
+            return part;
+        }
+
+        void delete_partitioner()
+        {
+            std::lock_guard<compat::mutex> l(partitioner_mtx());
+            std::unique_ptr<detail::partitioner>& part = partitioner_ref();
+            if (part)
+                part.reset();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct partitioner_tag {};
 
     detail::partitioner &get_partitioner()
     {
-        util::static_<detail::partitioner, partitioner_tag> rp;
+        std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
 
-        if (!rp.get().cmd_line_parsed())
+        if (!rp->cmd_line_parsed())
         {
             if (get_runtime_ptr() != nullptr)
             {
@@ -136,7 +174,7 @@ namespace hpx { namespace resource
             }
         }
 
-        return rp.get();
+        return *rp;
     }
 
     namespace detail
@@ -150,10 +188,9 @@ namespace hpx { namespace resource
             resource::partitioner_mode rpmode, runtime_mode mode,
             bool check)
         {
-            util::static_<detail::partitioner, partitioner_tag> rp_;
-            auto &rp = rp_.get();
+            std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
 
-            if (rp.cmd_line_parsed())
+            if (rp->cmd_line_parsed())
             {
                 if (check)
                 {
@@ -180,10 +217,10 @@ namespace hpx { namespace resource
             }
             else
             {
-                rp.parse(f, desc_cmdline, argc, argv, std::move(ini_config),
+                rp->parse(f, desc_cmdline, argc, argv, std::move(ini_config),
                     rpmode, mode);
             }
-            return rp;
+            return *rp;
         }
     }
 

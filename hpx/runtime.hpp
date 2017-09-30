@@ -21,7 +21,6 @@
 #include <hpx/state.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <boost/smart_ptr/scoped_ptr.hpp>
@@ -318,8 +317,6 @@ namespace hpx
         void set_state(state s);
 
     protected:
-        util::reinit_helper reinit_;
-
         // list of functions to call on exit
         typedef std::vector<util::function_nonser<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
