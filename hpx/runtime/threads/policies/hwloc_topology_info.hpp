@@ -43,12 +43,19 @@ namespace hpx { namespace resource
 namespace hpx { namespace threads
 {
     struct hpx_hwloc_bitmap_wrapper {
+        // take ownership of the hwloc allocated bitmap
         hpx_hwloc_bitmap_wrapper(void *bmp) {
             bmp_ = reinterpret_cast<hwloc_bitmap_t >(bmp);
         }
+        // frees the hwloc allocated bitmap
         ~hpx_hwloc_bitmap_wrapper() {
             hwloc_bitmap_free(bmp_);
         }
+        // stringify the bitmp using hwloc
+        friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
+            hpx_hwloc_bitmap_wrapper const* bmp);
+
+        // the raw bitmap object
         hwloc_bitmap_t bmp_;
     };
 
