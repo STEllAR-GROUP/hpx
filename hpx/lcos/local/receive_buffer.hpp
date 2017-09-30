@@ -198,11 +198,13 @@ namespace hpx { namespace lcos { namespace local
             return buffer_map_.empty();
         }
 
-        void cancel_waiting(std::exception_ptr const& e,
+        // return the number of deleted buffer entries
+        std::size_t cancel_waiting(std::exception_ptr const& e,
             bool force_delete_entries = false)
         {
             std::lock_guard<mutex_type> l(mtx_);
 
+            std::size_t count = 0;
             iterator end = buffer_map_.end();
             for (iterator it = buffer_map_.begin(); it != end; /**/)
             {
@@ -210,8 +212,10 @@ namespace hpx { namespace lcos { namespace local
                 if (to_delete->second->cancel(e) || force_delete_entries)
                 {
                     buffer_map_.erase(to_delete);
+                    ++count;
                 }
             }
+            return count;
         }
 
     protected:
@@ -412,11 +416,13 @@ namespace hpx { namespace lcos { namespace local
             return buffer_map_.empty();
         }
 
-        void cancel_waiting(std::exception_ptr const& e,
+        // return the number of deleted buffer entries
+        std::size_t cancel_waiting(std::exception_ptr const& e,
             bool force_delete_entries = false)
         {
             std::lock_guard<mutex_type> l(mtx_);
 
+            std::size_t count = 0;
             iterator end = buffer_map_.end();
             for (iterator it = buffer_map_.begin(); it != end; /**/)
             {
@@ -424,8 +430,10 @@ namespace hpx { namespace lcos { namespace local
                 if (to_delete->second->cancel(e) || force_delete_entries)
                 {
                     buffer_map_.erase(to_delete);
+                    ++count;
                 }
             }
+            return count;
         }
 
     protected:
