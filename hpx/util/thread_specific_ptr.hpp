@@ -31,9 +31,7 @@
 #  endif
 #endif
 
-
 #if !defined(HPX_NATIVE_TLS)
-#    define HPX_NATIVE_TLS __thread
 #  if defined(_GLIBCXX_HAVE_TLS)
 #    define HPX_NATIVE_TLS __thread
 #  elif defined(HPX_WINDOWS)
