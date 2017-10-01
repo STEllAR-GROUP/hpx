@@ -32,6 +32,10 @@
 
 namespace hpx { namespace threads
 {
+
+    /// forward declare membind enum type as int
+    enum hpx_hwloc_membind_policy  : int;
+
     struct topology
     {
         virtual ~topology() {}
@@ -189,7 +193,8 @@ namespace hpx { namespace threads
         virtual mask_type get_cpubind_mask(compat::thread & handle,
             error_code& ec = throws) const = 0;
 
-        virtual hpx::resource::hwloc_bitmap_ptr cpuset_to_nodeset(
+        /// convert a cpu mask into a numa node mask in hwloc bitmap form
+        virtual hwloc_bitmap_ptr cpuset_to_nodeset(
             mask_cref_type cpuset) const = 0;
 
         virtual void write_to_log() const = 0;
@@ -197,9 +202,12 @@ namespace hpx { namespace threads
         /// This is equivalent to malloc(), except that it tries to allocate
         /// page-aligned memory from the OS.
         virtual void* allocate(std::size_t len) const = 0;
+
+        /// allocate memory with binding to a numa node set as
+        /// specified by the policy and flags (see hwloc docs)
         virtual void* allocate_membind(std::size_t len,
-            hpx::resource::hwloc_bitmap_ptr bitmap,
-            hpx::resource::hpx_membind_policy policy, int flags) const = 0;
+            hwloc_bitmap_ptr bitmap,
+            hpx_hwloc_membind_policy policy, int flags) const = 0;
 
         /// Free memory that was previously allocated by allocate
         virtual void deallocate(void* addr, std::size_t len) const = 0;

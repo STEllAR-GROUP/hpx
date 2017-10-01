@@ -739,13 +739,13 @@ namespace hpx { namespace threads
         return get_number_of_cores();
     }
 
-    hpx::resource::hwloc_bitmap_ptr hwloc_topology_info::cpuset_to_nodeset(
+    hwloc_bitmap_ptr hwloc_topology_info::cpuset_to_nodeset(
         mask_cref_type mask) const
     {
         hwloc_bitmap_t cpuset  = mask_to_bitmap(mask, HWLOC_OBJ_PU);
         hwloc_bitmap_t nodeset = hwloc_bitmap_alloc();
         hwloc_cpuset_to_nodeset_strict(topo, cpuset, nodeset);
-        return std::make_shared<hpx::resource::hpx_hwloc_bitmap_wrapper>(nodeset);
+        return std::make_shared<hpx::threads::hpx_hwloc_bitmap_wrapper>(nodeset);
     }
 
     namespace detail
@@ -1133,8 +1133,8 @@ namespace hpx { namespace threads
     /// Allocate some memory on NUMA memory nodes specified by nodeset
     /// as specified by the hwloc hwloc_alloc_membind_nodeset call
     void* hwloc_topology_info::allocate_membind(std::size_t len,
-        hpx::resource::hwloc_bitmap_ptr bitmap,
-        hpx::resource::hpx_membind_policy policy, int flags) const
+        hwloc_bitmap_ptr bitmap,
+        hpx_hwloc_membind_policy policy, int flags) const
     {
         char strp[256];
         hwloc_bitmap_snprintf((char*)(strp), 256, bitmap->bmp_);

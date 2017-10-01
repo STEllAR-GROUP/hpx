@@ -38,7 +38,10 @@
 namespace hpx { namespace resource
 {
     class resource_partitioner;
+}}
 
+namespace hpx { namespace threads
+{
     struct hpx_hwloc_bitmap_wrapper {
         hpx_hwloc_bitmap_wrapper(void *bmp) {
             bmp_ = reinterpret_cast<hwloc_bitmap_t >(bmp);
@@ -49,12 +52,18 @@ namespace hpx { namespace resource
         hwloc_bitmap_t bmp_;
     };
 
-    typedef std::shared_ptr<hpx_hwloc_bitmap_wrapper> hwloc_bitmap_ptr;
+    /// \brief Please see hwloc documentation for the corresponding
+    /// enums HWLOC_MEMBIND_XXX
+    enum hpx_hwloc_membind_policy : int {
+        HPX_MEMBIND_DEFAULT = 0,
+        HPX_MEMBIND_FIRSTTOUCH = 1,
+        HPX_MEMBIND_BIND = 2,
+        HPX_MEMBIND_INTERLEAVE = 3,
+        HPX_MEMBIND_REPLICATE =	4,
+        HPX_MEMBIND_NEXTTOUCH =	5,
+        HPX_MEMBIND_MIXED = -1
+    };
 
-}}
-
-namespace hpx { namespace threads
-{
     struct HPX_EXPORT hwloc_topology_info : topology
     {
         friend resource::resource_partitioner;
@@ -177,7 +186,8 @@ namespace hpx { namespace threads
             std::size_t numa_node
             ) const;
 
-        hpx::resource::hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type cpuset) const;
+        /// convert a cpu mask into a numa node mask in hwloc bitmap form
+        hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type cpuset) const;
 
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
             mask_cref_type m, const std::string &pool_name) const;
@@ -191,8 +201,8 @@ namespace hpx { namespace threads
         void* allocate(std::size_t len) const;
 
         void* allocate_membind(std::size_t len,
-            hpx::resource::hwloc_bitmap_ptr bitmap,
-            hpx::resource::hpx_membind_policy policy, int flags) const;
+            hwloc_bitmap_ptr bitmap,
+            hpx_hwloc_membind_policy policy, int flags) const;
 
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const;

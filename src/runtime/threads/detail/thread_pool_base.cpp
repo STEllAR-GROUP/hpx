@@ -51,7 +51,7 @@ namespace hpx { namespace threads { namespace detail
         return used_processing_units_;
     }
 
-    hpx::resource::hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const
+    hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const
     {
         return used_numa_domains_;
     }
