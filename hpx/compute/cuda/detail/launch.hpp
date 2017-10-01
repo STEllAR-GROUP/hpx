@@ -63,7 +63,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
 
         closure& operator=(closure const&) = delete;
 
-        HPX_DEVICE void operator()()
+        HPX_DEVICE HPX_FORCEINLINE void operator()()
         {
             // FIXME: is it possible to move the arguments?
             hpx::util::invoke_fused_r<void>(f_, args_);
@@ -97,7 +97,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             static_assert(sizeof(Closure) < 256,
                 "We currently require the closure to be less than 256 bytes");
 
-#if !defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_HOST_CODE)
             detail::scoped_active_target active(tgt);
 
             launch_function<<<gridDim, blockDim, 0, active.stream()>>>(
@@ -115,6 +115,9 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             void *param_buffer = cudaGetParameterBuffer(
                 std::alignment_of<Closure>::value, sizeof(Closure));
             std::memcpy(param_buffer, &c, sizeof(Closure));
+//             cudaLaunchKernel(reinterpret_cast<void*>(launcher),
+//                 dim3(gridDim), dim3(blockDim), param_buffer, 0,
+//                 tgt.native_handle().get_stream());
             cudaLaunchDevice(reinterpret_cast<void*>(launcher), param_buffer,
                 dim3(gridDim), dim3(blockDim), 0, tgt.native_handle().get_stream());
 #endif
