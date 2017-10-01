@@ -29,6 +29,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <hwloc.h>
 
@@ -1176,10 +1177,10 @@ namespace hpx { namespace threads
                     static_cast<unsigned int>(pu_obj->os_index));
             }
         }
-        std::cout << "mask_to_bitmap mask_cref is " << mask;
-        char strp[256];
-        hwloc_bitmap_snprintf((char*)(strp), 256, (const hwloc_bitmap_s*)(bitmap));
-        std::cout << "\n" << "bitmap is " << strp << std::endl;
+//        std::cout << "mask_to_bitmap mask_cref is " << mask;
+//        char strp[256];
+//        hwloc_bitmap_snprintf((char*)(strp), 256, (const hwloc_bitmap_s*)(bitmap));
+//        std::cout << "\n" << "bitmap is " << strp << std::endl;
         return bitmap;
     }
 
@@ -1198,10 +1199,10 @@ namespace hpx { namespace threads
             if (hwloc_bitmap_isset(bitmap, idx) != 0)
                 set(mask, detail::get_index(pu_obj));
         }
-        std::cout << "bitmap_to_mask mask_cref is " << mask;
-        char strp[256];
-        hwloc_bitmap_snprintf((char*)(strp), 256, (const hwloc_bitmap_s*)(bitmap));
-        std::cout << "\n" << "bitmap is " << strp << std::endl;
+//        std::cout << "bitmap_to_mask mask_cref is " << mask;
+//        char strp[256];
+//        hwloc_bitmap_snprintf((char*)(strp), 256, (const hwloc_bitmap_s*)(bitmap));
+//        std::cout << "\n" << "bitmap is " << strp << std::endl;
         return mask;
     }
 

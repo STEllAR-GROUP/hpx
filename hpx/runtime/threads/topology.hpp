@@ -16,7 +16,6 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/resource/partitioner_fwd.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -32,7 +31,6 @@
 
 namespace hpx { namespace threads
 {
-
     /// forward declare membind enum type as int
     enum hpx_hwloc_membind_policy  : int;
 

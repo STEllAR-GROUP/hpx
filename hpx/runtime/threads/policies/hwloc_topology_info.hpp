@@ -66,8 +66,8 @@ namespace hpx { namespace threads
         HPX_MEMBIND_FIRSTTOUCH = 1,
         HPX_MEMBIND_BIND = 2,
         HPX_MEMBIND_INTERLEAVE = 3,
-        HPX_MEMBIND_REPLICATE =	4,
-        HPX_MEMBIND_NEXTTOUCH =	5,
+        HPX_MEMBIND_REPLICATE = 4,
+        HPX_MEMBIND_NEXTTOUCH = 5,
         HPX_MEMBIND_MIXED = -1
     };
 
