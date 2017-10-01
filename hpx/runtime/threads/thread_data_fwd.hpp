@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <memory>
 
 namespace hpx
 {
