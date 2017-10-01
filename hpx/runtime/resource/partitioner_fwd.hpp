@@ -25,11 +25,6 @@ namespace hpx
 
         class partitioner;
 
-        struct hpx_hwloc_bitmap_wrapper;
-        typedef std::shared_ptr<hpx_hwloc_bitmap_wrapper> hwloc_bitmap_ptr;
-
-        enum hpx_membind_policy  : int;
-
         namespace detail
         {
             class HPX_EXPORT partitioner;

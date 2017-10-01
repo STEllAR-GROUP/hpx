@@ -37,6 +37,9 @@ namespace hpx { namespace threads
 
     class HPX_EXPORT executor;
 
+    struct hpx_hwloc_bitmap_wrapper;
+    typedef std::shared_ptr<hpx_hwloc_bitmap_wrapper> hwloc_bitmap_ptr;
+
     typedef coroutines::coroutine coroutine_type;
 
     typedef coroutines::detail::coroutine_self thread_self;
