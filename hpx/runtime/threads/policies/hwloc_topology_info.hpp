@@ -19,6 +19,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/resource/partitioner_fwd.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
@@ -37,6 +38,19 @@
 namespace hpx { namespace resource
 {
     class resource_partitioner;
+
+    struct hpx_hwloc_bitmap_wrapper {
+        hpx_hwloc_bitmap_wrapper(void *bmp) {
+            bmp_ = reinterpret_cast<hwloc_bitmap_t >(bmp);
+        }
+        ~hpx_hwloc_bitmap_wrapper() {
+            hwloc_bitmap_free(bmp_);
+        }
+        hwloc_bitmap_t bmp_;
+    };
+
+    typedef std::shared_ptr<hpx_hwloc_bitmap_wrapper> hwloc_bitmap_ptr;
+
 }}
 
 namespace hpx { namespace threads
@@ -163,8 +177,10 @@ namespace hpx { namespace threads
             std::size_t numa_node
             ) const;
 
+        hpx::resource::hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type cpuset) const;
+
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-            mask_type const& m, std::string pool_name) const;
+            mask_cref_type m, const std::string &pool_name) const;
 
         struct hwloc_topology_tag {};
 
@@ -174,6 +190,10 @@ namespace hpx { namespace threads
         /// page-aligned memory from the OS.
         void* allocate(std::size_t len) const;
 
+        void* allocate_membind(std::size_t len,
+            hpx::resource::hwloc_bitmap_ptr bitmap,
+            hpx::resource::hpx_membind_policy policy, int flags) const;
+
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const;
 
@@ -182,6 +202,9 @@ namespace hpx { namespace threads
         void print_mask_vector(
             std::ostream& os, std::vector<mask_type> const& v) const;
         void print_hwloc(std::ostream&) const;
+
+        hwloc_bitmap_t mask_to_bitmap(mask_cref_type mask, hwloc_obj_type_t htype) const;
+        mask_type bitmap_to_mask(hwloc_bitmap_t bitmap, hwloc_obj_type_t htype) const;
 
     private:
         static mask_type empty_mask;

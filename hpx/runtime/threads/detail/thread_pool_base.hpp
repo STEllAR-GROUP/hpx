@@ -120,6 +120,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         mask_cref_type get_used_processing_units() const;
+        hpx::resource::hwloc_bitmap_ptr get_numa_domain_bitmap() const;
 
         // performance counters
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
@@ -290,6 +291,7 @@ namespace hpx { namespace threads { namespace detail
         typedef hpx::lcos::local::spinlock pu_mutex_type;
         mutable pu_mutex_type used_processing_units_mtx_;
         threads::mask_type used_processing_units_;
+        hpx::resource::hwloc_bitmap_ptr used_numa_domains_;
 
         // Mode of operation of the pool
         policies::scheduler_mode mode_;
