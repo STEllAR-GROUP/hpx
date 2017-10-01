@@ -468,15 +468,17 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
 
             // Select a OS thread which hasn't been disabled
-            while (true)
+            auto const& rp = resource::get_partitioner();
+            std::size_t count = queue_size;
+            while (count-- != 0)
             {
-                auto const& rp = resource::get_partitioner();
                 auto mask = rp.get_pu_mask(
                     num_thread + parent_pool_->get_thread_offset());
-                if(bit_and(mask, parent_pool_->get_used_processing_units()))
+
+                if (bit_and(mask, parent_pool_->get_used_processing_units()))
                     break;
-                else
-                    num_thread = (num_thread + 1) % queue_size;
+
+                num_thread = (num_thread + 1) % queue_size;
             }
 
             // now create the thread
