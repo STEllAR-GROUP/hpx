@@ -268,6 +268,12 @@ namespace hpx { namespace threads
             return total_used_processing_punits;
         }
 
+        hpx::resource::hwloc_bitmap_ptr get_pool_numa_bitmap(
+            const std::string &pool_name) const
+        {
+            return get_pool(pool_name).get_numa_domain_bitmap();
+        }
+
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
             for (auto& pool_iter : pools_)

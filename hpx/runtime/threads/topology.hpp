@@ -16,6 +16,7 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/resource/partitioner_fwd.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -147,8 +148,8 @@ namespace hpx { namespace threads
 
         /// \brief Prints the \param m to os in a human readable form
         virtual void print_affinity_mask(std::ostream& os,
-            std::size_t num_thread, mask_type const& m,
-            std::string pool_name) const = 0;
+            std::size_t num_thread, mask_cref_type m,
+            const std::string &pool_name) const = 0;
 
         /// \brief Reduce thread priority of the current thread.
         ///
@@ -188,11 +189,17 @@ namespace hpx { namespace threads
         virtual mask_type get_cpubind_mask(compat::thread & handle,
             error_code& ec = throws) const = 0;
 
+        virtual hpx::resource::hwloc_bitmap_ptr cpuset_to_nodeset(
+            mask_cref_type cpuset) const = 0;
+
         virtual void write_to_log() const = 0;
 
         /// This is equivalent to malloc(), except that it tries to allocate
         /// page-aligned memory from the OS.
         virtual void* allocate(std::size_t len) const = 0;
+        virtual void* allocate_membind(std::size_t len,
+            hpx::resource::hwloc_bitmap_ptr bitmap,
+            hpx::resource::hpx_membind_policy policy, int flags) const = 0;
 
         /// Free memory that was previously allocated by allocate
         virtual void deallocate(void* addr, std::size_t len) const = 0;

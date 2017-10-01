@@ -213,7 +213,7 @@ public:
     }
 
     void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-        mask_type const& m, std::string pool_name) const
+        mask_cref_type m, const std::string &pool_name) const
     {
     }
 
