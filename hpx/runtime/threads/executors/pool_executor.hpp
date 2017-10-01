@@ -24,16 +24,16 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////
-        class HPX_EXPORT customized_pool_executor
+        class HPX_EXPORT pool_executor
             : public threads::detail::scheduled_executor_base
         {
         public:
-            customized_pool_executor(const std::string& pool_name);
+            pool_executor(const std::string& pool_name);
 
-            customized_pool_executor(const std::string& pool_name,
+            pool_executor(const std::string& pool_name,
                     thread_stacksize stacksize);
 
-            customized_pool_executor(const std::string& pool_name,
+            pool_executor(const std::string& pool_name,
                     thread_priority priority,
                     thread_stacksize stacksize = thread_stacksize_default);
 
@@ -93,14 +93,14 @@ namespace hpx { namespace threads { namespace executors
     }   // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT customized_pool_executor : public scheduled_executor
+    struct HPX_EXPORT pool_executor : public scheduled_executor
     {
-        customized_pool_executor(const std::string& pool_name);
+        pool_executor(const std::string& pool_name);
 
-        customized_pool_executor(const std::string& pool_name,
+        pool_executor(const std::string& pool_name,
                 thread_stacksize stacksize);
 
-        customized_pool_executor(const std::string& pool_name,
+        pool_executor(const std::string& pool_name,
                 thread_priority priority,
                 thread_stacksize stacksize = thread_stacksize_default);
     };

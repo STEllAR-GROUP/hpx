@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/exception.hpp>
-#include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
+#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
@@ -18,21 +18,21 @@ namespace hpx { namespace threads { namespace executors
 {
     namespace detail
     {
-        customized_pool_executor::customized_pool_executor(
+        pool_executor::pool_executor(
                 std::string const& pool_name)
             : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
             , stacksize_(thread_stacksize_default)
             , priority_(thread_priority_default)
         {}
 
-        customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+        pool_executor::pool_executor(const std::string& pool_name,
                 thread_stacksize stacksize)
             : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
             , stacksize_(stacksize)
             , priority_(thread_priority_default)
         {}
 
-        customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+        pool_executor::pool_executor(const std::string& pool_name,
                 thread_priority priority, thread_stacksize stacksize)
             : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
             , stacksize_(stacksize)
@@ -40,7 +40,7 @@ namespace hpx { namespace threads { namespace executors
             {}
 
         threads::thread_result_type
-        customized_pool_executor::thread_function_nullary(closure_type func)
+        pool_executor::thread_function_nullary(closure_type func)
         {
             // execute the actual thread function
             func();
@@ -48,13 +48,13 @@ namespace hpx { namespace threads { namespace executors
         }
 
         // Return the requested policy element
-        std::size_t customized_pool_executor::get_policy_element(
+        std::size_t pool_executor::get_policy_element(
             threads::detail::executor_parameter p, error_code& ec) const
         {
             //! FIXME what is this supposed to do??
 
             HPX_THROWS_IF(ec, bad_parameter,
-                "customized_pool_executor::get_policy_element",
+                "pool_executor::get_policy_element",
                 "requested value of invalid policy element");
             return std::size_t(-1);
         }
@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace executors
         // Schedule the specified function for execution in this executor.
         // Depending on the subclass implementation, this may block in some
         // situations.
-        void customized_pool_executor::add(closure_type&& f,
+        void pool_executor::add(closure_type&& f,
             util::thread_description const& desc,
             threads::thread_state_enum initial_state, bool run_now,
             threads::thread_stacksize stacksize, error_code& ec)
@@ -71,7 +71,7 @@ namespace hpx { namespace threads { namespace executors
             thread_init_data data(
                 util::bind(
                     util::one_shot(
-                        &customized_pool_executor::thread_function_nullary),
+                        &pool_executor::thread_function_nullary),
                     std::move(f)),
                 desc);
 
@@ -94,7 +94,7 @@ namespace hpx { namespace threads { namespace executors
         // Schedule given function for execution in this executor no sooner
         // than time abs_time. This call never blocks, and may violate
         // bounds on the executor's queue size.
-        void customized_pool_executor::add_at(
+        void pool_executor::add_at(
             util::steady_clock::time_point const& abs_time,
             closure_type&& f, util::thread_description const& desc,
             threads::thread_stacksize stacksize, error_code& ec)
@@ -103,7 +103,7 @@ namespace hpx { namespace threads { namespace executors
             thread_init_data data(
                 util::bind(
                     util::one_shot(
-                        &customized_pool_executor::thread_function_nullary),
+                        &pool_executor::thread_function_nullary),
                     std::move(f)),
                 desc);
 
@@ -132,7 +132,7 @@ namespace hpx { namespace threads { namespace executors
         // Schedule given function for execution in this executor no sooner
         // than time rel_time from now. This call never blocks, and may
         // violate bounds on the executor's queue size.
-        void customized_pool_executor::add_after(
+        void pool_executor::add_after(
             util::steady_clock::duration const& rel_time, closure_type&& f,
             util::thread_description const& desc,
             threads::thread_stacksize stacksize, error_code& ec)
@@ -142,7 +142,7 @@ namespace hpx { namespace threads { namespace executors
         }
 
         // Return an estimate of the number of waiting tasks.
-        std::uint64_t customized_pool_executor::num_pending_closures(
+        std::uint64_t pool_executor::num_pending_closures(
             error_code& ec) const
         {
             if (&ec != &throws)
@@ -154,7 +154,7 @@ namespace hpx { namespace threads { namespace executors
         }
 
         // Reset internal (round robin) thread distribution scheme
-        void customized_pool_executor::reset_thread_distribution()
+        void pool_executor::reset_thread_distribution()
         {
             pool_.reset_thread_distribution();
         }
@@ -163,20 +163,20 @@ namespace hpx { namespace threads { namespace executors
 
 namespace hpx { namespace threads { namespace executors
 {
-    customized_pool_executor::customized_pool_executor(
+    pool_executor::pool_executor(
         const std::string& pool_name)
-      : scheduled_executor(new detail::customized_pool_executor(pool_name))
+      : scheduled_executor(new detail::pool_executor(pool_name))
     {}
 
-    customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+    pool_executor::pool_executor(const std::string& pool_name,
             thread_stacksize stacksize)
-        : scheduled_executor(new detail::customized_pool_executor(pool_name, stacksize))
+        : scheduled_executor(new detail::pool_executor(pool_name, stacksize))
     {}
 
-    customized_pool_executor::customized_pool_executor(const std::string& pool_name,
+    pool_executor::pool_executor(const std::string& pool_name,
             thread_priority priority, thread_stacksize stacksize)
         : scheduled_executor(
-              new detail::customized_pool_executor(pool_name, priority, stacksize))
+              new detail::pool_executor(pool_name, priority, stacksize))
     {}
 
 
