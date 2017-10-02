@@ -556,7 +556,8 @@ namespace hpx { namespace resource { namespace detail
 
         if (pool_name==initial_thread_pools_[0].pool_name_)
         {
-            initial_thread_pools_[0] = detail::init_pool_data(initial_thread_pools_[0].pool_name_, sched);
+            initial_thread_pools_[0] = detail::init_pool_data(
+                initial_thread_pools_[0].pool_name_, sched);
             return;
         }
 
