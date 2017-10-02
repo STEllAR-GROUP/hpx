@@ -4,11 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    named_pool_executor
     resource_partitioner
     throttle
     used_pus
 )
 
+set(named_pool_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4)
 set(throttle_PARAMETERS THREADS_PER_LOCALITY 4)
 set(used_pus_PARAMETERS THREADS_PER_LOCALITY 4)
