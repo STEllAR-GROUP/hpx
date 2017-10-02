@@ -211,12 +211,12 @@ namespace hpx { namespace parallel { namespace execution
         reset_thread_distribution(Parameters&& params, Executor&& exec)
         -> decltype(reset_thread_distribution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params),
+                >::call(std::forward<Parameters>(params),
                         std::forward<Executor>(exec)))
         {
             return reset_thread_distribution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params),
+                >::call(std::forward<Parameters>(params),
                         std::forward<Executor>(exec));
         }
 
@@ -254,11 +254,11 @@ namespace hpx { namespace parallel { namespace execution
         set_scheduler_mode(Parameters&& params)
         -> decltype(count_processing_units_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params)))
+                >::call(std::forward<Parameters>(params)))
         {
             return count_processing_units_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params));
+                >::call(std::forward<Parameters>(params));
         }
 
 #if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
@@ -288,11 +288,11 @@ namespace hpx { namespace parallel { namespace execution
         HPX_FORCEINLINE auto mark_begin_execution(Parameters&& params)
         -> decltype(mark_begin_execution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params)))
+                >::call(std::forward<Parameters>(params)))
         {
             return mark_begin_execution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params));
+                >::call(std::forward<Parameters>(params));
         }
 
 #if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
@@ -322,11 +322,11 @@ namespace hpx { namespace parallel { namespace execution
         HPX_FORCEINLINE auto mark_end_execution(Parameters&& params)
         -> decltype(mark_end_execution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params)))
+                >::call(std::forward<Parameters>(params)))
         {
             return mark_end_execution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(0, std::forward<Parameters>(params));
+                >::call(std::forward<Parameters>(params));
         }
 
 #if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
