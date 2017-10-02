@@ -367,7 +367,7 @@ namespace hpx { namespace resource { namespace detail
                         // exclusively if dynamic pools are enabled.
                         // Also, by default, the first PU is always exclusive
                         // (to avoid deadlocks).
-                        add_resource(p, initial_thread_pools_[0].pool_name_,
+                        add_resource(p, get_default_pool_name(),
                             first || !(mode_ & mode_allow_dynamic_pools));
                         first = false;
                     }
@@ -378,11 +378,11 @@ namespace hpx { namespace resource { namespace detail
         std::unique_lock<mutex_type> l(mtx_);
 
         // @TODO allow empty pools
-        if (get_pool_data(initial_thread_pools_[0].pool_name_).num_threads_ == 0)
+        if (get_pool_data(get_default_pool_name()).num_threads_ == 0)
         {
             l.unlock();
             throw_runtime_error("partitioner::setup_pools",
-                "Default pool " + initial_thread_pools_[0].pool_name_
+                "Default pool " + get_default_pool_name()
                 + " has no threads assigned. Please rerun with "
                 "--hpx:threads=X and check the pool thread assignment");
         }
@@ -554,10 +554,10 @@ namespace hpx { namespace resource { namespace detail
 
         std::unique_lock<mutex_type> l(mtx_);
 
-        if (pool_name==initial_thread_pools_[0].pool_name_)
+        if (pool_name==get_default_pool_name())
         {
             initial_thread_pools_[0] = detail::init_pool_data(
-                initial_thread_pools_[0].pool_name_, sched);
+                get_default_pool_name(), sched);
             return;
         }
 
@@ -599,10 +599,10 @@ namespace hpx { namespace resource { namespace detail
 
         std::unique_lock<mutex_type> l(mtx_);
 
-        if (pool_name==initial_thread_pools_[0].pool_name_)
+        if (pool_name==get_default_pool_name())
         {
             initial_thread_pools_[0] = detail::init_pool_data(
-                initial_thread_pools_[0].pool_name_, std::move(scheduler_creation));
+                get_default_pool_name(), std::move(scheduler_creation));
             return;
         }
 
