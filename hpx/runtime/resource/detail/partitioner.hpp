@@ -178,7 +178,7 @@ namespace hpx { namespace resource { namespace detail
             initial_thread_pools_[0].pool_name_ = name;
         }
 
-        const std::string &get_default_pool_name() {
+        const std::string &get_default_pool_name() const {
             return initial_thread_pools_[0].pool_name_;
         }
 
