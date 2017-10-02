@@ -54,7 +54,7 @@ namespace util {
         friend std::ostream& operator<<(
             std::ostream& ost, checkpoint const& ckp);
         friend std::istream& operator>>(std::istream& ist, checkpoint& ckp);
-        //Serialization Definition
+        // Serialization Definition
         friend class hpx::serialization::access;
         template <typename Archive>
         void serialize(Archive& arch, const unsigned int version)
@@ -77,16 +77,17 @@ namespace util {
         }
         ~checkpoint() = default;
 
-        //Other Constructors
-        checkpoint(char* stream, std::size_t count)
+        // Other Constructors
+        checkpoint(std::vector<char> const& vec)
+          : data(vec)
         {
-            for (std::size_t i = 0; i < count; i++)
-            {
-                data.push_back(*stream);
-                stream++;
-            }
+        }
+        checkpoint(std::vector<char> && vec)
+          : data(std::move(vec))
+        {
         }
 
+        // Overloads
         checkpoint& operator=(checkpoint const& c)
         {
             if (&c != this)
@@ -113,7 +114,8 @@ namespace util {
             return !(data == c.data);
         }
 
-        // Expose iterators to access data held by checkpoint
+        // Iterators
+        //  expose iterators to access data held by checkpoint
         using const_iterator = std::vector<char>::const_iterator;
         const_iterator begin() const
         {
@@ -123,6 +125,8 @@ namespace util {
         {
             return data.end();
         }
+
+        // Functions
         size_t size() const
         {
             return data.size();
@@ -191,19 +195,19 @@ namespace util {
         return ist;
     }
 
-    //Function object for save_checkpoint
+    // Function object for save_checkpoint
     namespace detail {
         struct save_funct_obj
         {
             template <typename... Ts>
             checkpoint operator()(checkpoint&& c, Ts&&... ts) const
             {
-                //Create serialization archive from checkpoint data member
+                // Create serialization archive from checkpoint data member
                 hpx::serialization::output_archive ar(c.data);
-                //Serialize data
-                int const sequencer[] = {//Trick to expand the variable pack
-                    (ar << ts,
-                        0)...};      //Takes advantage of the comma operator
+                // Serialize data
+                int const sequencer[] = {// Trick to expand the variable pack
+                    0, (ar << ts,0)...  // Takes advantage of the comma operator
+                };
                 (void) sequencer;    // Suppress unused param. warnings
                 return c;
             }
@@ -249,11 +253,9 @@ namespace util {
                     checkpoint>::value>::type>
     hpx::future<checkpoint> save_checkpoint(T&& t, Ts&&... ts)
     {
-        {
-            return hpx::dataflow(detail::save_funct_obj(),
-                std::move(checkpoint()), std::forward<T>(t),
-                std::forward<Ts>(ts)...);
-        }
+        return hpx::dataflow(detail::save_funct_obj(),
+            std::move(checkpoint()), std::forward<T>(t),
+            std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////
@@ -290,10 +292,8 @@ namespace util {
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(checkpoint&& c, T&& t, Ts&&... ts)
     {
-        {
-            return hpx::dataflow(detail::save_funct_obj(), std::move(c),
-                std::forward<T>(t), std::forward<Ts>(ts)...);
-        }
+        return hpx::dataflow(detail::save_funct_obj(), std::move(c),
+            std::forward<T>(t), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////
@@ -331,11 +331,9 @@ namespace util {
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(hpx::launch p, T&& t, Ts&&... ts)
     {
-        {
-            return hpx::dataflow(p, detail::save_funct_obj(),
-                std::move(checkpoint()), std::forward<T>(t),
-                std::forward<Ts>(ts)...);
-        }
+        return hpx::dataflow(p, detail::save_funct_obj(),
+            std::move(checkpoint()), std::forward<T>(t),
+            std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////
@@ -377,10 +375,8 @@ namespace util {
     hpx::future<checkpoint> save_checkpoint(
         hpx::launch p, checkpoint&& c, T&& t, Ts&&... ts)
     {
-        {
-            return hpx::dataflow(p, detail::save_funct_obj(), std::move(c),
-                std::forward<T>(t), std::forward<Ts>(ts)...);
-        }
+        return hpx::dataflow(p, detail::save_funct_obj(), std::move(c),
+            std::forward<T>(t), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////
@@ -422,12 +418,10 @@ namespace util {
     checkpoint save_checkpoint(
         hpx::launch::sync_policy sync_p, T&& t, Ts&&... ts)
     {
-        {
-            hpx::future<checkpoint> f_chk = hpx::dataflow(sync_p,
-                detail::save_funct_obj(), std::move(checkpoint()),
-                std::forward<T>(t), std::forward<Ts>(ts)...);
-            return f_chk.get();
-        }
+        hpx::future<checkpoint> f_chk = hpx::dataflow(sync_p,
+            detail::save_funct_obj(), std::move(checkpoint()),
+            std::forward<T>(t), std::forward<Ts>(ts)...);
+        return f_chk.get();
     }
 
     ///////////////////////////////////
@@ -465,12 +459,10 @@ namespace util {
     checkpoint save_checkpoint(
         hpx::launch::sync_policy sync_p, checkpoint&& c, T&& t, Ts&&... ts)
     {
-        {
-            hpx::future<checkpoint> f_chk =
-                hpx::dataflow(sync_p, detail::save_funct_obj(), std::move(c),
-                    std::forward<T>(t), std::forward<Ts>(ts)...);
-            return f_chk.get();
-        }
+        hpx::future<checkpoint> f_chk =
+            hpx::dataflow(sync_p, detail::save_funct_obj(), std::move(c),
+            std::forward<T>(t), std::forward<Ts>(ts)...);
+        return f_chk.get();
     }
 
     ///////////////////////////////////
@@ -498,19 +490,17 @@ namespace util {
     template <typename T, typename... Ts>
     void restore_checkpoint(checkpoint const& c, T& t, Ts&... ts)
     {
-        {
-            //Create seriaalization archive
-            hpx::serialization::input_archive ar(c.data, c.size());
+        // Create seriaalization archive
+        hpx::serialization::input_archive ar(c.data, c.size());
 
-            //De-serialize data
-            ar >> t;
-            int const sequencer[] = { //Trick to exand the variable pack
-                (ar >> ts, 0)...};    //Takes advantage of the comma operator
-            (void) sequencer;         //Suppress unused param. warnings
-        }
+        // De-serialize data
+        ar >> t;
+        int const sequencer[] = { // Trick to exand the variable pack
+            (ar >> ts, 0)...};    // Takes advantage of the comma operator
+        (void) sequencer;         // Suppress unused param. warnings
     }
 
-}    //End Util Namespace
-}    //End HPX Namespace
+}    // End Util Namespace
+}    // End HPX Namespace
 
 #endif
