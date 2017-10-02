@@ -208,7 +208,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, global_thread_num))
         {
-            static mask_type m = get_full_machine_mask(num_threads_);
+            static mask_type m = mask_type();
             return m;
         }
 

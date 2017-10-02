@@ -17,8 +17,9 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
-namespace hpx { namespace parallel { inline namespace v3
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces and then assigned to threads.
@@ -28,7 +29,7 @@ namespace hpx { namespace parallel { inline namespace v3
     /// This executor parameters type makes sure that as many loop iterations
     /// are combined as necessary to run for the amount of time specified.
     ///
-    struct persistent_auto_chunk_size : executor_parameters_tag
+    struct persistent_auto_chunk_size
     {
     public:
         /// Construct an \a persistent_auto_chunk_size executor parameters object
@@ -118,5 +119,26 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \endcond
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<parallel::execution::persistent_auto_chunk_size>
+      : std::true_type
+    {};
+    /// \endcond
+}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+
+#include <hpx/traits/v1/is_executor_parameters.hpp>
+
+namespace hpx { namespace parallel { inline namespace v3
+{
+    using persistent_auto_chunk_size = execution::persistent_auto_chunk_size;
+}}}
+
+#endif
 
 #endif

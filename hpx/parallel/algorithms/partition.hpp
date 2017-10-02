@@ -25,6 +25,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_information.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -172,12 +173,10 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::util::decay<ExPolicy>::type::executor_parameters_type
                         parameters_type;
 
-                    typedef executor_parameter_traits<parameters_type> traits;
-
                     std::size_t const cores =
                         execution::processing_units_count(policy.executor(),
                                 policy.parameters());
-                    std::size_t max_chunks = traits::maximal_number_of_chunks(
+                    std::size_t max_chunks = execution::maximal_number_of_chunks(
                         policy.parameters(), policy.executor(), cores, size);
 
                     result = stable_partition_helper()(

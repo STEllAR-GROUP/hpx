@@ -92,6 +92,10 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
+# print initial diagnostics
+hpx_info("CMake version: " ${CMAKE_VERSION})
+hpx_info("HPX version: " ${HPX_VERSION})
+
 ################################################################################
 # Fortran compiler detection
 #
@@ -1095,6 +1099,11 @@ if(HPX_WITH_CUDA)
     if(NOT MSVC)
       hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
       link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+      #set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G)
+      #set(CUDA_NVCC_FLAGS_RELWITHDEBINFO ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O3;-g)
+      #set(CUDA_NVCC_FLAGS_MINSIZEREL ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1)
+      #set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O3)
+      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-w)
     else()
       set(CUDA_PROPAGATE_HOST_FLAGS OFF)
       hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64)

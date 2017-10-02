@@ -17,19 +17,27 @@
 #include <atomic>
 #include <cstddef>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace test
 {
     struct dummy_parameters
-      : hpx::parallel::executor_parameters_tag
     {
-        dummy_parameters() {}
+        dummy_parameters() = default;
     };
 
-    static const dummy_parameters dummy;
+    static dummy_parameters HPX_CONSTEXPR_OR_CONST dummy{};
 }
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_executor_parameters<test::dummy_parameters>
+      : std::true_type
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 void verify_resource_allocation(std::size_t num_execs, std::size_t num_pus)

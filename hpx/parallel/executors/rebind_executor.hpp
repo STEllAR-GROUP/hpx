@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/parallel/executors/execution_fwd.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>

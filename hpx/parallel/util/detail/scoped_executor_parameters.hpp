@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_UTIL_DETAIL_SCOPED_EXECUTOR_PARAMETERS_APR_22_1221PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 
 namespace hpx { namespace parallel { namespace util { namespace detail
 {
@@ -15,19 +15,16 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename Parameters>
     struct scoped_executor_parameters
     {
-    private:
-        typedef executor_parameter_traits<Parameters> parameter_traits;
-
     public:
         scoped_executor_parameters(Parameters const& params)
           : params_(params)
         {
-            parameter_traits::mark_begin_execution(params_);
+            execution::mark_begin_execution(params_);
         }
 
         ~scoped_executor_parameters()
         {
-            parameter_traits::mark_end_execution(params_);
+            execution::mark_end_execution(params_);
         }
 
     private:

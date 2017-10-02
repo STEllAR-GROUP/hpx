@@ -38,6 +38,8 @@
 #    define HPX_NATIVE_TLS __declspec(thread)
 #  elif defined(__FreeBSD__) || (defined(__APPLE__) && defined(__MACH__))
 #    define HPX_NATIVE_TLS __thread
+#  elif defined(__clang__) && defined(HPX_COMPUTE_DEVICE_CODE)
+#    define HPX_NATIVE_TLS __thread
 #  else
 #    error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
 #  endif

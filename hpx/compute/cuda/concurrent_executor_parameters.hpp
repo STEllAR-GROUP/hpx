@@ -8,23 +8,32 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if defined(HPX_HAVE_CUDA)// && defined(__CUDACC__)
 #include <hpx/traits/is_executor_parameters.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 namespace hpx { namespace compute { namespace cuda
 {
-    struct concurrent_executor_parameters : parallel::executor_parameters_tag
+    struct concurrent_executor_parameters
     {
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor& exec, F &&, std::size_t cores,
-            std::size_t num_tasks)
+        std::size_t get_chunk_size(
+            Executor& exec, F&&, std::size_t cores, std::size_t num_tasks)
         {
-            return (num_tasks + cores - 1)/cores;
+            return (num_tasks + cores - 1) / cores;
         }
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_executor_parameters<compute::cuda::concurrent_executor_parameters>
+      : std::true_type
+    {};
+}}
 
 #endif
 #endif

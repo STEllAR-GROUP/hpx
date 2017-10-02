@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/executor_traits.hpp
+/// \file parallel/executors/v1/executor_traits.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM)
 #define HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM
@@ -15,7 +15,7 @@
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 #include <hpx/traits/is_range.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
@@ -594,7 +594,7 @@ namespace hpx { namespace parallel { inline namespace v3
     ///    is_executor is undefined.
     ///
     template <typename T>
-    struct is_executor;         // defined in hpx/traits/is_executor_v1.hpp
+    struct is_executor;         // defined in hpx/traits/v1/is_executor.hpp
 
     ///////////////////////////////////////////////////////////////////////////
     // compatibility layer mapping new customization points onto executor_traits

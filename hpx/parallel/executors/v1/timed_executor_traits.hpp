@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/timed_executor_traits.hpp
+/// \file parallel/executors/v1/timed_executor_traits.hpp
 
 #if !defined(HPX_PARALLEL_TIMED_EXECUTOR_TRAITS_AUG_04_2015_0525PM)
 #define HPX_PARALLEL_TIMED_EXECUTOR_TRAITS_AUG_04_2015_0525PM
@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/util/bind.hpp>
@@ -322,7 +322,7 @@ namespace hpx { namespace parallel { inline namespace v3
     /// timed scheduling functionality (in addition to what is supported
     /// execution agents generated using execution_traits type).
     ///
-    template <typename Executor, typename Enable>
+    template <typename Executor, typename Enable = void>
     struct timed_executor_traits : executor_traits<Executor>
     {
         /// The type of the executor associated with this instance of
@@ -561,7 +561,9 @@ namespace hpx { namespace parallel { inline namespace v3
     ///    is_timed_executor is undefined.
     ///
     template <typename T>
-    struct is_timed_executor;   // defined in hpx/traits/is_timed_executor.hpp
+    struct is_timed_executor
+      : hpx::traits::is_timed_executor<T>
+    {};
 }}}
 
 #endif

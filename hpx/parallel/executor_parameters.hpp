@@ -14,8 +14,8 @@
 #include <hpx/parallel/executors/persistent_auto_chunk_size.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/thread_executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_executor_parameter_traits.hpp>
 #endif
 
 #endif

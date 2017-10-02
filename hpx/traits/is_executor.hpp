@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/traits/is_executor_v1.hpp>    // backwards compatibility
+#include <hpx/traits/v1/is_executor.hpp>    // backwards compatibility
 
 #include <type_traits>
 
@@ -51,12 +51,19 @@ namespace hpx { namespace parallel { namespace execution
       : detail::is_one_way_executor<typename std::decay<T>::type>
     {};
 
+    template <typename T>
+    using is_one_way_executor_t = typename is_one_way_executor<T>::type;
+
     // Condition: T meets the syntactic requirements for NonBlockingOneWayExecutor
     // Precondition: T is a complete type
     template <typename T, typename Enable = void>
     struct is_never_blocking_one_way_executor
       : detail::is_never_blocking_one_way_executor<typename std::decay<T>::type>
     {};
+
+    template <typename T>
+    using is_never_blocking_one_way_executor_t =
+        typename is_never_blocking_one_way_executor<T>::type;
 
     // Condition: T meets the syntactic requirements for BulkOneWayExecutor
     // Precondition: T is a complete type
@@ -65,6 +72,10 @@ namespace hpx { namespace parallel { namespace execution
       : detail::is_bulk_one_way_executor<typename std::decay<T>::type>
     {};
 
+    template <typename T>
+    using is_bulk_one_way_executor_t =
+        typename is_bulk_one_way_executor<T>::type;
+
     // Condition: T meets the syntactic requirements for TwoWayExecutor
     // Precondition: T is a complete type
     template <typename T, typename Enable = void>
@@ -72,12 +83,19 @@ namespace hpx { namespace parallel { namespace execution
       : detail::is_two_way_executor<typename std::decay<T>::type>
     {};
 
+    template <typename T>
+    using is_two_way_executor_t = typename is_two_way_executor<T>::type;
+
     // Condition: T meets the syntactic requirements for BulkTwoWayExecutor
     // Precondition: T is a complete type
     template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
       : detail::is_bulk_two_way_executor<typename std::decay<T>::type>
     {};
+
+    template <typename T>
+    using is_bulk_two_way_executor_t =
+        typename is_bulk_two_way_executor<T>::type;
 
 #if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
     template <typename T>

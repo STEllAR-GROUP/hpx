@@ -119,7 +119,7 @@ void test_timed_executor()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_timed_async_executor2 : hpx::parallel::timed_executor_tag
+struct test_timed_async_executor2
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
@@ -171,6 +171,24 @@ struct test_timed_async_executor3 : test_timed_async_executor1
         this->execute_at(abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_timed_executor<test_timed_async_executor1>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_timed_executor<test_timed_async_executor2>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_timed_executor<test_timed_async_executor3>
+      : std::true_type
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])

@@ -56,7 +56,7 @@ void chunk_size_test_par(Parameters && params)
         iterator_tag());
 }
 
-struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
+struct timer_hooks_parameters
 {
     timer_hooks_parameters(char const* name)
       : name_(name), time_(0), count_(0)
@@ -78,6 +78,14 @@ struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
     std::uint64_t time_;
     std::atomic<std::size_t> count_;
 };
+
+namespace hpx { namespace traits
+{
+    template <>
+    struct is_executor_parameters<timer_hooks_parameters>
+      : std::true_type
+    {};
+}}
 
 void test_timer_hooks()
 {

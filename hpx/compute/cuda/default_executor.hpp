@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if defined(HPX_HAVE_CUDA)
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -17,6 +17,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/throw_exception.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 
@@ -45,6 +46,7 @@ namespace hpx { namespace compute { namespace cuda
             static void call(cuda::target const& target, F && f,
                 Shape const& shape, Ts &&... ts)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 std::size_t count = util::size(shape);
 
                 int threads_per_block =
@@ -73,6 +75,11 @@ namespace hpx { namespace compute { namespace cuda
                     },
                     std::forward<F>(f), shape_container.data(), count,
                     std::forward<Ts>(ts)...);
+#else
+                HPX_THROW_EXCEPTION(hpx::not_implemented,
+                    "hpx::compute::cuda::detail::bulk_launch_helper",
+                    "Trying to launch a CUDA kernel, but did not compile in CUDA mode");
+#endif
             }
         };
 
@@ -89,6 +96,7 @@ namespace hpx { namespace compute { namespace cuda
             static void call(cuda::target const& target, F && f,
                 Shape const& shape, Ts &&... ts)
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 typedef typename hpx::traits::range_traits<Shape>::value_type
                     value_type;
 
@@ -119,6 +127,11 @@ namespace hpx { namespace compute { namespace cuda
                         std::forward<F>(f), std::forward<Ts>(ts)...
                     );
                 }
+#else
+                HPX_THROW_EXCEPTION(hpx::not_implemented,
+                    "hpx::compute::cuda::detail::bulk_launch_helper",
+                    "Trying to launch a CUDA kernel, but did not compile in CUDA mode");
+#endif
             }
         };
     }

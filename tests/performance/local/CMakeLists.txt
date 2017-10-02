@@ -127,7 +127,7 @@ if(HPX_WITH_CUDA)
   set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
 endif()
 if(HPX_WITH_CUDA_CLANG)
-  set_source_files_properties(stream.cpp PROPERTIES COMPILE_FLAGS -xcuda)
+  set_source_files_properties(stream.cpp PROPERTIES COMPILE_FLAGS "-xcuda ${HPX_CUDA_CLANG_FLAGS}")
 endif()
 
 foreach(benchmark ${benchmarks})

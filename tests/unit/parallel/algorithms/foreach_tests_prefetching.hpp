@@ -110,7 +110,6 @@ void test_for_each_prefetching_exception(ExPolicy policy, IteratorTag)
     auto ctx = hpx::parallel::util::make_prefetcher_context(range.begin(),
         range.end(), prefetch_distance_factor, c);
 
-
     bool caught_exception = false;
     try {
         hpx::parallel::for_each(policy,

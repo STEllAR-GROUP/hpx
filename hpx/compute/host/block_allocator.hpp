@@ -166,7 +166,7 @@ namespace hpx { namespace compute { namespace host
             auto policy =
                 hpx::parallel::execution::parallel_policy()
                     .on(executor_)
-                    .with(hpx::parallel::static_chunk_size());
+                    .with(hpx::parallel::execution::static_chunk_size());
 
             typedef boost::range_detail::integer_iterator<std::size_t>
                 iterator_type;
@@ -241,7 +241,7 @@ namespace hpx { namespace compute { namespace host
             hpx::parallel::for_each(
                 hpx::parallel::execution::par
                     .on(executor_)
-                    .with(hpx::parallel::static_chunk_size()),
+                    .with(hpx::parallel::execution::static_chunk_size()),
                 util::begin(irange), util::end(irange),
                 [p](std::size_t i)
                 {

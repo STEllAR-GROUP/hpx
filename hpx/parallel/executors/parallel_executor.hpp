@@ -46,7 +46,7 @@ namespace hpx { namespace parallel { namespace execution
         /// with this executor.
         typedef parallel_execution_tag execution_category;
 
-        /// Associate the auto_chunk_size executor parameters type as a default
+        /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.
         typedef static_chunk_size executor_parameters_type;
 
@@ -213,9 +213,9 @@ namespace hpx { namespace traits
 }}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/is_executor_v1.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 
 namespace hpx { namespace parallel { inline namespace v3
 {
