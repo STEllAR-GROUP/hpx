@@ -26,6 +26,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     struct HPX_EXPORT affinity_data
     {
         affinity_data();
+        ~affinity_data();
 
         std::size_t init(util::command_line_handling const& cfg_);
 

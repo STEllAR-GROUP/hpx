@@ -228,6 +228,12 @@ namespace hpx { namespace resource { namespace detail
         initial_thread_pools_.push_back(init_pool_data("default"));
     }
 
+    partitioner::~partitioner()
+    {
+        --instance_number_counter_;
+        detail::init_pool_data::num_threads_overall = 0;
+    }
+
     bool partitioner::pu_exposed(std::size_t pu_num)
     {
         threads::mask_type pu_mask = threads::mask_type();

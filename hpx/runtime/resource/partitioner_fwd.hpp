@@ -28,6 +28,7 @@ namespace hpx
         namespace detail
         {
             class HPX_EXPORT partitioner;
+            void HPX_EXPORT delete_partitioner();
         }
 
         // May be used anywhere in code and returns a reference to the single,

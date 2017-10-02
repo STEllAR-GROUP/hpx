@@ -78,6 +78,7 @@ namespace hpx { namespace resource { namespace detail
 
     public:
         partitioner();
+        ~partitioner();
 
         void print_init_pool_data(std::ostream&) const;
 

@@ -25,18 +25,6 @@ namespace hpx { namespace util
 
     // Invoke all globally registered destruction functions
     HPX_API_EXPORT void reinit_destruct();
-
-    // just a little helper to invoke the constructors and destructors
-    struct reinit_helper
-    {
-        reinit_helper()
-        {
-        }
-        ~reinit_helper ()
-        {
-            reinit_destruct();
-        }
-    };
 }}
 
 #endif
