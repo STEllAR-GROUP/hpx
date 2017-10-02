@@ -14,6 +14,7 @@
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -132,8 +133,11 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface reset_thread_distribution()
-        template <typename Parameters, typename Enable>
-        struct reset_thread_distribution_fn_helper
+        template <typename Parameters, typename Executor_>
+        struct reset_thread_distribution_fn_helper<Parameters, Executor_,
+            typename std::enable_if<
+                hpx::traits::is_executor_any<Executor_>::value
+            >::type>
         {
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static void call(

@@ -93,7 +93,7 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Parameters, typename Enable = void>
         struct maximal_number_of_chunks_fn_helper;
 
-        template <typename Parameters, typename Enable = void>
+        template <typename Parameters, typename Executor, typename Enable = void>
         struct reset_thread_distribution_fn_helper;
 
         template <typename Parameters, typename Enable = void>
@@ -210,12 +210,14 @@ namespace hpx { namespace parallel { namespace execution
         HPX_FORCEINLINE auto
         reset_thread_distribution(Parameters&& params, Executor&& exec)
         -> decltype(reset_thread_distribution_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay_unwrap<Executor>::type
                 >::call(std::forward<Parameters>(params),
                         std::forward<Executor>(exec)))
         {
             return reset_thread_distribution_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay_unwrap<Executor>::type
                 >::call(std::forward<Parameters>(params),
                         std::forward<Executor>(exec));
         }

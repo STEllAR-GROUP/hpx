@@ -5,12 +5,13 @@
 
 /// \file parallel/executors/thread_execution_parameters.hpp
 
-#if !defined(HPX_PARALLEL_THREAD_EXECUTOR_PARAMETER_TRAITS_AUG_26_2015_1204PM)
-#define HPX_PARALLEL_THREAD_EXECUTOR_PARAMETER_TRAITS_AUG_26_2015_1204PM
+#if !defined(HPX_PARALLEL_THREAD_EXECUTION_PARAMETER_TRAITS_AUG_26_2015_1204PM)
+#define HPX_PARALLEL_THREAD_EXECUTION_PARAMETER_TRAITS_AUG_26_2015_1204PM
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 
 #include <hpx/parallel/executors/execution_parameters.hpp>
 
