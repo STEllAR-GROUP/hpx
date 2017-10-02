@@ -193,7 +193,9 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE auto operator()(Parameters&& params,
                     Executor&& exec, std::size_t cores,
                     std::size_t num_tasks) const
-            ->  decltype(has_pending_closures(std::forward<Executor>(exec)))
+            ->  decltype(maximal_number_of_chunks(
+                    std::forward<Parameters>(params),
+                    std::forward<Executor>(exec), cores, num_tasks))
             {
                 return maximal_number_of_chunks(
                     std::forward<Parameters>(params),

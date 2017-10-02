@@ -56,11 +56,11 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE static auto
             call(int, AnyParameters&& params, Executor&& exec, F&& f,
                     std::size_t cores, std::size_t num_tasks)
-            ->  decltype(params.get_chunk_size(params,
+            ->  decltype(params.get_chunk_size(
                     std::forward<Executor>(exec), std::forward<F>(f), cores,
                     num_tasks))
             {
-                return params.get_chunk_size(params,
+                return params.get_chunk_size(
                     std::forward<Executor>(exec), std::forward<F>(f), cores,
                     num_tasks);
             }
