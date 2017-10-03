@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/traits/v1/is_executor_parameters.hpp>     // backwards compatibility
 
 #include <functional>
 #include <type_traits>
@@ -25,6 +24,8 @@ namespace hpx { namespace traits
     template <typename Parameters, typename Enable = void>
     struct is_executor_parameters;
 }}
+
+#include <hpx/traits/v1/is_executor_parameters.hpp>     // backwards compatibility
 
 namespace hpx { namespace parallel { namespace execution
 {
