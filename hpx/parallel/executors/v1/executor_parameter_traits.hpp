@@ -101,13 +101,45 @@ namespace hpx { namespace parallel { inline namespace v3
             execution::detail::has_maximal_number_of_chunks<T>;
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Parameters_>
+        struct reset_thread_distribution_helper
+        {
+            template <typename Parameters, typename Executor>
+            static void call(hpx::traits::detail::wrap_int, Parameters &&,
+                Executor &&)
+            {
+            }
+
+            template <typename Parameters, typename Executor>
+            static auto call(int, Parameters && params, Executor && exec)
+            ->  decltype(
+                    params.reset_thread_distribution(
+                        std::forward<Executor>(exec))
+                )
+            {
+                params.reset_thread_distribution(std::forward<Executor>(exec));
+            }
+
+            template <typename Executor>
+            static void call(Parameters_& params, Executor && exec)
+            {
+                call(0, params, std::forward<Executor>(exec));
+            }
+
+            template <typename Parameters, typename Executor>
+            static void call(Parameters params, Executor && exec)
+            {
+                call(static_cast<Parameters_&>(params),
+                    std::forward<Executor>(exec));
+            }
+        };
+
         template <typename Parameters, typename Executor>
         void call_reset_thread_distribution(Parameters && params,
             Executor && exec)
         {
-            execution::detail::reset_thread_distribution_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type,
-                    typename hpx::util::decay<Executor>::type
+            reset_thread_distribution_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type
                 >::call(std::forward<Parameters>(params),
                     std::forward<Executor>(exec));
         }
@@ -329,7 +361,7 @@ namespace hpx { namespace parallel { inline namespace v3
     template <typename Parameters, typename Executor>
     HPX_FORCEINLINE
     typename std::enable_if<
-        hpx::traits::is_executor_parameters<Parameters>::value &&
+//         hpx::traits::is_executor_parameters<Parameters>::value &&
             hpx::traits::is_executor<Executor>::value
     >::type
     reset_thread_distribution(Parameters && params, Executor && exec)

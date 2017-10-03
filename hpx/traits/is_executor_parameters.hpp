@@ -25,6 +25,8 @@ namespace hpx { namespace traits
     struct is_executor_parameters;
 }}
 
+#include <hpx/traits/v1/is_executor_parameters.hpp>     // backwards compatibility
+
 namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
