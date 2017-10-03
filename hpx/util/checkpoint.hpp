@@ -496,7 +496,7 @@ namespace util {
         // De-serialize data
         ar >> t;
         int const sequencer[] = { // Trick to exand the variable pack
-            (ar >> ts, 0)...};    // Takes advantage of the comma operator
+            0, (ar >> ts, 0)...};    // Takes advantage of the comma operator
         (void) sequencer;         // Suppress unused param. warnings
     }
 
