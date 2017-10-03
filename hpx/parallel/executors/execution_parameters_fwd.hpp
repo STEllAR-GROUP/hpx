@@ -211,13 +211,13 @@ namespace hpx { namespace parallel { namespace execution
         reset_thread_distribution(Parameters&& params, Executor&& exec)
         -> decltype(reset_thread_distribution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type,
-                    typename hpx::util::decay_unwrap<Executor>::type
+                    typename hpx::util::decay<Executor>::type
                 >::call(std::forward<Parameters>(params),
                         std::forward<Executor>(exec)))
         {
             return reset_thread_distribution_fn_helper<
                     typename hpx::util::decay_unwrap<Parameters>::type,
-                    typename hpx::util::decay_unwrap<Executor>::type
+                    typename hpx::util::decay<Executor>::type
                 >::call(std::forward<Parameters>(params),
                         std::forward<Executor>(exec));
         }
