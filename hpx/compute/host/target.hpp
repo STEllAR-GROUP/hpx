@@ -120,11 +120,8 @@ namespace hpx { namespace compute { namespace host
     private:
         friend class hpx::serialization::access;
 
-        template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & handle_.mask_ & locality_;
-        }
+        void serialize(serialization::input_archive& ar, const unsigned int);
+        void serialize(serialization::output_archive& ar, const unsigned int);
 
         native_handle_type handle_;
         hpx::id_type locality_;
