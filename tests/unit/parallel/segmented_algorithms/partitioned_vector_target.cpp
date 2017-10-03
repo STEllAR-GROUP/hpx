@@ -6,6 +6,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/partitioned_vector.hpp>
+#include <hpx/runtime/serialization/bitset.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
