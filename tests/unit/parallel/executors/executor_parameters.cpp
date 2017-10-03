@@ -138,11 +138,13 @@ struct timer_hooks_parameters
       : name_(name)
     {}
 
-    void mark_begin_execution()
+    template <typename Executor>
+    void mark_begin_execution(Executor &&)
     {
     }
 
-    void mark_end_execution()
+    template <typename Executor>
+    void mark_end_execution(Executor &&)
     {
     }
 

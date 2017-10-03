@@ -31,8 +31,9 @@ namespace hpx { namespace threads
 namespace hpx { namespace parallel { inline namespace v3 { namespace detail
 {
     /// \cond NOINTERNAL
-    template <typename Parameters>
-    std::size_t call_processing_units_parameter_count(Parameters && params);
+    template <typename Parameters, typename Executor>
+    std::size_t call_processing_units_parameter_count(Parameters && params,
+        Executor && exec);
     /// \endcond
 }}}}
 
@@ -56,18 +57,20 @@ namespace hpx { namespace parallel { namespace execution
             template <typename AnyExecutor, typename Parameters>
             HPX_FORCEINLINE static auto
             call(hpx::traits::detail::wrap_int, AnyExecutor && exec,
-                Parameters& params)
+                    Parameters& params)
             -> decltype(parallel::v3::detail::
-                    call_processing_units_parameter_count(params))
+                    call_processing_units_parameter_count(params,
+                        std::forward<Executor>(exec)))
             {
                 return parallel::v3::detail::
-                    call_processing_units_parameter_count(params);
+                    call_processing_units_parameter_count(params,
+                        std::forward<Executor>(exec));
             }
 
             template <typename AnyExecutor, typename Parameters>
             HPX_FORCEINLINE static auto
             call(int, AnyExecutor && exec, Parameters&)
-            -> decltype(exec.processing_units_count())
+            ->  decltype(exec.processing_units_count())
             {
                 return exec.processing_units_count();
             }

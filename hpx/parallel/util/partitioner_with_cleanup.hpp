@@ -53,10 +53,14 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
 
                 // inform parameter traits
-                scoped_executor_parameters<parameters_type> scoped_param(
-                    policy.parameters());
+                scoped_executor_parameters_ref<
+                        parameters_type, executor_type
+                    > scoped_param(policy.parameters(), policy.executor());
 
                 std::vector<hpx::future<Result> > inititems;
                 std::list<std::exception_ptr> errors;
@@ -117,15 +121,19 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
 
-                typedef scoped_executor_parameters<parameters_type>
-                    scoped_executor_parameters;
+                typedef scoped_executor_parameters<
+                        parameters_type, executor_type
+                    > scoped_executor_parameters;
 
                 // inform parameter traits
                 std::shared_ptr<scoped_executor_parameters>
                     scoped_param(std::make_shared<
                             scoped_executor_parameters
-                        >(policy.parameters()));
+                        >(policy.parameters(), policy.executor()));
 
                 std::vector<hpx::future<Result> > inititems;
                 std::list<std::exception_ptr> errors;

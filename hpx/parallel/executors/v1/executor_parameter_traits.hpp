@@ -53,12 +53,15 @@ namespace hpx { namespace parallel { inline namespace v3
             execution::extract_has_variable_chunk_size<Parameters>;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Parameters>
-        std::size_t call_processing_units_parameter_count(Parameters && params)
+        template <typename Parameters, typename Executor>
+        std::size_t call_processing_units_parameter_count(Parameters && params,
+            Executor && exec)
         {
             return execution::detail::count_processing_units_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(std::forward<Parameters>(params));
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay<Executor>::type
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
         }
 
         template <typename T>
@@ -71,7 +74,8 @@ namespace hpx { namespace parallel { inline namespace v3
             F && f, std::size_t cores, std::size_t num_tasks)
         {
             return execution::detail::get_chunk_size_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay<Executor>::type
                 >::call(std::forward<Parameters>(params),
                     std::forward<Executor>(exec), std::forward<F>(f),
                     cores, num_tasks);
@@ -86,7 +90,8 @@ namespace hpx { namespace parallel { inline namespace v3
             Executor && exec, std::size_t cores, std::size_t num_tasks)
         {
             return execution::detail::maximal_number_of_chunks_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay<Executor>::type
                 >::call(std::forward<Parameters>(params),
                     std::forward<Executor>(exec), cores, num_tasks);
         }
@@ -101,7 +106,8 @@ namespace hpx { namespace parallel { inline namespace v3
             Executor && exec)
         {
             execution::detail::reset_thread_distribution_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay<Executor>::type
                 >::call(std::forward<Parameters>(params),
                     std::forward<Executor>(exec));
         }
@@ -111,12 +117,14 @@ namespace hpx { namespace parallel { inline namespace v3
             execution::detail::has_reset_thread_distribution<T>;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Parameters>
-        void call_mark_begin_execution(Parameters && params)
+        template <typename Parameters, typename Executor>
+        void call_mark_begin_execution(Parameters && params, Executor && exec)
         {
             execution::detail::mark_begin_execution_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(std::forward<Parameters>(params));
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay<Executor>::type
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
         }
 
         template <typename T>
@@ -124,12 +132,14 @@ namespace hpx { namespace parallel { inline namespace v3
             execution::detail::has_mark_begin_execution<T>;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Parameters>
-        void call_mark_end_execution(Parameters && params)
+        template <typename Parameters, typename Executor>
+        void call_mark_end_execution(Parameters && params, Executor && exec)
         {
             execution::detail::mark_end_execution_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
-                >::call(std::forward<Parameters>(params));
+                    typename hpx::util::decay_unwrap<Parameters>::type,
+                    typename hpx::util::decay<Executor>::type
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
         }
 
         template <typename T>
@@ -238,11 +248,12 @@ namespace hpx { namespace parallel { inline namespace v3
         ///       otherwise it forwards the request to the executor parameters
         ///       object.
         ///
-        template <typename Parameters_>
-        static std::size_t processing_units_count(Parameters_ && params)
+        template <typename Parameters_, typename Executor>
+        static std::size_t processing_units_count(Parameters_ && params,
+            Executor && exec)
         {
             return detail::call_processing_units_parameter_count(
-                std::forward<Parameters_>(params));
+                std::forward<Parameters_>(params), std::forward<Executor>(exec));
         }
 
         /// Mark the begin of a parallel algorithm execution
@@ -253,10 +264,11 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \note This calls params.mark_begin_execution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
-        template <typename Parameters_>
-        static void mark_begin_execution(Parameters_ && params)
+        template <typename Parameters_, typename Executor>
+        static void mark_begin_execution(Parameters_ && params, Executor && exec)
         {
-            detail::call_mark_begin_execution(std::forward<Parameters_>(params));
+            detail::call_mark_begin_execution(std::forward<Parameters_>(params),
+                std::forward<Executor>(exec));
         }
 
         /// Mark the end of a parallel algorithm execution
@@ -267,10 +279,11 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \note This calls params.mark_end_execution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
-        template <typename Parameters_>
-        static void mark_end_execution(Parameters_ && params)
+        template <typename Parameters_, typename Executor>
+        static void mark_end_execution(Parameters_ && params, Executor && exec)
         {
-            detail::call_mark_end_execution(std::forward<Parameters_>(params));
+            detail::call_mark_end_execution(std::forward<Parameters_>(params),
+                std::forward<Executor>(exec));
         }
     };
 
