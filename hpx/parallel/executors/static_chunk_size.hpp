@@ -13,7 +13,6 @@
 #include <hpx/traits/is_executor_parameters.hpp>
 
 #include <hpx/parallel/executors/execution_parameters.hpp>
-#include <hpx/parallel/executors/thread_execution_parameters.hpp>
 
 #include <cstddef>
 #include <type_traits>

@@ -145,13 +145,34 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Parameters, typename Executor_>
         struct reset_thread_distribution_fn_helper<Parameters, Executor_,
             typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+                hpx::traits::is_executor_any<Executor_>::value ||
+                    hpx::traits::is_threads_executor<Executor_>::value
             >::type>
         {
+            // handle thread executors
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static void call2(
+                hpx::traits::detail::wrap_int, AnyParameters&& params,
+                    Executor&& exec)
+            {
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static auto call2(int, AnyParameters&&,
+                    Executor&& exec)
+            ->  decltype(exec.reset_thread_distribution())
+            {
+                exec.reset_thread_distribution();
+            }
+
+            // handle parameters exposing the required functionality
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static void call(
-                hpx::traits::detail::wrap_int, AnyParameters&&, Executor&&)
+                hpx::traits::detail::wrap_int, AnyParameters&& params,
+                    Executor&& exec)
             {
+                call2(0, std::forward<AnyParameters>(params),
+                    std::forward<Executor>(exec));
             }
 
             template <typename AnyParameters, typename Executor>
