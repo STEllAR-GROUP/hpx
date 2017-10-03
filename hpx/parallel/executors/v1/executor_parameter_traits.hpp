@@ -101,7 +101,7 @@ namespace hpx { namespace parallel { inline namespace v3
             Executor && exec)
         {
             execution::detail::reset_thread_distribution_fn_helper<
-                    typename hpx::util::decay_unwrap<Parameters>::type
+                    typename hpx::util::decay_unwrap<Parameters>::type, Executor
                 >::call(std::forward<Parameters>(params),
                     std::forward<Executor>(exec));
         }
