@@ -60,11 +60,11 @@ namespace hpx { namespace parallel { namespace execution
                     Parameters& params)
             -> decltype(parallel::v3::detail::
                     call_processing_units_parameter_count(params,
-                        std::forward<Executor>(exec)))
+                        std::forward<AnyExecutor>(exec)))
             {
                 return parallel::v3::detail::
                     call_processing_units_parameter_count(params,
-                        std::forward<Executor>(exec));
+                        std::forward<AnyExecutor>(exec));
             }
 
             template <typename AnyExecutor, typename Parameters>

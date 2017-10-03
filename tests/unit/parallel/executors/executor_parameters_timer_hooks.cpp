@@ -81,13 +81,13 @@ struct timer_hooks_parameters
     std::atomic<std::size_t> count_;
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_executor_parameters<timer_hooks_parameters>
       : std::true_type
     {};
-}}
+}}}
 
 void test_timer_hooks()
 {

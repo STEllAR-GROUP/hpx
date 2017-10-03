@@ -255,13 +255,13 @@ struct test_sync_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_one_way_executor<test_sync_executor1>
       : std::true_type
     {};
-}}
+}}}
 
 struct test_sync_executor2 : test_sync_executor1
 {
@@ -314,7 +314,7 @@ struct test_sync_executor2 : test_sync_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_one_way_executor<test_sync_executor2>
@@ -325,7 +325,7 @@ namespace hpx { namespace traits
     struct is_bulk_one_way_executor<test_sync_executor2>
       : std::true_type
     {};
-}}
+}}}
 
 template <typename Executor, typename B1, typename B2>
 void static_check_executor(B1, B2)

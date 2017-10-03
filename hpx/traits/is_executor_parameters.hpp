@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/traits/v1/is_executor_parameters.hpp>     // backwards compatibility
 
 #include <functional>
 #include <type_traits>
@@ -24,8 +25,6 @@ namespace hpx { namespace traits
     template <typename Parameters, typename Enable = void>
     struct is_executor_parameters;
 }}
-
-#include <hpx/traits/v1/is_executor_parameters.hpp>     // backwards compatibility
 
 namespace hpx { namespace parallel { namespace execution
 {
@@ -117,8 +116,17 @@ namespace hpx { namespace traits
     // new executor framework
     template <typename Parameters, typename Enable>
     struct is_executor_parameters
-      : parallel::execution::is_executor_parameters<Parameters>
+      : parallel::execution::is_executor_parameters<
+            typename std::decay<Parameters>::type>
     {};
+
+    template <typename T>
+    using is_executor_parameters_t = typename is_executor_parameters<T>::type;
+
+#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
+    template <typename T>
+    constexpr bool is_executor_parameters_v = is_executor_parameters<T>::value;
+#endif
 }}
 
 #endif

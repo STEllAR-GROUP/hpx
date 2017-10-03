@@ -16,6 +16,7 @@
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
@@ -44,7 +45,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Parameters, typename Executor_>
         struct get_chunk_size_fn_helper<Parameters, Executor_,
             typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+                hpx::traits::is_executor_any<Executor_>::value ||
+                    hpx::traits::is_threads_executor<Executor_>::value
             >::type>
         {
             template <typename AnyParameters, typename Executor, typename F>
@@ -53,7 +55,7 @@ namespace hpx { namespace parallel { namespace execution
                     Executor&& exec, F&& f, std::size_t cores,
                     std::size_t num_tasks)
             {
-                return num_tasks;       // assume sequential execution
+                return (num_tasks + 4 * cores -1) / (4 * cores);
             }
 
             template <typename AnyParameters, typename Executor, typename F>
@@ -96,7 +98,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Parameters, typename Executor_>
         struct maximal_number_of_chunks_fn_helper<Parameters, Executor_,
             typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+                hpx::traits::is_executor_any<Executor_>::value ||
+                    hpx::traits::is_threads_executor<Executor_>::value
             >::type>
         {
             template <typename AnyParameters, typename Executor>
@@ -183,7 +186,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Parameters, typename Executor_>
         struct count_processing_units_fn_helper<Parameters, Executor_,
             typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+                hpx::traits::is_executor_any<Executor_>::value ||
+                    hpx::traits::is_threads_executor<Executor_>::value
             >::type>
         {
             template <typename AnyParameters, typename Executor>
@@ -227,7 +231,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Parameters, typename Executor_>
         struct mark_begin_execution_fn_helper<Parameters, Executor_,
             typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+                hpx::traits::is_executor_any<Executor_>::value ||
+                    hpx::traits::is_threads_executor<Executor_>::value
             >::type>
         {
             template <typename AnyParameters, typename Executor>
@@ -268,7 +273,8 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Parameters, typename Executor_>
         struct mark_end_execution_fn_helper<Parameters, Executor_,
             typename std::enable_if<
-                hpx::traits::is_executor_any<Executor_>::value
+                hpx::traits::is_executor_any<Executor_>::value ||
+                    hpx::traits::is_threads_executor<Executor_>::value
             >::type>
         {
             template <typename AnyParameters, typename Executor>

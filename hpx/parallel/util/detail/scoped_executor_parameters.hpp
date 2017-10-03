@@ -16,7 +16,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct scoped_executor_parameters
     {
     public:
-        scoped_executor_parameters(Parameters const& params, Executor const& exec)
+        scoped_executor_parameters(Parameters const& params,
+                Executor const& exec)
           : params_(params), exec_(exec)
         {
             execution::mark_begin_execution(params_, exec_);
@@ -37,7 +38,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct scoped_executor_parameters_ref
     {
     public:
-        scoped_executor_parameters_ref(Parameters const& params, Executor const& exec)
+        scoped_executor_parameters_ref(Parameters const& params,
+                Executor const& exec)
           : params_(params), exec_(exec)
         {
             execution::mark_begin_execution(params_, exec_);

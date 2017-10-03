@@ -193,10 +193,7 @@ namespace hpx { namespace parallel { namespace execution
         return distribution_policy_executor<dist_policy_type>(
             std::forward<DistPolicy>(policy));
     }
-}}}
 
-namespace hpx { namespace traits
-{
     /// \cond NOINTERNAL
     template <typename DistPolicy>
     struct is_two_way_executor<
@@ -204,7 +201,7 @@ namespace hpx { namespace traits
       : std::true_type
     {};
     /// \endcond
-}}
+}}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/v1/is_executor.hpp>

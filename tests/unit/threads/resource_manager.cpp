@@ -31,13 +31,13 @@ namespace test
     static dummy_parameters HPX_CONSTEXPR_OR_CONST dummy{};
 }
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_executor_parameters<test::dummy_parameters>
       : std::true_type
     {};
-}}
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 void verify_resource_allocation(std::size_t num_execs, std::size_t num_pus)

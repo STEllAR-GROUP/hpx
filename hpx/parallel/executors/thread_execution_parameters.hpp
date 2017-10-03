@@ -23,7 +23,8 @@ namespace hpx { namespace threads
     // reset_thread_distribution dispatch point
     template <typename Parameters, typename Executor>
     HPX_FORCEINLINE typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value
+        hpx::traits::is_executor_parameters<Parameters>::value &&
+            hpx::traits::is_threads_executor<Executor>::value
     >::type
     reset_thread_distribution(Parameters && params, Executor && sched)
     {
