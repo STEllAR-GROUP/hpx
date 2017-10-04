@@ -13,7 +13,6 @@
 #include <hpx/traits/is_executor_parameters.hpp>
 
 #include <hpx/parallel/executors/execution_parameters.hpp>
-#include <hpx/parallel/executors/thread_execution_parameters.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -88,7 +87,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     /// \cond NOINTERNAL
     template <>
@@ -96,7 +95,7 @@ namespace hpx { namespace traits
       : std::true_type
     {};
     /// \endcond
-}}
+}}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 

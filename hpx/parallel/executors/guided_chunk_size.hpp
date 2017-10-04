@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { namespace execution
     };
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     /// \cond NOINTERNAL
     template <>
@@ -94,7 +94,7 @@ namespace hpx { namespace traits
       : std::true_type
     {};
     /// \endcond
-}}
+}}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 

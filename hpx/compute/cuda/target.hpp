@@ -188,13 +188,12 @@ namespace hpx { namespace compute { namespace cuda
         }
 
     private:
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
         friend class hpx::serialization::access;
 
-        template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version)
-        {
-            ar & handle_.device_ & locality_;
-        }
+        void serialize(serialization::input_archive& ar, const unsigned int);
+        void serialize(serialization::output_archive& ar, const unsigned int);
+#endif
 
         native_handle_type handle_;
         hpx::id_type locality_;

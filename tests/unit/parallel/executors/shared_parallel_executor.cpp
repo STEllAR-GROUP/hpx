@@ -28,13 +28,13 @@ struct shared_parallel_executor
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<shared_parallel_executor>
         : std::true_type
     {};
-}}
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test(int passed_through)

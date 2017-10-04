@@ -138,24 +138,26 @@ struct timer_hooks_parameters
       : name_(name)
     {}
 
-    void mark_begin_execution()
+    template <typename Executor>
+    void mark_begin_execution(Executor &&)
     {
     }
 
-    void mark_end_execution()
+    template <typename Executor>
+    void mark_end_execution(Executor &&)
     {
     }
 
     std::string name_;
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_executor_parameters<timer_hooks_parameters>
       : std::true_type
     {};
-}}
+}}}
 
 void test_combined_hooks()
 {

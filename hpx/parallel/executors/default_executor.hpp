@@ -9,9 +9,9 @@
 #define HPX_PARALLEL_EXECUTORS_DEFAULT_EXECUTOR_AUG_24_2015_0624PM
 
 #include <hpx/config.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/executors/thread_execution.hpp>
 #include <hpx/parallel/executors/thread_execution_information.hpp>
-#include <hpx/parallel/executors/thread_execution_parameters.hpp>
 #include <hpx/parallel/executors/thread_timed_execution.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 

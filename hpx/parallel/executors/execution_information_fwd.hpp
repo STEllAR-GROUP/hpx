@@ -120,8 +120,8 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename Parameters>
             HPX_FORCEINLINE auto operator()(
                 Executor&& exec, Parameters& params) const
-                -> decltype(processing_units_count(std::forward<Executor>(exec),
-                    params))
+                -> decltype(processing_units_count(
+                        std::forward<Executor>(exec), params))
             {
                 return processing_units_count(
                     std::forward<Executor>(exec), params);

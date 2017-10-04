@@ -27,13 +27,13 @@ namespace hpx { namespace compute { namespace cuda
     };
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_executor_parameters<compute::cuda::concurrent_executor_parameters>
       : std::true_type
     {};
-}}
+}}}
 
 #endif
 #endif

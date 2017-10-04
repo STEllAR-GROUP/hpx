@@ -52,7 +52,7 @@ struct void_parallel_executor
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<void_parallel_executor>
@@ -63,7 +63,7 @@ namespace hpx { namespace traits
     struct is_bulk_two_way_executor<void_parallel_executor>
         : std::true_type
     {};
-}}
+}}}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Tests to void_parallel_executor behavior for the bulk executes

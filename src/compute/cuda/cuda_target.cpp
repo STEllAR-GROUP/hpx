@@ -7,14 +7,24 @@
 
 #if defined(HPX_HAVE_CUDA)
 
+#include <hpx/compute/cuda/target.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
+#  include <hpx/runtime/serialization/bitset.hpp>
+# else
+#  include <hpx/runtime/serialization/dynamic_bitset.hpp>
+# endif
+#endif
+#include <hpx/runtime/serialization/serialize.hpp>
+#endif
 
 #include <cstddef>
 #include <string>
@@ -306,12 +316,20 @@ namespace hpx { namespace compute { namespace cuda
             create(std::move(p));
     }
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
     ///////////////////////////////////////////////////////////////////////////
-    target& get_default_target()
+    void target::serialize(serialization::input_archive& ar,
+        const unsigned int version)
     {
-        static target target_;
-        return target_;
+        ar >> handle_.device_ >> locality_;
     }
+
+    void target::serialize(serialization::output_archive& ar,
+        const unsigned int version)
+    {
+        ar << handle_.device_ << locality_;
+    }
+#endif
 }}}
 
 #endif

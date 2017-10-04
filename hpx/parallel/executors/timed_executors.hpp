@@ -436,7 +436,7 @@ namespace hpx { namespace parallel { namespace execution
         timed_executor<execution::parallel_executor>;
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     /// \cond NOINTERNAL
 
@@ -456,7 +456,8 @@ namespace hpx { namespace traits
     template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
             parallel::execution::timed_executor<BaseExecutor> >
-      : is_never_blocking_one_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_never_blocking_one_way_executor<
+            typename std::decay<BaseExecutor>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -472,7 +473,7 @@ namespace hpx { namespace traits
       : std::true_type
     {};
     /// \endcond
-}}
+}}}
 
 #include <hpx/parallel/executors/timed_execution.hpp>
 #include <hpx/parallel/executors/thread_timed_execution.hpp>

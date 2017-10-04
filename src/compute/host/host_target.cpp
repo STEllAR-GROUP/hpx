@@ -9,8 +9,17 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+
+#if defined(HPX_HAVE_MORE_THAN_64_THREADS)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
+#  include <hpx/runtime/serialization/bitset.hpp>
+# else
+#  include <hpx/runtime/serialization/dynamic_bitset.hpp>
+# endif
+#endif
 
 #include <cstddef>
 #include <utility>
@@ -35,5 +44,15 @@ namespace hpx { namespace compute { namespace host
             }
         }
         return std::make_pair(num_thread, hpx::threads::count(mask));
+    }
+
+    void target::serialize(serialization::input_archive& ar, const unsigned int)
+    {
+        ar >> handle_.mask_ >> locality_;
+    }
+
+    void target::serialize(serialization::output_archive& ar, const unsigned int)
+    {
+        ar << handle_.mask_ << locality_;
     }
 }}}

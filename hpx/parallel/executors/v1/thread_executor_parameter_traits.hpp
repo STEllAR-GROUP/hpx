@@ -122,11 +122,13 @@ namespace hpx { namespace parallel { inline namespace v3
         ///       otherwise it forwards teh request to the executor parameters
         ///       object.
         ///
-        template <typename Parameters_>
-        static std::size_t processing_units_count(Parameters_ && params)
+        template <typename Parameters_, typename Executor>
+        static std::size_t processing_units_count(Parameters_ && params,
+            Executor && exec)
         {
             return detail::call_processing_units_parameter_count(
-                std::forward<Parameters_>(params));
+                std::forward<Parameters_>(params),
+                std::forward<Executor>(exec));
         }
 
         /// Mark the begin of a parallel algorithm execution
