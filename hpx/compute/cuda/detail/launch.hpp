@@ -94,8 +94,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail
             HPX_UNUSED(launcher);
             Closure c{std::move(f), std::move(args)};
 
-            static_assert(sizeof(Closure) < 256,
-                "We currently require the closure to be less than 256 bytes");
+            static_assert(sizeof(Closure) < 4096,
+                "We currently require the closure to be less than 4096 bytes");
 
 #if defined(HPX_COMPUTE_HOST_CODE)
             detail::scoped_active_target active(tgt);
