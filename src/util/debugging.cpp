@@ -9,9 +9,18 @@
 
 #include <iostream>
 
+#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
+    /* UNIX-style OS. ------------------------------------------- */
+#include <unistd.h>
+#endif
+
 #if defined(HPX_WINDOWS)
 #include <Windows.h>
 #endif    // HPX_WINDOWS
+
+#if defined(_POSIX_VERSION)
+#include <boost/asio/ip/host_name.hpp>
+#endif
 
 namespace hpx {
 namespace util {
