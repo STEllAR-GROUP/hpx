@@ -9,9 +9,17 @@
 
 #include <iostream>
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 #if defined(HPX_WINDOWS)
 #include <Windows.h>
 #endif    // HPX_WINDOWS
+
+#if defined(_POSIX_VERSION)
+#include <boost/asio/ip/host_name.hpp>
+#endif
 
 namespace hpx {
 namespace util {
