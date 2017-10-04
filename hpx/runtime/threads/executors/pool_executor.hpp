@@ -24,11 +24,18 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////
-        class HPX_EXPORT customized_pool_executor
+        class HPX_EXPORT pool_executor
             : public threads::detail::scheduled_executor_base
         {
         public:
-            customized_pool_executor(const std::string& pool_name);
+            pool_executor(const std::string& pool_name);
+
+            pool_executor(const std::string& pool_name,
+                    thread_stacksize stacksize);
+
+            pool_executor(const std::string& pool_name,
+                    thread_priority priority,
+                    thread_stacksize stacksize = thread_stacksize_default);
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
@@ -75,6 +82,10 @@ namespace hpx { namespace threads { namespace executors
             // the scheduler used by this executor
             pool_type& pool_;
 
+            // task properties
+            thread_stacksize stacksize_;
+            thread_priority priority_;
+
             // protect scheduler initialization
             typedef compat::mutex mutex_type;
             mutable mutex_type mtx_;
@@ -82,9 +93,16 @@ namespace hpx { namespace threads { namespace executors
     }   // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT customized_pool_executor : public scheduled_executor
+    struct HPX_EXPORT pool_executor : public scheduled_executor
     {
-        customized_pool_executor(const std::string& pool_name);
+        pool_executor(const std::string& pool_name);
+
+        pool_executor(const std::string& pool_name,
+                thread_stacksize stacksize);
+
+        pool_executor(const std::string& pool_name,
+                thread_priority priority,
+                thread_stacksize stacksize = thread_stacksize_default);
     };
 }}}
 
