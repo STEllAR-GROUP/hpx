@@ -11,7 +11,7 @@
 //
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
-#include <hpx/runtime/threads/executors/customized_pool_executors.hpp>
+#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 //
 #include <hpx/include/iostreams.hpp>
@@ -95,7 +95,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (use_pools)
     {
         // get executors
-        hpx::threads::executors::customized_pool_executor mpi_exec("mpi");
+        hpx::threads::executors::pool_executor mpi_exec("mpi");
         mpi_executor = mpi_exec;
         hpx::cout << "\n[hpx_main] got mpi executor " << std::endl;
     }

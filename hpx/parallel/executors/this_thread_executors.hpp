@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_EXECUTORS_THIS_THREAD_EXECUTORS_JUL_16_2015_0809PM
 
 #include <hpx/config.hpp>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/executors/thread_execution.hpp>
 #include <hpx/parallel/executors/thread_execution_information.hpp>
 #include <hpx/parallel/executors/thread_timed_execution.hpp>

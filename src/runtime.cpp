@@ -32,6 +32,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
@@ -255,6 +256,9 @@ namespace hpx
         // allow to reuse instance number if this was the only instance
         if (0 == instance_number_counter_)
             --instance_number_counter_;
+
+        util::reinit_destruct();
+        resource::detail::delete_partitioner();
     }
 
     void runtime::set_state(state s)

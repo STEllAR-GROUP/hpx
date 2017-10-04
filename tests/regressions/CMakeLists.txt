@@ -36,6 +36,7 @@ set(tests
     dynamic_counters_loaded_1508
     id_type_ref_counting_1032
     multiple_init
+    multiple_init_2918
     unhandled_exception_582
    )
 

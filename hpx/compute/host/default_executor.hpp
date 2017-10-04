@@ -74,7 +74,7 @@ namespace hpx { namespace compute { namespace host
     };
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct executor_execution_category<compute::host::default_executor>
@@ -101,6 +101,6 @@ namespace hpx { namespace traits
     struct is_bulk_two_way_executor<compute::host::default_executor>
       : std::true_type
     {};
-}}
+}}}
 
 #endif

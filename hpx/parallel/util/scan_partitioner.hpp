@@ -64,12 +64,14 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-
-                typedef scoped_executor_parameters<parameters_type>
-                    scoped_executor_parameters;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
 
                 // inform parameter traits
-                scoped_executor_parameters scoped_param(policy.parameters());
+                scoped_executor_parameters_ref<
+                        parameters_type, executor_type
+                    > scoped_param(policy.parameters(), policy.executor());
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
@@ -146,7 +148,7 @@ namespace hpx { namespace parallel { namespace util
 
                 // always rethrow if 'errors' is not empty or 'workitems' or
                 // 'finalitems' have an exceptional future
-                handle_local_exceptions<ExPolicy>::call(workitems, errors, false);
+                handle_local_exceptions<ExPolicy>::call(workitems, errors);
                 handle_local_exceptions<ExPolicy>::call(finalitems, errors);
 
                 try {
@@ -173,12 +175,14 @@ namespace hpx { namespace parallel { namespace util
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
-
-                typedef scoped_executor_parameters<parameters_type>
-                    scoped_executor_parameters;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
 
                 // inform parameter traits
-                scoped_executor_parameters scoped_param(policy.parameters());
+                scoped_executor_parameters_ref<
+                        parameters_type, executor_type
+                    > scoped_param(policy.parameters(), policy.executor());
 
                 std::vector<hpx::shared_future<Result1> > workitems;
                 std::vector<hpx::future<Result2> > finalitems;
@@ -290,7 +294,7 @@ namespace hpx { namespace parallel { namespace util
 
                 // always rethrow if 'errors' is not empty or 'workitems' or
                 // 'finalitems' have an exceptional future
-                handle_local_exceptions<ExPolicy>::call(workitems, errors, false);
+                handle_local_exceptions<ExPolicy>::call(workitems, errors);
                 handle_local_exceptions<ExPolicy>::call(finalitems, errors);
 
                 try {

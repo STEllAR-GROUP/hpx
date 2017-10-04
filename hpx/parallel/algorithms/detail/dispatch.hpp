@@ -106,10 +106,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
+                typedef typename
+                    hpx::util::decay<ExPolicy>::type::executor_type
+                    executor_type;
 
-                parallel::util::detail::scoped_executor_parameters<
-                        parameters_type
-                    > scoped_param(policy.parameters());
+                parallel::util::detail::scoped_executor_parameters_ref<
+                        parameters_type, executor_type
+                    > scoped_param(policy.parameters(), policy.executor());
 
                 return parallel::util::detail::algorithm_result<
                         ExPolicy, local_result_type

@@ -230,7 +230,7 @@ namespace hpx { namespace compute { namespace cuda
     };
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct executor_execution_category<compute::cuda::default_executor>
@@ -257,7 +257,7 @@ namespace hpx { namespace traits
     struct is_bulk_two_way_executor<compute::cuda::default_executor>
       : std::true_type
     {};
-}}
+}}}
 
 #endif
 #endif

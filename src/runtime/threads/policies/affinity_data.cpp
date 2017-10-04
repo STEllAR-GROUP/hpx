@@ -104,6 +104,11 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
     }
 
+    affinity_data::~affinity_data()
+    {
+        --instance_number_counter_;
+    }
+
     std::size_t affinity_data::init(util::command_line_handling const& cfg_)
     {
         num_threads_ = cfg_.num_threads_;

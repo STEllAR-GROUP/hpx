@@ -199,7 +199,7 @@ namespace hpx { namespace compute { namespace cuda
     };
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <typename Executor>
     struct executor_execution_category<
@@ -231,7 +231,7 @@ namespace hpx { namespace traits
         compute::cuda::concurrent_executor<Executor> >
       : std::true_type
     {};
-}}
+}}}
 
 #endif
 #endif

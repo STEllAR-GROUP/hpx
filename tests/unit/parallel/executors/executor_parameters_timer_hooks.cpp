@@ -62,13 +62,15 @@ struct timer_hooks_parameters
       : name_(name), time_(0), count_(0)
     {}
 
-    void mark_begin_execution()
+    template <typename Executor>
+    void mark_begin_execution(Executor &&)
     {
         ++count_;
         time_ = hpx::util::high_resolution_clock::now();
     }
 
-    void mark_end_execution()
+    template <typename Executor>
+    void mark_end_execution(Executor &&)
     {
         time_ = hpx::util::high_resolution_clock::now() - time_;
         ++count_;
@@ -79,13 +81,13 @@ struct timer_hooks_parameters
     std::atomic<std::size_t> count_;
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_executor_parameters<timer_hooks_parameters>
       : std::true_type
     {};
-}}
+}}}
 
 void test_timer_hooks()
 {

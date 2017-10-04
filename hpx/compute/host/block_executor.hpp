@@ -244,7 +244,7 @@ namespace hpx { namespace compute { namespace host
     };
 }}}
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <typename Executor>
     struct executor_execution_category<
@@ -276,6 +276,6 @@ namespace hpx { namespace traits
             compute::host::block_executor<Executor> >
       : std::true_type
     {};
-}}
+}}}
 
 #endif

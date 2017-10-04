@@ -192,7 +192,7 @@ struct test_timed_async_executor1 : test_async_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_async_executor1>
@@ -203,7 +203,7 @@ namespace hpx { namespace traits
     struct is_two_way_executor<test_timed_async_executor1>
       : std::true_type
     {};
-}}
+}}}
 
 struct test_timed_async_executor2 : test_async_executor1
 {
@@ -231,7 +231,7 @@ struct test_timed_async_executor3 : test_timed_async_executor2
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_timed_async_executor2>
@@ -242,7 +242,7 @@ namespace hpx { namespace traits
     struct is_two_way_executor<test_timed_async_executor3>
       : std::true_type
     {};
-}}
+}}}
 
 struct test_timed_async_executor4 : test_async_executor1
 {
@@ -266,7 +266,7 @@ struct test_timed_async_executor5 : test_timed_async_executor4
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_timed_async_executor4>
@@ -277,17 +277,17 @@ namespace hpx { namespace traits
     struct is_two_way_executor<test_timed_async_executor5>
       : std::true_type
     {};
-}}
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-//     test_timed_executor<test_async_executor1>({{ 0, 0, 6, 0, 0, 0 }});
-//     test_timed_executor<test_timed_async_executor1>({{ 0, 0, 4, 0, 0, 2 }});
-//     test_timed_executor<test_timed_async_executor2>({{ 2, 0, 4, 0, 0, 0 }});
-//     test_timed_executor<test_timed_async_executor3>({{ 0, 0, 4, 2, 0, 0 }});
+    test_timed_executor<test_async_executor1>({{ 0, 0, 6, 0, 0, 0 }});
+    test_timed_executor<test_timed_async_executor1>({{ 0, 0, 4, 0, 0, 2 }});
+    test_timed_executor<test_timed_async_executor2>({{ 2, 0, 4, 0, 0, 0 }});
+    test_timed_executor<test_timed_async_executor3>({{ 0, 0, 4, 2, 0, 0 }});
     test_timed_executor<test_timed_async_executor4>({{ 0, 2, 4, 0, 0, 0 }});
-//     test_timed_executor<test_timed_async_executor5>({{ 0, 0, 4, 0, 2, 0 }});
+    test_timed_executor<test_timed_async_executor5>({{ 0, 0, 4, 0, 2, 0 }});
 
     return hpx::finalize();
 }

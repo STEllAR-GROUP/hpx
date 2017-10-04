@@ -164,13 +164,13 @@ struct test_async_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_async_executor1>
       : std::true_type
     {};
-}}
+}}}
 
 struct test_async_executor2 : test_async_executor1
 {
@@ -186,13 +186,13 @@ struct test_async_executor2 : test_async_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_async_executor2>
       : std::true_type
     {};
-}}
+}}}
 
 struct test_async_executor3 : test_async_executor1
 {
@@ -211,13 +211,13 @@ struct test_async_executor3 : test_async_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_async_executor3>
       : std::true_type
     {};
-}}
+}}}
 
 struct test_async_executor4 : test_async_executor1
 {
@@ -237,7 +237,7 @@ struct test_async_executor4 : test_async_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_async_executor4>
@@ -248,7 +248,7 @@ namespace hpx { namespace traits
     struct is_bulk_two_way_executor<test_async_executor4>
       : std::true_type
     {};
-}}
+}}}
 
 struct test_async_executor5 : test_async_executor1
 {
@@ -262,13 +262,13 @@ struct test_async_executor5 : test_async_executor1
     }
 };
 
-namespace hpx { namespace traits
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
     struct is_two_way_executor<test_async_executor5>
       : std::true_type
     {};
-}}
+}}}
 
 template <typename Executor,
     typename B1, typename B2, typename B3, typename B4, typename B5>

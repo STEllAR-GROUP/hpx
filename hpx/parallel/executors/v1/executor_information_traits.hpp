@@ -44,8 +44,9 @@ namespace hpx { namespace parallel { inline namespace v3
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Parameters>
-        std::size_t call_processing_units_parameter_count(Parameters && params);
+        template <typename Parameters, typename Executor>
+        std::size_t call_processing_units_parameter_count(Parameters && params,
+            Executor && exec);
 
         struct processing_units_count_helper
         {
@@ -53,7 +54,7 @@ namespace hpx { namespace parallel { inline namespace v3
             static std::size_t call(hpx::traits::detail::wrap_int,
                 Executor& exec, Parameters& params)
             {
-                return call_processing_units_parameter_count(params);
+                return call_processing_units_parameter_count(params, exec);
             }
 
             template <typename Executor, typename Parameters>
