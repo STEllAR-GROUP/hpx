@@ -174,6 +174,14 @@ namespace hpx { namespace resource { namespace detail
         std::size_t expand_pool(std::string const& pool_name,
             util::function_nonser<void(std::size_t)> const& add_pu);
 
+        void set_default_pool_name(const std::string &name) {
+            initial_thread_pools_[0].pool_name_ = name;
+        }
+
+        const std::string &get_default_pool_name() const {
+            return initial_thread_pools_[0].pool_name_;
+        }
+
     private:
         ////////////////////////////////////////////////////////////////////////
         void fill_topology_vectors();

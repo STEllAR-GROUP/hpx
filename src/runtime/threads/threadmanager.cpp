@@ -359,12 +359,12 @@ namespace hpx { namespace threads
             // make sure the first thread-pool that gets instantiated is the default one
             if (i == 0)
             {
-                if (name != "default")
+                if (name != rp.get_default_pool_name())
                 {
                     throw std::invalid_argument("Trying to instantiate pool " +
                         name +
                         " as first thread pool, but first thread pool must be "
-                        "named default");
+                        "named " + rp.get_default_pool_name());
                 }
             }
 
@@ -801,46 +801,18 @@ namespace hpx { namespace threads
         return *pools_[0];
     }
 
-//     threadmanager::scheduler_type& threadmanager::get_scheduler(
-//         std::string const& pool_name) const
-//     {
-//         // if the given pool_name is default, we don't need to look for it
-//         if (pool_name == "default")
-//         {
-//             return default_scheduler();
-//         }
-//
-//         // don't start at begin() since the first one is the default, start one
-//         // further
-//         auto pool =
-//             std::find_if(
-//                 ++pools_.begin(), pools_.end(),
-//                 [&pool_name](pool_type const& itp) -> bool
-//                 {
-//                     return (itp->get_pool_name() == pool_name);
-//                 });
-//
-//         if (pool != pools_.end())
-//         {
-//             return pool->get_scheduler();
-//         }
-//
-//         throw std::invalid_argument(
-//                 "the resource partitioner does not own a thread pool named \""
-//                 + pool_name + "\". \n");
-//     }
-
     detail::thread_pool_base& threadmanager::get_pool(
         std::string const& pool_name) const
     {
         // if the given pool_name is default, we don't need to look for it
-        if (pool_name == "default")
+        // we must always return pool 0
+        if (pool_name == "default" ||
+            pool_name == resource::get_partitioner().get_default_pool_name())
         {
             return default_pool();
         }
 
-        // don't start at begin() since the first one is the default,
-        // start one further
+        // now check the other pools - no need to check pool 0 again, so ++begin
         auto pool = std::find_if(
             ++pools_.begin(), pools_.end(),
             [&pool_name](pool_type const& itp) -> bool
