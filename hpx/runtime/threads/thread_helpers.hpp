@@ -12,6 +12,7 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -438,6 +439,20 @@ namespace hpx { namespace threads
     HPX_API_EXPORT threads::executors::current_executor
         get_executor(thread_id_type const& id, error_code& ec = throws);
 
+    /// Returns a pointer to the pool that was used to run the current thread
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    HPX_EXPORT threads::detail::thread_pool_base*
+        get_pool(thread_id_type const& id, error_code& ec = throws);
+
     /// \cond NOINTERNAL
     /// Reset internal (round robin) thread distribution scheme
     HPX_API_EXPORT void reset_thread_distribution();
@@ -640,6 +655,20 @@ namespace hpx { namespace this_thread
     ///
     HPX_EXPORT threads::executors::current_executor
         get_executor(error_code& ec = throws);
+
+    /// Returns a pointer to the pool that was used to run the current thread
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    HPX_EXPORT threads::detail::thread_pool_base*
+        get_pool(error_code& ec = throws);
 
     /// \cond NOINTERNAL
     // returns the remaining available stack space
