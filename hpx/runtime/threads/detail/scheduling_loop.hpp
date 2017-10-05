@@ -297,6 +297,7 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data background_init(
             [&, background_running](thread_state_ex_enum) -> thread_result_type
             {
+
                 while(*background_running)
                 {
                     if (callbacks.background_())
@@ -671,8 +672,20 @@ namespace hpx { namespace threads { namespace detail
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                         {
-                            this_state.store(state_stopped);
-                            break;
+                            if (background_thread.get() != nullptr)
+                            {
+                                HPX_ASSERT(background_running);
+                                *background_running = false;
+                                scheduler.SchedulingPolicy::schedule_thread(
+                                    background_thread.get(), num_thread);
+                                background_thread.reset();
+                                background_running.reset();
+                            }
+                            else
+                            {
+                                this_state.store(state_stopped);
+                                break;
+                            }
                         }
 
                         // otherwise, keep idling for some time
@@ -695,6 +708,7 @@ namespace hpx { namespace threads { namespace detail
                     // possible. No need to reschedule, as another LCO will
                     // set it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
+                    HPX_ASSERT(background_running);
                     *background_running = false;
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
@@ -724,6 +738,7 @@ namespace hpx { namespace threads { namespace detail
                     // possible. No need to reschedule, as another LCO will
                     // set it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
+                    HPX_ASSERT(background_running);
                     *background_running = false;
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
@@ -746,10 +761,22 @@ namespace hpx { namespace threads { namespace detail
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
+                    if (background_thread)
                     {
-                        this_state.store(state_stopped);
-                        break;
+                        HPX_ASSERT(background_running);
+                        *background_running = false;
+                        scheduler.SchedulingPolicy::schedule_thread(
+                            background_thread.get(), num_thread);
+                        background_thread.reset();
+                        background_running.reset();
+                    }
+                    else
+                    {
+                        if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
+                        {
+                            this_state.store(state_stopped);
+                            break;
+                        }
                     }
                     may_exit = false;
                 }
@@ -757,7 +784,6 @@ namespace hpx { namespace threads { namespace detail
                 {
                     scheduler.SchedulingPolicy::cleanup_terminated(std::size_t(-1), true);
                 }
-
             }
         }
     }
