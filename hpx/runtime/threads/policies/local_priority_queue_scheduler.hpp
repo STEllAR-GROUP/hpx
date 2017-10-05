@@ -426,20 +426,36 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(bool delete_all = false)
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
         {
             bool empty = true;
-            for (std::size_t i = 0; i != queues_.size(); ++i)
-                empty = queues_[i]->cleanup_terminated(delete_all) && empty;
-            if (!delete_all)
+//             if (num_thread == std::size_t(-1))
+//             {
+                for (std::size_t i = 0; i != queues_.size(); ++i)
+                    empty = queues_[i]->cleanup_terminated(delete_all) && empty;
+                if (!delete_all)
+                    return empty;
+
+                for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
+                    empty = high_priority_queues_[i]->
+                        cleanup_terminated(delete_all) && empty;
+
+                empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
                 return empty;
-
-            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                empty = high_priority_queues_[i]->
-                    cleanup_terminated(delete_all) && empty;
-
-            empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
-            return empty;
+//             }
+//             else
+//             {
+//                 empty = queues_[num_thread]->cleanup_terminated(delete_all);
+//                 if (delete_all)
+//                     return true;
+//
+//                 if (num_thread < high_priority_queues_.size())
+//                     empty = high_priority_queues_[num_thread]->
+//                         cleanup_terminated(delete_all) && empty;
+//
+//                 low_priority_queue_.cleanup_terminated(delete_all);
+//                 return true;
+//             }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -469,8 +485,7 @@ namespace hpx { namespace threads { namespace policies
 
             // Select a OS thread which hasn't been disabled
             auto const& rp = resource::get_partitioner();
-            std::size_t count = queue_size;
-            while (count-- != 0)
+            while (true)
             {
                 auto mask = rp.get_pu_mask(
                     num_thread + parent_pool_->get_thread_offset());
@@ -585,8 +600,22 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
+            std::size_t queue_size = queues_.size();
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+                num_thread = curr_queue_++ % queue_size;
+
+            // Select a OS thread which hasn't been disabled
+            auto const& rp = resource::get_partitioner();
+            while (true)
+            {
+                auto mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+
+                if (bit_and(mask, parent_pool_->get_used_processing_units()))
+                    break;
+
+                num_thread = (num_thread + 1) % queue_size;
+            }
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||
@@ -610,8 +639,22 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
+            std::size_t queue_size = queues_.size();
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+                num_thread = curr_queue_++ % queue_size;
+
+            // Select a OS thread which hasn't been disabled
+            auto const& rp = resource::get_partitioner();
+            while (true)
+            {
+                auto mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+
+                if (bit_and(mask, parent_pool_->get_used_processing_units()))
+                    break;
+
+                num_thread = (num_thread + 1) % queue_size;
+            }
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||
@@ -916,6 +959,17 @@ namespace hpx { namespace threads { namespace policies
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count)
         {
+            // Check if we have been disabled
+            {
+                auto const& rp = resource::get_partitioner();
+                auto mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+
+                if (!bit_and(mask, parent_pool_->get_used_processing_units()))
+                    return true;
+
+            }
+
             std::size_t added = 0;
             bool result = true;
 
