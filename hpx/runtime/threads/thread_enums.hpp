@@ -142,6 +142,18 @@ namespace hpx { namespace threads
     /// Get the readable string representing the given stack size
     /// constant.
     HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_schedule_hint
+    ///
+    /// A \a placeholder for an int type that can be used for scheduler hints
+    /// when tasks are created
+    enum thread_schedule_hint : int
+    {
+        thread_schedule_hint_none = -1,
+    };
+
+
 }}
 
 #endif

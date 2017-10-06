@@ -65,8 +65,11 @@ namespace hpx { namespace threads { namespace executors
         void pool_executor::add(closure_type&& f,
             util::thread_description const& desc,
             threads::thread_state_enum initial_state,
-            threads::thread_stacksize stacksize, error_code& ec)
+            threads::thread_stacksize stacksize,
+            threads::thread_schedule_hint schedulehint,
+            error_code& ec)
         {
+            std::cout << "pool exeutor received hint " << schedulehint << std::endl;
             // create a new thread
             thread_init_data data(
                 util::bind(

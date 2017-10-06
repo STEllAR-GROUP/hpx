@@ -85,7 +85,7 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
 #define LOG_CUSTOM_MSG2(x)
 #endif
 
-#define EXTRA_DEBUG
+//#define EXTRA_DEBUG
 
 #if defined(HPX_MSVC)
 #undef EXTRA_DEBUG
@@ -569,27 +569,15 @@ namespace threads {
             {
                 bool empty = true;
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                {
-                    //LOG_CUSTOM_MSG(hexpointer(this) << "cleanup_terminated "
-                    //<< delete_all << " " << i);
                     empty = queues_[i]->cleanup_terminated(delete_all) && empty;
-                }
                 if (!delete_all)
                     return empty;
 
-                //LOG_CUSTOM_MSG(hexpointer(this)
-                //<< "high_priority_queue_ cleanup_terminated " << empty);
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                {
-                    empty = high_priority_queues_[i]->cleanup_terminated(
-                                delete_all) &&
-                        empty;
-                }
+                    empty = high_priority_queues_[i]->
+                        cleanup_terminated(delete_all) && empty;
 
-                //LOG_CUSTOM_MSG2(hexpointer(this)
-                //<< "low_priority_queue_ cleanup_terminated " << empty);
-                empty =
-                    low_priority_queue_.cleanup_terminated(delete_all) && empty;
+                empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
                 return empty;
             }
 

@@ -817,7 +817,9 @@ namespace detail
         // run in a separate thread
         virtual threads::thread_id_type apply(launch policy,
             threads::thread_priority priority,
-            threads::thread_stacksize stacksize, error_code& ec)
+            threads::thread_stacksize stacksize,
+            threads::thread_schedule_hint schedulehint,
+            error_code& ec)
         {
             HPX_ASSERT(false);      // shouldn't ever be called
             return threads::invalid_thread_id;

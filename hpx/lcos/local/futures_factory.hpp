@@ -95,14 +95,24 @@ namespace hpx { namespace lcos { namespace local
             // run in a separate thread
             threads::thread_id_type apply(launch policy,
                 threads::thread_priority priority,
-                threads::thread_stacksize stacksize, error_code& ec) override
+                threads::thread_stacksize stacksize,
+                threads::thread_schedule_hint schedulehint, // JB_EDIT
+                error_code& ec) override
             {
                 this->check_started();
 
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
-                if (policy == launch::fork) {
+                if (this->sched_) {
+                    this->sched_->add(
+                        util::deferred_call(
+                            &base_type::run_impl, std::move(this_)),
+                        util::thread_description(f_, "task_object::apply"),
+                        threads::pending, false, stacksize, schedulehint, ec);
+                    return threads::invalid_thread_id;
+                }
+                else if (policy == launch::fork) {
                     return threads::register_thread_nullary(
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
@@ -116,7 +126,7 @@ namespace hpx { namespace lcos { namespace local
                     util::deferred_call(
                         &base_type::run_impl, std::move(this_)),
                     util::thread_description(f_, "task_object::apply"),
-                    threads::pending, priority, std::size_t(-1),
+                    threads::pending, priority, schedulehint,
                     stacksize, ec);
                 return threads::invalid_thread_id;
             }
@@ -183,13 +193,7 @@ namespace hpx { namespace lcos { namespace local
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
-                if (exec_) {
-                    parallel::execution::post(*exec_,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)));
-                    return threads::invalid_thread_id;
-                }
-                else if (policy == launch::fork) {
+                if (policy == launch::fork) {
                     return threads::register_thread_nullary(
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
@@ -506,6 +510,7 @@ namespace hpx { namespace lcos { namespace local
             launch policy = launch::async,
             threads::thread_priority priority = threads::thread_priority_default,
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            threads::thread_schedule_hint schedulehint = threads::thread_schedule_hint_none,
             error_code& ec = throws) const
         {
             if (!task_) {
@@ -514,7 +519,7 @@ namespace hpx { namespace lcos { namespace local
                     "futures_factory invalid (has it been moved?)");
                 return threads::invalid_thread_id;
             }
-            return task_->apply(policy, priority, stacksize, ec);
+            return task_->apply(policy, priority, stacksize, schedulehint, ec);
         }
 
         // This is the same as get_future, except that it moves the

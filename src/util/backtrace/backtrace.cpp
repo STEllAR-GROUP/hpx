@@ -414,7 +414,9 @@ namespace hpx { namespace util {
         error_code ec(lightweight);
         threads::thread_id_type tid = p.apply(
             launch::fork, threads::thread_priority_default,
-            threads::thread_stacksize_medium, ec);
+            threads::thread_stacksize_medium,
+            threads::thread_schedule_hint_none,
+            ec);
         if (ec) return "<couldn't retrieve stack backtrace>";
 
         // make sure this thread is executed last

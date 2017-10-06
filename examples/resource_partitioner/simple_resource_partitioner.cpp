@@ -1,3 +1,4 @@
+//  Copyright (c) 2017 John Biddiscombe
 //  Copyright (c) 2017 Shoshana Jakobovits
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,30 +29,17 @@
 #include "shared_priority_scheduler.hpp"
 #include "system_characteristics.hpp"
 
-namespace resource { namespace pools
-{
-    enum ids
-    {
-        DEFAULT = 0,
-        MPI = 1,
-        GPU = 2,
-        MATRIX = 3,
-    };
-}}
-
+// ------------------------------------------------------------------------
 static bool use_pools = false;
 static bool use_scheduler = false;
 static int pool_threads = 1;
 
+// ------------------------------------------------------------------------
 // this is our custom scheduler type
 using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<>;
 using namespace hpx::threads::policies;
 
-// Force an instantiation of the pool type templated on our custom scheduler
-// we need this to ensure that the pool has the generated member functions needed
-// by the linker for this pool type
-// template class hpx::threads::detail::scheduled_thread_pool<high_priority_sched>;
-
+// ------------------------------------------------------------------------
 // dummy function we will call using async
 void do_stuff(std::size_t n, bool printout)
 {
@@ -67,6 +55,7 @@ void do_stuff(std::size_t n, bool printout)
         hpx::cout << "\n";
 }
 
+// ------------------------------------------------------------------------
 // this is called on an hpx thread after the runtime starts up
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -230,6 +219,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     return hpx::finalize();
 }
 
+// ------------------------------------------------------------------------
 // the normal int main function that is called at startup and runs on an OS thread
 // the user must call hpx::init to start the hpx runtime which will execute hpx_main
 // on an hpx thread
