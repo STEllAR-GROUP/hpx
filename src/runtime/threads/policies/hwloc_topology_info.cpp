@@ -395,9 +395,7 @@ namespace hpx { namespace threads
                             "failed to set thread affinity mask ("
                             HPX_CPU_MASK_PREFIX "%x) for cpuset %s",
                             mask, buffer.get()));
-
-                    if (ec)
-                        return;
+                    return;
                 }
             }
         }
