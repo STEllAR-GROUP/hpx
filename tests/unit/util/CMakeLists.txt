@@ -8,6 +8,7 @@ set(tests
     any_serialization
     boost_any
     bind_action
+    checkpoint
     config_entry
     function
     pack_traversal

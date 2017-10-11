@@ -700,9 +700,21 @@ namespace hpx {
             // --hpx:bind=none  should disable all affinity definitions
             if (threads::any(used_processing_units))
             {
+                error_code ec;
+
                 this->topology_.set_thread_affinity_mask(
                     this->topology_.get_service_affinity_mask(
-                        used_processing_units));
+                        used_processing_units), ec);
+
+                if (ec)
+                {
+                    HPX_THROW_EXCEPTION(kernel_error
+                        , "runtime_impl::init_tss_ex"
+                        , hpx::util::format(
+                            "failed to set thread affinity mask ("
+                            HPX_CPU_MASK_PREFIX "%x) for service thread: %s",
+                            used_processing_units, runtime::thread_name_.get()));
+                }
             }
 #endif
         }
