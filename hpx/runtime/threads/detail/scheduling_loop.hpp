@@ -772,7 +772,8 @@ namespace hpx { namespace threads { namespace detail
                     }
                     else
                     {
-                        if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
+                        if (scheduler.SchedulingPolicy::cleanup_terminated(
+                            num_thread, true))
                         {
                             this_state.store(state_stopped);
                             break;

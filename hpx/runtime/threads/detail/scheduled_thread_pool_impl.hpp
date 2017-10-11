@@ -1367,6 +1367,8 @@ namespace hpx { namespace threads { namespace detail
 
         auto const& rp = resource::get_partitioner();
         auto mask = rp.get_pu_mask(thread_num);
+        if(!threads::any(mask))
+            threads::set(mask, thread_num + this->thread_offset_);
         used_processing_units_ |= mask;
 
         if (&ec != &throws)
@@ -1403,6 +1405,8 @@ namespace hpx { namespace threads { namespace detail
 
             auto const& rp = resource::get_partitioner();
             auto mask = rp.get_pu_mask(virt_core + this->thread_offset_);
+            if(!threads::any(mask))
+                threads::set(mask, virt_core + this->thread_offset_);
             used_processing_units_ &= not_(mask);
 
             resource::get_partitioner().unassign_pu(id_.name(), virt_core);
