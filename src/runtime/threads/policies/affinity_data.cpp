@@ -137,6 +137,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             hpx::util::safe_lexical_cast<std::size_t>(
                 get_config_entry("hpx.cores", 0), 0);
 
+        init_cached_pu_nums(num_system_pus);
+
 #if defined(HPX_HAVE_HWLOC)
         std::string affinity_desc;
         hpx::detail::get_affinity_description(cfg_, affinity_desc);
@@ -145,7 +147,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             // don't use any affinity for any of the os-threads
             threads::resize(no_affinity_, num_system_pus);
             for (std::size_t i = 0; i != num_threads_; ++i)
-                threads::set(no_affinity_, i);
+                threads::set(no_affinity_, get_pu_num(i));
         }
         else if (!affinity_desc.empty())
         {
@@ -186,7 +188,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
 
         pu_offset_ %= num_system_pus;
-        init_cached_pu_nums(num_system_pus);
 
         std::vector<std::size_t> cores;
         cores.reserve(num_threads_);
@@ -320,7 +321,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
     void affinity_data::init_cached_pu_nums(std::size_t hardware_concurrency)
     {
-        if(pu_nums_.empty())
+        if (pu_nums_.empty())
         {
             pu_nums_.resize(num_threads_);
             for (std::size_t i = 0; i != num_threads_; ++i)
