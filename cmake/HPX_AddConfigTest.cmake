@@ -549,6 +549,14 @@ macro(hpx_check_for_cxx11_noreturn_attribute)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_override)
+  add_hpx_config_test(HPX_WITH_CXX11_OVERRIDE
+    SOURCE cmake/tests/cxx11_override.cpp
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_override)
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx14_constexpr)
   add_hpx_config_test(HPX_WITH_CXX14_CONSTEXPR
     SOURCE cmake/tests/cxx14_constexpr.cpp

@@ -79,6 +79,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_variadic_templates(
     REQUIRED "HPX needs support for C++11 variadic templates")
 
+  hpx_check_for_cxx11_override(
+    REQUIRED "HPX needs support for C++11 override")
+
   # Check the availability of certain C++11 library features
   hpx_check_for_cxx11_std_array(
     REQUIRED "HPX needs support for C++11 std::array")
