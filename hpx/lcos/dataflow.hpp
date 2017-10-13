@@ -11,28 +11,25 @@
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unwrap_ref.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/v1/is_executor.hpp>
@@ -67,44 +64,6 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
-    struct reset_dataflow_future
-    {
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(Future& future) const
-        {
-            future = Future();
-        }
-
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(boost::reference_wrapper<Future>& future) const
-        {
-            future.get() = Future();
-        }
-
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(std::reference_wrapper<Future>& future) const
-        {
-            future.get() = Future();
-        }
-
-        template <typename Future>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            !traits::detail::is_future_or_future_range<Future>::value
-        >::type operator()(Future& future) const
-        {}
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Args, typename Enable = void>
     struct dataflow_return;
 
@@ -135,25 +94,7 @@ namespace hpx { namespace lcos { namespace detail
 
         typedef hpx::lcos::future<result_type> type;
 
-        typedef typename util::detail::make_index_pack<
-                util::tuple_size<Futures>::value
-            >::type indices_type;
-
         typedef std::is_void<result_type> is_void;
-
-        template <std::size_t I>
-        struct is_end
-          : std::integral_constant<
-                bool,
-                util::tuple_size<Futures>::value == I
-            >
-        {};
-
-        typedef typename std::conditional<
-                is_void::value
-              , void(dataflow_frame::*)(indices_type, std::true_type)
-              , void(dataflow_frame::*)(indices_type, std::false_type)
-            >::type execute_function_type;
 
     private:
         // workaround gcc regression wrongly instantiating constructors
@@ -163,45 +104,37 @@ namespace hpx { namespace lcos { namespace detail
     public:
         typedef typename base_type::init_no_addref init_no_addref;
 
-        template <typename Policy_, typename FFunc, typename FFutures>
-        dataflow_frame(
-            Policy_ && policy
-          , FFunc && func
-          , FFutures && futures)
-              : policy_(std::forward<Policy_>(policy))
-              , func_(std::forward<FFunc>(func))
-              , futures_(std::forward<FFutures>(futures))
-              , done_(false)
-        {}
+        /// A struct to construct the dataflow_frame in-place
+        struct construction_data
+        {
+            Policy policy_;
+            Func func_;
+        };
 
-        template <typename Policy_, typename FFunc, typename FFutures>
-        dataflow_frame(
-            Policy_ && policy
-          , FFunc && func
-          , FFutures && futures
-          , init_no_addref no_addref)
-              : base_type(no_addref)
-              , policy_(std::forward<Policy_>(policy))
-              , func_(std::forward<FFunc>(func))
-              , futures_(std::forward<FFutures>(futures))
-              , done_(false)
-        {}
+        /// Construct the dataflow_frame from the given policy
+        /// and callable object.
+        static construction_data construct_from(Policy policy, Func func)
+        {
+            return construction_data{std::move(policy), std::move(func)};
+        }
 
-    protected:
+        explicit dataflow_frame(construction_data data)
+          : base_type(init_no_addref{})
+          , policy_(std::move(data.policy_))
+          , func_(std::move(data.func_))
+        {
+        }
+
+    private:
         ///////////////////////////////////////////////////////////////////////
-        template <std::size_t ...Is>
+        /// Passes the futures into the evaluation function and
+        /// sets the result future.
         HPX_FORCEINLINE
-        void execute(util::detail::pack_c<std::size_t, Is...>, std::false_type)
+        void execute(std::false_type, Futures&& futures)
         {
             try {
-                result_type res = util::invoke_fused(func_, std::move(futures_));
-
-                // reset futures
-                reset_dataflow_future reset;
-                int const _sequencer[] = {
-                    ((reset(util::get<Is>(futures_))), 0)...
-                };
-                (void)_sequencer;
+                result_type res =
+                    util::invoke_fused(func_, std::move(futures));
 
                 this->set_data(std::move(res));
             }
@@ -210,19 +143,13 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        template <std::size_t ...Is>
+        /// Passes the futures into the evaluation function and
+        /// sets the result future.
         HPX_FORCEINLINE
-        void execute(util::detail::pack_c<std::size_t, Is...>, std::true_type)
+        void execute(std::true_type, Futures&& futures)
         {
             try {
-                util::invoke_fused(func_, std::move(futures_));
-
-                // reset futures
-                reset_dataflow_future reset;
-                int const _sequencer[] = {
-                    ((reset(util::get<Is>(futures_))), 0)...
-                };
-                (void)_sequencer;
+                util::invoke_fused(func_, std::move(futures));
 
                 this->set_data(util::unused_type());
             }
@@ -231,14 +158,15 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        HPX_FORCEINLINE void done()
+        HPX_FORCEINLINE void done(Futures futures)
         {
             hpx::util::annotate_function annotate(func_);
-            execute(indices_type(), is_void());
+
+            execute(is_void{}, std::move(futures));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void finalize(hpx::detail::async_policy policy)
+        void finalize(hpx::detail::async_policy policy, Futures&& futures)
         {
             // schedule the final function invocation with high priority
             util::thread_description desc(func_, "dataflow_frame::finalize");
@@ -246,7 +174,8 @@ namespace hpx { namespace lcos { namespace detail
 
             // simply schedule new thread
             threads::register_thread_nullary(
-                util::deferred_call(&dataflow_frame::done, std::move(this_))
+                util::deferred_call(&dataflow_frame::done, std::move(this_),
+                                    std::move(futures))
               , desc
               , threads::pending
               , true
@@ -256,19 +185,20 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         HPX_FORCEINLINE
-        void finalize(hpx::detail::sync_policy)
+        void finalize(hpx::detail::sync_policy, Futures&& futures)
         {
-            done();
+            done(std::move(futures));
         }
 
-        void finalize(hpx::detail::fork_policy policy)
+        void finalize(hpx::detail::fork_policy policy, Futures&& futures)
         {
             // schedule the final function invocation with high priority
             util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
             threads::thread_id_type tid = threads::register_thread_nullary(
-                util::deferred_call(&dataflow_frame::done, std::move(this_))
+                util::deferred_call(&dataflow_frame::done, std::move(this_),
+                                    std::move(futures))
               , desc
               , threads::pending_do_not_schedule
               , true
@@ -283,27 +213,28 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        void finalize(launch policy)
+        void finalize(launch policy, Futures&& futures)
         {
             if (policy == launch::sync)
             {
-                finalize(launch::sync);
+                finalize(launch::sync, std::move(futures));
             }
             else if (policy == launch::fork)
             {
-                finalize(launch::fork);
+                finalize(launch::fork, std::move(futures));
             }
             else
             {
-                finalize(launch::async);
+                finalize(launch::async, std::move(futures));
             }
         }
 
         HPX_FORCEINLINE
-        void finalize(threads::executor& sched)
+        void finalize(threads::executor& sched, Futures&& futures)
         {
             boost::intrusive_ptr<dataflow_frame> this_(this);
-            hpx::apply(sched, &dataflow_frame::done, std::move(this_));
+            hpx::apply(sched, &dataflow_frame::done, std::move(this_),
+                std::move(futures));
         }
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
@@ -313,11 +244,11 @@ namespace hpx { namespace lcos { namespace detail
         typename std::enable_if<
             traits::is_executor<Executor>::value
         >::type
-        finalize(Executor& exec)
+        finalize(Executor& exec, Futures&& futures)
         {
             boost::intrusive_ptr<dataflow_frame> this_(this);
             parallel::executor_traits<Executor>::apply_execute(exec,
-                &dataflow_frame::done, std::move(this_));
+                &dataflow_frame::done, std::move(this_), std::move(futures));
         }
 #endif
 
@@ -327,201 +258,51 @@ namespace hpx { namespace lcos { namespace detail
             traits::is_one_way_executor<Executor>::value ||
             traits::is_two_way_executor<Executor>::value
         >::type
-        finalize(Executor& exec)
+        finalize(Executor& exec, Futures&& futures)
         {
+            using execute_function_type =
+                typename std::conditional<
+                    is_void::value,
+                    void (dataflow_frame::*)(std::true_type, Futures&&),
+                    void (dataflow_frame::*)(std::false_type, Futures&&)
+                >::type;
+
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
             parallel::execution::post(exec,
-                f, std::move(this_), indices_type(), is_void());
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <std::size_t I>
-        HPX_FORCEINLINE
-        void do_await(std::true_type)
-        {
-            done_ = true;
-        }
-
-        // Current element is a not a future or future range, e.g. a just plain
-        // value.
-        template <std::size_t I, typename IsFuture, typename IsRange>
-        HPX_FORCEINLINE
-        void await_next_respawn(IsFuture is_future, IsRange is_range)
-        {
-            await_next<I>(is_future, is_range);
-
-            // avoid finalizing more than once
-            bool expected = true;
-            if (done_.compare_exchange_strong(expected, false))
-                finalize(policy_);
-        }
-
-        template <std::size_t I>
-        HPX_FORCEINLINE
-        void await_next(std::false_type, std::false_type)
-        {
-            do_await<I + 1>(is_end<I + 1>());
-        }
-
-        template <std::size_t I, typename Iter>
-        void await_range_respawn(Iter next, Iter end)
-        {
-            await_range<I>(next, end);
-
-            // avoid finalizing more than once
-            bool expected = true;
-            if (done_.compare_exchange_strong(expected, false))
-                finalize(policy_);
-        }
-
-        template <std::size_t I, typename Iter>
-        void await_range(Iter next, Iter end)
-        {
-            void (dataflow_frame::*f)(Iter, Iter) =
-                &dataflow_frame::await_range_respawn<I>;
-
-            for (/**/; next != end; ++next)
-            {
-                typedef
-                    typename std::iterator_traits<Iter>::value_type
-                    future_type;
-                typedef
-                    typename traits::future_traits<future_type>::type
-                    future_result_type;
-
-                typename traits::detail::shared_state_ptr<
-                        future_result_type
-                    >::type next_future_data =
-                        traits::detail::get_shared_state(*next);
-
-                if (next_future_data.get() != nullptr &&
-                    !next_future_data->is_ready())
-                {
-                    next_future_data->execute_deferred();
-
-                    // execute_deferred might have made the future ready
-                    if (!next_future_data->is_ready())
-                    {
-                        boost::intrusive_ptr<dataflow_frame> this_(this);
-                        next_future_data->set_on_completed(
-                            util::deferred_call(
-                                f
-                              , std::move(this_)
-                              , std::move(next)
-                              , std::move(end)
-                            )
-                        );
-                        return;
-                    }
-                }
-            }
-
-            do_await<I + 1>(is_end<I + 1>());
-        }
-
-        // Current element is a range (vector) of futures
-        template <std::size_t I>
-        HPX_FORCEINLINE
-        void await_next(std::false_type, std::true_type)
-        {
-            typedef
-                typename util::tuple_element<I, Futures>::type
-                future_type;
-            future_type & f_ = util::get<I>(futures_);
-
-            await_range<I>(
-                util::begin(util::unwrap_ref(f_))
-              , util::end(util::unwrap_ref(f_))
-            );
-        }
-
-        // Current element is a simple future
-        template <std::size_t I>
-        HPX_FORCEINLINE
-        void await_next(std::true_type, std::false_type)
-        {
-            typedef
-                typename util::tuple_element<I, Futures>::type
-                future_type;
-            future_type & f_ = util::get<I>(futures_);
-
-            typedef
-                typename traits::future_traits<future_type>::type
-                future_result_type;
-
-            typename traits::detail::shared_state_ptr<
-                    future_result_type
-                >::type next_future_data =
-                    traits::detail::get_shared_state(f_);
-
-            if (next_future_data.get() != nullptr &&
-                !next_future_data->is_ready())
-            {
-                next_future_data->execute_deferred();
-
-                // execute_deferred might have made the future ready
-                if (!next_future_data->is_ready())
-                {
-                    void (dataflow_frame::*f)(
-                            std::true_type, std::false_type
-                        ) = &dataflow_frame::await_next_respawn<I>;
-
-                    boost::intrusive_ptr<dataflow_frame> this_(this);
-                    next_future_data->set_on_completed(
-                        util::deferred_call(
-                            f
-                          , std::move(this_)
-                          , std::true_type()
-                          , std::false_type()
-                        )
-                    );
-                    return;
-                }
-            }
-
-            do_await<I + 1>(is_end<I + 1>());
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <std::size_t I>
-        HPX_FORCEINLINE
-        void do_await(std::false_type)
-        {
-            typedef
-                typename util::tuple_element<I, Futures>::type
-                future_type;
-
-            typedef util::detail::any_of<
-                    traits::is_future<future_type>,
-                    traits::is_ref_wrapped_future<future_type>
-                > is_future;
-
-            typedef util::detail::any_of<
-                    traits::is_future_range<future_type>,
-                    traits::is_ref_wrapped_future_range<future_type>
-                > is_range;
-
-            await_next<I>(is_future(), is_range());
+                f, std::move(this_), is_void{}, std::move(futures));
         }
 
     public:
-        HPX_FORCEINLINE void do_await()
+        /// Check whether the current future is ready
+        template <typename T>
+        auto operator()(util::async_traverse_visit_tag, T&& current)
+            -> decltype(async_visit_future(std::forward<T>(current)))
         {
-            do_await<0>(is_end<0>());
+            return async_visit_future(std::forward<T>(current));
+        }
 
-            // avoid finalizing more than once
-            bool expected = true;
-            if (done_.compare_exchange_strong(expected, false))
-                finalize(policy_);
+        /// Detach the current execution context and continue when the
+        /// current future was set to be ready.
+        template <typename T, typename N>
+        auto operator()(util::async_traverse_detach_tag, T&& current, N&& next)
+            -> decltype(async_detach_future(
+                std::forward<T>(current), std::forward<N>(next)))
+        {
+            return async_detach_future(
+                std::forward<T>(current), std::forward<N>(next));
+        }
+
+        /// Finish the dataflow when the traversal has finished
+        void operator()(util::async_traverse_complete_tag, Futures futures)
+        {
+            finalize(policy_, std::move(futures));
         }
 
     private:
         Policy policy_;
         Func func_;
-        Futures futures_;
-        std::atomic<bool> done_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -561,21 +342,21 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
-            typedef typename frame_type::init_no_addref init_no_addref;
 
-            boost::intrusive_ptr<frame_type> p(new frame_type(
-                    std::forward<Policy>(launch_policy)
-                  , Derived()
-                  , util::forward_as_tuple(
-                        id
-                      , traits::acquire_future_disp()(std::forward<Ts>(ts))...
-                    )
-                  , init_no_addref()
-                ), false);
-            p->do_await();
+            // Create the data which is used to construct the dataflow_frame
+            auto data = frame_type::construct_from(
+                std::forward<Policy>(launch_policy), Derived{});
+
+            // Construct the dataflow_frame and traverse
+            // the arguments asynchronously
+            boost::intrusive_ptr<frame_type> p = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{},
+                std::move(data), id,
+                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
 
             using traits::future_access;
-            return future_access<typename frame_type::type>::create(std::move(p));
+            return future_access<typename frame_type::type>::create(
+                std::move(p));
         }
 
         template <

@@ -57,19 +57,17 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
-            typedef typename frame_type::init_no_addref init_no_addref;
 
-            boost::intrusive_ptr<frame_type> p(new frame_type(
-                    std::forward<Policy>(policy)
-                  , std::forward<F>(f)
-                  , util::forward_as_tuple(
-                        traits::acquire_future_disp()(
-                            std::forward<Ts>(ts)
-                        )...
-                    )
-                  , init_no_addref()
-                ), false);
-            p->do_await();
+            // Create the data which is used to construct the dataflow_frame
+            auto data = frame_type::construct_from(
+                std::forward<Policy>(policy), std::forward<F>(f));
+
+            // Construct the dataflow_frame and traverse
+            // the arguments asynchronously
+            boost::intrusive_ptr<frame_type> p = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{},
+                std::move(data),
+                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
 
             using traits::future_access;
             return future_access<typename frame_type::type>::create(std::move(p));
@@ -144,19 +142,16 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
-            typedef typename frame_type::init_no_addref init_no_addref;
 
-            boost::intrusive_ptr<frame_type> p(new frame_type(
-                    sched
-                  , std::forward<F>(f)
-                  , util::forward_as_tuple(
-                        traits::acquire_future_disp()(
-                            std::forward<Ts>(ts)
-                        )...
-                    )
-                  , init_no_addref()
-                ), false);
-            p->do_await();
+            // Create the data which is used to construct the dataflow_frame
+            auto data = frame_type::construct_from(sched, std::forward<F>(f));
+
+            // Construct the dataflow_frame and traverse
+            // the arguments asynchronously
+            boost::intrusive_ptr<frame_type> p = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{},
+                std::move(data),
+                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
 
             using traits::future_access;
             return future_access<typename frame_type::type>::create(std::move(p));
@@ -197,17 +192,17 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
-            typedef typename frame_type::init_no_addref init_no_addref;
 
-            boost::intrusive_ptr<frame_type> p(new frame_type(
-                    std::forward<Executor_>(exec)
-                  , std::forward<F>(f)
-                  , util::forward_as_tuple(
-                        traits::acquire_future_disp()(std::forward<Ts>(ts))...
-                    )
-                  , init_no_addref()
-                ), false);
-            p->do_await();
+            // Create the data which is used to construct the dataflow_frame
+            auto data = frame_type::construct_from(
+                std::forward<Executor_>(exec), std::forward<F>(f));
+
+            // Construct the dataflow_frame and traverse
+            // the arguments asynchronously
+            boost::intrusive_ptr<frame_type> p = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{},
+                std::move(data),
+                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
 
             using traits::future_access;
             return future_access<typename frame_type::type>::create(std::move(p));

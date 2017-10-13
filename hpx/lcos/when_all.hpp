@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2017 Denis Blank
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -136,23 +137,15 @@ namespace hpx
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_some.hpp>
 #include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/range.hpp>
+#include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unwrap_ref.hpp>
 
-#include <boost/intrusive_ptr.hpp>
-
-#include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
@@ -190,210 +183,87 @@ namespace hpx { namespace lcos
             }
         };
 
-        ///////////////////////////////////////////////////////////////////////
         template <typename Tuple>
-        struct when_all_frame //-V690
-          : hpx::lcos::detail::future_data<typename when_all_result<Tuple>::type>
+        class async_when_all_frame
+          : public future_data<typename when_all_result<Tuple>::type>
         {
+        public:
             typedef typename when_all_result<Tuple>::type result_type;
             typedef hpx::lcos::future<result_type> type;
             typedef hpx::lcos::detail::future_data<result_type> base_type;
 
-        private:
-            // workaround gcc regression wrongly instantiating constructors
-            when_all_frame();
-            when_all_frame(when_all_frame const&);
-
-            template <std::size_t I>
-            struct is_end
-              : std::integral_constant<
-                    bool,
-                    util::tuple_size<Tuple>::value == I
-                >
-            {};
-
-        public:
-            typedef typename base_type::init_no_addref init_no_addref;
-
-            template <typename Tuple_>
-            when_all_frame(Tuple_&& t)
-              : t_(std::forward<Tuple_>(t))
-            {}
-
-            template <typename Tuple_>
-            when_all_frame(Tuple_&& t, init_no_addref no_addref)
-              : base_type(no_addref), t_(std::forward<Tuple_>(t))
-            {}
-
-        protected:
-            // End of the tuple is reached
-            template <std::size_t I>
-            HPX_FORCEINLINE
-            void do_await(std::true_type)
+            explicit async_when_all_frame(
+                typename base_type::init_no_addref no_addref)
+              : future_data<typename when_all_result<Tuple>::type>(no_addref)
             {
-                this->set_value(when_all_result<Tuple>::call(std::move(t_)));
             }
 
-            // Current element is a range of futures
-            template <std::size_t I, typename Iter>
-            void await_range(Iter next, Iter end)
+            template <typename T>
+            auto operator()(util::async_traverse_visit_tag, T&& current)
+                -> decltype(async_visit_future(std::forward<T>(current)))
             {
-                typedef typename std::iterator_traits<Iter>::value_type
-                    future_type;
-                typedef typename traits::future_traits<future_type>::type
-                    future_result_type;
-
-                void (when_all_frame::*f)(Iter, Iter) =
-                    &when_all_frame::await_range<I>;
-
-                for (/**/; next != end; ++next)
-                {
-                    typename traits::detail::shared_state_ptr<
-                            future_result_type
-                        >::type next_future_data =
-                            traits::detail::get_shared_state(*next);
-
-                    if (next_future_data.get() != nullptr &&
-                        !next_future_data->is_ready())
-                    {
-                        next_future_data->execute_deferred();
-
-                        // execute_deferred might have made the future ready
-                        if (!next_future_data->is_ready())
-                        {
-                            // Attach a continuation to this future which will
-                            // re-evaluate it and continue to the next element
-                            // in the sequence (if any).
-                            boost::intrusive_ptr<when_all_frame> this_(this);
-                            next_future_data->set_on_completed(util::deferred_call(
-                                f, std::move(this_),
-                                std::move(next), std::move(end)));
-                            return;
-                        }
-                    }
-                }
-
-                do_await<I + 1>(is_end<I + 1>());
+                return async_visit_future(std::forward<T>(current));
             }
 
-            template <std::size_t I>
-            HPX_FORCEINLINE
-            void await_next(std::false_type, std::true_type)
+            template <typename T, typename N>
+            auto operator()(
+                util::async_traverse_detach_tag, T&& current, N&& next)
+                -> decltype(async_detach_future(
+                    std::forward<T>(current), std::forward<N>(next)))
             {
-                await_range<I>(
-                    util::begin(util::unwrap_ref(util::get<I>(t_))),
-                    util::end(util::unwrap_ref(util::get<I>(t_))));
+                return async_detach_future(
+                    std::forward<T>(current), std::forward<N>(next));
             }
 
-            // Current element is a simple future
-            template <std::size_t I>
-            HPX_FORCEINLINE
-            void await_next(std::true_type, std::false_type)
+            template <typename T>
+            void operator()(util::async_traverse_complete_tag, T&& pack)
             {
-                typedef typename util::decay_unwrap<
-                    typename util::tuple_element<I, Tuple>::type
-                >::type future_type;
-
-                future_type& f_ = util::get<I>(t_);
-
-                typedef typename traits::future_traits<future_type>::type
-                    future_result_type;
-
-                typename traits::detail::shared_state_ptr<
-                        future_result_type
-                    >::type next_future_data =
-                        traits::detail::get_shared_state(f_);
-
-                if (next_future_data.get() != nullptr &&
-                    !next_future_data->is_ready())
-                {
-                    next_future_data->execute_deferred();
-
-                    // execute_deferred might have made the future ready
-                    if (!next_future_data->is_ready())
-                    {
-                        // Attach a continuation to this future which will
-                        // re-evaluate it and continue to the next argument
-                        // (if any).
-                        void (when_all_frame::*f)(std::true_type, std::false_type) =
-                            &when_all_frame::await_next<I>;
-
-                        boost::intrusive_ptr<when_all_frame> this_(this);
-                        next_future_data->set_on_completed(util::deferred_call(
-                            f, std::move(this_), std::true_type(), std::false_type()));
-                        return;
-                    }
-                }
-
-                do_await<I + 1>(is_end<I + 1>());
+                this->set_value(
+                    when_all_result<Tuple>::call(std::forward<T>(pack)));
             }
-
-            template <std::size_t I>
-            HPX_FORCEINLINE
-            void do_await(std::false_type)
-            {
-                typedef typename util::decay_unwrap<
-                    typename util::tuple_element<I, Tuple>::type
-                >::type future_type;
-
-                typedef traits::is_future<future_type> is_future;
-                typedef traits::is_future_range<future_type> is_range;
-
-                await_next<I>(is_future(), is_range());
-            }
-
-        public:
-            HPX_FORCEINLINE void do_await()
-            {
-                do_await<0>(is_end<0>());
-            }
-
-        private:
-            Tuple t_;
         };
+
+        template <typename... T>
+        typename detail::async_when_all_frame<
+            util::tuple<
+                typename traits::acquire_future<T>::type...
+            >
+        >::type
+        when_all_impl(T&&... args)
+        {
+            typedef util::tuple<typename traits::acquire_future<T>::type...>
+                result_type;
+            typedef detail::async_when_all_frame<result_type> frame_type;
+
+            traits::acquire_future_disp func;
+
+            typename frame_type::base_type::init_no_addref no_addref;
+
+            auto frame = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{}, no_addref,
+                func(std::forward<T>(args))...);
+
+            using traits::future_access;
+            return future_access<typename frame_type::type>::create(
+                std::move(frame));
+        }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Range>
-    typename std::enable_if<traits::is_future_range<Range>::value,
-        lcos::future<typename std::decay<Range>::type> >::type //-V659
-    when_all(Range&& lazy_values)
+    template <typename First, typename Second>
+    auto when_all(First&& first, Second&& second)
+        -> decltype(detail::when_all_impl(
+            std::forward<First>(first), std::forward<Second>(second)))
     {
-        typedef typename std::decay<Range>::type result_type;
-
-        result_type lazy_values_ = traits::acquire_future<result_type>()(lazy_values);
-
-        typedef detail::when_all_frame<
-                util::tuple<result_type>
-            > frame_type;
-        typedef typename frame_type::init_no_addref init_no_addref;
-
-        boost::intrusive_ptr<frame_type> p(new frame_type(
-            util::forward_as_tuple(std::move(lazy_values_)), init_no_addref()),
-            false);
-        p->do_await();
-
-        using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
+        return detail::when_all_impl(
+            std::forward<First>(first), std::forward<Second>(second));
     }
-
-    template <typename Iterator, typename Container =
-        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
-    lcos::future<Container>
-    when_all(Iterator begin, Iterator end)
+    template <typename Iterator,
+        typename Container = std::vector<
+            typename detail::future_iterator_traits<Iterator>::type>>
+    future<Container> when_all(Iterator begin, Iterator end)
     {
-        Container lazy_values_;
-
-        typename std::iterator_traits<Iterator>::
-            difference_type difference = std::distance(begin, end);
-        if (difference > 0)
-            traits::detail::reserve_if_reservable(
-                lazy_values_, static_cast<std::size_t>(difference));
-
-        std::transform(begin, end, std::back_inserter(lazy_values_),
-            traits::acquire_future_disp());
-
-        return lcos::when_all(std::move(lazy_values_));
+        return detail::when_all_impl(
+            detail::acquire_future_iterators<Iterator, Container>(begin, end));
     }
 
     inline lcos::future<util::tuple<> > //-V524
@@ -404,52 +274,23 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator, typename Container =
-        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
-    lcos::future<Container>
-    when_all_n(Iterator begin, std::size_t count)
+    template <typename Iterator,
+        typename Container = std::vector<
+            typename lcos::detail::future_iterator_traits<Iterator>::type>>
+    lcos::future<Container> when_all_n(Iterator begin, std::size_t count)
     {
-        Container values;
-        traits::detail::reserve_if_reservable(values, count);
-
-        traits::acquire_future_disp func;
-        for (std::size_t i = 0; i != count; ++i)
-            values.push_back(func(*begin++));
-
-        return lcos::when_all(std::move(values));
+        return detail::when_all_impl(
+            detail::acquire_future_n<Iterator, Container>(begin, count));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename... Ts>
-    typename std::enable_if<
-        !(traits::is_future_range<T>::value && sizeof...(Ts) == 0),
-        typename detail::when_all_frame<
-            util::tuple<
-                typename traits::acquire_future<T>::type,
-                typename traits::acquire_future<Ts>::type...
-            >
-        >::type
-    >::type
-    when_all(T&& t, Ts&&... ts)
+    template <typename... Args,
+        typename std::enable_if<(sizeof...(Args) == 1U) ||
+            (sizeof...(Args) > 2U)>::type* = nullptr>
+    auto when_all(Args&&... args)
+        -> decltype(detail::when_all_impl(std::forward<Args>(args)...))
     {
-        typedef util::tuple<
-                typename traits::acquire_future<T>::type,
-                typename traits::acquire_future<Ts>::type...
-            > result_type;
-        typedef detail::when_all_frame<result_type> frame_type;
-        typedef typename frame_type::init_no_addref init_no_addref;
-
-        traits::acquire_future_disp func;
-        result_type values(
-            func(std::forward<T>(t)),
-            func(std::forward<Ts>(ts))...);
-
-        boost::intrusive_ptr<frame_type> p(
-            new frame_type(std::move(values), init_no_addref()), false);
-        p->do_await();
-
-        using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
+        return detail::when_all_impl(std::forward<Args>(args)...);
     }
 }}
 
