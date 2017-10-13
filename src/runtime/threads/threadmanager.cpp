@@ -94,7 +94,7 @@ namespace hpx {
         {
             if (vm.count("hpx:hierarchy-arity"))
             {
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:hierarchy-arity, valid for "
                     "--hpx:queuing=hierarchy only.");
@@ -116,14 +116,14 @@ namespace hpx {
             // pu control is available for HWLOC only
             if (vm.count("hpx:pu-offset"))
             {
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:pu-offset, valid for --hpx:queuing=priority or "
                     "--hpx:queuing=local-priority only.");
             }
             if (vm.count("hpx:pu-step"))
             {
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:pu-step, valid for --hpx:queuing=abp-priority, "
                     "--hpx:queuing=periodic-priority, or "
@@ -134,7 +134,7 @@ namespace hpx {
             // affinity control is available for HWLOC only
             if (vm.count("hpx:affinity"))
             {
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:affinity, valid for --hpx:queuing=abp-priority, "
                     "--hpx:queuing=periodic-priority, or "
@@ -142,7 +142,7 @@ namespace hpx {
             }
             if (vm.count("hpx:bind"))
             {
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:bind, valid for --hpx:queuing=abp-priority, "
                     "--hpx:queuing=periodic-priority, or "
@@ -150,7 +150,7 @@ namespace hpx {
             }
             if (vm.count("hpx:print-bind"))
             {
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:print-bind, valid for --hpx:queuing=abp-priority, "
                     "--hpx:queuing=periodic-priority, or "
@@ -170,7 +170,7 @@ namespace hpx {
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
                 if (num_high_priority_queues > num_threads)
                 {
-                    throw detail::command_line_error(
+                    throw hpx::detail::command_line_error(
                         "Invalid command line option: "
                         "number of high priority threads ("
                         "--hpx:high-priority-threads), should not be larger "
@@ -193,7 +193,7 @@ namespace hpx {
                     0 != std::string("numa").find(affinity_domain) &&
                     0 != std::string("machine").find(affinity_domain))
                 {
-                    throw detail::command_line_error(
+                    throw hpx::detail::command_line_error(
                         "Invalid command line option "
                         "--hpx:affinity, value must be one of: pu, core, numa, "
                         "or machine.");
@@ -214,7 +214,7 @@ namespace hpx {
                     cfg.pu_offset_ == std::size_t(0)) ||
                 cfg.pu_step_ != 1 || cfg.affinity_domain_ != "pu")
             {
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Command line option --hpx:bind "
                     "should not be used with --hpx:pu-step, --hpx:pu-offset, "
                     "or --hpx:affinity.");
@@ -417,7 +417,7 @@ namespace hpx { namespace threads
                 pools_.push_back(std::move(pool));
 
 #else
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=local "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local'.");
@@ -533,7 +533,7 @@ namespace hpx { namespace threads
                 pools_.push_back(std::move(pool));
 
 #else
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=static "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static'.");
@@ -579,7 +579,7 @@ namespace hpx { namespace threads
                 pools_.push_back(std::move(pool));
 
 #else
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=static-priority "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static-priority'.");
@@ -620,7 +620,7 @@ namespace hpx { namespace threads
                         thread_offset));
                 pools_.push_back(std::move(pool));
 #else
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=abp-priority "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
@@ -660,7 +660,7 @@ namespace hpx { namespace threads
                         thread_offset));
                 pools_.push_back(std::move(pool));
 #else
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=hierarchy "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=hierarchy'.");
@@ -701,7 +701,7 @@ namespace hpx { namespace threads
                         thread_offset));
                 pools_.push_back(std::move(pool));
 #else
-                throw detail::command_line_error(
+                throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=periodic-priority "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=periodic-priority'.");
