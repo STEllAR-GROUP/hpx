@@ -1144,7 +1144,7 @@ namespace hpx { namespace threads
         hwloc_bitmap_ptr bitmap,
         hpx_hwloc_membind_policy policy, int flags) const
     {
-        return hwloc_alloc_membind_nodeset(topo, len, bitmap->bmp_,
+        return hwloc_alloc_membind_nodeset(topo, len, bitmap->get_bmp(),
             (hwloc_membind_policy_t)(policy), flags);
     }
 
