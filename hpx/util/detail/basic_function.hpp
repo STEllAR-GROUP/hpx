@@ -60,7 +60,7 @@ namespace hpx { namespace util { namespace detail
     {
         // make sure the empty table instance is initialized in time, even
         // during early startup
-        static VTable const* get_empty_table()
+        static VTable const* get_empty_table() noexcept
         {
             static VTable const empty_table =
                 detail::construct_vtable<detail::empty_function<R(Ts...)> >();
