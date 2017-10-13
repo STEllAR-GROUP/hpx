@@ -12,6 +12,7 @@
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -385,6 +386,22 @@ namespace hpx { namespace threads
 
         return executors::current_executor(id->get_scheduler_base());
     }
+
+    threads::detail::thread_pool_base*
+        get_pool(thread_id_type const& id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "hpx::threads::get_pool",
+                "null thread id encountered");
+            return nullptr;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return id->get_scheduler_base()->get_parent_pool();
+    }
 }}
 
 namespace hpx { namespace this_thread
@@ -571,6 +588,12 @@ namespace hpx { namespace this_thread
     threads::executors::current_executor get_executor(error_code& ec)
     {
         return threads::get_executor(threads::get_self_id(), ec);
+    }
+
+    threads::detail::thread_pool_base*
+        get_pool(error_code& ec)
+    {
+        return threads::get_pool(threads::get_self_id(), ec);
     }
 
     std::ptrdiff_t get_available_stack_space()

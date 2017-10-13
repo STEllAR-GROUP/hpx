@@ -85,9 +85,9 @@ int hpx_main(int argc, char* argv[])
     // Check random scheduling with reducing resources.
     num_thread = 0;
     bool up = true;
-    hpx::util::high_resolution_timer t;
     std::vector<hpx::future<void>> fs;
-    while (t.elapsed() < 5)
+    hpx::util::high_resolution_timer t;
+    while (t.elapsed() < 2)
     {
         for (std::size_t i = 0; i < hpx::resource::get_num_threads("default") * 10; ++i)
         {
@@ -96,7 +96,9 @@ int hpx_main(int argc, char* argv[])
         if (up)
         {
             if (num_thread != hpx::resource::get_num_threads("default") -1)
+            {
                 tp.remove_processing_unit(num_thread);
+            }
 
             ++num_thread;
             if (num_thread == hpx::resource::get_num_threads("default"))
@@ -116,8 +118,7 @@ int hpx_main(int argc, char* argv[])
             }
         }
     }
-
-    hpx::when_all(fs).get();
+    hpx::when_all(std::move(fs)).get();
 
     return hpx::finalize();
 }

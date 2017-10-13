@@ -56,6 +56,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
         self_(nullptr)
     {
+        scheduler_.set_parent_pool(this_thread::get_pool());
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the
         // manage_executor interface.
@@ -70,7 +71,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // if we're still starting up, give this executor a chance of executing
         // its tasks
         while (scheduler_.get_state(0) < state_running)
+        {
             this_thread::suspend();
+        }
 
         // Inform the resource manager that this executor is about to be
         // destroyed. This will cause it to invoke remove_processing_unit below
@@ -128,6 +131,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // if the scheduler was stopped, we need to restart it
         state expected = state_stopped;
         scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
+
 
         // create a new thread
         thread_init_data data(util::bind(
