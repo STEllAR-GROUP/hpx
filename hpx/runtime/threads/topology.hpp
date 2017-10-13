@@ -207,6 +207,14 @@ namespace hpx { namespace threads
             hwloc_bitmap_ptr bitmap,
             hpx_hwloc_membind_policy policy, int flags) const = 0;
 
+        virtual threads::mask_type get_area_membind_nodeset(
+            const void *addr, std::size_t len, void *nodeset) const = 0;
+
+        virtual bool set_area_membind_nodeset(
+            const void *addr, std::size_t len, void *nodeset) const = 0;
+
+        virtual int get_numa_domain(const void *addr, void *nodeset) const = 0;
+
         /// Free memory that was previously allocated by allocate
         virtual void deallocate(void* addr, std::size_t len) const = 0;
 

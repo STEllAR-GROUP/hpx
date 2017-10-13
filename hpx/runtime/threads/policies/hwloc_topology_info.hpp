@@ -214,6 +214,14 @@ namespace hpx { namespace threads
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const;
 
+        threads::mask_type get_area_membind_nodeset(
+            const void *addr, std::size_t len, void *nodeset) const;
+
+        bool set_area_membind_nodeset(
+            const void *addr, std::size_t len, void *nodeset) const;
+
+        int get_numa_domain(const void *addr, void *nodeset) const;
+
         void print_vector(
             std::ostream& os, std::vector<std::size_t> const& v) const;
         void print_mask_vector(

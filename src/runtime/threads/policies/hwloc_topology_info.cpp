@@ -1144,10 +1144,47 @@ namespace hpx { namespace threads
         hwloc_bitmap_ptr bitmap,
         hpx_hwloc_membind_policy policy, int flags) const
     {
-        std::cout << "Calling hwloc_alloc_membind with bitmap " << bitmap << std::endl;
-
         return hwloc_alloc_membind_nodeset(topo, len, bitmap->bmp_,
             (hwloc_membind_policy_t)(policy), flags);
+    }
+
+    bool hwloc_topology_info::set_area_membind_nodeset(
+        const void *addr, std::size_t len, void *nodeset) const
+    {
+        hwloc_membind_policy_t policy = HWLOC_MEMBIND_BIND;
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
+        if (ret<0) {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::hwloc_topology_info::set_area_membind_nodeset"
+              , "hwloc_set_area_membind_nodeset failed");
+            return false;
+        }
+        return true;
+    }
+
+    threads::mask_type hwloc_topology_info::get_area_membind_nodeset(
+        const void *addr, std::size_t len, void *nodeset) const
+    {
+        hwloc_membind_policy_t policy;
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        hwloc_get_area_membind_nodeset(topo, addr, len, ns, &policy, 0);
+        return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
+    }
+
+    int hwloc_topology_info::get_numa_domain(const void *addr, void *nodeset) const
+    {
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        int ret = hwloc_get_area_memlocation(topo, addr, 1,  ns,
+            HWLOC_MEMBIND_BYNODESET);
+        if (ret<0) {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::hwloc_topology_info::set_area_membind_nodeset"
+              , "hwloc_set_area_membind_nodeset failed");
+            return -1;
+        }
+        threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
+        return threads::find_first(mask);
     }
 
     /// Free memory that was previously allocated by allocate
@@ -1163,22 +1200,18 @@ namespace hpx { namespace threads
         hwloc_bitmap_t bitmap = hwloc_bitmap_alloc();
         hwloc_bitmap_zero(bitmap);
         //
-        int const pu_depth =
+        int const depth =
             hwloc_get_type_or_below_depth(topo, htype);
 
         for (std::size_t i = 0; i != mask_size(mask); ++i) {
             if (test(mask, i)) {
-                hwloc_obj_t const pu_obj =
-                    hwloc_get_obj_by_depth(topo, pu_depth, unsigned(i));
-                HPX_ASSERT(i == detail::get_index(pu_obj));
+                hwloc_obj_t const hw_obj =
+                    hwloc_get_obj_by_depth(topo, depth, unsigned(i));
+                HPX_ASSERT(i == detail::get_index(hw_obj));
                 hwloc_bitmap_set(bitmap,
-                    static_cast<unsigned int>(pu_obj->os_index));
+                    static_cast<unsigned int>(hw_obj->os_index));
             }
         }
-//        std::cout << "mask_to_bitmap mask_cref is " << mask;
-//        char strp[256];
-//        hwloc_bitmap_snprintf((char*)(strp), 256, (const hwloc_bitmap_s*)(bitmap));
-//        std::cout << "\n" << "bitmap is " << strp << std::endl;
         return bitmap;
     }
 
@@ -1187,9 +1220,10 @@ namespace hpx { namespace threads
         hwloc_obj_type_t htype) const
     {
         mask_type mask = mask_type();
-        std::size_t num_pus = get_number_of_pus();
+        std::size_t num = hwloc_get_nbobjs_by_type(topo, htype);
+        //
         int const pu_depth = hwloc_get_type_or_below_depth(topo, htype);
-        for (unsigned int i=0; std::size_t(i)!=num_pus; ++i) //-V104
+        for (unsigned int i=0; std::size_t(i)!=num; ++i) //-V104
         {
             hwloc_obj_t const pu_obj =
                 hwloc_get_obj_by_depth(topo, pu_depth, i);
@@ -1197,10 +1231,6 @@ namespace hpx { namespace threads
             if (hwloc_bitmap_isset(bitmap, idx) != 0)
                 set(mask, detail::get_index(pu_obj));
         }
-//        std::cout << "bitmap_to_mask mask_cref is " << mask;
-//        char strp[256];
-//        hwloc_bitmap_snprintf((char*)(strp), 256, (const hwloc_bitmap_s*)(bitmap));
-//        std::cout << "\n" << "bitmap is " << strp << std::endl;
         return mask;
     }
 
