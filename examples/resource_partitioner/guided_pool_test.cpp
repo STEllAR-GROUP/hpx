@@ -49,17 +49,17 @@ using namespace hpx::threads::policies;
 void async_guided(std::size_t n, bool printout, const std::string &message)
 {
     if (printout) {
-        hpx::cout << "[async_guided] " << message << " " << n << "\n";
+        std::cout << "[async_guided] " << message << " " << n << "\n";
     }
     for (std::size_t i(0); i < n; ++i)
     {
         double f = std::sin(2 * M_PI * i / n);
         if (printout) {
-            hpx::cout << "sin(" << i << ") = " << f << ", ";
+            std::cout << "sin(" << i << ") = " << f << ", ";
         }
     }
     if (printout) {
-        hpx::cout << "\n";
+        std::cout << "\n";
     }
 }
 
@@ -77,6 +77,19 @@ namespace hpx { namespace threads { namespace executors
     };
 }}}
 
+// ------------------------------------------------------------------------
+// specialize the hint template for lambda args
+namespace hpx { namespace threads { namespace executors
+{
+    template <>
+    struct HPX_EXPORT pool_numa_hint<int, double, const std::string &>
+    {
+        int operator ()(int, double, const std::string &) const {
+            return 42;
+        }
+    };
+}}}
+
 using namespace hpx::threads::executors;
 
 // this is called on an hpx thread after the runtime starts up
@@ -87,17 +100,26 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (vm.count("use-scheduler"))
         use_scheduler = true;
     //
-    hpx::cout << "[hpx_main] starting ..."
+    std::cout << "[hpx_main] starting ..."
               << "use_pools " << use_pools << " "
               << "use_scheduler " << use_scheduler << "\n";
 
     std::size_t num_threads = hpx::get_num_worker_threads();
-    hpx::cout << "HPX using threads = " << num_threads << std::endl;
+    std::cout << "HPX using threads = " << num_threads << std::endl;
 
-    using hint_type = pool_numa_hint<decltype(&async_guided)>;
+    using hint_type1 = pool_numa_hint<decltype(&async_guided)>;
 
-    hpx::threads::executors::guided_pool_executor<hint_type> guided_exec(CUSTOM_POOL_NAME);
+    hpx::threads::executors::guided_pool_executor<hint_type1> guided_exec(CUSTOM_POOL_NAME);
     hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided, 5, true, "Guided function");
+
+    using hint_type2 = pool_numa_hint<int, double, const std::string &>;
+
+    hpx::threads::executors::guided_pool_executor<hint_type2> guided_exec2(CUSTOM_POOL_NAME);
+    hpx::future<void> gf2 = hpx::async(guided_exec2,
+        [](int a, double x, const std::string &msg) {
+            std::cout << "inside async lambda " << msg << std::endl;
+        },
+        5, 3.14, "Guided function 2");
 
 //    hpx::future<void> gf2 = gf1.then(
 //        guided_exec, [](hpx::future<void>&& f) { async_guided(5, true, "guided continuation"); });
