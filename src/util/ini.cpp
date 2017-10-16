@@ -793,7 +793,7 @@ void section::merge(section& second)
     for (section_map::iterator i = sections_.begin(); i != send; ++i)
     {
         // is there something to merge with?
-        if (second.has_section(i->first))
+        if (second.has_section(l, i->first))
             i->second.merge (second.sections_[i->first]);
     }
 
@@ -803,10 +803,10 @@ void section::merge(section& second)
     for (section_map::iterator i = s.begin (); i != secend; ++i)
     {
         // if THIS knows the section, we already merged it above
-        if (!has_section(i->first))
+        if (!has_section(l, i->first))
         {
             // it is not known here, so we can't merge, but have to add it.
-            add_section (i->first, i->second, get_root());
+            add_section (l, i->first, i->second, get_root());
         }
     }
 }

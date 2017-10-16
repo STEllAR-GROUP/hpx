@@ -178,7 +178,7 @@ namespace hpx { namespace util
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
-            "os_threads = 1",
+            "os_threads = all",
             "cores = all",
             "localities = 1",
             "first_pu = 0",
