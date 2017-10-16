@@ -1042,31 +1042,28 @@ namespace hpx { namespace threads { namespace policies
                 // just falls through to the cleanup work below (no work is available)
                 // in which case the current thread (which failed to acquire
                 // the lock) will just retry to enter this loop.
-                std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
-                if (!lk.owns_lock())
-                    return false;            // avoid long wait on lock
+                {
+                    std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
+                    if (!lk.owns_lock())
+                        return false;            // avoid long wait on lock
 
-                // stop running after all HPX threads have been terminated
-                bool added_new = add_new_always(added, addfrom, lk, steal);
-                if (!added_new) {
-                    // Before exiting each of the OS threads deletes the
-                    // remaining terminated HPX threads
-                    // REVIEW: Should we be doing this if we are stealing?
-                    bool canexit = cleanup_terminated_locked(true);
-                    if (!running && canexit) {
-                        // we don't have any registered work items anymore
-                        //do_some_work();       // notify possibly waiting threads
-                        return true;            // terminate scheduling loop
+                    // stop running after all HPX threads have been terminated
+                    bool added_new = add_new_always(added, addfrom, lk, steal);
+                    if (!added_new) {
+                        // Before exiting each of the OS threads deletes the
+                        // remaining terminated HPX threads
+                        // REVIEW: Should we be doing this if we are stealing?
+                        bool canexit = cleanup_terminated_locked(true);
+                        if (!running && canexit) {
+                            // we don't have any registered work items anymore
+                            //do_some_work();       // notify possibly waiting threads
+                            return true;            // terminate scheduling loop
+                        }
+                        return false;
                     }
-                    return false;
-                }
 
-                cleanup_terminated_locked();
-            }
-            bool canexit = cleanup_terminated_locked(true);
-            if (!running && canexit) {
-                // we don't have any registered work items anymore
-                return true;            // terminate scheduling loop
+                    cleanup_terminated_locked();
+                }
             }
             return false;
         }
