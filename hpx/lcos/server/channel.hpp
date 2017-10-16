@@ -96,13 +96,13 @@ namespace hpx { namespace lcos { namespace server
         {
             return channel_.get(generation);
         }
-        HPX_DEFINE_COMPONENT_ACTION(channel, get_generation);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(channel, get_generation);
 
         void set_generation(RemoteType && value, std::size_t generation)
         {
             channel_.set(std::move(value), generation);
         }
-        HPX_DEFINE_COMPONENT_ACTION(channel, set_generation);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(channel, set_generation);
 
         void close(bool force_delete_entries)
         {

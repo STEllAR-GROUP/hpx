@@ -257,7 +257,8 @@ namespace hpx { namespace lcos
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
-            return hpx::apply(action_type(), this->get_id(), util::unused,
+            hpx::util::unused_type unused;
+            return hpx::apply(action_type(), this->get_id(), std::move(unused),
                 generation);
         }
         template <typename U = T>
@@ -266,7 +267,8 @@ namespace hpx { namespace lcos
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
-            return hpx::async(action_type(), this->get_id(), util::unused,
+            hpx::util::unused_type unused;
+            return hpx::async(action_type(), this->get_id(), std::move(unused),
                 generation);
         }
         template <typename U = T>
@@ -275,7 +277,8 @@ namespace hpx { namespace lcos
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
-            return action_type()(this->get_id(), util::unused, generation);
+            hpx::util::unused_type unused;
+            return action_type()(this->get_id(), std::move(unused), generation);
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value>::type
@@ -495,7 +498,8 @@ namespace hpx { namespace lcos
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
-            return hpx::apply(action_type(), this->get_id(), util::unused,
+            hpx::util::unused_type unused;
+            return hpx::apply(action_type(), this->get_id(), std::move(unused),
                 generation);
         }
         template <typename U = T>
@@ -504,7 +508,8 @@ namespace hpx { namespace lcos
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
-            return hpx::async(action_type(), this->get_id(), util::unused,
+            hpx::util::unused_type unused;
+            return hpx::async(action_type(), this->get_id(), std::move(unused),
                 generation);
         }
         template <typename U = T>
@@ -513,7 +518,8 @@ namespace hpx { namespace lcos
         {
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
-            return action_type()(this->get_id(), util::unused, generation);
+            hpx::util::unused_type unused;
+            return action_type()(this->get_id(), std::move(unused), generation);
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value>::type
