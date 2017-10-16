@@ -95,6 +95,8 @@ namespace hpx { namespace threads { namespace executors
     struct HPX_EXPORT guided_pool_executor {};
 
     // --------------------------------------------------------------------
+    // this is a guided pool executor templated over a function type
+    // the function type should be the one used for async calls
     template <>
     template <typename R, typename...Args>
     struct HPX_EXPORT guided_pool_executor<pool_numa_hint<R(*)(Args...)>>
@@ -122,8 +124,44 @@ namespace hpx { namespace threads { namespace executors
         };
 
     private:
-        pool_numa_hint<R(*)(Args...)>   hint_;
+        pool_numa_hint<R(*)(Args...)> hint_;
     };
+
+    // --------------------------------------------------------------------
+    // this is a guided pool executor templated over args only
+    // the args should be the same as those that would be called
+    // for an async function or continuation. This makes it possible to
+    // guide a lambda rather than a full function.
+    template <>
+    template <typename...Args>
+    struct HPX_EXPORT guided_pool_executor<pool_numa_hint<Args...>>
+        : guided_pool_executor_base
+    {
+    public:
+        using guided_pool_executor_base::guided_pool_executor_base;
+
+        template <typename F, typename ... Ts>
+        hpx::future<
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
+        async_execute(F && f, Ts &&... ts)
+        {
+            // hold onto the function until all futures have become ready
+            // by using a dataflow operation, then call the scheduling hint
+            // before passing the task onwards to the real executor
+            return hpx::dataflow(
+                util::unwrapping(
+                    pre_execution_domain_schedule<pool_executor,
+                        pool_numa_hint<Args...>> {
+                            pool_executor_, hint_
+                        }
+                ),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+        };
+
+    private:
+        pool_numa_hint<Args...> hint_;
+    };
+
 }}}
 
 namespace hpx { namespace parallel { namespace execution
