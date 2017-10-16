@@ -294,13 +294,15 @@ namespace hpx { namespace threads { namespace detail
     {
         thread_id_type background_thread;
         background_running.reset(new bool(true));
+        auto bg_callback = callbacks.background_;
         thread_init_data background_init(
-            [&, background_running](thread_state_ex_enum) -> thread_result_type
+            [&idle_loop_count, bg_callback, background_running]
+            (thread_state_ex_enum) -> thread_result_type
             {
 
                 while(*background_running)
                 {
-                    if (callbacks.background_())
+                    if (bg_callback())
                     {
                         // we only update the idle_loop_count if
                         // background_running is true. If it was false, this task
@@ -672,20 +674,8 @@ namespace hpx { namespace threads { namespace detail
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                         {
-                            if (background_thread.get() != nullptr)
-                            {
-                                HPX_ASSERT(background_running);
-                                *background_running = false;
-                                scheduler.SchedulingPolicy::schedule_thread(
-                                    background_thread.get(), num_thread);
-                                background_thread.reset();
-                                background_running.reset();
-                            }
-                            else
-                            {
-                                this_state.store(state_stopped);
-                                break;
-                            }
+                            this_state.store(state_stopped);
+                            break;
                         }
 
                         // otherwise, keep idling for some time
@@ -713,8 +703,11 @@ namespace hpx { namespace threads { namespace detail
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
-                    background_thread = create_background_thread(scheduler, params,
-                        background_running, num_thread, idle_loop_count);
+                    if (running)
+                    {
+                        background_thread = create_background_thread(scheduler, params,
+                            background_running, num_thread, idle_loop_count);
+                    }
                 }
 
                 // call back into invoking context
@@ -743,12 +736,15 @@ namespace hpx { namespace threads { namespace detail
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
-                    background_thread = create_background_thread(scheduler, params,
-                        background_running, num_thread, idle_loop_count);
+                    if (running)
+                    {
+                        background_thread = create_background_thread(scheduler, params,
+                            background_running, num_thread, idle_loop_count);
+                    }
                 }
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
-                idle_loop_count > params.max_idle_loop_count_ || may_exit)
+                (idle_loop_count > params.max_idle_loop_count_) || may_exit)
             {
                 // clean up terminated threads
                 if (idle_loop_count > params.max_idle_loop_count_)
@@ -761,23 +757,11 @@ namespace hpx { namespace threads { namespace detail
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    if (background_thread)
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(
+                        num_thread, true))
                     {
-                        HPX_ASSERT(background_running);
-                        *background_running = false;
-                        scheduler.SchedulingPolicy::schedule_thread(
-                            background_thread.get(), num_thread);
-                        background_thread.reset();
-                        background_running.reset();
-                    }
-                    else
-                    {
-                        if (scheduler.SchedulingPolicy::cleanup_terminated(
-                            num_thread, true))
-                        {
-                            this_state.store(state_stopped);
-                            break;
-                        }
+                        this_state.store(state_stopped);
+                        break;
                     }
                     may_exit = false;
                 }

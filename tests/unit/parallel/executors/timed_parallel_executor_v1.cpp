@@ -74,6 +74,8 @@ int hpx_main(int argc, char* argv[])
     test_timed_async();
     test_timed_apply();
 
+    std::cout << "Finalizing...\n";
+
     return hpx::finalize();
 }
 
