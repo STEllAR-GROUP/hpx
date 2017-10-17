@@ -171,6 +171,9 @@ namespace hpx { namespace threads { namespace detail
 
         if (!threads_.empty())
         {
+            // set state to stopping
+            sched_->Scheduler::set_all_states(state_stopping);
+
             // make sure we're not waiting
             sched_->Scheduler::do_some_work(std::size_t(-1));
 
@@ -1392,6 +1395,16 @@ namespace hpx { namespace threads { namespace detail
     {
         compat::thread t;
 
+        // inform the scheduler to stop the virtual core
+        std::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(virt_core);
+
+        hpx::state oldstate = state.exchange(state_stopping);
+
+        HPX_ASSERT(oldstate == state_starting ||
+            oldstate == state_running || oldstate == state_suspended ||
+            oldstate == state_stopping || oldstate == state_stopped);
+
         {
             std::lock_guard<pu_mutex_type> l(used_processing_units_mtx_);
             if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
@@ -1412,13 +1425,6 @@ namespace hpx { namespace threads { namespace detail
             resource::get_partitioner().unassign_pu(id_.name(), virt_core);
             std::swap(threads_[virt_core], t);
         }
-
-        // inform the scheduler to stop the virtual core
-        std::atomic<hpx::state>& state =
-            sched_->Scheduler::get_state(virt_core);
-
-        hpx::state oldstate = state.exchange(state_stopping);
-        HPX_ASSERT(oldstate == state_running);
 
         if (hpx::get_runtime_ptr())
         {

@@ -426,34 +426,19 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        bool cleanup_terminated(bool delete_all = false)
         {
             bool empty = true;
-            if (num_thread == std::size_t(-1))
-            {
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    empty = queues_[i]->cleanup_terminated(delete_all) && empty;
-                if (!delete_all)
-                    return empty;
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+                empty = queues_[i]->cleanup_terminated(delete_all) && empty;
+            if (!delete_all)
+                return empty;
 
-                for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                    empty = high_priority_queues_[i]->
-                        cleanup_terminated(delete_all) && empty;
+            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
+                empty = high_priority_queues_[i]->
+                    cleanup_terminated(delete_all) && empty;
 
-                empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
-            }
-            else
-            {
-                empty = queues_[num_thread]->cleanup_terminated(delete_all);
-                if (delete_all)
-                    return true;
-
-                if (num_thread < high_priority_queues_.size())
-                    empty = high_priority_queues_[num_thread]->
-                        cleanup_terminated(delete_all) && empty;
-
-                empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
-            }
+            empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
             return empty;
         }
 
