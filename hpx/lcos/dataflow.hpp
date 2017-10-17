@@ -133,8 +133,10 @@ namespace hpx { namespace lcos { namespace detail
         void execute(std::false_type, Futures&& futures)
         {
             try {
+                Func func = std::move(func_);
+
                 result_type res =
-                    util::invoke_fused(func_, std::move(futures));
+                    util::invoke_fused(std::move(func), std::move(futures));
 
                 this->set_data(std::move(res));
             }
@@ -149,7 +151,9 @@ namespace hpx { namespace lcos { namespace detail
         void execute(std::true_type, Futures&& futures)
         {
             try {
-                util::invoke_fused(func_, std::move(futures));
+                Func func = std::move(func_);
+
+                util::invoke_fused(std::move(func), std::move(futures));
 
                 this->set_data(util::unused_type());
             }
