@@ -98,6 +98,9 @@ int hpx_main(int argc, char* argv[])
     }
 #endif
 
+    std::cout << "Finalize...\n";
+
+
     return hpx::finalize();
 }
 
