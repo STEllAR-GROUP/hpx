@@ -138,14 +138,15 @@ namespace util {
             /// Calls the visitor with the given element
             template <typename T>
             auto traverse(T&& value) -> decltype(util::invoke(
-                visitor(), async_traverse_visit_tag{}, std::forward<T>(value)))
+                std::declval<Visitor&>(), async_traverse_visit_tag{},
+                std::forward<T>(value)))
             {
                 return util::invoke(visitor(), async_traverse_visit_tag{},
                     std::forward<T>(value));
             }
 
             /// Calls the visitor with the given element and a continuation
-            /// which is capable of continuing the asynchrone traversal
+            /// which is capable of continuing the asynchronous traversal
             /// when it's called later.
             template <typename T, typename Hierarchy>
             void async_continue(T&& value, Hierarchy&& hierarchy)
@@ -165,7 +166,7 @@ namespace util {
             }
 
             /// Calls the visitor with no arguments to signalize that the
-            /// asynchrnous traversal was finished.
+            /// asynchronous traversal was finished.
             void async_complete()
             {
                 util::invoke(
