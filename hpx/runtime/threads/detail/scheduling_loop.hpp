@@ -667,25 +667,13 @@ namespace hpx { namespace threads { namespace detail
                         num_thread, running, idle_loop_count))
                 {
                     // clean up terminated threads one more time before existing
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                         {
-                            if (background_thread.get() != nullptr)
-                            {
-                                HPX_ASSERT(background_running);
-                                *background_running = false;
-                                scheduler.SchedulingPolicy::schedule_thread(
-                                    background_thread.get(), num_thread);
-                                background_thread.reset();
-                                background_running.reset();
-                            }
-                            else
-                            {
-                                this_state.store(state_stopped);
-                                break;
-                            }
+                            this_state.store(state_stopped);
+                            break;
                         }
 
                         // otherwise, keep idling for some time
@@ -761,29 +749,16 @@ namespace hpx { namespace threads { namespace detail
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    if (background_thread)
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
-                        HPX_ASSERT(background_running);
-                        *background_running = false;
-                        scheduler.SchedulingPolicy::schedule_thread(
-                            background_thread.get(), num_thread);
-                        background_thread.reset();
-                        background_running.reset();
-                    }
-                    else
-                    {
-                        if (scheduler.SchedulingPolicy::cleanup_terminated(
-                            num_thread, true))
-                        {
-                            this_state.store(state_stopped);
-                            break;
-                        }
+                        this_state.store(state_stopped);
+                        break;
                     }
                     may_exit = false;
                 }
                 else
                 {
-                    scheduler.SchedulingPolicy::cleanup_terminated(std::size_t(-1), true);
+                    scheduler.SchedulingPolicy::cleanup_terminated(true);
                 }
             }
         }
