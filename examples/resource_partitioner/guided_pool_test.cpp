@@ -62,32 +62,53 @@ void async_guided(std::size_t n, bool printout, const std::string &message)
         std::cout << "\n";
     }
 }
+/*
+template <typename ... Args>
+int a_function(Args...args) {
+    std::cout << "A_function double is " << std::endl;
+    return 2;
+}
+*/
+std::string a_function(hpx::future<double> &&df) {
+    std::cout << "A_function double is " << df.get() << std::endl;
+    return "The number 2";
+}
 
-// ------------------------------------------------------------------------
-// specialize the hint template for our function type
 namespace hpx { namespace threads { namespace executors
 {
-    template <>
+    // ------------------------------------------------------------------------
+    // specialize the hint template for our function type
     template <typename R, typename...Args>
     struct HPX_EXPORT pool_numa_hint<R(*)(Args...)>
     {
         int operator ()(Args ...args) const {
+            std::cout << "Function type numa hint invoked " << std::endl;
             return 56;
         }
     };
-}}}
 
-// ------------------------------------------------------------------------
-// specialize the hint template for lambda args
-namespace hpx { namespace threads { namespace executors
-{
+    // ------------------------------------------------------------------------
+    // specialize the hint template for lambda args
     template <>
     struct HPX_EXPORT pool_numa_hint<int, double, const std::string &>
     {
         int operator ()(int, double, const std::string &) const {
+            std::cout << "Lambda arg type numa hint invoked " << std::endl;
             return 42;
         }
     };
+
+    // ------------------------------------------------------------------------
+    // specialize the hint template for .then continuation
+    template <>
+    struct HPX_EXPORT pool_numa_hint<double>
+    {
+        int operator ()(double) const {
+            std::cout << "Lambda continuation numa hint invoked " << std::endl;
+            return 27;
+        }
+    };
+
 }}}
 
 using namespace hpx::threads::executors;
@@ -107,24 +128,74 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t num_threads = hpx::get_num_worker_threads();
     std::cout << "HPX using threads = " << num_threads << std::endl;
 
+    std::cout << std::endl << std::endl;
+    std::cout << "----------------------------------------------" << std::endl;
+    std::cout << "Testing async guided exec " << std::endl;
+    std::cout << "----------------------------------------------" << std::endl;
+    // we must specialize the numa callback hint for the function type we are invoking
     using hint_type1 = pool_numa_hint<decltype(&async_guided)>;
-
+    // create an executor using that hint type
     hpx::threads::executors::guided_pool_executor<hint_type1> guided_exec(CUSTOM_POOL_NAME);
+    // invoke an async function using our numa hint executor
     hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided, 5, true, "Guided function");
-
-    using hint_type2 = pool_numa_hint<int, double, const std::string &>;
-
-    hpx::threads::executors::guided_pool_executor<hint_type2> guided_exec2(CUSTOM_POOL_NAME);
-    hpx::future<void> gf2 = hpx::async(guided_exec2,
-        [](int a, double x, const std::string &msg) {
-            std::cout << "inside async lambda " << msg << std::endl;
-        },
-        5, 3.14, "Guided function 2");
-
-//    hpx::future<void> gf2 = gf1.then(
-//        guided_exec, [](hpx::future<void>&& f) { async_guided(5, true, "guided continuation"); });
-
     gf1.get();
+
+    std::cout << std::endl << std::endl;
+    std::cout << "----------------------------------------------" << std::endl;
+    std::cout << "Testing async guided exec lambda" << std::endl;
+    std::cout << "----------------------------------------------" << std::endl;
+    // specialize the numa hint callback for a lambda type invocation
+    // the args of the async lambda must match the args of the hint type
+    using hint_type2 = pool_numa_hint<int, double, const std::string &>;
+    // create an executor using the numa hint type
+    hpx::threads::executors::guided_pool_executor<hint_type2> guided_lambda_exec(CUSTOM_POOL_NAME);
+
+    using namespace hpx::traits;
+    static_assert(
+        has_sync_execute_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::false_type(),
+        "check has_sync_execute_member<Executor>::value");
+    static_assert(
+        has_async_execute_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::true_type(),
+        "check has_async_execute_member<Executor>::value");
+    static_assert(
+        has_then_execute_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::true_type(),
+        "has_then_execute_member<executor>::value");
+    static_assert(
+        has_post_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::false_type(),
+        "has_post_member<executor>::value");
+
+
+    // invoke the lambda asynchronously and use the numa executor
+    hpx::future<double> gf2 = hpx::async(guided_lambda_exec,
+        [](int a, double x, const std::string &msg) mutable -> double {
+            std::cout << "inside async lambda " << msg << std::endl;
+            // return a double as an example
+            return 3.1415;
+        },
+        5, 2.718, "Guided function 2");
+    gf2.get();
+
+    std::cout << std::endl << std::endl;
+    std::cout << "----------------------------------------------" << std::endl;
+    std::cout << "Testing async guided exec continuation" << std::endl;
+    std::cout << "----------------------------------------------" << std::endl;
+    // specialize the numa hint callback for another lambda type invocation
+    // the args of the async lambda must match the args of the hint type
+    using hint_type3 = pool_numa_hint<double>;
+    // create an executor using the numa hint type
+    hpx::threads::executors::guided_pool_executor<hint_type3> guided_cont_exec(CUSTOM_POOL_NAME);
+    // invoke the lambda asynchronously and use the numa executor
+    auto new_future = hpx::async([]() -> double { return 2*3.1415;} ).then(
+        guided_cont_exec, a_function);
+/*
+    [](double df)
+    {
+        double d = df; // .get();
+        std::cout << "received a double of value " << d << std::endl;
+        return d*2;
+    }));
+*/
+    new_future.get();
 
     return hpx::finalize();
 }
