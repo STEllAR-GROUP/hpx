@@ -85,6 +85,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         if (!pool_->run(lk, num_threads_))
         {
+            lk.unlock();
             HPX_THROW_EXCEPTION(invalid_status,
                 "thread_pool_os_executor<Scheduler>::thread_pool_os_executor",
                 "couldn't start thread_pool");
