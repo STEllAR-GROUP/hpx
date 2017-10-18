@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace executors
             threads::thread_schedule_hint schedulehint,
             error_code& ec)
         {
-            std::cout << "pool exeutor received hint " << schedulehint << std::endl;
+            std::cout << "pool executor received hint " << schedulehint << std::endl;
             // create a new thread
             thread_init_data data(
                 util::bind(
