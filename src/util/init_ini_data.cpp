@@ -95,14 +95,19 @@ namespace hpx { namespace util
         tokenizer_type::iterator end_suffixes = tok_suffixes.end();
 
         bool result = false;
-        for (tokenizer_type::iterator it = tok_paths.begin (); it != end_paths; ++it) {
-            std::string path = *it;
-            for (tokenizer_type::iterator jt = tok_suffixes.begin ();
-                jt != end_suffixes; ++jt) {
+        for (tokenizer_type::iterator it = tok_paths.begin(); it != end_paths;
+             ++it)
+        {
+            for (tokenizer_type::iterator jt = tok_suffixes.begin();
+                 jt != end_suffixes; ++jt)
+            {
+                std::string path = *it;
                 path += *jt;
-                bool result2 = handle_ini_file (ini, path + "/hpx.ini");
-                if (result2) {
-                    LBT_(info) << "loaded configuration: " << path << "/hpx.ini";
+                bool result2 = handle_ini_file(ini, path + "/hpx.ini");
+                if (result2)
+                {
+                    LBT_(info)
+                        << "loaded configuration: " << path << "/hpx.ini";
                 }
                 result = result2 || result;
             }
