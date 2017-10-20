@@ -7,9 +7,14 @@ set(tests
     for_each_value_proxy
    )
 
+include_directories(${CUDA_INCLUDE_DIRS})
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
+
+  set(${test}_FLAGS
+    DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
 
   source_group("Source Files" FILES ${sources})
 

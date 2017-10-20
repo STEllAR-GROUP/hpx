@@ -45,8 +45,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     class coroutine_self
     {
+    public:
         HPX_NON_COPYABLE(coroutine_self);
 
+    private:
         // store the current this and write it to the TSS on exit
         struct reset_self_on_exit
         {
@@ -126,7 +128,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return tmp;
         }
 
-        HPX_ATTRIBUTE_NORETURN void exit()
+        HPX_NORETURN void exit()
         {
             m_pimpl->exit_self();
             std::terminate(); // FIXME: replace with hpx::terminate();
@@ -204,6 +206,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         static HPX_EXPORT coroutine_self* get_self();
         static HPX_EXPORT void init_self();
         static HPX_EXPORT void reset_self();
+
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            HPX_ASSERT(m_pimpl);
+            return m_pimpl->get_apex_data();
+        }
+#endif
 
     private:
         yield_decorator_type yield_decorator_;

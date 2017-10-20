@@ -9,14 +9,17 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
+#include <hpx/util/debugging.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -26,7 +29,6 @@
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
@@ -279,13 +281,15 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_threads(util::manage_config& cfgmap,
+            util::runtime_configuration const& rtcfg,
             boost::program_options::variables_map& vm,
             util::batch_environment& env, bool using_nodelist, bool initial)
         {
             std::size_t batch_threads = env.retrieve_number_of_threads();
-            std::size_t default_threads = 1;
+            std::size_t default_threads = thread::hardware_concurrency();
             std::string threads_str = cfgmap.get_value<std::string>(
-                "hpx.os_threads", "");
+                "hpx.os_threads", rtcfg.get_entry("hpx.os_threads",
+                    std::to_string(default_threads)));
 
             if ("all" == threads_str)
             {
@@ -293,13 +297,15 @@ namespace hpx { namespace util
                     batch_threads = thread::hardware_concurrency();
                 else
                     default_threads = batch_threads;
-
-                cfgmap.config_["hpx.os_threads"] =
-                    std::to_string(batch_threads);
             }
             else if (batch_threads != std::size_t(-1))
             {
                 default_threads = batch_threads;
+            }
+            else
+            {
+                default_threads =
+                    hpx::util::safe_lexical_cast<std::size_t>(threads_str);
             }
 
             std::size_t threads = cfgmap.get_value<std::size_t>(
@@ -318,7 +324,8 @@ namespace hpx { namespace util
                 }
                 else
                 {
-                    threads = hpx::util::safe_lexical_cast<std::size_t>(threads_str);
+                    threads =
+                        hpx::util::safe_lexical_cast<std::size_t>(threads_str);
                 }
 
                 if (threads == 0)
@@ -331,7 +338,7 @@ namespace hpx { namespace util
                 if (threads > HPX_HAVE_MAX_CPU_COUNT)
                 {
                     throw hpx::detail::command_line_error("Requested more than "
-                        BOOST_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
+                        HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
                         "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }
@@ -483,8 +490,8 @@ namespace hpx { namespace util
 
             // Check for parsing failures
             if (!iftransform) {
-                throw hpx::detail::command_line_error(boost::str(boost::format(
-                    "Could not parse --hpx:iftransform argument '%1%'") %
+                throw hpx::detail::command_line_error(hpx::util::format(
+                    "Could not parse --hpx:iftransform argument '%1%'",
                     vm["hpx:iftransform"].as<std::string>()));
             }
 
@@ -526,15 +533,16 @@ namespace hpx { namespace util
                     std::cerr << "failed opening: " << node_file << std::endl;
 
                 // raise hard error if node file could not be opened
-                throw hpx::detail::command_line_error(boost::str(boost::format(
-                    "Could not open nodefile: '%s'") % node_file));
+                throw hpx::detail::command_line_error(hpx::util::format(
+                    "Could not open nodefile: '%s'", node_file));
             }
         }
         else if (vm.count("hpx:nodes")) {
             nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
 
-        enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
+        enable_batch_env = (cfgmap.get_value<int>("hpx.ignore_batch_env", 0)
+            + vm.count("hpx:ignore-batch-env")) == 0;
 #endif
 
         util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
@@ -554,7 +562,7 @@ namespace hpx { namespace util
 
         // handle number of cores and threads
         num_threads_ = detail::handle_num_threads(
-            cfgmap, vm, env, using_nodelist, initial);
+            cfgmap, rtcfg_, vm, env, using_nodelist, initial);
         num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
         bool expect_connections = false;
@@ -610,11 +618,11 @@ namespace hpx { namespace util
 
         // If the user has not specified an explicit runtime mode we
         // retrieve it from the command line.
-        if (hpx::runtime_mode_default == mode_) {
+        if (hpx::runtime_mode_default == rtcfg_.mode_) {
 #if defined(HPX_HAVE_NETWORKING)
             // The default mode is console, i.e. all workers need to be
             // started with --worker/-w.
-            mode_ = hpx::runtime_mode_console;
+            rtcfg_.mode_ = hpx::runtime_mode_console;
             if (vm.count("hpx:console") + vm.count("hpx:worker") +
                 vm.count("hpx:connect") > 1)
             {
@@ -627,7 +635,7 @@ namespace hpx { namespace util
             // In these cases we default to executing with an empty
             // hpx_main, except if specified otherwise.
             if (vm.count("hpx:worker")) {
-                mode_ = hpx::runtime_mode_worker;
+                rtcfg_.mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
@@ -640,17 +648,17 @@ namespace hpx { namespace util
 #endif
             }
             else if (vm.count("hpx:connect")) {
-                mode_ = hpx::runtime_mode_connect;
+                rtcfg_.mode_ = hpx::runtime_mode_connect;
             }
 #else
-            mode_ = hpx::runtime_mode_console;
+            rtcfg_.mode_ = hpx::runtime_mode_console;
 #endif
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         // we initialize certain settings if --node is specified (or data
         // has been retrieved from the environment)
-        if (mode_ == hpx::runtime_mode_connect) {
+        if (rtcfg_.mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
             hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
                 boost::lexical_cast<std::uint16_t>(
@@ -682,7 +690,7 @@ namespace hpx { namespace util
                 if (env.agas_node() == node) {
                     // console node, by default runs AGAS
                     run_agas_server = true;
-                    mode_ = hpx::runtime_mode_console;
+                    rtcfg_.mode_ = hpx::runtime_mode_console;
                 }
                 else {
                     // don't use port zero for non-console localities
@@ -691,7 +699,7 @@ namespace hpx { namespace util
 
                     // each node gets an unique port
                     hpx_port = static_cast<std::uint16_t>(hpx_port + node);
-                    mode_ = hpx::runtime_mode_worker;
+                    rtcfg_.mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                     // do not execute any explicit hpx_main except if asked
@@ -725,7 +733,7 @@ namespace hpx { namespace util
             }
         }
 
-        if ((vm.count("hpx:connect") || mode_ == hpx::runtime_mode_connect) &&
+        if ((vm.count("hpx:connect") || rtcfg_.mode_ == hpx::runtime_mode_connect) &&
             hpx_host == "127.0.0.1")
         {
             hpx_host = hpx::util::resolve_public_ip_address();
@@ -776,14 +784,14 @@ namespace hpx { namespace util
             // and no additional option (--hpx:agas or --hpx:node) has been
             // specified. That simplifies running small standalone
             // applications on one locality.
-            run_agas_server = mode_ != runtime_mode_connect;
+            run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         if (hpx_host == agas_host && hpx_port == agas_port) {
             // we assume that we need to run the agas server if the user
             // asked for the same network addresses for HPX and AGAS
-            run_agas_server = mode_ != runtime_mode_connect;
+            run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
         }
         else if (run_agas_server) {
             // otherwise, if the user instructed us to run the AGAS server,
@@ -797,7 +805,7 @@ namespace hpx { namespace util
         else if (env.found_batch_environment()) {
             // in batch mode, if the network addresses are different and we
             // should not run the AGAS server we assume to be in worker mode
-            mode_ = hpx::runtime_mode_worker;
+            rtcfg_.mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
@@ -818,35 +826,15 @@ namespace hpx { namespace util
 
         if (run_agas_server) {
             ini_config += "hpx.agas.service_mode=bootstrap";
-            if (vm.count("hpx:run-agas-server-only"))
-                ini_config += "hpx.components.load_external=0";
-        }
-        else if (vm.count("hpx:run-agas-server-only") &&
-              !(env.found_batch_environment()))
-        {
-            throw hpx::detail::command_line_error(
-                "Command line option --hpx:run-agas-server-only "
-                "can be specified only for the node running the AGAS server.");
-        }
-
-        if (1 == num_localities_ && vm.count("hpx:run-agas-server-only")) {
-            std::cerr << "hpx::init: command line warning: --hpx:run-agas-server-only "
-                "used for single locality execution, application might "
-                "not run properly." << std::endl;
         }
 
         // we can't run the AGAS server while connecting
-        if (run_agas_server && mode_ == runtime_mode_connect) {
+        if (run_agas_server && rtcfg_.mode_ == runtime_mode_connect) {
             throw hpx::detail::command_line_error(
                 "Command line option error: can't run AGAS server"
                 "while connecting to a running application.");
         }
 
-        // Set whether the AGAS server is running as a dedicated runtime.
-        // This decides whether the AGAS actions are executed with normal
-        // priority (if dedicated) or with high priority (non-dedicated)
-        if (vm.count("hpx:run-agas-server-only"))
-            ini_config += "hpx.agas.dedicated_server=1";
 #else
         ini_config += "hpx.agas.service_mode=bootstrap";
 #endif
@@ -922,7 +910,7 @@ namespace hpx { namespace util
         //        service only and requests to use 'priority_local' as the
         //        scheduler, switch to the 'local' scheduler instead.
         ini_config += std::string("hpx.runtime_mode=") +
-            get_runtime_mode_name(mode_);
+            get_runtime_mode_name(rtcfg_.mode_);
 
         bool noshutdown_evaluate = false;
         if (vm.count("hpx:print-counter-at")) {
@@ -948,10 +936,10 @@ namespace hpx { namespace util
                     continue;
                 }
 
-                throw hpx::detail::command_line_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(hpx::util::format(
                     "Invalid argument for option --hpx:print-counter-at: "
                     "'%1%', allowed values: 'startup', 'shutdown' (default), "
-                    "'noshutdown'") % s));
+                    "'noshutdown'", s));
             }
         }
 
@@ -1047,29 +1035,12 @@ namespace hpx { namespace util
                 ini_config_ += "hpx.cmd_line_help_option!=" + help_option;
             }
             else {
-                throw hpx::detail::command_line_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(hpx::util::format(
                     "Invalid argument for option --hpx:help: '%1%', allowed values: "
-                    "'minimal' (default) and 'full'") % help_option));
+                    "'minimal' (default) and 'full'", help_option));
             }
         }
         return false;
-    }
-
-    void attach_debugger()
-    {
-#if defined(_POSIX_VERSION)
-        volatile int i = 0;
-        std::cerr
-            << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
-            << " ready for attaching debugger. Once attached set i = 1 and continue"
-            << std::endl;
-        while(i == 0)
-        {
-            sleep(1);
-        }
-#elif defined(HPX_WINDOWS)
-        DebugBreak();
-#endif
     }
 
     void command_line_handling::handle_attach_debugger()
@@ -1078,11 +1049,12 @@ namespace hpx { namespace util
         if(vm_.count("hpx:attach-debugger"))
         {
             std::string option = vm_["hpx:attach-debugger"].as<std::string>();
-            if (option != "startup" && option != "exception") {
+            if (option != "off" && option != "startup" &&
+                option != "exception" && option != "test-failure") {
                 std::cerr <<
                     "hpx::init: command line warning: --hpx:attach-debugger: "
                     "invalid option: " << option << ". Allowed values are "
-                    "'startup' or 'exception'" << std::endl;
+                    "'off', 'startup', 'exception' or 'test-failure'" << std::endl;
             }
             else {
                 if (option == "startup")
@@ -1101,7 +1073,9 @@ namespace hpx { namespace util
         std::size_t num_threads)
     {
         threads::topology& top = threads::create_topology();
-        runtime & rt = get_runtime();
+        runtime& rt = get_runtime();
+        auto const& rp = hpx::resource::get_partitioner();
+        auto const& tm = rt.get_thread_manager();
         {
             std::ostringstream strm;    // make sure all output is kept together
 
@@ -1110,38 +1084,46 @@ namespace hpx { namespace util
             for (std::size_t i = 0; i != num_threads; ++i)
             {
                 // print the mask for the current PU
-                threads::mask_cref_type pu_mask =
-                    rt.get_thread_manager().get_pu_mask(top, i);
+                threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
+                std::string pool_name = tm.get_pool(i).get_pool_name();
 
                 if (!threads::any(pu_mask))
                 {
-                    strm << std::setw(4) << i << ": thread binding disabled" //-V112
+                    strm << std::setw(4) << i
+                         << ": thread binding disabled"    //-V112
                          << std::endl;
                 }
                 else
                 {
-                    top.print_affinity_mask(strm, i, pu_mask);
+                    top.print_affinity_mask(strm, i, pu_mask, pool_name);
                 }
 
                 // Make sure the mask does not contradict the CPU bindings
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                threads::mask_type boundcpu = top.get_cpubind_mask(
-                    rt.get_thread_manager().get_os_thread_handle(i), ec);
+                compat::thread& blob = tm.get_os_thread_handle(i);
+                threads::mask_type boundcpu = top.get_cpubind_mask(blob, ec);
+
+                /* threads::mask_type boundcpu = top.get_cpubind_mask(
+                    rt.get_thread_manager().get_os_thread_handle(i), ec);*/
 
                 // The masks reported by HPX must be the same as the ones
                 // reported from HWLOC.
                 if (!ec && threads::any(boundcpu) &&
                     !threads::equal(boundcpu, pu_mask, num_threads))
                 {
+                    std::string boundcpu_str = threads::to_string(boundcpu);
+                    std::string pu_mask_str = threads::to_string(pu_mask);
                     HPX_THROW_EXCEPTION(invalid_status,
                         "handle_print_bind",
-                        boost::str(
-                            boost::format("unexpected mismatch between "
-                                "locality %1%: binding reported from HWLOC(%2%) "
-                                " and HPX(%3%) on thread %4%"
-                            ) % hpx::get_locality_id() % boundcpu % pu_mask % i));
+                        hpx::util::format(
+                            "unexpected mismatch between locality %1%: "
+                            "binding "
+                            "reported from HWLOC(%2%) and HPX(%3%) on "
+                            "thread %4%",
+                            hpx::get_locality_id(), boundcpu_str,
+                            pu_mask_str, i));
                 }
             }
 
@@ -1169,6 +1151,9 @@ namespace hpx { namespace util
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv)
     {
+        // set the flag signaling that command line parsing has been done
+        cmd_line_parsed_ = true;
+
         util::manage_config cfgmap(ini_config_);
 
         std::vector<std::shared_ptr<plugins::plugin_registry_base> >
@@ -1189,7 +1174,7 @@ namespace hpx { namespace util
             boost::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argc,
                     argv, prevm, std::size_t(-1), util::allow_unregistered,
-                    mode_))
+                    rtcfg_.mode_))
             {
                 return -1;
             }
@@ -1239,7 +1224,7 @@ namespace hpx { namespace util
         std::vector<std::string> unregistered_options;
 
         if (!util::parse_commandline(rtcfg_, desc_cmdline,
-                argc, argv, vm_, node_, util::allow_unregistered, mode_,
+                argc, argv, vm_, node_, util::allow_unregistered, rtcfg_.mode_,
                 &help, &unregistered_options))
         {
             return -1;
@@ -1256,22 +1241,28 @@ namespace hpx { namespace util
         store_command_line(argc, argv);
         store_unregistered_options(argv[0], unregistered_options);
 
+        // add all remaining ini settings to the global configuration
+        rtcfg_.reconfigure(ini_config_);
+
         // help can be printed only after the runtime mode has been set
         if (handle_help_options(help))
             return 1;     // exit application gracefully
 
-        // add all remaining ini settings to the global configuration
-        rtcfg_.reconfigure(ini_config_);
-
         // print version/copyright information
         if (vm_.count("hpx:version")) {
-            detail::print_version(std::cout);
+            if(!version_printed_){
+                detail::print_version(std::cout);
+                version_printed_ = true;
+            }
             return 1;
         }
 
         // print configuration information (static and dynamic)
         if (vm_.count("hpx:info")) {
-            detail::print_info(std::cout, *this);
+            if(!info_printed_){
+                detail::print_info(std::cout, *this);
+                info_printed_ = true;
+            }
             return 1;
         }
 

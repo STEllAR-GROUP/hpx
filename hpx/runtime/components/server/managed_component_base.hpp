@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -161,6 +162,7 @@ namespace hpx { namespace components
     class managed_component_base
       : public traits::detail::managed_component_tag
     {
+    public:
         HPX_NON_COPYABLE(managed_component_base);
 
     private:
@@ -236,6 +238,7 @@ namespace hpx { namespace components
         naming::id_type get_id() const;
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type get_gid() const
         {
             return get_unmanaged_id();
@@ -256,6 +259,14 @@ namespace hpx { namespace components
             // If this assertion is triggered then this component instance is
             // being migrated even if the component type has not been enabled
             // to support migration.
+            HPX_ASSERT(false);
+        }
+
+        void on_migrated()
+        {
+            // If this assertion is triggered then this component instance is being
+            // migrated even if the component type has not been enabled to support
+            // migration.
             HPX_ASSERT(false);
         }
 
@@ -294,9 +305,10 @@ namespace hpx { namespace components
             static heap_type& get_heap()
             {
                 // ensure thread-safe initialization
-                util::reinitializable_static<
-                    heap_type, wrapper_heap_tag
-                > heap(components::get_component_type<Component>());
+                static components::component_type t =
+                    components::get_component_type<Component>();
+
+                util::reinitializable_static<heap_type, wrapper_heap_tag> heap(t);
                 return heap.get();
             }
 
@@ -351,6 +363,7 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component
     {
+    public:
         HPX_NON_COPYABLE(managed_component);
 
     public:
@@ -504,7 +517,11 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         //          initialization of arrays of wrappers.
-        static value_type* create(std::size_t count = 1)
+        template <typename T = Component>
+        static typename std::enable_if<
+            std::is_default_constructible<T>::value, value_type*
+        >::type
+        create(std::size_t count = 1)
         {
             // allocate the memory
             void* p = heap_type::alloc(count);
@@ -593,6 +610,7 @@ namespace hpx { namespace components
         }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type get_gid() const
         {
             return get_unmanaged_id();
@@ -618,7 +636,10 @@ namespace hpx { namespace components
 
         template <typename Component_>
         friend naming::gid_type server::create(naming::gid_type const& gid,
-            util::unique_function_nonser<void(void*)> const& ctor);
+            util::unique_function_nonser<void(void*)> const& ctor, void** p);
+
+        template <typename Component_, typename ...Ts>
+        friend naming::gid_type server::create_with_args(Ts&&... ts);
 #endif
 
         naming::gid_type get_base_gid(

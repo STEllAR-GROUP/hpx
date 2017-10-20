@@ -166,14 +166,12 @@ namespace hpx
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/utility/swap.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 #include <cstddef>
 #include <utility>
 #include <vector>
@@ -202,7 +200,6 @@ namespace hpx { namespace lcos
             const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
     void wait_any(std::array<Future, N> const& futures, error_code& ec = throws)
@@ -223,7 +220,6 @@ namespace hpx { namespace lcos
         return lcos::wait_any(
             const_cast<std::array<Future, N> const&>(lazy_values), ec);
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>

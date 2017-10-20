@@ -11,6 +11,8 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <type_traits>
 #include <utility>
@@ -97,14 +99,13 @@ namespace hpx
         template <class Key, class Value, class Comp, class Alloc>
         void serialize(input_archive& ar, std::map<Key, Value, Comp, Alloc>& t, unsigned)
         {
-            typedef typename std::map<Key, Value, Comp, Alloc>::size_type size_type;
             typedef typename std::map<Key, Value, Comp, Alloc>::value_type value_type;
 
-            size_type size;
+            std::uint64_t size;
             ar >> size; //-V128
 
             t.clear();
-            for (size_type i = 0; i < size; ++i)
+            for (std::size_t i = 0; i < size; ++i)
             {
                 value_type v;
                 ar >> v;
@@ -118,7 +119,8 @@ namespace hpx
         {
             typedef typename std::map<Key, Value, Comp, Alloc>::value_type value_type;
 
-            ar << t.size(); //-V128
+            std::uint64_t size = t.size();
+            ar << size;
             for(const value_type& val : t)
             {
                 ar << val;

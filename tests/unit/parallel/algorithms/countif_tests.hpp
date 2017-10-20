@@ -9,10 +9,9 @@
 #include <hpx/include/parallel_count.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -50,11 +49,11 @@ void test_count_if(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(100007);
-    std::iota(boost::begin(c), boost::begin(c) + 50, 0);
-    std::iota(boost::begin(c) + 50, boost::end(c), std::rand() + 50);
+    std::iota(std::begin(c), std::begin(c) + 50, 0);
+    std::iota(std::begin(c) + 50, std::end(c), std::rand() + 50);
 
     diff_type num_items = hpx::parallel::count_if(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)),
+        iterator(std::begin(c)), iterator(std::end(c)),
         smaller_than_50());
 
     HPX_TEST_EQ(num_items, 50u);
@@ -68,12 +67,12 @@ void test_count_if_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::begin(c) + 50, 0);
-    std::iota(boost::begin(c) + 50, boost::end(c), std::rand() + 50);
+    std::iota(std::begin(c), std::begin(c) + 50, 0);
+    std::iota(std::begin(c) + 50, std::end(c), std::rand() + 50);
 
     hpx::future<diff_type> f =
         hpx::parallel::count_if(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             smaller_than_50());
 
     HPX_TEST_EQ(f.get(), 50);
@@ -92,16 +91,16 @@ void test_count_if_exception(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         // pred should never proc, so simple 'returns true'
         hpx::parallel::count_if(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)),
+            decorated_iterator(std::end(c)),
             always_true());
         HPX_TEST(false);
     }
@@ -125,7 +124,7 @@ void test_count_if_exception_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::fill(boost::begin(c), boost::end(c), 10);
+    std::fill(std::begin(c), std::end(c), 10);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -133,9 +132,9 @@ void test_count_if_exception_async(ExPolicy p, IteratorTag)
         hpx::future<diff_type> f =
             hpx::parallel::count_if(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
+                decorated_iterator(std::end(c)),
                 always_true());
         returned_from_algorithm = true;
         f.get();
@@ -167,15 +166,15 @@ void test_count_if_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::count_if(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c)),
+            decorated_iterator(std::end(c)),
             always_true());
         HPX_TEST(false);
     }
@@ -198,7 +197,7 @@ void test_count_if_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -206,9 +205,9 @@ void test_count_if_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<diff_type> f =
             hpx::parallel::count_if(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c)),
+                decorated_iterator(std::end(c)),
                 always_true());
         returned_from_algorithm = true;
         f.get();

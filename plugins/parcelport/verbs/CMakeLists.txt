@@ -38,7 +38,7 @@ hpx_option(HPX_PARCELPORT_VERBS_WITH_LOGGING BOOL
 if (HPX_PARCELPORT_VERBS_WITH_LOGGING)
   hpx_add_config_define_namespace(
       DEFINE    HPX_PARCELPORT_VERBS_HAVE_LOGGING
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 endif()
 
 #------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ hpx_option(HPX_PARCELPORT_VERBS_WITH_DEV_MODE BOOL
 if (HPX_PARCELPORT_VERBS_WITH_DEV_MODE)
   hpx_add_config_define_namespace(
       DEFINE    HPX_PARCELPORT_VERBS_HAVE_DEV_MODE
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 endif()
 
 #------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE)
   if (NOT Boost_USE_STATIC_LIBS)
     hpx_add_config_define_namespace(
         DEFINE    BOOST_LOG_DYN_LINK
-        NAMESPACE parcelport_verbs)
+        NAMESPACE parcelport)
   endif()
 endif()
 
@@ -80,12 +80,12 @@ hpx_option(HPX_PARCELPORT_VERBS_INTERFACE STRING
 hpx_add_config_define_namespace(
     DEFINE HPX_PARCELPORT_VERBS_DEVICE
     VALUE  "\"${HPX_PARCELPORT_VERBS_DEVICE}\""
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 hpx_add_config_define_namespace(
     DEFINE HPX_PARCELPORT_VERBS_INTERFACE
     VALUE  "\"${HPX_PARCELPORT_VERBS_INTERFACE}\""
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 #------------------------------------------------------------------------------
 # Bootstrap options
@@ -98,12 +98,12 @@ if (HPX_PARCELPORT_VERBS_WITH_BOOTSTRAPPING)
   hpx_add_config_define_namespace(
       DEFINE    HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING
       VALUE     std::true_type
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 else()
   hpx_add_config_define_namespace(
       DEFINE    HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING
       VALUE     std::false_type
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 endif()
 
 #------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ hpx_option(HPX_PARCELPORT_VERBS_WITH_PERFORMANCE_COUNTERS BOOL
 if (HPX_PARCELPORT_VERBS_WITH_PERFORMANCE_COUNTERS)
   hpx_add_config_define_namespace(
       DEFINE    HPX_PARCELPORT_VERBS_HAVE_PERFORMANCE_COUNTERS
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 endif()
 
 #------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ hpx_option(HPX_PARCELPORT_VERBS_THROTTLE_SENDS STRING
 hpx_add_config_define_namespace(
     DEFINE    HPX_PARCELPORT_VERBS_THROTTLE_SENDS
     VALUE     ${HPX_PARCELPORT_VERBS_THROTTLE_SENDS}
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 #------------------------------------------------------------------------------
 # Custom Scheduler options
@@ -142,7 +142,7 @@ hpx_option(HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER BOOL
 if (HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER)
   hpx_add_config_define_namespace(
       DEFINE    HPX_PARCELPORT_VERBS_USE_CUSTOM_SCHEDULER
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 endif()
 
 #------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ hpx_option(HPX_PARCELPORT_VERBS_DEBUG_LOCKS BOOL
 if (HPX_PARCELPORT_VERBS_DEBUG_LOCKS)
   hpx_add_config_define_namespace(
       DEFINE    HPX_PARCELPORT_VERBS_DEBUG_LOCKS
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 endif()
 
 #------------------------------------------------------------------------------
@@ -177,23 +177,23 @@ hpx_option(HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD STRING
 hpx_add_config_define_namespace(
     DEFINE    HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE
     VALUE     ${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 # define the message header size to be equal to the chunk size
 hpx_add_config_define_namespace(
     DEFINE    HPX_PARCELPORT_VERBS_MESSAGE_HEADER_SIZE
     VALUE     ${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 hpx_add_config_define_namespace(
     DEFINE    HPX_PARCELPORT_VERBS_64K_PAGES
     VALUE     ${HPX_PARCELPORT_VERBS_64K_PAGES}
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 hpx_add_config_define_namespace(
     DEFINE    HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD
     VALUE     ${HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD}
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 #------------------------------------------------------------------------------
 # Preposting options
@@ -205,7 +205,7 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_PREPOSTS STRING
 hpx_add_config_define_namespace(
     DEFINE    HPX_PARCELPORT_VERBS_MAX_PREPOSTS
     VALUE     ${HPX_PARCELPORT_VERBS_MAX_PREPOSTS}
-    NAMESPACE parcelport_verbs)
+    NAMESPACE parcelport)
 
 #------------------------------------------------------------------------------
 # Hardware checks
@@ -216,24 +216,8 @@ if (HPX_PARCELPORT_VERBS_INTERFACE MATCHES "roq")
   hpx_add_config_define_namespace(
       DEFINE HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
       VALUE  1
-      NAMESPACE parcelport_verbs)
+      NAMESPACE parcelport)
 endif()
-
-#------------------------------------------------------------------------------
-# Write parcelport_verbs_defines.hpp
-#------------------------------------------------------------------------------
-# write config to build dir
-write_config_defines_file(
-  TEMPLATE ""
-  NAMESPACE "parcelport_verbs"
-  FILENAME "${CMAKE_BINARY_DIR}/hpx/config/parcelport_verbs_defines.hpp")
-
-# write config to install dir
-write_config_defines_file(
-  TEMPLATE ""
-  NAMESPACE "parcelport_verbs"
-  FILENAME
-  "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/parcelport_verbs_defines.hpp")
 
 #------------------------------------------------------------------------------
 # Define the ParcelPort registration macro

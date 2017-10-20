@@ -34,6 +34,7 @@ set(tests
     future_then
     future_then_executor
     future_wait
+    global_spmd_block
     local_latch
     local_barrier
     local_dataflow
@@ -41,31 +42,38 @@ set(tests
     local_dataflow_std_array
     local_event
     local_mutex
+    local_promise_allocator
     make_future
     packaged_action
     promise
+    promise_allocator
     reduce
     remote_dataflow
     remote_latch
     run_guarded
     shared_future
     sliding_semaphore
-    unwrapped
+    split_future
+    split_shared_future
+    use_allocator
     wait_all_std_array
     wait_any_std_array
     when_all
     when_all_std_array
     when_any
     when_any_std_array
+    when_each
     when_some
     when_some_std_array
    )
 
-if(NOT MSVC12)
-  # MSVC12 can't cope with split_future
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
   set(tests ${tests}
-      split_future
-      split_shared_future)
+      apply_local_executor_v1
+      async_local_executor_v1
+      future_then_executor_v1
+      local_dataflow_executor_v1
+     )
 endif()
 
 if(HPX_WITH_AWAIT)
@@ -129,13 +137,20 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
+  set(folder_name "Tests/Unit/LCOs")
+  string(FIND ${test} "_v1" _is_v1_test)
+
+  if(NOT (_is_v1_test EQUAL -1))
+    set(folder_name "Tests/Unit/LCOs/V1")
+  endif()
+
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/LCOs")
+                     FOLDER ${folder_name})
 
   add_hpx_unit_test("lcos" ${test} ${${test}_PARAMETERS})
 

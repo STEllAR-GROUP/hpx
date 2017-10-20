@@ -137,7 +137,7 @@ namespace hpx { namespace parallel { namespace util
     }
 
     template <typename InIter, typename OutIter>
-    HPX_FORCEINLINE std::pair<InIter, OutIter>
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<InIter, OutIter>
     copy_n(InIter first, std::size_t count, OutIter dest)
     {
         typedef

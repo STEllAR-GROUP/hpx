@@ -7,7 +7,9 @@
 #define HPX_SERIALIZATION_LIST_HPP
 
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/detail/serialize_collection.hpp>
 
+#include <cstdint>
 #include <list>
 
 namespace hpx { namespace serialization
@@ -16,30 +18,22 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, std::list<T, Allocator> & ls, unsigned)
     {
         // normal load ...
-        typedef typename std::list<T, Allocator>::size_type size_type;
-        size_type size;
+        std::uint64_t size;
         ar >> size; //-V128
-
-        ls.resize(size);
         if(size == 0) return;
 
-        for(auto & li: ls)
-        {
-            ar >> li;
-        }
+        detail::load_collection(ar, ls, size);
     }
 
     template <typename T, typename Allocator>
     void serialize(output_archive & ar, const std::list<T, Allocator> & ls, unsigned)
     {
         // normal save ...
-        ar << ls.size(); //-V128
+        std::uint64_t size = ls.size();
+        ar << size;
         if(ls.empty()) return;
 
-        for(auto const & li: ls)
-        {
-            ar << li;
-        }
+        detail::save_collection(ar, ls);
     }
 }}
 

@@ -10,11 +10,9 @@
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
-
-#include <hpx/util/detail/count_num_args.hpp>
-
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins

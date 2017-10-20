@@ -1,6 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2015 Hartmut Kaiser
-    Copyright (C) 2016 Adrian Serio
+    Copyright (C) 2016-2017 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -70,15 +70,13 @@ our tables below.
   [[John Biddiscombe]        [__cscs__]           [[$./images/emails/biddisco.png]]]
   [[Anton Bikineev]          [__cct__, __lsu__]   [[$./images/emails/antbikineev.png]]]
   [[Martin Stumpf]           [__inf3__, __fau__]  [[$./images/emails/martinhstumpf.png]]]
-  [[Bryce Adelstein-Lelbach] [__lbnl__]           [[$./images/emails/balelbach.png]]]
+  [[Bryce Adelstein Lelbach] [__nvidia__]         [[$./images/emails/blelbach.png]]]
   [[Shuangyang Yang]         [__cct__, __lsu__]   [[$./images/emails/syang16.png]]]
   [[Jeroen Habraken]         [__tue__]            [[$./images/emails/vexocide.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
-  [[Andrew Kemp]             [__cct__, __lsu__]   [[$./images/emails/akemp.png]]]
+  [[Antoine Tran Tan]        [__cct__, __lsu__]   [[$./images/emails/atrantan.png]]]
   [[Adrian Serio]            [__cct__, __lsu__]   [[$./images/emails/aserio.png]]]
   [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
-  [[Matthew Anderson]        [__crest__, __iu__]  [[$./images/emails/manderson.png]]]
-  [[Dylan Stark]             [__sandia__]         [[$./images/emails/dstark.png]]]
 ]
 
 [heading Contributors to this Document]
@@ -87,7 +85,7 @@ our tables below.
   [[Name]                    [Institution]        [email]]
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
-  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
+  [[Bryce Adelstein Lelbach] [__nvidia__]         [[$./images/emails/blelbach.png]]]
   [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
   [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
@@ -99,7 +97,24 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
-* Khalid Hasanov, who contributed changes which allowed to run HPX on 64Bit
+* Christopher Taylor, for his interest in __hpx__ and the fixes he provided.
+* Shoshana Jakobovits, for her work on the resource partitioner.
+* Denis Blank, who re-wrote our unwrapped function to accept plain values
+  arbitrary containers, and properly deal with nested futures.
+* Ajai V. George, who implemented several of the parallel algorithms.
+* Taeguk Kwon, who worked on implementing parallel algorithms as well as 
+  adapting the parallel algorithms to the Ranges TS.
+* Zach Byerly, who in his work developing applications on top of __hpx__
+  opened tickets and contributed to the __hpx__ examples.
+* Daniel Estermann, for his work porting __hpx__ to the Raspberry Pi.
+* Alireza Kheirkhahan, who built and administered our local cluster as well
+  as his work in distributed IO.
+* Abhimanyu Rawat, who worked on stack overflow detection.
+* David Pfander, who improved signal handling in __hpx__, provided his
+  optimization expertise, and worked on incorporating the Vc 
+  vectorization into __hpx__.
+* Denis Demidov, who contributed his insights with VexCL.
+* Khalid Hasanov, who contributed changes which allowed to run __hpx__ on 64Bit
   power-pc architectures.
 * Zahra Khatami, who contributed the prefetching iterators and the persistent
   auto chunking executor parameters implementation.
@@ -119,7 +134,7 @@ the project through discussions, pull requests, documentation patches, etc.
 * Harris Brakmic, who contributed an extensive build system description for
   building __hpx__ with Visual Studio.
 * Parsa Amini, who refactored and simplified the implementation of AGAS in
-  __hpx__.
+  __hpx__ and who works on its implementation and optimization.
 * Luis Martinez de Bartolome who implemented a build system extension for
   __hpx__ integrating it with the __conan__ C/C++ package manager.
 * Vinay C Amatya, who contributed to the documentation and provided some
@@ -136,7 +151,7 @@ the project through discussions, pull requests, documentation patches, etc.
   contributed to the resource manager used in the thread scheduling subsystem.
   She also worked on __hpx__ in the context of the Google Summer of Code 2015.
 * Larry Xiao, Devang Bacharwar, Marcin Copik, and Konstantin Kronfeldner who
-  worked on HPX in the context of the Google Summer of Code program 2015.
+  worked on __hpx__ in the context of the Google Summer of Code program 2015.
 * Daniel Bourgeois (__cct__) who contributed to __hpx__ the implementation of
   several parallel algorithms (as proposed by __cpp11_n4107__).
 * Anuj Sharma and Christopher Bross (__inf3__), who worked on __hpx__ in the
@@ -149,11 +164,8 @@ the project through discussions, pull requests, documentation patches, etc.
   (as proposed by __cpp11_n4107__).
 * Damond Howard (__lsu__), who works on __hpxcl__ (mainly all work related to
   __cuda__).
-* Parsa Amini (__cct__), who works on the implementation and optimization of
-  AGAS (Active Global Address Space).
 * Christoph Junghans (Los Alamos National Lab), who helped making our
   buildsystem more portable.
-* Andreas Buhr, who helped with improving our documentation.
 * Antoine Tran Tan (Laboratoire de Recherche en Informatique, Paris), who
   worked on integrating __hpx__ as a backend for __nt2__. He also contributed
   an implementation of an API similar to Fortran co-arrays on top of __hpx__.
@@ -179,13 +191,24 @@ the project through discussions, pull requests, documentation patches, etc.
   also contributed a complete rewrite of the serialization infrastructure
   replacing Boost.Serialization inside __hpx__.
 * Pyry Jahkola, who contributed the Mac OS build system and build documentation
-  on how to build HPX using Clang and libc++.
-* Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library, and
-  who submitted several test cases allowing us to reproduce and fix problems
+  on how to build __hpx__ using Clang and libc++.
+* Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library,
+  and who submitted several test cases allowing us to reproduce and fix problems
   in __hpx__.
 * Rekha Raj, who contributed changes to the description of the Windows build
   instructions.
-* Alex Nagelberg for his work on implementing a C wrapper API for HPX.
+* Jeremy Kemp how worked on an __hpx__ OpenMP backend and added regression tests.
+* Alex Nagelberg for his work on implementing a C wrapper API for __hpx__.
+* Chen Guo, helvihartmann, Nicholas Pezolano, and John West who added
+  and improved examples in __hpx__.
+* Joseph Kleinhenz, Markus Elfring, Kirill Kropivyansky, Alexander Neundorf, 
+  and BryantLam who improved our CMake. 
+* Praveen Velliengiri, Element-126, ShmuelLevine, Aalekh Nigam, 
+  HadrienG2, Prayag Verma, and
+  Avyav Kumar who improved the documentation.
+* J. F. Bastien, Christopher Hinz, Brandon Kohn, hendrx, Dekken, 
+  woodmeister123, Andrew Kemp, Dylan Stark, and Matthew Anderson who 
+  contributed to the general improvement of __hpx__
 
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and

@@ -7,7 +7,7 @@
  HPX
 *****
 
-HPX is a C++ Standards Library for Concurrency and Parallelism. It implements
+HPX is a C++ Standard Library for Concurrency and Parallelism. It implements
 all of the corresponding facilities as defined by the C++ Standard.
 Additionally, in HPX we implement functionalities proposed as part of the
 ongoing C++ standardization process. We also extend the C++ Standard APIs to
@@ -24,8 +24,8 @@ functionalities and converging onto a stable API which will provide a
 smooth migration path for developers.
 
 The API exposed by HPX is not only modelled after the interfaces defined by the
-C++11/14 ISO standard, it also adheres to the programming guidelines used by the
-Boost collection of C++ libraries. We aim improve the scalability of today's
+C++11/14/17 ISO standard, it also adheres to the programming guidelines used by the
+Boost collection of C++ libraries. We aim to improve the scalability of today's
 applications and to expose new levels of parallelism which are necessary to
 take advantage of the exascale systems of the future.
 
@@ -54,12 +54,12 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.99) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.99/html/index.html>`_.
+The documentation for the latest release of HPX (currently V1.0) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-1.0.0/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/doi/10.5281/zenodo.58027.svg
-     :target: http://dx.doi.org/10.5281/zenodo.58027
+.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.556772.svg
+     :target: https://doi.org/10.5281/zenodo.556772
 
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
@@ -68,7 +68,7 @@ single-page version of the documentation
 `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.99) which can be
+(currently HPX V1.0) which can be
 `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
@@ -85,6 +85,14 @@ integration service tracks the current build status for the master branch:
      :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master
      :alt: HPX master branch build status
 
+The `AppVeyor <https://ci.appveyor.com/project/hkaiser/hpx>`_ contiguous
+integration tracks the status for Windows builds using the native Visual Studio 2017
+toolchain: |appveyor_status|.
+
+.. |appveyor_status| image:: https://ci.appveyor.com/api/projects/status/sd3ehemep05fhaj1/branch/master?svg=true
+     :target: https://ci.appveyor.com/project/hkaiser/hpx/branch/master
+     :alt: HPX master branch Windows build status
+
 In any case, if you happen to run into problems we very much encourage and appreciate
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
@@ -92,6 +100,15 @@ any issue reports through the `issue tracker for this Github project
 Also, if you have any questions feel free to ask it over at
 `stackoverflow <http://stackoverflow.com>`_
 and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
+
+For a full list of support options please see our
+`Support page <https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md>`_.
+
+We have adopted a
+`code of conduct <https://github.com/STEllAR-GROUP/hpx/blob/master/.github/CODE_OF_CONDUCT.md>`_
+for this project. Please refer to this document if you would like to know more
+about the expectations for members of our community, with regard to how they
+will behave toward each other.
 
 ********************
  Build Instructions

@@ -21,7 +21,7 @@ namespace hpx { namespace util { namespace detail
       : unique_function_vtable<Sig>, copyable_vtable
     {
         template <typename T>
-        HPX_CONSTEXPR function_vtable(construct_vtable<T>) HPX_NOEXCEPT
+        HPX_CONSTEXPR function_vtable(construct_vtable<T>) noexcept
           : unique_function_vtable<Sig>(construct_vtable<T>())
           , copyable_vtable(construct_vtable<T>())
         {}

@@ -7,12 +7,12 @@
 #include <hpx/hpx_main.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/range/functions.hpp>
 #include <boost/regex.hpp>
 
 struct pipeline
@@ -31,7 +31,7 @@ struct pipeline
                 };
 
                 hpx::async(trim, std::move(item))
-                    .then(hpx::util::unwrapped(
+                    .then(hpx::util::unwrapping(
                         [](std::string const& tc)
                         {
                             std::cout << "->" << tc << std::endl;
@@ -58,7 +58,7 @@ int main()
         "Notice: qux",
         "\tError: abc"
       };
-    std::vector<std::string> input(boost::begin(inputs), boost::end(inputs));
+    std::vector<std::string> input(std::begin(inputs), std::end(inputs));
 
     pipeline::process(input);
 

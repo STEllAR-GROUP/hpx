@@ -13,10 +13,6 @@
 #include <hpx/runtime/components/server/invoke_function.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_executor.hpp>
-
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
 
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -25,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -36,9 +32,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F, typename ... Ts>
         struct distribution_policy_execute_result_impl<F, false, Ts...>
         {
-            typedef typename hpx::util::detail::deferred_result_of<
-                    F(Ts...)
-                >::type type;
+            typedef typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
+                type;
         };
 
         template <typename Action, typename ... Ts>
@@ -66,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///         evaluate to true.
     ///
     template <typename DistPolicy>
-    class distribution_policy_executor : public executor_tag
+    class distribution_policy_executor
     {
     private:
         /// \cond NOINTERNAL
@@ -75,12 +70,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             "distribution_policy_executor needs to be instantiated with a "
                 "distribution policy type");
 
-        // apply_execute implementations
+        // post implementations
         template <typename F, typename ... Ts>
         typename std::enable_if<
             !hpx::traits::is_action<F>::value
         >::type
-        apply_execute_impl(F && f, Ts && ... ts) const
+        post_impl(F && f, Ts && ... ts) const
         {
             typedef components::server::invoke_function_action<F> action_type;
             policy_.template apply<action_type>(threads::thread_priority_default,
@@ -91,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typename std::enable_if<
             hpx::traits::is_action<Action>::value
         >::type
-        apply_execute_impl(Action && act, Ts && ... ts) const
+        post_impl(Action && act, Ts && ... ts) const
         {
             policy_.template apply<Action>(threads::thread_priority_default,
                 std::forward<Ts>(ts)...);
@@ -136,18 +131,35 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {}
 
         /// \cond NOINTERNAL
+        bool operator==(distribution_policy_executor const& rhs) const noexcept
+        {
+            return policy_ == rhs.policy_;
+        }
+
+        bool operator!=(distribution_policy_executor const& rhs) const noexcept
+        {
+            return !(*this == rhs);
+        }
+
+        distribution_policy_executor const& context() const noexcept
+        {
+            return *this;
+        }
+        /// \endcond
+
+        /// \cond NOINTERNAL
         typedef parallel_execution_tag execution_category;
 
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts) const
+        void post(F && f, Ts &&... ts) const
         {
-            return apply_execute_impl(std::forward<F>(f),
+            return post_impl(std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename ... Ts>
         hpx::future<
-            typename detail::distribution_policy_execute_result<F&&, Ts&&...>::type
+            typename detail::distribution_policy_execute_result<F, Ts...>::type
         >
         async_execute(F && f, Ts &&... ts) const
         {
@@ -156,8 +168,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F, typename ... Ts>
-        typename detail::distribution_policy_execute_result<F&&, Ts&&...>::type
-        execute(F && f, Ts &&... ts) const
+        typename detail::distribution_policy_execute_result<F, Ts...>::type
+        sync_execute(F && f, Ts &&... ts) const
         {
             return async_execute_impl(std::forward<F>(f),
                 std::forward<Ts>(ts)...).get();
@@ -182,15 +194,68 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             std::forward<DistPolicy>(policy));
     }
 
+    /// \cond NOINTERNAL
+    template <typename DistPolicy>
+    struct is_two_way_executor<
+            parallel::execution::distribution_policy_executor<DistPolicy> >
+      : std::true_type
+    {};
+    /// \endcond
+}}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/v1/is_executor.hpp>
+
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Compatibility layer
+namespace hpx { namespace parallel { inline namespace v3
+{
+    /// \cond NOINTERNAL
+
+    // this must be a type distinct from parallel::execution::parallel_executor
+    // to avoid ambiguities
+    template <typename DistPolicy>
+    struct distribution_policy_executor
+      : execution::distribution_policy_executor<DistPolicy>
+    {
+        template <typename DistPolicy_>
+        distribution_policy_executor(DistPolicy_ && policy)
+          : execution::distribution_policy_executor<DistPolicy>(
+                std::forward<DistPolicy_>(policy))
+        {}
+
+        template <typename F, typename ... Ts>
+        typename execution::detail::distribution_policy_execute_result<
+            F, Ts...
+        >::type
+        execute(F && f, Ts &&... ts) const
+        {
+            return execution::distribution_policy_executor<DistPolicy>::
+                sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+    };
+
+    template <typename DistPolicy>
+    distribution_policy_executor<typename hpx::util::decay<DistPolicy>::type>
+    make_distribution_policy_executor(DistPolicy && policy)
+    {
+        typedef typename hpx::util::decay<DistPolicy>::type dist_policy_type;
+        return distribution_policy_executor<dist_policy_type>(
+            std::forward<DistPolicy>(policy));
+    }
+
     namespace detail
     {
-        /// \cond NOINTERNAL
         template <typename DistPolicy>
         struct is_executor<distribution_policy_executor<DistPolicy> >
           : std::true_type
         {};
-        /// \endcond
     }
+    /// \endcond
 }}}
+
+#endif
 
 #endif

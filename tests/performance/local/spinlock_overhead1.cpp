@@ -10,12 +10,11 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -58,8 +57,6 @@ namespace test
 {
     struct local_spinlock
     {
-        HPX_NON_COPYABLE(local_spinlock);
-
     private:
         std::uint64_t v_;
 
@@ -103,6 +100,9 @@ namespace test
         {
             HPX_ITT_SYNC_CREATE(this, "test::local_spinlock", "");
         }
+
+        local_spinlock(local_spinlock const&) = delete;
+        local_spinlock& operator=(local_spinlock const&) = delete;
 
         ~local_spinlock()
         {
@@ -219,7 +219,7 @@ int hpx_main(
                 for (std::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
-                wait_each(hpx::util::unwrapped(
+                wait_each(hpx::util::unwrapping(
                     [] (double r) { global_scratch += r; }),
                     futures);
 
@@ -227,22 +227,22 @@ int hpx_main(
                 const double duration = walltime.elapsed();
 
                 if (vm.count("csv"))
-                    cout << ( boost::format("%3%,%4%,%2%\n")
-                            % count
-                            % duration
-                            % k1
-                            % k2
-                            )
-                         << flush;
+                    hpx::util::format_to(cout,
+                        "%3%,%4%,%2%\n",
+                        count,
+                        duration,
+                        k1,
+                        k2
+                    ) << flush;
                 else
-                    cout << ( boost::format("invoked %1% futures in %2% seconds \
-                             (k1 = %3%, k2 = %4%)\n")
-                            % count
-                            % duration
-                            % k1
-                            % k2
-                            )
-                         << flush;
+                    hpx::util::format_to(cout,
+                        "invoked %1% futures in %2% seconds "
+                        "(k1 = %3%, k2 = %4%)\n",
+                        count,
+                        duration,
+                        k1,
+                        k2
+                    ) << flush;
             }
         }
     }

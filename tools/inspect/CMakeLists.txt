@@ -10,7 +10,7 @@ add_hpx_executable(inspect
   NOLIBS
   FOLDER "Tools/Inspect")
 
-if(NOT MSVC)
+if((NOT MSVC) OR HPX_WITH_VCPKG)
   target_link_libraries(inspect_exe ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
 endif()
 

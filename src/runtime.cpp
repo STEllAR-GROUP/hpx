@@ -1,10 +1,11 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -24,19 +25,21 @@
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/debugging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -55,7 +58,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_ATTRIBUTE_NORETURN void handle_termination(char const* reason)
+    HPX_NORETURN void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
         {
@@ -111,7 +114,7 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT HPX_ATTRIBUTE_NORETURN void termination_handler(int signum)
+    HPX_EXPORT HPX_NORETURN void termination_handler(int signum)
     {
         if (signum != SIGINT &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -230,13 +233,11 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration & rtcfg
-          , threads::policies::init_affinity_data const& affinity_init)
+    runtime::runtime(util::runtime_configuration & rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
-        affinity_init_(affinity_init),
-        topology_(threads::create_topology()),
+        topology_(resource::get_partitioner().get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
@@ -247,7 +248,7 @@ namespace hpx
         runtime::init_tss();
         util::reinit_construct();       // call only after TLS was initialized
 
-        counters_.reset(new performance_counters::registry());
+        counters_ = std::make_shared<performance_counters::registry>();
     }
 
     runtime::~runtime()
@@ -255,6 +256,9 @@ namespace hpx
         // allow to reuse instance number if this was the only instance
         if (0 == instance_number_counter_)
             --instance_number_counter_;
+
+        util::reinit_destruct();
+        resource::detail::delete_partitioner();
     }
 
     void runtime::set_state(state s)
@@ -264,7 +268,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::atomic<int> runtime::instance_number_counter_(-1);
+    std::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     util::thread_specific_ptr<runtime*, runtime::tls_tag> runtime::runtime_;
@@ -282,7 +286,7 @@ namespace hpx
             runtime::uptime_.reset(new std::uint64_t);
             *runtime::uptime_.get() = util::high_resolution_clock::now();
 
-            threads::thread_self::init_self();
+            threads::thread_self::init_self(); // done in resource_partitioner
         }
     }
 
@@ -325,7 +329,7 @@ namespace hpx
         return *thread_support_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
     void runtime::register_query_counters(
         std::shared_ptr<util::query_counters> const& active_counters)
     {
@@ -426,6 +430,19 @@ namespace hpx
               ""
             },
 
+#if BOOST_VERSION >= 105600
+            // rolling stddev counter
+            { "/statistics/rolling_stddev", performance_counters::counter_aggregating,
+              "returns the rolling standard deviation value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_stddev",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+#endif
+
             // median counter
             { "/statistics/median", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
@@ -456,6 +473,28 @@ namespace hpx
               HPX_PERFORMANCE_COUNTER_V1,
                &performance_counters::detail::statistics_counter_creator,
                &performance_counters::default_counter_discoverer,
+              ""
+            },
+
+            // rolling max counter
+            { "/statistics/rolling_max", performance_counters::counter_aggregating,
+              "returns the rolling maximum value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_max",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+
+            // rolling min counter
+            { "/statistics/rolling_min", performance_counters::counter_aggregating,
+              "returns the rolling minimum value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/rolling_min",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer,
               ""
             },
 
@@ -548,6 +587,57 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
+
+            // arithmetics mean counter
+            { "/arithmetics/mean", performance_counters::counter_aggregating,
+              "returns the average value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/mean@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics variance counter
+            { "/arithmetics/variance", performance_counters::counter_aggregating,
+              "returns the standard deviation of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/variance@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics median counter
+            { "/arithmetics/median", performance_counters::counter_aggregating,
+              "returns the median of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/median@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics min counter
+            { "/arithmetics/min", performance_counters::counter_aggregating,
+              "returns the minimum value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/min@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // arithmetics max counter
+            { "/arithmetics/max", performance_counters::counter_aggregating,
+              "returns the maximum value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/max@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
         };
         performance_counters::install_counter_types(
             arithmetic_counter_types,
@@ -557,7 +647,7 @@ namespace hpx
     std::uint32_t runtime::assign_cores(std::string const& locality_basename,
         std::uint32_t cores_needed)
     {
-        std::lock_guard<boost::mutex> l(mtx_);
+        std::lock_guard<compat::mutex> l(mtx_);
 
         used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
@@ -574,15 +664,13 @@ namespace hpx
 
     std::uint32_t runtime::assign_cores()
     {
-        // initialize thread affinity settings in the scheduler
-        if (affinity_init_.used_cores_ == 0) {
-            // correct used_cores from config data if appropriate
-            affinity_init_.used_cores_ = std::size_t(
-                this->get_config().get_first_used_core());
-        }
+        // adjust thread assignments to allow for more than one locality per
+        // node
+        std::size_t first_core = this->get_config().get_first_used_core();
+        std::size_t cores_needed =
+            hpx::resource::get_partitioner().assign_cores(first_core);
 
-        return static_cast<std::uint32_t>(
-            this->get_thread_manager().init(affinity_init_));
+        return static_cast<std::uint32_t>(cores_needed);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -621,7 +709,7 @@ namespace hpx
         rt->unregister_thread();
     }
 
-    void report_error(std::size_t num_thread, boost::exception_ptr const& e)
+    void report_error(std::size_t num_thread, std::exception_ptr const& e)
     {
         // Early and late exceptions
         if (!threads::threadmanager_is(state_running))
@@ -637,7 +725,7 @@ namespace hpx
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
-    void report_error(boost::exception_ptr const& e)
+    void report_error(std::exception_ptr const& e)
     {
         // Early and late exceptions
         if (!threads::threadmanager_is(state_running))
@@ -673,45 +761,62 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     std::string get_config_entry(std::string const& key, std::string const& dflt)
     {
-        if (nullptr == get_runtime_ptr())
-            return dflt;
-        return get_runtime().get_config().get_entry(key, dflt);
+        //! FIXME runtime_configuration should probs be a member of
+        // hpx::runtime only, not command_line_handling
+        //! FIXME change functions in this section accordingly
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime().get_config().get_entry(key, dflt);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return std::to_string(dflt);
-        return get_runtime().get_config().get_entry(key, dflt);
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime().get_config().get_entry(key, dflt);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
 
     // set entries
     void set_config_entry(std::string const& key, std::string const& value)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_entry(key, value);
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime_ptr()->get_config().add_entry(key, value);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.add_entry(key, value);
     }
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_entry(key, std::to_string(value));
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime_ptr()->get_config().add_entry(
+                key, std::to_string(value));
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches().rtcfg_.
+                add_entry(key, std::to_string(value));
     }
 
     void set_config_entry_callback(std::string const& key,
-        util::function_nonser<
-            void(std::string const&, std::string const&)
-        > const& callback)
+        util::function_nonser<void(
+            std::string const&, std::string const&)> const& callback)
     {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr == rt)
-            return;
-        return rt->get_config().add_notification_callback(key, callback);
+        if (get_runtime_ptr() != nullptr)
+        {
+            return get_runtime_ptr()->get_config().add_notification_callback(
+                key, callback);
+        }
+        return resource::get_partitioner()
+            .get_command_line_switches()
+            .rtcfg_.add_notification_callback(key, callback);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1084,7 +1189,7 @@ namespace hpx { namespace parcelset
 namespace hpx { namespace threads
 {
     // shortcut for get_applier().get_thread_manager()
-    threadmanager_base& get_thread_manager()
+    threadmanager& get_thread_manager()
     {
         return get_runtime().get_thread_manager();
     }
@@ -1114,11 +1219,6 @@ namespace hpx { namespace threads
         get_runtime().get_thread_manager().set_scheduler_mode(m);
     }
 
-    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(
-        threads::topology& topo, std::size_t thread_num)
-    {
-        return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);
-    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1265,4 +1365,3 @@ namespace hpx
         if (nullptr != rt) rt->stop_evaluating_counters();
     }
 }
-

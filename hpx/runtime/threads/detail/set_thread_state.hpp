@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,15 +16,15 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/steady_clock.hpp>
 
-#include <boost/asio/basic_deadline_timer.hpp>
-#include <boost/atomic.hpp>
+#include <boost/asio/basic_waitable_timer.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <functional>
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type const& thrd, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
         thread_id_type const& timer_id,
-        std::shared_ptr<boost::atomic<bool> > const& triggered)
+        std::shared_ptr<std::atomic<bool> > const& triggered)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -294,8 +294,8 @@ namespace hpx { namespace threads { namespace detail
         // allowing the deadline_timer to go out of scope gracefully
         thread_id_type self_id = get_self_id();
 
-        std::shared_ptr<boost::atomic<bool> > triggered(
-            std::make_shared<boost::atomic<bool> >(false));
+        std::shared_ptr<std::atomic<bool> > triggered(
+            std::make_shared<std::atomic<bool> >(false));
 
         thread_init_data data(
             util::bind(&wake_timer_thread,
@@ -307,10 +307,8 @@ namespace hpx { namespace threads { namespace detail
         create_thread(&scheduler, data, wake_id, suspended);
 
         // create timer firing in correspondence with given time
-        typedef boost::asio::basic_deadline_timer<
-            util::steady_clock
-          , util::chrono_traits<util::steady_clock>
-        > deadline_timer;
+        typedef boost::asio::basic_waitable_timer<
+            util::steady_clock> deadline_timer;
 
         deadline_timer t (
             get_thread_pool("timer-pool")->get_io_service(), abs_time);

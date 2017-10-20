@@ -9,9 +9,8 @@
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 
-#include <boost/random.hpp>
-
 #include <cstddef>
+#include <random>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
@@ -30,8 +29,8 @@ struct random_fill
         return dist(gen);
     }
 
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> dist;
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned)

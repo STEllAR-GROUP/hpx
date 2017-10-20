@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/config/config_strings.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 // Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
@@ -17,13 +18,13 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
-#include <boost/format.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <cstdint>
 #include <sstream>
@@ -58,9 +59,9 @@ namespace hpx
 
     std::string full_version_as_string()
     {
-        return boost::str(
-            boost::format("%d.%d.%d") % //-V609
-            HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
+        return hpx::util::format("%d.%d.%d", //-V609
+            HPX_VERSION_MAJOR,
+            HPX_VERSION_MINOR,
             HPX_VERSION_SUBMINOR);
     }
 
@@ -145,83 +146,10 @@ namespace hpx
     {
         std::ostringstream strm;
 
-#if defined(HPX_HAVE_NATIVE_TLS)
-        strm << "  HPX_HAVE_NATIVE_TLS=ON\n";
-#else
-        strm << "  HPX_HAVE_NATIVE_TLS=OFF\n";
-#endif
-#if defined(HPX_HAVE_STACKTRACES)
-        strm << "  HPX_HAVE_STACKTRACES=ON\n";
-#else
-        strm << "  HPX_HAVE_STACKTRACES=OFF\n";
-#endif
-#if defined(HPX_HAVE_COMPRESSION_BZIP2)
-        strm << "  HPX_HAVE_COMPRESSION_BZIP2=ON\n";
-#else
-        strm << "  HPX_HAVE_COMPRESSION_BZIP2=OFF\n";
-#endif
-#if defined(HPX_HAVE_COMPRESSION_SNAPPY)
-        strm << "  HPX_HAVE_COMPRESSION_SNAPPY=ON\n";
-#else
-        strm << "  HPX_HAVE_COMPRESSION_SNAPPY=OFF\n";
-#endif
-#if defined(HPX_HAVE_COMPRESSION_ZLIB)
-        strm << "  HPX_HAVE_COMPRESSION_ZLIB=ON\n";
-#else
-        strm << "  HPX_HAVE_COMPRESSION_ZLIB=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCEL_COALESCING)
-        strm << "  HPX_HAVE_PARCEL_COALESCING=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCEL_COALESCING=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_TCP)
-        strm << "  HPX_HAVE_PARCELPORT_TCP=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_TCP=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-        strm << "  HPX_HAVE_PARCELPORT_MPI=ON (" << mpi_version() << ")\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_MPI=OFF\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_VERBS)
-        strm << "  HPX_HAVE_PARCELPORT_VERBS=ON\n";
-#else
-        strm << "  HPX_HAVE_PARCELPORT_VERBS=OFF\n";
-#endif
-#if defined(HPX_HAVE_VERIFY_LOCKS)
-        strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
-#else
-        strm << "  HPX_HAVE_VERIFY_LOCKS=OFF\n";
-#endif
-#if defined(HPX_HAVE_HWLOC)
-        strm << "  HPX_HAVE_HWLOC=ON\n";
-#else
-        strm << "  HPX_HAVE_HWLOC=OFF\n";
-#endif
-#if HPX_HAVE_ITTNOTIFY != 0
-        strm << "  HPX_HAVE_ITTNOTIFY=ON\n";
-#else
-        strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";
-#endif
-#if defined(HPX_MSVC)
-#if defined(HPX_HAVE_FIBER_BASED_COROUTINES)
-        strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=ON\n";
-#else
-        strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=OFF\n";
-#endif
-#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
-        strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=ON\n";
-#else
-        strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=OFF\n";
-#endif
-#endif
-#if defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
-        strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=ON\n";
-#else
-        strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=OFF\n";
-#endif
+        char const* const* p = hpx::config_strings;
+        while (*p)
+            strm << "  " << *p++ << "\n";
+        strm << "\n";
 
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS="
@@ -234,10 +162,6 @@ namespace hpx
 #if defined(HPX_AGAS_LOCAL_CACHE_SIZE)
         strm << "  HPX_AGAS_LOCAL_CACHE_SIZE="
              << HPX_AGAS_LOCAL_CACHE_SIZE << "\n";
-#endif
-#if defined(HPX_HAVE_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
-        strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="
-             << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
 #if defined(HPX_HAVE_MALLOC)
         strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
@@ -262,28 +186,29 @@ namespace hpx
 
     std::string build_string()
     {
-        return boost::str(
-            boost::format("V%s%s (AGAS: V%d.%d), Git: %.10s") % //-V609
-                full_version_as_string() % HPX_VERSION_TAG %
-                (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
-                HPX_HAVE_GIT_COMMIT);
+        return hpx::util::format("V%s%s (AGAS: V%d.%d), Git: %.10s", //-V609
+            full_version_as_string(), HPX_VERSION_TAG,
+            HPX_AGAS_VERSION / 0x10, HPX_AGAS_VERSION % 0x10,
+            HPX_HAVE_GIT_COMMIT);
     }
 
     std::string boost_version()
     {
-        // BOOST_VERSION: 105400
-        return boost::str(boost::format("V%d.%d.%d") %
-            (BOOST_VERSION / 100000) % (BOOST_VERSION / 100 % 1000) %
-            (BOOST_VERSION % 100));
+        // BOOST_VERSION: 105700
+        return hpx::util::format("V%d.%d.%d",
+            BOOST_VERSION / 100000,
+            BOOST_VERSION / 100 % 1000,
+            BOOST_VERSION % 100);
     }
 
 #if defined(HPX_HAVE_HWLOC)
     std::string hwloc_version()
     {
         // HWLOC_API_VERSION: 0x00010700
-        return boost::str(boost::format("V%d.%d.%d") %
-            (HWLOC_API_VERSION / 0x10000) % (HWLOC_API_VERSION / 0x100 % 0x100) %
-            (HWLOC_API_VERSION % 0x100));
+        return hpx::util::format("V%d.%d.%d",
+            HWLOC_API_VERSION / 0x10000,
+            HWLOC_API_VERSION / 0x100 % 0x100,
+            HWLOC_API_VERSION % 0x100);
     }
 #endif
 
@@ -311,7 +236,7 @@ namespace hpx
 
     std::string complete_version()
     {
-        boost::format logo(
+        std::string version = hpx::util::format(
             "Versions:\n"
             "  HPX: %s\n"
             "  Boost: %s\n"
@@ -327,33 +252,31 @@ namespace hpx
             "  Date: %s\n"
             "  Platform: %s\n"
             "  Compiler: %s\n"
-            "  Standard Library: %s\n");
-
-        std::string version = boost::str(logo %
-            build_string() %
-            boost_version() %
+            "  Standard Library: %s\n",
+            build_string(),
+            boost_version(),
 #if defined(HPX_HAVE_HWLOC)
-            hwloc_version() %
+            hwloc_version(),
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            mpi_version() %
+            mpi_version(),
 #endif
-            build_type() %
-            build_date_time() %
-            boost_platform() %
-            boost_compiler() %
+            build_type(),
+            build_date_time(),
+            boost_platform(),
+            boost_compiler(),
             boost_stdlib());
 
 #if defined(HPX_HAVE_MALLOC)
-            version += "  Allocator: " + malloc_version() + "\n";
+        version += "  Allocator: " + malloc_version() + "\n";
 #endif
 
-            return version;
+        return version;
     }
 
     std::string build_type()
     {
-        return BOOST_PP_STRINGIZE(HPX_BUILD_TYPE);
+        return HPX_PP_STRINGIZE(HPX_BUILD_TYPE);
     }
 
     std::string build_date_time()
@@ -368,7 +291,7 @@ namespace hpx
         std::ostringstream strm;
 
         // runtime mode
-        strm << "  {mode}: " << get_runtime_mode_name(cfg.mode_) << "\n";
+        strm << "  {mode}: " << get_runtime_mode_name(cfg.rtcfg_.mode_) << "\n";
 
         if (cfg.num_localities_ != 1)
             strm << "  {localities}: " << cfg.num_localities_ << "\n";
@@ -384,7 +307,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    char const HPX_CHECK_VERSION[] = BOOST_PP_STRINGIZE(HPX_CHECK_VERSION);
-    char const HPX_CHECK_BOOST_VERSION[] = BOOST_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
+    char const HPX_CHECK_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
+    char const HPX_CHECK_BOOST_VERSION[] = HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
 }
 

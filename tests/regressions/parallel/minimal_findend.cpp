@@ -8,9 +8,8 @@
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -69,12 +68,12 @@ void find_end_failing_test()
     try {
         std::find_end(
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("error"); }),
             decorated_iterator(
-                boost::end(c),
+                std::end(c),
                 [](){ throw std::runtime_error("error"); }),
-            boost::begin(h), boost::end(h));
+            std::begin(h), std::end(h));
 
         // should never reach this point
         HPX_TEST(false);

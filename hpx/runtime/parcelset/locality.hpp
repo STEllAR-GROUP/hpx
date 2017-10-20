@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,8 +12,10 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <map>
 #include <memory>
@@ -118,7 +120,7 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return impl_ ? impl_->valid(): false;
         }
@@ -178,11 +180,9 @@ namespace hpx { namespace parcelset
         // serialization support
         friend class hpx::serialization::access;
 
-        template <class T>
-        void save(T& ar, const unsigned int version) const;
+        void save(serialization::output_archive& ar, const unsigned int version) const;
 
-        template <class T>
-        void load(T& ar, const unsigned int version);
+        void load(serialization::input_archive& ar, const unsigned int version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
 

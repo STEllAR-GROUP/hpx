@@ -40,6 +40,10 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/traits/v1/is_executor.hpp>
+#include <hpx/traits/v1/is_executor_parameters.hpp>
+#endif
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -50,6 +54,7 @@
 #include <hpx/traits/is_placeholder.hpp>
 #include <hpx/traits/is_range.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
+#include <hpx/traits/is_tuple_like.hpp>
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>

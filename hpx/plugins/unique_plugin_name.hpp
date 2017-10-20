@@ -7,7 +7,7 @@
 #if !defined(HPX_UNIQUE_PLUGIN_NAME_MAR_24_2013_245PM)
 #define HPX_UNIQUE_PLUGIN_NAME_MAR_24_2013_245PM
 
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 namespace hpx { namespace plugins
 {
@@ -28,7 +28,7 @@ namespace hpx { namespace plugins
                                                                               \
             static type call (void)                                           \
             {                                                                 \
-                return BOOST_PP_STRINGIZE(name);                              \
+                return HPX_PP_STRINGIZE(name);                                \
             }                                                                 \
         };                                                                    \
     }}                                                                        \

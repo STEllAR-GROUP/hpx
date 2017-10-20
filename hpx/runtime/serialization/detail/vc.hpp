@@ -16,7 +16,7 @@
 #include <cstddef>
 #include <type_traits>
 
-#include <Vc/version.h>
+#include <Vc/global.h>
 
 #if defined(Vc_IS_VERSION_1) && Vc_IS_VERSION_1
 

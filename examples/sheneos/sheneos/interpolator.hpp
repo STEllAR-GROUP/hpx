@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,17 +7,15 @@
 #define HPX_SHENEOS_AUG_08_2011_1223PM
 
 #include <hpx/hpx.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "stubs/partition3d.hpp"
-#include "configuration.hpp"
+#include "server/configuration.hpp"
+#include "partition3d.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace sheneos
@@ -26,17 +24,23 @@ namespace sheneos
     /// spans a 3D space (ye, temp and rho) from the ShenEOS tables and
     /// dispatches interpolation requests to the correct partition.
     class HPX_COMPONENT_EXPORT interpolator
+      : public hpx::components::client_base<
+            interpolator,
+            hpx::components::server::distributed_metadata_base<config_data>
+        >
     {
+    private:
+        typedef hpx::components::server::distributed_metadata_base<
+                config_data
+            > config_data_type;
+        typedef hpx::components::client_base<interpolator, config_data_type>
+            base_type;
+
     public:
         /// Initialize an interpolator which is not connected to any
         /// interpolation partitions. Call connect() to attach a running
         /// instance or create() to create a new one.
         interpolator();
-
-        /// Destroy the interpolator. If this instance was initialized using
-        /// create(), this will unregister the symbolic name of the associated
-        /// partition objects.
-        ~interpolator();
 
         /// Create a new interpolator instance and initialize it synchronously.
         ///
@@ -48,10 +52,18 @@ namespace sheneos
         ///                           \a sheneos::server::partition3d is created
         ///                           on each locality that supports the
         ///                           component.
-        void create(std::string const& datafilename,
-            std::string const& symbolic_name_base =
-                "/sheneos/interpolator",
+        interpolator(std::string const& datafilename,
+            std::string const& symbolic_name_base = "/sheneos/interpolator",
             std::size_t num_instances = std::size_t(-1));
+
+        interpolator(hpx::future<hpx::id_type> && id)
+          : base_type(std::move(id))
+        {}
+
+        /// Destroy the interpolator. If this instance was initialized using
+        /// create(), this will unregister the symbolic name of the associated
+        /// partition objects.
+        ~interpolator();
 
         /// Connect to an existing interpolation object with the given symbolic
         /// name.
@@ -61,12 +73,12 @@ namespace sheneos
         /// Asynchronously interpolate the function values for the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
         /// the proper partition for the actual interpolation.
-        hpx::lcos::future<std::vector<double> >
+        hpx::future<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
             std::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
-            return stubs::partition3d::interpolate_async(
-                get_id(ye, temp, rho), ye, temp, rho, eosvalues);
+            return get_partition(ye, temp, rho).
+                interpolate_async(ye, temp, rho, eosvalues);
         }
 
         /// Synchronously interpolate the function values for the given ye,
@@ -75,19 +87,19 @@ namespace sheneos
         std::vector<double> interpolate(double ye, double temp, double rho,
             std::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
-            return stubs::partition3d::interpolate(
-                get_id(ye, temp, rho), ye, temp, rho, eosvalues);
+            return get_partition(ye, temp, rho).
+                interpolate(ye, temp, rho, eosvalues);
         }
 
         /// Asynchronously interpolate the function values for the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
         /// the proper partition for the actual interpolation.
-        hpx::lcos::future<double>
+        hpx::future<double>
         interpolate_one_async(double ye, double temp, double rho,
             std::uint32_t eosvalue)  const
         {
-            return stubs::partition3d::interpolate_one_async(
-                get_id(ye, temp, rho), ye, temp, rho, eosvalue);
+            return get_partition(ye, temp, rho).
+                interpolate_one_async(ye, temp, rho, eosvalue);
         }
 
         /// Synchronously interpolate the function values for the given ye,
@@ -96,15 +108,15 @@ namespace sheneos
         double interpolate_one(double ye, double temp, double rho,
             std::uint32_t eosvalue)  const
         {
-            return stubs::partition3d::interpolate_one(
-                get_id(ye, temp, rho), ye, temp, rho, eosvalue);
+            return get_partition(ye, temp, rho).
+                interpolate_one(ye, temp, rho, eosvalue);
         }
 
         /// Asynchronously interpolate one function value for all the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
         /// the proper partitions for the actual interpolation using bulk
         /// operations.
-        hpx::lcos::future<std::vector<double> >
+        hpx::future<std::vector<double> >
         interpolate_one_bulk_async(std::vector<sheneos_coord> const& coords,
             std::uint32_t eosvalue) const;
 
@@ -143,33 +155,28 @@ namespace sheneos
 
     private:
         /// Find the GID of the partition that contains the specified value.
-        hpx::naming::id_type const& get_id(double ye, double temp, double rho) const;
+        partition3d const& get_partition(double ye, double temp, double rho) const;
 
-        hpx::naming::id_type const& get_id(sheneos_coord const& c) const
+        partition3d const& get_partition(sheneos_coord const& c) const
         {
-            return get_id(c.ye_, c.temp_, c.rho_);
+            return get_partition(c.ye_, c.temp_, c.rho_);
         }
-
-        typedef hpx::components::distributing_factory distributing_factory;
-        typedef distributing_factory::async_create_result_type
-            async_create_result_type;
 
         /// Initialize the partitions and store the mappings.
         void fill_partitions(std::string const& datafilename,
-            std::string symbolic_name_base, async_create_result_type future);
+            std::string symbolic_name_base, std::size_t num_instances);
 
         std::size_t get_partition_index(std::size_t d, double value) const;
 
     private:
-        std::vector<hpx::naming::id_type> partitions_;
+        std::vector<partition3d> partitions_;
+
         double minval_[dimension::dim];
         double maxval_[dimension::dim];
         double delta_[dimension::dim];
         std::size_t num_values_[dimension::dim];
         std::size_t num_partitions_per_dim_;
         bool was_created_;
-
-        configuration cfg_;
     };
 }
 

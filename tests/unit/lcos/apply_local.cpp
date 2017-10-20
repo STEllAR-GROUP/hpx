@@ -9,15 +9,14 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::int32_t> accumulator;
+std::atomic<std::int32_t> accumulator;
 hpx::lcos::local::condition_variable_any result_cv;
 
 void increment(std::int32_t i)
@@ -50,9 +49,7 @@ struct increment_type
     }
 };
 
-#if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
 auto increment_lambda = [](std::int32_t i){ accumulator += i; };
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -108,7 +105,6 @@ int hpx_main()
         hpx::apply(hpx::util::bind(obj, _1), 1);
     }
 
-#   if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
     {
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
@@ -117,21 +113,13 @@ int hpx_main()
         hpx::apply(hpx::util::bind(increment_lambda, 1));
         hpx::apply(hpx::util::bind(increment_lambda, _1), 1);
     }
-#   endif
 
     hpx::lcos::local::no_mutex result_mutex;
     std::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
-#   if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
     result_cv.wait_for(l, std::chrono::seconds(1),
         hpx::util::bind(std::equal_to<std::int32_t>(), std::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
-#   else
-    result_cv.wait_for(l, std::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<std::int32_t>(), std::ref(accumulator), 15));
-
-    HPX_TEST_EQ(accumulator.load(), 15);
-#   endif
 
     return hpx::finalize();
 }

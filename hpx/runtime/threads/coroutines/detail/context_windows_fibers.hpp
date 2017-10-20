@@ -39,11 +39,10 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/throw_exception.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 
@@ -185,6 +184,7 @@ namespace hpx { namespace threads { namespace coroutines
         class fibers_context_impl
           : public fibers_context_impl_base
         {
+        public:
             HPX_NON_COPYABLE(fibers_context_impl);
 
         public:
@@ -208,12 +208,12 @@ namespace hpx { namespace threads { namespace coroutines
             {
                 if (0 == m_ctx)
                 {
-                    boost::throw_exception(boost::system::system_error(
+                    throw boost::system::system_error(
                         boost::system::error_code(
                             GetLastError(),
                             boost::system::system_category()
                             )
-                        ));
+                        );
                 }
             }
 
@@ -238,7 +238,7 @@ namespace hpx { namespace threads { namespace coroutines
                 increment_stack_recycle_count();
             }
 
-            typedef boost::atomic<std::int64_t> counter_type;
+            typedef std::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_recycle_counter()
             {

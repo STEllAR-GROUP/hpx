@@ -11,12 +11,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/assert.hpp>
-
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -36,7 +35,7 @@ namespace hpx { namespace threads { namespace policies
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     /// This scheduler does not do any work stealing.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
@@ -92,7 +91,7 @@ namespace hpx { namespace threads { namespace policies
                 q->increment_num_pending_misses();
 
                 // Give up, we should have work to convert.
-                if (q->get_staged_queue_length(boost::memory_order_relaxed) != 0)
+                if (q->get_staged_queue_length(std::memory_order_relaxed) != 0)
                     return false;
             }
 
@@ -125,6 +124,18 @@ namespace hpx { namespace threads { namespace policies
             result = this->queues_[num_thread]->wait_or_add_new(running,
                 idle_loop_count, added) && result;
             if (0 != added) return result;
+
+            // Check if we have been disabled
+            {
+                auto const& rp = resource::get_partitioner();
+                auto mask = rp.get_pu_mask(
+                    num_thread + this->parent_pool_->get_thread_offset());
+
+                if (!bit_and(mask, this->parent_pool_->get_used_processing_units()))
+                {
+                    return added == 0 && !running;
+                }
+            }
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?

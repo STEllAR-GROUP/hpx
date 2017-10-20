@@ -16,9 +16,10 @@ namespace hpx { namespace traits
     namespace detail
     {
         struct fixed_component_tag {};
-        struct simple_component_tag {};
-        struct component_tag : simple_component_tag {};
+        struct component_tag {};
         struct managed_component_tag {};
+
+        typedef component_tag simple_component_tag;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -36,11 +37,9 @@ namespace hpx { namespace traits
     // Simple components are components
     template <typename Component>
     struct is_component<Component,
-            typename std::enable_if<
-                std::is_base_of<
-                    detail::simple_component_tag, Component
-                >::value>::type>
-      : std::true_type
+        typename std::enable_if<
+            std::is_base_of<detail::component_tag, Component>::value>::type>
+        : std::true_type
     {};
 
     // Fixed components are components

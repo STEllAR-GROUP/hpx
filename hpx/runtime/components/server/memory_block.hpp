@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,7 @@
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
@@ -44,8 +45,6 @@ namespace hpx { namespace components { namespace server { namespace detail
     ///        a block of memory managed by a server#memory_block component.
     class memory_block_header //-V690
     {
-        HPX_DELETE_COPY_CTOR(memory_block_header);
-
     public:
         /// This constructor is called on the locality where there memory_block
         /// is hosted
@@ -78,6 +77,8 @@ namespace hpx { namespace components { namespace server { namespace detail
             HPX_ASSERT(act.construct());
             act.construct()(this->get_ptr(), size);
         }
+
+        memory_block_header(memory_block_header const&) = delete;
 
         ~memory_block_header()
         {
@@ -133,6 +134,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         naming::id_type get_unmanaged_id() const;
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type get_gid() const //-V659
         {
             return get_unmanaged_id();
@@ -446,6 +448,7 @@ namespace hpx { namespace components { namespace server
     ///
     class memory_block
     {
+    public:
         HPX_NON_COPYABLE(memory_block);
 
     public:
@@ -566,9 +569,11 @@ namespace hpx { namespace components { namespace server
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
+            static component_type t = component_memory_block;
+
             util::reinitializable_static<
                 heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT
-            > heap(component_memory_block);
+            > heap(t);
             return heap.get(get_runtime_instance_number());
         }
 
@@ -659,6 +664,7 @@ namespace hpx { namespace components { namespace server
         }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         naming::id_type get_gid() const
         {
             return get_checked()->get_gid();

@@ -11,9 +11,11 @@
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 
 #include "htts2.hpp"
 
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -203,17 +205,15 @@ struct hpx_driver : htts2::driver
                 << "Total Walltime [nanoseconds]"
                 << "\n";
 
-        std::cout
-            << ( boost::format("%lu,%lu,%lu,%.14g\n")
-               % this->osthreads_
-               % this->tasks_
-               % this->payload_duration_
-               % results
-               )
-            ;
+        hpx::util::format_to(std::cout, "%lu,%lu,%lu,%.14g\n",
+            this->osthreads_,
+            this->tasks_,
+            this->payload_duration_,
+            results
+        );
     }
 
-//    boost::atomic<std::uint64_t> count_;
+//    std::atomic<std::uint64_t> count_;
 };
 
 int main(int argc, char** argv)

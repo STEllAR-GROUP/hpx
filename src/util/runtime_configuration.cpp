@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2016 Hartmut Kaiser
+//  Copyright (c) 2005-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,9 @@
 #include <hpx/config/defaults.hpp>
 // TODO: move parcel ports into plugins
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
@@ -19,7 +22,6 @@
 #include <hpx/version.hpp>
 
 #include <boost/detail/endian.hpp>
-#include <boost/preprocessor/stringize.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
@@ -87,7 +89,7 @@ namespace hpx { namespace threads { namespace policies
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
     // startup code
-    bool minimal_deadlock_detection = true;
+    HPX_EXPORT bool minimal_deadlock_detection = true;
 #endif
 }}}
 
@@ -176,7 +178,7 @@ namespace hpx { namespace util
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
-            "os_threads = 1",
+            "os_threads = all",
             "cores = all",
             "localities = 1",
             "first_pu = 0",
@@ -190,14 +192,22 @@ namespace hpx { namespace util
                 "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
             "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:"
-                BOOST_STRINGIZE(HPX_IDLE_LOOP_COUNT_MAX) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
             "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
-                BOOST_STRINGIZE(HPX_BUSY_LOOP_COUNT_MAX) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
+
+            /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
+            /// then apply the test-failure value as default.
+#if defined(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
+            "attach-debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
+#else
+            "attach-debugger = ${HPX_ATTACH_DEBUGGER}",
+#endif
 
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
             "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",
-            "cut_off = ${HPX_LCOS_COLLECTIVES_CUT_OFF:256}",
+            "cut_off = ${HPX_LCOS_COLLECTIVES_CUT_OFF:-1}",
 
             // connect back to the given latch if specified
             "[hpx.on_startup]",
@@ -211,24 +221,24 @@ namespace hpx { namespace util
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_SMALL_STACK_SIZE)) "}",
             "medium_size = ${HPX_MEDIUM_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_MEDIUM_STACK_SIZE)) "}",
             "large_size = ${HPX_LARGE_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_LARGE_STACK_SIZE)) "}",
             "huge_size = ${HPX_HUGE_STACK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_HUGE_STACK_SIZE)) "}",
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
             "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
 #endif
 
             "[hpx.threadpools]",
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
             "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
 
             "[hpx.thread_queue]",
             "min_tasks_to_steal_pending = "
@@ -238,6 +248,8 @@ namespace hpx { namespace util
             "min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}",
             "max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}",
             "max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}",
+            "max_terminated_threads = ${HPX_SCHEDULER_MAX_TERMINATED_THREADS:"
+              HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_SCHEDULER_MAX_TERMINATED_THREADS)) "}",
 
             "[hpx.commandline]",
             // enable aliasing
@@ -276,15 +288,15 @@ namespace hpx { namespace util
             // command_line_handling.cpp
             "address = ${HPX_AGAS_SERVER_ADDRESS}",
             "port = ${HPX_AGAS_SERVER_PORT:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_INITIAL_IP_PORT)) "}",
             "max_pending_refcnt_requests = "
                 "${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(
+                    HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS))
                 "}",
             "service_mode = hosted",
-            "dedicated_server = 0",
             "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE) "}",
+                HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_AGAS_LOCAL_CACHE_SIZE)) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
             "use_caching = ${HPX_AGAS_USE_CACHING:1}",
 
@@ -332,11 +344,8 @@ namespace hpx { namespace util
         std::string& hpx_ini_file_,
         std::vector<std::string> const& cmdline_ini_defs_)
     {
-        // add explicit configuration information if its provided
-        if (!hpx_ini_file_.empty()) {
-            util::init_ini_data_base(*this, hpx_ini_file_);
-            need_to_call_pre_initialize = true;
-        }
+        util::init_ini_data_base(*this, hpx_ini_file_);
+        need_to_call_pre_initialize = true;
 
         // let the command line override the config file.
         if (!cmdline_ini_defs_.empty()) {
@@ -464,15 +473,16 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration(char const* argv0_)
-      : num_localities(0),
+    runtime_configuration::runtime_configuration(char const* argv0_, runtime_mode mode)
+      : mode_(mode),
+        num_localities(0),
         small_stacksize(HPX_SMALL_STACK_SIZE),
         medium_stacksize(HPX_MEDIUM_STACK_SIZE),
         large_stacksize(HPX_LARGE_STACK_SIZE),
         huge_stacksize(HPX_HUGE_STACK_SIZE),
         need_to_call_pre_initialize(true)
 #if defined(__linux) || defined(linux) || defined(__linux__)
-      , argv0(argv0_)
+        , argv0(argv0_)
 #endif
     {
         pre_initialize_ini();
@@ -724,21 +734,6 @@ namespace hpx { namespace util
         return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;
     }
 
-    // Get whether the AGAS server is running as a dedicated runtime.
-    // This decides whether the AGAS actions are executed with normal
-    // priority (if dedicated) or with high priority (non-dedicated)
-    bool runtime_configuration::get_agas_dedicated_server() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (nullptr != sec) {
-                return hpx::util::get_entry_as<int>(
-                    *sec, "dedicated_server", 0) != 0;
-            }
-        }
-        return false;
-    }
-
     bool runtime_configuration::get_itt_notify_mode() const
     {
 #if HPX_HAVE_ITTNOTIFY != 0
@@ -949,25 +944,25 @@ namespace hpx { namespace util
     std::ptrdiff_t runtime_configuration::init_small_stack_size() const
     {
         return init_stack_size("small_size",
-            BOOST_PP_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_SMALL_STACK_SIZE), HPX_SMALL_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_medium_stack_size() const
     {
         return init_stack_size("medium_size",
-            BOOST_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_MEDIUM_STACK_SIZE), HPX_MEDIUM_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_large_stack_size() const
     {
         return init_stack_size("large_size",
-            BOOST_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_LARGE_STACK_SIZE), HPX_LARGE_STACK_SIZE);
     }
 
     std::ptrdiff_t runtime_configuration::init_huge_stack_size() const
     {
         return init_stack_size("huge_size",
-            BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
+            HPX_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
     }
 
     ///////////////////////////////////////////////////////////////////////////

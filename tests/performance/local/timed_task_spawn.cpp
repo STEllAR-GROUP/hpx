@@ -9,19 +9,20 @@
 // FIXME: Calling the tasks "workers" overloads the term worker-thread (which
 // refers to OS-threads).
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/format.hpp>
 #include <boost/math/common_factor.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
+#include <chrono>
 #include <cstdint>
+#include <ctime>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -70,12 +71,14 @@ std::uint64_t no_suspend_step = 1;
 ///////////////////////////////////////////////////////////////////////////////
 std::string format_build_date(std::string timestamp)
 {
-    boost::gregorian::date d = boost::gregorian::from_us_string(timestamp);
+    std::chrono::time_point<std::chrono::system_clock> now =
+        std::chrono::system_clock::now();
 
-    char const* fmt = "%02i-%02i-%04i";
+    std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
-    return boost::str(boost::format(fmt)
-                     % d.month().as_number() % d.day() % d.year());
+    std::string ts = std::ctime(&current_time);
+    ts.resize(ts.size()-1);     // remove trailing '\n'
+    return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -144,20 +147,21 @@ void print_results(
         }
     }
 
-    cout << ( boost::format("%lu, %lu, %lu, %lu, %.14g, %.14g")
-            % delay
-            % tasks
-            % suspended_tasks
-            % cores
-            % walltime
-            % warmup_estimate
-            );
+    hpx::util::format_to(cout,
+        "%lu, %lu, %lu, %lu, %.14g, %.14g",
+        delay,
+        tasks,
+        suspended_tasks,
+        cores,
+        walltime,
+        warmup_estimate
+    );
 
     if (ac)
     {
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            cout << ( boost::format(", %.14g")
-                    % counter_values[i].get_value<double>());
+            hpx::util::format_to(cout, ", %.14g",
+                counter_values[i].get_value<double>());
     }
 
     cout << "\n";

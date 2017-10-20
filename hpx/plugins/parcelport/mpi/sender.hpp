@@ -12,6 +12,7 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
@@ -70,7 +71,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if (connection->send())
             {
                 error_code ec;
-                connection->postprocess_handler_(
+                util::unique_function_nonser<
+                    void(
+                        error_code const&
+                      , parcelset::locality const&
+                      , connection_ptr
+                    )
+                > postprocess_handler;
+                std::swap(postprocess_handler, connection->postprocess_handler_);
+                postprocess_handler(
                     ec, connection->destination(), connection);
             }
             else

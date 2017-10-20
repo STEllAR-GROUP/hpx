@@ -7,6 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/format.hpp>
 
 #include <cstdint>
 #include <sstream>
@@ -26,8 +27,8 @@ managed_refcnt_checker::~managed_refcnt_checker()
 
     if (!references_.empty())
     {
-        strm << ( boost::format("[%1%/%2%]: held references\n")
-                % prefix_ % this_);
+        hpx::util::format_to(strm, "[%1%/%2%]: held references\n",
+            prefix_, this_);
 
         for (naming::id_type const& ref : references_)
         {
@@ -43,11 +44,11 @@ managed_refcnt_checker::~managed_refcnt_checker()
 
     if (naming::invalid_id != target_)
     {
-        strm << ( boost::format("[%1%/%2%]: destroying object\n")
-                % prefix_ % this_);
+        hpx::util::format_to(strm, "[%1%/%2%]: destroying object\n",
+            prefix_, this_);
 
-        strm << ( boost::format("[%1%/%2%]: triggering flag %3%\n")
-                % prefix_ % this_ % target_);
+        hpx::util::format_to(strm, "[%1%/%2%]: triggering flag %3%\n",
+            prefix_, this_, target_);
 
         hpx::trigger_lco_event(target_);
     }

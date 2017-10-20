@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -19,8 +19,6 @@
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
-
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -47,7 +45,7 @@ namespace hpx { namespace threads { namespace policies
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
@@ -112,6 +110,18 @@ namespace hpx { namespace threads { namespace policies
             result = this->queues_[num_thread]->wait_or_add_new(running,
                 idle_loop_count, added) && result;
             if (0 != added) return result;
+
+            // Check if we have been disabled
+            {
+                auto const& rp = resource::get_partitioner();
+                auto mask = rp.get_pu_mask(
+                    num_thread + this->parent_pool_->get_thread_offset());
+
+                if (!bit_and(mask, this->parent_pool_->get_used_processing_units()))
+                {
+                    return added == 0 && !running;
+                }
+            }
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?

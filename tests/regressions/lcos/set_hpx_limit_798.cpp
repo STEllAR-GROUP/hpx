@@ -11,11 +11,11 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 using hpx::lcos::shared_future;
 using hpx::lcos::make_ready_future;
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 // define large action
 double func(double x1 , double x2 , double x3 , double x4 ,
@@ -29,7 +29,7 @@ int main()
     shared_future< double > f = make_ready_future( 1.0 );
     f = hpx::dataflow(
             hpx::launch::sync,
-            unwrapped(&func),
+            unwrapping(&func),
             f, f, f, f, f, f, f);
     return hpx::util::report_errors();
 }

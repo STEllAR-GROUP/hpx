@@ -6,6 +6,7 @@
 
 set(tests
     discover_counters_1787
+    statistics_2666
     uptime_1737)
 
 if(HPX_WITH_PAPI)

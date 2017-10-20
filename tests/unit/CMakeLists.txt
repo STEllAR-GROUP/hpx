@@ -11,24 +11,18 @@ set(subdirs
     component
     diagnostics
     lcos
+    parallel
     parcelset
     performance_counter
+    resource
     serialization
     threads
     traits
     util
    )
 
-if(HPX_WITH_SECURITY)
-  set(subdirs ${subdirs} security)
-endif()
-
 if(HPX_WITH_APEX)
   set(subdirs ${subdirs} apex)
-endif()
-
-if(HPX_WITH_CXX11_LAMBDAS)
-  set(subdirs ${subdirs} parallel)
 endif()
 
 set(subdirs ${subdirs} computeapi)

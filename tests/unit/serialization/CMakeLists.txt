@@ -5,22 +5,28 @@
 
 set(tests
     serialization_array
+    serialization_valarray
     serialization_builtins
     serialization_complex
     serialization_custom_constructor
-    serialization_list
+    serialization_deque
     serialization_map
+    serialization_list
     serialization_set
     serialization_simple
     serialization_smart_ptr
     serialization_unordered_map
     serialization_vector
+    serialization_partitioned_vector
     serialization_variant
     serialize_buffer
     zero_copy_serialization
 )
 
 add_subdirectory(polymorphic)
+
+set(serialization_partitioned_vector_FLAGS DEPENDENCIES partitioned_vector_component)
+set(serialization_partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources

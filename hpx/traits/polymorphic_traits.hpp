@@ -9,7 +9,7 @@
 
 #include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/has_xxx.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 
 #include <type_traits>
 
@@ -34,36 +34,36 @@ namespace hpx { namespace traits
       : detail::has_serialized_with_id<T> {};
 }}
 
-#define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                          \
-    namespace hpx { namespace traits {                                      \
-        template <>                                                         \
-        struct is_nonintrusive_polymorphic<Class>                           \
-          : std::true_type {};                                              \
-    }}                                                                      \
+#define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                            \
+    namespace hpx { namespace traits {                                        \
+        template <>                                                           \
+        struct is_nonintrusive_polymorphic<Class>                             \
+          : std::true_type {};                                                \
+    }}                                                                        \
 /**/
 
-#define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE(TEMPLATE, ARG_LIST)    \
-    namespace hpx { namespace traits {                                      \
-        HPX_UTIL_STRIP(TEMPLATE)                                            \
-        struct is_nonintrusive_polymorphic<HPX_UTIL_STRIP(ARG_LIST)>        \
-          : std::true_type {};                                              \
-    }}                                                                      \
+#define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE(TEMPLATE, ARG_LIST)      \
+    namespace hpx { namespace traits {                                        \
+        HPX_PP_STRIP_PARENS(TEMPLATE)                                         \
+        struct is_nonintrusive_polymorphic<HPX_PP_STRIP_PARENS(ARG_LIST)>     \
+          : std::true_type {};                                                \
+    }}                                                                        \
 /**/
 
-#define HPX_TRAITS_SERIALIZED_WITH_ID(Class)                                \
-    namespace hpx { namespace traits {                                      \
-        template <>                                                         \
-        struct is_serialized_with_id<Class>                                 \
-          : std::true_type {};                                              \
-    }}                                                                      \
+#define HPX_TRAITS_SERIALIZED_WITH_ID(Class)                                  \
+    namespace hpx { namespace traits {                                        \
+        template <>                                                           \
+        struct is_serialized_with_id<Class>                                   \
+          : std::true_type {};                                                \
+    }}                                                                        \
 /**/
 
-#define HPX_TRAITS_SERIALIZED_WITH_ID_TEMPLATE(TEMPLATE, ARG_LIST)          \
-    namespace hpx { namespace traits {                                      \
-        HPX_UTIL_STRIP(TEMPLATE)                                            \
-        struct is_serialized_with_id<HPX_UTIL_STRIP(ARG_LIST)>              \
-          : std::true_type {};                                              \
-    }}                                                                      \
+#define HPX_TRAITS_SERIALIZED_WITH_ID_TEMPLATE(TEMPLATE, ARG_LIST)            \
+    namespace hpx { namespace traits {                                        \
+        HPX_PP_STRIP_PARENS(TEMPLATE)                                         \
+        struct is_serialized_with_id<HPX_PP_STRIP_PARENS(ARG_LIST)>           \
+          : std::true_type {};                                                \
+    }}                                                                        \
 /**/
 
 #endif

@@ -91,6 +91,8 @@ namespace hpx { namespace serialization
         detail::load_impl(ar, v, use_optimized());
     }
 
+
+
     // save compute::vector<T>
     namespace detail
     {
@@ -99,9 +101,7 @@ namespace hpx { namespace serialization
             compute::vector<T, Allocator> const& vs, std::false_type)
         {
             // normal save ...
-            typedef typename compute::vector<T, Allocator>::value_type
-                value_type;
-            for(value_type const& v : vs)
+            for(auto const & v : vs)
             {
                 ar << v;
             }

@@ -5,6 +5,8 @@
 
 set(tests
     is_callable
+    is_range
+    is_tuple_like
    )
 
 foreach(test ${tests})

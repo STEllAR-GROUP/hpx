@@ -11,9 +11,8 @@
 #include <type_traits>
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) && \
-    !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) && \
-    (_MSC_FULL_VER < 180021114)         // NovCTP_2013
-#include <boost/thread/once.hpp>
+    !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS))
+#include <hpx/compat/mutex.hpp>
 
 #include <memory>   // for placement new
 #endif
@@ -28,7 +27,7 @@ namespace hpx { namespace util
 {
 #if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION) || \
     (HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) || \
-    (_MSC_FULL_VER >= 180021114)         // NovCTP_2013
+    defined(HPX_MSVC)
 
     //
     // C++11 requires thread-safe initialization of function-scope statics.
@@ -37,7 +36,7 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
-    private:
+    public:
         HPX_NON_COPYABLE(static_);
 
     public:
@@ -95,7 +94,7 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
-    private:
+    public:
         HPX_NON_COPYABLE(static_);
 
     public:
@@ -125,7 +124,7 @@ namespace hpx { namespace util
 
         static_()
         {
-            boost::call_once(&default_constructor::construct, constructed_);
+            compat::call_once(constructed_, &default_constructor::construct);
         }
 
         operator reference()
@@ -160,14 +159,14 @@ namespace hpx { namespace util
             std::alignment_of<value_type>::value>::type storage_type;
 
         static storage_type data_;
-        static boost::once_flag constructed_;
+        static compat::once_flag constructed_;
     };
 
     template <typename T, typename Tag>
     typename static_<T, Tag>::storage_type static_<T, Tag>::data_;
 
     template <typename T, typename Tag>
-    boost::once_flag static_<T, Tag>::constructed_ = BOOST_ONCE_INIT;
+    compat::once_flag static_<T, Tag>::constructed_;
 #endif
 }}
 

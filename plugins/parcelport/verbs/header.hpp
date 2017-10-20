@@ -42,7 +42,7 @@ namespace verbs
             rdma_region region;
         };
 
-        typedef std::pair<uint32_t, uint32_t> num_chunks_type;
+        typedef std::pair<uint16_t, uint16_t> num_chunks_type;
 
         struct header_block {
             uint32_t        tag;
@@ -88,7 +88,9 @@ namespace verbs
               message_header.chunk_info.piggyback.offset = 0;
               message_header.chunk_info.piggyback.bytes  = chunkbytes;
               std::memcpy(&data_[0], chunks.data(), chunkbytes);
-              LOG_DEBUG_MSG("Chunkbytes is " << hexnumber(chunkbytes));
+              LOG_DEBUG_MSG("Chunkbytes is " << decnumber(chunkbytes) <<
+                  "header_block_size "
+                  << decnumber(sizeof(detail::header_block)));
             }
             else {
               message_header.flags &= ~chunk_flag;

@@ -28,14 +28,13 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 105100
-#error Boost.Context is available only with Boost V1.51 or later
+#if BOOST_VERSION < 106100
+#include <boost/context/all.hpp>
+#else
+#include <boost/context/detail/fcontext.hpp>
 #endif
 
-#include <boost/atomic.hpp>
-
-#include <boost/context/all.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -44,7 +43,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS) && BOOST_VERSION >= 105300
+#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
 
 #define HPX_COROUTINES_SEGMENTS 10
 
@@ -100,8 +99,7 @@ namespace hpx { namespace threads { namespace coroutines
                 posix::watermark_stack(limit, size);
 #else
                 void* limit = std::calloc(size, sizeof(char));
-                if (!limit) boost::throw_exception(std::bad_alloc());
-
+                if (!limit) throw std::bad_alloc();
 #endif
                 return static_cast<char*>(limit) + size;
             }
@@ -132,14 +130,20 @@ namespace hpx { namespace threads { namespace coroutines
             { return minimum_stacksize(); }
 
             static std::size_t minimum_stacksize()
-            { return SIGSTKSZ + sizeof(boost::context::fcontext_t) + 15; }
+            { return SIGSTKSZ +
+#if BOOST_VERSION < 106100
+                sizeof(boost::context::fcontext_t)
+#else
+                sizeof(boost::context::detail::fcontext_t)
+#endif
+                + 15; }
 
             void* allocate(std::size_t size) const
             {
                 HPX_ASSERT(default_stacksize() <= size);
 
                 void* limit = __splitstack_makecontext(size, segments_ctx_, &size);
-                if (!limit) boost::throw_exception(std::bad_alloc());
+                if (!limit) throw std::bad_alloc();
 
                 int off = 0;
                  __splitstack_block_signals_context(segments_ctx_, &off, 0);
@@ -158,6 +162,7 @@ namespace hpx { namespace threads { namespace coroutines
 
         // Generic implementation for the context_impl_base class based on
         // Boost.Context.
+#if BOOST_VERSION < 106100
         template <typename T>
         HPX_FORCEINLINE void trampoline(intptr_t pv)
         {
@@ -166,16 +171,38 @@ namespace hpx { namespace threads { namespace coroutines
             (*fun)();
             std::abort();
         }
+#else
+        template <typename T>
+        HPX_FORCEINLINE void trampoline(boost::context::detail::transfer_t tr)
+        {
+            auto arg = reinterpret_cast<std::pair<void*,
+                 boost::context::detail::fcontext_t*>*>(tr.data);
+
+            HPX_ASSERT(arg->second);
+            *arg->second = tr.fctx;
+
+            T* fun = reinterpret_cast<T*>(arg->first);
+            HPX_ASSERT(fun);
+            (*fun)();
+
+            std::abort();
+        }
+#endif
 
         class fcontext_context_impl
         {
+        public:
             HPX_NON_COPYABLE(fcontext_context_impl);
 
         public:
             typedef fcontext_context_impl context_impl_base;
 
             fcontext_context_impl()
+#if BOOST_VERSION < 106100
               : cb_(0)
+#else
+              : cb_(std::make_pair(nullptr, nullptr))
+#endif
               , funp_(0)
 #if BOOST_VERSION > 105500
               , ctx_(0)
@@ -189,7 +216,11 @@ namespace hpx { namespace threads { namespace coroutines
             // a new stack. The stack size can be optionally specified.
             template <typename Functor>
             fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
+#if BOOST_VERSION < 106100
               : cb_(reinterpret_cast<intptr_t>(&cb))
+#else
+              : cb_(std::make_pair(reinterpret_cast<void*>(&cb), nullptr))
+#endif
               , funp_(&trampoline<Functor>)
 #if BOOST_VERSION > 105500
               , ctx_(0)
@@ -206,9 +237,13 @@ namespace hpx { namespace threads { namespace coroutines
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
 
                 std::swap(*ctx, ctx_);
-#else
+#elif BOOST_VERSION < 106100
                 ctx_ =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
+#else
+                ctx_ =
+                    boost::context::detail::make_fcontext(
+                            stack_pointer_, stack_size_, funp_);
 #endif
             }
 
@@ -253,7 +288,7 @@ namespace hpx { namespace threads { namespace coroutines
             HPX_EXPORT void reset_stack();
             HPX_EXPORT void rebind_stack();
 
-            typedef boost::atomic<std::int64_t> counter_type;
+            typedef std::atomic<std::int64_t> counter_type;
 
             HPX_EXPORT static counter_type& get_stack_unbind_counter();
             HPX_EXPORT static std::uint64_t get_stack_unbind_count(bool
@@ -267,7 +302,7 @@ namespace hpx { namespace threads { namespace coroutines
 
         private:
             friend void swap_context(fcontext_context_impl& from,
-                fcontext_context_impl const& to, detail::default_hint)
+                fcontext_context_impl& to, detail::default_hint)
             {
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
                 __splitstack_getcontext(from.alloc_.segments_ctx_);
@@ -276,8 +311,13 @@ namespace hpx { namespace threads { namespace coroutines
                 // switch to other coroutine context
 #if BOOST_VERSION < 105600
                 boost::context::jump_fcontext(&from.ctx_, &to.ctx_, to.cb_, false);
-#else
+#elif BOOST_VERSION < 106100
                 boost::context::jump_fcontext(&from.ctx_, to.ctx_, to.cb_, false);
+#else
+                to.cb_.second = &from.ctx_;
+                auto transfer = boost::context::detail::jump_fcontext(
+                        to.ctx_, reinterpret_cast<void*>(&to.cb_));
+                to.ctx_ = transfer.fctx;
 #endif
 
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
@@ -286,9 +326,15 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
         private:
+#if BOOST_VERSION < 106100
             intptr_t cb_;
             void (*funp_)(intptr_t);
             boost::context::fcontext_t ctx_;
+#else
+            std::pair<void*, boost::context::detail::fcontext_t*> cb_;
+            void (*funp_)(boost::context::detail::transfer_t);
+            boost::context::detail::fcontext_t ctx_;
+#endif
             stack_allocator alloc_;
             std::size_t stack_size_;
             void * stack_pointer_;

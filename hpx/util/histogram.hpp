@@ -7,10 +7,9 @@
 #define HISTOGRAM_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/iterator_range.hpp>
 
-#include <boost/range/iterator_range.hpp>
 #include <boost/parameter/keyword.hpp>
-#include <boost/mpl/placeholders.hpp>
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/extractor.hpp>
 #include <boost/accumulators/numeric/functional.hpp>
@@ -61,25 +60,19 @@ namespace hpx { namespace util
         template <typename Sample>
         struct histogram_impl : boost::accumulators::accumulator_base
         {
-#if BOOST_VERSION > 105400
             typedef typename boost::numeric::functional::fdiv_base<
                     Sample, std::size_t
                 >::result_type float_type;
-#else
-            typedef typename boost::numeric::functional::average<
-                    Sample, std::size_t
-                >::result_type float_type;
-#endif
             typedef std::vector<std::pair<float_type, float_type> > histogram_type;
             typedef std::vector<float_type> array_type;
 
             // for boost::result_of
-            typedef boost::iterator_range<
+            typedef util::iterator_range<
                     typename histogram_type::iterator
                 > result_type;
 
 // conversion from 'const __int64' to 'const double', possible loss of data
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4244)
 #endif
@@ -106,7 +99,7 @@ namespace hpx { namespace util
                     this->bin_positions_[i] = minimum_ + (i - 1.0) * bin_size_;
                 }
             }
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
@@ -159,7 +152,7 @@ namespace hpx { namespace util
                 }
 
                 // returns a range of pairs
-                return boost::make_iterator_range(this->histogram_);
+                return util::make_iterator_range(this->histogram_);
             }
 
         private:

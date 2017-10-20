@@ -12,4 +12,3 @@
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
 #endif
-

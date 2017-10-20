@@ -37,10 +37,10 @@ void test_transform_reduce_binary_exception(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::transform_reduce(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)),
-            boost::begin(d), init);
+            decorated_iterator(std::end(c)),
+            std::begin(d), init);
         HPX_TEST(false);
     }
     catch(hpx::exception_list const& e) {
@@ -71,10 +71,10 @@ void test_transform_reduce_binary_exception_async(ExPolicy p, IteratorTag)
         hpx::future<std::size_t> f =
             hpx::parallel::transform_reduce(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)),
-                boost::begin(d), init);
+                decorated_iterator(std::end(c)),
+                std::begin(d), init);
         returned_from_algorithm = true;
         f.get();
         HPX_TEST(false);

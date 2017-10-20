@@ -8,28 +8,27 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -66,7 +65,6 @@ namespace hpx
     int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl;
 
     class HPX_EXPORT runtime
@@ -84,16 +82,14 @@ namespace hpx
             std::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(
-            util::runtime_configuration & rtcfg
-          , threads::policies::init_affinity_data const& affinity_init);
+        runtime(util::runtime_configuration & rtcfg);
 
         virtual ~runtime();
 
         /// \brief Manage list of functions to call on exit
         void on_exit(util::function_nonser<void()> const& f)
         {
-            std::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<compat::mutex> l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -110,7 +106,7 @@ namespace hpx
 
             typedef util::function_nonser<void()> value_type;
 
-            std::lock_guard<boost::mutex> l(mtx_);
+            std::lock_guard<compat::mutex> l(mtx_);
             for (value_type const& f : on_exit_functions_)
                 f();
         }
@@ -193,7 +189,7 @@ namespace hpx
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
         virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
 
-        virtual threads::threadmanager_base& get_thread_manager() = 0;
+        virtual threads::threadmanager& get_thread_manager() = 0;
 
         virtual naming::resolver_client& get_agas_client() = 0;
 
@@ -207,9 +203,9 @@ namespace hpx
         virtual std::uint64_t get_memory_lva() const = 0;
 
         virtual void report_error(std::size_t num_thread,
-            boost::exception_ptr const& e) = 0;
+            std::exception_ptr const& e) = 0;
 
-        virtual void report_error(boost::exception_ptr const& e) = 0;
+        virtual void report_error(std::exception_ptr const& e) = 0;
 
         virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
 
@@ -321,32 +317,30 @@ namespace hpx
         void set_state(state s);
 
     protected:
-        util::reinit_helper reinit_;
-
         // list of functions to call on exit
         typedef std::vector<util::function_nonser<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
-        mutable boost::mutex mtx_;
+        mutable compat::mutex mtx_;
 
         util::runtime_configuration ini_;
         std::shared_ptr<performance_counters::registry> counters_;
         std::shared_ptr<util::query_counters> active_counters_;
 
         long instance_number_;
-        static boost::atomic<int> instance_number_counter_;
+        static std::atomic<int> instance_number_counter_;
 
         // certain components (such as PAPI) require all threads to be
         // registered with the library
         boost::scoped_ptr<util::thread_mapper> thread_support_;
 
-        threads::policies::init_affinity_data affinity_init_;
+        // topology and affinity data
         threads::topology& topology_;
 
         // locality basename -> used cores
         typedef std::map<std::string, std::uint32_t> used_cores_map_type;
         used_cores_map_type used_cores_map_;
 
-        boost::atomic<state> state_;
+        std::atomic<state> state_;
 
         boost::scoped_ptr<components::server::memory> memory_;
         boost::scoped_ptr<components::server::runtime_support> runtime_support_;

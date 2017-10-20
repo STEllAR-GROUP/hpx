@@ -12,6 +12,8 @@
 #include <sys/param.h>
 
 #include <hpx/exception.hpp>
+#include <hpx/util/format.hpp>
+
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_uint.hpp>
@@ -20,7 +22,6 @@
 #include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
-#include <boost/format.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -93,7 +94,7 @@ namespace hpx { namespace performance_counters { namespace memory
     bool read_proc_statm(proc_statm& ps, std::int32_t pid)
     {
         std::string filename
-            = boost::str(boost::format("/proc/%1%/statm") % pid);
+            = hpx::util::format("/proc/%1%/statm", pid);
 
         ifstream_raii in(filename.c_str(), std::ios_base::in);
 
@@ -125,8 +126,8 @@ namespace hpx { namespace performance_counters { namespace memory
             HPX_THROW_EXCEPTION(
                 hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_virtual",
-                boost::str( boost::format("failed to parse '/proc/%1%/statm'")
-                          % getpid()));
+                hpx::util::format("failed to parse '/proc/%1%/statm'",
+                    getpid()));
             return std::uint64_t(-1);
         }
 
@@ -144,8 +145,8 @@ namespace hpx { namespace performance_counters { namespace memory
             HPX_THROW_EXCEPTION(
                 hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_resident",
-                boost::str( boost::format("failed to parse '/proc/%1%/statm'")
-                          % getpid()));
+                hpx::util::format("failed to parse '/proc/%1%/statm'",
+                    getpid()));
             return std::uint64_t(-1);
         }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/asio_util.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -19,6 +20,7 @@
 
 #include <cstdint>
 #include <ctime>
+#include <exception>
 #include <sstream>
 #include <string>
 
@@ -27,11 +29,15 @@
 // before any Asio's own global objects. With MSVC, this may be accomplished
 // by adding the following code to the DLL:
 
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable:4073)
+#endif
 #pragma init_seg(lib)
 boost::asio::detail::winsock_init<>::manual manual_winsock_init;
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,7 +87,7 @@ namespace hpx { namespace util
                 return ep;
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not an address, try to treat it as a host name
@@ -97,7 +103,7 @@ namespace hpx { namespace util
             return *it;
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors
@@ -128,7 +134,7 @@ namespace hpx { namespace util
             return endpoint.address().to_string();
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors
@@ -236,7 +242,7 @@ namespace hpx { namespace util
             }
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not an address, try to treat it as a host name
@@ -252,7 +258,7 @@ namespace hpx { namespace util
             return endpoint_iterator_type(resolver.resolve(query));
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors
@@ -287,7 +293,7 @@ namespace hpx { namespace util
             }
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not an address, try to treat it as a host name
@@ -299,7 +305,7 @@ namespace hpx { namespace util
             return endpoint_iterator_type(resolver.resolve(query));
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // it's not a host name either, create a custom iterator allowing to
@@ -313,7 +319,7 @@ namespace hpx { namespace util
             return endpoint_iterator_type(resolver.resolve(query));
         }
         catch (boost::system::system_error const&) {
-            errors.add(boost::current_exception());
+            errors.add(std::current_exception());
         }
 
         // report errors

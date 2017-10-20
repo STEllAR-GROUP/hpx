@@ -10,14 +10,14 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/random.hpp>
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <functional>
 #include <iostream>
+#include <random>
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -62,10 +62,10 @@ double null_function(
   , std::uint64_t delay_iterations
     )
 {
-    boost::random::mt19937_64 prng(seed);
+    std::mt19937_64 prng(seed);
 
-    boost::random::uniform_real_distribution<double> v(0, 1.);
-    boost::random::uniform_smallint<std::uint8_t> s(0, 1);
+    std::uniform_real_distribution<double> v(0, 1.);
+    std::uniform_int_distribution<std::uint8_t> s(0, 1);
 
     double d = 0.;
 
@@ -197,8 +197,8 @@ int hpx_main(
                 char const* fmt =
                     "%016u, %.7g,%|31t| %.7g%|41t| [steps/second]\n";
 
-                std::cout << (boost::format(fmt) % i % d % step_speed)
-                          << std::flush;
+                hpx::util::format_to(std::cout, fmt, i, d, step_speed)
+                    << std::flush;
 
             }
         }

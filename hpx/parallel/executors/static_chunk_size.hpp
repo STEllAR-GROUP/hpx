@@ -9,17 +9,15 @@
 #define HPX_PARALLEL_STATIC_CHUNK_SIZE_JUL_31_2015_0740PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/executors/executor_information_traits.hpp>
-#include <hpx/parallel/executors/executor_parameter_traits.hpp>
-#include <hpx/parallel/executors/thread_executor_information_traits.hpp>
-#include <hpx/parallel/executors/thread_executor_parameter_traits.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 
-#include <cstddef>
+#include <hpx/parallel/executors/execution_parameters.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
+#include <cstddef>
+#include <type_traits>
+
+namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces of size \a chunk_size and then
@@ -29,7 +27,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
-    struct static_chunk_size : executor_parameters_tag
+    struct static_chunk_size
     {
         /// Construct a \a static_chunk_size executor parameters object
         ///
@@ -62,8 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             // Make sure the internal round robin counter of the executor is
             // reset
-            typedef executor_parameter_traits<static_chunk_size> traits;
-            traits::reset_thread_distribution(*this, exec);
+            execution::reset_thread_distribution(*this, exec);
 
             // by default use static work distribution over number of
             // available compute resources, create four times the number of
@@ -89,5 +86,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \endcond
     };
 }}}
+
+namespace hpx { namespace parallel { namespace execution
+{
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<parallel::execution::static_chunk_size>
+      : std::true_type
+    {};
+    /// \endcond
+}}}
+
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+
+#include <hpx/parallel/executors/v1/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/v1/thread_executor_parameter_traits.hpp>
+#include <hpx/traits/v1/is_executor_parameters.hpp>
+
+namespace hpx { namespace parallel { inline namespace v3
+{
+    using static_chunk_size = execution::static_chunk_size;
+}}}
+
+#endif
 
 #endif

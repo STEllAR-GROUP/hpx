@@ -12,6 +12,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_client.hpp>
@@ -67,6 +68,49 @@ namespace hpx
     template <typename Component, typename ...Ts>
     <unspecified>
     new_(id_type const& locality, Ts&&... vs);
+
+    /// \brief Create one new instance of the given Component type on the
+    /// current locality.
+    ///
+    /// This function creates one new instance of the given Component
+    /// type on the current locality and returns a future object for the
+    /// global address which can be used to reference the new component
+    /// instance.
+    ///
+    /// \param vs        [in] Any number of arbitrary arguments (passed by
+    ///                  value, by const reference or by rvalue reference)
+    ///                  which will be forwarded to the constructor of
+    ///                  the created component instance.
+    ///
+    /// \note    This function requires to specify an explicit template
+    ///          argument which will define what type of component(s) to
+    ///          create, for instance:
+    ///          \code
+    ///              hpx::future<hpx::id_type> f =
+    ///                 hpx::local_new<some_component>(...);
+    ///              hpx::id_type id = f.get();
+    ///          \endcode
+    ///
+    /// \returns The function returns different types depending on its use:\n
+    ///          * If the explicit template argument \a Component represents a
+    ///          component type (<code>traits::is_component<Component>::value</code>
+    ///          evaluates to true), the function will return an \a hpx::future
+    ///          object instance which can be used to retrieve the global
+    ///          address of the newly created component.
+    ///          * If the explicit template argument \a Component represents a
+    ///          client side object (<code>traits::is_client<Component>::value</code>
+    ///          evaluates to true), the function will return a new instance
+    ///          of that type which can be used to refer to the newly created
+    ///          component instance.
+    ///
+    /// \note    The difference of this funtion to \a hpx::new_ is that it can
+    ///          be used in cases where the supplied arguments are non-copyable
+    ///          and non-movable. All operations are guaranteed to be local
+    ///          only.
+    ///
+    template <typename Component, typename ...Ts>
+    <unspecified>
+    local_new(Ts&&... vs);
 
     /// \brief Create multiple new instances of the given Component type on the
     /// specified locality.
@@ -372,11 +416,77 @@ namespace hpx { namespace components
         return detail::new_client<Client>::call(
             policy, std::forward<Ts>(vs)...);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Same as above, but just on this locality. This does not go through an
+    // action, that means that the constructor arguments can be non-copyable
+    // and non-movable.
+    namespace detail
+    {
+        template <typename Component>
+        struct local_new_component
+        {
+            typedef typename hpx::future<hpx::id_type> type;
+
+            template <typename ...Ts>
+            static type call(Ts &&... ts)
+            {
+                typedef typename Component::wrapping_type component_type;
+
+                hpx::id_type id(
+                    components::server::construct<component_type>(
+                        std::forward<Ts>(ts)...
+                    ),
+                    hpx::id_type::managed);
+                return hpx::make_ready_future(std::move(id));
+            }
+        };
+
+        template <typename Client>
+        struct local_new_client
+        {
+            typedef Client type;
+            typedef typename Client::server_component_type::wrapping_type
+                component_type;
+
+            template <typename ...Ts>
+            static type call(Ts &&... ts)
+            {
+                hpx::id_type id(
+                    components::server::construct<component_type>(
+                        std::forward<Ts>(ts)...
+                    ),
+                    hpx::id_type::managed);
+                return make_client<Client>(std::move(id));
+            }
+        };
+    }
+
+    template <typename Component, typename ...Ts>
+    inline typename util::lazy_enable_if<
+        traits::is_component<Component>::value,
+        detail::local_new_component<Component>
+    >::type
+    local_new(Ts &&... ts)
+    {
+        return detail::local_new_component<Component>::call(std::forward<Ts>(ts)...);
+    }
+
+    template <typename Client, typename ...Ts>
+    inline typename util::lazy_enable_if<
+        traits::is_client<Client>::value,
+        detail::local_new_client<Client>
+    >::type
+    local_new(Ts &&... ts)
+    {
+        return detail::local_new_client<Client>::call(std::forward<Ts>(ts)...);
+    }
 }}
 
 namespace hpx
 {
     using hpx::components::new_;
+    using hpx::components::local_new;
 }
 
 #endif

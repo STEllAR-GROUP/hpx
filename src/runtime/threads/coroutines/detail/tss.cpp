@@ -41,9 +41,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         return new tss_storage;
 #else
-        boost::throw_exception(std::runtime_error(
+        throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return nullptr;
 #endif
     }
@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            boost::throw_exception(null_thread_id_exception());
+            throw null_thread_id_exception();
             return 0;
         }
 
@@ -76,9 +76,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         return node->get_data<std::size_t>();
 #else
-        boost::throw_exception(std::runtime_error(
+        throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return 0;
 #endif
     }
@@ -89,14 +89,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            boost::throw_exception(null_thread_id_exception());
+            throw null_thread_id_exception();
             return 0;
         }
 
         detail::tss_storage* tss_map = self->get_or_create_thread_tss_data();
         if (nullptr == tss_map)
         {
-            boost::throw_exception(std::bad_alloc());
+            throw std::bad_alloc();
             return 0;
         }
 
@@ -112,9 +112,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         return prev_val;
 #else
-        boost::throw_exception(std::runtime_error(
+        throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return 0;
 #endif
     }
@@ -126,7 +126,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            boost::throw_exception(null_thread_id_exception());
+            throw null_thread_id_exception();
             return nullptr;
         }
 
@@ -136,9 +136,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         return tss_map->find(key);
 #else
-        boost::throw_exception(std::runtime_error(
+        throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return nullptr;
 #endif
     }
@@ -159,14 +159,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            boost::throw_exception(null_thread_id_exception());
+            throw null_thread_id_exception();
             return;
         }
 
         detail::tss_storage* tss_map = self->get_or_create_thread_tss_data();
         if (nullptr == tss_map)
         {
-            boost::throw_exception(std::bad_alloc());
+            throw std::bad_alloc();
             return;
         }
 
@@ -180,7 +180,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (nullptr == self)
         {
-            boost::throw_exception(null_thread_id_exception());
+            throw null_thread_id_exception();
             return;
         }
 

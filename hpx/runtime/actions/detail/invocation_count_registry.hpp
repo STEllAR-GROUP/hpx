@@ -8,12 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters.hpp>
-
+#include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
-
-#include <boost/atomic.hpp>
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstdint>
 #include <string>
@@ -25,6 +22,7 @@ namespace hpx { namespace actions { namespace detail
 {
     class HPX_EXPORT invocation_count_registry
     {
+    public:
         HPX_NON_COPYABLE(invocation_count_registry);
 
     public:
@@ -90,8 +88,8 @@ namespace hpx { namespace actions { namespace detail
 #define HPX_REGISTER_ACTION_INVOCATION_COUNT(Action)                          \
     namespace hpx { namespace actions { namespace detail                      \
     {                                                                         \
-        template register_action_invocation_count<Action>                     \
-            register_action_invocation_count<Action>::instance;               \
+        template register_action_invocation_count< Action>                    \
+            register_action_invocation_count< Action>::instance;              \
     }}}                                                                       \
 /**/
 

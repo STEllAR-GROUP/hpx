@@ -110,6 +110,7 @@ macro(hpx_quickbook_to_boostbook name)
   add_custom_command(OUTPUT ${name}.xml
     COMMAND "${BOOSTQUICKBOOK_EXECUTABLE}"
         "--output-file=${name}.xml"
+        "--include-path=${CMAKE_CURRENT_BINARY_DIR}/generated"
         "${git_commit_option}"
         "${doxygen_option}"
         "-D__hpx_source_dir__=${doc_source_dir}"

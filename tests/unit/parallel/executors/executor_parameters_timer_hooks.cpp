@@ -9,8 +9,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -31,7 +30,7 @@ void chunk_size_test_seq(Parameters && params)
     test_for_each_async(execution::seq(execution::task).with(std::ref(params)),
         iterator_tag());
 
-    sequential_executor seq_exec;
+    execution::sequenced_executor seq_exec;
     test_for_each(execution::seq.on(seq_exec).with(std::ref(params)),
         iterator_tag());
     test_for_each_async(
@@ -49,7 +48,7 @@ void chunk_size_test_par(Parameters && params)
     test_for_each_async(execution::par(execution::task).with(std::ref(params)),
         iterator_tag());
 
-    parallel_executor par_exec;
+    execution::parallel_executor par_exec;
     test_for_each(execution::par.on(par_exec).with(std::ref(params)),
         iterator_tag());
     test_for_each_async(
@@ -57,19 +56,21 @@ void chunk_size_test_par(Parameters && params)
         iterator_tag());
 }
 
-struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
+struct timer_hooks_parameters
 {
     timer_hooks_parameters(char const* name)
       : name_(name), time_(0), count_(0)
     {}
 
-    void mark_begin_execution()
+    template <typename Executor>
+    void mark_begin_execution(Executor &&)
     {
         ++count_;
         time_ = hpx::util::high_resolution_clock::now();
     }
 
-    void mark_end_execution()
+    template <typename Executor>
+    void mark_end_execution(Executor &&)
     {
         time_ = hpx::util::high_resolution_clock::now() - time_;
         ++count_;
@@ -77,8 +78,16 @@ struct timer_hooks_parameters : hpx::parallel::executor_parameters_tag
 
     std::string name_;
     std::uint64_t time_;
-    boost::atomic<std::size_t> count_;
+    std::atomic<std::size_t> count_;
 };
+
+namespace hpx { namespace parallel { namespace execution
+{
+    template <>
+    struct is_executor_parameters<timer_hooks_parameters>
+      : std::true_type
+    {};
+}}}
 
 void test_timer_hooks()
 {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,11 +18,11 @@
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/protect.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ namespace lcos {
             // any error in the parcel layer will be stored in the future object
             if (ec)
             {
-                boost::exception_ptr exception = HPX_GET_EXCEPTION(ec,
+                std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
                     "packaged_action::parcel_write_handler",
                     parcelset::dump_parcel(p));
                 shared_state->set_exception(exception);
@@ -92,7 +92,7 @@ namespace lcos {
             // any error in the parcel layer will be stored in the future object
             if (ec)
             {
-                boost::exception_ptr exception = HPX_GET_EXCEPTION(ec,
+                std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
                     "packaged_action::parcel_write_handler",
                     parcelset::dump_parcel(p));
                 shared_state->set_exception(exception);
@@ -118,7 +118,7 @@ namespace lcos {
                 this->shared_state_, _1, _2);
 
             naming::address addr_(this->resolve());
-            naming::id_type cont_id(this->get_id());
+            naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             if (addr)
@@ -136,6 +136,8 @@ namespace lcos {
                         std::move(cont_id), std::move(addr_)),
                     id, priority, std::move(f), std::forward<Ts>(vs)...);
             }
+
+            this->shared_state_->mark_as_started();
         }
 
         template <typename... Ts>
@@ -153,13 +155,15 @@ namespace lcos {
                 this->shared_state_, _1, _2);
 
             naming::address addr_(this->resolve());
-            naming::id_type cont_id(this->get_id());
+            naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
                     std::move(cont_id), std::move(addr_)),
                 id, priority, std::move(f), std::forward<Ts>(vs)...);
+
+            this->shared_state_->mark_as_started();
         }
 
         template <typename Callback, typename... Ts>
@@ -181,7 +185,7 @@ namespace lcos {
                 _1, _2);
 
             naming::address addr_(this->resolve());
-            naming::id_type cont_id(this->get_id());
+            naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             if (addr)
@@ -199,6 +203,8 @@ namespace lcos {
                         std::move(cont_id), std::move(addr_)),
                     id, priority, std::move(cb), std::forward<Ts>(vs)...);
             }
+
+            this->shared_state_->mark_as_started();
         }
 
         template <typename Callback, typename... Ts>
@@ -220,13 +226,15 @@ namespace lcos {
                 _1, _2);
 
             naming::address addr_(this->resolve());
-            naming::id_type cont_id(this->get_id());
+            naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
                     std::move(cont_id), std::move(addr_)),
                 id, priority, std::move(f), std::forward<Ts>(vs)...);
+
+            this->shared_state_->mark_as_started();
         }
 
     public:
@@ -315,7 +323,7 @@ namespace lcos {
             auto cb = util::bind(&packaged_action::parcel_write_handler,
                 this->shared_state_, _1, _2);
 
-            naming::id_type cont_id(this->get_id());
+            naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             auto f = hpx::functional::apply_c_p_cb<action_type>(cont_id,
@@ -343,7 +351,7 @@ namespace lcos {
                 util::protect(std::forward<Callback>(cb)), this->shared_state_,
                 _1, _2);
 
-            naming::id_type cont_id(this->get_id());
+            naming::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             auto f = hpx::functional::apply_c_p_cb<action_type>(cont_id,
@@ -384,25 +392,27 @@ namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<
-                        component_type>::call())
+                if (traits::component_supports_migration<component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->shared_state_->set_data(
-                            action_type::execute_function(
-                                addr.address_, std::forward<Ts>(vs)...));
+                        auto && result = action_type::execute_function(
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        this->shared_state_->mark_as_started();
+                        this->shared_state_->set_data(std::move(result));
                         return;
                     }
                 }
                 else
                 {
                     // local, direct execution
-                    this->shared_state_->set_data(action_type::execute_function(
-                        addr.address_, std::forward<Ts>(vs)...));
+                    auto && result = action_type::execute_function(
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                    this->shared_state_->mark_as_started();
+                    this->shared_state_->set_data(std::move(result));
                     return;
                 }
             }
@@ -425,25 +435,27 @@ namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<
-                        component_type>::call())
+                if (traits::component_supports_migration<component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->shared_state_->set_data(
-                            action_type::execute_function(
-                                addr.address_, std::forward<Ts>(vs)...));
+                        auto && result = action_type::execute_function(
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        this->shared_state_->mark_as_started();
+                        this->shared_state_->set_data(std::move(result));
                         return;
                     }
                 }
                 else
                 {
                     // local, direct execution
-                    this->shared_state_->set_data(action_type::execute_function(
-                        addr.address_, std::forward<Ts>(vs)...));
+                    auto && result = action_type::execute_function(
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                    this->shared_state_->mark_as_started();
+                    this->shared_state_->set_data(std::move(result));
                     return;
                 }
             }
@@ -467,17 +479,17 @@ namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<
-                        component_type>::call())
+                if (traits::component_supports_migration<component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->shared_state_->set_data(
-                            action_type::execute_function(
-                                addr.address_, std::forward<Ts>(vs)...));
+                        auto && result = action_type::execute_function(
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        this->shared_state_->mark_as_started();
+                        this->shared_state_->set_data(std::move(result));
 
                         // invoke callback
                         cb(boost::system::error_code(), parcelset::parcel());
@@ -487,8 +499,10 @@ namespace lcos {
                 else
                 {
                     // local, direct execution
-                    this->shared_state_->set_data(action_type::execute_function(
-                        addr.address_, std::forward<Ts>(vs)...));
+                    auto && result = action_type::execute_function(
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                    this->shared_state_->mark_as_started();
+                    this->shared_state_->set_data(std::move(result));
 
                     // invoke callback
                     cb(boost::system::error_code(), parcelset::parcel());
@@ -514,17 +528,17 @@ namespace lcos {
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<
-                        component_type>::call())
+                if (traits::component_supports_migration<component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
                         // local, direct execution
-                        this->shared_state_->set_data(
-                            action_type::execute_function(
-                                addr.address_, std::forward<Ts>(vs)...));
+                        auto && result = action_type::execute_function(
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        this->shared_state_->mark_as_started();
+                        this->shared_state_->set_data(std::move(result));
 
                         // invoke callback
                         cb(boost::system::error_code(), parcelset::parcel());
@@ -534,8 +548,10 @@ namespace lcos {
                 else
                 {
                     // local, direct execution
-                    this->shared_state_->set_data(action_type::execute_function(
-                        addr.address_, std::forward<Ts>(vs)...));
+                    auto && result = action_type::execute_function(
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                    this->shared_state_->mark_as_started();
+                    this->shared_state_->set_data(std::move(result));
 
                     // invoke callback
                     cb(boost::system::error_code(), parcelset::parcel());

@@ -17,7 +17,7 @@
 #include <mutex>
 #include <utility>
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
@@ -93,7 +93,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     };
 }}}}
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 

@@ -3,13 +3,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(jacobi_smp_applications)
-
-if(HPX_WITH_CXX11_LAMBDAS)
-  set(jacobi_smp_applications ${jacobi_smp_applications}
-      jacobi_hpx
-      jacobi_nonuniform_hpx)
-endif()
+set(jacobi_smp_applications
+    jacobi_hpx
+    jacobi_nonuniform_hpx)
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(jacobi_smp_applications ${jacobi_smp_applications}

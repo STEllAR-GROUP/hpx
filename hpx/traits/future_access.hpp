@@ -87,6 +87,10 @@ namespace hpx { namespace traits
                     typename shared_state_ptr_for<Future>::type
                 > type;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename SharedState, typename Allocator>
+        struct shared_state_allocator;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -195,6 +199,12 @@ namespace hpx { namespace traits
         }
 #endif
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SharedState, typename Allocator>
+    struct shared_state_allocator
+      : detail::shared_state_allocator<SharedState, Allocator>
+    {};
 }}
 
 #endif

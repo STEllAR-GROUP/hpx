@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -16,21 +18,18 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/topology.hpp> //! FIXME remove
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/exception_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
-
 #include <cstddef>
 #include <cstdint>
+#include <exception>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -41,7 +40,6 @@ namespace hpx
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
-    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl : public runtime
     {
     private:
@@ -56,28 +54,17 @@ namespace hpx
             util::function_nonser<runtime::hpx_main_function_type> func,
             int& result);
 
-        void wait_helper(boost::mutex& mtx, boost::condition_variable& cond,
+        void wait_helper(compat::mutex& mtx, compat::condition_variable& cond,
             bool& running);
 
     public:
-        typedef SchedulingPolicy scheduling_policy_type;
         typedef threads::policies::callback_notifier notification_policy_type;
-
-        typedef typename scheduling_policy_type::init_parameter_type
-            init_scheduler_type;
 
         /// Construct a new HPX runtime instance
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
-        /// \param num_threads    [in] The initial number of threads to be started
-        ///                       by the thread-manager.
-        explicit runtime_impl(util::runtime_configuration & rtcfg,
-            runtime_mode locality_mode = runtime_mode_console,
-            std::size_t num_threads = 1,
-            init_scheduler_type const& init = init_scheduler_type(),
-            threads::policies::init_affinity_data const& affinity_init =
-                threads::policies::init_affinity_data());
+        explicit runtime_impl(util::runtime_configuration & rtcfg);
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
@@ -145,7 +132,8 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, boost::condition_variable& cond, boost::mutex& mtx);
+        void stopped(bool blocking, compat::condition_variable& cond,
+            compat::mutex& mtx);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -154,7 +142,7 @@ namespace hpx
         /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
         void report_error(std::size_t num_thread,
-            boost::exception_ptr const& e);
+            std::exception_ptr const& e);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
@@ -164,7 +152,7 @@ namespace hpx
         /// \note This function will retrieve the number of the current
         ///       shepherd thread and forward to the report_error function
         ///       above.
-        void report_error(boost::exception_ptr const& e);
+        void report_error(std::exception_ptr const& e);
 
         /// \brief Run the HPX runtime system, use the given function for the
         ///        main \a thread and block waiting for all threads to
@@ -234,7 +222,7 @@ namespace hpx
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
-        hpx::threads::threadmanager_base& get_thread_manager()
+        hpx::threads::threadmanager& get_thread_manager()
         {
             return *thread_manager_;
         }
@@ -263,19 +251,6 @@ namespace hpx
             strm << get_runtime().endpoints();
             return strm.str();
         }
-
-        /// \brief Return the number of executed HPX threads
-        ///
-        /// \param num This parameter specifies the sequence number of the OS
-        ///            thread the number of executed HPX threads should be
-        ///            returned for. If this is std::size_t(-1) the function
-        ///            will return the overall number of executed HPX threads.
-#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-        std::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const
-        {
-            return thread_manager_->get_executed_threads(num);
-        }
-#endif
 
         std::uint64_t get_runtime_support_lva() const
         {
@@ -376,20 +351,22 @@ namespace hpx
         util::unique_id_ranges id_pool_;
         runtime_mode mode_;
         int result_;
-        std::size_t num_threads_;
         util::io_service_pool main_pool_;
+#ifdef HPX_HAVE_IO_POOL
         util::io_service_pool io_pool_;
+#endif
+#ifdef HPX_HAVE_TIMER_POOL
         util::io_service_pool timer_pool_;
-        scheduling_policy_type scheduler_;
+#endif
         notification_policy_type notifier_;
-        boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
+        std::unique_ptr<hpx::threads::threadmanager> thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
         applier::applier applier_;
         boost::signals2::scoped_connection default_error_sink_;
 
-        boost::mutex mtx_;
-        boost::exception_ptr exception_;
+        compat::mutex mtx_;
+        std::exception_ptr exception_;
     };
 }
 

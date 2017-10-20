@@ -1,22 +1,20 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-// hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
-// hpxinspect:nodeprecatedname:boost::chrono
-// hpxinspect:nodeprecatedname:boost::unique_lock
 
 #if !defined(HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM)
 #define HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util_fwd.hpp>
@@ -24,20 +22,15 @@
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #endif
 
-#include <boost/chrono/chrono.hpp>
-#include <boost/exception_ptr.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
-
-#include <boost/atomic.hpp>
-
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <utility>
 #include <vector>
 
@@ -51,7 +44,7 @@ namespace hpx { namespace threads { namespace policies
     {
         struct reset_on_exit
         {
-            reset_on_exit(boost::atomic<std::int32_t>& counter)
+            reset_on_exit(std::atomic<std::int32_t>& counter)
               : counter_(counter)
             {
                 ++counter_;
@@ -62,7 +55,7 @@ namespace hpx { namespace threads { namespace policies
                 HPX_ASSERT(counter_ > 0);
                 --counter_;
             }
-            boost::atomic<std::int32_t>& counter_;
+            std::atomic<std::int32_t>& counter_;
         };
     }
 #endif
@@ -72,21 +65,20 @@ namespace hpx { namespace threads { namespace policies
     /// scheduler policies
     struct scheduler_base
     {
-    private:
+    public:
         HPX_NON_COPYABLE(scheduler_base);
 
     public:
         scheduler_base(std::size_t num_threads,
                 char const* description = "",
                 scheduler_mode mode = nothing_special)
-          : topology_(get_topology())
-          , affinity_data_(num_threads)
-          , mode_(mode)
+          : mode_(mode)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
           , states_(num_threads)
           , description_(description)
+          , parent_pool_(nullptr)
         {
             for (std::size_t i = 0; i != num_threads; ++i)
                 states_[i].store(state_initialized);
@@ -96,37 +88,38 @@ namespace hpx { namespace threads { namespace policies
         {
         }
 
-        threads::mask_cref_type get_pu_mask(topology const& topology,
-            std::size_t num_thread) const
+        threads::detail::thread_pool_base *get_parent_pool()
         {
-            return affinity_data_.get_pu_mask(topology, num_thread,
-                this->numa_sensitive());
+            HPX_ASSERT(parent_pool_ != nullptr);
+            return parent_pool_;
         }
 
-        std::size_t get_pu_num(std::size_t num_thread) const
+        void set_parent_pool(threads::detail::thread_pool_base *p)
         {
-            return affinity_data_.get_pu_num(num_thread);
+            HPX_ASSERT(parent_pool_ == nullptr);
+            parent_pool_ = p;
         }
 
-        void add_punit(std::size_t virt_core, std::size_t thread_num)
+        inline std::size_t global_to_local_thread_index(std::size_t n)
         {
-            affinity_data_.add_punit(virt_core, thread_num, topology_);
+            return n - parent_pool_->get_thread_offset();
         }
 
-        std::size_t init(init_affinity_data const& data,
-            topology const& topology)
+        inline std::size_t local_to_global_thread_index(std::size_t n)
         {
-            return affinity_data_.init(data, topology);
+            return n + parent_pool_->get_thread_offset();
         }
+
+        char const* get_description() const { return description_; }
 
         void idle_callback(std::size_t /*num_thread*/)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
-            boost::chrono::milliseconds period(++wait_count_);
+            std::chrono::milliseconds period(++wait_count_);
 
-            boost::unique_lock<boost::mutex> l(mtx_);
+            std::unique_lock<compat::mutex> l(mtx_);
             cond_.wait_for(l, period);
 #endif
         }
@@ -148,7 +141,7 @@ namespace hpx { namespace threads { namespace policies
         void do_some_work(std::size_t num_thread)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-            wait_count_.store(0, boost::memory_order_release);
+            wait_count_.store(0, std::memory_order_release);
 
             if (num_thread == std::size_t(-1))
                 cond_.notify_all();
@@ -158,12 +151,12 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // allow to access/manipulate states
-        boost::atomic<hpx::state>& get_state(std::size_t num_thread)
+        std::atomic<hpx::state>& get_state(std::size_t num_thread)
         {
             HPX_ASSERT(num_thread < states_.size());
             return states_[num_thread];
         }
-        boost::atomic<hpx::state> const& get_state(std::size_t num_thread) const
+        std::atomic<hpx::state> const& get_state(std::size_t num_thread) const
         {
             HPX_ASSERT(num_thread < states_.size());
             return states_[num_thread];
@@ -171,7 +164,7 @@ namespace hpx { namespace threads { namespace policies
 
         void set_all_states(hpx::state s)
         {
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type& state : states_)
                 state.store(s);
         }
@@ -179,7 +172,7 @@ namespace hpx { namespace threads { namespace policies
         // return whether all states are at least at the given one
         bool has_reached_state(hpx::state s) const
         {
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type const& state : states_)
             {
                 if (state.load() < s)
@@ -190,7 +183,7 @@ namespace hpx { namespace threads { namespace policies
 
         bool is_state(hpx::state s) const
         {
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type const& state : states_)
             {
                 if (state.load() != s)
@@ -204,7 +197,7 @@ namespace hpx { namespace threads { namespace policies
             std::pair<hpx::state, hpx::state> result(
                 last_valid_runtime_state, first_valid_runtime_state);
 
-            typedef boost::atomic<hpx::state> state_type;
+            typedef std::atomic<hpx::state> state_type;
             for (state_type const& state_iter : states_)
             {
                 hpx::state s = state_iter.load();
@@ -218,7 +211,7 @@ namespace hpx { namespace threads { namespace policies
         // get/set scheduler mode
         scheduler_mode get_scheduler_mode() const
         {
-            return mode_.load(boost::memory_order_acquire);
+            return mode_.load(std::memory_order_acquire);
         }
 
         void set_scheduler_mode(scheduler_mode mode)
@@ -228,6 +221,58 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
+
+        inline std::size_t domain_from_local_thread_index(std::size_t n)
+        {
+            auto &rp = resource::get_partitioner();
+            auto const& topo = rp.get_topology();
+            std::size_t global_id = local_to_global_thread_index(n);
+            std::size_t pu_num = rp.get_pu_num(global_id);
+
+            return topo.get_numa_node_number(pu_num);
+        }
+
+        template <typename Queue>
+        std::size_t num_domains(const std::vector<Queue*> &queues)
+        {
+            auto &rp = resource::get_partitioner();
+            auto const& topo = rp.get_topology();
+            std::size_t num_queues = queues.size();
+
+            std::set<std::size_t> domains;
+            for (std::size_t local_id = 0; local_id != num_queues; ++local_id)
+            {
+                std::size_t global_id = local_to_global_thread_index(local_id);
+                std::size_t pu_num = rp.get_pu_num(global_id);
+                std::size_t dom = topo.get_numa_node_number(pu_num);
+                domains.insert(dom);
+            }
+            return domains.size();
+        }
+
+        // either threads in same domain, or not in same domain
+        // depending on the predicate
+        std::vector<std::size_t> domain_threads(
+            std::size_t local_id, const std::vector<std::size_t> &ts,
+            std::function<bool(std::size_t, std::size_t)> pred)
+        {
+            std::vector<std::size_t> result;
+            auto &rp = resource::get_partitioner();
+            auto const& topo = rp.get_topology();
+            std::size_t global_id = local_to_global_thread_index(local_id);
+            std::size_t pu_num = rp.get_pu_num(global_id);
+            std::size_t numa = topo.get_numa_node_number(pu_num);
+            for (auto local_id : ts)
+            {
+                global_id = local_to_global_thread_index(local_id);
+                pu_num = rp.get_pu_num(global_id);
+                if (pred(numa, topo.get_numa_node_number(pu_num)))
+                {
+                    result.push_back(local_id);
+                }
+            }
+            return result;
+        }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         virtual std::uint64_t get_creation_time(bool reset) = 0;
@@ -291,7 +336,7 @@ namespace hpx { namespace threads { namespace policies
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
         virtual void on_error(std::size_t num_thread,
-            boost::exception_ptr const& e) = 0;
+            std::exception_ptr const& e) = 0;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         virtual std::int64_t get_average_thread_wait_time(
@@ -301,32 +346,33 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         virtual void start_periodic_maintenance(
-            boost::atomic<hpx::state>& global_state)
+            std::atomic<hpx::state>& global_state)
         {}
 
         virtual void reset_thread_distribution() {}
 
     protected:
-        topology const& topology_;
-        detail::affinity_data affinity_data_;
-        boost::atomic<scheduler_mode> mode_;
+        std::atomic<scheduler_mode> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
-        boost::mutex mtx_;
-        boost::condition_variable cond_;
-        boost::atomic<std::uint32_t> wait_count_;
+        compat::mutex mtx_;
+        compat::condition_variable cond_;
+        std::atomic<std::uint32_t> wait_count_;
 #endif
 
-        std::vector<boost::atomic<hpx::state> > states_;
+        std::vector<std::atomic<hpx::state> > states_;
         char const* description_;
+
+        // the pool that owns this scheduler
+        threads::detail::thread_pool_base *parent_pool_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:
         coroutines::detail::tss_data_node* find_tss_data(void const* key)
         {
             if (!thread_data_)
-                return 0;
+                return nullptr;
             return thread_data_->find(key);
         }
 
@@ -355,7 +401,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 return current_node->get_value();
             }
-            return 0;
+            return nullptr;
         }
 
         void set_tss_data(void const* key,

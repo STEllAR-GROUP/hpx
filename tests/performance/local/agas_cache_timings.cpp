@@ -14,10 +14,10 @@
 #include <hpx/util/cache/entries/lfu_entry.hpp>
 #include <hpx/util/cache/local_cache.hpp>
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/histogram.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/icl/closed_interval.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
 #include <algorithm>
@@ -36,52 +36,64 @@ typedef hpx::util::cache::entries::lfu_entry<hpx::agas::gva> gva_entry_type;
 struct gva_cache_key
 {
 private:
-    typedef boost::icl::closed_interval<hpx::naming::gid_type, std::less>
-        key_type;
+    typedef std::pair<hpx::naming::gid_type, hpx::naming::gid_type> key_type;
 
     key_type key_;
 
 public:
     gva_cache_key()
       : key_()
-    {}
+    {
+    }
 
-    explicit gva_cache_key(hpx::naming::gid_type const& id, std::uint64_t count)
+    explicit gva_cache_key(
+            hpx::naming::gid_type const& id, std::uint64_t count = 1)
       : key_(hpx::naming::detail::get_stripped_gid(id),
-             hpx::naming::detail::get_stripped_gid(id) + (count - 1))
+            hpx::naming::detail::get_stripped_gid(id) + (count - 1))
     {
         HPX_ASSERT(count);
     }
 
     hpx::naming::gid_type get_gid() const
     {
-        return boost::icl::lower(key_);
+        return key_.first;
     }
 
     std::uint64_t get_count() const
     {
-        hpx::naming::gid_type const size = boost::icl::length(key_);
+        hpx::naming::gid_type const size = key_.second - key_.first;
         HPX_ASSERT(size.get_msb() == 0);
         return size.get_lsb();
     }
 
     friend bool operator<(gva_cache_key const& lhs, gva_cache_key const& rhs)
     {
-        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
+        return lhs.key_.second < rhs.key_.first;
     }
 
     friend bool operator==(gva_cache_key const& lhs, gva_cache_key const& rhs)
     {
+        // Direct hit
+        if (lhs.key_ == rhs.key_)
+        {
+            return true;
+        }
+
         // Is lhs in rhs?
         if (1 == lhs.get_count() && 1 != rhs.get_count())
-            return boost::icl::contains(rhs.key_, lhs.key_);
+        {
+            return rhs.key_.first <= lhs.key_.first &&
+                lhs.key_.second <= rhs.key_.second;
+        }
 
         // Is rhs in lhs?
         else if (1 != lhs.get_count() && 1 == rhs.get_count())
-            return boost::icl::contains(lhs.key_, rhs.key_);
+        {
+            return lhs.key_.first <= rhs.key_.first &&
+                rhs.key_.second <= lhs.key_.second;
+        }
 
-        // Direct hit
-        return lhs.key_ == rhs.key_;
+        return false;
     }
 };
 
@@ -246,7 +258,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ("cache_size", value<std::size_t>(),
          "initial cache size (default: "
-         BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) ")")
+         HPX_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) ")")
         ("num_entries,n", value<std::size_t>(),
          "number of items to insert into cache (default: 1000)")
         ;

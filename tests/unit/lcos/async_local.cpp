@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <atomic>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,6 +253,41 @@ int hpx_main()
         hpx::future<void> f6 = hpx::async(hpx::launch::sync,
             hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
         f6.get();
+    }
+
+    {
+        using hpx::util::placeholders::_1;
+
+        auto policy1 =
+            hpx::launch::select([]()
+            {
+                return hpx::launch::sync;
+            });
+
+        hpx::future<std::int32_t> f1 =
+            hpx::async(policy1, hpx::util::bind(&increment, 42));
+        HPX_TEST_EQ(f1.get(), 43);
+
+        hpx::future<std::int32_t> f2 =
+            hpx::async(policy1, hpx::util::bind(&increment, _1), 42);
+        HPX_TEST_EQ(f2.get(), 43);
+
+        std::atomic<int> count(0);
+        auto policy2 =
+            hpx::launch::select([&count]() -> hpx::launch
+            {
+                if (count++ == 0)
+                    return hpx::launch::async;
+                return hpx::launch::sync;
+            });
+
+        hpx::future<void> f3 =
+            hpx::async(policy2, hpx::util::bind(&do_nothing, _1), 42);
+        f3.get();
+
+        hpx::future<void> f4 =
+            hpx::async(policy2, hpx::util::bind(&do_nothing, 42));
+        f4.get();
     }
 
     return hpx::finalize();

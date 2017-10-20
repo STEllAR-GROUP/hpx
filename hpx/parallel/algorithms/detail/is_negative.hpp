@@ -7,11 +7,10 @@
 #define HPX_PARALLEL_DETAIL_IS_NEGATIVE_JUL_2014_01_0148PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail
 {
     // main template represents non-integral types (raises error)
     template <typename Size, typename Enable = void>

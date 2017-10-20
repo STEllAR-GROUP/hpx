@@ -8,12 +8,13 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/unwrapped.hpp>
-
-#include <boost/format.hpp>
+#include <hpx/util/format.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -26,13 +27,15 @@
 namespace hpx { namespace performance_counters
 {
     performance_counter_set::performance_counter_set(std::string const& name,
-        bool reset)
+            bool reset)
+      : invocation_count_(0)
     {
         add_counters(name, reset);
     }
 
     performance_counter_set::performance_counter_set(
-        std::vector<std::string> const& names, bool reset)
+            std::vector<std::string> const& names, bool reset)
+      : invocation_count_(0)
     {
         add_counters(names, reset);
     }
@@ -64,14 +67,29 @@ namespace hpx { namespace performance_counters
     bool performance_counter_set::find_counter(counter_info const& info,
         bool reset, error_code& ec)
     {
+        // keep only local counters if requested
+        if (print_counters_locally_)
+        {
+            counter_path_elements p;
+            get_counter_path_elements(info.fullname_, p, ec);
+            if (ec) return false;
+
+            if (p.parentinstanceindex_ != hpx::get_locality_id())
+            {
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return true;
+            }
+        }
+
         naming::id_type id = get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counter_set::find_counter",
-                boost::str(boost::format(
-                    "unknown performance counter: '%1%' (%2%)") %
-                    info.fullname_ % ec.get_message()));
+                hpx::util::format(
+                    "unknown performance counter: '%1%' (%2%)",
+                    info.fullname_, ec.get_message()));
             return false;
         }
 
@@ -157,7 +175,7 @@ namespace hpx { namespace performance_counters
     bool performance_counter_set::start(launch::sync_policy, error_code& ec)
     {
         try {
-            auto v = hpx::util::unwrapped(start());
+            auto v = hpx::util::unwrap(start());
             return std::all_of(v.begin(), v.end(), [](bool val) { return val; });
         }
         catch (hpx::exception const& e) {
@@ -191,7 +209,7 @@ namespace hpx { namespace performance_counters
     bool performance_counter_set::stop(launch::sync_policy, error_code& ec)
     {
         try {
-            auto v = hpx::util::unwrapped(stop());
+            auto v = hpx::util::unwrap(stop());
             return std::all_of(v.begin(), v.end(), [](bool val) { return val; });
         }
         catch (hpx::exception const& e) {
@@ -225,7 +243,7 @@ namespace hpx { namespace performance_counters
     void performance_counter_set::reset(launch::sync_policy, error_code& ec)
     {
         try {
-            hpx::util::unwrapped(reset());
+            hpx::util::unwrap(reset());
         }
         catch (hpx::exception const& e) {
             HPX_RETHROWS_IF(ec, e, "performance_counter_set::start");
@@ -241,6 +259,7 @@ namespace hpx { namespace performance_counters
         {
             std::unique_lock<mutex_type> l(mtx_);
             ids = ids_;
+            ++invocation_count_;
         }
 
         std::vector<hpx::future<counter_value> > v;
@@ -249,7 +268,7 @@ namespace hpx { namespace performance_counters
         // reset all performance counters
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            if (infos_[i].type_ != counter_raw)
+            if (infos_[i].type_ == counter_histogram)
                 continue;
 
             using performance_counters::stubs::performance_counter;
@@ -264,7 +283,7 @@ namespace hpx { namespace performance_counters
         launch::sync_policy, bool reset, error_code& ec) const
     {
         try {
-            return hpx::util::unwrapped(get_counter_values(reset));
+            return hpx::util::unwrap(get_counter_values(reset));
         }
         catch (hpx::exception const& e) {
             HPX_RETHROWS_IF(ec, e,
@@ -282,6 +301,7 @@ namespace hpx { namespace performance_counters
         {
             std::unique_lock<mutex_type> l(mtx_);
             ids = ids_;
+            ++invocation_count_;
         }
 
         std::vector<hpx::future<counter_values_array> > v;
@@ -306,13 +326,20 @@ namespace hpx { namespace performance_counters
             launch::sync_policy, bool reset, error_code& ec) const
     {
         try {
-            return hpx::util::unwrapped(get_counter_values_array(reset));
+            return hpx::util::unwrap(get_counter_values_array(reset));
         }
         catch (hpx::exception const& e) {
             HPX_RETHROWS_IF(ec, e,
                 "performance_counter_set::get_counter_values_aray");
             return std::vector<counter_values_array>();
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::size_t performance_counter_set::get_invocation_count() const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return invocation_count_;
     }
 }}
 

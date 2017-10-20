@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <numeric>
 #include <random>
@@ -22,15 +23,11 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_container_algorithm.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/lightweight_test.hpp>
-//
-#include <boost/range/functions.hpp>
-#include <boost/format.hpp>
+#include <hpx/util/iterator_range.hpp>
 //
 #include "test_utils.hpp"
-
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
 
 #if !defined(HPX_SORT_TEST_SIZE_STRINGS)
 #define HPX_SORT_TEST_SIZE_STRINGS 1000000
@@ -46,8 +43,8 @@ template <typename T>
 void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 {
     // use the default random engine and an uniform distribution
-    boost::random::mt19937 eng(static_cast<unsigned int>(seed));
-    boost::random::uniform_real_distribution<double> distr(lower, upper);
+    std::mt19937 eng(static_cast<unsigned int>(seed));
+    std::uniform_real_distribution<double> distr(lower, upper);
 
     for (auto &elem : V) {
         elem = static_cast<T>(distr(eng));
@@ -100,18 +97,17 @@ int verify(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
             it != A.end(); ++it)
         {
             if (comp((*it), temp)) {
-                if (print) std::cout << "fail "
-                  << boost::format("%8.6f") % (elapsed / 1e9)
-                  << A.size() << std::endl;
+                if (print)
+                    hpx::util::format_to(std::cout, "fail %8.6f", elapsed / 1e9)
+                      << A.size() << std::endl;
                 return 0;
             }
             temp = (*it);
         }
     }
-    if (print) std::cout
-      << "OK "
-      << boost::format("%8.6f") % (elapsed / 1e9)
-      << A.size() << std::endl;
+    if (print)
+        hpx::util::format_to(std::cout, "OK %8.6f", elapsed / 1e9)
+          << A.size() << std::endl;
     return 1;
 }
 
@@ -222,7 +218,7 @@ void test_sort_exception(ExPolicy && policy, T)
 
             hpx::parallel::sort(
                 std::forward<ExPolicy>(policy),
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(
                         c.begin(), [](){ throw std::runtime_error("test"); }),
                     decorated_iterator(c.end())));
@@ -254,7 +250,7 @@ void test_sort_exception(ExPolicy && policy, T)
 
             hpx::parallel::sort(
                 std::forward<ExPolicy>(policy),
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(
                         c.begin(), [](){ throw std::bad_alloc(); }),
                     decorated_iterator(c.end())));
@@ -301,7 +297,7 @@ void test_sort_exception(ExPolicy && policy, T, Compare comp)
 
             hpx::parallel::sort(
                 std::forward<ExPolicy>(policy),
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(
                         c.begin(), [](){ throw std::runtime_error("test"); }),
                     decorated_iterator(c.end())),
@@ -334,7 +330,7 @@ void test_sort_exception(ExPolicy && policy, T, Compare comp)
 
             hpx::parallel::sort(
                 std::forward<ExPolicy>(policy),
-                boost::make_iterator_range(
+                hpx::util::make_iterator_range(
                     decorated_iterator(
                         c.begin(), [](){ throw std::bad_alloc(); }),
                     decorated_iterator(c.end())),
@@ -384,7 +380,7 @@ void test_sort_exception_async(ExPolicy && policy, T)
             hpx::future<void> f =
                 hpx::parallel::sort(
                     std::forward<ExPolicy>(policy),
-                    boost::make_iterator_range(
+                    hpx::util::make_iterator_range(
                         decorated_iterator(
                             c.begin(), [](){ throw std::runtime_error("test"); }),
                         decorated_iterator(c.end())));
@@ -422,7 +418,7 @@ void test_sort_exception_async(ExPolicy && policy, T)
             hpx::future<void> f =
                 hpx::parallel::sort(
                     std::forward<ExPolicy>(policy),
-                    boost::make_iterator_range(
+                    hpx::util::make_iterator_range(
                         decorated_iterator(
                             c.begin(), [](){ throw std::bad_alloc(); }),
                         decorated_iterator(c.end())));
@@ -475,7 +471,7 @@ void test_sort_exception_async(ExPolicy && policy, T, Compare comp)
             hpx::future<void> f =
                 hpx::parallel::sort(
                     std::forward<ExPolicy>(policy),
-                    boost::make_iterator_range(
+                    hpx::util::make_iterator_range(
                         decorated_iterator(
                             c.begin(), [](){ throw std::runtime_error("test"); }),
                         decorated_iterator(c.end())),
@@ -514,7 +510,7 @@ void test_sort_exception_async(ExPolicy && policy, T, Compare comp)
             hpx::future<void> f =
                 hpx::parallel::sort(
                     std::forward<ExPolicy>(policy),
-                    boost::make_iterator_range(
+                    hpx::util::make_iterator_range(
                         decorated_iterator(
                             c.begin(), [](){ throw std::bad_alloc(); }),
                         decorated_iterator(c.end())),
@@ -553,7 +549,7 @@ void test_sort2(ExPolicy && policy, T)
 
     // Fill vector with increasing values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -577,7 +573,7 @@ void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
 
     // Fill vector with increasing values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(std::begin(c), std::end(c), 0);
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -601,7 +597,7 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
 
     // Fill vector with random values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
-    std::iota(boost::begin(c), boost::end(c), T(0));
+    std::iota(std::begin(c), std::end(c), T(0));
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking

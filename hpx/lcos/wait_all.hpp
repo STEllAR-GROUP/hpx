@@ -103,9 +103,10 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/lcos_fwd.hpp>     // forward declare wait_all()
+
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_some.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -113,17 +114,15 @@ namespace hpx
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap_ref.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
 
 #include <algorithm>
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -169,12 +168,10 @@ namespace hpx { namespace lcos
           : is_future_or_shared_state<T>
         {};
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
         template <typename T, std::size_t N>
         struct is_future_or_shared_state_range<std::array<T, N> >
           : is_future_or_shared_state<T>
         {};
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
@@ -283,8 +280,8 @@ namespace hpx { namespace lcos
             void await_next(std::false_type, std::true_type)
             {
                 await_range<I>(
-                    boost::begin(util::unwrap_ref(util::get<I>(t_))),
-                    boost::end(util::unwrap_ref(util::get<I>(t_))));
+                    util::begin(util::unwrap_ref(util::get<I>(t_))),
+                    util::end(util::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future
@@ -389,7 +386,6 @@ namespace hpx { namespace lcos
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
     void wait_all(std::array<Future, N> const& values)
@@ -415,7 +411,6 @@ namespace hpx { namespace lcos
     {
         lcos::wait_all(const_cast<std::array<Future, N> const&>(values));
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
@@ -432,7 +427,7 @@ namespace hpx { namespace lcos
 
         result_type values;
         std::transform(begin, end, std::back_inserter(values),
-            detail::wait_get_shared_state<future_type>());
+            traits::detail::wait_get_shared_state<future_type>());
 
         lcos::wait_all(values);
     }
@@ -450,7 +445,7 @@ namespace hpx { namespace lcos
         result_type values;
         values.reserve(count);
 
-        detail::wait_get_shared_state<future_type> func;
+        traits::detail::wait_get_shared_state<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             values.push_back(func(*begin++));
 

@@ -7,8 +7,7 @@
 #define HPX_UTIL_PLUGIN_CONFIG_HPP
 
 #include <hpx/config.hpp>
-
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NO_EXPORT_API)
@@ -63,11 +62,11 @@
 #endif
 
 #define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR                                 \
-    BOOST_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC)                     \
+    HPX_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC)                       \
 /**/
 
 #define HPX_PLUGIN_SYMBOLS_PREFIX_STR                                         \
-    BOOST_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX)                             \
+    HPX_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX)                               \
 /**/
 
 #endif /*HPX_UTIL_PLUGIN_CONFIG_HPP*/

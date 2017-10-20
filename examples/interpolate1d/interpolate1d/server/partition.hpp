@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,14 +7,13 @@
 #define HPX_PARTITION_AUG_04_2011_1204PM
 
 #include <hpx/hpx.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
 
 #include <cstddef>
 #include <string>
 
 #include "../dimension.hpp"
+
+#include <boost/scoped_array.hpp>
 
 namespace interpolate1d { namespace server
 {
@@ -24,18 +23,15 @@ namespace interpolate1d { namespace server
     {
     private:
         typedef hpx::components::component_base<partition> base_type;
+        typedef hpx::lcos::local::spinlock mutex_type;
 
     public:
         partition();
 
-        // components must contain a typedef for wrapping_type defining the
-        // component type used to encapsulate instances of this component
-        typedef partition wrapping_type;
-
         // exposed functionality
         void init(std::string datafilename, dimension const&,
             std::size_t num_nodes);
-        double interpolate(double value);
+        double interpolate(double value) const;
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -45,6 +41,8 @@ namespace interpolate1d { namespace server
         HPX_DEFINE_COMPONENT_ACTION(partition, interpolate);
 
     private:
+        static mutex_type mtx_;     // one for whole application
+
         dimension dim_;
         boost::scoped_array<double> values_;
         double min_value_, max_value_, delta_;

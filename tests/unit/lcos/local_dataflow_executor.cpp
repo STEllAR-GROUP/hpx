@@ -10,10 +10,9 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -38,26 +37,26 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> void_f_count;
-boost::atomic<std::uint32_t> int_f_count;
+std::atomic<std::uint32_t> void_f_count;
+std::atomic<std::uint32_t> int_f_count;
 
 void void_f() {++void_f_count;}
 int int_f() {++int_f_count; return 42; }
 
-boost::atomic<std::uint32_t> void_f1_count;
-boost::atomic<std::uint32_t> int_f1_count;
+std::atomic<std::uint32_t> void_f1_count;
+std::atomic<std::uint32_t> int_f1_count;
 
 void void_f1(int) {++void_f1_count;}
 int int_f1(int i) {++int_f1_count; return i+42; }
 
-boost::atomic<std::uint32_t> int_f2_count;
+std::atomic<std::uint32_t> int_f2_count;
 int int_f2(int l, int r) {++int_f2_count; return l + r; }
 
-boost::atomic<std::uint32_t> int_f_vector_count;
+std::atomic<std::uint32_t> int_f_vector_count;
 
 int int_f_vector(std::vector<int> const & vf)
 {
@@ -78,23 +77,23 @@ void function_pointers(Executor& exec)
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    future<void> f1 = dataflow(exec, unwrapped(&void_f1), async(&int_f));
+    future<void> f1 = dataflow(exec, unwrapping(&void_f1), async(&int_f));
     future<int>
         f2 = dataflow(exec,
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
         );
     future<int>
         f3 = dataflow(exec,
-            unwrapped(&int_f2)
+            unwrapping(&int_f2)
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42)
             )
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(37)
             )
         );
@@ -103,18 +102,18 @@ void function_pointers(Executor& exec)
     std::vector<future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
-        vf.push_back(dataflow(exec, unwrapped(&int_f1), make_ready_future(42)));
+        vf.push_back(dataflow(exec, unwrapping(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(exec, unwrapped(&int_f_vector), std::move(vf));
+    future<int> f4 = dataflow(exec, unwrapping(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(exec,
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(exec,
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
           , dataflow(exec,
-                unwrapped(&void_f)
+                unwrapping(&void_f)
               , make_ready_future())
         );
 
@@ -132,8 +131,8 @@ void function_pointers(Executor& exec)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> future_void_f1_count;
-boost::atomic<std::uint32_t> future_void_f2_count;
+std::atomic<std::uint32_t> future_void_f1_count;
+std::atomic<std::uint32_t> future_void_f2_count;
 
 void future_void_f1(future<void> f1)
 {
@@ -154,8 +153,8 @@ void future_void_f2(future<void> f1, future<void> f2)
     ++future_void_f2_count;
 }
 
-boost::atomic<std::uint32_t> future_int_f1_count;
-boost::atomic<std::uint32_t> future_int_f2_count;
+std::atomic<std::uint32_t> future_int_f1_count;
+std::atomic<std::uint32_t> future_int_f2_count;
 
 int future_int_f1(future<void> f1)
 {
@@ -171,7 +170,7 @@ int future_int_f2(future<int> f1, future<int> f2)
     return f1.get() + f2.get();
 }
 
-boost::atomic<std::uint32_t> future_int_f_vector_count;
+std::atomic<std::uint32_t> future_int_f_vector_count;
 
 int future_int_f_vector(std::vector<future<int> >& vf)
 {
@@ -181,6 +180,7 @@ int future_int_f_vector(std::vector<future<int> >& vf)
         HPX_TEST(f.is_ready());
         sum += f.get();
     }
+    ++future_int_f_vector_count;
     return sum;
 }
 
@@ -248,17 +248,19 @@ void future_function_pointers(Executor& exec)
     future<int> f5 = dataflow(exec, &future_int_f_vector, std::ref(vf));
 
     HPX_TEST_EQ(f5.get(), 10);
+    HPX_TEST_EQ(future_int_f1_count, 10u);
+    HPX_TEST_EQ(future_int_f_vector_count, 1u);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::uint32_t> void_f4_count;
-boost::atomic<std::uint32_t> int_f4_count;
+std::atomic<std::uint32_t> void_f4_count;
+std::atomic<std::uint32_t> int_f4_count;
 
 void void_f4(int) { ++void_f4_count; }
 int int_f4(int i) { ++int_f4_count; return i+42; }
 
-boost::atomic<std::uint32_t> void_f5_count;
-boost::atomic<std::uint32_t> int_f5_count;
+std::atomic<std::uint32_t> void_f5_count;
+std::atomic<std::uint32_t> int_f5_count;
 
 void void_f5(int, hpx::future<int>) { ++void_f5_count; }
 int int_f5(int i, hpx::future<int> j) { ++int_f5_count; return i+j.get()+42; }
@@ -319,7 +321,7 @@ void plain_deferred_arguments(Executor& exec)
 int hpx_main(variables_map&)
 {
     {
-        hpx::parallel::sequential_executor exec;
+        hpx::parallel::execution::sequenced_executor exec;
         function_pointers(exec);
         future_function_pointers(exec);
         plain_arguments(exec);
@@ -327,7 +329,7 @@ int hpx_main(variables_map&)
     }
 
     {
-        hpx::parallel::parallel_executor exec;
+        hpx::parallel::execution::parallel_executor exec;
         function_pointers(exec);
         future_function_pointers(exec);
         plain_arguments(exec);

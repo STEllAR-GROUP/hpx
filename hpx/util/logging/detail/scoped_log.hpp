@@ -28,31 +28,15 @@
 namespace hpx { namespace util { namespace logging {
 
 
-#ifndef HPX_LOG_USE_WCHAR_T
-
-#define BOOST_SCOPED_LOG_WITH_CLASS_NAME(logger, msg, class_name) \
+#define HPX_SCOPED_LOG_WITH_CLASS_NAME(logger, msg, class_name) \
 struct class_name { \
     class_name()  { logger ( "start of " msg ) ;} \
     ~class_name() { logger ( "  end of " msg ) ; } \
 } HPX_LOG_CONCATENATE(log_, __LINE__);
 
-#define BOOST_SCOPED_LOG(logger, msg) \
- BOOST_SCOPED_LOG_WITH_CLASS_NAME(logger, msg, \
- HPX_LOG_CONCATENATE(boost_scoped_log,__LINE__) )
-
-#else
-// unicode
-#define BOOST_SCOPED_LOG_WITH_CLASS_NAME(logger, msg, class_name) \
-struct class_name { \
-    class_name()  { logger ( L"start of " msg ) ;} \
-    ~class_name() { logger ( L"  end of " msg ) ; } \
-} HPX_LOG_CONCATENATE(log_, __LINE__);
-
-#define BOOST_SCOPED_LOG(logger, msg) \
- BOOST_SCOPED_LOG_WITH_CLASS_NAME(logger, msg, \
- HPX_LOG_CONCATENATE(boost_scoped_log,__LINE__) )
-
-#endif
+#define HPX_SCOPED_LOG(logger, msg) \
+ HPX_SCOPED_LOG_WITH_CLASS_NAME(logger, msg, \
+ HPX_LOG_CONCATENATE(hpx_scoped_log,__LINE__) )
 
 // default scoped write - in case your gather
 //    class .read_msg().out() returns an STL ostream
@@ -110,7 +94,7 @@ namespace detail {
 
 
 
-#define BOOST_SCOPED_LOG_CTX_IMPL(logger_macro, operator_, class_name) \
+#define HPX_SCOPED_LOG_CTX_IMPL(logger_macro, operator_, class_name) \
 struct class_name : ::hpx::util::logging::detail::scoped_gather_base<> { \
     class_name() : m_is_enabled(false) { } \
     ~class_name() {  if ( m_is_enabled) \
@@ -123,11 +107,11 @@ struct class_name : ::hpx::util::logging::detail::scoped_gather_base<> { \
 
 
 
-// note: to use BOOST_SCOPED_LOG_CTX, you need to #include
+// note: to use HPX_SCOPED_LOG_CTX, you need to #include
 // <hpx/util/logging/gather/ostream_like.hpp>
 //       This is included by default, in #include <hpx/util/logging/format_fwd.hpp>
-#define BOOST_SCOPED_LOG_CTX(logger) \
-BOOST_SCOPED_LOG_CTX_IMPL(logger, << , HPX_LOG_CONCATENATE(boost_scoped_log,__LINE__) )
+#define HPX_SCOPED_LOG_CTX(logger) \
+HPX_SCOPED_LOG_CTX_IMPL(logger, << , HPX_LOG_CONCATENATE(hpx_scoped_log,__LINE__) )
 
 
 }}}

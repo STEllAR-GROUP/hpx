@@ -17,7 +17,7 @@
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_serialization_filter<action>                            \
+        struct action_serialization_filter< action>                           \
         {                                                                     \
             /* Note that the caller is responsible for deleting the filter */ \
             /* instance returned from this function */                        \

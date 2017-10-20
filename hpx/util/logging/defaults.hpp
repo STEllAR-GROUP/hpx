@@ -66,15 +66,6 @@ Example:
 
 */
 
-// define HPX_LOG_USE_WCHAR_T if you want your char type to be 'wchar_t'
-
-#if defined(HPX_WINDOWS) && !defined(HPX_LOG_DONOT_USE_WCHAR_T)
-#if defined( UNICODE) || defined(_UNICODE)
-#undef HPX_LOG_USE_WCHAR_T
-#define HPX_LOG_USE_WCHAR_T
-#endif
-#endif
-
     // forward defines
 
     namespace filter {
@@ -94,11 +85,8 @@ Example:
 
     struct default_types
     {
-#ifdef HPX_LOG_USE_WCHAR_T
-        typedef wchar_t char_type;
-#else
         typedef char char_type;
-#endif
+
         // this is the type we use to hold a string, internally
         typedef std::basic_string<char_type> hold_string_type;
 

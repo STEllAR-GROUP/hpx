@@ -12,8 +12,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <list>
 #include <utility>
 #include <vector>
@@ -26,17 +25,17 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct handle_remote_exceptions
     {
         // std::bad_alloc has to be handled separately
-        static void call(boost::exception_ptr const& e,
-            std::list<boost::exception_ptr>& errors)
+        static void call(std::exception_ptr const& e,
+            std::list<std::exception_ptr>& errors)
         {
             try {
-                boost::rethrow_exception(e);
+                std::rethrow_exception(e);
             }
             catch (std::bad_alloc const& ba) {
-                boost::throw_exception(ba);
+                throw ba;
             }
             catch (exception_list const& el) {
-                for (boost::exception_ptr const& ex: el)
+                for (std::exception_ptr const& ex: el)
                     errors.push_back(ex);
             }
             catch (...) {
@@ -46,7 +45,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::future<T> > const& workitems,
-            std::list<boost::exception_ptr>& errors)
+            std::list<std::exception_ptr>& errors)
         {
             for (hpx::future<T> const& f: workitems)
             {
@@ -55,12 +54,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             }
 
             if (!errors.empty())
-                boost::throw_exception(exception_list(std::move(errors)));
+                throw exception_list(std::move(errors));
         }
 
         template <typename T>
         static void call(std::vector<hpx::shared_future<T> > const& workitems,
-            std::list<boost::exception_ptr>& errors)
+            std::list<std::exception_ptr>& errors)
         {
             for (hpx::shared_future<T> const& f: workitems)
             {
@@ -69,22 +68,22 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             }
 
             if (!errors.empty())
-                boost::throw_exception(exception_list(std::move(errors)));
+                throw exception_list(std::move(errors));
         }
     };
 
     template <>
     struct handle_remote_exceptions<execution::parallel_unsequenced_policy>
     {
-        HPX_ATTRIBUTE_NORETURN static void call(
-            boost::exception_ptr const&, std::list<boost::exception_ptr>&)
+        HPX_NORETURN static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             hpx::terminate();
         }
 
         template <typename T>
         static void call(std::vector<hpx::future<T> > const& workitems,
-            std::list<boost::exception_ptr>&)
+            std::list<std::exception_ptr>&)
         {
             for (hpx::future<T> const& f: workitems)
             {
@@ -95,7 +94,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename T>
         static void call(std::vector<hpx::shared_future<T> > const& workitems,
-            std::list<boost::exception_ptr>&)
+            std::list<std::exception_ptr>&)
         {
             for (hpx::shared_future<T> const& f: workitems)
             {

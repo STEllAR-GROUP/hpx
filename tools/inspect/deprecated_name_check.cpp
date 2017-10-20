@@ -8,6 +8,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include <algorithm>
 
 #include "deprecated_name_check.hpp"
@@ -25,6 +27,7 @@ namespace boost
   {
     deprecated_names const names[] =
     {
+      // boost::xyz
       { "(\\bboost\\s*::\\s*move\\b)", "std::move" },
       { "(\\bboost\\s*::\\s*forward\\b)", "std::forward" },
       { "(\\bboost\\s*::\\s*noncopyable\\b)", "HPX_NON_COPYABLE" },
@@ -61,7 +64,40 @@ namespace boost
       { "(\\bboost\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper" },
       { "(\\bboost\\s*::\\s*(c?ref)\\b)", "std::\\2" },
       { "(\\bboost\\s*::\\s*(u?int[0-9]+_t)\\b)", "std::\\2" },
+      { "(\\bboost\\s*::\\s*thread\\b)", "hpx::compat::thread" },
+      { "(\\bboost\\s*::\\s*this_thread::\\s*get_id\\b)", "hpx::compat::this_thread::get_id" },
+      { "(\\bboost\\s*::\\s*this_thread::\\s*yield\\b)", "hpx::compat::this_thread::yield" },
+      { "(\\bboost\\s*::\\s*this_thread::\\s*sleep_until\\b)", "hpx::compat::this_thread::sleep_until" },
+      { "(\\bboost\\s*::\\s*this_thread::\\s*sleep_for\\b)", "hpx::compat::this_thread::sleep_for" },
+      { "(\\bboost\\s*::\\s*mutex\\b)", "hpx::compat::mutex" },
+      { "(\\bboost\\s*::\\s*recursive_mutex\\b)", "hpx::compat::recursive_mutex" },
+      { "(\\bboost\\s*::\\s*once_flag\\b)", "hpx::compat::once_flag" },
+      { "(\\bboost\\s*::\\s*call_once\\b)", "hpx::compat::call_once" },
+      { "(\\bboost\\s*::\\s*cv_status\\b)", "hpx::compat::cv_status" },
+      { "(\\bboost\\s*::\\s*condition_variable\\b)", "hpx::compat::condition_variable" },
+      { "(\\bboost\\s*::\\s*barrier\\b)", "hpx::compat::barrier" },
+      { "(\\bboost\\s*::\\s*exception_ptr\\b)", "std::exception_ptr" },
+      { "(\\bboost\\s*::\\s*copy_exception\\b)", "std::make_exception_ptr" },
+      { "(\\bboost\\s*::\\s*current_exception\\b)", "std::current_exception" },
+      { "(\\bboost\\s*::\\s*rethrow_exception\\b)", "std::rethrow_exception" },
+      { "(\\bboost\\s*::\\s*enable_error_info\\b)", "hpx::throw_with_info" },
+      { "(\\bboost\\s*::\\s*iterator_range\\b)", "hpx::util::iterator_range" },
+      { "(\\bboost\\s*::\\s*make_iterator_range\\b)", "hpx::util::make_iterator_range" },
+      { "(\\bboost\\s*::\\s*atomic_flag\\b)", "std::atomic_flag" },
+      { "(\\bboost\\s*::\\s*atomic\\b)", "std::atomic" },
+      { "(\\bboost\\s*::\\s*memory_order_((relaxed)|(acquire)|(release)|"
+        "(acq_rel)|(seq_cst))\\b)", "std::memory_order_\\2" },
+      { "(\\bboost\\s*::\\s*random\\s*::\\s*([^\\s]*)\\b)", "std::\\2" },
+      { "(\\bboost\\s*::\\s*format\\b)", "hpx::util::format[_to]" },
+      /////////////////////////////////////////////////////////////////////////
+      { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
+      { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
       { "(\\bNULL\\b)", "nullptr" },
+      // Boost preprocessor macros
+      { "\\b(BOOST_PP_CAT)\\b", "HPX_PP_CAT" },
+      { "\\b(BOOST_PP_STRINGIZE)\\b", "HPX_PP_STRINGIZE" },
+      { "\\b(BOOST_STRINGIZE)\\b", "HPX_PP_STRINGIZE(HPX_PP_EXPAND())" },
+      { "\\b(BOOST_ASSERT)\\b", "HPX_ASSERT" },
       { nullptr, nullptr }
     };
 

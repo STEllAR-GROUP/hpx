@@ -22,7 +22,6 @@
 #include <hpx/include/performance_counters.hpp>
 
 #include <boost/range/irange.hpp>
-#include <boost/format.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -219,7 +218,7 @@ struct stepper
         boost::shared_array<double> data)
     {
         using hpx::dataflow;
-        using hpx::util::unwrapped;
+        using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
@@ -232,7 +231,7 @@ struct stepper
             auto range = boost::irange(b, np);
             using hpx::parallel::execution::par;
             hpx::parallel::for_each(
-                par, boost::begin(range), boost::end(range),
+                par, std::begin(range), std::end(range),
                 [&U, nx](std::size_t i)
                 {
                     U[0][i] = hpx::make_ready_future(
@@ -246,7 +245,7 @@ struct stepper
             auto range = boost::irange(b, np);
             using hpx::parallel::execution::par;
             hpx::parallel::for_each(
-                par, boost::begin(range), boost::end(range),
+                par, std::begin(range), std::end(range),
                 [&U, nx, data](std::size_t i)
                 {
                     U[0][i] = hpx::make_ready_future(
@@ -255,7 +254,7 @@ struct stepper
             );
         }
 
-        auto Op = unwrapped(&stepper::heat_part);
+        auto Op = unwrapping(&stepper::heat_part);
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)

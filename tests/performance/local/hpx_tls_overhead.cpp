@@ -5,16 +5,17 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/compat/thread.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
 #include <boost/config.hpp>
-#include <boost/format.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstdint>
 #include <iostream>
+#include <vector>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -23,8 +24,8 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
-
 using hpx::util::thread_specific_ptr;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,29 +91,35 @@ int main(
 
     ///////////////////////////////////////////////////////////////////////////
     // run the test
-    boost::thread_group workers;
+    std::vector<compat::thread> workers;
 
     high_resolution_timer t;
 
     for (std::uint64_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, updates));
+        workers.push_back(compat::thread(worker, updates));
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     const double duration = t.elapsed();
 
     ///////////////////////////////////////////////////////////////////////////
     // output results
     if (vm.count("csv"))
-        std::cout << ( boost::format("%1%,%2%,%3%\n")
-                     % updates
-                     % threads
-                     % duration);
+        hpx::util::format_to(std::cout,
+            "%1%,%2%,%3%\n",
+            updates,
+            threads,
+            duration);
     else
-        std::cout << ( boost::format("ran %1% updates per OS-thread on %2% "
-                                     "OS-threads in %3% seconds\n")
-                     % updates
-                     % threads
-                     % duration);
+        hpx::util::format_to(std::cout,
+            "ran %1% updates per OS-thread on %2% "
+            "OS-threads in %3% seconds\n",
+            updates,
+            threads,
+            duration);
 }
 

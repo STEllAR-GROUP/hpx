@@ -22,8 +22,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdint>
@@ -36,10 +35,6 @@
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
-#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas
@@ -57,6 +52,7 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelport
       : public std::enable_shared_from_this<parcelport>
     {
+    public:
         HPX_NON_COPYABLE(parcelport);
 
     private:
@@ -341,24 +337,16 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
-        typedef util::tuple<
-            std::shared_ptr<std::vector<parcel> >
-          , std::vector<write_handler_type>
-        >
-#else
         typedef util::tuple<
             std::vector<parcel>
           , std::vector<write_handler_type>
-        >
-#endif
-            map_second_type;
+        > map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;
 
         typedef std::set<locality> pending_parcels_destinations;
         pending_parcels_destinations parcel_destinations_;
-        boost::atomic<std::uint32_t> num_parcel_destinations_;
+        std::atomic<std::uint32_t> num_parcel_destinations_;
 
         /// The local locality
         locality here_;

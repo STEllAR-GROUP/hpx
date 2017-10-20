@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/unique_function.hpp>
 
@@ -96,7 +97,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         template <typename Handler, typename ParcelPostprocess>
         void async_write(Handler && handler, ParcelPostprocess && parcel_postprocess)
         {
+            HPX_ASSERT(!handler_);
+            HPX_ASSERT(!postprocess_handler_);
             HPX_ASSERT(!buffer_.data_.empty());
+            buffer_.data_point_.time_ = util::high_resolution_clock::now();
             request_ptr_ = nullptr;
             chunks_idx_ = 0;
             tag_ = acquire_tag(sender_);
@@ -115,6 +119,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
             else
             {
+                HPX_ASSERT(!handler_);
                 error_code ec;
                 parcel_postprocess(ec, there_, shared_from_this());
             }
@@ -259,6 +264,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             error_code ec;
             handler_(ec);
+            handler_.reset();
             buffer_.data_point_.time_ =
                 util::high_resolution_clock::now() - buffer_.data_point_.time_;
             pp_->add_sent_data(buffer_.data_point_);

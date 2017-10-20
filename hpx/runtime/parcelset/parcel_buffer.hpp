@@ -12,8 +12,6 @@
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/util/integer/endian.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <utility>
 #include <vector>
 
@@ -111,7 +109,6 @@ namespace hpx { namespace parcelset
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;
-        HPX_MOVABLE_ONLY(parcel_buffer);
     };
 }}
 

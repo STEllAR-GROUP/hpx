@@ -20,7 +20,7 @@ namespace hpx { namespace util
 /// boost::mutex-compatible spinlock class
 struct spinlock
 {
-  private:
+  public:
     HPX_NON_COPYABLE(spinlock);
 
   private:

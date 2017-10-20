@@ -12,8 +12,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <mutex>
 #include <utility>
 
@@ -37,13 +36,13 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Check if the event has occurred.
         bool occurred()
         {
-            return event_.load(boost::memory_order_acquire);
+            return event_.load(std::memory_order_acquire);
         }
 
         /// \brief Wait for the event to occur.
         void wait()
         {
-            if (event_.load(boost::memory_order_acquire))
+            if (event_.load(std::memory_order_acquire))
                 return;
 
             std::unique_lock<mutex_type> l(mtx_);
@@ -53,7 +52,7 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Release all threads waiting on this semaphore.
         void set()
         {
-            event_.store(true, boost::memory_order_release);
+            event_.store(true, std::memory_order_release);
 
             std::unique_lock<mutex_type> l(mtx_);
             set_locked(std::move(l));
@@ -62,7 +61,7 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Reset the event
         void reset()
         {
-            event_.store(false, boost::memory_order_release);
+            event_.store(false, std::memory_order_release);
         }
 
     private:
@@ -70,7 +69,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT(l.owns_lock());
 
-            while (!event_.load(boost::memory_order_acquire))
+            while (!event_.load(std::memory_order_acquire))
             {
                 cond_.wait(l, "event::wait_locked");
             }
@@ -87,7 +86,7 @@ namespace hpx { namespace lcos { namespace local
         mutex_type mtx_;      ///< This mutex protects the queue.
         local::detail::condition_variable cond_;
 
-        boost::atomic<bool> event_;
+        std::atomic<bool> event_;
     };
 }}}
 

@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if defined(HPX_HAVE_CUDA)
 
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
@@ -28,7 +28,7 @@ namespace hpx { namespace compute { namespace cuda
 
     public:
 
-        value_proxy(T *p, cuda::target & tgt) HPX_NOEXCEPT
+        value_proxy(T *p, cuda::target & tgt) noexcept
           : p_(p)
           , target_(&tgt)
         {}
@@ -51,35 +51,30 @@ namespace hpx { namespace compute { namespace cuda
             return *this;
         }
 
-        // Note: The code duplication below allows Cuda Clang to not see
-        //       the host side implicit cast during the device code
-        //       compilation. Without this, wrong template parameter
-        //       deduction can occur if a value_proxy is given in the arg
-        //       list of invoke()
+        // Note: The difference of signature allows to define proper
+        //       implicit casts for device code and host code
 
-#if defined(__CUDA_ARCH__)
-        HPX_DEVICE operator T() const
+        HPX_DEVICE operator T&()
+        {
+            return *p_;
+        }
+
+        HPX_HOST operator T() const
         {
             return access_target::read(*target_, p_);
         }
-#else
-        operator T() const
-        {
-            return access_target::read(*target_, p_);
-        }
-#endif
 
         T* operator &() const
         {
             return p_;
         }
 
-        T* device_ptr() const HPX_NOEXCEPT
+        T* device_ptr() const noexcept
         {
             return p_;
         }
 
-        cuda::target& target() const HPX_NOEXCEPT
+        cuda::target& target() const noexcept
         {
             return *target_;
         }
@@ -98,7 +93,7 @@ namespace hpx { namespace compute { namespace cuda
     public:
         typedef T const proxy_type;
 
-        value_proxy(T *p, cuda::target & tgt) HPX_NOEXCEPT
+        value_proxy(T *p, cuda::target & tgt) noexcept
           : p_(p)
           , target_(tgt)
         {}
@@ -108,30 +103,17 @@ namespace hpx { namespace compute { namespace cuda
           , target_(other.target())
         {}
 
-        // Note: The code duplication below allows Cuda Clang to not see
-        //       the host side implicit cast during the device code
-        //       compilation. Without this, wrong template parameter
-        //       deduction can occur if a value_proxy is given in the arg
-        //       list of invoke()
-
-#if defined(__CUDA_ARCH__)
-        HPX_DEVICE operator T() const
+        HPX_HOST_DEVICE operator T() const
         {
             return access_target::read(target_, p_);
         }
-#else
-        operator T() const
-        {
-            return access_target::read(target_, p_);
-        }
-#endif
 
-        T* device_ptr() const HPX_NOEXCEPT
+        T* device_ptr() const noexcept
         {
             return p_;
         }
 
-        cuda::target& target() const HPX_NOEXCEPT
+        cuda::target& target() const noexcept
         {
             return target_;
         }

@@ -5,16 +5,10 @@
 
 set(subdirs
     algorithms
-    osu
     lcos
-   )
-
-if(HPX_WITH_CXX11_LAMBDAS)
-  set(subdirs
-    ${subdirs}
     network_storage
+    osu
    )
-endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.performance.network.${subdir}_perf)

@@ -38,6 +38,11 @@
 #include <android/log.h>
 #endif
 
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(push)
+#pragma warning (disable: 4250) // 'class1' : inherits 'class2::member' via dominance
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
@@ -433,7 +438,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
            logger_writer_type& writer = agas_logger()->writer();
 
@@ -485,7 +490,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
            logger_writer_type& writer = parcel_logger()->writer();
 
@@ -538,7 +543,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
            logger_writer_type& writer = timing_logger()->writer();
 
@@ -609,7 +614,8 @@ namespace hpx { namespace util
         if (logformat.empty())
             logformat = "|\\n";
 
-        if (hpx::util::logging::level::disable_all != lvl) {
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        {
             writer.add_destination("console", console(lvl, destination_hpx)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
@@ -680,7 +686,8 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (hpx::util::logging::level::disable_all != lvl) {
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        {
             logger_writer_type& writer = app_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
@@ -733,7 +740,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
             logger_writer_type& writer = debuglog_logger()->writer();
 
@@ -784,7 +791,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
             logger_writer_type& writer = agas_console_logger()->writer();
 
@@ -833,7 +840,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
             logger_writer_type& writer = parcel_console_logger()->writer();
 
@@ -881,7 +888,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
             logger_writer_type& writer = timing_console_logger()->writer();
 
@@ -929,7 +936,8 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (hpx::util::logging::level::disable_all != lvl) {
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        {
             logger_writer_type& writer = hpx_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
@@ -977,7 +985,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
             logger_writer_type& writer = app_console_logger()->writer();
 
@@ -1026,7 +1034,7 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (hpx::util::logging::level::disable_all != lvl)
+        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
         {
             logger_writer_type& writer = debuglog_console_logger()->writer();
 
@@ -1228,6 +1236,10 @@ namespace hpx { namespace util { namespace detail
         init_debuglog_console_log(ini);
     }
 }}}
+
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(pop)
+#endif
 
 #else  // HPX_HAVE_LOGGING
 

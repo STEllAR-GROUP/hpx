@@ -5,17 +5,15 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/unwrapped.hpp>
-
-#include <boost/atomic.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <array>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -40,26 +38,26 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> void_f_count;
-boost::atomic<std::uint32_t> int_f_count;
+std::atomic<std::uint32_t> void_f_count;
+std::atomic<std::uint32_t> int_f_count;
 
 void void_f() {++void_f_count;}
 int int_f() {++int_f_count; return 42; }
 
-boost::atomic<std::uint32_t> void_f1_count;
-boost::atomic<std::uint32_t> int_f1_count;
+std::atomic<std::uint32_t> void_f1_count;
+std::atomic<std::uint32_t> int_f1_count;
 
 void void_f1(int) {++void_f1_count;}
 int int_f1(int i) {++int_f1_count; return i+42; }
 
-boost::atomic<std::uint32_t> int_f2_count;
+std::atomic<std::uint32_t> int_f2_count;
 int int_f2(int l, int r) {++int_f2_count; return l + r; }
 
-boost::atomic<std::uint32_t> int_f_vector_count;
+std::atomic<std::uint32_t> int_f_vector_count;
 
 int int_f_vector(std::array<int, 10> const & vf)
 {
@@ -79,23 +77,23 @@ void function_pointers()
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    future<void> f1 = dataflow(unwrapped(&void_f1), async(&int_f));
+    future<void> f1 = dataflow(unwrapping(&void_f1), async(&int_f));
     future<int>
         f2 = dataflow(
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
         );
     future<int>
         f3 = dataflow(
-            unwrapped(&int_f2)
+            unwrapping(&int_f2)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42)
             )
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(37)
             )
         );
@@ -104,18 +102,18 @@ void function_pointers()
     std::array<future<int>, 10> vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
-        vf[i] = dataflow(unwrapped(&int_f1), make_ready_future(42));
+        vf[i] = dataflow(unwrapping(&int_f1), make_ready_future(42));
     }
-    future<int> f4 = dataflow(unwrapped(&int_f_vector), std::move(vf));
+    future<int> f4 = dataflow(unwrapping(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
           , dataflow(
-                unwrapped(&void_f)
+                unwrapping(&void_f)
               , make_ready_future())
         );
 
@@ -133,8 +131,8 @@ void function_pointers()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> future_void_f1_count;
-boost::atomic<std::uint32_t> future_void_f2_count;
+std::atomic<std::uint32_t> future_void_f1_count;
+std::atomic<std::uint32_t> future_void_f2_count;
 
 void future_void_f1(future<void> f1)
     { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
@@ -143,12 +141,12 @@ void future_void_sf1(shared_future<void> f1)
 void future_void_f2(future<void> f1, future<void> f2)
     { HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready()); ++future_void_f2_count;}
 
-boost::atomic<std::uint32_t> future_int_f1_count;
+std::atomic<std::uint32_t> future_int_f1_count;
 
 int future_int_f1(future<void> f1) { HPX_TEST(f1.is_ready());
     ++future_int_f1_count; return 1;}
 
-boost::atomic<std::uint32_t> future_int_f_vector_count;
+std::atomic<std::uint32_t> future_int_f_vector_count;
 
 int future_int_f_vector(std::array<future<int>, 10>& vf)
 {
@@ -207,5 +205,3 @@ int main(int argc, char* argv[])
       "HPX main exited with non-zero status");
     return report_errors();
 }
-
-#endif

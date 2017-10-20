@@ -125,7 +125,7 @@ struct test_allocator
     // Returns the maximum theoretically possible value of n, for which the
     // call allocate(n, 0) could succeed. In most implementations, this
     // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
-    size_type max_size() const HPX_NOEXCEPT
+    size_type max_size() const noexcept
     {
         return (std::numeric_limits<size_type>::max)();
     }

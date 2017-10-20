@@ -8,14 +8,15 @@
 #define HPX_PARTITIONED_VECTOR_FWD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
 
 #include <vector>
 
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Data>
-    class partitioned_vector;       // forward declaration
+    template <typename T, typename Data = std::vector<T>>
+    class partitioned_vector;
 
     template <typename T, typename Data> class local_vector_iterator;
     template <typename T, typename Data> class const_local_vector_iterator;
@@ -38,8 +39,11 @@ namespace hpx
 
     namespace server
     {
-        template <typename T, typename Data = std::vector<T> >
+        template <typename T, typename Data = std::vector<T>>
         class partitioned_vector;
+
+        template <typename T, typename Data = std::vector<T>>
+        class partitioned_vector_partition;
     }
 }
 

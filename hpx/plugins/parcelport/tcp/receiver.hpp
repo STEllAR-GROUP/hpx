@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2011 Katelyn Kufahl
 //  Copyright (c) 2011 Bryce Lelbach
@@ -21,6 +21,7 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/protect.hpp>
@@ -31,7 +32,6 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
-#include <boost/atomic.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -258,7 +258,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
                 {
-                    std::size_t chunk_size = buffer_.transmission_chunks_[i].second;
+                    std::size_t chunk_size = static_cast<std::size_t>(
+                        buffer_.transmission_chunks_[i].second);
                     buffer_.chunks_[i].resize(chunk_size);
                     buffers.push_back(
                         boost::asio::buffer(buffer_.chunks_[i].data(), chunk_size));

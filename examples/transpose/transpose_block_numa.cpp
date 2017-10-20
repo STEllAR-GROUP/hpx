@@ -7,8 +7,10 @@
 #include <hpx/hpx.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
@@ -125,14 +127,12 @@ struct sub_block
     std::uint64_t size_;
     double * data_;
     mode mode_;
-
-    HPX_MOVABLE_ONLY(sub_block);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // dirty workaround to avoid serialization of executors
 typedef
-    hpx::threads::executors::local_priority_queue_attached_executor
+    hpx::parallel::execution::local_priority_queue_attached_executor
     executor_type;
 typedef
     std::vector<executor_type>
@@ -357,7 +357,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(blocks_start, blocks_end);
-        for_each(par, boost::begin(range), boost::end(range),
+        for_each(par, std::begin(range), std::end(range),
             [&](std::uint64_t b)
             {
                 std::shared_ptr<block_component> A_ptr =
@@ -419,15 +419,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 
                             auto range = numa_ranges[domain];
 
-                            std::uint64_t block_start = *boost::begin(range);
-                            std::uint64_t block_end = *boost::end(range);
+                            std::uint64_t block_start = *std::begin(range);
+                            std::uint64_t block_end = *std::end(range);
                             std::uint64_t blocks_size = block_end - block_start;
 
                             std::vector<hpx::future<void> > block_futures;
                             block_futures.resize(blocks_size);
 
                             for_each(par.on(execs[domain]),
-                                boost::begin(range), boost::end(range),
+                                std::begin(range), std::end(range),
                                 [
                                     domain, &block_futures, num_blocks,
                                     block_start, block_order, tile_size, &A, &B
@@ -493,7 +493,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                 )
             );
         }
-        std::vector<double> errsqs = hpx::util::unwrapped(numa_workers);
+        std::vector<double> errsqs = hpx::util::unwrap(numa_workers);
 
         ///////////////////////////////////////////////////////////////////////
         // Analyze and output results
@@ -573,8 +573,8 @@ int main(int argc, char* argv[])
         "hpx.run_hpx_main!=1",
         "hpx.numa_sensitive=2",  // no-cross NUMA stealing
         // block all cores of requested number of NUMA-domains
-        boost::str(boost::format("hpx.cores=%d") % (numa_nodes * num_cores)),
-        boost::str(boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second))
+        hpx::util::format("hpx.cores=%d", numa_nodes * num_cores),
+        hpx::util::format("hpx.os_threads=%d", numa_nodes * pus.second)
     };
 
     std::string node_name("numanode");
@@ -588,11 +588,11 @@ int main(int argc, char* argv[])
             bind_desc += ";";
 
         std::size_t base_thread = i * pus.second;
-        bind_desc += boost::str(
-            boost::format("thread:%d-%d=%s:%d.core:0-%d.pu:0")
-              % base_thread % (base_thread+pus.second-1)  // thread:%d-%d
-              % node_name % i                             // %s:%d
-              % (pus.second-1)                            // core:0-%d
+        bind_desc += hpx::util::format(
+            "thread:%d-%d=%s:%d.core:0-%d.pu:0",
+            base_thread, (base_thread+pus.second-1), // thread:%d-%d
+            node_name, i,                            // %s:%d
+            pus.second-1                             // core:0-%d
         );
     }
     cfg.push_back(bind_desc);
@@ -650,7 +650,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     double errsq =
         transform_reduce(
             par.on(execs[domain]),
-            boost::begin(range), boost::end(range), 0.0,
+            std::begin(range), std::end(range), 0.0,
             [](double lhs, double rhs) { return lhs + rhs; },
             [&](std::uint64_t b) -> double
             {

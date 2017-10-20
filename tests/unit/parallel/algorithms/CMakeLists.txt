@@ -18,12 +18,13 @@ set(tests
     copy
     copyif_random
     copyif_forward
-    copyif_input
     copyif_exception
     copyif_bad_alloc
     copyn
     count
     countif
+    destroy
+    destroyn
     equal
     equal_binary
     exclusive_scan
@@ -44,7 +45,6 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
-    foreach_prefetching_executors
     foreach_projection
     foreachn
     foreachn_exception
@@ -62,21 +62,24 @@ set(tests
     for_loop_strided
     generate
     generaten
+    is_heap
+    is_heap_until
     includes
     inclusive_scan
-    inclusive_scan_executors
     is_partitioned
     is_sorted
-    is_sorted_executors
     is_sorted_until
     lexicographical_compare
     max_element
+    merge
     min_element
     minmax_element
     mismatch
     mismatch_binary
     move
     none_of
+    partition
+    partition_copy
     reduce_
     reduce_by_key
     remove_copy
@@ -110,11 +113,34 @@ set(tests
     transform_reduce_binary_exception
     transform_reduce_binary_bad_alloc
     uninitialized_copy
-    uninitialized_copy_executors
     uninitialized_copyn
+    uninitialized_default_construct
+    uninitialized_default_constructn
     uninitialized_fill
     uninitialized_filln
+    uninitialized_move
+    uninitialized_moven
+    uninitialized_value_construct
+    uninitialized_value_constructn
+    unique
+    unique_copy
    )
+
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests}
+      foreach_executors_v1
+      foreach_prefetching_executors_v1
+      inclusive_scan_executors_v1
+      is_sorted_executors_v1
+      uninitialized_copy_executors_v1
+     )
+endif()
+
+if(HPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+  set(tests ${tests}
+      copyif_input
+     )
+endif()
 
 foreach(test ${tests})
   set(sources
@@ -124,13 +150,20 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
+  set(folder_name "Tests/Unit/Parallel/Algorithms")
+  string(FIND ${test} "_v1" _is_v1_test)
+
+  if(NOT (_is_v1_test EQUAL -1))
+    set(folder_name "Tests/Unit/Parallel/Algorithms/V1")
+  endif()
+
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Parallel/Algorithms")
+                     FOLDER ${folder_name})
 
   add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 

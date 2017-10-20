@@ -18,7 +18,7 @@ namespace hpx { namespace traits
     template <typename F, typename Enable = void>
     struct get_function_annotation
     {
-        static char const* call(F const& f) HPX_NOEXCEPT
+        static char const* call(F const& f) noexcept
         {
             return nullptr;
         }

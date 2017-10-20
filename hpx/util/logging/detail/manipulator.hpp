@@ -21,9 +21,10 @@
 # pragma once
 #endif
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
+#if defined(HPX_MSVC_WARNING_PRAGMA) && (HPX_MSVC >= 1020)
+#pragma warning(push)
 // 'class1' : inherits 'class2::member' via dominance
-#pragma warning ( disable : 4250)
+#pragma warning(disable: 4250)
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
@@ -787,6 +788,10 @@ namespace destination {
 }
 
 }}}
+
+#if defined(HPX_MSVC_WARNING_PRAGMA)
+#pragma warning(pop)
+#endif
 
 #endif
 

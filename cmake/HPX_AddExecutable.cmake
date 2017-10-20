@@ -8,7 +8,7 @@ macro(add_hpx_executable name)
   # retrieve arguments
   set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB NOLIBS NOHPX_INIT)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE HPX_PREFIX)
-  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
+  set(multi_value_args SOURCES HEADERS AUXILIARY DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_LANGUAGE)
@@ -116,22 +116,24 @@ macro(add_hpx_executable name)
     set(exclude_from_all ${exclude_from_all} EXCLUDE_FROM_DEFAULT_BUILD TRUE)
   endif()
 
+  # Manage files with .cu extension in case When Cuda Clang is used
   if(HPX_WITH_CUDA_CLANG)
     foreach(source ${${name}_SOURCES})
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
         message(${extension})
-        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES LANGUAGE CXX)
+        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
+          LANGUAGE CXX)
       endif()
     endforeach()
   endif()
 
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     cuda_add_executable(${name}_exe
-      ${${name}_SOURCES} ${${name}_HEADERS})
+      ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   else()
     add_executable(${name}_exe
-      ${${name}_SOURCES} ${${name}_HEADERS})
+      ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   endif()
 
   if(${name}_OUTPUT_SUFFIX)

@@ -12,11 +12,11 @@
 #include <hpx/util/high_resolution_clock.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/random.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -37,8 +37,8 @@ struct random_fill
         return dist(gen);
     }
 
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> dist;
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned)

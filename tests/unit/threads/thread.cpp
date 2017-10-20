@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -16,6 +17,8 @@
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
+
+namespace compat = hpx::compat;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void set_description(char const* test_name)
@@ -212,16 +215,16 @@ void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class non_copyable_functor
+struct non_copyable_callable
 {
-    HPX_NON_COPYABLE(non_copyable_functor);
-
-public:
     unsigned value;
 
-    non_copyable_functor()
+    non_copyable_callable()
       : value(0)
     {}
+
+    non_copyable_callable(non_copyable_callable const&) = delete;
+    non_copyable_callable& operator=(non_copyable_callable const&) = delete;
 
     void operator()()
     {
@@ -231,7 +234,7 @@ public:
 
 void do_test_creation_through_reference_wrapper()
 {
-    non_copyable_functor f;
+    non_copyable_callable f;
 
     hpx::thread thrd(std::ref(f));
     thrd.join();
@@ -247,8 +250,8 @@ void test_creation_through_reference_wrapper()
 ///////////////////////////////////////////////////////////////////////////////
 // struct long_running_thread
 // {
-//     boost::condition_variable cond;
-//     boost::mutex mut;
+//     compat::condition_variable cond;
+//     compat::mutex mut;
 //     bool done;
 //
 //     long_running_thread()
@@ -257,7 +260,7 @@ void test_creation_through_reference_wrapper()
 //
 //     void operator()()
 //     {
-//         std::lock_guard<boost::mutex> lk(mut);
+//         std::lock_guard<compat::mutex> lk(mut);
 //         while(!done)
 //         {
 //             cond.wait(lk);
@@ -278,7 +281,7 @@ void test_creation_through_reference_wrapper()
 //     HPX_TEST(!joined);
 //     HPX_TEST(thrd.joinable());
 //     {
-//         std::lock_guard<boost::mutex> lk(f.mut);
+//         std::lock_guard<compat::mutex> lk(f.mut);
 //         f.done=true;
 //         f.cond.notify_one();
 //     }

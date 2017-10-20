@@ -10,14 +10,14 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/chrono_traits.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/asio/basic_deadline_timer.hpp>
+#include <boost/asio/basic_waitable_timer.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -26,13 +26,15 @@
 #include <string>
 #include <utility>
 
+#include <iostream>
+
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     service_executor::service_executor(
             char const* pool_name, char const* pool_name_suffix)
       : pool_(get_thread_pool(pool_name, pool_name_suffix)),
-        task_count_(0), shutdown_sem_(0)
+        task_count_(0)
     {
         if (!pool_) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -43,16 +45,33 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     service_executor::~service_executor()
     {
-        if (task_count_ != 0)
-            shutdown_sem_.wait();
+        std::unique_lock<mutex_type> l(mtx_);
+        while (task_count_ > 0)
+        {
+            // We need to cancel the wait process here, since we might block
+            // other running HPX threads.
+            shutdown_cv_.wait_for(l, std::chrono::seconds(1));
+            if (hpx::threads::get_self_ptr())
+            {
+                hpx::this_thread::suspend();
+            }
+        }
     }
 
     void service_executor::thread_wrapper(closure_type&& f) //-V669
     {
         f();                          // execute the actual thread function
 
-        if (--task_count_ == 0)
-            shutdown_sem_.signal();
+        // By hanging on to the lock during notify_all, we ensure that the
+        // destructor is only completed after this function returned
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            HPX_ASSERT(task_count_ > 0);
+            if (--task_count_ == 0)
+            {
+                shutdown_cv_.notify_all();
+            }
+        }
     }
 
     struct thread_wrapper_helper
@@ -103,10 +122,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             util::bind(&thread_wrapper_helper::invoke, wfp));
     }
 
-    typedef boost::asio::basic_deadline_timer<
-        util::steady_clock
-      , util::chrono_traits<util::steady_clock>
-    > steady_clock_deadline_timer;
+    typedef boost::asio::basic_waitable_timer<util::steady_clock> deadline_timer;
 
     struct delayed_add_helper
     {
@@ -129,7 +145,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         service_executor* exec_;
         service_executor::closure_type f_;
-        steady_clock_deadline_timer timer_;
+        deadline_timer timer_;
     };
 
     // Schedule given function for execution in this executor no sooner

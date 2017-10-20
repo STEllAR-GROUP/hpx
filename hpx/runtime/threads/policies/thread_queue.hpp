@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -25,17 +26,18 @@
 #   include <hpx/util/tick_counter.hpp>
 #endif
 
-#include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <functional>
 #include <list>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -65,7 +67,7 @@ namespace hpx { namespace threads { namespace policies
     // We control whether to collect queue wait times using this global bool.
     // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.
-    extern bool maintain_queue_wait_times;
+    extern HPX_EXPORT bool maintain_queue_wait_times;
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
     ///////////////////////////////////////////////////////////////////////////
@@ -116,6 +118,15 @@ namespace hpx { namespace threads { namespace policies
                     "hpx.thread_queue.max_delete_count", "1000"));
             return max_delete_count;
         }
+
+        inline int get_max_terminated_threads()
+        {
+            static int max_terminated_threads =
+                boost::lexical_cast<int>(hpx::get_config_entry(
+                    "hpx.thread_queue.max_terminated_threads",
+                    std::to_string(HPX_SCHEDULER_MAX_TERMINATED_THREADS)));
+            return max_terminated_threads;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -150,7 +161,7 @@ namespace hpx { namespace threads { namespace policies
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_lifo,
         typename StagedQueuing = lockfree_lifo,
         typename TerminatedQueuing = lockfree_fifo>
@@ -172,6 +183,9 @@ namespace hpx { namespace threads { namespace policies
 
         // number of terminated threads to discard
         int const max_delete_count;
+
+        // number of terminated threads to collect before cleaning them up
+        int const max_terminated_threads;
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef std::unordered_set<thread_id_type> thread_map_type;
@@ -539,6 +553,7 @@ namespace hpx { namespace threads { namespace policies
             min_add_new_count(detail::get_min_add_new_count()),
             max_add_new_count(detail::get_max_add_new_count()),
             max_delete_count(detail::get_max_delete_count()),
+            max_terminated_threads(detail::get_max_terminated_threads()),
             thread_map_count_(0),
             work_items_(128, queue_num),
             work_items_count_(0),
@@ -609,7 +624,7 @@ namespace hpx { namespace threads { namespace policies
 
         // This returns the current length of the staged queue
         std::int64_t get_staged_queue_length(
-            boost::memory_order order = boost::memory_order_seq_cst) const
+            std::memory_order order = std::memory_order_seq_cst) const
         {
             return new_tasks_count_.load(order);
         }
@@ -821,13 +836,13 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        /// Return the next thread to be executed, return false if non is
+        /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(threads::thread_data*& thrd,
             bool allow_stealing = false, bool steal = false) HPX_HOT
         {
             std::int64_t work_items_count =
-                work_items_count_.load(boost::memory_order_relaxed);
+                work_items_count_.load(std::memory_order_relaxed);
 
             if (allow_stealing && min_tasks_to_steal_pending > work_items_count)
             {
@@ -881,7 +896,7 @@ namespace hpx { namespace threads { namespace policies
                 terminated_items_.push(thrd);
 
                 std::int64_t count = ++terminated_items_count_;
-                if (count > HPX_MAX_TERMINATED_THREADS)
+                if (count > max_terminated_threads)
                 {
                     cleanup_terminated(true);   // clean up all terminated threads
                 }
@@ -951,7 +966,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             std::vector<thread_id_type> ids;
-            ids.reserve(count);
+            ids.reserve(static_cast<std::size_t>(count));
 
             if (state == unknown)
             {
@@ -995,7 +1010,7 @@ namespace hpx { namespace threads { namespace policies
         {
             // try to generate new threads from task lists, but only if our
             // own list of threads is empty
-            if (0 == work_items_count_.load(boost::memory_order_relaxed))
+            if (0 == work_items_count_.load(std::memory_order_relaxed))
             {
                 // see if we can avoid grabbing the lock below
                 if (addfrom)
@@ -1003,7 +1018,7 @@ namespace hpx { namespace threads { namespace policies
                     // don't try to steal if there are only a few tasks left on
                     // this queue
                     if (running && min_tasks_to_steal_staged >
-                        addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
+                        addfrom->new_tasks_count_.load(std::memory_order_relaxed))
                     {
                         return false;
                     }
@@ -1011,7 +1026,7 @@ namespace hpx { namespace threads { namespace policies
                 else
                 {
                     if (running &&
-                        0 == new_tasks_count_.load(boost::memory_order_relaxed))
+                        0 == new_tasks_count_.load(std::memory_order_relaxed))
                     {
                         return false;
                     }
@@ -1070,29 +1085,29 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread) {}
         void on_stop_thread(std::size_t num_thread) {}
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e) {}
+        void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
 
     private:
         mutable mutex_type mtx_;                    ///< mutex protecting the members
 
         thread_map_type thread_map_;
         ///< mapping of thread id's to HPX-threads
-        boost::atomic<std::int64_t> thread_map_count_;
+        std::atomic<std::int64_t> thread_map_count_;
         ///< overall count of work items
 
         work_items_type work_items_;
         ///< list of active work items
-        boost::atomic<std::int64_t> work_items_count_;
+        std::atomic<std::int64_t> work_items_count_;
         ///< count of active work items
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        boost::atomic<std::int64_t> work_items_wait_;
+        std::atomic<std::int64_t> work_items_wait_;
         ///< overall wait time of work items
-        boost::atomic<std::int64_t> work_items_wait_count_;
+        std::atomic<std::int64_t> work_items_wait_count_;
         ///< overall number of work items in queue
 #endif
         terminated_items_type terminated_items_;     ///< list of terminated threads
-        boost::atomic<std::int64_t> terminated_items_count_;
+        std::atomic<std::int64_t> terminated_items_count_;
         ///< count of terminated items
 
         std::size_t max_count_;
@@ -1100,12 +1115,12 @@ namespace hpx { namespace threads { namespace policies
         task_items_type new_tasks_;
         ///< list of new tasks to run
 
-        boost::atomic<std::int64_t> new_tasks_count_;
+        std::atomic<std::int64_t> new_tasks_count_;
         ///< count of new tasks to run
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        boost::atomic<std::int64_t> new_tasks_wait_;
+        std::atomic<std::int64_t> new_tasks_wait_;
         ///< overall wait time of new tasks
-        boost::atomic<std::int64_t> new_tasks_wait_count_;
+        std::atomic<std::int64_t> new_tasks_wait_count_;
         ///< overall number tasks waited
 #endif
 
@@ -1124,18 +1139,18 @@ namespace hpx { namespace threads { namespace policies
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         // # of times our associated worker-thread couldn't find work in work_items
-        boost::atomic<std::int64_t> pending_misses_;
+        std::atomic<std::int64_t> pending_misses_;
 
         // # of times our associated worker-thread looked for work in work_items
-        boost::atomic<std::int64_t> pending_accesses_;
+        std::atomic<std::int64_t> pending_accesses_;
 
-        boost::atomic<std::int64_t> stolen_from_pending_;
+        std::atomic<std::int64_t> stolen_from_pending_;
         ///< count of work_items stolen from this queue
-        boost::atomic<std::int64_t> stolen_from_staged_;
+        std::atomic<std::int64_t> stolen_from_staged_;
         ///< count of new_tasks stolen from this queue
-        boost::atomic<std::int64_t> stolen_to_pending_;
+        std::atomic<std::int64_t> stolen_to_pending_;
         ///< count of work_items stolen to this queue from other queues
-        boost::atomic<std::int64_t> stolen_to_staged_;
+        std::atomic<std::int64_t> stolen_to_staged_;
         ///< count of new_tasks stolen to this queue from other queues
 #endif
 

@@ -6,6 +6,7 @@
 
 #include <hpx/runtime/threads/topology.hpp>
 
+#include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
@@ -57,7 +58,7 @@ namespace hpx { namespace threads
     {
         // We bind the service threads to the first NUMA domain. This is useful
         // as the first NUMA domain is likely to have the PCI controllers etc.
-        mask_cref_type machine_mask = this->get_numa_node_affinity_mask(0, true, ec);
+        mask_cref_type machine_mask = this->get_numa_node_affinity_mask(0, ec);
         if (ec || !any(machine_mask))
             return mask_type();
 
@@ -71,24 +72,27 @@ namespace hpx { namespace threads
 
     bool topology::reduce_thread_priority(error_code& ec) const
     {
+#ifdef HPX_HAVE_NICE_THREADLEVEL
 #if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
         pid_t tid;
         tid = syscall(SYS_gettid);
         if (setpriority(PRIO_PROCESS, tid, 19))
         {
-            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",
+            HPX_THROWS_IF(ec, no_success, "topology::reduce_thread_priority",
                 "setpriority returned an error");
             return false;
         }
-#elif defined(HPX_MSVC)
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+
         if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
         {
-            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",
+            HPX_THROWS_IF(ec, no_success, "topology::reduce_thread_priority",
                 "SetThreadPriority returned an error");
             return false;
         }
 #elif defined(__bgq__)
         ThreadPriority_Low();
+#endif
 #endif
         return true;
     }
@@ -115,7 +119,7 @@ namespace hpx { namespace threads
 #elif defined(HPX_HAVE_HWLOC)
           : num_of_cores_(detail::hwloc_hardware_concurrency())
 #else
-          : num_of_cores_(boost::thread::hardware_concurrency())
+          : num_of_cores_(compat::thread::hardware_concurrency())
 #endif
         {
             if (num_of_cores_ == 0)

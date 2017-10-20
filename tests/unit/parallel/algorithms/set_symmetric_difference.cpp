@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2107 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_set_operations.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -31,20 +30,20 @@ void test_set_symmetric_difference1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c1 = test::random_fill(10007);
     std::vector<std::size_t> c2 = test::random_fill(c1.size());
 
-    std::sort(boost::begin(c1), boost::end(c1));
-    std::sort(boost::begin(c2), boost::end(c2));
+    std::sort(std::begin(c1), std::end(c1));
+    std::sort(std::begin(c2), std::end(c2));
 
     std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::parallel::set_symmetric_difference(policy,
-        iterator(boost::begin(c1)), iterator(boost::end(c1)),
-        boost::begin(c2), boost::end(c2), boost::begin(c3));
+        iterator(std::begin(c1)), iterator(std::end(c1)),
+        std::begin(c2), std::end(c2), std::begin(c3));
 
-    std::set_symmetric_difference(boost::begin(c1), boost::end(c1),
-        boost::begin(c2), boost::end(c2), boost::begin(c4));
+    std::set_symmetric_difference(std::begin(c1), std::end(c1),
+        std::begin(c2), std::end(c2), std::begin(c4));
 
     // verify values
-    HPX_TEST(std::equal(boost::begin(c3), boost::end(c3), boost::begin(c4)));
+    HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -56,22 +55,22 @@ void test_set_symmetric_difference1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1 = test::random_fill(10007);
     std::vector<std::size_t> c2 = test::random_fill(c1.size());
 
-    std::sort(boost::begin(c1), boost::end(c1));
-    std::sort(boost::begin(c2), boost::end(c2));
+    std::sort(std::begin(c1), std::end(c1));
+    std::sort(std::begin(c2), std::end(c2));
 
     std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::future<void> result =
         hpx::parallel::set_symmetric_difference(p,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2), boost::begin(c3));
+            iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2), std::begin(c3));
     result.wait();
 
-    std::set_symmetric_difference(boost::begin(c1), boost::end(c1),
-        boost::begin(c2), boost::end(c2), boost::begin(c4));
+    std::set_symmetric_difference(std::begin(c1), std::end(c1),
+        std::begin(c2), std::end(c2), std::begin(c4));
 
     // verify values
-    HPX_TEST(std::equal(boost::begin(c3), boost::end(c3), boost::begin(c4)));
+    HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename IteratorTag>
@@ -109,7 +108,9 @@ void set_symmetric_difference_test1()
 {
     test_set_symmetric_difference1<std::random_access_iterator_tag>();
     test_set_symmetric_difference1<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference1<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,20 +129,20 @@ void test_set_symmetric_difference2(ExPolicy policy, IteratorTag)
 
     auto comp = [](std::size_t l, std::size_t r) { return l > r; };
 
-    std::sort(boost::begin(c1), boost::end(c1), comp);
-    std::sort(boost::begin(c2), boost::end(c2), comp);
+    std::sort(std::begin(c1), std::end(c1), comp);
+    std::sort(std::begin(c2), std::end(c2), comp);
 
     std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::parallel::set_symmetric_difference(policy,
-        iterator(boost::begin(c1)), iterator(boost::end(c1)),
-        boost::begin(c2), boost::end(c2), boost::begin(c3), comp);
+        iterator(std::begin(c1)), iterator(std::end(c1)),
+        std::begin(c2), std::end(c2), std::begin(c3), comp);
 
-    std::set_symmetric_difference(boost::begin(c1), boost::end(c1),
-        boost::begin(c2), boost::end(c2), boost::begin(c4), comp);
+    std::set_symmetric_difference(std::begin(c1), std::end(c1),
+        std::begin(c2), std::end(c2), std::begin(c4), comp);
 
     // verify values
-    HPX_TEST(std::equal(boost::begin(c3), boost::end(c3), boost::begin(c4)));
+    HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -159,22 +160,22 @@ void test_set_symmetric_difference2_async(ExPolicy p, IteratorTag)
 
     auto comp = [](std::size_t l, std::size_t r) { return l > r; };
 
-    std::sort(boost::begin(c1), boost::end(c1), comp);
-    std::sort(boost::begin(c2), boost::end(c2), comp);
+    std::sort(std::begin(c1), std::end(c1), comp);
+    std::sort(std::begin(c2), std::end(c2), comp);
 
     std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size()); //-V656
 
     hpx::future<void> result =
         hpx::parallel::set_symmetric_difference(p,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2), boost::begin(c3), comp);
+            iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2), std::begin(c3), comp);
     result.wait();
 
-    std::set_symmetric_difference(boost::begin(c1), boost::end(c1),
-        boost::begin(c2), boost::end(c2), boost::begin(c4), comp);
+    std::set_symmetric_difference(std::begin(c1), std::end(c1),
+        std::begin(c2), std::end(c2), std::begin(c4), comp);
 
     // verify values
-    HPX_TEST(std::equal(boost::begin(c3), boost::end(c3), boost::begin(c4)));
+    HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
 template <typename IteratorTag>
@@ -212,7 +213,9 @@ void set_symmetric_difference_test2()
 {
     test_set_symmetric_difference2<std::random_access_iterator_tag>();
     test_set_symmetric_difference2<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference2<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,8 +233,8 @@ void test_set_symmetric_difference_exception(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c1 = test::random_fill(10007);
     std::vector<std::size_t> c2 = test::random_fill(c1.size());
 
-    std::sort(boost::begin(c1), boost::end(c1));
-    std::sort(boost::begin(c2), boost::end(c2));
+    std::sort(std::begin(c1), std::end(c1));
+    std::sort(std::begin(c2), std::end(c2));
 
     std::vector<std::size_t> c3(2*c1.size());
 
@@ -239,11 +242,11 @@ void test_set_symmetric_difference_exception(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::set_symmetric_difference(policy,
             decorated_iterator(
-                boost::begin(c1),
+                std::begin(c1),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2),
-            boost::begin(c3));
+            decorated_iterator(std::end(c1)),
+            std::begin(c2), std::end(c2),
+            std::begin(c3));
 
         HPX_TEST(false);
     }
@@ -272,8 +275,8 @@ void test_set_symmetric_difference_exception_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1 = test::random_fill(10007);
     std::vector<std::size_t> c2 = test::random_fill(c1.size());
 
-    std::sort(boost::begin(c1), boost::end(c1));
-    std::sort(boost::begin(c2), boost::end(c2));
+    std::sort(std::begin(c1), std::end(c1));
+    std::sort(std::begin(c2), std::end(c2));
 
     std::vector<std::size_t> c3(2*c1.size());
 
@@ -283,11 +286,11 @@ void test_set_symmetric_difference_exception_async(ExPolicy p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::set_symmetric_difference(p,
                 decorated_iterator(
-                    boost::begin(c1),
+                    std::begin(c1),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c1)),
-                boost::begin(c2), boost::end(c2),
-                boost::begin(c3));
+                decorated_iterator(std::end(c1)),
+                std::begin(c2), std::end(c2),
+                std::begin(c3));
 
         returned_from_algorithm = true;
         f.get();
@@ -341,7 +344,9 @@ void set_symmetric_difference_exception_test()
 {
     test_set_symmetric_difference_exception<std::random_access_iterator_tag>();
     test_set_symmetric_difference_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference_exception<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -359,8 +364,8 @@ void test_set_symmetric_difference_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c1 = test::random_fill(10007);
     std::vector<std::size_t> c2 = test::random_fill(c1.size());
 
-    std::sort(boost::begin(c1), boost::end(c1));
-    std::sort(boost::begin(c2), boost::end(c2));
+    std::sort(std::begin(c1), std::end(c1));
+    std::sort(std::begin(c2), std::end(c2));
 
     std::vector<std::size_t> c3(2*c1.size());
 
@@ -368,11 +373,11 @@ void test_set_symmetric_difference_bad_alloc(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::set_symmetric_difference(policy,
             decorated_iterator(
-                boost::begin(c1),
+                std::begin(c1),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2),
-            boost::begin(c3));
+            decorated_iterator(std::end(c1)),
+            std::begin(c2), std::end(c2),
+            std::begin(c3));
 
         HPX_TEST(false);
     }
@@ -400,8 +405,8 @@ void test_set_symmetric_difference_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1 = test::random_fill(10007);
     std::vector<std::size_t> c2 = test::random_fill(c1.size());
 
-    std::sort(boost::begin(c1), boost::end(c1));
-    std::sort(boost::begin(c2), boost::end(c2));
+    std::sort(std::begin(c1), std::end(c1));
+    std::sort(std::begin(c2), std::end(c2));
 
     std::vector<std::size_t> c3(2*c1.size());
 
@@ -411,11 +416,11 @@ void test_set_symmetric_difference_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::set_symmetric_difference(p,
                 decorated_iterator(
-                    boost::begin(c1),
+                    std::begin(c1),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(boost::end(c1)),
-                boost::begin(c2), boost::end(c2),
-                boost::begin(c3));
+                decorated_iterator(std::end(c1)),
+                std::begin(c2), std::end(c2),
+                std::begin(c3));
 
         returned_from_algorithm = true;
         f.get();
@@ -468,7 +473,9 @@ void set_symmetric_difference_bad_alloc_test()
 {
     test_set_symmetric_difference_bad_alloc<std::random_access_iterator_tag>();
     test_set_symmetric_difference_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_set_symmetric_difference_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

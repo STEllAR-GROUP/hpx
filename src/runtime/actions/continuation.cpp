@@ -12,8 +12,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +65,7 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger_error(boost::exception_ptr const& e)
+    void continuation::trigger_error(std::exception_ptr const& e)
     {
         if (!gid_) {
             HPX_THROW_EXCEPTION(invalid_status,
@@ -79,7 +78,7 @@ namespace hpx { namespace actions
         set_lco_error(gid_, this->get_addr(), e);
     }
 
-    void continuation::trigger_error(boost::exception_ptr && e) //-V659
+    void continuation::trigger_error(std::exception_ptr && e) //-V659
     {
         if (!gid_) {
             HPX_THROW_EXCEPTION(invalid_status,

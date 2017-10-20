@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2011-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 #define HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
@@ -26,8 +27,9 @@ namespace hpx { namespace iostreams { namespace detail
 
         template <typename F, typename Mutex>
         void output(std::uint32_t locality_id, std::uint64_t count,
-            detail::buffer in, F const& write_f, Mutex& mtx)
+            detail::buffer const& buf_in, F const& write_f, Mutex& mtx)
         {
+            detail::buffer in(buf_in);
             std::unique_lock<Mutex> l(mtx);
             data_type& data = output_data_map_[locality_id]; //-V108
 

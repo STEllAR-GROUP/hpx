@@ -1,9 +1,10 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/executors/thread_pool_os_executors.hpp>
+#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
@@ -16,16 +17,17 @@
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #endif
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -50,17 +52,17 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    boost::atomic<std::size_t>
+    std::atomic<std::size_t>
         thread_pool_os_executor<Scheduler>::os_executor_count_(0);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     thread_pool_os_executor<Scheduler>::thread_pool_os_executor(
             std::size_t num_punits, std::string const& affinity_desc)
-      : scheduler_(num_punits),
+      : scheduler_(nullptr),
         executor_name_(get_unique_name()),
         notifier_(get_notification_policy(executor_name_.c_str())),
-        pool_(scheduler_, notifier_, executor_name_.c_str()),
+        pool_(nullptr),
         num_threads_(num_punits)
     {
         if (num_punits > hpx::threads::hardware_concurrency())
@@ -72,14 +74,18 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             return;
         }
 
+        std::unique_ptr<Scheduler> scheduler(new Scheduler(num_punits));
+        scheduler_ = scheduler.get();
+
+        pool_.reset(new threads::detail::scheduled_thread_pool<Scheduler>(
+            std::move(scheduler), notifier_, 0, executor_name_.c_str()));
+
         std::unique_lock<mutex_type> lk(mtx_);
+        pool_->init(num_threads_, 0);
 
-        // initialize the affinity configuration for this scheduler
-        threads::policies::init_affinity_data data("pu", affinity_desc);
-        pool_.init(num_threads_, data);
-
-        if (!pool_.run(lk, num_threads_))
+        if (!pool_->run(lk, num_threads_))
         {
+            lk.unlock();
             HPX_THROW_EXCEPTION(invalid_status,
                 "thread_pool_os_executor<Scheduler>::thread_pool_os_executor",
                 "couldn't start thread_pool");
@@ -91,13 +97,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         // if we're still starting up, give this executor a chance of executing
         // its tasks
-        while (!scheduler_.has_reached_state(state_running))
+        while (!scheduler_->has_reached_state(state_running))
             this_thread::suspend();
 
         // inform the scheduler to stop the core
         {
             std::unique_lock<mutex_type> lk(mtx_);
-            pool_.stop(lk, true);
+            pool_->stop(lk, true);
         }
 
 #if defined(HPX_DEBUG)
@@ -105,7 +111,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // been initialized)
         for (std::size_t i = 0; i != num_threads_; ++i)
         {
-            hpx::state s = scheduler_.get_state(i).load();
+            hpx::state s = scheduler_->get_state(i).load();
             HPX_ASSERT(s == state_initialized || s == state_stopped);
         }
 //
@@ -165,7 +171,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        pool_.create_thread(data, id, initial_state, run_now, ec);
+        pool_->create_thread(data, id, initial_state, run_now, ec);
         if (ec) return;
 
         HPX_ASSERT(invalid_thread_id != id || !run_now);
@@ -190,13 +196,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         data.stacksize = threads::get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        pool_.create_thread(data, id, suspended, true, ec);
+        pool_->create_thread(data, id, suspended, true, ec);
         if (ec) return;
 
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
         // now schedule new thread for execution
-        pool_.set_state(abs_time, id, pending, wait_timeout,
+        pool_->set_state(abs_time, id, pending, wait_timeout,
             thread_priority_normal, ec);
         if (ec) return;
 
@@ -226,7 +232,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             ec = make_success_code();
 
         std::lock_guard<mutex_type> lk(mtx_);
-        return pool_.get_thread_count(unknown, thread_priority_default,
+        return pool_->get_thread_count(unknown, thread_priority_default,
             std::size_t(-1), false);
     }
 
@@ -234,7 +240,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_os_executor<Scheduler>::reset_thread_distribution()
     {
-        pool_.reset_thread_distribution();
+        pool_->reset_thread_distribution();
     }
 }}}}
 

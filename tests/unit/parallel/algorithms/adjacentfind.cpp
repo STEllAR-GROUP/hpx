@@ -7,10 +7,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_adjacent_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -30,7 +30,7 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
 
     // fill vector with random values about 1
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), (std::rand() % 100) + 2);
+    std::iota(std::begin(c), std::end(c), (std::rand() % 100) + 2);
 
     std::size_t random_pos = (std::rand() % 10004) + 2; //-V101
 
@@ -38,9 +38,9 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
     c[random_pos + 1] = 1;
 
     iterator index = hpx::parallel::adjacent_find(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)));
+        iterator(std::begin(c)), iterator(std::end(c)));
 
-    base_iterator test_index = boost::begin(c) + random_pos;
+    base_iterator test_index = std::begin(c) + random_pos;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -53,7 +53,7 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
 
     // fill vector with random values above 1
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), (std::rand() % 100) + 2);
+    std::iota(std::begin(c), std::end(c), (std::rand() % 100) + 2);
 
     std::size_t random_pos = (std::rand() % 10004) + 2; //-V101
 
@@ -62,11 +62,11 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
 
     hpx::future<iterator> f =
         hpx::parallel::adjacent_find(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)));
+            iterator(std::begin(c)), iterator(std::end(c)));
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = boost::begin(c) + random_pos;
+    base_iterator test_index = std::begin(c) + random_pos;
 
     HPX_TEST(f.get() == iterator(test_index));
 }

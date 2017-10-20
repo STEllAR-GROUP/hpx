@@ -113,8 +113,6 @@ struct sub_block
     std::uint64_t size_;
     double * data_;
     mode mode_;
-
-    HPX_MOVABLE_ONLY(sub_block);
 };
 
 struct block_component
@@ -249,7 +247,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(blocks_start, blocks_end);
-        for_each(par, boost::begin(range), boost::end(range),
+        for_each(par, std::begin(range), std::end(range),
             [&](std::uint64_t b)
             {
                 std::shared_ptr<block_component> A_ptr =
@@ -299,7 +297,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::vector<hpx::future<void> > block_futures;
             block_futures.resize(num_local_blocks);
 
-            for_each(par, boost::begin(range), boost::end(range),
+            for_each(par, std::begin(range), std::end(range),
                 [&](std::uint64_t b)
                 {
                     std::vector<hpx::future<void> > phase_futures;
@@ -453,7 +451,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(blocks_start, blocks_end);
     double errsq =
-        transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
+        transform_reduce(par, std::begin(range), std::end(range), 0.0,
             [](double lhs, double rhs) { return lhs + rhs; },
             [&](std::uint64_t b) -> double
             {

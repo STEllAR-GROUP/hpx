@@ -10,11 +10,10 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/scoped_timer.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -25,7 +24,7 @@ namespace hpx { namespace agas { namespace server
 {
     void primary_namespace::route(parcelset::parcel && p)
     { // {{{ route implementation
-        util::scoped_timer<boost::atomic<std::int64_t> > update(
+        util::scoped_timer<std::atomic<std::int64_t> > update(
             counter_data_.route_.time_
         );
         counter_data_.increment_route_count();
@@ -54,9 +53,9 @@ namespace hpx { namespace agas { namespace server
 
                 HPX_THROWS_IF(ec, no_success,
                     "primary_namespace::route",
-                    boost::str(boost::format(
-                            "can't route parcel to unknown gid: %s"
-                        ) % gid));
+                    hpx::util::format(
+                        "can't route parcel to unknown gid: %s",
+                        gid));
 
                 return;
             }
@@ -75,8 +74,6 @@ namespace hpx { namespace agas { namespace server
             addr.type_ = g.type;
             addr.address_ = g.lva();
         }
-
-        naming::id_type source = p.source_id();
 
         // either send the parcel on its way or execute actions locally
         if (addr.locality_ == get_locality())
@@ -97,6 +94,8 @@ namespace hpx { namespace agas { namespace server
             naming::gid_type const& id = hpx::util::get<0>(cache_address);
             if (id && naming::detail::store_in_cache(id))
             {
+                naming::id_type source = p.source_id();
+
                 gva const& g = hpx::util::get<1>(cache_address);
                 naming::address addr(g.prefix, g.type, g.lva());
 

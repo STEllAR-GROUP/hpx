@@ -19,6 +19,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <memory>

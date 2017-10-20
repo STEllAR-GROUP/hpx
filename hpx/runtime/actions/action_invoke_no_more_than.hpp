@@ -18,8 +18,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -221,13 +219,13 @@ namespace hpx { namespace actions { namespace detail
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_decorate_function<action>                               \
-          : hpx::actions::detail::action_decorate_function<action, maxnum>    \
+        struct action_decorate_function< action>                              \
+          : hpx::actions::detail::action_decorate_function< action, maxnum>   \
         {};                                                                   \
                                                                               \
         template <>                                                           \
-        struct action_decorate_continuation<action>                           \
-          : hpx::actions::detail::action_decorate_continuation<action, maxnum>\
+        struct action_decorate_continuation< action>                          \
+          : hpx::actions::detail::action_decorate_continuation< action, maxnum>\
         {};                                                                   \
     }}                                                                        \
 /**/

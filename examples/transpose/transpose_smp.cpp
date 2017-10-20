@@ -59,7 +59,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(start, order);
     // parallel for
-    for_each(par, boost::begin(range), boost::end(range),
+    for_each(par, std::begin(range), std::end(range),
         [&](std::uint64_t i)
         {
             for(std::uint64_t j = 0; j < order; ++j)
@@ -82,7 +82,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         {
             auto range = boost::irange(start, order+tile_size, tile_size);
             // parallel for
-            for_each(par, boost::begin(range), boost::end(range),
+            for_each(par, std::begin(range), std::end(range),
                 [&](std::uint64_t i)
                 {
                     for(std::uint64_t j = 0; j < order; j += tile_size)
@@ -105,7 +105,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         {
             auto range = boost::irange(start, order);
             // parallel for
-            for_each(par, boost::begin(range), boost::end(range),
+            for_each(par, std::begin(range), std::end(range),
                 [&](std::uint64_t i)
                 {
                     for(std::uint64_t j = 0; j < order; ++j)
@@ -186,7 +186,7 @@ double test_results(std::uint64_t order, std::vector<double> const & trans)
     auto range = boost::irange(start, order);
     // parallel reduce
     double errsq =
-        transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
+        transform_reduce(par, std::begin(range), std::end(range), 0.0,
             [](double lhs, double rhs) { return lhs + rhs; },
             [&](std::uint64_t i) -> double
             {

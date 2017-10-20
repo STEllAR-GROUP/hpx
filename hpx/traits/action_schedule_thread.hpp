@@ -23,6 +23,7 @@ namespace hpx { namespace traits
             template <typename Action>
             static void
             call(wrap_int, naming::address::address_type,
+                    naming::address::component_type,
                     threads::thread_init_data& data,
                     threads::thread_state_enum initial_state)
             {
@@ -33,26 +34,28 @@ namespace hpx { namespace traits
             template <typename Action>
             static auto
             call(int, naming::address::address_type lva,
+                    naming::address::component_type comptype,
                     threads::thread_init_data& data,
                     threads::thread_state_enum initial_state)
             ->  decltype(
                     Action::component_type::schedule_thread(
-                        lva, data, initial_state)
+                        lva, comptype, data, initial_state)
                 )
             {
                 // by default we forward this to the component type
                 typedef typename Action::component_type component_type;
-                component_type::schedule_thread(lva, data, initial_state);
+                component_type::schedule_thread(lva, comptype, data, initial_state);
             }
         };
 
         template <typename Action>
         void call_schedule_thread(naming::address::address_type lva,
+            naming::address::component_type comptype,
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
             schedule_thread_helper::template call<Action>(
-                0, lva, data, initial_state);
+                0, lva, comptype, data, initial_state);
         }
     }
 
@@ -61,10 +64,13 @@ namespace hpx { namespace traits
     {
         // returns whether target was migrated to another locality
         static void
-        call(naming::address::address_type lva, threads::thread_init_data& data,
+        call(naming::address::address_type lva,
+            naming::address::component_type comptype,
+            threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
-            return detail::call_schedule_thread<Action>(lva, data, initial_state);
+            return detail::call_schedule_thread<Action>(
+                lva, comptype, data, initial_state);
         }
     };
 }}

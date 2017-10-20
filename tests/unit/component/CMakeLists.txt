@@ -18,23 +18,25 @@ set(tests
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
     launch_process
+    local_new
     migrate_component
     migrate_component_to_storage
     new_
     new_binpacking
     new_colocated
     unordered_map
-    partitioned_vector_copy
-    partitioned_vector_for_each
-    partitioned_vector_handle_values
-    partitioned_vector_iter
-    partitioned_vector_move
-    partitioned_vector_target
-    partitioned_vector_transform_reduce
-    partitioned_vector_fill
-    partitioned_vector_inclusive_scan
-    partitioned_vector_exclusive_scan
+    partitioned_vector_view
+    partitioned_vector_view_iterator
+    partitioned_vector_subview
+    coarray
+    coarray_all_reduce
    )
+
+if(HPX_WITH_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests}
+      distribution_policy_executor_v1
+     )
+endif()
 
 # add executable needed for launch_process_test
 add_hpx_executable(launched_process_test
@@ -103,22 +105,20 @@ set(new__PARAMETERS LOCALITIES 2)
 set(new_binpacking_PARAMETERS LOCALITIES 2)
 set(new_colocated_PARAMETERS LOCALITIES 2)
 
-set(partitioned_vector_copy_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_for_each_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_handle_values_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_iter_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_move_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(partitioned_vector_inclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_inclusive_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
+set(partitioned_vector_view_iterator_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_view_iterator_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(partitioned_vector_exclusive_sacn_FLAGS DEPENDENCIES partitioned_vector_component)
-set(partitioned_vector_exclusive_scan_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
+set(partitioned_vector_subview_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_subview_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(coarray_FLAGS DEPENDENCIES partitioned_vector_component)
+set(coarray_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(coarray_all_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
+set(coarray_all_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
@@ -126,13 +126,20 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
+  set(folder_name "Tests/Unit/Components")
+  string(FIND ${test} "_v1" _is_v1_test)
+
+  if(NOT (_is_v1_test EQUAL -1))
+    set(folder_name "Tests/Unit/Components/V1")
+  endif()
+
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Components")
+                     FOLDER ${folder_name})
 
   add_hpx_unit_test("components" ${test} ${${test}_PARAMETERS})
 
@@ -150,4 +157,3 @@ foreach(test ${tests})
 endforeach()
 
 add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
-

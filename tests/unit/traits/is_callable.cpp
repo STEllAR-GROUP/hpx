@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:hpx::traits::is_callable
+
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -28,12 +30,11 @@ void nullary_function()
 void lambdas()
 {
     using hpx::traits::is_callable;
-#   if defined(HPX_HAVE_CXX11_LAMBDAS)
+
     auto lambda = [](){};
 
     typedef decltype(lambda) f;
     HPX_TEST_MSG((is_callable<f()>::value == true), "lambda");
-#   endif
 }
 
 void functions_byval_params()

@@ -588,7 +588,7 @@ namespace hpx { namespace traits
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename T>
-        struct element_result_of : util::result_of<F(T)> {};
+        struct element_result_of : util::invoke_result<F, T> {};
 
         template <typename F, typename Iter>
         struct lift_zipped_iterators;

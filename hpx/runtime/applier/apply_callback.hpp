@@ -14,11 +14,10 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/util/detail/pack.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <hpx/runtime/applier/apply.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -156,9 +155,9 @@ namespace hpx
     {
         if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
+                hpx::util::format(
+                    "the target (destination) does not match the action type (%s)",
+                    hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
 
@@ -380,9 +379,6 @@ namespace hpx
         template <typename Action, typename Callback, typename ...Ts>
         struct apply_c_p_cb_impl
         {
-        private:
-            HPX_MOVABLE_ONLY(apply_c_p_cb_impl);
-
         public:
             typedef util::tuple<Ts...> tuple_type;
 

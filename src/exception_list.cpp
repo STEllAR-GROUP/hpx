@@ -9,8 +9,8 @@
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>
-#include <boost/exception_ptr.hpp>
 
+#include <exception>
 #include <mutex>
 #include <set>
 #include <string>
@@ -55,7 +55,7 @@ namespace hpx
       : hpx::exception(hpx::success)
     {}
 
-    exception_list::exception_list(boost::exception_ptr const& e)
+    exception_list::exception_list(std::exception_ptr const& e)
       : hpx::exception(hpx::get_error(e), hpx::get_error_what(e))
     {
         add(e);
@@ -128,7 +128,7 @@ namespace hpx
         return result;
     }
 
-    void exception_list::add(boost::exception_ptr const& e)
+    void exception_list::add(std::exception_ptr const& e)
     {
         std::unique_lock<mutex_type> l(mtx_);
         if (exceptions_.empty())

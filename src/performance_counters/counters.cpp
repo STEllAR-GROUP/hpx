@@ -14,14 +14,15 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 
 #include <hpx/util/bind.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
-
-#include <boost/format.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
@@ -110,7 +111,8 @@ namespace hpx { namespace performance_counters
         result = "/";
         result += path.objectname_;
 
-        if (!path.parentinstancename_.empty() || !path.instancename_.empty())
+        if (!path.parentinstancename_.empty() || !path.instancename_.empty() ||
+            !path.subinstancename_.empty())
         {
             result += "{";
             if (!path.parentinstancename_.empty())
@@ -119,18 +121,34 @@ namespace hpx { namespace performance_counters
                 if (-1 != path.parentinstanceindex_)
                 {
                     result += "#";
-                    result += std::to_string
-                                (path.parentinstanceindex_);
+                    result += std::to_string(path.parentinstanceindex_);
                 }
-                if (!path.instancename_.empty())
-                    result += "/";
             }
-            if (!path.instancename_.empty()) {
+            if (!path.instancename_.empty())
+            {
+                result += "/";
                 result += path.instancename_;
-                if (-1 != path.instanceindex_)
+                if (path.instanceindex_ != -1)
+                {
+                    if (path.instancename_ == "pool")
+                    {
+                        result += "#" +
+                            hpx::resource::get_pool_name(path.instanceindex_);
+                    }
+                    else
+                    {
+                        result += "#" + std::to_string(path.instanceindex_);
+                    }
+                }
+            }
+            if (!path.subinstancename_.empty())
+            {
+                result += "/";
+                result += path.subinstancename_;
+                if (-1 != path.subinstanceindex_)
                 {
                     result += "#";
-                    result += std::to_string(path.instanceindex_);
+                    result += std::to_string(path.subinstanceindex_);
                 }
             }
             result += "}";
@@ -222,10 +240,46 @@ namespace hpx { namespace performance_counters
         else {
             result = "/";
             result += path.parentinstancename_;
+            if (path.parentinstanceindex_ == -1)
+            {
+                result += "#*";
+            }
+            else
+            {
+                result += "#" + std::to_string(path.parentinstanceindex_);
+            }
 
-            if (!path.instancename_.empty()) {
+            if (!path.instancename_.empty())
+            {
                 result += "/";
                 result += path.instancename_;
+                if (path.instanceindex_ == -1)
+                {
+                    result += "#*";
+                }
+                else if (path.instancename_ == "pool")
+                {
+                    result += "#" +
+                        hpx::resource::get_pool_name(path.instanceindex_);
+                }
+                else
+                {
+                    result += "#" + std::to_string(path.instanceindex_);
+                }
+            }
+
+            if (!path.subinstancename_.empty())
+            {
+                result += "/";
+                result += path.subinstancename_;
+                if (path.subinstanceindex_ == -1)
+                {
+                    result += "#*";
+                }
+                else
+                {
+                    result += "#" + std::to_string(path.subinstanceindex_);
+                }
             }
         }
 
@@ -248,6 +302,7 @@ namespace hpx { namespace performance_counters
     {
         instance_name parent_;
         instance_name child_;
+        instance_name subchild_;
     };
 
     struct path_elements
@@ -270,6 +325,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     hpx::performance_counters::instance_elements,
     (hpx::performance_counters::instance_name, parent_)
     (hpx::performance_counters::instance_name, child_)
+    (hpx::performance_counters::instance_name, subchild_)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -299,20 +355,29 @@ namespace hpx { namespace performance_counters
             start = -qi::lit(counter_prefix)
                 >> '/' >> +~qi::char_("/{#@") >> -instance
                 >> -('/' >>  +~qi::char_("#}@")) >> -('@' >> +qi::char_);
-            instance = '{' >> parent >> -('/' >> child) >> '}';
+            instance =
+                    '{' >> parent >> -('/' >> child) >> -('/' >> subchild) >> '}'
+                ;
             parent =
                     &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)
                     // base counter
                 |  +~qi::char_("#/}")
-                    >>  (   '#' >> raw_uint     // counter parentinstance name
-                        |  -qi::string("#*")    // counter parentinstance skeleton name
+                    >>  (   '#' >> raw_uint     // counter parent-instance name
+                        |  -qi::string("#*")    // counter parent-instance skeleton name
                         )
                     >> qi::attr(false)
                 ;
             child =
-                   +~qi::char_("#}")
-                    >>  (   '#' >> raw_uint     // counter instance name
+                   +~qi::char_("#/}")
+                    >>  (   qi::char_('#') >> +~qi::char_("/}") // counter instance name
                         |  -qi::string("#*")    // counter instance skeleton name
+                        )
+                    >> qi::attr(false)
+                ;
+            subchild =
+                   +~qi::char_("#}")
+                    >>  (   '#' >> raw_uint     // counter (sub-)instance name
+                        |  -qi::string("#*")    // counter (sub-)instance skeleton name
                         )
                     >> qi::attr(false)
                 ;
@@ -323,6 +388,7 @@ namespace hpx { namespace performance_counters
         qi::rule<Iterator, instance_elements()> instance;
         qi::rule<Iterator, instance_name()> parent;
         qi::rule<Iterator, instance_name()> child;
+        qi::rule<Iterator, instance_name()> subchild;
         qi::rule<Iterator, std::string()> raw_uint;
     };
 
@@ -342,7 +408,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                boost::str(boost::format("invalid counter name format: %s") % name));
+                hpx::util::format("invalid counter name format: %s", name));
             return status_invalid_data;
         }
 
@@ -356,25 +422,63 @@ namespace hpx { namespace performance_counters
         path.instancename_ = elements.instance_.child_.name_;
         path.instanceindex_ = -1;
 
+        path.subinstancename_ = elements.instance_.subchild_.name_;
+        path.subinstanceindex_ = -1;
+
         path.parameters_ = elements.parameters_;
 
-        if (!path.parentinstance_is_basename_) {
-            if (elements.instance_.parent_.index_ == "#*") {
+        if (!path.parentinstance_is_basename_)
+        {
+            if (elements.instance_.parent_.index_ == "#*")
+            {
                 path.parentinstancename_ += "#*";
             }
-            else if (!elements.instance_.parent_.index_.empty()) {
+            else if (!elements.instance_.parent_.index_.empty())
+            {
                 path.parentinstanceindex_ =
-                    hpx::util::safe_lexical_cast<std::uint64_t>
-                    (elements.instance_.parent_.index_);
+                    hpx::util::safe_lexical_cast<std::int64_t>(
+                        elements.instance_.parent_.index_);
             }
 
-            if (elements.instance_.child_.index_ == "#*") {
+            if (elements.instance_.child_.index_ == "#*")
+            {
                 path.instancename_ += "#*";
             }
-            else if (!elements.instance_.child_.index_.empty()) {
-                path.instanceindex_ =
-                    hpx::util::safe_lexical_cast<std::uint64_t>
-                    (elements.instance_.child_.index_);
+            else if (!elements.instance_.child_.index_.empty())
+            {
+                if (elements.instance_.child_.index_[0] == '#')
+                    elements.instance_.child_.index_.erase(0, 1);
+
+                if (path.instancename_ == "pool")
+                {
+                    path.instanceindex_ = hpx::resource::get_pool_index(
+                        elements.instance_.child_.index_);
+                }
+                else
+                {
+                    path.instanceindex_ =
+                        hpx::util::safe_lexical_cast<std::int64_t>(
+                            elements.instance_.child_.index_, std::int64_t(-2));
+                    if (path.instanceindex_ == std::int64_t(-2))
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter,
+                            "get_counter_path_elements",
+                            hpx::util::format(
+                                "invalid counter name format: %s", name));
+                        return status_invalid_data;
+                    }
+                }
+            }
+
+            if (elements.instance_.subchild_.index_ == "#*")
+            {
+                path.subinstancename_ += "#*";
+            }
+            else if (!elements.instance_.subchild_.index_.empty())
+            {
+                path.subinstanceindex_ =
+                    hpx::util::safe_lexical_cast<std::uint64_t>(
+                        elements.instance_.subchild_.index_);
             }
         }
 
@@ -401,7 +505,7 @@ namespace hpx { namespace performance_counters
         if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
-                boost::str(boost::format("invalid counter name format: %s") % name));
+                hpx::util::format("invalid counter name format: %s", name));
             return status_invalid_data;
         }
 
@@ -464,6 +568,10 @@ namespace hpx { namespace performance_counters
             {
                 p.instancename_ = "total";
                 p.instanceindex_ = -1;
+            }
+            if (p.subinstancename_.empty())
+            {
+                p.subinstanceindex_ = -1;
             }
         }
 
@@ -681,7 +789,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<std::int64_t> const& parameters, error_code& ec)
+            std::vector<std::size_t> const& parameters, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().
@@ -699,6 +807,20 @@ namespace hpx { namespace performance_counters
             naming::gid_type gid;
             get_runtime().get_counter_registry().
                 create_arithmetics_counter(info, base_counter_names, gid, ec);
+            return gid;
+        }
+
+        // \brief Create a new aggregating extended performance counter instance
+        //        based on given base counter name and given base time interval
+        //        (milliseconds).
+        naming::gid_type create_arithmetics_counter_extended(
+            counter_info const& info,
+            std::vector<std::string> const& base_counter_names, error_code& ec)
+        {
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().
+                create_arithmetics_counter_extended(info, base_counter_names,
+                    gid, ec);
             return gid;
         }
 
@@ -774,6 +896,19 @@ namespace hpx { namespace performance_counters
         }
 
         ///////////////////////////////////////////////////////////////////////
+        inline bool is_pool_kind(std::string const& pattern)
+        {
+            std::string::size_type p = pattern.find("pool#*");
+            return p != std::string::npos;
+        }
+
+        inline std::string get_pool_kind(std::string const& pattern)
+        {
+            HPX_ASSERT(is_pool_kind(pattern));
+            return pattern.substr(0, pattern.find_last_of('#'));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         inline bool is_node_kind(std::string const& pattern)
         {
             std::string::size_type p = pattern.find("-node#*");
@@ -812,6 +947,40 @@ namespace hpx { namespace performance_counters
 
         ///////////////////////////////////////////////////////////////////////
         // expand main counter name
+        bool expand_counter_info_pools(bool expand_threads,
+            counter_info& i, counter_path_elements& p,
+            discover_counter_func const& f, error_code& ec)
+        {
+            std::size_t num_pools = hpx::resource::get_num_thread_pools();
+            for (std::size_t l = 0; l != num_pools; ++l)
+            {
+                p.instanceindex_ = static_cast<std::int64_t>(l);
+
+                if (expand_threads)
+                {
+                    std::size_t num_threads =
+                        hpx::resource::get_num_threads(p.instanceindex_);
+                    for (std::size_t t = 0; t != num_threads; ++t)
+                    {
+                        p.subinstanceindex_ = static_cast<std::int64_t>(t);
+
+                        counter_status status =
+                            get_counter_name(p, i.fullname_, ec);
+                        if (!status_is_valid(status) || !f(i, ec) || ec)
+                            return false;
+                    }
+                }
+                else
+                {
+                    counter_status status =
+                        get_counter_name(p, i.fullname_, ec);
+                    if (!status_is_valid(status) || !f(i, ec) || ec)
+                        return false;
+                }
+            }
+            return true;
+        }
+
         bool expand_counter_info_threads(
             counter_info& i, counter_path_elements& p,
             discover_counter_func const& f, error_code& ec)
@@ -847,9 +1016,23 @@ namespace hpx { namespace performance_counters
             counter_info& i, counter_path_elements& p,
             discover_counter_func const& f, error_code& ec)
         {
+            bool expand_pools = false;
             bool expand_threads = false;
             bool expand_nodes = false;
-            if (is_thread_kind(p.instancename_))
+
+            if (is_pool_kind(p.instancename_))
+            {
+                p.instancename_ = get_pool_kind(p.instancename_);
+                expand_pools = true;
+
+                if (is_thread_kind(p.subinstancename_))
+                {
+                    p.subinstancename_ =
+                        get_thread_kind(p.subinstancename_) + "-thread";
+                    expand_threads = true;
+                }
+            }
+            else if (is_thread_kind(p.instancename_))
             {
                 p.instancename_ = get_thread_kind(p.instancename_) + "-thread";
                 expand_threads = true;
@@ -865,7 +1048,14 @@ namespace hpx { namespace performance_counters
             for (std::uint32_t l = 0; l != last_locality; ++l)
             {
                 p.parentinstanceindex_ = static_cast<std::int32_t>(l);
-                if (expand_threads) {
+                if (expand_pools) {
+                    if (!detail::expand_counter_info_pools(
+                            expand_threads, i, p, f, ec))
+                    {
+                        return false;
+                    }
+                }
+                else if (expand_threads) {
                     if (!detail::expand_counter_info_threads(i, p, f, ec))
                         return false;
                 }
@@ -903,9 +1093,25 @@ namespace hpx { namespace performance_counters
                 return detail::expand_counter_info_localities(i, p, f, ec);
             }
 
-            // now expand "<...>-thread#*"
+            // now expand "pool#*"
+            if (detail::is_pool_kind(p.instancename_))
+            {
+                bool expand_threads = detail::is_thread_kind(p.subinstancename_);
+
+                counter_info i = info;
+                p.instancename_ = detail::get_pool_kind(p.instancename_);
+                if (expand_threads)
+                {
+                    p.subinstancename_ = detail::get_thread_kind(
+                        p.subinstancename_) + "-thread";
+                }
+                return detail::expand_counter_info_pools(
+                    expand_threads, i, p, f, ec);
+            }
+
             if (detail::is_thread_kind(p.instancename_))
             {
+                // now expand "<...>-thread#*"
                 counter_info i = info;
                 p.instancename_ = detail::get_thread_kind(p.instancename_) + "-thread";
                 return detail::expand_counter_info_threads(i, p, f, ec);
@@ -1022,8 +1228,9 @@ namespace hpx { namespace performance_counters
                 if (&ec == &throws)
                     throw;
                 ec = make_error_code(e.get_error(), e.what());
-                LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
-                    % remove_counter_prefix(complemented_info.fullname_) % e.what());
+                LPCS_(warning) << hpx::util::format(
+                    "failed to create counter %s (%s)",
+                    remove_counter_prefix(complemented_info.fullname_), e.what());
                 return lcos::future<naming::id_type>();
             }
         }
@@ -1033,7 +1240,7 @@ namespace hpx { namespace performance_counters
     }
 
     lcos::future<naming::id_type> get_counter_async(
-        std::string const& name, error_code& ec)
+        std::string name, error_code& ec)
     {
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
 

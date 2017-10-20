@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,14 +15,14 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/scoped_timer.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -55,10 +55,6 @@ void component_namespace::register_counter_types(
 {
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
-    boost::format help_count(
-        "returns the number of invocations of the AGAS service '%s'");
-    boost::format help_time(
-        "returns the overall execution time of the AGAS service '%s'");
     performance_counters::create_counter_func creator(
         util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::component_namespace_service_name));
@@ -79,9 +75,13 @@ void component_namespace::register_counter_types(
 
         if (detail::component_namespace_services[i].target_ ==
              detail::counter_target_count)
-            help = boost::str(help_count % name.substr(p+1));
+            help = hpx::util::format(
+                "returns the number of invocations of the AGAS service '%s'",
+                name.substr(p+1));
         else
-            help = boost::str(help_time % name.substr(p+1));
+            help = hpx::util::format(
+                "returns the overall execution time of the AGAS service '%s'",
+                name.substr(p+1));
 
         performance_counters::install_counter_type(
             agas::performance_counter_basename + name
@@ -177,7 +177,7 @@ components::component_type component_namespace::bind_prefix(
   , std::uint32_t prefix
     )
 { // {{{ bind_prefix implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.bind_prefix_.time_
     );
     counter_data_.increment_bind_prefix_count();
@@ -223,10 +223,10 @@ components::component_type component_namespace::bind_prefix(
 
             HPX_THROW_EXCEPTION(duplicate_component_id
               , "component_namespace::bind_prefix"
-              , boost::str(boost::format(
+              , hpx::util::format(
                     "component id is already registered for the given "
-                    "locality, key(%1%), prefix(%2%), ctype(%3%)")
-                    % key % prefix % cit->second));
+                    "locality, key(%1%), prefix(%2%), ctype(%3%)",
+                    key, prefix, cit->second));
             return components::component_invalid;
         }
 
@@ -235,10 +235,10 @@ components::component_type component_namespace::bind_prefix(
         // First registration for this locality, we still return no_success to
         // convey the fact that another locality already registered this
         // component type.
-        LAGAS_(info) << (boost::format(
+        LAGAS_(info) << hpx::util::format(
             "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
-            "ctype(%3%), response(no_success)")
-            % key % prefix % cit->second);
+            "ctype(%3%), response(no_success)",
+            key, prefix, cit->second);
 
         return cit->second;
     }
@@ -261,9 +261,9 @@ components::component_type component_namespace::bind_prefix(
 
     fit->second.insert(prefix);
 
-    LAGAS_(info) << (boost::format(
-        "component_namespace::bind_prefix, key(%1%), prefix(%2%), ctype(%3%)")
-        % key % prefix % cit->second);
+    LAGAS_(info) << hpx::util::format(
+        "component_namespace::bind_prefix, key(%1%), prefix(%2%), ctype(%3%)",
+        key, prefix, cit->second);
 
     return cit->second;
 } // }}}
@@ -272,7 +272,7 @@ components::component_type component_namespace::bind_name(
     std::string const& key
     )
 { // {{{ bind_name implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.bind_name_.time_
     );
     counter_data_.increment_bind_name_count();
@@ -303,9 +303,9 @@ components::component_type component_namespace::bind_name(
         ++type_counter;
     }
 
-    LAGAS_(info) << (boost::format(
-        "component_namespace::bind_name, key(%1%), ctype(%2%)")
-        % key % it->second);
+    LAGAS_(info) << hpx::util::format(
+        "component_namespace::bind_name, key(%1%), ctype(%2%)",
+        key, it->second);
 
     return it->second;
 } // }}}
@@ -314,7 +314,7 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
     components::component_type key
     )
 { // {{{ resolve_id implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_id_.time_
     );
     counter_data_.increment_resolve_id_count();
@@ -333,9 +333,9 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
     // throw an exception if it->second.empty()? It should be impossible.
     if (it == end || it->second.empty())
     {
-        LAGAS_(info) << (boost::format(
-            "component_namespace::resolve_id, key(%1%), localities(0)")
-            % key);
+        LAGAS_(info) << hpx::util::format(
+            "component_namespace::resolve_id, key(%1%), localities(0)",
+            key);
 
         return std::vector<std::uint32_t>();
     }
@@ -351,9 +351,9 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
         for (; pit != pend; ++pit)
             p.push_back(*pit);
 
-        LAGAS_(info) << (boost::format(
-            "component_namespace::resolve_id, key(%1%), localities(%2%)")
-            % key % prefixes.size());
+        LAGAS_(info) << hpx::util::format(
+            "component_namespace::resolve_id, key(%1%), localities(%2%)",
+            key, prefixes.size());
 
         return p;
     }
@@ -363,7 +363,7 @@ bool component_namespace::unbind(
     std::string const& key
     )
 { // {{{ unbind implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.unbind_name_.time_
     );
     counter_data_.increment_unbind_name_count();
@@ -375,9 +375,9 @@ bool component_namespace::unbind(
     // REVIEW: Should this be an error?
     if (it == component_ids_.left.end())
     {
-        LAGAS_(info) << (boost::format(
-            "component_namespace::unbind, key(%1%), response(no_success)")
-            % key);
+        LAGAS_(info) <<hpx::util::format(
+            "component_namespace::unbind, key(%1%), response(no_success)",
+            key);
 
        return false;
     }
@@ -387,9 +387,9 @@ bool component_namespace::unbind(
     factories_.erase(it->second);
     component_ids_.left.erase(it);
 
-    LAGAS_(info) << (boost::format(
-        "component_namespace::unbind, key(%1%)")
-        % key);
+    LAGAS_(info) << hpx::util::format(
+        "component_namespace::unbind, key(%1%)",
+        key);
 
     return true;
 } // }}}
@@ -399,7 +399,7 @@ void component_namespace::iterate_types(
     iterate_types_function_type const& f
     )
 { // {{{ iterate implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.iterate_types_.time_
     );
     counter_data_.increment_iterate_types_count();
@@ -433,7 +433,7 @@ std::string component_namespace::get_component_type_name(
     components::component_type t
     )
 { // {{{ get_component_type_name implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.get_component_type_name_.time_
     );
     counter_data_.increment_get_component_type_name_count();
@@ -458,19 +458,20 @@ std::string component_namespace::get_component_type_name(
 
     if (result.empty())
     {
-        LAGAS_(info) << (boost::format(
-            "component_namespace::get_component_typename, \
-             key(%1%/%2%), response(no_success)")
-            % int(components::get_derived_type(t)) %
-              int(components::get_base_type(t)));
+        LAGAS_(info) << hpx::util::format(
+            "component_namespace::get_component_typename, "
+            "key(%1%/%2%), response(no_success)",
+            int(components::get_derived_type(t)),
+            int(components::get_base_type(t)));
 
         return result;
     }
 
-    LAGAS_(info) << (boost::format(
-        "component_namespace::get_component_typename, key(%1%/%2%), response(%3%)")
-        % int(components::get_derived_type(t)) % int(components::get_base_type(t))
-        % result);
+    LAGAS_(info) << hpx::util::format(
+        "component_namespace::get_component_typename, key(%1%/%2%), response(%3%)",
+        int(components::get_derived_type(t)),
+        int(components::get_base_type(t)),
+        result);
 
     return result;
 } // }}}
@@ -479,7 +480,7 @@ std::uint32_t component_namespace::get_num_localities(
     components::component_type key
     )
 { // {{{ get_num_localities implementation
-    util::scoped_timer<boost::atomic<std::int64_t> > update(
+    util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.num_localities_.time_
     );
     counter_data_.increment_num_localities_count();
@@ -495,18 +496,18 @@ std::uint32_t component_namespace::get_num_localities(
                                      , end = factories_.end();
     if (it == end)
     {
-        LAGAS_(info) << (boost::format(
-            "component_namespace::get_num_localities, key(%1%), localities(0)")
-            % key);
+        LAGAS_(info) << hpx::util::format(
+            "component_namespace::get_num_localities, key(%1%), localities(0)",
+            key);
 
         return std::uint32_t(0);
     }
 
     std::uint32_t num_localities = static_cast<std::uint32_t>(it->second.size());
 
-    LAGAS_(info) << (boost::format(
-        "component_namespace::get_num_localities, key(%1%), localities(%2%)")
-        % key % num_localities);
+    LAGAS_(info) << hpx::util::format(
+        "component_namespace::get_num_localities, key(%1%), localities(%2%)",
+        key, num_localities);
 
     return num_localities;
 } // }}}

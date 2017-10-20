@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/find_prefix.hpp>
 
 #if defined(HPX_WINDOWS)
@@ -128,7 +129,7 @@ namespace hpx { namespace util
         HPX_UNUSED(argv0);
 
         char exe_path[MAX_PATH + 1] = { '\0' };
-        if (!GetModuleFileName(nullptr, exe_path, sizeof(exe_path)))
+        if (!GetModuleFileNameA(nullptr, exe_path, sizeof(exe_path)))
         {
             HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
                 "get_executable_filename",

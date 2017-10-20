@@ -11,13 +11,30 @@
 # ---------------------------------------------------------------------
 # on startup, this is unset, but we'll set it to an empty string anyway
 set_property(GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS "")
+set_property(GLOBAL PROPERTY HPX_CONFIG_COND_DEFINITIONS "")
 
 function(hpx_add_config_define definition)
 
-  if(ARGN)
+  # if(ARGN) ignores an argument "0"
+  set(Args ${ARGN})
+  list(LENGTH Args ArgsLen)
+  if(ArgsLen GREATER 0)
     set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_DEFINITIONS "${definition} ${ARGN}")
   else()
     set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_DEFINITIONS "${definition}")
+  endif()
+
+endfunction()
+
+function(hpx_add_config_cond_define definition)
+
+  # if(ARGN) ignores an argument "0"
+  set(Args ${ARGN})
+  list(LENGTH Args ArgsLen)
+  if(ArgsLen GREATER 0)
+    set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS "${definition} ${ARGN}")
+  else()
+    set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS "${definition}")
   endif()
 
 endfunction()
@@ -56,19 +73,38 @@ function(write_config_defines_file)
     "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if (${OPTION_NAMESPACE} STREQUAL "default")
-    get_property(DEFINITIONS_VAR GLOBAL PROPERTY
-      HPX_CONFIG_DEFINITIONS)
+    get_property(DEFINITIONS_VAR GLOBAL PROPERTY HPX_CONFIG_DEFINITIONS)
+    get_property(COND_DEFINITIONS_VAR GLOBAL PROPERTY HPX_CONFIG_COND_DEFINITIONS)
   else()
     get_property(DEFINITIONS_VAR GLOBAL PROPERTY
       HPX_CONFIG_DEFINITIONS_${OPTION_NAMESPACE})
   endif()
 
-  list(SORT DEFINITIONS_VAR)
-  list(REMOVE_DUPLICATES DEFINITIONS_VAR)
+  if(DEFINED DEFINITIONS_VAR)
+    list(SORT DEFINITIONS_VAR)
+    list(REMOVE_DUPLICATES DEFINITIONS_VAR)
+  endif()
 
   set(hpx_config_defines "\n")
   foreach(def ${DEFINITIONS_VAR})
-    set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
+    set(hpx_config_defines "${hpx_config_defines}#define ${def}\n")#"
+  endforeach()
+
+  if(DEFINED COND_DEFINITIONS_VAR)
+    list(SORT COND_DEFINITIONS_VAR)
+    list(REMOVE_DUPLICATES COND_DEFINITIONS_VAR)
+    set(hpx_config_defines "${hpx_config_defines}\n")
+  endif()
+  foreach(def ${COND_DEFINITIONS_VAR})
+    string(FIND ${def} " " _pos)
+    if(NOT ${_pos} EQUAL -1)
+      string(SUBSTRING ${def} 0 ${_pos} defname)
+    else()
+      set(defname ${def})
+      string(STRIP ${defname} defname)
+    endif()
+    set(hpx_config_defines
+        "${hpx_config_defines}#if !defined(${defname})\n#define ${def}\n#endif\n")#"
   endforeach()
 
   # if the user has not specified a template, generate a proper header file
@@ -85,7 +121,7 @@ function(write_config_defines_file)
       "#ifndef HPX_CONFIG_${NAMESPACE_UPPER}_HPP\n"
       "#define HPX_CONFIG_${NAMESPACE_UPPER}_HPP\n"
     )
-    set(TEMP_FILENAME "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}")
+    set(TEMP_FILENAME "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}")
     file(WRITE ${TEMP_FILENAME}
         ${PREAMBLE}
         ${hpx_config_defines}

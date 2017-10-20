@@ -31,9 +31,10 @@ namespace hpx { namespace threads { namespace detail
 
     enum distribution_type
     {
-        compact  = 0x01,
-        scatter  = 0x02,
-        balanced = 0x04
+        compact       = 0x01,
+        scatter       = 0x02,
+        balanced      = 0x04,
+        numa_balanced = 0x08
     };
 
     struct spec_type

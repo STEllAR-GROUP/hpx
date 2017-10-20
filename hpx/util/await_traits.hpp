@@ -142,29 +142,6 @@ namespace std { namespace experimental
         {
         }
     };
-
-    struct suspend_if
-    {
-    private:
-        bool b_;
-
-    public:
-        suspend_if(bool b)
-          : b_(b)
-        {
-        }
-
-        bool await_ready() const
-        {
-            return !b_;
-        }
-        void await_suspend(coroutine_handle<>) const
-        {
-        }
-        void await_resume() const
-        {
-        }
-    };
 }}
 
 #endif    // defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)

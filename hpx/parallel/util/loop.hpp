@@ -11,9 +11,11 @@
 #include <hpx/parallel/datapar/loop.hpp>
 #endif
 #include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <algorithm>
@@ -30,7 +32,7 @@ namespace hpx { namespace parallel { namespace util
     HPX_HOST_DEVICE HPX_FORCEINLINE
     typename std::enable_if<
        !execution::is_vectorpack_execution_policy<ExPolicy>::value,
-        typename std::result_of<F&&(Iters...)>::type
+        typename hpx::util::invoke_result<F, Iters...>::type
     >::type
     loop_step(VecOnly, F && f, Iters& ... its)
     {
@@ -537,6 +539,21 @@ namespace hpx { namespace parallel { namespace util
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
         return detail::accumulate_n<cat>::call(it, count, std::move(init),
             std::forward<Pred>(f));
+    }
+
+    template <typename T, typename Iter, typename Reduce,
+        typename Conv = util::projection_identity>
+    HPX_FORCEINLINE T
+    accumulate(Iter first, Iter last, Reduce && r, Conv && conv = Conv())
+    {
+        T val = hpx::util::invoke(conv, *first);
+        ++first;
+        while(last != first)
+        {
+            val = hpx::util::invoke(r, val, *first);
+            ++first;
+        }
+        return val;
     }
 }}}
 

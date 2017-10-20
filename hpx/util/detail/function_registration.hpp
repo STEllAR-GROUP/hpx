@@ -10,9 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
-
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 
 #include <type_traits>
 
@@ -51,11 +50,11 @@ namespace hpx { namespace util { namespace detail
     namespace hpx { namespace util { namespace detail {                       \
         template<> HPX_ALWAYS_EXPORT                                          \
         char const* get_function_name<                                        \
-            VTable, std::decay<HPX_UTIL_STRIP(F)>::type>();                   \
+            VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type>();              \
                                                                               \
         template <>                                                           \
         struct get_function_name_declared<                                    \
-            VTable, std::decay<HPX_UTIL_STRIP(F)>::type                       \
+            VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type                  \
         > : std::true_type                                                    \
         {};                                                                   \
     }}}                                                                       \
@@ -65,7 +64,7 @@ namespace hpx { namespace util { namespace detail
     namespace hpx { namespace util { namespace detail {                       \
         template<> HPX_ALWAYS_EXPORT                                          \
         char const* get_function_name<                                        \
-            VTable, std::decay<HPX_UTIL_STRIP(F)>::type>()                    \
+            VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type>()               \
         {                                                                     \
             /*If you encounter this assert while compiling code, that means   \
             that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro         \
@@ -73,10 +72,10 @@ namespace hpx { namespace util { namespace detail
             is defined misses a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION*/\
             static_assert(                                                    \
                 get_function_name_declared<                                   \
-                    VTable, std::decay<HPX_UTIL_STRIP(F)>::type>::value,      \
+                    VTable, std::decay<HPX_PP_STRIP_PARENS(F)>::type>::value, \
                 "HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION missing for "\
-                BOOST_PP_STRINGIZE(Name));                                    \
-            return BOOST_PP_STRINGIZE(Name);                                  \
+                HPX_PP_STRINGIZE(Name));                                      \
+            return HPX_PP_STRINGIZE(Name);                                    \
         }                                                                     \
     }}}                                                                       \
 /**/

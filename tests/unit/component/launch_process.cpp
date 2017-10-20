@@ -35,7 +35,7 @@ std::vector<std::string> get_environment()
     int len = get_arraylen(_environ);
     std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
 #elif defined(linux) || defined(__linux) || defined(__linux__) || \
-      defined(__AIX__) || defined(__APPLE__)
+      defined(__AIX__) || defined(__APPLE__) || defined(__FreeBSD__)
     int len = get_arraylen(environ);
     std::copy(&environ[0], &environ[len], std::back_inserter(env));
 #else
@@ -75,6 +75,7 @@ int hpx_main(boost::program_options::variables_map &vm)
     args.push_back("--component=test_server");
     args.push_back("--set_message=accessed");
     args.push_back("--hpx:ignore-batch-env");
+    args.push_back("--hpx:threads=1");
 
     // set up environment for launched executable
     std::vector<std::string> env = get_environment();   // current environment

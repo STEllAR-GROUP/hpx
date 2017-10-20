@@ -9,18 +9,17 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<int> count_call_void(0);
-boost::atomic<int> count_call_future_void(0);
+std::atomic<int> count_call_void(0);
+std::atomic<int> count_call_future_void(0);
 
-boost::atomic<int> count_active_call_void(0);
-boost::atomic<int> count_active_call_future_void(0);
+std::atomic<int> count_active_call_void(0);
+std::atomic<int> count_active_call_future_void(0);
 
 struct test_server
   : hpx::components::simple_component_base<test_server>
@@ -110,11 +109,11 @@ void test_component_call_future_void()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<int> count_plain_void(0);
-boost::atomic<int> count_plain_future_void(0);
+std::atomic<int> count_plain_void(0);
+std::atomic<int> count_plain_future_void(0);
 
-boost::atomic<int> count_active_plain_void(0);
-boost::atomic<int> count_active_plain_future_void(0);
+std::atomic<int> count_active_plain_void(0);
+std::atomic<int> count_active_plain_future_void(0);
 
 void plain_void()
 {

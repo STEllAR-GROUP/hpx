@@ -6,7 +6,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_MEMORY_REGION_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_MEMORY_REGION_HPP
 
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 //
@@ -96,8 +96,8 @@ namespace verbs
             size_    = length;
 
             LOG_DEBUG_MSG("allocated/registered memory region " << hexpointer(this)
-                << " with local key " << get_local_key()
-                << " at address " << get_address()
+                << " with local key " << hexlength(get_local_key())
+                << " at address " << hexpointer(get_address())
                 << " with length " << hexlength(get_length()));
             return 0;
         }
@@ -115,7 +115,7 @@ namespace verbs
         int release(void)
         {
             LOG_TRACE_MSG("About to release memory region with local key "
-                << get_local_key());
+                << hexlength(get_local_key()));
             if (region_ != nullptr) {
                 // get these before deleting/unregistering (for logging)
                 void *buffer = get_base_address();
@@ -130,8 +130,8 @@ namespace verbs
                     }
                     else {
                         LOG_DEBUG_MSG("deregistered memory region with local key "
-                            << get_local_key()
-                            << " at address " << buffer
+                            << hexlength(get_local_key())
+                            << " at address " << hexpointer(buffer)
                             << " with length " << hexlength(length));
                     }
                 }

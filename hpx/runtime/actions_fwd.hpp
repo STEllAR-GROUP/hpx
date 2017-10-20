@@ -9,6 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
 
+#include <cstdint>
+
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
@@ -24,6 +26,14 @@ namespace hpx { namespace actions
 
     template <typename Component, typename Signature, typename Derived>
     struct basic_action;
+
+    namespace detail
+    {
+        HPX_API_EXPORT std::uint32_t get_action_id_from_name(
+            char const* action_name);
+    }
+
+    /// \endcond
 }}
 
 #endif

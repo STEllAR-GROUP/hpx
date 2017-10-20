@@ -67,14 +67,15 @@ void test_thread_callable_object_no_arguments()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class callable_noncopyable_no_args
+struct callable_noncopyable_no_args
 {
-    HPX_NON_COPYABLE(callable_noncopyable_no_args);
-
-public:
     static bool called;
 
     callable_noncopyable_no_args() {}
+
+    callable_noncopyable_no_args(callable_noncopyable_no_args const&) = delete;
+    callable_noncopyable_no_args& operator=(
+        callable_noncopyable_no_args const&) = delete;
 
     void operator()() const
     {

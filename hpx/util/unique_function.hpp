@@ -39,27 +39,25 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable<R(Ts...)> vtable;
         typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
 
-        HPX_MOVABLE_ONLY(unique_function);
-
     public:
         typedef typename base_type::result_type result_type;
 
-        unique_function() HPX_NOEXCEPT
+        unique_function() noexcept
           : base_type()
         {}
 
-        unique_function(std::nullptr_t) HPX_NOEXCEPT
+        unique_function(std::nullptr_t) noexcept
           : base_type()
         {}
 
-        unique_function(unique_function&& other) HPX_NOEXCEPT
+        unique_function(unique_function&& other) noexcept
           : base_type(static_cast<base_type&&>(other))
         {}
 
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function(F&& f)
           : base_type()
@@ -67,7 +65,7 @@ namespace hpx { namespace util
             assign(std::forward<F>(f));
         }
 
-        unique_function& operator=(unique_function&& other) HPX_NOEXCEPT
+        unique_function& operator=(unique_function&& other) noexcept
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -76,7 +74,7 @@ namespace hpx { namespace util
         template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, unique_function>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type>
         unique_function& operator=(F&& f)
         {
@@ -94,12 +92,13 @@ namespace hpx { namespace util
 
     template <typename Sig, bool Serializable>
     static bool is_empty_function(
-        unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+        unique_function<Sig, Serializable> const& f) noexcept
     {
         return f.empty();
     }
 }}
 
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
@@ -107,24 +106,35 @@ namespace hpx { namespace traits
     struct get_function_address<util::unique_function<Sig, Serializable> >
     {
         static std::size_t
-            call(util::unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+            call(util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     template <typename Sig, bool Serializable>
     struct get_function_annotation<util::unique_function<Sig, Serializable> >
     {
         static char const*
-            call(util::unique_function<Sig, Serializable> const& f) HPX_NOEXCEPT
+            call(util::unique_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
         }
     };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename Sig, bool Serializable>
+    struct get_function_annotation_itt<util::unique_function<Sig, Serializable> >
+    {
+        static util::itt::string_handle
+            call(util::unique_function<Sig, Serializable> const& f) noexcept
+        {
+            return f.get_function_annotation_itt();
+        }
+    };
 #endif
 }}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(Sig, F, Name)           \

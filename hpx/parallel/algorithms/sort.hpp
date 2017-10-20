@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 John Biddiscombe
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2017 Hartmut Kaiser
 //  Copyright (c) 2015 Francisco Jose Tapia
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,27 +18,25 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
-#include <boost/exception_ptr.hpp>
-
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iterator>
 #include <list>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // sort
@@ -77,16 +75,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::future<RandomIt> sort_thread(ExPolicy& policy,
             RandomIt first, RandomIt last, Compare comp)
         {
-            typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                executor_type;
-            typedef typename hpx::parallel::executor_traits<executor_type>
-                executor_traits;
-
             //------------------------- begin ----------------------
             std::ptrdiff_t N = last - first;
             if (std::size_t(N) <= sort_limit_per_task)
             {
-                return executor_traits::async_execute(
+                return execution::async_execute(
                     policy.executor(),
                     [first, last, comp]() -> RandomIt
                     {
@@ -146,13 +139,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             // spawn tasks for each sub section
             hpx::future<RandomIt> left =
-                executor_traits::async_execute(
+                execution::async_execute(
                     policy.executor(),
                         &sort_thread<ExPolicy, RandomIt, Compare>,
                         std::ref(policy), first, c_last, comp);
 
             hpx::future<RandomIt> right =
-                executor_traits::async_execute(
+                execution::async_execute(
                     policy.executor(),
                         &sort_thread<ExPolicy, RandomIt, Compare>,
                         std::ref(policy), c_first, last, comp);
@@ -163,14 +156,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     if (left.has_exception() || right.has_exception())
                     {
-                        std::list<boost::exception_ptr> errors;
+                        std::list<std::exception_ptr> errors;
                         if (left.has_exception())
                             errors.push_back(left.get_exception_ptr());
                         if (right.has_exception())
                             errors.push_back(right.get_exception_ptr());
 
-                        boost::throw_exception(
-                            exception_list(std::move(errors)));
+                        throw exception_list(std::move(errors));
                     }
                     return last;
                 },
@@ -206,19 +198,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (detail::is_sorted_sequential(first, last, comp))
                     return hpx::make_ready_future(last);
 
-                typedef typename hpx::util::decay<ExPolicy>::type::executor_type
-                    executor_type;
-                typedef typename hpx::parallel::executor_traits<executor_type>
-                    executor_traits;
-
-                result = executor_traits::async_execute(
-                    policy.executor(),
+                result = execution::async_execute(policy.executor(),
                         &sort_thread<ExPolicy, RandomIt, Compare>,
                         std::ref(policy), first, last, comp);
             }
             catch (...) {
                 return detail::handle_exception<ExPolicy, RandomIt>::call(
-                    boost::current_exception());
+                    std::current_exception());
             }
 
             if (result.has_exception())
@@ -360,7 +346,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             (hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
-        typedef execution::is_sequential_execution_policy<ExPolicy> is_seq;
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::sort<RandomIt>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,

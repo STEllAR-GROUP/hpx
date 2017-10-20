@@ -259,15 +259,7 @@ namespace hpx { namespace util { namespace detail
     {
         return l;
     }
-
-    struct bootstrap_logging { constexpr bootstrap_logging() {} };
-    constexpr bootstrap_logging lbt_;
-
-    template <typename T>
-    bootstrap_logging const& operator<< (bootstrap_logging const& l, T&&)
-    {
-        return l;
-    }
+}
 
     #define LAGAS_(lvl)           if(true) {} else hpx::util::detail::dummy_log
     #define LPT_(lvl)             if(true) {} else hpx::util::detail::dummy_log
@@ -276,6 +268,16 @@ namespace hpx { namespace util { namespace detail
     #define LHPX_(lvl, cat)       if(true) {} else hpx::util::detail::dummy_log
     #define LAPP_(lvl)            if(true) {} else hpx::util::detail::dummy_log
     #define LDEB_                 if(true) {} else hpx::util::detail::dummy_log
+
+    #define LTM_(lvl)             if(true) {} else hpx::util::detail::dummy_log
+    #define LRT_(lvl)             if(true) {} else hpx::util::detail::dummy_log
+    #define LOSH_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LERR_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LLCO_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LPCS_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LAS_(lvl)             if(true) {} else hpx::util::detail::dummy_log
+    #define LBT_(lvl)             if(true) {} else hpx::util::detail::dummy_log
+    #define LSEC_(lvl)            if(true) {} else hpx::util::detail::dummy_log
 
     #define LFATAL_               if(true) {} else hpx::util::detail::dummy_log
 
@@ -292,7 +294,16 @@ namespace hpx { namespace util { namespace detail
     #define LHPX_ENABLED(lvl)     (false)
     #define LAPP_ENABLED(lvl)     (false)
     #define LDEB_ENABLED          (false)
-}}}
+}}
+
+struct bootstrap_logging { constexpr bootstrap_logging() {} };
+constexpr bootstrap_logging lbt_;
+
+template <typename T>
+bootstrap_logging const& operator<< (bootstrap_logging const& l, T&&)
+{
+    return l;
+}
 
 #endif
 #endif

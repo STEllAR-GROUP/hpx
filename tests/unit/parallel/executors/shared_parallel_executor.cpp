@@ -10,31 +10,31 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#include <boost/range/functions.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 struct shared_parallel_executor
-  : hpx::parallel::executor_tag
 {
-    template <typename T>
-    struct future_type
-    {
-        typedef hpx::shared_future<T> type;
-    };
-
     template <typename F, typename ... Ts>
-    hpx::shared_future<typename hpx::util::result_of<F&&(Ts &&...)>::type>
+    hpx::shared_future<typename hpx::util::invoke_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
         return hpx::async(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
+
+namespace hpx { namespace parallel { namespace execution
+{
+    template <>
+    struct is_two_way_executor<shared_parallel_executor>
+        : std::true_type
+    {};
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id test(int passed_through)
@@ -46,21 +46,21 @@ hpx::thread::id test(int passed_through)
 void test_sync()
 {
     typedef shared_parallel_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     executor exec;
-    HPX_TEST(traits::execute(exec, &test, 42) != hpx::this_thread::get_id());
+    HPX_TEST(
+        hpx::parallel::execution::sync_execute(exec, &test, 42) !=
+        hpx::this_thread::get_id());
 }
 
 void test_async()
 {
     typedef shared_parallel_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     executor exec;
 
     hpx::shared_future<hpx::thread::id> fut =
-        traits::async_execute(exec, &test, 42);
+        hpx::parallel::execution::async_execute(exec, &test, 42);
 
     HPX_TEST(
         fut.get() !=
@@ -77,41 +77,42 @@ void bulk_test(int value, hpx::thread::id tid, int passed_through) //-V813
 void test_bulk_sync()
 {
     typedef shared_parallel_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
     executor exec;
-    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
-    traits::bulk_execute(exec, &bulk_test, v, tid, 42);
+    hpx::parallel::execution::bulk_sync_execute(
+        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
+    hpx::parallel::execution::bulk_sync_execute(
+        exec, &bulk_test, v, tid, 42);
 }
 
 void test_bulk_async()
 {
     typedef shared_parallel_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(boost::begin(v), boost::end(v), std::rand());
+    std::iota(std::begin(v), std::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
     executor exec;
     std::vector<hpx::shared_future<void> > futs =
-        traits::bulk_async_execute(exec,
+        hpx::parallel::execution::bulk_async_execute(exec,
             hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
     hpx::when_all(futs).get();
 
-    futs = traits::bulk_async_execute(exec, &bulk_test, v, tid, 42);
+    futs = hpx::parallel::execution::bulk_async_execute(exec,
+        &bulk_test, v, tid, 42);
     hpx::when_all(futs).get();
 }
 
@@ -124,19 +125,18 @@ void void_test(int passed_through)
 void test_sync_void()
 {
     typedef shared_parallel_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     executor exec;
-    traits::execute(exec, &void_test, 42);
+    hpx::parallel::execution::sync_execute(exec, &void_test, 42);
 }
 
 void test_async_void()
 {
     typedef shared_parallel_executor executor;
-    typedef hpx::parallel::executor_traits<executor> traits;
 
     executor exec;
-    hpx::shared_future<void> fut = traits::async_execute(exec, &void_test, 42);
+    hpx::shared_future<void> fut =
+        hpx::parallel::execution::async_execute(exec, &void_test, 42);
     fut.get();
 }
 

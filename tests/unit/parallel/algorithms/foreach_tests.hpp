@@ -6,12 +6,12 @@
 #if !defined(HPX_PARALLEL_TEST_FOREACH_MAY26_15_1414)
 #define HPX_PARALLEL_TEST_FOREACH_MAY26_15_1414
 
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
+#include <iterator>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -58,18 +58,18 @@ void test_for_each(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     iterator result =
         hpx::parallel::for_each(std::forward<ExPolicy>(policy),
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             set_42());
 
-    HPX_TEST(result == iterator(boost::end(c)));
+    HPX_TEST(result == iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](int v) -> void {
             HPX_TEST_EQ(v, int(42));
             ++count;
@@ -84,19 +84,19 @@ void test_for_each_async(ExPolicy && p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::future<iterator> f =
         hpx::parallel::for_each(std::forward<ExPolicy>(p),
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             set_42());
     f.wait();
 
-    HPX_TEST(f.get() == iterator(boost::end(c)));
+    HPX_TEST(f.get() == iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](int v) -> void {
             HPX_TEST_EQ(v, int(42));
             ++count;
@@ -116,12 +116,12 @@ void test_for_each_exception(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::for_each(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             throw_always());
 
         HPX_TEST(false);
@@ -144,14 +144,14 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<iterator> f =
             hpx::parallel::for_each(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -182,12 +182,12 @@ void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     try {
         hpx::parallel::for_each(policy,
-            iterator(boost::begin(c)), iterator(boost::end(c)),
+            iterator(std::begin(c)), iterator(std::end(c)),
             throw_bad_alloc());
 
         HPX_TEST(false);
@@ -209,14 +209,14 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<iterator> f =
             hpx::parallel::for_each(p,
-                iterator(boost::begin(c)), iterator(boost::end(c)),
+                iterator(std::begin(c)), iterator(std::end(c)),
                 throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
@@ -246,17 +246,17 @@ void test_for_each_n(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     iterator result = hpx::parallel::for_each_n(policy,
-        iterator(boost::begin(c)), c.size(),
+        iterator(std::begin(c)), c.size(),
         set_42());
-    iterator end = iterator(boost::end(c));
+    iterator end = iterator(std::end(c));
     HPX_TEST(result == end);
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](int v) -> void {
             HPX_TEST_EQ(v, int(42));
             ++count;
@@ -271,17 +271,17 @@ void test_for_each_n_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::future<iterator> f =
         hpx::parallel::for_each_n(p,
-            iterator(boost::begin(c)), c.size(),
+            iterator(std::begin(c)), c.size(),
             set_42());
-    HPX_TEST(f.get() == iterator(boost::end(c)));
+    HPX_TEST(f.get() == iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](int v) -> void {
             HPX_TEST_EQ(v, int(42));
             ++count;

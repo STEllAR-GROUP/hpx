@@ -10,8 +10,7 @@
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
 #include <memory>
 
 namespace hpx { namespace threads { namespace detail
@@ -22,7 +21,7 @@ namespace hpx { namespace threads { namespace detail
         hpx::threads::thread_id_type self_id = hpx::threads::get_self_id();
         if (!self_id)
         {
-            boost::throw_exception(coroutines::null_thread_id_exception());
+            throw coroutines::null_thread_id_exception();
             return 0;
         }
         return self_id->get_scheduler_base()->get_tss_data(key);
@@ -38,7 +37,7 @@ namespace hpx { namespace threads { namespace detail
         hpx::threads::thread_id_type self_id = hpx::threads::get_self_id();
         if (!self_id)
         {
-            boost::throw_exception(coroutines::null_thread_id_exception());
+            throw coroutines::null_thread_id_exception();
             return;
         }
         self_id->get_scheduler_base()->set_tss_data(key, func, tss_data,

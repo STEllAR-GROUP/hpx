@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_set_operations.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -31,23 +30,23 @@ void test_includes1(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
 
     HPX_ASSERT(start <= end);
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     {
         bool result = hpx::parallel::includes(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            iterator(std::begin(c1)), iterator(std::end(c1)),
             start_it, end_it);
 
         bool expected = std::includes(
-            boost::begin(c1), boost::end(c1),
+            std::begin(c1), std::end(c1),
             start_it, end_it);
 
         // verify values
@@ -63,11 +62,11 @@ void test_includes1(ExPolicy policy, IteratorTag)
             ++c2[std::rand() % c2.size()]; //-V104
 
             bool result = hpx::parallel::includes(policy,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2), boost::end(c2));
+                iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2));
 
-            bool expected = std::includes(boost::begin(c1), boost::end(c1),
-                boost::begin(c2), boost::end(c2));
+            bool expected = std::includes(std::begin(c1), std::end(c1),
+                std::begin(c2), std::end(c2));
 
             // verify values
             HPX_TEST_EQ(result, expected);
@@ -83,25 +82,25 @@ void test_includes1_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
 
     HPX_ASSERT(start <= end);
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     {
         hpx::future<bool> result =
             hpx::parallel::includes(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                iterator(std::begin(c1)), iterator(std::end(c1)),
                 start_it, end_it);
         result.wait();
 
         bool expected = std::includes(
-            boost::begin(c1), boost::end(c1),
+            std::begin(c1), std::end(c1),
             start_it, end_it);
 
         // verify values
@@ -118,12 +117,12 @@ void test_includes1_async(ExPolicy p, IteratorTag)
 
             hpx::future<bool> result =
                 hpx::parallel::includes(p,
-                    iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                    boost::begin(c2), boost::end(c2));
+                    iterator(std::begin(c1)), iterator(std::end(c1)),
+                    std::begin(c2), std::end(c2));
             result.wait();
 
-            bool expected = std::includes(boost::begin(c1), boost::end(c1),
-                boost::begin(c2), boost::end(c2));
+            bool expected = std::includes(std::begin(c1), std::end(c1),
+                std::begin(c2), std::end(c2));
 
             // verify values
             HPX_TEST_EQ(result.get(), expected);
@@ -159,7 +158,9 @@ void includes_test1()
 {
     test_includes1<std::random_access_iterator_tag>();
     test_includes1<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_includes1<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,23 +176,23 @@ void test_includes2(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
 
     HPX_ASSERT(start <= end);
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     {
         bool result = hpx::parallel::includes(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            iterator(std::begin(c1)), iterator(std::end(c1)),
             start_it, end_it, std::less<std::size_t>());
 
         bool expected = std::includes(
-            boost::begin(c1), boost::end(c1),
+            std::begin(c1), std::end(c1),
             start_it, end_it, std::less<std::size_t>());
 
         // verify values
@@ -207,11 +208,11 @@ void test_includes2(ExPolicy policy, IteratorTag)
             ++c2[std::rand() % c2.size()]; //-V104
 
             bool result = hpx::parallel::includes(policy,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2), boost::end(c2), std::less<std::size_t>());
+                iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::less<std::size_t>());
 
-            bool expected = std::includes(boost::begin(c1), boost::end(c1),
-                boost::begin(c2), boost::end(c2), std::less<std::size_t>());
+            bool expected = std::includes(std::begin(c1), std::end(c1),
+                std::begin(c2), std::end(c2), std::less<std::size_t>());
 
             // verify values
             HPX_TEST_EQ(result, expected);
@@ -227,25 +228,25 @@ void test_includes2_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
 
     HPX_ASSERT(start <= end);
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     {
         hpx::future<bool> result =
             hpx::parallel::includes(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                iterator(std::begin(c1)), iterator(std::end(c1)),
                 start_it, end_it, std::less<std::size_t>());
         result.wait();
 
         bool expected = std::includes(
-            boost::begin(c1), boost::end(c1),
+            std::begin(c1), std::end(c1),
             start_it, end_it, std::less<std::size_t>());
 
         // verify values
@@ -262,12 +263,12 @@ void test_includes2_async(ExPolicy p, IteratorTag)
 
             hpx::future<bool> result =
                 hpx::parallel::includes(p,
-                    iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                    boost::begin(c2), boost::end(c2), std::less<std::size_t>());
+                    iterator(std::begin(c1)), iterator(std::end(c1)),
+                    std::begin(c2), std::end(c2), std::less<std::size_t>());
             result.wait();
 
-            bool expected = std::includes(boost::begin(c1), boost::end(c1),
-                boost::begin(c2), boost::end(c2), std::less<std::size_t>());
+            bool expected = std::includes(std::begin(c1), std::end(c1),
+                std::begin(c2), std::end(c2), std::less<std::size_t>());
 
             // verify values
             HPX_TEST_EQ(result.get(), expected);
@@ -303,7 +304,9 @@ void includes_test2()
 {
     test_includes2<std::random_access_iterator_tag>();
     test_includes2<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_includes2<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,7 +322,7 @@ void test_includes_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
@@ -331,13 +334,13 @@ void test_includes_exception(ExPolicy policy, IteratorTag)
 
     HPX_ASSERT(end <= c1.size());
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     bool caught_exception = false;
     try {
         hpx::parallel::includes(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            iterator(std::begin(c1)), iterator(std::end(c1)),
             start_it, end_it,
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
@@ -364,7 +367,7 @@ void test_includes_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
@@ -376,15 +379,15 @@ void test_includes_exception_async(ExPolicy p, IteratorTag)
 
     HPX_ASSERT(end <= c1.size());
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<bool> f =
             hpx::parallel::includes(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                iterator(std::begin(c1)), iterator(std::end(c1)),
                 start_it, end_it,
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::runtime_error("test"), true;
@@ -437,7 +440,9 @@ void includes_exception_test()
 {
     test_includes_exception<std::random_access_iterator_tag>();
     test_includes_exception<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_includes_exception<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -453,7 +458,7 @@ void test_includes_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
@@ -465,13 +470,13 @@ void test_includes_bad_alloc(ExPolicy policy, IteratorTag)
 
     HPX_ASSERT(end <= c1.size());
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::includes(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            iterator(std::begin(c1)), iterator(std::end(c1)),
             start_it, end_it,
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
@@ -497,7 +502,7 @@ void test_includes_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = std::rand(); //-V101
-    std::iota(boost::begin(c1), boost::end(c1), first_value);
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     std::size_t start = std::rand() % c1.size();
     std::size_t end = start + (std::rand() % (c1.size() - start));
@@ -509,15 +514,15 @@ void test_includes_bad_alloc_async(ExPolicy p, IteratorTag)
 
     HPX_ASSERT(end <= c1.size());
 
-    base_iterator start_it = boost::next(boost::begin(c1), start);
-    base_iterator end_it = boost::next(boost::begin(c1), end);
+    base_iterator start_it = boost::next(std::begin(c1), start);
+    base_iterator end_it = boost::next(std::begin(c1), end);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<bool> f =
             hpx::parallel::includes(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                iterator(std::begin(c1)), iterator(std::end(c1)),
                 start_it, end_it,
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::bad_alloc(), true;
@@ -569,7 +574,9 @@ void includes_bad_alloc_test()
 {
     test_includes_bad_alloc<std::random_access_iterator_tag>();
     test_includes_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_includes_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

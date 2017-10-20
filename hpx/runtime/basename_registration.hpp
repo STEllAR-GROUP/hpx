@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,8 +9,10 @@
 #define HPX_RUNTIME_BASENAME_REGISTRATION_AUG_17_2015_0432PM
 
 #include <hpx/config.hpp>
+#include <hpx/components_fwd.hpp>
+
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <cstddef>

@@ -11,14 +11,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/thread/mutex.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -37,7 +36,7 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
@@ -50,7 +49,7 @@ namespace hpx { namespace threads { namespace policies
         typedef std::true_type has_periodic_maintenance;
 
         void start_periodic_maintenance(
-            boost::atomic<hpx::state>& global_state)
+            std::atomic<hpx::state>& global_state)
         {
             threads::detail::start_periodic_maintenance(*this, global_state,
                 has_periodic_maintenance());

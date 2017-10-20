@@ -7,9 +7,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 #include <chrono>
 #include <string>
 #include <utility>
@@ -115,7 +113,6 @@ void test_split_future_pair()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 std::array<int, 0> make_array0_slowly()
 {
     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -154,7 +151,27 @@ void test_split_future_array()
     HPX_TEST_EQ(result[1].get(), 43);
     HPX_TEST_EQ(result[2].get(), 44);
 }
-#endif
+
+///////////////////////////////////////////////////////////////////////////////
+std::vector<int> make_vector_slowly()
+{
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+    return std::vector<int>{{42, 43, 44}};
+}
+
+void test_split_future_vector()
+{
+    hpx::lcos::local::futures_factory<std::vector<int>()> pt(
+        make_vector_slowly);
+    pt.apply();
+
+    std::vector<hpx::future<int> > result =
+        hpx::split_future(pt.get_future(), 3);
+
+    HPX_TEST_EQ(result[0].get(), 42);
+    HPX_TEST_EQ(result[1].get(), 43);
+    HPX_TEST_EQ(result[2].get(), 44);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
@@ -166,10 +183,10 @@ int hpx_main(int argc, char* argv[])
 
     test_split_future_pair();
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     test_split_future_array0();
     test_split_future_array();
-#endif
+
+    test_split_future_vector();
 
     hpx::finalize();
     return hpx::util::report_errors();

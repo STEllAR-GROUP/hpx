@@ -32,7 +32,7 @@ namespace hpx { namespace util { namespace detail
     VTable const vtables<VTable, T>::instance = construct_vtable<T>();
 
     template <typename VTable, typename T>
-    HPX_CONSTEXPR inline VTable const* get_vtable() HPX_NOEXCEPT
+    HPX_CONSTEXPR inline VTable const* get_vtable() noexcept
     {
         static_assert(
             std::is_same<T, typename std::decay<T>::type>::value,
@@ -124,7 +124,7 @@ namespace hpx { namespace util { namespace detail
         void (*delete_)(void**);
 
         template <typename T>
-        HPX_CONSTEXPR vtable(construct_vtable<T>) HPX_NOEXCEPT
+        HPX_CONSTEXPR vtable(construct_vtable<T>) noexcept
           : get_type(&vtable::template _get_type<T>)
           , destruct(&vtable::template _destruct<T>)
           , delete_(&vtable::template _delete<T>)

@@ -6,6 +6,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include "length_check.hpp"
 #include "function_hyper.hpp"
 #include <cstddef>
@@ -97,7 +99,6 @@ namespace boost
             while (p < someline.size())
             {
                 currline++;
-                std::size_t rend = someline[p].find_last_of("\r");
                 bool check_not = false;
                 boost::regex error_note, http_note;
 

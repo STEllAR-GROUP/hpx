@@ -7,7 +7,7 @@
 #define HPX_PARCELSET_POLICIES_VERBS_COMPLETION_QUEUE_HPP
 
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 //
 #include <inttypes.h>
 #include <infiniband/verbs.h>

@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2015 Hartmut Kaiser
+//  Copyright (c) 1998-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,14 +12,14 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/util/logging.hpp>
 #endif
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/unlock_guard.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <list>
@@ -77,26 +77,24 @@ namespace hpx { namespace util
             HPX_ASSERT(sizeof(typename heap_type::storage_type) == uint64_t(heap_size));
         }
 
-        ~one_size_heap_list() HPX_NOEXCEPT
+        ~one_size_heap_list() noexcept
         {
 #if defined(HPX_DEBUG)
-            LOSH_(info)
-                << (boost::format(
-                   "%1%::~%1%: size(%2%), max_count(%3%), alloc_count(%4%), "
-                   "free_count(%5%)")
-                   % name()
-                   % heap_count_
-                   % max_alloc_count_
-                   % alloc_count_
-                   % free_count_);
+            LOSH_(info) << hpx::util::format(
+                "%1%::~%1%: size(%2%), max_count(%3%), alloc_count(%4%), "
+                "free_count(%5%)",
+                name(),
+                heap_count_,
+                max_alloc_count_,
+                alloc_count_,
+                free_count_);
 
             if (alloc_count_ > free_count_)
             {
-                LOSH_(warning)
-                    << (boost::format(
-                       "%1%::~%1%: releasing with %2% allocated objects")
-                       % name()
-                       % (alloc_count_ - free_count_));
+                LOSH_(warning) << hpx::util::format(
+                    "%1%::~%1%: releasing with %2% allocated objects",
+                    name(),
+                    alloc_count_ - free_count_);
             }
 #endif
         }
@@ -141,15 +139,14 @@ namespace hpx { namespace util
                         }
 
 #if defined(HPX_DEBUG)
-                        LOSH_(info)
-                            << (boost::format(
-                                "%1%::alloc: failed to allocate from heap[%2%] "
-                                "(heap[%2%] has allocated %3% objects and has "
-                                "space for %4% more objects)")
-                                % name()
-                                % (*it)->heap_count_
-                                % (*it)->size()
-                                % (*it)->free_size());
+                        LOSH_(info) << hpx::util::format(
+                            "%1%::alloc: failed to allocate from heap[%2%] "
+                            "(heap[%2%] has allocated %3% objects and has "
+                            "space for %4% more objects)",
+                            name(),
+                            (*it)->heap_count_,
+                            (*it)->size(),
+                            (*it)->free_size());
 #endif
                     }
                 }
@@ -180,21 +177,20 @@ namespace hpx { namespace util
                     // out of memory
                     HPX_THROW_EXCEPTION(out_of_memory,
                         name() + "::alloc",
-                        boost::str(boost::format(
-                            "new heap failed to allocate %1% objects")
-                            % count));
+                        hpx::util::format(
+                            "new heap failed to allocate %1% objects",
+                            count));
                 }
 
 #if defined(HPX_DEBUG)
                 alloc_count_ += count;
                 ++heap_count_;
 
-                LOSH_(info)
-                    << (boost::format(
-                        "%1%::alloc: creating new heap[%2%], size is now %3%")
-                        % name()
-                        % heap_count_
-                        % heap_list_.size());
+                LOSH_(info) << hpx::util::format(
+                    "%1%::alloc: creating new heap[%2%], size is now %3%",
+                    name(),
+                    heap_count_,
+                    heap_list_.size());
 #endif
                 did_create = true;
             }
@@ -234,7 +230,7 @@ namespace hpx { namespace util
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
                     name() + "::add_heap",
-                    boost::str(boost::format("heap %1% could not be added") % p));
+                    hpx::util::format("heap %1% could not be added", p));
             }
 
 #if defined(HPX_DEBUG)
@@ -291,9 +287,9 @@ namespace hpx { namespace util
 
             HPX_THROW_EXCEPTION(bad_parameter,
                 name() + "::free",
-                boost::str(boost::format(
-                    "pointer %1% was not allocated by this %2%")
-                    % p % name()));
+                hpx::util::format(
+                    "pointer %1% was not allocated by this %2%",
+                    p, name()));
         }
 
         bool did_alloc(void* p) const

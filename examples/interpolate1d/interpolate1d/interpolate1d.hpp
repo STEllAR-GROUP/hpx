@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,15 +7,13 @@
 #define HPX_INTERPOLATE1D_AUG_04_2011_0340PM
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
 
-#include "stubs/partition.hpp"
+#include "partition.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace interpolate1d
@@ -35,31 +33,27 @@ namespace interpolate1d
         // function dispatches to the proper partition for the actual
         // interpolation.
         hpx::lcos::future<double>
-        interpolate_async(double value)
+        interpolate_async(double value) const
         {
-            return stubs::partition::interpolate_async(get_id(value), value);
+            return get_partition(value).interpolate_async(value);
         }
 
-        double interpolate(double value)
+        double interpolate(double value) const
         {
-            return stubs::partition::interpolate(get_id(value), value);
+            return get_partition(value).interpolate(value);
         }
 
     private:
         // map the given value to the gid of the partition responsible for the
         // interpolation
-        hpx::naming::id_type get_id(double value);
+        partition get_partition(double value) const;
 
         // initialize the partitions and store the mappings
-        typedef hpx::components::distributing_factory distributing_factory;
-        typedef distributing_factory::async_create_result_type
-            async_create_result_type;
-
         void fill_partitions(std::string const& datafilename,
-            async_create_result_type future);
+            hpx::future<std::vector<partition> > && partitions);
 
     private:
-        std::vector<hpx::naming::id_type> partitions_;
+        std::vector<partition> partitions_;
         std::uint64_t num_elements_;
         double minval_, delta_;
     };

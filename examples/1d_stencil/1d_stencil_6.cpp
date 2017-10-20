@@ -275,11 +275,11 @@ struct stepper
         partition const& right)
     {
         using hpx::dataflow;
-        using hpx::util::unwrapped;
+        using hpx::util::unwrapping;
 
         return dataflow(
             hpx::launch::async,
-            unwrapped(
+            unwrapping(
                 [left, middle, right](partition_data const& l, partition_data const& m,
                     partition_data const& r)
                 {

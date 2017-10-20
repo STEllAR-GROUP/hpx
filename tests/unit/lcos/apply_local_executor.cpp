@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,15 +10,14 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::int32_t> accumulator;
+std::atomic<std::int32_t> accumulator;
 hpx::lcos::local::condition_variable_any result_cv;
 
 void increment(std::int32_t i)
@@ -131,12 +130,12 @@ void test_apply_with_executor(Executor& exec)
 int hpx_main()
 {
     {
-        hpx::parallel::sequential_executor exec;
+        hpx::parallel::execution::sequenced_executor exec;
         test_apply_with_executor(exec);
     }
 
     {
-        hpx::parallel::parallel_executor exec;
+        hpx::parallel::execution::parallel_executor exec;
         test_apply_with_executor(exec);
     }
 

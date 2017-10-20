@@ -9,8 +9,7 @@
 
 #include <hpx/util/transform_iterator.hpp>
 
-#include <boost/range/functions.hpp>
-
+#include <iterator>
 #include <numeric>
 #include <sstream>
 #include <string>
@@ -125,7 +124,7 @@ namespace test
 void test_stencil3_iterator()
 {
     std::vector<int> values(10);
-    std::iota(boost::begin(values), boost::end(values), 0);
+    std::iota(std::begin(values), std::end(values), 0);
 
     auto r = test::make_stencil3_range(values.begin()+1, values.end()-1);
 
@@ -154,7 +153,7 @@ namespace test
         {
             typedef typename std::iterator_traits<Iterator>::reference
                 element_type;
-            typedef typename hpx::util::result_of<F(element_type)>::type
+            typedef typename hpx::util::invoke_result<F, element_type>::type
                 value_type;
 
             typedef hpx::util::tuple<value_type, element_type, value_type> type;
@@ -190,7 +189,7 @@ namespace test
 void test_stencil3_iterator_custom()
 {
     std::vector<int> values(10);
-    std::iota(boost::begin(values), boost::end(values), 0);
+    std::iota(std::begin(values), std::end(values), 0);
 
     auto t = test::make_custom_stencil_transformer([](int i) -> int { return 2*i; });
     auto r = test::make_stencil3_range(values.begin()+1, values.end()-1, t);

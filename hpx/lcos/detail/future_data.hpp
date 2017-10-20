@@ -12,12 +12,14 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/util/annotated_function.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
@@ -27,22 +29,11 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
-#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
-#include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/util/thread_description.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#else
-#include <hpx/util/itt_notify.hpp>
-#endif
-#endif
-
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <chrono>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -170,7 +161,7 @@ namespace detail
     struct future_data_storage
     {
         typedef typename future_data_result<R>::type value_type;
-        typedef boost::exception_ptr error_type;
+        typedef std::exception_ptr error_type;
 
         // determine the required alignment, define aligned storage of proper
         // size
@@ -188,12 +179,25 @@ namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F1, typename F2>
-    class compose_cb_impl
+    struct handle_continuation_recursion_count
     {
-        HPX_MOVABLE_ONLY(compose_cb_impl);
+        handle_continuation_recursion_count()
+          : count_(threads::get_continuation_recursion_count())
+        {
+            ++count_;
+        }
+        ~handle_continuation_recursion_count()
+        {
+            --count_;
+        }
 
-    public:
+        std::size_t& count_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F1, typename F2>
+    struct compose_cb_impl
+    {
         template <typename A1, typename A2>
         compose_cb_impl(A1 && f1, A2 && f2)
           : f1_(std::forward<A1>(f1))
@@ -227,11 +231,18 @@ namespace detail
                 return;
             }
 
-            f1_();
-            f2_();
+            {
+                hpx::util::annotate_function annotate(f1_);
+                (void)annotate;
+                f1_();
+            }
+            {
+                hpx::util::annotate_function annotate(f2_);
+                (void)annotate;
+                f2_();
+            }
         }
 
-    private:
         F1 f1_;
         F2 f2_;
     };
@@ -251,22 +262,6 @@ namespace detail
         > result_type;
         return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct handle_continuation_recursion_count
-    {
-        handle_continuation_recursion_count()
-          : count_(threads::get_continuation_recursion_count())
-        {
-            ++count_;
-        }
-        ~handle_continuation_recursion_count()
-        {
-            --count_;
-        }
-
-        std::size_t& count_;
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool run_on_completed_on_new_thread(
@@ -291,7 +286,7 @@ namespace detail
         typedef util::unused_type result_type;
         typedef future_data_refcnt_base::init_no_addref init_no_addref;
 
-        virtual ~future_data() HPX_NOEXCEPT {}
+        virtual ~future_data() noexcept {}
         virtual void execute_deferred(error_code& = throws) = 0;
         virtual bool cancelable() const = 0;
         virtual void cancel() = 0;
@@ -299,6 +294,7 @@ namespace detail
         virtual void wait(error_code& = throws) = 0;
         virtual future_status wait_until(util::steady_clock::time_point const&,
             error_code& = throws) = 0;
+        virtual std::exception_ptr get_exception_ptr() const = 0;
 
         enum state
         {
@@ -370,24 +366,24 @@ namespace detail
             state_ = value;
         }
 
-        future_data(boost::exception_ptr const& e, init_no_addref no_addref)
+        future_data(std::exception_ptr const& e, init_no_addref no_addref)
           : future_data<traits::detail::future_data_void>(no_addref)
         {
-            boost::exception_ptr* exception_ptr =
-                reinterpret_cast<boost::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) boost::exception_ptr(e);
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(e);
             state_ = exception;
         }
-        future_data(boost::exception_ptr && e, init_no_addref no_addref)
+        future_data(std::exception_ptr && e, init_no_addref no_addref)
           : future_data<traits::detail::future_data_void>(no_addref)
         {
-            boost::exception_ptr* exception_ptr =
-                reinterpret_cast<boost::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) boost::exception_ptr(std::move(e));
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(std::move(e));
             state_ = exception;
         }
 
-        virtual ~future_data() HPX_NOEXCEPT
+        virtual ~future_data() noexcept
         {
             reset();
         }
@@ -448,12 +444,12 @@ namespace detail
             // and promise::set_exception).
             if (state_ == exception)
             {
-                boost::exception_ptr* exception_ptr =
-                    reinterpret_cast<boost::exception_ptr*>(&storage_);
+                std::exception_ptr* exception_ptr =
+                    reinterpret_cast<std::exception_ptr*>(&storage_);
                 // an error has been reported in the meantime, throw or set
                 // the error code
                 if (&ec == &throws) {
-                    boost::rethrow_exception(*exception_ptr);
+                    std::rethrow_exception(*exception_ptr);
                     // never reached
                 }
                 else {
@@ -490,12 +486,12 @@ namespace detail
             // and promise::set_exception).
             if (state_ == exception)
             {
-                boost::exception_ptr* exception_ptr =
-                    reinterpret_cast<boost::exception_ptr*>(&storage_);
+                std::exception_ptr* exception_ptr =
+                    reinterpret_cast<std::exception_ptr*>(&storage_);
                 // an error has been reported in the meantime, throw or set
                 // the error code
                 if (&ec == &throws) {
-                    boost::rethrow_exception(*exception_ptr);
+                    std::rethrow_exception(*exception_ptr);
                     // never reached
                 }
                 else {
@@ -510,30 +506,14 @@ namespace detail
 
         // deferred execution of a given continuation
         bool run_on_completed(completed_callback_type && on_completed,
-            boost::exception_ptr& ptr)
+            std::exception_ptr& ptr)
         {
             try {
-#if HPX_HAVE_ITTNOTIFY != 0
-                util::itt::string_handle const& sh =
-                    traits::get_function_annotation_itt<
-                            completed_callback_type
-                        >::call(on_completed);
-                util::itt::task task(hpx::get_thread_itt_domain(), sh);
-#elif defined(HPX_HAVE_APEX)
-                char const* name = traits::get_function_annotation<
-                        completed_callback_type
-                    >::call(on_completed);
-                if (name != nullptr)
-                {
-                    util::apex_wrapper apex_profiler(name, (uint64_t)this);
-                    on_completed();
-                }
-                else
-#endif
+                hpx::util::annotate_function annotate(on_completed);
                 on_completed();
             }
             catch (...) {
-                ptr = boost::current_exception();
+                ptr = std::current_exception();
                 return false;
             }
             return true;
@@ -557,7 +537,7 @@ namespace detail
             if (!recurse_asynchronously)
             {
                 // directly execute continuation on this thread
-                boost::exception_ptr ptr;
+                std::exception_ptr ptr;
                 if (!run_on_completed(std::move(on_completed), ptr))
                 {
                     error_code ec(lightweight);
@@ -570,7 +550,7 @@ namespace detail
                 boost::intrusive_ptr<future_data> this_(this);
 
                 error_code ec(lightweight);
-                boost::exception_ptr ptr;
+                std::exception_ptr ptr;
                 if (!run_on_completed_on_new_thread(
                         util::deferred_call(&future_data::run_on_completed,
                             std::move(this_), std::move(on_completed),
@@ -585,7 +565,7 @@ namespace detail
 
                     // re-throw exception in this context
                     HPX_ASSERT(ptr);        // exception should have been set
-                    boost::rethrow_exception(ptr);
+                    std::rethrow_exception(ptr);
                 }
             }
         }
@@ -653,9 +633,9 @@ namespace detail
             completed_callback_type on_completed = std::move(this->on_completed_);
 
             // set the data
-            boost::exception_ptr* exception_ptr =
-                reinterpret_cast<boost::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) boost::exception_ptr(
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(
                 std::forward<Target>(data));
             state_ = exception;
 
@@ -700,7 +680,7 @@ namespace detail
             }
             catch (...) {
                 // store the error instead
-                return set_exception(boost::current_exception());
+                return set_exception(std::current_exception());
             }
         }
 
@@ -712,7 +692,7 @@ namespace detail
             }
             catch (...) {
                 // store the error code
-                set_exception(boost::current_exception());
+                set_exception(std::current_exception());
             }
         }
 
@@ -734,8 +714,8 @@ namespace detail
             }
             case exception:
             {
-                boost::exception_ptr* exception_ptr =
-                    reinterpret_cast<boost::exception_ptr*>(&storage_);
+                std::exception_ptr* exception_ptr =
+                    reinterpret_cast<std::exception_ptr*>(&storage_);
                 exception_ptr->~exception_ptr();
                 break;
             }
@@ -814,12 +794,63 @@ namespace detail
             return future_status::ready; //-V110
         }
 
+        std::exception_ptr get_exception_ptr() const
+        {
+            HPX_ASSERT(state_ == exception);
+            return *reinterpret_cast<std::exception_ptr const*>(&storage_);
+        }
+
     protected:
         completed_callback_type on_completed_;
 
     private:
         local::detail::condition_variable cond_;    // threads waiting in read
         typename future_data_storage<Result>::type storage_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result, typename Allocator>
+    struct future_data_allocator : future_data<Result>
+    {
+        typedef typename future_data<Result>::init_no_addref init_no_addref;
+        typedef typename
+                std::allocator_traits<Allocator>::template
+                    rebind_alloc<future_data_allocator>
+            other_allocator;
+
+        future_data_allocator(other_allocator const& alloc)
+          : future_data<Result>(), alloc_(alloc)
+        {}
+        future_data_allocator(init_no_addref no_addref,
+                other_allocator const& alloc)
+          : future_data<Result>(no_addref), alloc_(alloc)
+        {}
+        template <typename Target>
+        future_data_allocator(Target && data, init_no_addref no_addref,
+                other_allocator const& alloc)
+          : future_data<Result>(std::move(data), no_addref), alloc_(alloc)
+        {}
+        future_data_allocator(std::exception_ptr const& e,
+                init_no_addref no_addref, other_allocator const& alloc)
+          : future_data<Result>(e, no_addref), alloc_(alloc)
+        {}
+        future_data_allocator(std::exception_ptr && e,
+                init_no_addref no_addref, other_allocator const& alloc)
+          : future_data<Result>(std::move(e), no_addref), alloc_(alloc)
+        {}
+
+    private:
+        void destroy()
+        {
+            typedef std::allocator_traits<other_allocator> traits;
+
+            other_allocator alloc(alloc_);
+            traits::destroy(alloc, this);
+            traits::deallocate(alloc, this, 1);
+        }
+
+    private:
+        other_allocator alloc_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -938,12 +969,6 @@ namespace detail
             return started_;
         }
 
-        bool started_test_and_set()
-        {
-            std::lock_guard<mutex_type> l(this->mtx_);
-            return started_test_and_set_locked(l);
-        }
-
         template <typename Lock>
         bool started_test_and_set_locked(Lock& l)
         {
@@ -956,6 +981,12 @@ namespace detail
         }
 
     protected:
+        bool started_test_and_set()
+        {
+            std::lock_guard<mutex_type> l(this->mtx_);
+            return started_test_and_set_locked(l);
+        }
+
         void check_started()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
@@ -1001,7 +1032,7 @@ namespace detail
         }
 
         void set_exception(
-            boost::exception_ptr const& e, error_code& ec = throws)
+            std::exception_ptr const& e, error_code& ec = throws)
         {
             this->future_data<Result>::set_exception(e, ec);
         }
@@ -1115,7 +1146,7 @@ namespace detail
             }
             catch (...) {
                 this->started_ = true;
-                this->set_exception(boost::current_exception());
+                this->set_exception(std::current_exception());
                 throw;
             }
         }
@@ -1124,5 +1155,42 @@ namespace detail
         threads::thread_id_type id_;
     };
 }}}
+
+namespace hpx { namespace traits
+{
+    namespace detail
+    {
+        template <typename R, typename Allocator>
+        struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
+        {
+            typedef lcos::detail::future_data_allocator<R, Allocator> type;
+        };
+    }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F1, typename F2>
+    struct get_function_annotation<lcos::detail::compose_cb_impl<F1, F2> >
+    {
+        static char const*
+            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
+        {
+            return get_function_annotation<F1>::call(f.f1_);
+        }
+    };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename F1, typename F2>
+    struct get_function_annotation_itt<lcos::detail::compose_cb_impl<F1, F2> >
+    {
+        static util::itt::string_handle
+            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
+        {
+            return get_function_annotation_itt<F1>::call(f.f1_);
+        }
+    };
+#endif
+#endif
+}}
 
 #endif

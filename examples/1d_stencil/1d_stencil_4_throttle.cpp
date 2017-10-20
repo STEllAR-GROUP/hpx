@@ -16,6 +16,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/format.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
 #include <boost/range/irange.hpp>
@@ -24,8 +25,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -49,8 +48,7 @@ hpx::naming::id_type counter_id;
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     std::uint32_t const prefix = hpx::get_locality_id();
-    boost::format active_threads(counter_name);
-    id_type id = get_counter(boost::str(active_threads % prefix));
+    id_type id = get_counter(hpx::util::format(counter_name, prefix));
     return id;
 }
 
@@ -149,8 +147,6 @@ public:
 private:
     std::unique_ptr<double[]> data_;
     std::size_t size_;
-
-    HPX_MOVABLE_ONLY(partition_data);
 };
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
@@ -204,7 +200,7 @@ struct stepper
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
     {
         using hpx::dataflow;
-        using hpx::util::unwrapped;
+        using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
@@ -215,15 +211,14 @@ struct stepper
         std::size_t b = 0;
         auto range = boost::irange(b, np);
         using hpx::parallel::execution::par;
-        hpx::parallel::for_each(par,
-            boost::begin(range), boost::end(range),
+        hpx::parallel::for_each(par, std::begin(range), std::end(range),
             [&U, nx](std::size_t i)
             {
                 U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
             }
         );
 
-        auto Op = unwrapped(&stepper::heat_part);
+        auto Op = unwrapping(&stepper::heat_part);
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)

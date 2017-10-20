@@ -39,14 +39,14 @@ void for_each_executors_test()
     using namespace hpx::parallel;
 
     {
-        parallel_executor exec;
+        execution::parallel_executor exec;
 
         test_executors(execution::par.on(exec));
         test_executors_async(execution::par(execution::task).on(exec));
     }
 
     {
-        sequential_executor exec;
+        execution::sequenced_executor exec;
 
         test_executors(execution::seq.on(exec));
         test_executors_async(execution::seq(execution::task).on(exec));

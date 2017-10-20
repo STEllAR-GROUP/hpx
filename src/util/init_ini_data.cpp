@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2014 Hartmut Kaiser
+//  Copyright (c) 2005-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,20 +7,20 @@
 #include <hpx/config.hpp>
 #include <hpx/config/defaults.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
-#include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/plugin.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -30,6 +30,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <random>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -94,14 +95,19 @@ namespace hpx { namespace util
         tokenizer_type::iterator end_suffixes = tok_suffixes.end();
 
         bool result = false;
-        for (tokenizer_type::iterator it = tok_paths.begin (); it != end_paths; ++it) {
-            std::string path = *it;
-            for (tokenizer_type::iterator jt = tok_suffixes.begin ();
-                jt != end_suffixes; ++jt) {
+        for (tokenizer_type::iterator it = tok_paths.begin(); it != end_paths;
+             ++it)
+        {
+            for (tokenizer_type::iterator jt = tok_suffixes.begin();
+                 jt != end_suffixes; ++jt)
+            {
+                std::string path = *it;
                 path += *jt;
-                bool result2 = handle_ini_file (ini, path + "/hpx.ini");
-                if (result2) {
-                    LBT_(info) << "loaded configuration: " << path << "/hpx.ini";
+                bool result2 = handle_ini_file(ini, path + "/hpx.ini");
+                if (result2)
+                {
+                    LBT_(info)
+                        << "loaded configuration: " << path << "/hpx.ini";
                 }
                 result = result2 || result;
             }
@@ -451,8 +457,14 @@ namespace hpx { namespace util
             return plugin_registries;
 
         // make sure each node loads libraries in a different order
+#if defined(HPX_HAVE_CXX11_STD_SHUFFLE)
+        std::random_device random_device;
+        std::mt19937 generator(random_device());
+        std::shuffle(libdata.begin(), libdata.end(), std::move(generator));
+#else
         std::srand(static_cast<unsigned>(std::time(nullptr)));
         std::random_shuffle(libdata.begin(), libdata.end());
+#endif
 
         typedef std::pair<fs::path, std::string> libdata_type;
         for (libdata_type const& p : libdata)

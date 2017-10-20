@@ -16,11 +16,10 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/unlock_guard.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -42,10 +41,13 @@ namespace hpx { namespace util
     query_counters::query_counters(std::vector<std::string> const& names,
             std::vector<std::string> const& reset_names,
             std::int64_t interval, std::string const& dest, std::string const& form,
-            std::vector<std::string> const& shortnames, bool csv_header)
+            std::vector<std::string> const& shortnames, bool csv_header,
+            bool print_counters_locally)
       : names_(names), reset_names_(reset_names),
+        counters_(print_counters_locally),
         destination_(dest), format_(form),
         counter_shortnames_(shortnames), csv_header_(csv_header),
+        print_counters_locally_(print_counters_locally),
         timer_(util::bind(&query_counters::evaluate, this_()),
             util::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
@@ -91,6 +93,9 @@ namespace hpx { namespace util
 
     void query_counters::start()
     {
+        if (print_counters_locally_ && destination_ != "cout")
+            destination_ += "." + std::to_string(hpx::get_locality_id());
+
         find_counters();
 
         counters_.start(launch::sync);
@@ -102,6 +107,7 @@ namespace hpx { namespace util
     void query_counters::stop_evaluating_counters()
     {
         timer_.stop();
+        counters_.stop(launch::sync);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -143,7 +149,7 @@ namespace hpx { namespace util
             *out  << "," << value.count_ << ",";
 
             double elapsed = static_cast<double>(value.time_) * 1e-9;
-            *out << boost::str(boost::format("%.6f") % elapsed)
+            *out << hpx::util::format("%.6f", elapsed)
                 << ",[s]," << val;
             if (!uom.empty())
                 *out << ",[" << uom << "]";
@@ -169,7 +175,7 @@ namespace hpx { namespace util
         *out << "," << value.count_ << ",";
 
         double elapsed = static_cast<double>(value.time_) * 1e-9;
-        *out << boost::str(boost::format("%.6f") % elapsed) << ",[s],";
+        *out << hpx::util::format("%.6f", elapsed) << ",[s],";
 
         bool first = true;
         for (std::int64_t val : value.values_)
@@ -405,7 +411,7 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ != performance_counters::counter_raw)
+            if (infos[i].type_ == performance_counters::counter_histogram)
                 continue;
             indicies.push_back(i);
         }

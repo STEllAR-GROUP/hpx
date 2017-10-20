@@ -9,6 +9,7 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/detail/non_default_constructible.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -16,12 +17,13 @@
 #include <boost/array.hpp>
 #include <boost/type_traits/integral_constant.hpp>
 
+#include <array>
 #include <algorithm>
 #include <cstddef> // for size_t
 #include <type_traits>
 #include <utility>
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4520) // multiple default constructors specified
 #endif
@@ -40,22 +42,22 @@ namespace hpx { namespace util
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type&
-    get(Tuple& t) HPX_NOEXCEPT;
+    get(Tuple& t) noexcept;
 
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type const&
-    get(Tuple const& t) HPX_NOEXCEPT;
+    get(Tuple const& t) noexcept;
 
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type&&
-    get(Tuple&& t) HPX_NOEXCEPT;
+    get(Tuple&& t) noexcept;
 
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type const&&
-    get(Tuple const&& t) HPX_NOEXCEPT;
+    get(Tuple const&& t) noexcept;
 
     namespace detail
     {
@@ -64,6 +66,10 @@ namespace hpx { namespace util
         struct tuple_member //-V690
         {
         public:
+            template <typename U = T,
+                typename EnableDefault = typename std::enable_if<
+                    std::is_constructible<U>::value
+                >::type>
             HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member()
               : _value()
             {}
@@ -76,8 +82,7 @@ namespace hpx { namespace util
               : _value(std::forward<U>(value))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
@@ -92,8 +97,8 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_HOST_DEVICE T& value() HPX_NOEXCEPT { return _value; }
-            HPX_HOST_DEVICE T const& value() const HPX_NOEXCEPT { return _value; }
+            HPX_HOST_DEVICE T& value() noexcept { return _value; }
+            HPX_HOST_DEVICE T const& value() const noexcept { return _value; }
 
         private:
             T _value;
@@ -122,8 +127,7 @@ namespace hpx { namespace util
               : T(std::forward<U>(value))
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
@@ -138,8 +142,8 @@ namespace hpx { namespace util
             {}
 #endif
 
-            HPX_HOST_DEVICE T& value() HPX_NOEXCEPT { return *this; }
-            HPX_HOST_DEVICE T const& value() const HPX_NOEXCEPT { return *this; }
+            HPX_HOST_DEVICE T& value() noexcept { return *this; }
+            HPX_HOST_DEVICE T const& value() const noexcept { return *this; }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -204,6 +208,13 @@ namespace hpx { namespace util
           : tuple_member<Is, Ts>...
         {
             // 20.4.2.1, tuple construction
+            template <typename Dependent = void,
+                typename Enable = typename std::enable_if<
+                    hpx::util::detail::all_of<
+                        std::is_constructible<Ts>...
+                    >::value,
+                    Dependent
+                >::type>
             HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl()
               : tuple_member<Is, Ts>()...
             {}
@@ -216,8 +227,7 @@ namespace hpx { namespace util
               : tuple_member<Is, Ts>(std::forward<Us>(vs))...
             {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
             tuple_impl(tuple_impl const&) = default;
             tuple_impl(tuple_impl&&) = default;
 #else
@@ -279,7 +289,7 @@ namespace hpx { namespace util
 
             template <std::size_t I>
             HPX_HOST_DEVICE typename detail::at_index<I, Ts...>::type&
-            get() HPX_NOEXCEPT
+            get() noexcept
             {
                 return static_cast<tuple_member<
                         I, typename detail::at_index<I, Ts...>::type
@@ -288,7 +298,7 @@ namespace hpx { namespace util
 
             template <std::size_t I>
             HPX_HOST_DEVICE typename detail::at_index<I, Ts...>::type const&
-            get() const HPX_NOEXCEPT
+            get() const noexcept
             {
                 return static_cast<tuple_member<
                         I, typename detail::at_index<I, Ts...>::type
@@ -300,6 +310,28 @@ namespace hpx { namespace util
             {
                 int const _sequencer[] = {
                     ((ar & this->get<Is>()), 0)...
+                };
+                (void)_sequencer;
+            }
+
+            template <typename Archive>
+            friend void load_construct_data(
+                Archive& ar, tuple_impl* t, unsigned int const version)
+            {
+                using serialization::detail::load_construct_data;
+                int const _sequencer[] = {
+                    (load_construct_data(ar, &t->get<Is>(), version), 0)...
+                };
+                (void)_sequencer;
+            }
+
+            template <typename Archive>
+            friend void save_construct_data(
+                Archive& ar, tuple_impl const* t, unsigned int const version)
+            {
+                using serialization::detail::save_construct_data;
+                int const _sequencer[] = {
+                    (save_construct_data(ar, &t->get<Is>(), version), 0)...
                 };
                 (void)_sequencer;
             }
@@ -342,14 +374,14 @@ namespace hpx { namespace util
 
         // tuple& operator=(const tuple& u);
         // Assigns each element of u to the corresponding element of *this.
-        HPX_HOST_DEVICE tuple& operator=(tuple const& /*other*/) HPX_NOEXCEPT
+        HPX_HOST_DEVICE tuple& operator=(tuple const& /*other*/) noexcept
         {
             return *this;
         }
 
         // tuple& operator=(tuple&& u) noexcept(see below );
         // For all i, assigns std::forward<Ti>(get<i>(u)) to get<i>(*this).
-        HPX_HOST_DEVICE tuple& operator=(tuple&& /*other*/) HPX_NOEXCEPT
+        HPX_HOST_DEVICE tuple& operator=(tuple&& /*other*/) noexcept
         {
             return *this;
         }
@@ -359,7 +391,7 @@ namespace hpx { namespace util
         // void swap(tuple& rhs) noexcept(see below);
         // Calls swap for each element in *this and its corresponding element
         // in rhs.
-        HPX_HOST_DEVICE void swap(tuple& /*other*/) HPX_NOEXCEPT
+        HPX_HOST_DEVICE void swap(tuple& /*other*/) noexcept
         {}
     };
 
@@ -376,6 +408,11 @@ namespace hpx { namespace util
 
         // constexpr tuple();
         // Value initializes each element.
+        template <typename Dependent = void,
+            typename Enable = typename std::enable_if<
+               hpx::util::detail::all_of<std::is_constructible<Ts>...>::value,
+               Dependent
+            >::type>
         HPX_CONSTEXPR HPX_HOST_DEVICE tuple()
           : _impl()
         {}
@@ -411,8 +448,7 @@ namespace hpx { namespace util
           : _impl(std::forward<U>(v), std::forward<Us>(vs)...)
         {}
 
-#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
@@ -536,6 +572,11 @@ namespace hpx { namespace util
       : boost::integral_constant<std::size_t, Size>
     {};
 
+    template <typename Type, std::size_t Size>
+    struct tuple_size<std::array<Type, Size> >
+      : boost::integral_constant<std::size_t, Size>
+    {};
+
     // template <size_t I, class Tuple>
     // class tuple_element
     template <std::size_t I, typename T>
@@ -563,13 +604,13 @@ namespace hpx { namespace util
         typedef typename detail::at_index<I, Ts...>::type type;
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&
-        get(tuple<Ts...>& tuple) HPX_NOEXCEPT
+        get(tuple<Ts...>& tuple) noexcept
         {
             return tuple._impl.template get<I>();
         }
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&
-        get(tuple<Ts...> const& tuple) HPX_NOEXCEPT
+        get(tuple<Ts...> const& tuple) noexcept
         {
             return tuple._impl.template get<I>();
         }
@@ -581,13 +622,13 @@ namespace hpx { namespace util
         typedef T0 type;
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&
-        get(std::pair<T0, T1>& tuple) HPX_NOEXCEPT
+        get(std::pair<T0, T1>& tuple) noexcept
         {
             return tuple.first;
         }
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&
-        get(std::pair<T0, T1> const& tuple) HPX_NOEXCEPT
+        get(std::pair<T0, T1> const& tuple) noexcept
         {
             return tuple.first;
         }
@@ -599,13 +640,13 @@ namespace hpx { namespace util
         typedef T1 type;
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&
-        get(std::pair<T0, T1>& tuple) HPX_NOEXCEPT
+        get(std::pair<T0, T1>& tuple) noexcept
         {
             return tuple.second;
         }
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&
-        get(std::pair<T0, T1> const& tuple) HPX_NOEXCEPT
+        get(std::pair<T0, T1> const& tuple) noexcept
         {
             return tuple.second;
         }
@@ -617,13 +658,31 @@ namespace hpx { namespace util
         typedef Type type;
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&
-        get(boost::array<Type, Size>& tuple) HPX_NOEXCEPT
+        get(boost::array<Type, Size>& tuple) noexcept
         {
             return tuple[I];
         }
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&
-        get(boost::array<Type, Size> const& tuple) HPX_NOEXCEPT
+        get(boost::array<Type, Size> const& tuple) noexcept
+        {
+            return tuple[I];
+        }
+    };
+
+    template <std::size_t I, typename Type, std::size_t Size>
+    struct tuple_element<I, std::array<Type, Size> >
+    {
+        typedef Type type;
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&
+        get(std::array<Type, Size>& tuple) noexcept
+        {
+            return tuple[I];
+        }
+
+        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&
+        get(std::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
         }
@@ -637,7 +696,7 @@ namespace hpx { namespace util
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type&
-    get(Tuple& t) HPX_NOEXCEPT
+    get(Tuple& t) noexcept
     {
         return tuple_element<I, Tuple>::get(t);
     }
@@ -648,7 +707,7 @@ namespace hpx { namespace util
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type const&
-    get(Tuple const& t) HPX_NOEXCEPT
+    get(Tuple const& t) noexcept
     {
         return tuple_element<I, Tuple>::get(t);
     }
@@ -659,7 +718,7 @@ namespace hpx { namespace util
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type&&
-    get(Tuple&& t) HPX_NOEXCEPT
+    get(Tuple&& t) noexcept
     {
         return std::forward<
             typename tuple_element<I, Tuple>::type>(util::get<I>(t));
@@ -671,7 +730,7 @@ namespace hpx { namespace util
     template <std::size_t I, typename Tuple>
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
     typename tuple_element<I, Tuple>::type const&&
-    get(Tuple const&& t) HPX_NOEXCEPT
+    get(Tuple const&& t) noexcept
     {
         return std::forward<
             typename tuple_element<I, Tuple>::type const>(util::get<I>(t));
@@ -700,7 +759,7 @@ namespace hpx { namespace util
     template <typename ...Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     tuple<Ts&&...>
-    forward_as_tuple(Ts&&... vs) HPX_NOEXCEPT
+    forward_as_tuple(Ts&&... vs) noexcept
     {
         return tuple<Ts&&...>(std::forward<Ts>(vs)...);
     }
@@ -710,7 +769,7 @@ namespace hpx { namespace util
     template <typename ...Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     tuple<Ts&...>
-    tie(Ts&... vs) HPX_NOEXCEPT
+    tie(Ts&... vs) noexcept
     {
         return tuple<Ts&...>(vs...);
     }
@@ -719,13 +778,14 @@ namespace hpx { namespace util
     //constexpr tuple<Ctypes ...> tuple_cat(Tuples&&...);
     namespace detail
     {
+        /// Deduces to the overall size of all given tuples
         template <std::size_t Size, typename Tuples>
         struct tuple_cat_size_impl;
 
         template <std::size_t Size>
-        struct tuple_cat_size_impl<Size, detail::pack<> >
+        struct tuple_cat_size_impl<Size, detail::pack<>>
+          : std::integral_constant<std::size_t, Size>
         {
-            static const std::size_t value = Size;
         };
 
         template <std::size_t Size, typename Head, typename ...Tail>
@@ -753,20 +813,12 @@ namespace hpx { namespace util
             >::type
         > : tuple_element<I, Head>
         {
-            typedef tuple_element<I, Head> base_type;
-
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type&
-            get(Head& head, Tail& ...tail) HPX_NOEXCEPT
+            template <typename THead, typename... TTail>
+            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
+                THead&& head, TTail&&... /*tail*/) noexcept
+                -> decltype(hpx::util::get<I>(std::forward<THead>(head)))
             {
-                return base_type::get(head);
-            }
-
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type const&
-            get(Head const& head, Tail& ...tail) HPX_NOEXCEPT
-            {
-                return base_type::get(head);
+                return hpx::util::get<I>(std::forward<THead>(head));
             }
         };
 
@@ -786,18 +838,12 @@ namespace hpx { namespace util
               , detail::pack<Tail...>
             > base_type;
 
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type&
-            get(Head& head, Tail& ...tail) HPX_NOEXCEPT
+            template <typename THead, typename... TTail>
+            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
+                THead&& /*head*/, TTail&&... tail) noexcept
+                -> decltype(base_type::get(std::forward<TTail>(tail)...))
             {
-                return base_type::get(tail...);
-            }
-
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename base_type::type const&
-            get(Head const& head, Tail& ...tail) HPX_NOEXCEPT
-            {
-                return base_type::get(tail...);
+                return base_type::get(std::forward<TTail>(tail)...);
             }
         };
 
@@ -805,39 +851,44 @@ namespace hpx { namespace util
         template <typename Indices, typename Tuples>
         struct tuple_cat_result_impl;
 
-        template <std::size_t ...Is, typename ...Tuples>
-        struct tuple_cat_result_impl<
-            detail::pack_c<std::size_t, Is...>, detail::pack<Tuples...>
-        >
+        template <std::size_t... Is, typename... Tuples>
+        struct tuple_cat_result_impl<pack_c<std::size_t, Is...>,
+            pack<Tuples...>>
         {
-            typedef tuple<
-                typename tuple_cat_element<Is, detail::pack<Tuples...> >::type...
-            > type;
-
-            template <typename ...Tuples_>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-            type make(Tuples_&&... tuples)
-            {
-                return type(tuple_cat_element<Is, detail::pack<Tuples...> >::get(
-                    std::forward<Tuples_>(tuples)...)...);
-            }
+            using type =
+                tuple<typename tuple_cat_element<Is, pack<Tuples...>>::type...>;
         };
 
-        template <typename ...Tuples>
-        struct tuple_cat_result
-          : tuple_cat_result_impl<
-                typename make_index_pack<tuple_cat_size<Tuples...>::value>::type
-              , detail::pack<Tuples...>
-            >
-        {};
+        template <typename Indices, typename Tuples>
+        using tuple_cat_result_of_t =
+            typename tuple_cat_result_impl<Indices, Tuples>::type;
+
+        template <std::size_t... Is, typename... Tuples, typename... Tuples_>
+        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat_impl(
+            pack_c<std::size_t, Is...> is_pack, pack<Tuples...> tuple_pack,
+            Tuples_&&... tuples)
+            -> tuple_cat_result_of_t<decltype(is_pack), decltype(tuple_pack)>
+        {
+            return tuple_cat_result_of_t<decltype(is_pack),
+                decltype(tuple_pack)>{
+                tuple_cat_element<Is, pack<Tuples...>>::get(
+                    std::forward<Tuples_>(tuples)...)...};
+        }
     }
 
-    template <typename ...Tuples>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
-    typename detail::tuple_cat_result<Tuples...>::type
-    tuple_cat(Tuples&&... tuples)
+    template <typename... Tuples>
+    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(
+        Tuples&&... tuples)
+        -> decltype(detail::tuple_cat_impl(
+            typename detail::make_index_pack<detail::tuple_cat_size<
+                typename std::decay<Tuples>::type...>::value>::type{},
+            detail::pack<typename std::decay<Tuples>::type...>{},
+            std::forward<Tuples>(tuples)...))
     {
-        return detail::tuple_cat_result<Tuples...>::make(
+        return detail::tuple_cat_impl(
+            typename detail::make_index_pack<detail::tuple_cat_size<
+                typename std::decay<Tuples>::type...>::value>::type{},
+            detail::pack<typename std::decay<Tuples>::type...>{},
             std::forward<Tuples>(tuples)...);
     }
 
@@ -981,7 +1032,7 @@ namespace hpx { namespace util
     template <typename ...Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     void swap(tuple<Ts...>& x, tuple<Ts...>& y)
-        HPX_NOEXCEPT_IF(HPX_NOEXCEPT_EXPR((x.swap(y))))
+        noexcept(noexcept(x.swap(y)))
     {
         x.swap(y);
     }
@@ -998,7 +1049,7 @@ namespace hpx { namespace util
     template <typename ...Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE
     void swap(tuple<Ts&...> && x, tuple<Ts&...> && y)
-        HPX_NOEXCEPT_IF(HPX_NOEXCEPT_EXPR((x.swap(y))))
+        noexcept(noexcept(x.swap(y)))
     {
         x.swap(y);
     }
@@ -1041,9 +1092,29 @@ namespace hpx { namespace serialization
       , unsigned int const version = 0
     )
     {}
+
+    template <typename Archive, typename ...Ts>
+    HPX_FORCEINLINE
+    void load_construct_data(
+        Archive& ar
+      , ::hpx::util::tuple<Ts...>* t
+      , unsigned int const version = 0)
+    {
+        load_construct_data(ar, &(t->_impl), version);
+    }
+
+    template <typename Archive, typename ...Ts>
+    HPX_FORCEINLINE
+    void save_construct_data(
+        Archive& ar
+      , ::hpx::util::tuple<Ts...> const* t
+      , unsigned int const version = 0)
+    {
+        save_construct_data(ar, &(t->_impl), version);
+    }
 }}
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 

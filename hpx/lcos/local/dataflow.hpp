@@ -15,7 +15,7 @@
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/v1/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -34,39 +34,40 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Policy, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename dataflow_frame<
-            Policy
+            typename std::decay<Policy>::type
           , typename std::decay<F>::type
           , util::tuple<
                 typename traits::acquire_future<Ts>::type...
             >
         >::type
-        call(Policy policy, F && f, Ts &&... ts)
+        call(Policy && policy, F && f, Ts &&... ts)
         {
-            static_assert(traits::is_launch_policy<Policy>::value,
+            static_assert(
+                traits::is_launch_policy<
+                    typename std::decay<Policy>::type
+                >::value,
                 "Policy must be a valid launch policy");
 
             typedef
                 dataflow_frame<
-                    Policy
+                    typename std::decay<Policy>::type
                   , typename std::decay<F>::type
                   , util::tuple<
                         typename traits::acquire_future<Ts>::type...
                     >
                 >
                 frame_type;
-            typedef typename frame_type::init_no_addref init_no_addref;
 
-            boost::intrusive_ptr<frame_type> p(new frame_type(
-                    policy
-                  , std::forward<F>(f)
-                  , util::forward_as_tuple(
-                        traits::acquire_future_disp()(
-                            std::forward<Ts>(ts)
-                        )...
-                    )
-                  , init_no_addref()
-                ), false);
-            p->do_await();
+            // Create the data which is used to construct the dataflow_frame
+            auto data = frame_type::construct_from(
+                std::forward<Policy>(policy), std::forward<F>(f));
+
+            // Construct the dataflow_frame and traverse
+            // the arguments asynchronously
+            boost::intrusive_ptr<frame_type> p = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{},
+                std::move(data),
+                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
 
             using traits::future_access;
             return future_access<typename frame_type::type>::create(std::move(p));
@@ -77,18 +78,22 @@ namespace hpx { namespace lcos { namespace detail
     // launch
     template <typename Policy>
     struct dataflow_dispatch<Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        typename std::enable_if<
+            traits::is_launch_policy<typename std::decay<Policy>::type>::value
+        >::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Policy_, typename F, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(Policy policy, F && f, Ts &&... ts)
+        call(Policy_ && policy, F && f, Ts &&... ts)
         ->  decltype(dataflow_launch_policy_dispatch<
                     typename std::decay<F>::type
-                >::call(policy, std::forward<F>(f), std::forward<Ts>(ts)...))
+                >::call(std::forward<Policy_>(policy), std::forward<F>(f),
+                    std::forward<Ts>(ts)...))
         {
             return dataflow_launch_policy_dispatch<
                     typename std::decay<F>::type
-                >::call(policy, std::forward<F>(f), std::forward<Ts>(ts)...);
+                >::call(std::forward<Policy_>(policy), std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
         }
     };
 
@@ -99,7 +104,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename detail::dataflow_frame<
-            launch
+            hpx::detail::async_policy
           , typename std::decay<F>::type
           , util::tuple<
                 typename traits::acquire_future<Ts>::type...
@@ -137,29 +142,35 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
-            typedef typename frame_type::init_no_addref init_no_addref;
 
-            boost::intrusive_ptr<frame_type> p(new frame_type(
-                    sched
-                  , std::forward<F>(f)
-                  , util::forward_as_tuple(
-                        traits::acquire_future_disp()(
-                            std::forward<Ts>(ts)
-                        )...
-                    )
-                  , init_no_addref()
-                ), false);
-            p->do_await();
+            // Create the data which is used to construct the dataflow_frame
+            auto data = frame_type::construct_from(sched, std::forward<F>(f));
+
+            // Construct the dataflow_frame and traverse
+            // the arguments asynchronously
+            boost::intrusive_ptr<frame_type> p = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{},
+                std::move(data),
+                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
 
             using traits::future_access;
             return future_access<typename frame_type::type>::create(std::move(p));
         }
     };
 
-    // parallel executor
+    // parallel executors
     template <typename Executor>
     struct dataflow_dispatch<Executor,
-        typename std::enable_if<traits::is_executor<Executor>::value>::type>
+        typename std::enable_if<
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+            traits::is_executor<
+                typename std::decay<Executor>::type>::value ||
+#endif
+            traits::is_one_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value
+        >::type>
     {
         template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
@@ -181,17 +192,17 @@ namespace hpx { namespace lcos { namespace detail
                     >
                 >
                 frame_type;
-            typedef typename frame_type::init_no_addref init_no_addref;
 
-            boost::intrusive_ptr<frame_type> p(new frame_type(
-                    std::forward<Executor_>(exec)
-                  , std::forward<F>(f)
-                  , util::forward_as_tuple(
-                        traits::acquire_future_disp()(std::forward<Ts>(ts))...
-                    )
-                  , init_no_addref()
-                ), false);
-            p->do_await();
+            // Create the data which is used to construct the dataflow_frame
+            auto data = frame_type::construct_from(
+                std::forward<Executor_>(exec), std::forward<F>(f));
+
+            // Construct the dataflow_frame and traverse
+            // the arguments asynchronously
+            boost::intrusive_ptr<frame_type> p = util::traverse_pack_async(
+                util::async_traverse_in_place_tag<frame_type>{},
+                std::move(data),
+                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
 
             using traits::future_access;
             return future_access<typename frame_type::type>::create(std::move(p));
@@ -207,7 +218,7 @@ namespace hpx
     namespace lcos { namespace local
     {
         template <typename F, typename ...Ts>
-        HPX_FORCEINLINE
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) HPX_FORCEINLINE
         auto dataflow(F && f, Ts &&... ts)
         ->  decltype(lcos::detail::dataflow_dispatch<
                 typename std::decay<F>::type>::call(

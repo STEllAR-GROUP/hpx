@@ -8,6 +8,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include <algorithm>
 
 #include "deprecated_include_check.hpp"
@@ -36,8 +38,17 @@ namespace boost
       { "boost/bind\\.hpp", "hpx/util/bind.hpp" },
       { "boost/(chrono/)?chrono\\.hpp", "chrono" },
       { "boost/(core/)?ref\\.hpp", "functional" },
-      { "boost/cstdint\\.hpp", "cstdint.hpp" },
+      { "boost/cstdint\\.hpp", "cstdint" },
+      { "boost/thread/barrier\\.hpp", "hpx/compat/barrier.hpp" },
+      { "boost/exception_ptr\\.hpp", "exception" },
+      { "boost/range/iterator_range\\.hpp", "hpx/util/iterator_range.hpp" },
       { "hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)" },
+      { "boost/preprocessor/cat\\.hpp", "hpx/util/detail/pp/cat.hpp" },
+      { "boost/preprocessor/stringize\\.hpp", "hpx/util/detail/pp/stringize.hpp" },
+      { "boost/atomic\\.hpp", "atomic" },
+      { "boost/nondet_random.hpp", "random" },
+      { "boost/random/([^\\s]*)\\.hpp", "random" },
+      { "boost/format\\.hpp", "hpx/util/format.hpp" },
       { nullptr, nullptr }
     };
 

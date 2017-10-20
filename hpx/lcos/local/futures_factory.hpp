@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,10 +18,10 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace local
                     this->set_value(f_());
                 }
                 catch(...) {
-                    this->set_exception(boost::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 
@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
                     this->set_value(result_type());
                 }
                 catch(...) {
-                    this->set_exception(boost::current_exception());
+                    this->set_exception(std::current_exception());
                 }
             }
 
@@ -295,9 +295,6 @@ namespace hpx { namespace lcos { namespace local
     protected:
         typedef lcos::detail::task_base<Result> task_impl_type;
 
-    private:
-        HPX_MOVABLE_ONLY(futures_factory);
-
     public:
         // construction and destruction
         futures_factory()
@@ -379,7 +376,8 @@ namespace hpx { namespace lcos { namespace local
             return task_->apply(policy, priority, stacksize, ec);
         }
 
-        // Result retrieval
+        // This is the same as get_future, except that it moves the
+        // shared state into the returned future.
         lcos::future<Result> get_future(error_code& ec = throws)
         {
             if (!task_) {
@@ -391,30 +389,7 @@ namespace hpx { namespace lcos { namespace local
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "futures_factory<Result()>::get_future",
-                    "future already has been retrieved from this promise");
-                return lcos::future<Result>();
-            }
-
-            future_obtained_ = true;
-
-            using traits::future_access;
-            return future_access<future<Result> >::create(task_);
-        }
-
-        // This is the same as get_future above, except that it moves the
-        // shared state into the returned future.
-        lcos::future<Result> retrieve_future(error_code& ec = throws)
-        {
-            if (!task_) {
-                HPX_THROWS_IF(ec, task_moved,
-                    "futures_factory<Result()>::get_future",
-                    "futures_factory invalid (has it been moved?)");
-                return lcos::future<Result>();
-            }
-            if (future_obtained_) {
-                HPX_THROWS_IF(ec, future_already_retrieved,
-                    "futures_factory<Result()>::get_future",
-                    "future already has been retrieved from this promise");
+                    "future already has been retrieved from this factory");
                 return lcos::future<Result>();
             }
 
@@ -424,9 +399,20 @@ namespace hpx { namespace lcos { namespace local
             return future_access<future<Result> >::create(std::move(task_));
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return !!task_;
+        }
+
+        void set_exception(std::exception_ptr const& e)
+        {
+            if (!task_) {
+                HPX_THROW_EXCEPTION(task_moved,
+                    "futures_factory<Result()>::set_exception",
+                    "futures_factory invalid (has it been moved?)");
+                return;
+            }
+            task_->set_exception(e);
         }
 
     protected:

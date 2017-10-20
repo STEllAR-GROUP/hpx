@@ -19,13 +19,13 @@
 #include <hpx/util/function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
 
-#include <boost/atomic.hpp>
 #include <boost/bimap.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -70,7 +70,7 @@ struct HPX_EXPORT component_namespace
     // data structure holding all counters for the omponent_namespace component
     struct counter_data
     {
-    private:
+    public:
         HPX_NON_COPYABLE(counter_data);
 
     public:
@@ -83,8 +83,8 @@ struct HPX_EXPORT component_namespace
                 , time_(0)
             {}
 
-            boost::atomic<std::int64_t> count_;
-            boost::atomic<std::int64_t> time_;
+            std::atomic<std::int64_t> count_;
+            std::atomic<std::int64_t> time_;
         };
 
         counter_data()

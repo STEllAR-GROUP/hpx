@@ -13,8 +13,7 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -79,7 +78,7 @@ namespace hpx { namespace threads { namespace executors
         private:
             std::size_t first_thread_;
             std::size_t num_threads_;
-            boost::atomic<std::size_t> os_thread_;
+            std::atomic<std::size_t> os_thread_;
             thread_priority priority_;
             thread_stacksize stacksize_;
         };

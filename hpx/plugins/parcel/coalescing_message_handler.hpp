@@ -12,7 +12,7 @@
 
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/histogram.hpp>
 #include <hpx/util/pool_timer.hpp>

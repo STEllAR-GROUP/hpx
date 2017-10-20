@@ -8,13 +8,14 @@
 #if !defined(HPX_EXCEPTION_LIST_OCT_06_2008_0942AM)
 #define HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
 
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <list>
 #include <mutex>
 #include <string>
@@ -36,7 +37,7 @@ namespace hpx
     private:
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        typedef std::list<boost::exception_ptr> exception_list_type;
+        typedef std::list<std::exception_ptr> exception_list_type;
         exception_list_type exceptions_;
         mutable mutex_type mtx_;
 
@@ -49,7 +50,7 @@ namespace hpx
         ~exception_list() throw() {}
 
         exception_list();
-        explicit exception_list(boost::exception_ptr const& e);
+        explicit exception_list(std::exception_ptr const& e);
         explicit exception_list(exception_list_type && l);
 
         exception_list(exception_list const& l);
@@ -59,14 +60,14 @@ namespace hpx
         exception_list& operator=(exception_list && l);
 
         ///
-        void add(boost::exception_ptr const& e);
+        void add(std::exception_ptr const& e);
         /// \endcond
 
         /// The number of exception_ptr objects contained within the
         /// exception_list.
         ///
         /// \note Complexity: Constant time.
-        std::size_t size() const HPX_NOEXCEPT
+        std::size_t size() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.size();
@@ -74,14 +75,14 @@ namespace hpx
 
         /// An iterator referring to the first exception_ptr object contained
         /// within the exception_list.
-        exception_list_type::const_iterator begin() const HPX_NOEXCEPT
+        exception_list_type::const_iterator begin() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.begin();
         }
 
         /// An iterator which is the past-the-end value for the exception_list.
-        exception_list_type::const_iterator end() const HPX_NOEXCEPT
+        exception_list_type::const_iterator end() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.end();

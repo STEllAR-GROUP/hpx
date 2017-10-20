@@ -25,13 +25,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
       : public hpx::util::iterator_facade<
             chunk_size_iterator<Iterator>,
             hpx::util::tuple<Iterator, std::size_t> const,
-            std::forward_iterator_tag>
+            std::input_iterator_tag>
     {
     private:
         typedef hpx::util::iterator_facade<
                 chunk_size_iterator<Iterator>,
                 hpx::util::tuple<Iterator, std::size_t> const,
-                std::forward_iterator_tag
+                std::input_iterator_tag
             > base_type;
 
     public:
@@ -90,13 +90,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail
       : public hpx::util::iterator_facade<
             chunk_size_idx_iterator<Iterator>,
             hpx::util::tuple<Iterator, std::size_t, std::size_t> const,
-            std::forward_iterator_tag>
+            std::input_iterator_tag>
     {
     private:
         typedef hpx::util::iterator_facade<
                 chunk_size_idx_iterator<Iterator>,
                 hpx::util::tuple<Iterator, std::size_t, std::size_t> const,
-                std::forward_iterator_tag
+                std::input_iterator_tag
             > base_type;
 
     public:

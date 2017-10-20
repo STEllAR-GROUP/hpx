@@ -31,17 +31,17 @@
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/random.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -61,7 +61,7 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Applications globals.
-boost::atomic<std::uint64_t> donecount(0);
+std::atomic<std::uint64_t> donecount(0);
 
 // Command-line variables.
 std::uint64_t tasks = 500000;
@@ -82,27 +82,27 @@ void print_results(
                      "Maximum Delay (iterations),Total Delay (iterations),"
                      "Total Walltime (seconds),Walltime per Task (seconds)\n";
 
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const seed_str  = boost::str(boost::format("%lu,") % seed);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+    std::string const cores_str = hpx::util::format("%lu,", cores);
+    std::string const seed_str  = hpx::util::format("%lu,", seed);
+    std::string const tasks_str = hpx::util::format("%lu,", tasks);
 
     std::string const min_delay_str
-        = boost::str(boost::format("%lu,") % min_delay);
+        = hpx::util::format("%lu,", min_delay);
     std::string const max_delay_str
-        = boost::str(boost::format("%lu,") % max_delay);
+        = hpx::util::format("%lu,", max_delay);
     std::string const total_delay_str
-        = boost::str(boost::format("%lu,") % total_delay);
+        = hpx::util::format("%lu,", total_delay);
 
-    std::cout <<
-        ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %10.12s\n")
-        % cores_str % seed_str % tasks_str
-        % min_delay_str % max_delay_str % total_delay_str
-        % walltime % (walltime / tasks));
+    hpx::util::format_to(std::cout,
+        "%-21s %-21s %-21s %-21s %-21s %-21s %10.12s\n",
+        cores_str, seed_str, tasks_str,
+        min_delay_str, max_delay_str, total_delay_str,
+        walltime, walltime / tasks);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t shuffler(
-    boost::random::mt19937_64& prng
+    std::mt19937_64& prng
   , std::uint64_t high
     )
 {
@@ -110,7 +110,7 @@ std::uint64_t shuffler(
         throw std::logic_error("high value was 0");
 
     // Our range is [0, x).
-    boost::random::uniform_int_distribution<std::uint64_t>
+    std::uniform_int_distribution<std::uint64_t>
         dist(0, high - 1);
 
     return dist(prng);
@@ -173,10 +173,10 @@ int qthreads_main(
         std::vector<std::uint64_t> payloads;
         payloads.reserve(tasks);
 
-        // For random numbers, we use a 64-bit specialization of Boost.Random's
+        // For random numbers, we use a 64-bit specialization of stdlib's
         // mersenne twister engine (good uniform distribution up to 311
         // dimensions, cycle length 2 ^ 19937 - 1)
-        boost::random::mt19937_64 prng(seed);
+        std::mt19937_64 prng(seed);
 
         std::uint64_t current_sum = 0;
 
@@ -200,7 +200,7 @@ int qthreads_main(
                 = (high_calc > max_delay) ? max_delay : high_calc;
 
             // Our range is [low, high].
-            boost::random::uniform_int_distribution<std::uint64_t>
+            std::uniform_int_distribution<std::uint64_t>
                 dist(low, high);
 
             std::uint64_t const payload = dist(prng);

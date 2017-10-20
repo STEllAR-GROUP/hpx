@@ -9,12 +9,11 @@
 // Including 'hpx/hpx_main.hpp' instead of the usual 'hpx/hpx_init.hpp' enables
 // to use the plain C-main below as the direct main HPX entry point.
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
-
-#include <boost/format.hpp>
+#include <hpx/include/lcos.hpp>
+#include <hpx/include/util.hpp>
 
 #include <cstddef>
 #include <list>
@@ -45,7 +44,7 @@ std::size_t hello_world_worker(std::size_t desired)
         // The HPX-thread has been run on the desired OS-thread.
         char const* msg = "hello world from OS-thread %1% on locality %2%";
 
-        hpx::cout << (boost::format(msg) % desired % hpx::get_locality_id())
+        hpx::util::format_to(hpx::cout, msg, desired, hpx::get_locality_id())
                   << std::endl << hpx::flush;
 
         return desired;
@@ -108,7 +107,7 @@ void hello_world_foreman()
         // all the futures in the vector have returned.
         hpx::lcos::local::spinlock mtx;
         hpx::lcos::wait_each(
-            hpx::util::unwrapped([&](std::size_t t) {
+            hpx::util::unwrapping([&](std::size_t t) {
                 if (std::size_t(-1) != t)
                 {
                     std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);

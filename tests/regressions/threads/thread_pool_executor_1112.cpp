@@ -9,11 +9,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <atomic>
 #include <iostream>
 
-#include <boost/atomic.hpp>
-
-boost::atomic<int> counter(0);
+std::atomic<int> counter(0);
 
 void doit()
 {

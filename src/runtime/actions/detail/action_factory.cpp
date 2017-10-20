@@ -129,20 +129,34 @@ namespace hpx { namespace actions { namespace detail
 
         if (id >= this_.cache_.size())
         {
-            std::string msg(
-                "Unknown type desciptor " + std::to_string(id));
+            std::string msg("Unknown type descriptor " + std::to_string(id));
 #if defined(HPX_DEBUG)
             if (name != nullptr)
             {
-                msg += ", for typename " + *name + "\n";
-                msg += this_.collect_registered_typenames();
+                msg += ", for typename " + *name;
             }
+            msg += this_.collect_registered_typenames();
 #endif
             HPX_THROW_EXCEPTION(serialization_error,
                 "action_registry::create", msg);
+            return nullptr;
         }
+
         ctor_t ctor = this_.cache_[id];
-        HPX_ASSERT(ctor != nullptr);
+        if (ctor == nullptr)
+        {
+            std::string msg("Unknown type descriptor " + std::to_string(id));
+#if defined(HPX_DEBUG)
+            if (name != nullptr)
+            {
+                msg += ", for typename " + *name;
+            }
+            msg += this_.collect_registered_typenames();
+#endif
+            HPX_THROW_EXCEPTION(serialization_error,
+                "action_registry::create", msg);
+            return nullptr;
+        }
         return ctor(with_continuation);
     }
 
@@ -170,7 +184,7 @@ namespace hpx { namespace actions { namespace detail
     std::string action_registry::collect_registered_typenames()
     {
 #if defined(HPX_DEBUG)
-        std::string msg("known constructors:\n");
+        std::string msg("\nknown constructors:\n");
 
         for (auto const& desc : typename_to_ctor_)
         {
@@ -189,4 +203,10 @@ namespace hpx { namespace actions { namespace detail
 #endif
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    std::uint32_t get_action_id_from_name(char const* action_name)
+    {
+        using hpx::actions::detail::action_registry;
+        return action_registry::get_id(action_name);
+    }
 }}}

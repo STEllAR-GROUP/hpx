@@ -48,11 +48,10 @@
 #include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <limits>
 #include <utility>
 
@@ -78,12 +77,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             }
         }
 
-        boost::atomic_uint64_t& get(std::size_t i)
+        std::atomic<std::uint64_t>& get(std::size_t i)
         {
             return m_allocation_counter[i % HPX_COROUTINE_NUM_ALL_HEAPS];
         }
 
-        boost::atomic_uint64_t m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
+        std::atomic<std::uint64_t> m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
     };
 
     /////////////////////////////////////////////////////////////////////////////
@@ -114,6 +113,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_phase(0),
 #endif
             m_thread_data(0),
+#if defined(HPX_HAVE_APEX)
+            m_apex_data(0ull),
+#endif
             m_type_info(),
             m_thread_id(id),
             continuation_recursion_count_(0)
@@ -178,17 +180,20 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
             m_thread_data = 0;
 #endif
+#if defined(HPX_HAVE_APEX)
+            m_apex_data = 0ull;
+#endif
             m_thread_id = nullptr;
         }
 
 #if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
-        void count_down() HPX_NOEXCEPT
+        void count_down() noexcept
         {
             HPX_ASSERT(m_operation_counter);
             --m_operation_counter;
         }
 
-        void count_up() HPX_NOEXCEPT
+        void count_up() noexcept
         {
             ++m_operation_counter;
         }
@@ -221,7 +226,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
          * returns 'is_ready()'.
          * Nothrow.
          */
-        bool signal() HPX_NOEXCEPT
+        bool signal() noexcept
         {
             HPX_ASSERT(!running() && !exited());
             HPX_ASSERT(m_wait_counter);
@@ -264,7 +269,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                     return true;
                 if (m_exit_status == ctx_exited_abnormally)
                 {
-                    boost::rethrow_exception(m_type_info);
+                    std::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = nullptr;
                     //std::swap(m_type_info, tinfo);
                     //throw abnormal_exit(tinfo ? *tinfo :
@@ -327,19 +332,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             if (m_exit_status || m_state == ctx_waiting)
             {
                 if (m_state == ctx_waiting)
-                    boost::throw_exception(coroutines::waiting());
+                    throw coroutines::waiting();
                 if (m_exit_status == ctx_exited_return)
                     return;
                 if (m_exit_status == ctx_exited_abnormally)
                 {
-                    boost::rethrow_exception(m_type_info);
+                    std::rethrow_exception(m_type_info);
                     //std::type_info const* tinfo = nullptr;
                     //std::swap(m_type_info, tinfo);
                     //throw abnormal_exit(tinfo ? *tinfo :
                     //      typeid(unknown_exception_tag));
                 }
                 else if (m_exit_status == ctx_exited_exit)
-                    boost::throw_exception(coroutine_exited());
+                    throw coroutine_exited();
                 else {
                     HPX_ASSERT(0 && "unknown exit status");
                 }
@@ -412,7 +417,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         // Cannot be called if there are pending operations.
         // It follows that cannot be called from 'this'.
         // Nothrow.
-        void exit() HPX_NOEXCEPT
+        void exit() noexcept
         {
             HPX_ASSERT(!pending());
             HPX_ASSERT(is_ready());
@@ -424,16 +429,16 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         // Always throw exit_exception.
         // Never returns from standard control flow.
-        HPX_ATTRIBUTE_NORETURN void exit_self()
+        HPX_NORETURN void exit_self()
         {
             HPX_ASSERT(!pending());
             HPX_ASSERT(running());
             m_exit_state = ctx_exit_pending;
-            boost::throw_exception(exit_exception());
+            throw exit_exception();
         }
 
         // Nothrow.
-        ~context_base() HPX_NOEXCEPT
+        ~context_base() noexcept
         {
             HPX_ASSERT(!running());
             try {
@@ -449,6 +454,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             delete_tss_storage(m_thread_data);
 #else
             m_thread_data = 0;
+#endif
+#if defined(HPX_HAVE_APEX)
+            m_apex_data = 0ull;
 #endif
         }
 
@@ -473,6 +481,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return olddata;
 #endif
         }
+
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            // APEX wants the ADDRESS of a location to store
+            // data.  This storage could be updated asynchronously,
+            // so APEX stores this address, and uses it as a way
+            // to remember state for the HPX thread in-betweeen
+            // calls to apex::start/stop/yield/resume().
+            // APEX will change the value pointed to by the address.
+            return const_cast<void**>(&m_apex_data);
+        }
+#endif
 
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_thread_tss_data(bool create_if_needed) const
@@ -555,7 +576,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             HPX_ASSERT(m_phase == 0);
 #endif
             HPX_ASSERT(m_thread_data == 0);
-            m_type_info = boost::exception_ptr();
+#if defined(HPX_HAVE_APEX)
+            HPX_ASSERT(m_apex_data == 0ull);
+#endif
+            m_type_info = std::exception_ptr();
         }
 
         // Cause the coroutine to exit if
@@ -565,12 +589,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             HPX_ASSERT(running());
             if (!m_exit_state) return;
-            boost::throw_exception(exit_exception());
+            throw exit_exception();
         }
 
         // Nothrow.
-        void do_return(context_exit_status status, boost::exception_ptr && info)
-            HPX_NOEXCEPT
+        void do_return(context_exit_status status, std::exception_ptr && info)
+            noexcept
         {
             HPX_ASSERT(status != ctx_not_exited);
             HPX_ASSERT(m_state == ctx_running);
@@ -583,7 +607,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     protected:
 
         // Nothrow.
-        void do_yield() HPX_NOEXCEPT
+        void do_yield() noexcept
         {
             swap_context(*this, m_caller, detail::yield_hint());
         }
@@ -609,7 +633,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         ctx_type m_caller;
 
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
-        mutable boost::atomic_uint64_t m_counter;
+        mutable std::atomic<std::uint64_t> m_counter;
 #endif
         static HPX_EXPORT allocation_counters m_allocation_counters;
         deleter_type* m_deleter;
@@ -628,9 +652,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #else
         mutable std::size_t m_thread_data;
 #endif
+#if defined(HPX_HAVE_APEX)
+        // This is a pointer that APEX will use to maintain state
+        // when an HPX thread is pre-empted.
+        void* m_apex_data;
+#endif
 
         // This is used to generate a meaningful exception trace.
-        boost::exception_ptr m_type_info;
+        std::exception_ptr m_type_info;
         thread_id_repr_type m_thread_id;
 
         std::size_t continuation_recursion_count_;

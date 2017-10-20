@@ -6,11 +6,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include "allgather.hpp"
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 #include <fstream>
@@ -40,7 +38,7 @@ namespace ag { namespace server
         lazy_results.push_back( hpx::async(get_item_, point_components[i]) );
       }
 
-      n_ = hpx::util::unwrapped(lazy_results);
+      n_ = hpx::util::unwrap(lazy_results);
     }
 
     double allgather::get_item() const

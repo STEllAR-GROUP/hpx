@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,7 +12,10 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 
 #include <type_traits>
 
@@ -55,8 +58,8 @@ namespace hpx { namespace components { namespace server
     HPX_DISTRIBUTED_METADATA_DECLARATION_(__VA_ARGS__)                        \
     /**/
 #define HPX_DISTRIBUTED_METADATA_DECLARATION_(...)                            \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DISTRIBUTED_METADATA_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)  \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DISTRIBUTED_METADATA_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)      \
     )(__VA_ARGS__))                                                           \
     /**/
 
@@ -67,18 +70,18 @@ namespace hpx { namespace components { namespace server
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::components::server::distributed_metadata_base<config>::        \
             get_action,                                                       \
-        BOOST_PP_CAT(__distributed_metadata_get_action_, name));              \
+        HPX_PP_CAT(__distributed_metadata_get_action_, name));                \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::base_lco_with_value<config>::set_value_action,           \
-        BOOST_PP_CAT(__set_value_distributed_metadata_config_data_, name))    \
+        HPX_PP_CAT(__set_value_distributed_metadata_config_data_, name))      \
     /**/
 
 #define HPX_DISTRIBUTED_METADATA(...)                                         \
     HPX_DISTRIBUTED_METADATA_(__VA_ARGS__)                                    \
     /**/
 #define HPX_DISTRIBUTED_METADATA_(...)                                        \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DISTRIBUTED_METADATA_, HPX_UTIL_PP_NARG(__VA_ARGS__)              \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DISTRIBUTED_METADATA_, HPX_PP_NARGS(__VA_ARGS__)                  \
     )(__VA_ARGS__))                                                           \
     /**/
 
@@ -89,15 +92,15 @@ namespace hpx { namespace components { namespace server
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::components::server::distributed_metadata_base<config>::        \
             get_action,                                                       \
-        BOOST_PP_CAT(__distributed_metadata_get_action_, name));              \
+        HPX_PP_CAT(__distributed_metadata_get_action_, name));                \
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::base_lco_with_value<config>::set_value_action,           \
-        BOOST_PP_CAT(__set_value_distributed_metadata_config_data_, name))    \
+        HPX_PP_CAT(__set_value_distributed_metadata_config_data_, name))      \
     typedef ::hpx::components::simple_component<                              \
         ::hpx::components::server::distributed_metadata_base<config>          \
-    > BOOST_PP_CAT(__distributed_metadata_, name);                            \
+    > HPX_PP_CAT(__distributed_metadata_, name);                              \
     HPX_REGISTER_COMPONENT(                                                   \
-        BOOST_PP_CAT(__distributed_metadata_, name))                          \
+        HPX_PP_CAT(__distributed_metadata_, name))                            \
     /**/
 
 #endif

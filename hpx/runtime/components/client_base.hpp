@@ -10,6 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -21,10 +22,11 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/assert.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <exception>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -131,14 +133,6 @@ namespace hpx { namespace traits
                 typename std::enable_if<is_client<Derived>::value>::type>
           : shared_state_ptr<typename traits::future_traits<Derived>::type>
         {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct action_remote_result_customization_point<Derived,
-            typename std::enable_if<is_client<Derived>::value>::type>
-        {
-            typedef id_type type;
-        };
     }
 }}
 
@@ -242,32 +236,32 @@ namespace hpx { namespace components
             shared_state_->set_value(std::move(id));
         }
 
-        explicit client_base(shared_future<id_type> const& f) HPX_NOEXCEPT
+        explicit client_base(shared_future<id_type> const& f) noexcept
           : shared_state_(
                 hpx::traits::future_access<future_type>::
                     get_shared_state(f))
         {}
-        explicit client_base(shared_future<id_type> && f) HPX_NOEXCEPT
+        explicit client_base(shared_future<id_type> && f) noexcept
           : shared_state_(
                 hpx::traits::future_access<future_type>::
                     get_shared_state(std::move(f)))
         {}
-        explicit client_base(future<id_type> && f) HPX_NOEXCEPT
+        explicit client_base(future<id_type> && f) noexcept
           : shared_state_(hpx::traits::future_access<future_type>::
                     get_shared_state(std::move(f)))
         {}
 
-        client_base(client_base const& rhs) HPX_NOEXCEPT
+        client_base(client_base const& rhs) noexcept
           : shared_state_(rhs.shared_state_)
         {}
-        client_base(client_base && rhs) HPX_NOEXCEPT
+        client_base(client_base && rhs) noexcept
           : registered_name_(std::move(rhs.registered_name_)),
             shared_state_(std::move(rhs.shared_state_))
         {
             rhs.shared_state_ = nullptr;
         }
 
-        // A future to a client_base can be unwrapped to represent the
+        // A future to a client_base can be unwrap to represent the
         // client_base directly as a client_base is semantically a future to
         // the id of the referenced object.
         client_base(future<Derived> && d)
@@ -333,13 +327,13 @@ namespace hpx { namespace components
         }
 
         // Returns: true only if *this refers to a shared state.
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return shared_state_ != nullptr;
         }
 
         // check whether the embedded shared state is valid
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return valid();
         }
@@ -369,6 +363,7 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         id_type const& get_gid() const
         {
             return get_id();
@@ -433,21 +428,21 @@ namespace hpx { namespace components
         }
 
         // Returns: true if the shared state is ready, false if it isn't.
-        bool is_ready() const HPX_NOEXCEPT
+        bool is_ready() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->is_ready();
         }
 
         // Returns: true if the shared state is ready and stores a value,
         //          false if it isn't.
-        bool has_value() const HPX_NOEXCEPT
+        bool has_value() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->has_value();
         }
 
         // Returns: true if the shared state is ready and stores an exception,
         //          false if it isn't.
-        bool has_exception() const HPX_NOEXCEPT
+        bool has_exception() const noexcept
         {
             return shared_state_ != nullptr && shared_state_->has_exception();
         }
@@ -468,7 +463,7 @@ namespace hpx { namespace components
         //   - Blocks until the future is ready.
         // Returns: The stored exception_ptr if has_exception(), a null
         //          pointer otherwise.
-        boost::exception_ptr get_exception_ptr() const
+        std::exception_ptr get_exception_ptr() const
         {
             if (!shared_state_)
             {
@@ -479,13 +474,13 @@ namespace hpx { namespace components
 
             error_code ec(lightweight);
             this->shared_state_->get_result(ec);
-            if (!ec) return boost::exception_ptr();
+            if (!ec) return std::exception_ptr();
             return hpx::detail::access_exception(ec);
         }
 
     private:
         template <typename F>
-        static typename lcos::detail::future_then_result<Derived, F>::cont_result
+        static typename hpx::traits::future_then_result<Derived, F>::cont_result
         on_ready(shared_future<id_type> && fut, F f)
         {
             return f(Derived(std::move(fut)));
@@ -493,11 +488,11 @@ namespace hpx { namespace components
 
     public:
         template <typename F>
-        typename lcos::detail::future_then_result<Derived, F>::type
+        typename hpx::traits::future_then_result<Derived, F>::type
         then(F && f)
         {
             typedef
-                typename lcos::detail::future_then_result<Derived, F>::result_type
+                typename hpx::traits::future_then_result<Derived, F>::result_type
                 result_type;
 
             if (!shared_state_)
@@ -509,7 +504,7 @@ namespace hpx { namespace components
             }
 
             typedef
-                typename hpx::util::result_of<F(Derived)>::type
+                typename hpx::util::invoke_result<F, Derived>::type
                 continuation_result_type;
             typedef
                 typename hpx::traits::detail::shared_state_ptr<result_type>::type
@@ -525,7 +520,7 @@ namespace hpx { namespace components
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        static void register_as_helper(Derived && f,
+        static void register_as_helper(client_base const& f,
             std::string const& symbolic_name)
         {
             hpx::agas::register_name(launch::sync, symbolic_name, f.get());
@@ -549,7 +544,7 @@ namespace hpx { namespace components
 
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
-                    *static_cast<Derived const*>(this), launch::all,
+                    *this, launch::sync,
                     util::bind(&client_base::register_as_helper,
                         util::placeholders::_1, symbolic_name
                     ));
@@ -570,6 +565,12 @@ namespace hpx { namespace components
         {
             HPX_ASSERT(!registered_name_.empty());   // call only once
             registered_name_.clear();
+        }
+
+        // Access registered name for the component
+        std::string const& registered_name() const
+        {
+            return registered_name_;
         }
 
     protected:
@@ -595,104 +596,6 @@ namespace hpx { namespace components
         client_base<Derived, Stub> const& rhs)
     {
         return lhs.get() < rhs.get();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::id_type const& id)
-    {
-        return Client(id);
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::future<hpx::id_type> const& id)
-    {
-        return Client(id);
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::future<hpx::id_type> && id)
-    {
-        return Client(std::move(id));
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, Client
-    >::type
-    make_client(hpx::shared_future<hpx::id_type> const& id)
-    {
-        return Client(id);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::id_type> const& ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::id_type const& id: ids)
-        {
-            result.push_back(Client(id));
-        }
-        return result;
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::future<hpx::id_type> > const& ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::future<hpx::id_type> const& id: ids)
-        {
-            result.push_back(Client(id));
-        }
-        return result;
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::future<hpx::id_type> > && ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::future<hpx::id_type>& id: ids)
-        {
-            result.push_back(Client(std::move(id)));
-        }
-        return result;
-    }
-
-    template <typename Client>
-    inline typename std::enable_if<
-        traits::is_client<Client>::value, std::vector<Client>
-    >::type
-    make_clients(std::vector<hpx::shared_future<hpx::id_type> > const& ids)
-    {
-        std::vector<Client> result;
-        result.reserve(ids.size());
-        for (hpx::shared_future<hpx::id_type> const& id: ids)
-        {
-            result.push_back(Client(id));
-        }
-        return result;
     }
 }}
 

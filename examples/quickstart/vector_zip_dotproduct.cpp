@@ -9,8 +9,7 @@
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <boost/range/functions.hpp>
-
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -20,8 +19,8 @@ int hpx_main()
     // lets say we have two vectors that simulate.. 10007D
     std::vector<double> xvalues(10007);
     std::vector<double> yvalues(10007);
-    std::fill(boost::begin(xvalues), boost::end(xvalues), 1.0);
-    std::fill(boost::begin(yvalues), boost::end(yvalues), 1.0);
+    std::fill(std::begin(xvalues), std::end(xvalues), 1.0);
+    std::fill(std::begin(yvalues), std::end(yvalues), 1.0);
 
     using hpx::util::make_zip_iterator;
     using hpx::util::tuple;
@@ -30,8 +29,8 @@ int hpx_main()
     double result =
         hpx::parallel::transform_reduce(
             hpx::parallel::execution::par,
-            make_zip_iterator(boost::begin(xvalues), boost::begin(yvalues)),
-            make_zip_iterator(boost::end(xvalues), boost::end(yvalues)),
+            make_zip_iterator(std::begin(xvalues), std::begin(yvalues)),
+            make_zip_iterator(std::end(xvalues), std::end(yvalues)),
             0.0,
             std::plus<double>(),
             [](tuple<double, double> r)

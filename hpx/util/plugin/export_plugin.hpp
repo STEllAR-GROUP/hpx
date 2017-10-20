@@ -10,14 +10,14 @@
 #define HPX_EXPORT_PLUGIN_VP_2004_08_25
 
 #include <hpx/config.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/plugin/abstract_factory.hpp>
 #include <hpx/util/plugin/concrete_factory.hpp>
 #include <hpx/util/plugin/config.hpp>
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/any.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <map>
 #include <string>
@@ -25,36 +25,36 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_NAME_2(name1, name2)                                       \
-    BOOST_PP_CAT(name1, BOOST_PP_CAT(_, name2))                               \
+    HPX_PP_CAT(name1, HPX_PP_CAT(_, name2))                                   \
     /**/
 
 #define HPX_PLUGIN_NAME_3(name, base, cname)                                  \
-    BOOST_PP_CAT(cname, BOOST_PP_CAT(_,                                       \
-        BOOST_PP_CAT(name, BOOST_PP_CAT(_, base))))                           \
+    HPX_PP_CAT(cname, HPX_PP_CAT(_,                                           \
+        HPX_PP_CAT(name, HPX_PP_CAT(_, base))))                               \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_LIST_NAME_(prefix, name, base)                             \
-    BOOST_PP_CAT(                                                             \
-        BOOST_PP_CAT(prefix, _exported_plugins_list_),                        \
+    HPX_PP_CAT(                                                               \
+        HPX_PP_CAT(prefix, _exported_plugins_list_),                          \
             HPX_PLUGIN_NAME_2(name, base))                                    \
     /**/
 
 #define HPX_PLUGIN_EXPORTER_NAME_(prefix, name, base, cname)                  \
-    BOOST_PP_CAT(                                                             \
-        BOOST_PP_CAT(prefix, _plugin_exporter_),                              \
+    HPX_PP_CAT(                                                               \
+        HPX_PP_CAT(prefix, _plugin_exporter_),                                \
             HPX_PLUGIN_NAME_3(name, base, cname))                             \
     /**/
 
 #define HPX_PLUGIN_EXPORTER_INSTANCE_NAME_(prefix, name, base, cname)         \
-    BOOST_PP_CAT(                                                             \
-        BOOST_PP_CAT(prefix, _plugin_exporter_instance_),                     \
+    HPX_PP_CAT(                                                               \
+        HPX_PP_CAT(prefix, _plugin_exporter_instance_),                       \
             HPX_PLUGIN_NAME_3(name, base, cname))                             \
     /**/
 
 #define HPX_PLUGIN_FORCE_LOAD_NAME_(prefix, name, base)                       \
-    BOOST_PP_CAT(                                                             \
-        BOOST_PP_CAT(prefix, _exported_plugins_force_load_),                  \
+    HPX_PP_CAT(                                                               \
+        HPX_PP_CAT(prefix, _exported_plugins_force_load_),                    \
             HPX_PLUGIN_NAME_2(name, base))                                    \
     /**/
 
@@ -109,7 +109,7 @@
                 static hpx::util::plugin::concrete_factory<                   \
                     BaseType, ActualType > cf;                                \
                 hpx::util::plugin::abstract_factory<BaseType>* w = &cf;       \
-                std::string actname(BOOST_PP_STRINGIZE(actualname));          \
+                std::string actname(HPX_PP_STRINGIZE(actualname));            \
                 boost::algorithm::to_lower(actname);                          \
                 HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()->insert(     \
                     std::make_pair(actname, w));                              \

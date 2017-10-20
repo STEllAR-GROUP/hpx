@@ -6,8 +6,8 @@
 #   Distributed under the Boost Software License, Version 1.0. (See accompanying
 #   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# This function writes a slurm script. 
-# We can call it with different parameter 
+# This function writes a slurm script.
+# We can call it with different parameter
 # settings to create different experiments
 
 function write_script
@@ -29,16 +29,18 @@ mkdir -p $DIR_NAME
 cat << _EOF_ > ${DIR_NAME}/submit-job.bash
 #!/bin/bash
 
-#SBATCH --job-name=HPX-Test
+#SBATCH --job-name=${JOB_NAME}
 #SBATCH --output=slurm.out
 #SBATCH --error=slurm.err
-#SBATCH --partition=${QUEUE}
 #SBATCH --nodes=${NODES}
 #SBATCH --time=${TIME}
-#SBATCH --dependency=singleton
-## #SBATCH --cpus-per-task=1
-#SBATCH --exclusive 
+#SBATCH --exclusive
 #SBATCH --distribution=cyclic
+#SBATCH --constraint=gpu
+#SBATCH --partition=${QUEUE}
+
+## #SBATCH --cpus-per-task=1
+## #SBATCH --dependency=singleton
 
 #======START=====
 module load slurm
@@ -48,24 +50,17 @@ module load slurm
 # not all are relevant for this test
 #
 export LD_LIBRARY_PATH=${LIB_PATH}:${LD_LIBRARY_PATH}
-export HDF5_PARAPREFIX=${BASEDIR}/${DIR_NAME}
-export BGLOCKLESSMPIO_F_TYPE=0x47504653
-export MV2_ALLTOALL_MEDIUM_MSG=524288
-#export MpiDefault=none
-#export MV2_IBA_HCA=roq
-#export MV2_USE_RDMA_CM=1
-#export MV2_USE_IWARP_MODE=1
-#export MV2_ENABLE_AFFINITY=0
-export LC_ALL="en_US.UTF-8"
 
-#${MPIEXEC} -n $[${SERVERS_PERNODE} * $NODES] ${EXECUTABLE1} ${PROGRAM_PARAMS}
-srun -n $[${SERVERS_PERNODE} * $NODES] ${EXECUTABLE1} ${PROGRAM_PARAMS}
+# slurm launch command
+srun -n $[${PROCESSES_PERNODE} * $NODES] ${EXECUTABLE1} ${PROGRAM_PARAMS}
 
 _EOF_
 
+# make the job script executable
 chmod 775 ${DIR_NAME}/submit-job.bash
 
-echo "cd ${DIR_NAME}; sbatch submit-job.bash; cd \$BASEDIR" >> run_jobs.bash
+# create a script that launches the job and adds the jobid to a cancel jobs script
+echo "cd ${DIR_NAME}; JOB=\$(sbatch submit-job.bash) ; echo \"\$JOB\" ; echo \"\$JOB\" | sed 's/Submitted batch job/scancel/g' >> \$BASEDIR/cancel_jobs.bash; cd \$BASEDIR" >> run_jobs.bash
 
 }
 
@@ -82,36 +77,56 @@ echo "cd $BASEDIR" >> run_jobs.bash
 chmod 775 run_jobs.bash
 
 #
-# 
+#
 #
 MPIEXEC="@MPIEXEC@"
-QUEUE=benchmark
 EXECUTABLE1=@EXE_PATH@
 LIB_PATH="@LIB_PATH@"
 JOB_OPTIONS1="@JOB_OPTIONS1@"
-MEMPERNODE=
-TIME="00:05:00"
-CLIENTS_PERNODE=0
-SERVERS_PERNODE=1
+TIME="00:10:00"
+PROCESSES_PERNODE=1
 
 # Loop through all the parameter combinations generating jobs for each
-# "tcp" "mpi" "ibverbs"
-for NODES in 1 2 3 4 6 8 12 16 32
+
+#for NODES in 2 4 8 16 32 64 128 256 512 1024 2048 4096
+for NODES in 32 64 128
 do
-  for PARCELTYPE in "mpi" "ibverbs"
+
+  if [ "$NODES" == "4096" ]; then
+    QUEUE=large
+  elif [ "$NODES" -lt "4" ]; then
+    QUEUE=debug
+  else
+    QUEUE=normal
+  fi
+
+#  for PARCELTYPE in "mpi" "libfabric"
+  for PARCELTYPE in "libfabric"
   do
-    if [ "$PARCELTYPE" != "tcp" ]; then 
-      TCP_ENABLE="-Ihpx.parcel.tcp.enable=0 -Ihpx.parcel.bootstrap=mpi"
-    else
-      TCP_ENABLE=""    
+
+    TCP_ENABLE="-Ihpx.parcel.tcp.enable=0"
+    MPI_ENABLE="-Ihpx.parcel.mpi.enable=0"
+    FAB_ENABLE="-Ihpx.parcel.libfabric.enable=0"
+
+    BOOTSTRAP="-Ihpx.parcel.bootstrap=$PARCELTYPE"
+
+    if [ "$PARCELTYPE" == "tcp" ]; then
+      TCP_ENABLE="-Ihpx.parcel.tcp.enable=1"
+    elif [ "$PARCELTYPE" == "mpi" ]; then
+      MPI_ENABLE="-Ihpx.parcel.mpi.enable=1"
+    elif [ "$PARCELTYPE" == "libfabric" ]; then
+      FAB_ENABLE="-Ihpx.parcel.libfabric.enable=1"
     fi
-    for TRANSFERSIZE in 128 256 512 1024 2048 4096 8192 16384
+
+    HPX_ARGS="-Ihpx.parcel.message_handlers=0 --hpx:bind=balanced "
+    # -Ihpx.max_busy_loop_count=10 --hpx:attach-debugger=exception"
+    for TRANSFERSIZE in 256 512 1024 2048 4096 8192
     do
-      for THREADS_PERTASK in 1 2 4 8 16
+      for THREADS_PERTASK in 12
       do
         LOCAL_SIZE=$(printf "%.0f" $( bc <<< "scale=6;(128 * $TRANSFERSIZE * $THREADS_PERTASK)/1024" ))
-        LOCAL_SIZE=$(echo $((LOCAL_SIZE>512?512:LOCAL_SIZE)))
-        PROGRAM_PARAMS="-Ihpx.parcel.${PARCELTYPE}.enable=1 $TCP_ENABLE --hpx:threads=${THREADS_PERTASK} --hpx:bind=balanced --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE} --parceltype=${PARCELTYPE} --distribution=1 --all-to-all=1 --iterations=10"
+        LOCAL_SIZE=$(echo $((LOCAL_SIZE>1024?1024:LOCAL_SIZE)))
+        PROGRAM_PARAMS="${BOOTSTRAP} ${TCP_ENABLE} ${MPI_ENABLE} ${FAB_ENABLE} --hpx:threads=${THREADS_PERTASK} ${HPX_ARGS} --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE} --parceltype=${PARCELTYPE} --distribution=0 --all-to-all=1 --no-local=1 --iterations=100"
         write_script
       done
     done

@@ -260,13 +260,13 @@ struct stepper
         partition const& middle, partition const& right)
     {
         using hpx::dataflow;
-        using hpx::util::unwrapped;
+        using hpx::util::unwrapping;
 
         hpx::shared_future<partition_data> middle_data =
             middle.get_data(partition_server::middle_partition);
 
         hpx::future<partition_data> next_middle = middle_data.then(
-            unwrapped(
+            unwrapping(
                 [middle](partition_data const& m) -> partition_data
                 {
                     HPX_UNUSED(middle);
@@ -284,7 +284,7 @@ struct stepper
 
         return dataflow(
             hpx::launch::async,
-            unwrapped(
+            unwrapping(
                 [left, middle, right](partition_data next, partition_data const& l,
                     partition_data const& m, partition_data const& r) -> partition
                 {

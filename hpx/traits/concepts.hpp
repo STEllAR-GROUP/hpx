@@ -9,25 +9,25 @@
 #if !defined(HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM)
 #define HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM
 
-#include <boost/preprocessor/cat.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 
 #include <type_traits>
 
 #define HPX_CONCEPT_REQUIRES_(...)                                            \
-    int BOOST_PP_CAT(_concept_requires_, __LINE__) = 42,                      \
+    int HPX_PP_CAT(_concept_requires_, __LINE__) = 42,                        \
     typename std::enable_if<                                                  \
-        (BOOST_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__),  \
+        (HPX_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__),    \
         int                                                                   \
-    >::type BOOST_PP_CAT(_concept_check_, __LINE__) = 0                       \
+    >::type HPX_PP_CAT(_concept_check_, __LINE__) = 0                         \
     /**/
 
 #define HPX_CONCEPT_REQUIRES(...)                                             \
     template<                                                                 \
-        int BOOST_PP_CAT(_concept_requires_, __LINE__) = 42,                  \
+        int HPX_PP_CAT(_concept_requires_, __LINE__) = 42,                    \
         typename std::enable_if<                                              \
-            (BOOST_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__), \
+            (HPX_PP_CAT(_concept_requires_, __LINE__) == 43) || (__VA_ARGS__),\
             int                                                               \
-        >::type BOOST_PP_CAT(_concept_check_, __LINE__) = 0>                  \
+        >::type HPX_PP_CAT(_concept_check_, __LINE__) = 0>                    \
     /**/
 
 #define HPX_CONCEPT_ASSERT(...)                                               \

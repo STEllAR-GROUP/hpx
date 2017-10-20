@@ -8,11 +8,16 @@ set(tests
     any_serialization
     boost_any
     bind_action
+    checkpoint
     config_entry
     function
+    pack_traversal
+    pack_traversal_async
     parse_slurm_nodelist
+    range
     tagged
     tuple
+    unwrap
    )
 
 if(HPX_WITH_CXX11_STD_INITIALIZER_LIST)

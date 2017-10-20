@@ -5,14 +5,15 @@
 
 #include <hpx/runtime/threads/thread_executor.hpp>
 
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <cstddef>
+#include <mutex>
 
 namespace hpx { namespace threads
 {
@@ -21,7 +22,8 @@ namespace hpx { namespace threads
         mask_cref_type executor_base::get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
         {
-            return get_thread_manager().get_pu_mask(topology, num_thread);
+            auto &rp = hpx::resource::get_partitioner();
+            return rp.get_pu_mask(num_thread);
         }
     }
 
@@ -36,24 +38,26 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::atomic<scheduled_executor> default_executor_instance;
+    lcos::local::spinlock default_executor_mutex;
+    scheduled_executor default_executor_instance;
 
     scheduled_executor default_executor()
     {
-        if (!default_executor_instance.load())
+        std::lock_guard<lcos::local::spinlock> lock(default_executor_mutex);
+
+        if (!default_executor_instance)
         {
             scheduled_executor& default_exec =
                 scheduled_executor::default_executor();
-            scheduled_executor empty_exec;
-
-            default_executor_instance.compare_exchange_strong(
-                empty_exec, default_exec);
+            default_executor_instance = default_exec;
         }
-        return default_executor_instance.load();
+        return default_executor_instance;
     }
 
     void set_default_executor(scheduled_executor executor)
     {
-        default_executor_instance.store(executor);
+        std::lock_guard<lcos::local::spinlock> lock(default_executor_mutex);
+
+        default_executor_instance = executor;
     }
 }}

@@ -9,9 +9,14 @@ set(tests
     foreach_range
     foreach_range_projection
     generate_range
+    is_heap_range
+    is_heap_until_range
     max_element_range
+    merge_range
     min_element_range
     minmax_element_range
+    partition_range
+    partition_copy_range
     remove_copy_range
     remove_copy_if_range
     replace_range
@@ -26,6 +31,8 @@ set(tests
     transform_range
     transform_range_binary
     transform_range_binary2
+    unique_range
+    unique_copy_range
    )
 
 foreach(test ${tests})

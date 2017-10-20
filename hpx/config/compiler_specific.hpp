@@ -62,8 +62,9 @@
 #endif
 
 #if defined(_MSC_VER)
-#  define HPX_MSVC _MSC_VER
 #  define HPX_WINDOWS
+#  define HPX_MSVC _MSC_VER
+#  define HPX_MSVC_WARNING_PRAGMA
 #  if defined(__NVCC__)
 #    define HPX_MSVC_NVCC
 #  endif
@@ -72,9 +73,33 @@
 
 #if defined(__MINGW32__)
 #   define HPX_WINDOWS
+#   define HPX_MINGW
 #endif
 
-#if (defined(__NVCC__) || defined(__CUDACC__)) && defined(HPX_HAVE_CUDA)
+// Detecting CUDA compilation mode
+#if defined(HPX_HAVE_CUDA)
+// Detecting NVCC
+# if defined(__NVCC__) || defined(__CUDACC__)
+#  if defined(__CUDA_ARCH__)
+// nvcc compiling CUDA code, device mode.
+#   define HPX_COMPUTE_DEVICE_CODE
+#  else
+// nvcc compiling CUDA code, host mode.
+#   define HPX_COMPUTE_HOST_CODE
+#  endif
+// Detecting NVCC
+# elif defined(__clang__) && defined(__CUDA__)
+#  if defined(__CUDA_ARCH__)
+// clang compiling CUDA code, device mode.
+#    define HPX_COMPUTE_DEVICE_CODE
+#  else
+// clang compiling CUDA code, host mode.
+#    define HPX_COMPUTE_HOST_CODE
+#  endif
+# endif
+#endif
+
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
 #define HPX_DEVICE __device__
 #define HPX_HOST __host__
 #define HPX_CONSTANT __constant__

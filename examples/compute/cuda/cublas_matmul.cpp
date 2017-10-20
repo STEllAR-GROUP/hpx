@@ -44,6 +44,7 @@
 #include <cublas_v2.h>
 //
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <sstream>
@@ -158,10 +159,10 @@ void matrixMulCPU(T *C, const T *A, const T *B,
         hpx::parallel::execution::par, 0, hA,
         [&](int i) {
             for (unsigned int j = 0; j < wB; ++j) {
-                double sum = 0;
+                T sum = 0;
                 for (unsigned int k = 0; k < wA; ++k) {
-                    double a = A[i * wA + k];
-                    double b = B[k * wB + j];
+                    T a = A[i * wA + k];
+                    T b = B[k * wB + j];
                     sum += a * b;
                 }
                 C[i * wB + j] = (T)sum;
@@ -190,7 +191,7 @@ compare_L2_err(const float *reference, const float *data,
     );
 
     float normRef = sqrtf(ref);
-    if (fabs(ref) < 1e-7) {
+    if (std::fabs(ref) < 1e-7f) {
         return false;
     }
 

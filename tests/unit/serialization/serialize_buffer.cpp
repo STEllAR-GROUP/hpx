@@ -90,7 +90,7 @@ void test_fixed_size_initialization_for_persistent_buffers(std::size_t max_size)
         std::vector<T> recv_vec;
         send_vec.reserve(size);
         for (std::size_t i = 0; i < size; ++i) {
-            send_vec.push_back(size - i);
+            send_vec.push_back(static_cast<int>(size - i));
         }
 
         hpx::serialization::serialize_buffer<T> send_buffer(size);

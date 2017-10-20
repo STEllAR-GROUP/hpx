@@ -1,10 +1,15 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_TRAITS_FUTURE_TRAITS_APR_29_2014_0925AM)
 #define HPX_TRAITS_FUTURE_TRAITS_APR_29_2014_0925AM
+
+#include <hpx/config.hpp>
+#include <hpx/traits/is_future.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace lcos
 {
@@ -62,6 +67,18 @@ namespace hpx { namespace traits
         typedef void type;
         typedef void result_type;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future, typename Enable = void>
+    struct is_future_void
+      : std::false_type
+    {};
+
+    template <typename Future>
+    struct is_future_void<Future,
+            typename std::enable_if<is_future<Future>::value>::type>
+      : std::is_void<typename future_traits<Future>::type>
+    {};
 }}
 
 #endif

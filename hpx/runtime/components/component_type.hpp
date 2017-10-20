@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 
 #include <cstdint>
 #include <string>
@@ -40,34 +40,37 @@ namespace hpx { namespace components
         // Base component for LCOs that do not produce a value.
         component_base_lco = 4,
 
-        // Base component for LCOs that do produce values.
-        component_base_lco_with_value = 5,
+        // Base component for LCOs that produce values.
+        component_base_lco_with_value_unmanaged = 5,
+
+        // (Managed) base component for LCOs that produce values.
+        component_base_lco_with_value = 6,
 
         // Synchronization latch, barrier, and flex_barrier LCOs.
-        component_latch = ((6 << 16) | component_base_lco_with_value),
-        component_barrier = ((7 << 16) | component_base_lco),
-        component_flex_barrier = ((8 << 16) | component_base_lco),
+        component_latch = ((7 << 16) | component_base_lco_with_value),
+        component_barrier = ((8 << 16) | component_base_lco),
+        component_flex_barrier = ((9 << 16) | component_base_lco),
 
         // An LCO representing a value which may not have been computed yet.
-        component_promise = ((9 << 16) | component_base_lco_with_value),
+        component_promise = ((10 << 16) | component_base_lco_with_value),
 
         // AGAS locality services.
-        component_agas_locality_namespace = 10,
+        component_agas_locality_namespace = 11,
 
         // AGAS primary address resolution services.
-        component_agas_primary_namespace = 11,
+        component_agas_primary_namespace = 12,
 
         // AGAS global type system.
-        component_agas_component_namespace = 12,
+        component_agas_component_namespace = 13,
 
         // AGAS symbolic naming services.
-        component_agas_symbol_namespace = 13,
+        component_agas_symbol_namespace = 14,
 
         component_last,
         component_first_dynamic = component_last,
 
         // Force this enum type to be at least 32 bits.
-        component_upper_bound = 0x7fffffffL //-V112
+        component_upper_bound = 0x7fffffffL    //-V112
     };
 
     enum factory_state_enum
@@ -115,14 +118,37 @@ namespace hpx { namespace components
         component_type lhs_base = get_base_type(lhs);
         component_type rhs_base = get_base_type(rhs);
 
+        if (lhs_base == rhs_base)
+            return true;
+
         // special case for lco's
-        if ((lhs_base == component_base_lco && rhs_base == component_base_lco_with_value)
-            || (rhs_base == component_base_lco && lhs_base ==
-                component_base_lco_with_value))
+        if (lhs_base == component_base_lco &&
+                (rhs_base == component_base_lco_with_value_unmanaged ||
+                 rhs_base == component_base_lco_with_value))
         {
             return true;
         }
-        return lhs_base == rhs_base;
+
+        if (rhs_base == component_base_lco &&
+                (lhs_base == component_base_lco_with_value_unmanaged ||
+                 lhs_base == component_base_lco_with_value))
+        {
+            return true;
+        }
+
+        if (lhs_base == component_base_lco_with_value_unmanaged &&
+            rhs_base == component_base_lco_with_value)
+        {
+            return true;
+        }
+
+        if (lhs_base == component_base_lco_with_value &&
+            rhs_base == component_base_lco_with_value_unmanaged)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -144,10 +170,10 @@ namespace hpx { namespace components
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        components::component_type component_type_database<component>::get()  \
+        components::component_type component_type_database< component>::get() \
             { return value; }                                                 \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(                         \
+        void component_type_database< component>::set(                        \
             components::component_type t) { value = t; }                      \
     }}                                                                        \
 /**/
@@ -155,8 +181,8 @@ namespace hpx { namespace components
 #define HPX_DEFINE_GET_COMPONENT_TYPE_TEMPLATE(template_, component)          \
     namespace hpx { namespace traits                                          \
     {                                                                         \
-        HPX_UTIL_STRIP(template_)                                             \
-        struct component_type_database<HPX_UTIL_STRIP(component) >            \
+        HPX_PP_STRIP_PARENS(template_)                                        \
+        struct component_type_database<HPX_PP_STRIP_PARENS(component) >       \
         {                                                                     \
             static components::component_type value;                          \
                                                                               \
@@ -166,8 +192,8 @@ namespace hpx { namespace components
                 { value = t; }                                                \
         };                                                                    \
                                                                               \
-        HPX_UTIL_STRIP(template_) components::component_type                  \
-        component_type_database<HPX_UTIL_STRIP(component) >::value =          \
+        HPX_PP_STRIP_PARENS(template_) components::component_type             \
+        component_type_database<HPX_PP_STRIP_PARENS(component) >::value =     \
             components::component_invalid;                                    \
     }}                                                                        \
 /**/
@@ -177,11 +203,11 @@ namespace hpx { namespace components
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        components::component_type component_type_database<component>::get()  \
+        components::component_type component_type_database< component>::get() \
             { return type; }                                                  \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(components::component_type) \
-            { HPX_ASSERT(false); }                                          \
+        void component_type_database< component>::set(components::component_type)\
+            { HPX_ASSERT(false); }                                            \
     }}                                                                        \
 /**/
 

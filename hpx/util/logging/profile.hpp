@@ -31,9 +31,7 @@
 
 #include <hpx/util/function.hpp>
 
-#include <boost/date_time/microsec_time_clock.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <chrono>
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -179,14 +177,15 @@ struct scoped_compute {
     compute& m_comp;
     compute::type m_type;
 
-    ::boost::posix_time::ptime m_start, m_end;
+    std::chrono::time_point<std::chrono::system_clock> m_start, m_end;
 
     scoped_compute(compute& comp, compute::type type) : m_comp(comp), m_type(type) {
-        m_start = ::boost::posix_time::microsec_clock::local_time();
+        m_start = std::chrono::system_clock::now();
     }
     ~scoped_compute() {
-        m_end = ::boost::posix_time::microsec_clock::local_time();
-        m_comp.add_period( (m_end - m_start).total_microseconds() , m_type);
+        m_end = std::chrono::system_clock::now();
+        m_comp.add_period(std::chrono::duration_cast<std::chrono::microseconds>(
+            m_end - m_start).count(), m_type);
     }
 
 };

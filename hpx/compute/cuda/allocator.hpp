@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#if defined(HPX_HAVE_CUDA)
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/compute/cuda/target.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace compute { namespace cuda
         typedef T value_type;
         typedef target_ptr<T> pointer;
         typedef target_ptr<T const> const_pointer;
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
         typedef T& reference;
         typedef T const& const_reference;
 #else
@@ -78,18 +78,18 @@ namespace hpx { namespace compute { namespace cuda
 
         // Returns the actual address of x even in presence of overloaded
         // operator&
-        pointer address(reference x) const HPX_NOEXCEPT
+        pointer address(reference x) const noexcept
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return &x;
 #else
             return pointer(x.device_ptr(), target_);
 #endif
         }
 
-        const_pointer address(const_reference x) const HPX_NOEXCEPT
+        const_pointer address(const_reference x) const noexcept
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             return &x;
 #else
             return pointer(x.device_ptr(), target_);
@@ -104,7 +104,7 @@ namespace hpx { namespace compute { namespace cuda
         pointer allocate(size_type n,
             std::allocator<void>::const_pointer hint = nullptr)
         {
-#if defined(__CUDA_ARCH__)
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             pointer result;
 #else
             value_type *p = nullptr;
@@ -130,7 +130,7 @@ namespace hpx { namespace compute { namespace cuda
         // originally produced p; otherwise, the behavior is undefined.
         void deallocate(pointer p, size_type n)
         {
-#if !defined(__CUDA_ARCH__)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
             detail::scoped_active_target active(target_);
 
             cudaError_t error = cudaFree(p.device_ptr());
@@ -147,7 +147,7 @@ namespace hpx { namespace compute { namespace cuda
         // Returns the maximum theoretically possible value of n, for which the
         // call allocate(n, 0) could succeed. In most implementations, this
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
-        size_type max_size() const HPX_NOEXCEPT
+        size_type max_size() const noexcept
         {
             detail::scoped_active_target active(target_);
             std::size_t free = 0;
@@ -168,8 +168,9 @@ namespace hpx { namespace compute { namespace cuda
         // Constructs count objects of type T in allocated uninitialized
         // storage pointed to by p, using placement-new
         template <typename ... Args>
-        void bulk_construct(pointer p, std::size_t count, Args &&... args)
+        HPX_HOST_DEVICE void bulk_construct(pointer p, std::size_t count, Args &&... args)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block - 1) / threads_per_block);
@@ -186,13 +187,15 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), count, std::forward<Args>(args)...);
             target_.synchronize();
+#endif
         }
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
         template <typename ... Args>
-        void construct(pointer p, Args &&... args)
+        HPX_HOST_DEVICE void construct(pointer p, Args &&... args)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
             detail::launch(
                 target_, 1, 1,
                 [] HPX_DEVICE (T* p, Args const&... args)
@@ -201,11 +204,13 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), std::forward<Args>(args)...);
             target_.synchronize();
+#endif
         }
 
         // Calls the destructor of count objects pointed to by p
-        void bulk_destroy(pointer p, std::size_t count)
+        HPX_HOST_DEVICE void bulk_destroy(pointer p, std::size_t count)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
             int threads_per_block = (std::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
@@ -222,20 +227,21 @@ namespace hpx { namespace compute { namespace cuda
                 },
                 p.device_ptr(), count);
             target_.synchronize();
+#endif
         }
 
         // Calls the destructor of the object pointed to by p
-        void destroy(pointer p)
+        HPX_HOST_DEVICE void destroy(pointer p)
         {
             bulk_destroy(p, 1);
         }
 
         // Access the underlying target (device)
-        target_type& target() HPX_NOEXCEPT
+        target_type& target() noexcept
         {
             return target_;
         }
-        target_type const& target() const HPX_NOEXCEPT
+        target_type const& target() const noexcept
         {
             return target_;
         }

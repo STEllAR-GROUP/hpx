@@ -37,16 +37,15 @@ int hpx_main(boost::program_options::variables_map& vm);
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \namespace hpx_startup
+/// \cond NOINTERNAL
 namespace hpx_startup
 {
-#ifndef DOXYGEN
     // As an alternative, the user can provide a function hpx_startup::user_main,
     // which is semantically equivalent to the plain old C-main.
     int user_main();
     int user_main(int argc, char** argv);
-#endif
 }
+/// \endcond
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \namespace hpx

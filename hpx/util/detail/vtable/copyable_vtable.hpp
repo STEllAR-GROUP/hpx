@@ -28,7 +28,7 @@ namespace hpx { namespace util { namespace detail
         void (*copy)(void**, void* const*);
 
         template <typename T>
-        HPX_CONSTEXPR copyable_vtable(construct_vtable<T>) HPX_NOEXCEPT
+        HPX_CONSTEXPR copyable_vtable(construct_vtable<T>) noexcept
           : copy(&copyable_vtable::template _copy<T>)
         {}
     };

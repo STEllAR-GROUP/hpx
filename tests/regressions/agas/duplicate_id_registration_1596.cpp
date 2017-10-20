@@ -9,15 +9,14 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-#include <boost/format.hpp>
 
 #include <cstddef>
 
 using namespace std;
 
-namespace server
+namespace tests { namespace server
 {
 
 struct ViewRegistrationListener
@@ -32,37 +31,37 @@ struct ViewRegistrationListener
     ViewRegistrationListener(const string &name) :
         name(name)
     {
-        cout << boost::format("constructed server listener %1% (%2%)")
-            % name % this << endl;
+        hpx::util::format_to(cout, "constructed server listener %1% (%2%)",
+            name, this) << endl;
     }
 
     void register_view()
     {
-        cout << boost::format("register view at listener %1% (%2%)")
-            % name % this << endl;
+        hpx::util::format_to(cout, "register view at listener %1% (%2%)",
+            name, this) << endl;
     }
     HPX_DEFINE_COMPONENT_ACTION(ViewRegistrationListener, register_view);
 
     string name;
 };
 
-}
+}}
 
 typedef hpx::components::simple_component<
-        server::ViewRegistrationListener
+        tests::server::ViewRegistrationListener
     > view_registration_listener_type;
 
 HPX_REGISTER_COMPONENT(
     view_registration_listener_type, ViewRegistrationListener);
 
 HPX_REGISTER_ACTION_DECLARATION(
-    server::ViewRegistrationListener::register_view_action,
+    tests::server::ViewRegistrationListener::register_view_action,
     view_registration_listener_register_view_action);
 HPX_REGISTER_ACTION(
-    server::ViewRegistrationListener::register_view_action,
+    tests::server::ViewRegistrationListener::register_view_action,
     view_registration_listener_register_view_action);
 
-namespace client
+namespace tests { namespace client
 {
 
 struct ViewRegistrationListener
@@ -93,13 +92,13 @@ struct ViewRegistrationListener
     }
 };
 
-}
+}}
 
 int hpx_main()
 {
     std::size_t num_expected_ids = 0;
     {
-        auto id = hpx::new_<server::ViewRegistrationListener>(
+        auto id = hpx::new_<tests::server::ViewRegistrationListener>(
             hpx::find_here(), string("A")).get();
         bool result = hpx::register_with_basename("Listener", id).get();
         HPX_TEST(result);
@@ -108,7 +107,7 @@ int hpx_main()
     }
 
     {
-        auto id = hpx::new_<server::ViewRegistrationListener>(
+        auto id = hpx::new_<tests::server::ViewRegistrationListener>(
             hpx::find_here(), string("B")).get();
         bool result = hpx::register_with_basename("Listener", id).get();
         HPX_TEST(!result);
@@ -117,7 +116,7 @@ int hpx_main()
     }
 
     {
-        auto id = hpx::new_<server::ViewRegistrationListener>(
+        auto id = hpx::new_<tests::server::ViewRegistrationListener>(
             hpx::find_here(), string("C")).get();
         bool result = hpx::register_with_basename("Listener", id).get();
         HPX_TEST(!result);
@@ -136,7 +135,7 @@ int hpx_main()
 
             cout << "resolved id: " << id << endl;
 
-            client::ViewRegistrationListener client(id);
+            tests::client::ViewRegistrationListener client(id);
             cout << "created client with id " << client.get_id() << endl;
 
             client.register_view();

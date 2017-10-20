@@ -8,10 +8,9 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/unwrap.hpp>
 
-#include <boost/atomic.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -36,26 +35,26 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
-using hpx::util::unwrapped;
+using hpx::util::unwrapping;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> void_f_count;
-boost::atomic<std::uint32_t> int_f_count;
+std::atomic<std::uint32_t> void_f_count;
+std::atomic<std::uint32_t> int_f_count;
 
 void void_f() {++void_f_count;}
 int int_f() {++int_f_count; return 42; }
 
-boost::atomic<std::uint32_t> void_f1_count;
-boost::atomic<std::uint32_t> int_f1_count;
+std::atomic<std::uint32_t> void_f1_count;
+std::atomic<std::uint32_t> int_f1_count;
 
 void void_f1(int) {++void_f1_count;}
 int int_f1(int i) {++int_f1_count; return i+42; }
 
-boost::atomic<std::uint32_t> int_f2_count;
+std::atomic<std::uint32_t> int_f2_count;
 int int_f2(int l, int r) {++int_f2_count; return l + r; }
 
-boost::atomic<std::uint32_t> int_f_vector_count;
+std::atomic<std::uint32_t> int_f_vector_count;
 
 int int_f_vector(std::vector<int> const & vf)
 {
@@ -75,23 +74,23 @@ void function_pointers()
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    future<void> f1 = dataflow(unwrapped(&void_f1), async(&int_f));
+    future<void> f1 = dataflow(unwrapping(&void_f1), async(&int_f));
     future<int>
         f2 = dataflow(
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
         );
     future<int>
         f3 = dataflow(
-            unwrapped(&int_f2)
+            unwrapping(&int_f2)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42)
             )
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(37)
             )
         );
@@ -100,18 +99,18 @@ void function_pointers()
     std::vector<future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
-        vf.push_back(dataflow(unwrapped(&int_f1), make_ready_future(42)));
+        vf.push_back(dataflow(unwrapping(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(unwrapped(&int_f_vector), std::move(vf));
+    future<int> f4 = dataflow(unwrapping(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(
-            unwrapped(&int_f1)
+            unwrapping(&int_f1)
           , dataflow(
-                unwrapped(&int_f1)
+                unwrapping(&int_f1)
               , make_ready_future(42))
           , dataflow(
-                unwrapped(&void_f)
+                unwrapping(&void_f)
               , make_ready_future())
         );
 
@@ -129,8 +128,8 @@ void function_pointers()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-boost::atomic<std::uint32_t> future_void_f1_count;
-boost::atomic<std::uint32_t> future_void_f2_count;
+std::atomic<std::uint32_t> future_void_f1_count;
+std::atomic<std::uint32_t> future_void_f2_count;
 
 void future_void_f1(future<void> f1)
     { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
@@ -139,8 +138,8 @@ void future_void_sf1(shared_future<void> f1)
 void future_void_f2(future<void> f1, future<void> f2)
     { HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready()); ++future_void_f2_count;}
 
-boost::atomic<std::uint32_t> future_int_f1_count;
-boost::atomic<std::uint32_t> future_int_f2_count;
+std::atomic<std::uint32_t> future_int_f1_count;
+std::atomic<std::uint32_t> future_int_f2_count;
 
 int future_int_f1(future<void> f1) { HPX_TEST(f1.is_ready());
     ++future_int_f1_count; return 1;}
@@ -151,7 +150,7 @@ int future_int_f2(future<int> f1, future<int> f2)
     return f1.get() + f2.get();
 }
 
-boost::atomic<std::uint32_t> future_int_f_vector_count;
+std::atomic<std::uint32_t> future_int_f_vector_count;
 
 int future_int_f_vector(std::vector<future<int> >& vf)
 {
@@ -225,14 +224,14 @@ void future_function_pointers()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::uint32_t> void_f4_count;
-boost::atomic<std::uint32_t> int_f4_count;
+std::atomic<std::uint32_t> void_f4_count;
+std::atomic<std::uint32_t> int_f4_count;
 
 void void_f4(int) { ++void_f4_count; }
 int int_f4(int i) { ++int_f4_count; return i+42; }
 
-boost::atomic<std::uint32_t> void_f5_count;
-boost::atomic<std::uint32_t> int_f5_count;
+std::atomic<std::uint32_t> void_f5_count;
+std::atomic<std::uint32_t> int_f5_count;
 
 void void_f5(int, hpx::future<int>) { ++void_f5_count; }
 int int_f5(int i, hpx::future<int> j) { ++int_f5_count; return i+j.get()+42; }
@@ -321,6 +320,69 @@ void plain_deferred_arguments()
     }
 }
 
+void plain_arguments_lazy()
+{
+    void_f4_count.store(0);
+    int_f4_count.store(0);
+
+    auto policy1 =
+        hpx::launch::select([]()
+        {
+            return hpx::launch::sync;
+        });
+
+    {
+        future<void> f1 = dataflow(policy1, &void_f4, 42);
+        future<int> f2 = dataflow(policy1, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 1u);
+    }
+
+    auto policy2 =
+        hpx::launch::select([]()
+        {
+            return hpx::launch::async;
+        });
+
+    {
+        future<void> f1 = dataflow(policy2, &void_f4, 42);
+        future<int> f2 = dataflow(policy2, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 2u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 2u);
+    }
+
+    void_f5_count.store(0);
+    int_f5_count.store(0);
+
+    std::atomic<int> count(0);
+    auto policy3 =
+        hpx::launch::select([&count]() -> hpx::launch
+        {
+            if (count++ == 0)
+                return hpx::launch::async;
+            return hpx::launch::sync;
+        });
+
+    {
+        future<void> f1 = dataflow(policy3, &void_f5, 42, async(&int_f));
+        future<int> f2 = dataflow(policy3, &int_f5, 42, async(&int_f));
+
+        f1.wait();
+        HPX_TEST_EQ(void_f5_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 126);
+        HPX_TEST_EQ(int_f5_count, 1u);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
@@ -328,6 +390,7 @@ int hpx_main(variables_map&)
     future_function_pointers();
     plain_arguments();
     plain_deferred_arguments();
+    plain_arguments_lazy();
 
     return hpx::finalize();
 }

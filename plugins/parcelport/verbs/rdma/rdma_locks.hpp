@@ -6,9 +6,9 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_RDMA_LOCKS_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_RDMA_LOCKS_HPP
 
-#include <hpx/config/parcelport_verbs_defines.hpp>
+#include <hpx/config/parcelport_defines.hpp>
 //
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <mutex>
 
 namespace hpx {

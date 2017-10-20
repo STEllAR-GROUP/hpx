@@ -5,9 +5,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/format.hpp>
 
 #include <boost/program_options.hpp>
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -55,18 +55,17 @@ int monitor(std::uint64_t pause, std::uint64_t values)
 {
     // Create the performances counters using their symbolic name.
     std::uint32_t const prefix = hpx::get_locality_id();
-    boost::format sine_explicit_fmt(
-        "/sine{locality#%d/instance#%d}/immediate/explicit");
-    boost::format sine_implicit_fmt(
-        "/sine{locality#%d/total}/immediate/implicit");
-    boost::format sine_average_fmt(
-        "/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average@100");
 
     using hpx::performance_counters::performance_counter;
-
-    performance_counter sine_explicit(boost::str(sine_explicit_fmt % prefix % 0));
-    performance_counter sine_implicit(boost::str(sine_implicit_fmt % prefix));
-    performance_counter sine_average(boost::str(sine_average_fmt % prefix % 1));
+    performance_counter sine_explicit(hpx::util::format(
+        "/sine{locality#%d/instance#%d}/immediate/explicit",
+        prefix, 0));
+    performance_counter sine_implicit(hpx::util::format(
+        "/sine{locality#%d/total}/immediate/implicit",
+        prefix));
+    performance_counter sine_average(hpx::util::format(
+        "/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average@100",
+        prefix, 1));
 
     // We need to explicitly start all counters before we can use them. For
     // certain counters this could be a no-op, in which case start will return
@@ -93,10 +92,10 @@ int monitor(std::uint64_t pause, std::uint64_t values)
             if (!start_time)
                 start_time = value2.time_;
 
-            std::cout << (boost::format("%.3f: %.4f, %.4f, %.4f\n") %
-                ((value2.time_ - start_time) * 1e-9) %
-                value1.get_value<double>() %
-                (value2.get_value<double>() / 100000.) %
+            hpx::util::format_to(std::cout, "%.3f: %.4f, %.4f, %.4f\n",
+                (value2.time_ - start_time) * 1e-9,
+                value1.get_value<double>(),
+                value2.get_value<double>() / 100000.,
                 value3.get_value<double>());
         }
 

@@ -58,12 +58,32 @@ namespace hpx { namespace threads
     enum thread_priority
     {
         thread_priority_unknown = -1,
-        thread_priority_default = 0,      ///< use default priority
-        thread_priority_low = 1,          ///< low thread priority
-        thread_priority_normal = 2,       ///< normal thread priority (default)
-        thread_priority_critical = 3,     ///< high thread priority
-        thread_priority_boost = 4         ///< high thread priority for first
-                                          ///< invocation, normal afterwards
+        thread_priority_default = 0,      /*!< Will assign the priority of the
+            task to the default (normal) priority. */
+        thread_priority_low = 1,          /*!< Task goes onto a special low
+            priority queue and will not be executed until all high/normal
+            priority tasks are done, even if they are added after the low
+            priority task. */
+        thread_priority_normal = 2,       /*!< Task will be executed when it is
+            taken from the normal priority queue, this is usually a first
+            in-first-out ordering of tasks (depending on scheduler choice).
+            This is the default priority. */
+        thread_priority_high_recursive = 3, /*!< The task is a high priority
+            task and any child tasks spawned by this task will be made high
+            priority as well - unless they are specifically flagged as non
+            default priority. */
+        thread_priority_boost = 4,        /*!< Same as \a thread_priority_high
+            except that the thread will fall back to \a thread_priority_normal
+            if resumed after being suspended. */
+        thread_priority_high = 5,         /*!< Task goes onto a special high
+            priority queue and will be executed before normal/low priority
+            tasks are taken (some schedulers modify the behavior slightly and
+            the documentation for those should be consulted). */
+
+        /// \cond NOINTERNAL
+        // obsolete, kept for compatibility only
+        thread_priority_critical = thread_priority_high_recursive,
+        /// \endcond
     };
 
     /// Get the readable string representing the name of the given thread_priority

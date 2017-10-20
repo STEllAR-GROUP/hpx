@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 #define HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -30,7 +31,7 @@ namespace hpx { namespace parcelset {
           typedef BufferType buffer_type;
           typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
 
-    private:
+    public:
         HPX_NON_COPYABLE(parcelport_connection);
 
     public:
@@ -81,6 +82,12 @@ namespace hpx { namespace parcelset {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         void set_state(state newstate)
         {
+            if (newstate == state_send_pending)
+            {
+                HPX_ASSERT(state_ == state_initialized ||
+                    state_ == state_reinitialized ||
+                    state_ == state_handle_read_ack);
+            }
             state_ = newstate;
         }
 #endif

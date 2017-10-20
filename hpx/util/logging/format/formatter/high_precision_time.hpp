@@ -27,10 +27,16 @@
 #include <hpx/util/logging/detail/manipulator.hpp> // is_generic
 #include <hpx/util/logging/detail/time_format_holder.hpp>
 
-#include <boost/date_time/microsec_time_clock.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <chrono>
+#include <cstdint>
+#include <ctime>
 
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+#elif defined(HPX_MSVC)
+#else
+#include <hpx/lcos/local/spinlock.hpp>
+#include <mutex>
+#endif
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
@@ -83,48 +89,50 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
         : non_const_context_base(format) {}
 
     template<class msg_type>
-    void write_high_precision_time(msg_type & msg, ::boost::posix_time::ptime val)
-        const {
+    void write_high_precision_time(msg_type & msg,
+        std::chrono::time_point<std::chrono::system_clock> val) const
+    {
+        std::time_t tt = std::chrono::system_clock::to_time_t(val);
+
+#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+        std::tm local_tm;
+        localtime_r(&tt, &local_tm);
+#elif defined(HPX_MSVC)
+        std::tm local_tm;
+        localtime_s(&local_tm, &tt);
+#else
+        // fall back to non-thread-safe version on other platforms
+        std::tm local_tm;
+        {
+            static hpx::lcos::local::spinlock mutex;
+            std::unique_lock<hpx::lcos::local::spinlock> ul(mutex);
+            local_tm = *std::localtime(&tt);
+        }
+#endif
+
+        std::chrono::nanoseconds nanosecs = std::chrono::duration_cast<
+                std::chrono::nanoseconds
+            >(val.time_since_epoch());
+        std::chrono::microseconds microsecs = std::chrono::duration_cast<
+                std::chrono::microseconds
+            >(val.time_since_epoch());
+        std::chrono::milliseconds millisecs = std::chrono::duration_cast<
+                std::chrono::milliseconds
+            >(val.time_since_epoch());
+
         char_type buffer[64];
 
-        int nanosecs = static_cast<int>(val.time_of_day().fractional_seconds()); //-V807
-        int digits = static_cast<int>(val.time_of_day().num_fractional_digits());
-        switch ( digits) {
-        case 0: break; // no high precision at all
-        case 1: nanosecs *= 100000000; break;
-        case 2: nanosecs *= 10000000; break;
-        case 3: nanosecs *= 1000000; break;
-        case 4: nanosecs *= 100000; break;
-        case 5: nanosecs *= 10000; break;
-        case 6: nanosecs *= 1000; break;
-        case 7: nanosecs *= 100; break;
-        case 8: nanosecs *= 10; break;
-        case 9: break;
-        default:
-            while ( digits > 9) {
-                nanosecs /= 10; digits--;
-            }
-            break;
-        }
-
-        non_const_context_base::context().write_time( buffer,
-            val.date().day(), //-V807
-            val.date().month(),
-            val.date().year(),
-            val.time_of_day().hours(),
-            val.time_of_day().minutes(),
-            val.time_of_day().seconds(),
-            nanosecs / 1000000,
-            nanosecs / 1000,
-            nanosecs
-            );
+        non_const_context_base::context().write_time(buffer,
+            local_tm.tm_mday, local_tm.tm_mon + 1, local_tm.tm_year + 1900,
+            local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec,
+            millisecs.count() % 1000, microsecs.count() % 1000,
+            nanosecs.count() % 1000);
 
         convert::write(buffer, msg);
     }
 
     template<class msg_type> void operator()(msg_type & msg) const {
-        write_high_precision_time(msg,
-            ::boost::posix_time::microsec_clock::local_time() );
+        write_high_precision_time(msg, std::chrono::system_clock::now());
     }
 
     bool operator==(const high_precision_time_t & other) const {

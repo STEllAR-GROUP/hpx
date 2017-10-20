@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/function.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -128,13 +129,19 @@ namespace hpx { namespace performance_counters
         ///        (milliseconds).
         counter_status create_statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
-            std::vector<std::int64_t> const& parameters,
+            std::vector<std::size_t> const& parameters,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Create a new arithmetics performance counter instance based
-        ///        on given base counter name and given base time interval
-        ///        (milliseconds).
+        ///        on given base counter names
         counter_status create_arithmetics_counter(counter_info const& info,
+            std::vector<std::string> const& base_counter_names,
+            naming::gid_type& id, error_code& ec = throws);
+
+        /// \brief Create a new extended arithmetics performance counter
+        ///        instance based on given base counter names
+        counter_status create_arithmetics_counter_extended(
+            counter_info const& info,
             std::vector<std::string> const& base_counter_names,
             naming::gid_type& id, error_code& ec = throws);
 

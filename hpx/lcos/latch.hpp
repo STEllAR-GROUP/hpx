@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,10 +10,10 @@
 #include <hpx/lcos/server/latch.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
-
-#include <boost/exception_ptr.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos
         ///
         /// \throws Nothing.
         ///
-        bool is_ready() const HPX_NOEXCEPT
+        bool is_ready() const noexcept
         {
             return is_ready_async().get();
         }
@@ -136,12 +136,12 @@ namespace hpx { namespace lcos
             return hpx::async(act, get_id());
         }
 
-        hpx::future<void> set_exception_async(boost::exception_ptr const& e)
+        hpx::future<void> set_exception_async(std::exception_ptr const& e)
         {
             lcos::server::latch::set_exception_action act;
              return hpx::async(act, get_id(), e);
         }
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(std::exception_ptr const& e)
         {
             set_exception_async(e).get();
         }

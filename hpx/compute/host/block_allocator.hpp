@@ -22,9 +22,10 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/functional/new.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/range/iterator_range_core.hpp>
+#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -48,7 +49,7 @@ namespace hpx { namespace compute { namespace host
     /// vector_type v(N, allocator_type(numa_nodes));
     ///
     template <typename T, typename Executor =
-        hpx::threads::executors::local_priority_queue_attached_executor>
+        hpx::parallel::execution::local_priority_queue_attached_executor>
     struct block_allocator
     {
         typedef T value_type;
@@ -115,12 +116,12 @@ namespace hpx { namespace compute { namespace host
 
         // Returns the actual address of x even in presence of overloaded
         // operator&
-        pointer address(reference x) const HPX_NOEXCEPT
+        pointer address(reference x) const noexcept
         {
             return &x;
         }
 
-        const_pointer address(const_reference x) const HPX_NOEXCEPT
+        const_pointer address(const_reference x) const noexcept
         {
             return &x;
         }
@@ -148,7 +149,7 @@ namespace hpx { namespace compute { namespace host
         // Returns the maximum theoretically possible value of n, for which the
         // call allocate(n, 0) could succeed. In most implementations, this
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
-        size_type max_size() const HPX_NOEXCEPT
+        size_type max_size() const noexcept
         {
             return (std::numeric_limits<size_type>::max)();
         }
@@ -165,7 +166,7 @@ namespace hpx { namespace compute { namespace host
             auto policy =
                 hpx::parallel::execution::parallel_policy()
                     .on(executor_)
-                    .with(hpx::parallel::static_chunk_size());
+                    .with(hpx::parallel::execution::static_chunk_size());
 
             typedef boost::range_detail::integer_iterator<std::size_t>
                 iterator_type;
@@ -183,7 +184,7 @@ namespace hpx { namespace compute { namespace host
 
             cancellation_token tok;
             partitioner::call(std::move(policy),
-                boost::begin(irange), count,
+                util::begin(irange), count,
                 [&arguments, p, &tok](iterator_type it, std::size_t part_size)
                     mutable -> partition_result_type
                 {
@@ -240,8 +241,8 @@ namespace hpx { namespace compute { namespace host
             hpx::parallel::for_each(
                 hpx::parallel::execution::par
                     .on(executor_)
-                    .with(hpx::parallel::static_chunk_size()),
-                boost::begin(irange), boost::end(irange),
+                    .with(hpx::parallel::execution::static_chunk_size()),
+                util::begin(irange), util::end(irange),
                 [p](std::size_t i)
                 {
                     (p + i)->~U();
@@ -257,7 +258,7 @@ namespace hpx { namespace compute { namespace host
         }
 
         // Access the underlying target (device)
-        target_type const& target() const HPX_NOEXCEPT
+        target_type const& target() const noexcept
         {
             return executor_.targets();
         }

@@ -8,8 +8,6 @@
 
 #include <boost/version.hpp>
 
-// use released library Boost.Lockfree starting V1.53.0
-#if BOOST_VERSION >= 105300
 #include <boost/lockfree/policies.hpp>
 #include <boost/lockfree/queue.hpp>
 
@@ -65,9 +63,5 @@ namespace boost { namespace lockfree
     struct caching_freelist_t {};
     struct static_freelist_t {};
 }}
-
-#else
-#include <boost/lockfree/detail/freelist.hpp>
-#endif
 
 #endif

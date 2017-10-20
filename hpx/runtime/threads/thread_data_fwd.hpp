@@ -32,10 +32,8 @@ namespace hpx
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-    struct HPX_EXPORT threadmanager_base;
-
-    template <typename SchedulingPolicy>
-    class HPX_EXPORT threadmanager_impl;
+    class HPX_EXPORT threadmanager;
+    struct HPX_EXPORT topology;
 
     class HPX_EXPORT executor;
 
@@ -123,7 +121,7 @@ namespace hpx { namespace threads
     /// \cond NOINTERNAL
     // The function get_thread_manager returns a reference to the
     // current thread manager.
-    HPX_API_EXPORT threadmanager_base& get_thread_manager();
+    HPX_API_EXPORT threadmanager& get_thread_manager();
     /// \endcond
 
     /// The function \a get_thread_count returns the number of currently
@@ -165,6 +163,10 @@ namespace hpx { namespace threads
     HPX_API_EXPORT bool enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state = unknown);
+
+#if defined(HPX_HAVE_APEX)
+    HPX_API_EXPORT void** get_self_apex_data();
+#endif
 }}
 
 #endif

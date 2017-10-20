@@ -6,6 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
 #include <hpx/include/lcos.hpp>
 
 #include <iostream>
@@ -32,10 +33,12 @@ void break_queue(queue_type queue)
 {
     queue.abort_pending();
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)
 {
+#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
     // Create a new queue of integers.
     queue_type queue = hpx::new_<queue_type>(hpx::find_here());
 
@@ -53,9 +56,9 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::apply(hpx::util::bind(&worker, queue));
 
     hpx::apply(hpx::util::bind(&break_queue, queue));
+#endif
 
-    hpx::finalize();
-    return 0;
+    return hpx::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,3 +66,4 @@ int main(int argc, char* argv[])
 {
     return hpx::init("queue_of_ints_client", argc, argv);
 }
+

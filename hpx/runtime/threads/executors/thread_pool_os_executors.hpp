@@ -7,7 +7,9 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_OS_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/compat/mutex.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -15,12 +17,11 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/thread/mutex.hpp>
-
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -71,16 +72,16 @@ namespace hpx { namespace threads { namespace executors
 
             /// Return the mask for processing units the given thread is allowed
             /// to run on.
-            mask_cref_type get_pu_mask(topology const& topology,
+            mask_cref_type get_pu_mask(topology const& /*topology*/,
                 std::size_t num_thread) const
             {
-                return pool_.get_pu_mask(topology, num_thread);
+                return hpx::resource::get_partitioner().get_pu_mask(num_thread);
             }
 
             /// Set the new scheduler mode
             void set_scheduler_mode(threads::policies::scheduler_mode mode)
             {
-                pool_.set_scheduler_mode(mode);
+                pool_->set_scheduler_mode(mode);
             }
 
         protected:
@@ -93,18 +94,18 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             // the scheduler used by this executor
-            Scheduler scheduler_;
+            Scheduler *scheduler_;
             std::string executor_name_;
             threads::policies::callback_notifier notifier_;
-            threads::detail::thread_pool<Scheduler> pool_;
+            std::unique_ptr<threads::detail::scheduled_thread_pool<Scheduler>> pool_;
 
             std::size_t num_threads_;
 
-            static boost::atomic<std::size_t> os_executor_count_;
+            static std::atomic<std::size_t> os_executor_count_;
             static std::string get_unique_name();
 
             // protect scheduler initialization
-            typedef boost::mutex mutex_type;
+            typedef compat::mutex mutex_type;
             mutable mutex_type mtx_;
         };
     }

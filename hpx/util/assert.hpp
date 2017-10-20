@@ -7,6 +7,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  Make HPX inspect tool happy: hpxinspect:noassert_macro
+//                               hpxinspect:noinclude:HPX_ASSERT
+//                               hpxinspect:nodeprecatedname:BOOST_ASSERT
+
 //  Note: There are no include guards. This is intentional.
 
 #if defined(HPX_USE_BOOST_ASSERT)
@@ -44,7 +47,7 @@
 
 namespace hpx
 {
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT void assertion_failed(char const * expr,
+    HPX_NORETURN HPX_EXPORT void assertion_failed(char const * expr,
         char const * function, char const * file, long line);  // user defined
 } // namespace hpx
 
@@ -85,7 +88,7 @@ namespace hpx
 
 namespace hpx
 {
-    HPX_ATTRIBUTE_NORETURN HPX_EXPORT void assertion_failed_msg(
+    HPX_NORETURN HPX_EXPORT void assertion_failed_msg(
         char const * expr, char const * msg,
         char const * function, char const * file, long line); // user defined
 } // namespace hpx
@@ -116,7 +119,7 @@ namespace hpx { namespace assertion { namespace detail
     // Note: The template is needed to make the function non-inline and
     // avoid linking errors
     template <typename CharT>
-    HPX_ATTRIBUTE_NORETURN HPX_NOINLINE void assertion_failed_msg(
+    HPX_NORETURN HPX_NOINLINE void assertion_failed_msg(
         CharT const * expr, char const * msg, char const * function,
         char const * file, long line)
     {

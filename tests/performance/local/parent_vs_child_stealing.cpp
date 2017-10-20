@@ -6,9 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <cstddef>
@@ -59,7 +59,7 @@ double measure(Policy policy)
         cores.push_back(hpx::async(&measure_one<Policy>, policy));
     }
 
-    std::vector<double> times = hpx::util::unwrapped(cores);
+    std::vector<double> times = hpx::util::unwrap(cores);
     return std::accumulate(times.begin(), times.end(), 0.0);
 }
 
@@ -89,13 +89,12 @@ int hpx_main(boost::program_options::variables_map& vm)
             << hpx::endl;
     }
 
-    hpx::cout
-        << (boost::format("%d,%d,%f,%f") %
-                num_cores %
-                iterations %
-                child_stealing_time %
-                parent_stealing_time)
-        << hpx::endl;
+    hpx::util::format_to(hpx::cout,
+        "%d,%d,%f,%f",
+        num_cores,
+        iterations,
+        child_stealing_time,
+        parent_stealing_time) << hpx::endl;
 
     return hpx::finalize();
 }

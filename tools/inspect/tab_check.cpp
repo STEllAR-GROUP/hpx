@@ -6,6 +6,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include "tab_check.hpp"
 #include "function_hyper.hpp"
 #include <string>
@@ -37,7 +39,7 @@ namespace boost
        if (contents.find("hpxinspect:" "notab") != string::npos) return;
        string total, linenum;
        long errors = 0, currline = 0;
-       size_t p = 0, extend = 0;
+       size_t p = 0;
        std::vector<std::string> someline, lineorder;
 
        char_separator<char> sep("\n", "", boost::keep_empty_tokens);

@@ -10,8 +10,6 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/async.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -39,6 +37,7 @@ using hpx::util::high_resolution_timer;
 
 using hpx::init;
 using hpx::finalize;
+using namespace std::placeholders;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
@@ -48,7 +47,7 @@ inline std::size_t partition(T* data, std::size_t begin, std::size_t end)
     T* last = first + (end - begin);
 
     T* middle = std::partition(
-        first, last, std::bind2nd(std::less<T>(), *first));
+        first, last, std::bind(std::less<T>(), _1, *first));
 
     return middle - data;
 }

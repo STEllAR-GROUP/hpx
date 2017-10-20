@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,7 +25,7 @@ eval(char const* expr, interpolate1d::interpolate1d& sine, double value)
               << std::endl;
 }
 
-int hpx_main(variables_map& vm)
+int hpx_main()
 {
     std::string datafilename("sine.h5");
     int num_localities = 7;
@@ -53,11 +53,6 @@ int hpx_main(variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options
-    options_description desc_commandline(
-        "Usage: " HPX_APPLICATION_STRING " [options]");
-
-    // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(argc, argv);       // Initialize and run HPX
 }
 

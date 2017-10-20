@@ -178,21 +178,19 @@ namespace hpx
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pp/strip_parens.hpp>
 #include <hpx/util/tuple.hpp>
 
-#include <boost/atomic.hpp>
-
 #include <algorithm>
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
+#include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -223,7 +221,7 @@ namespace hpx { namespace lcos
                 >::type* = nullptr) const
             {
                 std::size_t counter =
-                    wait_.count_.load(boost::memory_order_seq_cst);
+                    wait_.count_.load(std::memory_order_seq_cst);
                 if (counter < wait_.needed_count_ &&
                     shared_state.get() != nullptr && !shared_state->is_ready())
                 {
@@ -341,25 +339,13 @@ namespace hpx { namespace lcos
                 }
 
                 // at least N futures should be ready
-                HPX_ASSERT(count_.load(boost::memory_order_seq_cst) >= needed_count_);
+                HPX_ASSERT(count_.load(std::memory_order_seq_cst) >= needed_count_);
             }
 
             argument_type lazy_values_;
-            boost::atomic<std::size_t> count_;
+            std::atomic<std::size_t> count_;
             std::size_t const needed_count_;
             bool goal_reached_on_calling_thread_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Future>
-        struct wait_get_shared_state
-        {
-            HPX_FORCEINLINE
-            typename traits::detail::shared_state_ptr_for<Future>::type const&
-            operator()(Future const& f) const
-            {
-                return traits::detail::get_shared_state(f);
-            }
         };
     }
 
@@ -393,7 +379,7 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(lazy_values.begin(), lazy_values.end(),
             std::back_inserter(lazy_values_),
-            detail::wait_get_shared_state<Future>());
+            traits::detail::wait_get_shared_state<Future>());
 
         std::shared_ptr<detail::wait_some<result_type> > f =
             std::make_shared<detail::wait_some<result_type> >(
@@ -420,7 +406,6 @@ namespace hpx { namespace lcos
             n, const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
     void wait_some(std::size_t n,
@@ -451,7 +436,7 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(lazy_values.begin(), lazy_values.end(),
             lazy_values_.begin(),
-            detail::wait_get_shared_state<Future>());
+            traits::detail::wait_get_shared_state<Future>());
 
         std::shared_ptr<detail::wait_some<result_type> > f =
             std::make_shared<detail::wait_some<result_type> >(
@@ -477,7 +462,6 @@ namespace hpx { namespace lcos
         return lcos::wait_some(
             n, const_cast<std::array<Future, N> const&>(lazy_values), ec);
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
@@ -497,7 +481,7 @@ namespace hpx { namespace lcos
 
         result_type lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
-            detail::wait_get_shared_state<future_type>());
+            traits::detail::wait_get_shared_state<future_type>());
 
         std::shared_ptr<detail::wait_some<result_type> > f =
             std::make_shared<detail::wait_some<result_type> >(
@@ -521,7 +505,7 @@ namespace hpx { namespace lcos
 
         result_type lazy_values_;
         lazy_values_.resize(count);
-        detail::wait_get_shared_state<future_type> func;
+        traits::detail::wait_get_shared_state<future_type> func;
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 

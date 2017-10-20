@@ -48,11 +48,11 @@ namespace hpx { namespace util { namespace logging {
 
 */
 namespace level {
-    /** the higher the level , the more critical the error */
+    /** the higher the level, the more critical the error */
     typedef unsigned int type;
 
     enum {
-        disable_all = static_cast<type>(-1),
+        disable_all = -1,
         enable_all = 0,
         debug = 1000,
         info = 2000,

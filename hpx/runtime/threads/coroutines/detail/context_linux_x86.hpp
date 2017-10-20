@@ -3,6 +3,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2013-2016 Thomas Heller
+//  Copyright (c) 2017 Christopher Taylor
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,16 +19,31 @@
 #include <hpx/runtime/threads/coroutines/detail/posix_utility.hpp>
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
 #include <sys/param.h>
 
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+
+#include <signal.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <cstring>
+
+#ifndef SEGV_STACK_SIZE
+  #define SEGV_STACK_SIZE MINSIGSTKSZ+4096
+#endif
+
+#endif
+
+#include <iostream>
+#include <iomanip>
 
 #if defined(HPX_HAVE_VALGRIND)
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
@@ -140,7 +156,29 @@ namespace hpx { namespace threads { namespace coroutines
 
             x86_linux_context_impl()
                 : m_stack(nullptr)
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+            {
+
+                // concept inspired by the following links:
+                //
+                // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
+                // http://www.evanjones.ca/software/threading.html
+                //
+                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                segv_stack.ss_flags = 0;
+                segv_stack.ss_size = SEGV_STACK_SIZE;
+
+                std::memset(&action, '\0', sizeof(action));
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
+                action.sa_sigaction = &sigsegv_handler;
+
+                sigaltstack(&segv_stack, nullptr);
+                sigfillset(&action.sa_mask);
+                sigaction(SIGSEGV, &action, nullptr);
+            }
+#else
             {}
+#endif
 
             /**
              * Create a context that on restore invokes Functor on
@@ -156,15 +194,15 @@ namespace hpx { namespace threads { namespace coroutines
                 if (0 != (m_stack_size % EXEC_PAGESIZE))
                 {
                     throw std::runtime_error(
-                        boost::str(boost::format(
-                            "stack size of %1% is not page aligned, page size is %2%")
-                            % m_stack_size % EXEC_PAGESIZE));
+                        hpx::util::format(
+                            "stack size of %1% is not page aligned, page size is %2%",
+                            m_stack_size, EXEC_PAGESIZE));
                 }
 
                 if (0 >= m_stack_size)
                 {
                     throw std::runtime_error(
-                        boost::str(boost::format("stack size of %1% is invalid") %
+                        hpx::util::format("stack size of %1% is invalid",
                             m_stack_size));
                 }
 
@@ -189,8 +227,45 @@ namespace hpx { namespace threads { namespace coroutines
                         VALGRIND_STACK_REGISTER(m_stack, eos));
                 }
 #endif
+
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                segv_stack.ss_flags = 0;
+                segv_stack.ss_size = SEGV_STACK_SIZE;
+
+                std::memset(&action, '\0', sizeof(action));
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
+                action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
+
+                sigaltstack(&segv_stack, nullptr);
+                sigfillset(&action.sa_mask);
+                sigaction(SIGSEGV, &action, nullptr);
+#endif
             }
 
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+            static void sigsegv_handler(int signum, siginfo_t *info,
+                void *data)
+            {
+                void *addr = info->si_addr;
+
+                std::cerr << "Stack overflow in coroutine at address "
+                    << std::internal << std::hex
+                    << std::setw(sizeof(addr)*2+2)
+                    << std::setfill('0') << static_cast<int*>(addr)
+                    << ".\n\n";
+
+                std::cerr
+                    << "Configure the hpx runtime to allocate a larger coroutine "
+                       "stack size.\n Use the hpx.stacks.small_size, "
+                       "hpx.stacks.medium_size,\n hpx.stacks.large_size, "
+                       "or hpx.stacks.huge_size configuration\nflags to configure "
+                       "coroutine stack sizes.\n"
+                    << std::endl;
+
+                std::terminate();
+            }
+#endif
             ~x86_linux_context_impl()
             {
                 if (m_stack)
@@ -241,7 +316,7 @@ namespace hpx { namespace threads { namespace coroutines
                     context_size;
             }
 
-            typedef boost::atomic<std::int64_t> counter_type;
+            typedef std::atomic<std::int64_t> counter_type;
 
             static counter_type& get_stack_unbind_counter()
             {
@@ -344,6 +419,11 @@ namespace hpx { namespace threads { namespace coroutines
 
             std::ptrdiff_t m_stack_size;
             void* m_stack;
+
+#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+            struct sigaction action;
+            stack_t segv_stack;
+#endif
         };
 
         typedef x86_linux_context_impl context_impl;

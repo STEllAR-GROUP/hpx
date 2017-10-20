@@ -26,9 +26,9 @@
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <stack>
@@ -81,8 +81,10 @@ namespace hpx { namespace threads
     /// implemented by the thread-manager.
     class thread_data
     {
-        HPX_MOVABLE_ONLY(thread_data);
+    public:
+        HPX_NON_COPYABLE(thread_data);
 
+    private:
         // Avoid warning about using 'this' in initializer list
         thread_data* this_() { return this; }
 
@@ -131,7 +133,7 @@ namespace hpx { namespace threads
         ///                 by using the function \a threadmanager#get_state.
         thread_state get_state() const
         {
-            return current_state_.load(boost::memory_order_acquire);
+            return current_state_.load(std::memory_order_acquire);
         }
 
         /// The set_state function changes the state of this thread instance.
@@ -150,7 +152,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum state_ex = wait_unknown)
         {
             thread_state prev_state =
-                current_state_.load(boost::memory_order_acquire);
+                current_state_.load(std::memory_order_acquire);
 
             for (;;) {
                 thread_state tmp = prev_state;
@@ -219,7 +221,7 @@ namespace hpx { namespace threads
 
             // ignore the state_ex while compare-exchanging
             thread_state_ex_enum state_ex =
-                current_state_.load(boost::memory_order_relaxed).state_ex();
+                current_state_.load(std::memory_order_relaxed).state_ex();
 
             thread_state old_tmp(old_state.state(), state_ex, old_state.tag());
             thread_state new_tmp(new_state.state(), state_ex, tag);
@@ -252,7 +254,7 @@ namespace hpx { namespace threads
         thread_state_ex_enum set_state_ex(thread_state_ex_enum new_state)
         {
             thread_state prev_state =
-                current_state_.load(boost::memory_order_acquire);
+                current_state_.load(std::memory_order_acquire);
 
             for (;;) {
                 thread_state tmp = prev_state;
@@ -545,6 +547,13 @@ namespace hpx { namespace threads
             return coroutine_.set_thread_data(data);
         }
 
+#if defined(HPX_HAVE_APEX)
+        void** get_apex_data() const
+        {
+            return coroutine_.get_apex_data();
+        }
+#endif
+
         void rebind(thread_init_data& init_data,
             thread_state_enum newstate)
         {
@@ -673,7 +682,7 @@ namespace hpx { namespace threads
 #endif
         }
 
-        mutable boost::atomic<thread_state> current_state_;
+        mutable std::atomic<thread_state> current_state_;
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
@@ -718,7 +727,7 @@ namespace hpx { namespace threads
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
 
-        //reference count
+        // reference count
         util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;

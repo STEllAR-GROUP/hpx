@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/util/batch_environments/slurm_environment.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
@@ -61,9 +62,9 @@ namespace hpx { namespace util { namespace batch_environments
 
     void slurm_environment::retrieve_number_of_localities(bool debug)
     {
-        char* tasks_per_node = std::getenv("SLURM_TASKS_PER_NODE");
-        char *total_num_tasks = std::getenv("SLURM_NTASKS");
-        char *num_nodes = std::getenv("SLURM_NNODES");
+        char* tasks_per_node = std::getenv("SLURM_STEP_TASKS_PER_NODE");
+        char *total_num_tasks = std::getenv("SLURM_STEP_NUM_TASKS");
+        char *num_nodes = std::getenv("SLURM_STEP_NUM_NODES");
 
         if(total_num_tasks)
         {
@@ -78,7 +79,7 @@ namespace hpx { namespace util { namespace batch_environments
         if (tasks_per_node)
         {
             if (debug) {
-                std::cerr << "SLURM tasks per node found (SLURM_TASKS_PER_NODE): "
+                std::cerr << "SLURM tasks per node found (SLURM_STEP_TASKS_PER_NODE): "
                     << tasks_per_node << std::endl;
             }
 
@@ -274,11 +275,11 @@ namespace hpx { namespace util { namespace batch_environments
     void slurm_environment::retrieve_nodelist(std::vector<std::string> & nodes,
         bool debug)
     {
-        char* slurm_nodelist_env = std::getenv("SLURM_NODELIST");
+        char* slurm_nodelist_env = std::getenv("SLURM_STEP_NODELIST");
         if (slurm_nodelist_env)
         {
             if (debug) {
-                std::cerr << "SLURM nodelist found (SLURM_NODELIST): "
+                std::cerr << "SLURM nodelist found (SLURM_STEP_NODELIST): "
                     << slurm_nodelist_env << std::endl;
             }
 
@@ -324,7 +325,7 @@ namespace hpx { namespace util { namespace batch_environments
             if (!qi::parse(begin, end, nodelist) || begin != end)
             {
                 if (debug) {
-                    std::cerr << "failed to parse SLURM nodelist (SLURM_NODELIST): "
+                    std::cerr << "failed to parse SLURM nodelist (SLURM_STEP_NODELIST): "
                         << slurm_nodelist_env << std::endl;
                 }
             }

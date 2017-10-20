@@ -11,11 +11,9 @@
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
-#include <boost/format.hpp>
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <memory>
 #include <numeric>
 #include <stdexcept>
@@ -32,14 +30,14 @@ int num_overlapping_loops = 0;
 void measure_sequential_foreach(std::size_t size)
 {
     std::vector<std::size_t> data_representation(size);
-    std::iota(boost::begin(data_representation),
-        boost::end(data_representation),
+    std::iota(std::begin(data_representation),
+        std::end(data_representation),
         std::rand());
 
     // invoke sequential for_each
     hpx::parallel::for_each(hpx::parallel::execution::seq,
-        boost::begin(data_representation),
-        boost::end(data_representation),
+        std::begin(data_representation),
+        std::end(data_representation),
         [](std::size_t) {
             worker_timed(delay);
         });
@@ -48,17 +46,17 @@ void measure_sequential_foreach(std::size_t size)
 void measure_parallel_foreach(std::size_t size)
 {
     std::vector<std::size_t> data_representation(size);
-    std::iota(boost::begin(data_representation),
-        boost::end(data_representation),
+    std::iota(std::begin(data_representation),
+        std::end(data_representation),
         std::rand());
 
     // create executor parameters object
-    hpx::parallel::static_chunk_size cs(chunk_size);
+    hpx::parallel::execution::static_chunk_size cs(chunk_size);
 
     // invoke parallel for_each
     hpx::parallel::for_each(hpx::parallel::execution::par.with(cs),
-        boost::begin(data_representation),
-        boost::end(data_representation),
+        std::begin(data_representation),
+        std::end(data_representation),
         [](std::size_t) {
             worker_timed(delay);
         });
@@ -68,19 +66,19 @@ hpx::future<void> measure_task_foreach(std::size_t size)
 {
     std::shared_ptr<std::vector<std::size_t> > data_representation(
         std::make_shared<std::vector<std::size_t> >(size));
-    std::iota(boost::begin(*data_representation),
-        boost::end(*data_representation),
+    std::iota(std::begin(*data_representation),
+        std::end(*data_representation),
         std::rand());
 
     // create executor parameters object
-    hpx::parallel::static_chunk_size cs(chunk_size);
+    hpx::parallel::execution::static_chunk_size cs(chunk_size);
 
     // invoke parallel for_each
     return
         hpx::parallel::for_each(
             hpx::parallel::execution::par(hpx::parallel::execution::task).with(cs),
-            boost::begin(*data_representation),
-            boost::end(*data_representation),
+            std::begin(*data_representation),
+            std::end(*data_representation),
             [](std::size_t) {
                 worker_timed(delay);
             }

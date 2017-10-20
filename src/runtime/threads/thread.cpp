@@ -21,10 +21,10 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <mutex>
 #include <utility>
 
@@ -44,17 +44,17 @@ namespace hpx
             HPX_THROW_EXCEPTION(invalid_status, function, reason);
         }
         catch(...) {
-            hpx::report_error(boost::current_exception());
+            hpx::report_error(std::current_exception());
             /* nothing else we can do */;
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread::thread() HPX_NOEXCEPT
+    thread::thread() noexcept
       : id_(threads::invalid_thread_id)
     {}
 
-    thread::thread(thread&& rhs) HPX_NOEXCEPT
+    thread::thread(thread&& rhs) noexcept
       : id_(threads::invalid_thread_id)   // the rhs needs to end up with an invalid_id
     {
         std::lock_guard<mutex_type> l(rhs.mtx_);
@@ -62,7 +62,7 @@ namespace hpx
         rhs.id_ = threads::invalid_thread_id;
     }
 
-    thread& thread::operator=(thread&& rhs) HPX_NOEXCEPT
+    thread& thread::operator=(thread&& rhs) noexcept
     {
         std::lock_guard<mutex_type> l(mtx_);
         std::lock_guard<mutex_type> l2(rhs.mtx_);
@@ -90,7 +90,7 @@ namespace hpx
         }
     }
 
-    void thread::swap(thread& rhs) HPX_NOEXCEPT
+    void thread::swap(thread& rhs) noexcept
     {
         std::lock_guard<mutex_type> l(mtx_);
         std::lock_guard<mutex_type> l2(rhs.mtx_);
@@ -141,12 +141,12 @@ namespace hpx
         return threads::thread_result_type(threads::terminated, nullptr);
     }
 
-    thread::id thread::get_id() const HPX_NOEXCEPT
+    thread::id thread::get_id() const noexcept
     {
         return id(native_handle());
     }
 
-    std::size_t thread::hardware_concurrency() HPX_NOEXCEPT
+    std::size_t thread::hardware_concurrency() noexcept
     {
         return hpx::threads::hardware_concurrency();
     }
@@ -318,18 +318,18 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread
     {
-        void yield_to(thread::id id) HPX_NOEXCEPT
+        void yield_to(thread::id id) noexcept
         {
             this_thread::suspend(threads::pending, id.native_handle(),
                 "this_thread::yield_to");
         }
 
-        void yield() HPX_NOEXCEPT
+        void yield() noexcept
         {
             this_thread::suspend(threads::pending, "this_thread::yield");
         }
 
-        thread::id get_id() HPX_NOEXCEPT
+        thread::id get_id() noexcept
         {
             return thread::id(threads::get_self_id());
         }

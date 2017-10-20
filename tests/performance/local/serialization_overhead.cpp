@@ -3,15 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/serialization.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/format.hpp>
 
-#include <hpx/runtime/serialization/detail/preprocess.hpp>
-
-#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <algorithm>
@@ -119,7 +115,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     if (zerocopy)
         chunks = new std::vector<hpx::serialization::serialization_chunk>();
 
-    std::uint32_t dest_locality_id = outp.destination_locality_id();
+    //std::uint32_t dest_locality_id = outp.destination_locality_id();
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)
@@ -180,8 +176,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (print_header)
         hpx::cout << "datasize,testcount,average_time[s]\n" << hpx::flush;
 
-    hpx::cout << (boost::format("%d,%d,%f\n") %
-        data_size % iterations % (overall_time / concurrency)) << hpx::flush;
+    hpx::util::format_to(hpx::cout, "%d,%d,%f\n",
+        data_size, iterations, overall_time / concurrency) << hpx::flush;
 
     return hpx::finalize();
 }

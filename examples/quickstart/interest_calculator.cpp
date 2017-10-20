@@ -50,7 +50,7 @@ int hpx_main(variables_map & vm)
         using hpx::shared_future;
         using hpx::make_ready_future;
         using hpx::dataflow;
-        using hpx::util::unwrapped;
+        using hpx::util::unwrapping;
         hpx::naming::id_type here = hpx::find_here();
 
         double init_principal=vm["principal"].as<double>(); //Initial principal
@@ -81,8 +81,8 @@ int hpx_main(variables_map & vm)
 
         for (int i = 0; i < t; ++i)
         {
-            shared_future<double> interest = dataflow(unwrapped(calc), principal, rate);
-            principal = dataflow(unwrapped(add), principal, interest);
+            shared_future<double> interest = dataflow(unwrapping(calc), principal, rate);
+            principal = dataflow(unwrapping(add), principal, interest);
         }
 
         // wait for the dataflow execution graph to be finished calculating our

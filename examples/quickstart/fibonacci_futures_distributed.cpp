@@ -5,18 +5,16 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/include/util.hpp>
+#include <hpx/util/unwrap.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t threshold = 2;
@@ -24,7 +22,7 @@ std::uint64_t distribute_at = 2;
 int num_repeats = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> serial_execution_count(0);
+std::atomic<std::size_t> serial_execution_count(0);
 
 std::size_t get_serial_execution_count()
 {
@@ -33,7 +31,7 @@ std::size_t get_serial_execution_count()
 HPX_PLAIN_ACTION(get_serial_execution_count);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> next_locality(0);
+std::atomic<std::size_t> next_locality(0);
 std::vector<hpx::id_type> localities;
 hpx::id_type here;
 
@@ -133,7 +131,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
-        std::cout << (boost::format(fmt) % n % r % d);
+        hpx::util::format_to(std::cout, fmt, n, r, d);
 
         executed_one = true;
     }
@@ -153,15 +151,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 //        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_future(%1%) == %2%,elapsed time:,%3%,[s],%4%\n";
-        std::cout << (boost::format(fmt) % n % r % (d / max_runs)
-            % next_locality.load());
+        hpx::util::format_to(std::cout, fmt, n, r, d / max_runs,
+            next_locality.load());
 
         get_serial_execution_count_action serial_count;
         for (hpx::id_type const& loc : hpx::find_all_localities())
         {
             std::size_t count = serial_count(loc);
-            std::cout << (boost::format("  serial-count,%1%,%2%\n") %
-                loc % (count / max_runs));
+            hpx::util::format_to(std::cout, "  serial-count,%1%,%2%\n",
+                loc, count / max_runs);
         }
 
         executed_one = true;

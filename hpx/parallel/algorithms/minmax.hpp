@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,7 +19,6 @@
 #include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
@@ -36,7 +35,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
     // min_element
@@ -53,7 +52,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             FwdIter smallest = it;
             util::loop_n<ExPolicy>(
                 ++it, count-1,
-                [&f, &smallest, &proj](FwdIter const& curr)
+                [&f, &smallest, &proj](FwdIter const& curr) -> void
                 {
                     if (hpx::util::invoke(f,
                             hpx::util::invoke(proj, *curr),
@@ -86,7 +85,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename std::iterator_traits<FwdIter>::value_type smallest = *it;
                 util::loop_n<ExPolicy>(
                     ++it, count-1,
-                    [&f, &smallest, &proj](FwdIter const& curr)
+                    [&f, &smallest, &proj](FwdIter const& curr) -> void
                     {
                         if (hpx::util::invoke(f,
                                 hpx::util::invoke(proj, **curr),
@@ -128,12 +127,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 auto f1 =
                     [f, proj, policy](FwdIter it, std::size_t part_count)
+                    ->  FwdIter
                     {
                         return sequential_min_element(
                             policy, it, part_count, f, proj);
                     };
                 auto f2 =
                     [f, proj, policy](std::vector<FwdIter> && positions)
+                    ->  FwdIter
                     {
                         return min_element::sequential_minmax_element_ind(
                             policy, positions.begin(), positions.size(),
@@ -143,7 +144,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
                         std::forward<ExPolicy>(policy),
                         first, std::distance(first, last),
-                        std::move(f1), hpx::util::unwrapped(std::move(f2))
+                        std::move(f1), hpx::util::unwrapping(std::move(f2))
                     );
             }
         };
@@ -155,7 +156,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         min_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
@@ -281,7 +282,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             FwdIter greatest = it;
             util::loop_n<ExPolicy>(
                 ++it, count-1,
-                [&f, &greatest, &proj](FwdIter const& curr)
+                [&f, &greatest, &proj](FwdIter const& curr) -> void
                 {
                     if (hpx::util::invoke(f,
                             hpx::util::invoke(proj, *greatest),
@@ -314,7 +315,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename std::iterator_traits<FwdIter>::value_type greatest = *it;
                 util::loop_n<ExPolicy>(
                     ++it, count-1,
-                    [&f, &greatest, &proj](FwdIter const& curr)
+                    [&f, &greatest, &proj](FwdIter const& curr) -> void
                     {
                         if (hpx::util::invoke(f,
                                 hpx::util::invoke(proj, *greatest),
@@ -359,12 +360,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 auto f1 =
                     [f, proj, policy](FwdIter it, std::size_t part_count)
+                    ->  FwdIter
                     {
                         return sequential_max_element(
                             policy, it, part_count, f, proj);
                     };
                 auto f2 =
                     [f, proj, policy](std::vector<FwdIter> && positions)
+                    ->  FwdIter
                     {
                         return max_element::sequential_minmax_element_ind(
                             policy, positions.begin(), positions.size(),
@@ -374,7 +377,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
                         std::forward<ExPolicy>(policy),
                         first, std::distance(first, last),
-                        std::move(f1), hpx::util::unwrapped(std::move(f2))
+                        std::move(f1), hpx::util::unwrapping(std::move(f2))
                     );
             }
         };
@@ -386,7 +389,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         max_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 
@@ -515,7 +518,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             util::loop_n<ExPolicy>(
                 ++it, count-1,
-                [&f, &result, &proj](FwdIter const& curr)
+                [&f, &result, &proj](FwdIter const& curr) -> void
                 {
                     if (hpx::util::invoke(f,
                             hpx::util::invoke(proj, *curr),
@@ -556,7 +559,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename std::iterator_traits<PairIter>::value_type result = *it;
                 util::loop_n<ExPolicy>(
                     ++it, count-1,
-                    [&f, &result, &proj](PairIter const& curr)
+                    [&f, &result, &proj](PairIter const& curr) -> void
                     {
                         if (hpx::util::invoke(f,
                                 hpx::util::invoke(proj, *curr->first),
@@ -612,12 +615,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 auto f1 =
                     [f, proj, policy](FwdIter it, std::size_t part_count)
+                    ->  std::pair<FwdIter, FwdIter>
                     {
                         return sequential_minmax_element(
                             policy, it, part_count, f, proj);
                     };
                 auto f2 =
                     [f, proj, policy](std::vector<result_type> && positions)
+                    ->  result_type
                     {
                         return minmax_element::sequential_minmax_element_ind(
                             policy, positions.begin(), positions.size(),
@@ -628,7 +633,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     call(
                         std::forward<ExPolicy>(policy),
                         result.first, std::distance(result.first, last),
-                        std::move(f1), hpx::util::unwrapped(std::move(f2))
+                        std::move(f1), hpx::util::unwrapping(std::move(f2))
                     );
             }
         };
@@ -642,7 +647,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         minmax_element_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type)
         {
-            typedef parallel::execution::is_sequential_execution_policy<
+            typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
                 > is_seq;
 

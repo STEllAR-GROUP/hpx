@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,38 +18,37 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-
-#include <boost/exception_ptr.hpp>
 
 #include <boost/utility/addressof.hpp>      // boost::addressof
 #include <memory>                           // std::addressof
 
+#include <exception>
 #include <mutex>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
+namespace hpx { namespace parallel { inline namespace v2
 {
     namespace detail
     {
         /// \cond NOINTERNAL
         ///////////////////////////////////////////////////////////////////////
-        void handle_task_block_exceptions(parallel::exception_list& errors)
+        inline void handle_task_block_exceptions(parallel::exception_list& errors)
         {
             try {
-                boost::rethrow_exception(boost::current_exception());
+                std::rethrow_exception(std::current_exception());
             }
             catch (parallel::exception_list const& el) {
-                for (boost::exception_ptr const& e: el)
+                for (std::exception_ptr const& e: el)
                     errors.add(e);
             }
             catch (...) {
-                errors.add(boost::current_exception());
+                errors.add(std::current_exception());
             }
         }
         /// \endcond
@@ -61,7 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     class task_canceled_exception : public hpx::exception
     {
     public:
-        task_canceled_exception() HPX_NOEXCEPT
+        task_canceled_exception() noexcept
           : hpx::exception(hpx::task_canceled_exception)
         {}
     };
@@ -166,7 +165,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     errors.add(f.get_exception_ptr());
             }
             if (errors.size() != 0)
-                boost::throw_exception(errors);
+                throw errors;
         }
 
         // return future representing the execution of all tasks
@@ -254,10 +253,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             typedef typename ExPolicy::executor_type executor_type;
 
-            hpx::future<void> result =
-                executor_traits<executor_type>::async_execute(
-                    policy_.executor(), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            hpx::future<void> result = execution::async_execute(
+                policy_.executor(), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
 
             std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));
@@ -310,9 +308,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             typedef typename ExPolicy::executor_type executor_type;
 
-            hpx::future<void> result =
-                executor_traits<Executor>::async_execute(
-                    exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::future<void> result = execution::async_execute(
+                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
 
             std::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));

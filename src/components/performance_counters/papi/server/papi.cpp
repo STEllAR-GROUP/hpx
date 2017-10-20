@@ -18,7 +18,6 @@
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 #include <hpx/exception.hpp>
 
-#include <boost/format.hpp>
 #include <boost/version.hpp>
 
 #include <cstdint>
@@ -70,8 +69,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
                 "(perhaps thread was not registered)");
         papi_call(PAPI_attach(evset_, tm.get_thread_id(tix)),
             "failed to attach thread to PAPI event set", locstr);
-        tm.register_callback(tix,
-            std::bind1st(std::mem_fun(&thread_counters::terminate), this));
+        tm.register_callback(tix, [&](std::uint32_t i){return this->terminate(i);});
     }
 
     thread_counters::~thread_counters()

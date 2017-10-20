@@ -21,10 +21,14 @@ int hpx_main(boost::program_options::variables_map & vm)
     return hpx::finalize();
 }
 
+#include <iostream>
+
 int main(int argc, char* argv[])
 {
     boost::program_options::options_description
         desc("Usage: " HPX_APPLICATION_STRING " [options]");
+
+    std::cerr << "main started...\n";
 
     desc.add_options()
         ("window-size",

@@ -16,8 +16,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/range/functions.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace test
 {
@@ -105,16 +103,16 @@ void test_left_element_full()
 {
     // demonstrate use of 'previous' and 'next' transformers
     std::vector<int> values(10);
-    std::iota(boost::begin(values), boost::end(values), 0);
+    std::iota(std::begin(values), std::end(values), 0);
 
     auto transformer = test::make_previous_transformer(
-        boost::begin(values), &values.back());
+        std::begin(values), &values.back());
 
     std::ostringstream str;
 
     std::for_each(
-        hpx::util::make_transform_iterator(boost::begin(values), transformer),
-        hpx::util::make_transform_iterator(boost::end(values), transformer),
+        hpx::util::make_transform_iterator(std::begin(values), transformer),
+        hpx::util::make_transform_iterator(std::end(values), transformer),
         [&str](int d)
         {
             str << d << " ";
@@ -128,16 +126,16 @@ void test_right_element_full()
 {
     // demonstrate use of 'previous' and 'next' transformers
     std::vector<int> values(10);
-    std::iota(boost::begin(values), boost::end(values), 0);
+    std::iota(std::begin(values), std::end(values), 0);
 
     auto transformer = test::make_next_transformer(
-        boost::end(values)-1, &values.front());
+        std::end(values)-1, &values.front());
 
     std::ostringstream str;
 
     std::for_each(
-        hpx::util::make_transform_iterator(boost::begin(values), transformer),
-        hpx::util::make_transform_iterator(boost::end(values), transformer),
+        hpx::util::make_transform_iterator(std::begin(values), transformer),
+        hpx::util::make_transform_iterator(std::end(values), transformer),
         [&str](int d)
         {
             str << d << " ";

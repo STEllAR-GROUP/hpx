@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Thomas Heller
 //
@@ -9,6 +9,8 @@
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
@@ -27,6 +29,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
@@ -34,11 +37,9 @@
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/program_options/options_description.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -67,7 +68,6 @@ namespace hpx { namespace components { namespace server
     private:
         typedef lcos::local::spinlock component_map_mutex_type;
         typedef lcos::local::spinlock plugin_map_mutex_type;
-        typedef boost::mutex mutex_type;
 
         struct component_factory
         {
@@ -195,13 +195,13 @@ namespace hpx { namespace components { namespace server
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        HPX_ATTRIBUTE_NORETURN void terminate(
+        HPX_NORETURN void terminate(
             naming::id_type const& respond_to);
 
         void terminate_act(naming::id_type const& id) { terminate(id); }
 
         /// \brief Shutdown runtime system instances on all localities
-        HPX_ATTRIBUTE_NORETURN void terminate_all();
+        HPX_NORETURN void terminate_all();
 
         void terminate_all_act() { terminate_all(); }
 
@@ -419,13 +419,13 @@ namespace hpx { namespace components { namespace server
 #endif
 
     private:
-        mutex_type mtx_;
-        boost::condition_variable wait_condition_;
-        boost::condition_variable stop_condition_;
+        compat::mutex mtx_;
+        compat::condition_variable wait_condition_;
+        compat::condition_variable stop_condition_;
         bool stopped_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
-        boost::atomic<bool> shutdown_all_invoked_;
+        std::atomic<bool> shutdown_all_invoked_;
 
         typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
@@ -447,7 +447,7 @@ namespace hpx { namespace components { namespace server
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // Functions wrapped by creat_component actions below
+    // Functions wrapped by create_component actions below
 #if defined(__NVCC__)
     template <typename Component>
     naming::gid_type runtime_support::create_component()
@@ -800,11 +800,14 @@ namespace hpx { namespace components { namespace server
         }
 
         typedef typename Component::wrapping_type wrapping_type;
+        typename wrapping_type::derived_type* new_instance = nullptr;
+
         naming::gid_type id = factory->create_with_args(migrated_id,
-            detail::construct_function<wrapping_type>(std::move(*p)));
+            detail::construct_function<wrapping_type>(std::move(*p)),
+            reinterpret_cast<void**>(&new_instance));
 
         // sanity checks
-        if (!id)
+        if (!id || new_instance == nullptr)
         {
             // we should not get here (id should not be invalid)
             HPX_THROW_EXCEPTION(hpx::invalid_status,
@@ -826,6 +829,9 @@ namespace hpx { namespace components { namespace server
             << " of type: " << components::get_component_type_name(type)
             << " to locality: " << find_here();
 
+        // inform the newly created component that it has been migrated
+        new_instance->on_migrated();
+
         // At this point the object has been fully migrated. We now remove
         // the object from the AGAS table of migrated objects. This is
         // necessary as this object might have been migrated off this locality
@@ -833,6 +839,7 @@ namespace hpx { namespace components { namespace server
         agas::unmark_as_migrated(id);
 
         to_migrate.make_unmanaged();
+
         return id;
     }
 }}}

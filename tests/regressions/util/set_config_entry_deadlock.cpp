@@ -7,9 +7,10 @@
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic.hpp>
+#include <atomic>
+#include <string>
 
-boost::atomic<bool> invoked_callback(false);
+std::atomic<bool> invoked_callback(false);
 
 void config_entry_callback()
 {

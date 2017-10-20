@@ -21,14 +21,15 @@ namespace hpx { namespace components
     {
         class pinned_ptr_base
         {
+        public:
             HPX_NON_COPYABLE(pinned_ptr_base);
 
         public:
-            pinned_ptr_base() HPX_NOEXCEPT
+            pinned_ptr_base() noexcept
               : lva_(0)
             {}
 
-            explicit pinned_ptr_base(naming::address::address_type lva) HPX_NOEXCEPT
+            explicit pinned_ptr_base(naming::address::address_type lva) noexcept
               : lva_(lva)
             {}
 
@@ -41,12 +42,13 @@ namespace hpx { namespace components
         template <typename Component>
         class pinned_ptr : public pinned_ptr_base
         {
+        public:
             HPX_NON_COPYABLE(pinned_ptr);
 
         public:
-            pinned_ptr() HPX_NOEXCEPT {}
+            pinned_ptr() noexcept {}
 
-            explicit pinned_ptr(naming::address::address_type lva) HPX_NOEXCEPT
+            explicit pinned_ptr(naming::address::address_type lva) noexcept
               : pinned_ptr_base(lva)
             {
                 HPX_ASSERT(0 != this->lva_);
@@ -98,11 +100,6 @@ namespace hpx { namespace components
         {
             return pinned_ptr(lva, id<Component>());
         }
-
-#if !defined(HPX_INTEL_VERSION) || (HPX_INTEL_VERSION > 1400)
-        HPX_DELETE_COPY_CTOR(pinned_ptr);
-        HPX_DELETE_COPY_ASSIGN(pinned_ptr);
-#endif
 
     private:
         template <typename Component>

@@ -16,6 +16,7 @@
 #undef BOOST_POOL_INSTRUMENT
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
 //
 #include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 
@@ -42,8 +43,6 @@
 #include <boost/pool/simple_segregated_storage.hpp>
 // boost::alignment_of
 #include <boost/type_traits/alignment_of.hpp>
-// BOOST_ASSERT
-#include <boost/assert.hpp>
 
 #ifdef BOOST_POOL_INSTRUMENT
 # include <iostream>
@@ -76,7 +75,7 @@
   This page generated from file pool.hpp.
  */
 
-#ifdef BOOST_MSVC
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable:4127)  // Conditional expression is constant
 #endif
@@ -367,8 +366,8 @@ namespace details
             size_type rem = s % min_align;
             if(rem)
                 s += min_align - rem;
-            BOOST_ASSERT(s >= min_alloc_size);
-            BOOST_ASSERT(s % min_align == 0);
+            HPX_ASSERT(s >= min_alloc_size);
+            HPX_ASSERT(s % min_align == 0);
             return s;
         }
 
@@ -746,7 +745,7 @@ namespace details
 
 }}}}
 
-#ifdef BOOST_MSVC
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 

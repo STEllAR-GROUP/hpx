@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 //
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
 //
 #include <vector>

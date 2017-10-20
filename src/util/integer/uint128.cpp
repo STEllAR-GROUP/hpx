@@ -117,13 +117,13 @@ namespace hpx { namespace util { namespace integer
             // number is 0, just return 0
             return *this;
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4146)
 #endif
         // non 0 number
         return uint128 (-this->lo, ~this->hi);
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
     };

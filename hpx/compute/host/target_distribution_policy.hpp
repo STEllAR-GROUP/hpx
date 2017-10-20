@@ -179,15 +179,9 @@ namespace hpx { namespace compute { namespace host
 
                     for (std::size_t i = 0; i != v.size(); ++i)
                     {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                         result.emplace_back(
                                 std::move(localities[i]), v[i].get()
                             );
-#else
-                        result.push_back(std::make_pair(
-                                std::move(localities[i]), v[i].get()
-                            ));
-#endif
                     }
 
                     return result;

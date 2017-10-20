@@ -7,10 +7,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_adjacent_find.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -29,15 +29,15 @@ void test_adjacent_find_exception(ExPolicy policy, IteratorTag)
     typedef test::decorated_iterator <base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
+    std::iota(std::begin(c), std::end(c), std::rand() + 1);
 
     bool caught_exception = false;
     try {
         hpx::parallel::adjacent_find(policy,
             decorated_iterator(
-                boost::begin(c),
+                std::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(boost::end(c)));
+            decorated_iterator(std::end(c)));
         HPX_TEST(false);
     }
     catch (hpx::exception_list const& e) {
@@ -59,7 +59,7 @@ void test_adjacent_find_exception_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
+    std::iota(std::begin(c), std::end(c), std::rand() + 1);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -68,9 +68,9 @@ void test_adjacent_find_exception_async(ExPolicy p, IteratorTag)
         hpx::future<decorated_iterator> f =
             hpx::parallel::adjacent_find(p,
                 decorated_iterator(
-                    boost::begin(c),
+                    std::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(boost::end(c)));
+                decorated_iterator(std::end(c)));
 
         returned_from_algorithm = true;
 

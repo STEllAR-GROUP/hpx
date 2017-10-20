@@ -77,7 +77,7 @@ static void register_message_handlers()
         error_code ec(lightweight);
         rt.register_message_handler(util::get<0>(t), util::get<1>(t), ec);
     }
-    lbt_ << "(2nd stage) pre_main: registered message handlers";
+    lbt_ << "(3rd stage) pre_main: registered message handlers";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ int pre_main(runtime_mode mode)
 
         rt.set_state(state_startup);
         runtime_support::call_startup_functions(find_here(), false);
-        lbt_ << "(3rd stage) pre_main: ran startup functions";
+        lbt_ << "(4th stage) pre_main: ran startup functions";
     }
     else
     {
@@ -142,17 +142,23 @@ int pre_main(runtime_mode mode)
                     , "no console locality registered");
             }
 
-            lbt_ << "(2nd stage) pre_main: created 2nd and 3rd stage boot barriers";
+            lbt_ << "(2nd stage) pre_main: creating 2nd and 3rd stage boot barriers";
         }
         else // Hosted.
         {
-            lbt_ << "(2nd stage) pre_main: found 2nd and 3rd stage boot barriers";
+            lbt_ << "(2nd stage) pre_main: finding 2nd and 3rd stage boot barriers";
         }
         // }}}
 
         // create our global barrier...
         hpx::lcos::barrier::get_global_barrier() =
             hpx::lcos::barrier::create_global_barrier();
+
+        // Second stage bootstrap synchronizes component loading across all
+        // localities, ensuring that the component namespace tables are fully
+        // populated before user code is executed.
+        lcos::barrier::synchronize();
+        lbt_ << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
         // Work on registration requests for message handler plugins
         register_message_handlers();
@@ -161,18 +167,17 @@ int pre_main(runtime_mode mode)
         // executed.
         register_counter_types();
 
-        // Second stage bootstrap synchronizes component loading across all
-        // localities, ensuring that the component namespace tables are fully
-        // populated before user code is executed.
+        // Second stage bootstrap synchronizes performance counter loading
+        // across all localities.
         lcos::barrier::synchronize();
-        lbt_ << "(2nd stage) pre_main: passed 2nd stage boot barrier";
+        lbt_ << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
         runtime_support::call_startup_functions(find_here(), true);
         lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
 
         // Third stage separates pre-startup and startup function phase.
         lcos::barrier::synchronize();
-        lbt_ << "(3rd stage) pre_main: passed 3rd stage boot barrier";
+        lbt_ << "(4th stage) pre_main: passed 4th stage boot barrier";
 
         runtime_support::call_startup_functions(find_here(), false);
         lbt_ << "(4th stage) pre_main: ran startup functions";
@@ -182,13 +187,13 @@ int pre_main(runtime_mode mode)
         // all user code, including startup functions, are only run after the
         // component tables are populated.
         lcos::barrier::synchronize();
-        lbt_ << "(4th stage) pre_main: passed 4th stage boot barrier";
+        lbt_ << "(5th stage) pre_main: passed 4th stage boot barrier";
     }
 
     // Enable logging. Even if we terminate at this point we will see all
     // pending log messages so far.
     components::activate_logging();
-    lbt_ << "(4th stage) pre_main: activated logging";
+    lbt_ << "(last stage) pre_main: activated logging";
 
     // Any error in post-command line handling or any explicit --exit command
     // line option will cause the application to terminate at this point.

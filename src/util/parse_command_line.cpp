@@ -371,15 +371,12 @@ namespace hpx { namespace util
 
             // general options definitions
             hpx_options.add_options()
-                ("hpx:run-agas-server",
-                  "run AGAS server as part of this runtime instance")
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
                 ("hpx:agas", value<std::string>(),
                   "the IP address the AGAS root server is running on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
-                ("hpx:run-agas-server-only", "run only the AGAS server")
                 ("hpx:hpx", value<std::string>(),
                   "the IP address the HPX parcelport is listening on, "
                   "expected format: `address:port' (default: "
@@ -510,7 +507,7 @@ namespace hpx { namespace util
                 ("hpx:attach-debugger",
                   value<std::string>()->implicit_value("startup"),
                   "wait for a debugger to be attached, possible values: "
-                  "startup or exception (default: startup)")
+                  "off, startup, exception or test-failure (default: startup)")
 #endif
                 ("hpx:list-parcel-ports", "list all available parcel-ports")
             ;
@@ -568,6 +565,8 @@ namespace hpx { namespace util
                 ("hpx:reset-counters",
                   "reset all performance counter(s) specified with --hpx:print-counter "
                   "after they have been evaluated")
+                ("hpx:print-counters-locally",
+                  "each locality prints only its own local counters")
             ;
 
             hidden_options.add_options()

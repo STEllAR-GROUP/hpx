@@ -11,7 +11,6 @@
 #define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -22,13 +21,12 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/tuple.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
-
-#include <boost/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -84,35 +82,11 @@ namespace hpx { namespace traits
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        // If an action returns a future, we need to do special things
+        // If an action returns void, we need to do special things
         template <>
         struct action_remote_result_customization_point<void>
         {
             typedef util::unused_type type;
-        };
-
-        template <typename Result>
-        struct action_remote_result_customization_point<lcos::future<Result> >
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct action_remote_result_customization_point<lcos::future<void> >
-        {
-            typedef hpx::util::unused_type type;
-        };
-
-        template <typename Result>
-        struct action_remote_result_customization_point<lcos::shared_future<Result> >
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct action_remote_result_customization_point<lcos::shared_future<void> >
-        {
-            typedef hpx::util::unused_type type;
         };
     }
 }}
@@ -144,6 +118,14 @@ namespace hpx { namespace actions
             return util::type_id<Action>::typeid_.type_id();
         }
 #endif
+
+        template <typename Action>
+        std::uint32_t get_action_id()
+        {
+            static std::uint32_t id = get_action_id_from_name(
+                get_action_name<Action>());
+            return id;
+        }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         template <typename Action>
@@ -187,8 +169,10 @@ namespace hpx { namespace actions
             static threads::thread_priority
             call(threads::thread_priority priority)
             {
-                if (priority == threads::thread_priority_default)
-                    return threads::thread_priority_normal;
+//              The mapping to 'normal' is now done at the last possible moment
+//              in the scheduler.
+//                 if (priority == threads::thread_priority_default)
+//                     return threads::thread_priority_normal;
                 return priority;
             }
         };

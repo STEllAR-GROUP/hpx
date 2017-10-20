@@ -7,15 +7,16 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/format.hpp>
 
-#include <boost/format.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/random.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <chrono>
 #include <cstdint>
+#include <ctime>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -39,12 +40,14 @@ bool header = true;
 ///////////////////////////////////////////////////////////////////////////////
 std::string format_build_date(std::string timestamp)
 {
-    boost::gregorian::date d = boost::gregorian::from_us_string(timestamp);
+    std::chrono::time_point<std::chrono::system_clock> now =
+        std::chrono::system_clock::now();
 
-    char const* fmt = "%02i-%02i-%04i";
+    std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
-    return boost::str(boost::format(fmt)
-                     % d.month().as_number() % d.day() % d.year());
+    std::string ts = std::ctime(&current_time);
+    ts.resize(ts.size()-1);     // remove trailing '\n'
+    return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,22 +114,22 @@ void print_results(
         ;
 */
 
-    cout << ( boost::format("%lu %lu %lu %lu %lu %.14g")
-            % payload
-            % os_thread_count
-            % contexts
-            % iterations
-            % seed
-            % (((O/(2*iterations*os_thread_count))*1e9))
-//            % (((walltime/(2*iterations*os_thread_count))*1e9)
-            );
+    hpx::util::format_to(cout, "%lu %lu %lu %lu %lu %.14g",
+        payload,
+        os_thread_count,
+        contexts,
+        iterations,
+        seed,
+        (O/(2*iterations*os_thread_count))*1e9
+//      ((walltime/(2*iterations*os_thread_count))*1e9
+    );
 
 /*
     if (ac)
     {
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            cout << ( boost::format(" %.14g")
-                    % counter_values[i].get_value<double>());
+            hpx::util::format_to(cout, " %.14g",
+                counter_values[i].get_value<double>());
     }
 */
 
@@ -154,8 +157,8 @@ double perform_2n_iterations()
     coroutines.reserve(contexts);
     indices.reserve(iterations);
 
-    boost::random::mt19937_64 prng(seed);
-    boost::random::uniform_int_distribution<std::uint64_t>
+    std::mt19937_64 prng(seed);
+    std::uniform_int_distribution<std::uint64_t>
         dist(0, contexts - 1);
 
     kernel k;

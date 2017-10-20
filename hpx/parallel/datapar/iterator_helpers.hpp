@@ -12,6 +12,7 @@
 #include <hpx/parallel/traits/vector_pack_alignment_size.hpp>
 #include <hpx/parallel/traits/vector_pack_load_store.hpp>
 #include <hpx/parallel/traits/vector_pack_type.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -189,7 +190,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static typename std::result_of<F&&(V1*)>::type
+        static typename hpx::util::invoke_result<F, V1*>::type
         call1(F && f, Iter& it)
         {
             store_on_exit_unaligned<Iter, V1> tmp(it);
@@ -199,7 +200,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static typename std::result_of<F&&(V*)>::type
+        static typename hpx::util::invoke_result<F, V*>::type
         callv(F && f, Iter& it)
         {
             store_on_exit<Iter, V> tmp(it);
@@ -213,7 +214,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct invoke_vectorized_in2
     {
         template <typename F, typename Iter1, typename Iter2>
-        static typename std::result_of<F&&(V1*, V2*)>::type
+        static typename hpx::util::invoke_result<F, V1*, V2*>::type
         call_aligned(F && f, Iter1& it1, Iter2& it2)
         {
             static_assert(
@@ -234,7 +235,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         }
 
         template <typename F, typename Iter1, typename Iter2>
-        static typename std::result_of<F&&(V1*, V2*)>::type
+        static typename hpx::util::invoke_result<F, V1*, V2*>::type
         call_unaligned(F && f, Iter1& it1, Iter2& it2)
         {
             static_assert(
@@ -269,7 +270,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static typename std::result_of<F&&(V11*, V12*)>::type
+        static typename hpx::util::invoke_result<F, V11*, V12*>::type
         call1(F && f, Iter1& it1, Iter2& it2)
         {
             return invoke_vectorized_in2<V11, V12>::call_aligned(
@@ -278,7 +279,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE
-        static typename std::result_of<F&&(V1*, V2*)>::type
+        static typename hpx::util::invoke_result<F, V1*, V2*>::type
         callv(F && f, Iter1& it1, Iter2& it2)
         {
             if (is_data_aligned(it1) || is_data_aligned(it2))

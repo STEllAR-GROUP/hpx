@@ -1,6 +1,7 @@
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
+//  Copyright (c) 2017 Google
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,19 +30,19 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    static bool is_empty_function(F const&, std::false_type) HPX_NOEXCEPT
+    static bool is_empty_function(F const&, std::false_type) noexcept
     {
         return false;
     }
 
     template <typename F>
-    static bool is_empty_function(F const& f, std::true_type) HPX_NOEXCEPT
+    static bool is_empty_function(F const& f, std::true_type) noexcept
     {
         return f == nullptr;
     }
 
     template <typename F>
-    static bool is_empty_function(F const& f) HPX_NOEXCEPT
+    static bool is_empty_function(F const& f) noexcept
     {
         std::integral_constant<bool,
             std::is_pointer<F>::value
@@ -57,8 +58,6 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename R, typename ...Ts>
     class function_base<VTable, R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(function_base);
-
         // make sure the empty table instance is initialized in time, even
         // during early startup
         static VTable const* get_empty_table()
@@ -69,14 +68,14 @@ namespace hpx { namespace util { namespace detail
         }
 
     public:
-        function_base() HPX_NOEXCEPT
+        function_base() noexcept
           : vptr(get_empty_table())
         {
             std::memset(object, 0, vtable::function_storage_size);
             vtable::default_construct<empty_function<R(Ts...)> >(object);
         }
 
-        function_base(function_base&& other) HPX_NOEXCEPT
+        function_base(function_base&& other) noexcept
           : vptr(other.vptr)
         {
             // move-construct
@@ -90,7 +89,7 @@ namespace hpx { namespace util { namespace detail
             vptr->delete_(object);
         }
 
-        function_base& operator=(function_base&& other) HPX_NOEXCEPT
+        function_base& operator=(function_base&& other) noexcept
         {
             if (this != &other)
             {
@@ -100,7 +99,7 @@ namespace hpx { namespace util { namespace detail
             return *this;
         }
 
-        void assign(std::nullptr_t) HPX_NOEXCEPT
+        void assign(std::nullptr_t) noexcept
         {
             reset();
         }
@@ -128,7 +127,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void reset() HPX_NOEXCEPT
+        void reset() noexcept
         {
             if (!vptr->empty)
             {
@@ -139,34 +138,34 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void swap(function_base& f) HPX_NOEXCEPT
+        void swap(function_base& f) noexcept
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object); // swap
         }
 
-        bool empty() const HPX_NOEXCEPT
+        bool empty() const noexcept
         {
             return vptr->empty;
         }
 
-        explicit operator bool() const HPX_NOEXCEPT
+        explicit operator bool() const noexcept
         {
             return !empty();
         }
 
-        std::type_info const& target_type() const HPX_NOEXCEPT
+        std::type_info const& target_type() const noexcept
         {
             return empty() ? typeid(void) : vptr->get_type();
         }
 
         template <typename T>
-        T* target() HPX_NOEXCEPT
+        T* target() noexcept
         {
             typedef typename std::remove_cv<T>::type target_type;
 
             static_assert(
-                traits::is_callable<target_type&(Ts...), R>::value
+                traits::is_invocable_r<R, target_type&, Ts...>::value
               , "T shall be Callable with the function signature");
 
             VTable const* f_vptr = get_vtable<target_type>();
@@ -177,12 +176,12 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T>
-        T const* target() const HPX_NOEXCEPT
+        T const* target() const noexcept
         {
             typedef typename std::remove_cv<T>::type target_type;
 
             static_assert(
-                traits::is_callable<target_type&(Ts...), R>::value
+                traits::is_invocable_r<R, target_type&, Ts...>::value
               , "T shall be Callable with the function signature");
 
             VTable const* f_vptr = get_vtable<target_type>();
@@ -199,17 +198,35 @@ namespace hpx { namespace util { namespace detail
 
         std::size_t get_function_address() const
         {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->get_function_address(object);
+#else
+            return 0;
+#endif
         }
 
         char const* get_function_annotation() const
         {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->get_function_annotation(object);
+#else
+            return nullptr;
+#endif
+        }
+
+        util::itt::string_handle get_function_annotation_itt() const
+        {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            return vptr->get_function_annotation_itt(object);
+#else
+            static util::itt::string_handle sh;
+            return sh;
+#endif
         }
 
     private:
         template <typename T>
-        static VTable const* get_vtable() HPX_NOEXCEPT
+        static VTable const* get_vtable() noexcept
         {
             return detail::get_vtable<VTable, T>();
         }
@@ -220,7 +237,7 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename Sig, typename VTable>
-    static bool is_empty_function(function_base<VTable, Sig> const& f) HPX_NOEXCEPT
+    static bool is_empty_function(function_base<VTable, Sig> const& f) noexcept
     {
         return f.empty();
     }
@@ -236,23 +253,21 @@ namespace hpx { namespace util { namespace detail
           , R(Ts...)
         >
     {
-        HPX_MOVABLE_ONLY(basic_function);
-
         typedef serializable_function_vtable<VTable> vtable;
         typedef function_base<vtable, R(Ts...)> base_type;
 
     public:
         typedef R result_type;
 
-        basic_function() HPX_NOEXCEPT
+        basic_function() noexcept
           : base_type()
         {}
 
-        basic_function(basic_function&& other) HPX_NOEXCEPT
+        basic_function(basic_function&& other) noexcept
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        basic_function& operator=(basic_function&& other) HPX_NOEXCEPT
+        basic_function& operator=(basic_function&& other) noexcept
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -297,22 +312,20 @@ namespace hpx { namespace util { namespace detail
     class basic_function<VTable, R(Ts...), false>
       : public function_base<VTable, R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(basic_function);
-
         typedef function_base<VTable, R(Ts...)> base_type;
 
     public:
         typedef R result_type;
 
-        basic_function() HPX_NOEXCEPT
+        basic_function() noexcept
           : base_type()
         {}
 
-        basic_function(basic_function&& other) HPX_NOEXCEPT
+        basic_function(basic_function&& other) noexcept
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        basic_function& operator=(basic_function&& other) HPX_NOEXCEPT
+        basic_function& operator=(basic_function&& other) noexcept
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -321,7 +334,7 @@ namespace hpx { namespace util { namespace detail
 
     template <typename Sig, typename VTable, bool Serializable>
     static bool is_empty_function(
-        basic_function<VTable, Sig, Serializable> const& f) HPX_NOEXCEPT
+        basic_function<VTable, Sig, Serializable> const& f) noexcept
     {
         return f.empty();
     }

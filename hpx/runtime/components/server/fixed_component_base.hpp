@@ -1,5 +1,5 @@
 //  Copyright (c) 2011      Bryce Lelbach
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,6 +18,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <cstddef>
@@ -99,7 +100,7 @@ private:
 
     template <typename Component_>
     friend naming::gid_type server::create(naming::gid_type const& gid,
-        util::unique_function_nonser<void(void*)> const& ctor);
+        util::unique_function_nonser<void(void*)> const& ctor, void** p);
 
     // Return the component's fixed GID.
     naming::gid_type get_base_gid(
@@ -153,6 +154,7 @@ public:
     }
 
 #if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     naming::id_type get_gid() const
     {
         return get_unmanaged_id();
@@ -178,6 +180,14 @@ public:
     std::uint32_t pin_count() const { return 0; }
 
     void mark_as_migrated()
+    {
+        // If this assertion is triggered then this component instance is being
+        // migrated even if the component type has not been enabled to support
+        // migration.
+        HPX_ASSERT(false);
+    }
+
+    void on_migrated()
     {
         // If this assertion is triggered then this component instance is being
         // migrated even if the component type has not been enabled to support

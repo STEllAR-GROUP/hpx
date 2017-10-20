@@ -5,10 +5,10 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/include/iostreams.hpp>
-
-#include <boost/format.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/format.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -22,23 +22,24 @@ using hpx::find_here;
 using hpx::cout;
 using hpx::flush;
 
-#define HPX_SIZEOF(type)                                                \
-    (boost::format(fmter) % BOOST_PP_STRINGIZE(type) % sizeof(type))    \
-    /**/
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map&
     )
 {
     {
-        const boost::format fmter("%1% %|40t|%2%\n");
+#       define HPX_SIZEOF(type)                                               \
+            hpx::util::format("%1% %|40t|%2%\n",                              \
+                HPX_PP_STRINGIZE(type), sizeof(type))                         \
+            /**/
 
         cout << HPX_SIZEOF(hpx::naming::gid_type)
              << HPX_SIZEOF(hpx::naming::id_type)
              << HPX_SIZEOF(hpx::naming::address)
              << HPX_SIZEOF(hpx::threads::thread_data)
              << flush;
+
+#       undef HPX_SIZEOF
     }
 
     finalize();

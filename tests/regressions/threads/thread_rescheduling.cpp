@@ -5,13 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/plain_actions.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/dynamic_bitset.hpp>

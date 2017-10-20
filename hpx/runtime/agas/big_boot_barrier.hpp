@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,8 @@
 #define HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -17,13 +19,11 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
 #include <boost/lockfree/queue.hpp>
-
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -41,7 +41,7 @@ struct notification_header;
 
 struct HPX_EXPORT big_boot_barrier
 {
-private:
+public:
     HPX_NON_COPYABLE(big_boot_barrier);
 
 private:
@@ -51,8 +51,8 @@ private:
     service_mode const service_type;
     parcelset::locality const bootstrap_agas;
 
-    boost::condition_variable cond;
-    boost::mutex mtx;
+    compat::condition_variable cond;
+    compat::mutex mtx;
     std::size_t connected;
 
     boost::lockfree::queue<util::unique_function_nonser<void()>* > thunks;
@@ -120,11 +120,12 @@ public:
             p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
         }
 #endif
-        auto f = [this, dest](parcelset::parcel&& p)
+
+        parcelset::detail::parcel_await(std::move(p), parcelset::write_handler_type(), 0,
+            [this, dest](parcelset::parcel&& p, parcelset::write_handler_type&&)
             {
                 pp->send_early_parcel(dest, std::move(p));
-            };
-        parcelset::detail::parcel_await(std::move(p), 0, std::move(f)).apply();
+            }).apply();
     } // }}}
 
     template <typename Action, typename... Args>

@@ -9,9 +9,9 @@
 #include <hpx/lcos/promise.hpp>
 #include <hpx/lcos/future.hpp>
 //
-#include <hpx/config/parcelport_verbs_defines.hpp>
+#include <hpx/config/parcelport_defines.hpp>
 //
-#include <plugins/parcelport/verbs/rdma/rdma_logging.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_event_channel.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_shared_receive_queue.hpp>
@@ -21,12 +21,12 @@
 #include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 //
 #include <inttypes.h>
+#include <atomic>
+#include <iomanip>
+#include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
-#include <memory>
-#include <iostream>
-#include <iomanip>
-#include <atomic>
 
 #define HPX_PARCELPORT_VERBS_MAX_WORK_REQUESTS 1024
 

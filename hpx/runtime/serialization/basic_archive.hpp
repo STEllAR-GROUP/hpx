@@ -28,6 +28,7 @@ namespace hpx { namespace serialization
 
     enum archive_flags
     {
+        no_archive_flags            = 0x00000000,
         enable_compression          = 0x00002000,
         endian_big                  = 0x00004000,
         endian_little               = 0x00008000,

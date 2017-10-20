@@ -72,9 +72,9 @@ namespace hpx { namespace parallel { namespace traits
                 typename std::enable_if<
                     hpx::traits::is_iterator<Iter>::value
                 >::type>
-          : hpx::util::result_of<Proj(
+          : hpx::util::invoke_result<Proj,
                     typename std::iterator_traits<Iter>::reference
-                )>
+                >
         {};
 
         template <typename Projected>
@@ -90,14 +90,14 @@ namespace hpx { namespace parallel { namespace traits
         // with a tuple<datapar<T>...> instead of just a tuple<T...>
         template <typename Proj, typename ValueType, typename Enable = void>
         struct projected_result_of_vector_pack_
-          : hpx::util::result_of<Proj(
+          : hpx::util::invoke_result<Proj,
                     typename hpx::parallel::traits::vector_pack_load<
                         typename hpx::parallel::traits::vector_pack_type<
                             ValueType
                         >::type,
                         ValueType
                     >::value_type&
-                )>
+                >
         {};
 
         template <typename Projected, typename Enable = void>
@@ -137,9 +137,9 @@ namespace hpx { namespace parallel { namespace traits
                 typename std::enable_if<
                     hpx::traits::is_iterator<Iter>::value
                 >::type>
-          : hpx::traits::is_callable<Proj(
-                    typename std::iterator_traits<Iter>::reference
-                )>
+          : hpx::traits::is_invocable<
+                Proj, typename std::iterator_traits<Iter>::reference
+            >
         {};
 
         template <typename Projected, typename Enable = void>
@@ -197,7 +197,7 @@ namespace hpx { namespace parallel { namespace traits
     {
         template <typename F, typename ...Args>
         struct is_indirect_callable_impl
-          : hpx::traits::is_callable<F(Args...)>
+          : hpx::traits::is_invocable<F, Args...>
         {};
 
         template <typename ExPolicy, typename F, typename ProjectedPack,

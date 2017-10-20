@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_COMPONENTS_SERVER_EXECUTOR_COMPONENT_FEB_09_2017_0839PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/executors.hpp>
@@ -55,6 +55,7 @@ namespace hpx { namespace components
             traits::is_threads_executor<Executor_>::value
         >::type
         schedule_thread(hpx::naming::address::address_type lva,
+            naming::address::component_type comptype,
             hpx::threads::thread_init_data& data,
             hpx::threads::thread_state_enum initial_state)
         {
@@ -73,6 +74,7 @@ namespace hpx { namespace components
             !traits::is_threads_executor<Executor_>::value
         >::type
         schedule_thread(hpx::naming::address::address_type lva,
+            naming::address::component_type comptype,
             hpx::threads::thread_init_data& data,
             hpx::threads::thread_state_enum initial_state)
         {

@@ -8,22 +8,41 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 
 #include <hpx/compute/host/target.hpp>
 
+#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace compute { namespace host
 {
-    struct default_executor : hpx::parallel::executor_tag
+    struct default_executor
     {
         default_executor(host::target& target)
  //         : target_(target)
         {}
 
+        /// \cond NOINTERNAL
+        bool operator==(default_executor const& rhs) const noexcept
+        {
+            return true;
+        }
+
+        bool operator!=(default_executor const& rhs) const noexcept
+        {
+            return !(*this == rhs);
+        }
+
+        default_executor const& context() const noexcept
+        {
+            return *this;
+        }
+        /// \endcond
+
         template <typename F, typename ... Ts>
-        void apply_execute(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
         }
 
@@ -34,7 +53,7 @@ namespace hpx { namespace compute { namespace host
         }
 
         template <typename F, typename ... Ts>
-        static void execute(F && f, Ts &&... ts)
+        static void sync_execute(F && f, Ts &&... ts)
         {
         }
 
@@ -46,13 +65,42 @@ namespace hpx { namespace compute { namespace host
         }
 
         template <typename F, typename Shape, typename ... Ts>
-        static void bulk_execute(F && f, Shape const& shape, Ts &&... ts)
+        static void bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
         {
         }
 
     private:
  //       host::target& target_;
     };
+}}}
+
+namespace hpx { namespace parallel { namespace execution
+{
+    template <>
+    struct executor_execution_category<compute::host::default_executor>
+    {
+        typedef parallel::execution::parallel_execution_tag type;
+    };
+
+    template <>
+    struct is_one_way_executor<compute::host::default_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_two_way_executor<compute::host::default_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_one_way_executor<compute::host::default_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<compute::host::default_executor>
+      : std::true_type
+    {};
 }}}
 
 #endif

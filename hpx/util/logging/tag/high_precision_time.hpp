@@ -22,9 +22,6 @@
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/date_time/microsec_time_clock.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <hpx/util/logging/detail/manipulator.hpp> // is_generic
 #include <hpx/util/logging/format/formatter/tags.hpp> // uses_tag
@@ -33,6 +30,7 @@
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
 // do_convert_format
 
+#include <chrono>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -48,8 +46,8 @@ namespace tag {
 See @ref hpx::util::logging::tag "how to use tags".
 */
 struct high_precision_time {
-    high_precision_time() : val( ::boost::posix_time::microsec_clock::local_time() ) {}
-    ::boost::posix_time::ptime val;
+    high_precision_time() : val(std::chrono::system_clock::now()) {}
+    std::chrono::system_clock::time_point val;
 };
 
 }

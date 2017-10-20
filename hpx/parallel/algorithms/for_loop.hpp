@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/concepts.hpp>
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/traits/get_function_address.hpp>
+#include <hpx/traits/get_function_annotation.hpp>
+#endif
 #include <hpx/traits/is_iterator.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -22,7 +27,6 @@
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
-#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -30,12 +34,13 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
+namespace hpx { namespace parallel { inline namespace v2
 {
     // for_loop
     namespace detail
@@ -61,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         HPX_FORCEINLINE void invoke_iteration(hpx::util::tuple<Ts...>& args,
             hpx::util::detail::pack_c<std::size_t, Is...>, F && f, B part_begin)
         {
-            hpx::util::invoke(std::forward<F>(f), part_begin,
+            hpx::util::invoke_r<void>(std::forward<F>(f), part_begin,
                 hpx::util::get<Is>(args).iteration_value()...);
         }
 
@@ -97,7 +102,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         template <typename F, typename S, typename ...Ts>
         struct part_iterations<F, S, hpx::util::tuple<Ts...> >
         {
-            typename hpx::util::decay<F>::type f_;
+            typedef typename hpx::util::decay<F>::type fun_type;
+
+            fun_type f_;
             S stride_;
             hpx::util::tuple<Ts...> args_;
 
@@ -110,7 +117,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             template <typename B>
             HPX_HOST_DEVICE
-            void operator()(B part_begin, std::size_t part_steps,
+            void execute(B part_begin, std::size_t part_steps,
                 std::size_t part_index)
             {
                 auto pack = typename hpx::util::detail::make_index_pack<
@@ -133,6 +140,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     part_steps -= chunk;
                 }
             }
+
+            template <typename B>
+            HPX_HOST_DEVICE
+            void operator()(B part_begin, std::size_t part_steps,
+                std::size_t part_index)
+            {
+                hpx::util::annotate_function annotate(f_);
+                execute(part_begin, part_steps, part_index);
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -142,12 +158,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
               : for_loop_algo::algorithm("for_loop_algo")
             {}
 
-            template <typename ExPolicy, typename B, typename Size, typename S,
-                typename F, typename... Args>
+            template <typename ExPolicy, typename InIter, typename Size,
+                typename S, typename F, typename... Args>
             HPX_HOST_DEVICE
             static hpx::util::unused_type
-            sequential(ExPolicy policy, B first, Size size, S stride, F && f,
-                Args &&... args)
+            sequential(ExPolicy policy, InIter first, Size size, S stride,
+                F && f, Args &&... args)
             {
                 int const init_sequencer[] = {
                     0, (args.init_iteration(0), 0)...
@@ -233,14 +249,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<E>::value);
             }
 
-            // the for_loop should be executed sequentially either if the
-            // execution policy enforces sequential execution of if the
-            // loop boundaries are input or output iterators
+            // the for_loop should be executed sequentially if the
+            // execution policy enforces sequential execution or if the
+            // loop boundaries are integral types
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            static_assert(
+                (std::is_integral<B>::value ||
+                 hpx::traits::is_input_iterator<B>::value),
+                "Requires at least input iterator or integral loop boundaries.");
+
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
                     (!std::is_integral<B>::value &&
                      !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
+#else
+            static_assert(
+                (std::is_integral<B>::value ||
+                 hpx::traits::is_forward_iterator<B>::value),
+                "Requires at least forward iterator or integral loop boundaries.");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
             std::size_t size = parallel::v1::detail::distance(first, last);
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
@@ -271,10 +301,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     hpx::traits::is_bidirectional_iterator<B>::value);
             }
 
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+            // the for_loop_n should be executed sequentially either if the
+            // execution policy enforces sequential execution or if the
+            // loop boundaries are input or output iterators
             typedef std::integral_constant<bool,
-                    execution::is_sequential_execution_policy<ExPolicy>::value ||
-                   !hpx::traits::is_forward_iterator<B>::value
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                    (!std::is_integral<B>::value &&
+                     !hpx::traits::is_forward_iterator<B>::value)
                 > is_seq;
+#else
+            static_assert(
+                (std::is_integral<B>::value ||
+                 hpx::traits::is_forward_iterator<B>::value),
+                "Requires at least forward iterator or integral loop boundaries.");
+
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
 
             auto && t = hpx::util::forward_as_tuple(std::forward<Args>(args)...);
 
@@ -295,7 +338,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam Args        A parameter pack, it's last element is a function
     ///                     object to be invoked for each iteration, the others
     ///                     have to be either conforming to the induction or
@@ -399,7 +442,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam Args        A parameter pack, it's last element is a function
     ///                     object to be invoked for each iteration, the others
     ///                     have to be either conforming to the induction or
@@ -489,7 +532,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam S           The type of the stride variable. This should be
     ///                     an integral type.
     /// \tparam Args        A parameter pack, it's last element is a function
@@ -600,7 +643,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam S           The type of the stride variable. This should be
     ///                     an integral type.
     /// \tparam Args        A parameter pack, it's last element is a function
@@ -697,7 +740,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam Size        The type of a non-negative integral value specifying
     ///                     the number of items to iterate over.
     /// \tparam Args        A parameter pack, it's last element is a function
@@ -803,7 +846,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam Size        The type of a non-negative integral value specifying
     ///                     the number of items to iterate over.
     /// \tparam Args        A parameter pack, it's last element is a function
@@ -895,7 +938,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam Size        The type of a non-negative integral value specifying
     ///                     the number of items to iterate over.
     /// \tparam S           The type of the stride variable. This should be
@@ -1010,7 +1053,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// policy.
     ///
     /// \tparam I           The type of the iteration variable. This could be
-    ///                     an (input) iterator type or an integral type.
+    ///                     an (forward) iterator type or an integral type.
     /// \tparam Size        The type of a non-negative integral value specifying
     ///                     the number of items to iterate over.
     /// \tparam S           The type of the stride variable. This should be
@@ -1098,6 +1141,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             std::forward<Args>(args)...);
     }
 }}}
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx { namespace traits
+{
+    template <typename F, typename S, typename Tuple>
+    struct get_function_address<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static std::size_t call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                noexcept
+        {
+            return get_function_address<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+    template <typename F, typename S, typename Tuple>
+    struct get_function_annotation<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static char const* call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                noexcept
+        {
+            return get_function_annotation<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename F, typename S, typename Tuple>
+    struct get_function_annotation_itt<
+        parallel::v2::detail::part_iterations<F, S, Tuple> >
+    {
+        static util::itt::string_handle call(
+            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+                noexcept
+        {
+            return get_function_annotation_itt<
+                    typename hpx::util::decay<F>::type
+                >::call(f.f_);
+        }
+    };
+#endif
+}}
+#endif
 
 #endif
 

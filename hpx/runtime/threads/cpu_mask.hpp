@@ -16,6 +16,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
             && HPX_HAVE_MAX_CPU_COUNT > 64)
@@ -62,6 +63,12 @@ namespace hpx { namespace threads
         mask |= bits(idx);
     }
 
+    inline void unset(mask_type& mask, std::size_t idx)
+    {
+        HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+        mask &= not_(bits(idx));
+    }
+
     inline std::size_t mask_size(mask_cref_type mask)
     {
         return CHAR_BIT * sizeof(mask_type);
@@ -87,19 +94,19 @@ namespace hpx { namespace threads
         return ~std::size_t(0);
     }
 
-    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return lhs == rhs;
     }
 
     // return true if at least one of the masks has a bit set
-    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs | rhs) != 0;
     }
 
     // return true if at least one bit is set in both masks
-    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs & rhs) != 0;
     }
@@ -114,6 +121,11 @@ namespace hpx { namespace threads
               mask &= mask - 1; // clear the least significant bit set
         }
         return c;
+    }
+
+    inline void reset(mask_type& mask)
+    {
+        mask = 0ull;
     }
 
 #define HPX_CPU_MASK_PREFIX "0x"
@@ -184,19 +196,19 @@ namespace hpx { namespace threads
 #define HPX_CPU_MASK_PREFIX "0x"
 #endif
 
-    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool equal(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return lhs == rhs;
     }
 
     // return true if at least one of the masks has a bit set
-    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_or(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs | rhs).any();
     }
 
     // return true if at least one bit is set in both masks
-    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t)
+    inline bool bit_and(mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0)
     {
         return (lhs & rhs).any();
     }
@@ -206,7 +218,15 @@ namespace hpx { namespace threads
     {
         return mask.count();
     }
+
+    inline void reset(mask_type& mask)
+    {
+        mask.reset();
+    }
+
 #endif
+
+    HPX_API_EXPORT std::string to_string(mask_cref_type);
     /// \endcond
 }}
 

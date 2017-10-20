@@ -8,10 +8,9 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/range/functions.hpp>
-
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -30,12 +29,12 @@ void test_for_each_n_bad_alloc(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     try {
         hpx::parallel::for_each_n(policy,
-            iterator(boost::begin(c)), c.size(),
+            iterator(std::begin(c)), c.size(),
             [](std::size_t& v) { throw std::bad_alloc(); });
 
         HPX_TEST(false);
@@ -57,14 +56,14 @@ void test_for_each_n_bad_alloc_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
         hpx::future<iterator> f =
             hpx::parallel::for_each_n(p,
-                iterator(boost::begin(c)), c.size(),
+                iterator(std::begin(c)), c.size(),
                 [](std::size_t& v) { throw std::bad_alloc(); });
         returned_from_algorithm = true;
         f.get();    // rethrow bad_alloc
@@ -111,7 +110,9 @@ void for_each_n_bad_alloc_test()
 {
     test_for_each_n_bad_alloc<std::random_access_iterator_tag>();
     test_for_each_n_bad_alloc<std::forward_iterator_tag>();
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_for_each_n_bad_alloc<std::input_iterator_tag>();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

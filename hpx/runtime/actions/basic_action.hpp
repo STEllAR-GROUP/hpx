@@ -35,21 +35,19 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/void_guard.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
 
-#include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -69,24 +67,23 @@ namespace hpx { namespace actions
         template <typename Action, typename F, typename ...Ts>
         struct continuation_thread_function
         {
-            HPX_MOVABLE_ONLY(continuation_thread_function);
-
         public:
-            typedef typename Action::continuation_type
-                continuation_type;
+            typedef typename Action::continuation_type continuation_type;
 
             explicit continuation_thread_function(
-                continuation_type&& cont,
-                naming::address::address_type lva, F&& f, Ts&&... vs)
+                    continuation_type&& cont,
+                    naming::address::address_type lva,
+                    F&& f, Ts&&... vs)
               : cont_(std::move(cont))
               , lva_(lva)
               , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
             {}
 
             explicit continuation_thread_function(
-                naming::id_type target,
-                continuation_type&& cont,
-                naming::address::address_type lva, F&& f, Ts&&... vs)
+                    naming::id_type target,
+                    continuation_type&& cont,
+                    naming::address::address_type lva,
+                    F&& f, Ts&&... vs)
               : target_(std::move(target))
               , cont_(std::move(cont))
               , lva_(lva)
@@ -94,14 +91,16 @@ namespace hpx { namespace actions
             {}
 
             continuation_thread_function(continuation_thread_function && other)
-              : cont_(std::move(other.cont_)), lva_(std::move(other.lva_))
+              : cont_(std::move(other.cont_))
+              , lva_(std::move(other.lva_))
               , f_(std::move(other.f_))
             {}
 
             HPX_FORCEINLINE threads::thread_result_type
             operator()(threads::thread_state_ex_enum)
             {
-                LTM_(debug) << "Executing " << Action::get_action_name(lva_)
+                LTM_(debug)
+                    << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_.get_id() << ")";
 
                 actions::trigger(std::move(cont_), f_);
@@ -183,7 +182,8 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type /*lva*/, Ts&&... /*vs*/);
+        static R invoke(naming::address::address_type /*lva*/,
+            naming::address::component_type /*comptype*/, Ts&&... /*vs*/);
 
     protected:
         struct invoker
@@ -195,25 +195,29 @@ namespace hpx { namespace actions
                 result_type;
             template <typename ...Ts>
             HPX_FORCEINLINE result_type operator()(
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
                 return invoke(
-                    typename std::is_void<R>::type(), lva, std::forward<Ts>(vs)...);
+                    typename std::is_void<R>::type(), lva, comptype,
+                    std::forward<Ts>(vs)...);
             }
 
             template <typename ...Ts>
             HPX_FORCEINLINE result_type invoke(std::true_type,
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
-                Derived::invoke(lva, std::forward<Ts>(vs)...);
+                Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
                 return util::unused;
             }
 
             template <typename ...Ts>
             HPX_FORCEINLINE result_type invoke(std::false_type,
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
-                return Derived::invoke(lva, std::forward<Ts>(vs)...);
+                return Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
             }
         };
 
@@ -231,14 +235,15 @@ namespace hpx { namespace actions
 
             template <typename ...Ts>
             HPX_FORCEINLINE threads::thread_result_type
-            operator()(naming::address::address_type lva, Ts&&... vs) const
+            operator()(naming::address::address_type lva,
+                naming::address::component_type comptype, Ts&&... vs) const
             {
                 try {
                     LTM_(debug) << "Executing "
                         << Derived::get_action_name(lva) << ".";
 
                     // call the function, ignoring the return value
-                    Derived::invoke(lva, std::forward<Ts>(vs)...);
+                    Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
                 }
                 catch (hpx::thread_interrupted const&) { //-V565
                     /* swallow this exception */
@@ -249,7 +254,7 @@ namespace hpx { namespace actions
                         << Derived::get_action_name(lva) << ": " << e.what();
 
                     // report this error to the console in any case
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                 }
                 catch (...) {
                     LTM_(error)
@@ -257,7 +262,7 @@ namespace hpx { namespace actions
                         << Derived::get_action_name(lva);
 
                     // report this error to the console in any case
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                 }
 
                 // Verify that there are no more registered locks for this
@@ -280,19 +285,21 @@ namespace hpx { namespace actions
         static threads::thread_function_type
         construct_thread_function(naming::id_type const& target,
             naming::address::address_type lva,
-            Ts&&... vs)
+            naming::address::component_type comptype, Ts&&... vs)
         {
             if (target && target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(typename Derived::thread_function()),
-                        lva, std::forward<Ts>(vs)...));
+                    util::bind(util::one_shot(
+                        typename Derived::thread_function()),
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
             else
             {
                 return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(typename Derived::thread_function(target)),
-                        lva, std::forward<Ts>(vs)...));
+                    util::bind(util::one_shot(
+                        typename Derived::thread_function(target)),
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
         }
 
@@ -303,24 +310,25 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static threads::thread_function_type
         construct_thread_function(naming::id_type const& target,
-            continuation_type&& cont,
-            naming::address::address_type lva, Ts&&... vs)
+            continuation_type&& cont, naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
-                Derived, invoker, naming::address::address_type&, Ts&&...
+                Derived, invoker, naming::address::address_type&,
+                naming::address::component_type&, Ts&&...
             > thread_function;
 
             if (target && target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
                     thread_function(std::move(cont), lva, invoker(),
-                        lva, std::forward<Ts>(vs)...));
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
             else
             {
                 return traits::action_decorate_function<Derived>::call(lva,
                     thread_function(target, std::move(cont), lva, invoker(),
-                        lva, std::forward<Ts>(vs)...));
+                        lva, comptype, std::forward<Ts>(vs)...));
             }
         }
 
@@ -328,37 +336,27 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static HPX_FORCEINLINE
         typename invoker::result_type
-        execute_function(naming::address::address_type lva, Ts&&... vs)
+        execute_function(naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
         {
             LTM_(debug)
                 << "basic_action::execute_function"
                 << Derived::get_action_name(lva);
 
-            return invoker()(lva, std::forward<Ts>(vs)...);
+            return invoker()(lva, comptype, std::forward<Ts>(vs)...);
         }
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        typedef traits::is_future<result_type> is_future_pred;
-
         struct sync_invoke
         {
             template <typename IdOrPolicy, typename Policy, typename ...Ts>
             HPX_FORCEINLINE static result_type call(
-                std::false_type, Policy policy,
-                IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
+                Policy const& policy, IdOrPolicy const& id_or_policy,
+                error_code& ec, Ts&&... vs)
             {
                 return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...).get(ec);
-            }
-
-            template <typename IdOrPolicy, typename Policy, typename ...Ts>
-            HPX_FORCEINLINE static result_type call(
-                std::true_type, Policy policy,
-                IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
-            {
-                return hpx::async<basic_action>(policy, id_or_policy,
-                    std::forward<Ts>(vs)...);
             }
         };
 
@@ -369,18 +367,15 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(
-                    is_future_pred(), policy, id, ec, std::forward<Ts>(vs)...);
+            return sync_invoke::call(policy, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(is_future_pred(), launch::sync, id, ec,
-                    std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
@@ -388,18 +383,16 @@ namespace hpx { namespace actions
             launch policy, naming::id_type const& id,
             Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
-                    std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, id, throws, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(is_future_pred(), launch::sync, id, throws,
-                    std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, id, throws, std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -412,11 +405,8 @@ namespace hpx { namespace actions
         operator()(launch policy,
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
-            return util::void_guard<result_type>(),
-                sync_invoke::call(
-                    is_future_pred(), policy, dist_policy, ec,
-                    std::forward<Ts>(vs)...
-                );
+            return sync_invoke::call(
+                policy, dist_policy, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename DistPolicy, typename ...Ts>
@@ -478,7 +468,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        static boost::atomic<std::int64_t> invocation_count_;
+        static std::atomic<std::int64_t> invocation_count_;
 
     protected:
         static void increment_invocation_count()
@@ -488,7 +478,7 @@ namespace hpx { namespace actions
     };
 
     template <typename Component, typename R, typename ...Args, typename Derived>
-    boost::atomic<std::int64_t>
+    std::atomic<std::int64_t>
         basic_action<Component, R(Args...), Derived>::invocation_count_(0);
 
     namespace detail
@@ -816,13 +806,13 @@ namespace hpx { namespace serialization
     /**/
 
 #define HPX_DECLARE_ACTION_(...)                                              \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DECLARE_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                    \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DECLARE_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                        \
     )(__VA_ARGS__))                                                           \
     /**/
 
 #define HPX_DECLARE_ACTION_1(func)                                            \
-    HPX_DECLARE_ACTION_2(func, BOOST_PP_CAT(func, _action))                   \
+    HPX_DECLARE_ACTION_2(func, HPX_PP_CAT(func, _action))                     \
     /**/
 
 #define HPX_DECLARE_ACTION_2(func, name) struct name;                         \
@@ -838,9 +828,9 @@ namespace hpx { namespace serialization
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                    \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
-        util::itt::string_handle const& get_action_name_itt<action>()         \
+        util::itt::string_handle const& get_action_name_itt< action>()        \
         {                                                                     \
-            static util::itt::string_handle sh(BOOST_PP_STRINGIZE(actionname)); \
+            static util::itt::string_handle sh(HPX_PP_STRINGIZE(actionname)); \
             return sh;                                                        \
         }                                                                     \
     }}}                                                                       \
@@ -853,16 +843,16 @@ namespace hpx { namespace serialization
     HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                        \
     namespace hpx { namespace actions { namespace detail {                    \
         template<> HPX_ALWAYS_EXPORT                                          \
-        char const* get_action_name<action>()                                 \
+        char const* get_action_name< action>()                                \
         {                                                                     \
-            return BOOST_PP_STRINGIZE(actionname);                            \
+            return HPX_PP_STRINGIZE(actionname);                              \
         }                                                                     \
     }}}                                                                       \
 /**/
 
 #define HPX_REGISTER_ACTION_(...)                                             \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                   \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_ACTION_, HPX_PP_NARGS(__VA_ARGS__)                       \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_ACTION_1(action)                                         \
@@ -873,19 +863,21 @@ namespace hpx { namespace serialization
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
     namespace hpx { namespace actions {                                       \
-        template struct transfer_action<action>;                              \
-        template struct transfer_continuation_action<action>;                 \
+        template struct HPX_ALWAYS_EXPORT transfer_action< action>;           \
+        template struct HPX_ALWAYS_EXPORT                                     \
+            transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
 /**/
 #else
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
     namespace hpx { namespace actions {                                       \
-        extern template struct HPX_EXPORT transfer_action<action>;            \
-        extern template struct HPX_EXPORT transfer_continuation_action<action>;\
+        extern template struct HPX_ALWAYS_IMPORT transfer_action< action>;    \
+        extern template struct HPX_ALWAYS_IMPORT                              \
+            transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
 #endif
@@ -895,7 +887,7 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)           \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
-        util::itt::string_handle const& get_action_name_itt<action>();        \
+        util::itt::string_handle const& get_action_name_itt< action>();       \
     }}}                                                                       \
 /**/
 #else
@@ -906,25 +898,25 @@ namespace hpx { namespace serialization
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
-        char const* get_action_name<action>();                                \
+        char const* get_action_name< action>();                               \
     }}}                                                                       \
     HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                            \
                                                                               \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
-        struct is_action<action>                                              \
+        struct is_action< action>                                             \
           : std::true_type                                                    \
         {};                                                                   \
         template <>                                                           \
-        struct needs_automatic_registration<action>                           \
+        struct needs_automatic_registration< action>                          \
           : std::false_type                                                   \
         {};                                                                   \
     }}                                                                        \
 /**/
 
 #define HPX_REGISTER_ACTION_DECLARATION_(...)                                 \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_ACTION_DECLARATION_, HPX_UTIL_PP_NARG(__VA_ARGS__)       \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_REGISTER_ACTION_DECLARATION_, HPX_PP_NARGS(__VA_ARGS__)           \
     )(__VA_ARGS__))                                                           \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_1(action)                             \
@@ -939,7 +931,7 @@ namespace hpx { namespace serialization
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_stacksize<action>                                       \
+        struct action_stacksize< action>                                      \
         {                                                                     \
             enum { value = size };                                            \
         };                                                                    \
@@ -960,14 +952,14 @@ namespace hpx { namespace serialization
 /**/
 // This macro is deprecated. It expands to an inline function which will emit a
 // warning.
-#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                    \
-    HPX_DEPRECATED("HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "    \
-                   "removed in the next release")                              \
-    static inline void BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();   \
-    void BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)()                  \
-    {                                                                          \
-        BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();                  \
-    }                                                                          \
+#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                   \
+    HPX_DEPRECATED("HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "   \
+                   "removed in the next release")                             \
+    static inline void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();    \
+    void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)()                   \
+    {                                                                         \
+        HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();                   \
+    }                                                                         \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -975,7 +967,7 @@ namespace hpx { namespace serialization
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
-        struct action_priority<action>                                        \
+        struct action_priority< action>                                       \
         {                                                                     \
             enum { value = priority };                                        \
         };                                                                    \
@@ -988,8 +980,16 @@ namespace hpx { namespace serialization
 #define HPX_ACTION_HAS_NORMAL_PRIORITY(action)                                \
     HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_normal)          \
 /**/
+#define HPX_ACTION_HAS_HIGH_PRIORITY(action)                                  \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high)            \
+/**/
+#define HPX_ACTION_HAS_HIGH_RECURSIVE_PRIORITY(action)                        \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high_recursive)  \
+/**/
+
+// obsolete, kept for compatibility
 #define HPX_ACTION_HAS_CRITICAL_PRIORITY(action)                              \
-    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_critical)        \
+    HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_high_recursive)  \
 /**/
 
 /// \endcond

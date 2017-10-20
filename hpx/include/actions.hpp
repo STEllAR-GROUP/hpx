@@ -15,6 +15,7 @@
 #include <hpx/runtime/actions/make_continuation.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 
 #endif
 

@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "htts2.hpp"
-
-#include <boost/atomic.hpp>
+#include <hpx/util/format.hpp>
 
 #include <qthread/qthread.h>
 #include <qthread/qloop.h>
@@ -83,14 +82,12 @@ struct qthreads_driver : htts2::driver
                 << "Total Walltime [nanoseconds]"
                 << "\n";
 
-        std::cout
-            << ( boost::format("%lu,%lu,%lu,%.14g\n")
-               % this->osthreads_
-               % this->tasks_
-               % this->payload_duration_
-               % results
-               )
-            ;
+        hpx::util::format_to(std::cout, "%lu,%lu,%lu,%.14g\n",
+            this->osthreads_,
+            this->tasks_,
+            this->payload_duration_,
+            results
+        );
     }
 };
 

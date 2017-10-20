@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:is_callable
+// hpxinspect:nodeprecatedname:util::result_of
+
 #ifndef HPX_TRAITS_IS_CALLABLE_HPP
 #define HPX_TRAITS_IS_CALLABLE_HPP
 
@@ -46,6 +49,17 @@ namespace hpx { namespace traits
     template <typename F, typename ...Ts, typename R>
     struct is_callable<F(Ts...), R>
       : detail::is_callable_impl<F(Ts...), R>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename ...Ts>
+    struct is_invocable
+      : detail::is_callable_impl<F&&(Ts&&...), void>
+    {};
+
+    template <typename R, typename F, typename ...Ts>
+    struct is_invocable_r
+      : detail::is_callable_impl<F&&(Ts&&...), R>
     {};
 }}
 

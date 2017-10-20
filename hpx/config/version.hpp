@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2013 Adrian Serio
 //
@@ -12,8 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
 
-#include <boost/preprocessor/cat.hpp>
 #include <boost/version.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,19 +26,19 @@
 //  HPX_VERSION_DATE   YYYYMMDD is the date of the release
 //                               (estimated release date for master branch)
 //
-#define HPX_VERSION_FULL         0x001000
+#define HPX_VERSION_FULL         0x010100
 
 #define HPX_VERSION_MAJOR        1
-#define HPX_VERSION_MINOR        0
+#define HPX_VERSION_MINOR        1
 #define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20161031
+#define HPX_VERSION_DATE         20170424
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30
 #endif
 
-#define HPX_VERSION_TAG          "-trunk"
+#define HPX_VERSION_TAG          ""
 
 #if !defined(HPX_HAVE_GIT_COMMIT)
     #define HPX_HAVE_GIT_COMMIT  "unknown"
@@ -48,15 +48,15 @@
 // The version check enforces the major and minor version numbers to match for
 // every compilation unit to be compiled.
 #define HPX_CHECK_VERSION                                                     \
-    BOOST_PP_CAT(hpx_check_version_,                                          \
-        BOOST_PP_CAT(HPX_VERSION_MAJOR,                                       \
-            BOOST_PP_CAT(_, HPX_VERSION_MINOR)))                              \
+    HPX_PP_CAT(hpx_check_version_,                                            \
+        HPX_PP_CAT(HPX_VERSION_MAJOR,                                         \
+            HPX_PP_CAT(_, HPX_VERSION_MINOR)))                                \
     /**/
 
 // The version check enforces the major and minor version numbers to match for
 // every compilation unit to be compiled.
 #define HPX_CHECK_BOOST_VERSION                                               \
-    BOOST_PP_CAT(hpx_check_boost_version_, BOOST_VERSION)                     \
+    HPX_PP_CAT(hpx_check_boost_version_, BOOST_VERSION)                       \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////

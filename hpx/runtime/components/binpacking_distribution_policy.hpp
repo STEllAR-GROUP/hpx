@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,8 @@
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -39,122 +40,20 @@ namespace hpx { namespace components
     namespace detail
     {
         /// \cond NOINTERNAL
-        inline std::vector<std::size_t>
-        get_items_count(std::size_t count, std::vector<std::uint64_t> const& values)
-        {
-            std::size_t maxcount = 0;
-            std::size_t existing = 0;
+        HPX_EXPORT std::vector<std::size_t>
+        get_items_count(std::size_t count, std::vector<std::uint64_t> const& values);
 
-            for (std::uint64_t value: values)
-            {
-                maxcount = (std::max)(maxcount, std::size_t(value));
-                existing += value;
-            }
-
-            // distribute the number of components to create in a way, so that
-            // the overall number of component instances on all localities is
-            // approximately the same
-            std::size_t num_localities = values.size();
-
-            // calculate the number of new instances to create on each of the
-            // localities
-            std::vector<std::size_t> to_create(num_localities, 0);
-
-            bool even_fill = true;
-            while (even_fill)
-            {
-                even_fill = false;
-                for (std::size_t i = 0; i != num_localities; ++i)
-                {
-                    if(values[i] + to_create[i] >= maxcount) continue;
-                    even_fill = true;
-
-                    ++to_create[i];
-                    --count;
-                    if (count == 0) break;
-                }
-            }
-            std::size_t i = 0;
-            while (count != 0)
-            {
-                ++to_create[i];
-                i = (i + 1) % num_localities;
-                --count;
-            }
-
-            return to_create;
-        }
-
-        inline hpx::future<std::vector<std::uint64_t> >
+        HPX_EXPORT hpx::future<std::vector<std::uint64_t> >
         retrieve_counter_values(
-            std::vector<performance_counters::performance_counter> && counters)
-        {
-            using namespace hpx::performance_counters;
+            std::vector<performance_counters::performance_counter> && counters);
 
-            std::vector<hpx::future<std::uint64_t> > values;
-            values.reserve(counters.size());
+        HPX_EXPORT hpx::future<std::vector<std::uint64_t> > get_counter_values(
+            std::string component_name, std::string const& counter_name,
+            std::vector<hpx::id_type> const& localities);
 
-            for (performance_counter const& counter: counters)
-                values.push_back(counter.get_value<std::uint64_t>());
-
-            return hpx::dataflow(hpx::launch::sync,
-                hpx::util::unwrapped(
-                    [](std::vector<std::uint64_t> && values)
-                    {
-                        return values;
-                    }),
-                std::move(values));
-        }
-
-        template <typename String>
-        hpx::future<std::vector<std::uint64_t> > get_counter_values(
-            String component_name, std::string const& counter_name,
-            std::vector<hpx::id_type> const& localities)
-        {
-            using namespace hpx::performance_counters;
-
-            // create performance counters on all localities
-            std::vector<performance_counter> counters;
-            counters.reserve(localities.size());
-
-            if (counter_name[counter_name.size()-1] == '@')
-            {
-                std::string name(counter_name + component_name);
-
-                for (hpx::id_type const& id: localities)
-                    counters.push_back(performance_counter(name, id));
-            }
-            else
-            {
-                for (hpx::id_type const& id: localities)
-                    counters.push_back(performance_counter(counter_name, id));
-            }
-
-            return hpx::dataflow(
-                &retrieve_counter_values, std::move(counters));
-        }
-
-        inline hpx::id_type const& get_best_locality(
+        HPX_EXPORT hpx::id_type const& get_best_locality(
             hpx::future<std::vector<std::uint64_t> > && f,
-            std::vector<hpx::id_type> const& localities)
-        {
-            std::vector<std::uint64_t> values = f.get();
-
-            std::size_t best_locality = 0;
-            std::uint64_t min_value =
-                (std::numeric_limits<std::uint64_t>::max)();
-
-            for (std::size_t i = 0; i != values.size(); ++i)
-            {
-                if (min_value > values[i])
-                {
-                    min_value = values[i];
-                    best_locality = i;
-                }
-            }
-
-            return localities[best_locality];
-        }
+            std::vector<hpx::id_type> const& localities);
 
         template <typename Component>
         struct create_helper
@@ -252,7 +151,7 @@ namespace hpx { namespace components
         ///
         /// \param locs     [in] The list of localities the new instance should
         ///                 represent
-        /// \param counter_name  [in] The name of the performance counter which
+        /// \param perf_counter_name  [in] The name of the performance counter which
         ///                      should be used as the distribution criteria
         ///                      (by default the overall number of existing
         ///                      instances of the given component type will be
@@ -260,7 +159,7 @@ namespace hpx { namespace components
         ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> const& locs,
-            char const* counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name = default_binpacking_counter_name) const
         {
 #if defined(HPX_DEBUG)
             for (id_type const& loc: locs)
@@ -268,7 +167,7 @@ namespace hpx { namespace components
                 HPX_ASSERT(naming::is_locality(loc));
             }
 #endif
-            return binpacking_distribution_policy(locs, counter_name);
+            return binpacking_distribution_policy(locs, perf_counter_name);
         }
 
         /// Create a new \a default_distribution policy representing the given
@@ -276,7 +175,7 @@ namespace hpx { namespace components
         ///
         /// \param locs     [in] The list of localities the new instance should
         ///                 represent
-        /// \param counter_name  [in] The name of the performance counter which
+        /// \param perf_counter_name  [in] The name of the performance counter which
         ///                      should be used as the distribution criteria
         ///                      (by default the overall number of existing
         ///                      instances of the given component type will be
@@ -284,7 +183,7 @@ namespace hpx { namespace components
         ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> && locs,
-            char const* counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name = default_binpacking_counter_name) const
         {
 #if defined(HPX_DEBUG)
             for (id_type const& loc: locs)
@@ -292,7 +191,8 @@ namespace hpx { namespace components
                 HPX_ASSERT(naming::is_locality(loc));
             }
 #endif
-            return binpacking_distribution_policy(std::move(locs), counter_name);
+            return binpacking_distribution_policy(std::move(locs),
+                perf_counter_name);
         }
 
         /// Create a new \a default_distribution policy representing the given
@@ -300,17 +200,17 @@ namespace hpx { namespace components
         ///
         /// \param loc     [in] The locality the new instance should
         ///                 represent
-        /// \param counter_name  [in] The name of the performance counter which
+        /// \param perf_counter_name  [in] The name of the performance counter which
         ///                      should be used as the distribution criteria
         ///                      (by default the overall number of existing
         ///                      instances of the given component type will be
         ///                      used).
         ///
         binpacking_distribution_policy operator()(id_type const& loc,
-            char const* counter_name = default_binpacking_counter_name) const
+            char const* perf_counter_name = default_binpacking_counter_name) const
         {
             HPX_ASSERT(naming::is_locality(loc));
-            return binpacking_distribution_policy(loc, counter_name);
+            return binpacking_distribution_policy(loc, perf_counter_name);
         }
 
         /// Create one object on one of the localities associated by
@@ -432,20 +332,20 @@ namespace hpx { namespace components
     protected:
         /// \cond NOINTERNAL
         binpacking_distribution_policy(std::vector<id_type> const& localities,
-                char const* counter_name)
+                char const* perf_counter_name)
           : localities_(localities),
-            counter_name_(counter_name)
+            counter_name_(perf_counter_name)
         {}
 
         binpacking_distribution_policy(std::vector<id_type> && localities,
-                char const* counter_name)
+                char const* perf_counter_name)
           : localities_(std::move(localities)),
-            counter_name_(counter_name)
+            counter_name_(perf_counter_name)
         {}
 
         binpacking_distribution_policy(id_type const& locality,
-                char const* counter_name)
-          : counter_name_(counter_name)
+                char const* perf_counter_name)
+          : counter_name_(perf_counter_name)
         {
             localities_.push_back(locality);
         }

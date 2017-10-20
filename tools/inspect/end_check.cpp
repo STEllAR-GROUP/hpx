@@ -7,9 +7,12 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #include "end_check.hpp"
 #include "function_hyper.hpp"
 #include <string>
+#include <iterator>
 #include <boost/tokenizer.hpp>
 #include <boost/next_prior.hpp>
 
@@ -34,12 +37,9 @@ namespace boost
       const string & contents )     // contents of file to be inspected
     {
       if (contents.find( "hpxinspect:" "noend" ) != string::npos) return;
-      int linenumb = 0;
       char_separator<char> sep("\n", "", boost::keep_empty_tokens);
       tokenizer<char_separator<char>> tokens(contents, sep);
-      for (const auto& t : tokens) {
-          linenumb++;
-      }
+      const auto linenumb = std::distance(tokens.begin(), tokens.end());
       std::string lineloc = std::to_string(linenumb);
       // this file deliberately contains errors
       const char test_file_name[] = "wrong_line_ends_test.cpp";

@@ -8,24 +8,25 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 #include <hpx/lcos/local/detail/sliding_semaphore.hpp>
+#include <hpx/util/format.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/atomic.hpp>
-#include <boost/random.hpp>
 
-#include <array>
 #include <algorithm>
+#include <array>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <simple_profiler.hpp>
@@ -92,7 +93,7 @@
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
-#define MAX_RANKS 1024
+#define MAX_RANKS 16384
 
 //----------------------------------------------------------------------------
 // Define this to make memory access asynchronous and return a future
@@ -133,10 +134,10 @@
 // global vars
 //----------------------------------------------------------------------------
 std::vector<std::vector<hpx::future<int> > > ActiveFutures;
-std::array<boost::atomic<int>, MAX_RANKS>    FuturesWaiting;
+std::array<std::atomic<int>, MAX_RANKS>    FuturesWaiting;
 
 #if defined(USE_CLEANING_THREAD) || defined(USE_PARCELPORT_THREAD)
- boost::atomic<bool>                        FuturesActive;
+ std::atomic<bool>                        FuturesActive;
  hpx::lcos::local::spinlock                 FuturesMutex;
 #endif
 
@@ -230,12 +231,12 @@ public:
   typedef std::size_t size_type;
   typedef std::ptrdiff_t difference_type;
 
-  pointer_allocator() HPX_NOEXCEPT
+  pointer_allocator() noexcept
     : pointer_(nullptr), size_(0)
   {
   }
 
-  pointer_allocator(pointer p, size_type size) HPX_NOEXCEPT
+  pointer_allocator(pointer p, size_type size) noexcept
     : pointer_(p), size_(size)
   {
   }
@@ -484,8 +485,8 @@ int reduce(hpx::future<std::vector<hpx::future<int> > > futvec)
 // Test speed of write/put
 void test_write(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
-    boost::random::uniform_int_distribution<>& random_slot,
+    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
+    std::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -501,8 +502,17 @@ void test_write(
     hpx::util::simple_profiler level1("Write function", rank==0 && !options.warmup);
     //
     bool active = (rank==0) || (rank>0 && options.all2all);
+    if (rank==0) std::cout << "Iteration ";
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
         hpx::util::simple_profiler iteration(level1, "Iteration");
+        if (rank==0) {
+            if (i%10==0)  {
+                std::cout << "x" << std::flush;
+            }
+            else {
+                std::cout << "." << std::flush;
+            }
+        }
 
         DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
 
@@ -643,6 +653,7 @@ void test_write(
         DEBUG_OUTPUT(3, "Future wait, rank " << rank << " waiting on " << numwait);
         fwait.done();
     }
+    if (rank==0) std::cout << std::endl;
     DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
 
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
@@ -666,9 +677,10 @@ void test_write(
             "%1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, "
             "IOPS/s, %6%, BW(MB/s), %7%, ";
         if (!options.warmup) {
-            std::cout << (boost::format(msg) % options.network
-                % nranks % options.threads % writeMB % options.transfer_size_B
-                % IOPs_s % writeBW ) << std::endl;
+            hpx::util::format_to(std::cout, msg,
+                options.network,
+                nranks, options.threads, writeMB, options.transfer_size_B,
+                IOPs_s, writeBW ) << std::endl;
         }
         std::cout << std::endl;
     }
@@ -680,7 +692,7 @@ void test_write(
 static void transfer_data(general_buffer_type recv,
   hpx::future<transfer_buffer_type> &&f)
 {
-  transfer_buffer_type buffer(std::move(f.get()));
+  transfer_buffer_type buffer(f.get());
 //  if (buffer.data() != recv.data())
   {
     std::copy(buffer.data(), buffer.data() + buffer.size(), recv.data());
@@ -696,8 +708,8 @@ static void transfer_data(general_buffer_type recv,
 // Test speed of read/get
 void test_read(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
-    boost::random::mt19937& gen, boost::random::uniform_int_distribution<>& random_rank,
-    boost::random::uniform_int_distribution<>& random_slot,
+    std::mt19937& gen, std::uniform_int_distribution<>& random_rank,
+    std::uniform_int_distribution<>& random_slot,
     test_options &options
     )
 {
@@ -714,8 +726,18 @@ void test_read(
     //
     hpx::util::high_resolution_timer timerRead;
     //
+    if (rank==0) std::cout << "Iteration ";
     bool active = (rank==0) || (rank>0 && options.all2all);
     for (std::uint64_t i = 0; active && i < options.iterations; i++) {
+        if (rank==0) {
+            if (i%10==0)  {
+                std::cout << "x" << std::flush;
+            }
+            else {
+                std::cout << "." << std::flush;
+            }
+        }
+
         DEBUG_OUTPUT(1, "Starting iteration " << i << " on rank " << rank);
 #ifdef USE_CLEANING_THREAD
         //
@@ -853,6 +875,8 @@ void test_read(
     }
     hpx::lcos::barrier::synchronize();
     //
+    if (rank==0) std::cout << std::endl;
+    //
     uint64_t active_ranks = options.all2all ? nranks : 1;
     double readMB   = static_cast<double>
         (active_ranks*options.local_storage_MB*options.iterations);
@@ -870,9 +894,9 @@ void test_read(
         char const* msg = "CSVData, read, network, %1%, ranks, "
             "%2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, "
             "BW(MB/s), %7%, ";
-        std::cout << (boost::format(msg) % options.network % nranks
-            % options.threads % readMB % options.transfer_size_B
-          % IOPs_s % readBW ) << std::endl;
+        hpx::util::format_to(std::cout, msg, options.network, nranks,
+            options.threads, readMB, options.transfer_size_B,
+            IOPs_s, readBW) << std::endl;
     }
 }
 
@@ -901,8 +925,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     char const* msg = "hello world from OS-thread %1% on locality "
         "%2% rank %3% hostname %4%";
-    std::cout << (boost::format(msg) % current % hpx::get_locality_id()
-        % rank % name.c_str()) << std::endl;
+    hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
+        rank, name.c_str()) << std::endl;
     //
     // extract command line argument
     test_options options;
@@ -938,9 +962,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::terminate();
     }
     //
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
-    boost::random::uniform_int_distribution<> random_slot(0,
+    std::mt19937 gen;
+    std::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
+    std::uniform_int_distribution<> random_slot(0,
         (int)num_transfer_slots - 1);
     //
     ActiveFutures.reserve(nranks);

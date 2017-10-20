@@ -44,15 +44,3 @@ HPX_REGISTER_ACTION(
     board_type::wrapped_type::clear_action,
     board_clear_action);
 
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<nqueen::list_type>::set_value_action,
-    set_value_action_vector_std_size_t);
-
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<nqueen::list_type>::get_value_action,
-    get_value_action_vector_std_size_t);
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<nqueen::list_type>,
-    hpx::components::component_base_lco_with_value);
-

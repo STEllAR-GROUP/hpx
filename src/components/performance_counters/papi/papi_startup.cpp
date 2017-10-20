@@ -22,7 +22,6 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/exception.hpp>
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <cctype>
@@ -292,9 +291,9 @@ namespace hpx { namespace performance_counters { namespace papi
 
         // deferred options
         variables_map vm = util::get_options();
-        if (vm.count("papi-event-info"))
+        if (vm.count("hpx:papi-event-info"))
         {
-            std::string v = vm["papi-event-info"].as<std::string>();
+            std::string v = vm["hpx:papi-event-info"].as<std::string>();
             util::list_events(v);
         }
     }

@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,14 +8,16 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    template <class T>
-    void locality::save(T & ar, const unsigned int version) const
+    void locality::save(serialization::output_archive& ar, const unsigned int) const
     {
         std::string t = type();
         ar << t;
@@ -23,8 +25,7 @@ namespace hpx { namespace parcelset
         impl_->save(ar);
     }
 
-    template <class T>
-    void locality::load(T & ar, const unsigned int version)
+    void locality::load(serialization::input_archive& ar, const unsigned int)
     {
         std::string t;
         ar >> t;
@@ -34,11 +35,6 @@ namespace hpx { namespace parcelset
         impl_->load(ar);
         HPX_ASSERT(impl_->valid());
     }
-
-    template void locality::save<serialization::output_archive>(
-        serialization::output_archive&, const unsigned int) const;
-    template void locality::load<serialization::input_archive>(
-        serialization::input_archive&, const unsigned int);
 
     std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints)
     {

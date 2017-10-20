@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011-2015 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/exception_info.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -19,12 +20,16 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
 #include <hpx/util/logging.hpp>
 
+#include <boost/exception/exception.hpp>
+
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <string>
 #include <vector>
@@ -218,7 +223,7 @@ namespace hpx
                         << "encode_parcels: "
                            "caught hpx::exception: "
                         << e.what();
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (boost::system::system_error const& e) {
@@ -226,22 +231,22 @@ namespace hpx
                         << "encode_parcels: "
                            "caught boost::system::error: "
                         << e.what();
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (boost::exception const&) {
                     LPT_(fatal)
                         << "encode_parcels: "
                            "caught boost::exception";
-                    hpx::report_error(boost::current_exception());
+                    hpx::report_error(std::current_exception());
                     return 0;
                 }
                 catch (std::exception const& e) {
                     // We have to repackage all exceptions thrown by the
                     // serialization library as otherwise we will loose the
                     // e.what() description of the problem, due to slicing.
-                    boost::throw_exception(boost::enable_error_info(
-                        hpx::exception(serialization_error, e.what())));
+                    hpx::throw_with_info(
+                        hpx::exception(serialization_error, e.what()));
                     return 0;
                 }
             }
@@ -249,7 +254,7 @@ namespace hpx
                 LPT_(fatal)
                         << "encode_parcels: "
                        "caught unknown exception";
-                hpx::report_error(boost::current_exception());
+                hpx::report_error(std::current_exception());
                     return 0;
             }
 

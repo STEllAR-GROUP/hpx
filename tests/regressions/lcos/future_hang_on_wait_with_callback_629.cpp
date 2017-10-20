@@ -10,13 +10,13 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/format.hpp>
+#include <hpx/util/unwrap.hpp>
 
-#include <boost/random.hpp>
-#include <boost/format.hpp>
 
 #include <cstdint>
 #include <iostream>
+#include <random>
 #include <vector>
 
 using boost::program_options::variables_map;
@@ -61,10 +61,10 @@ double null_function(
   , std::uint64_t delay_iterations
     )
 {
-    boost::random::mt19937_64 prng(seed);
+    std::mt19937_64 prng(seed);
 
-    boost::random::uniform_real_distribution<double> v(0, 1.);
-    boost::random::uniform_smallint<std::uint8_t> s(0, 1);
+    std::uniform_real_distribution<double> v(0, 1.);
+    std::uniform_int_distribution<std::uint8_t> s(0, 1);
 
     double d = 0.;
 
@@ -122,7 +122,7 @@ double null_tree(
     null_function(seed, delay_iterations);
 
     hpx::lcos::wait_each(
-        hpx::util::unwrapped([&] (double r) { d += r; }),
+        hpx::util::unwrapping([&] (double r) { d += r; }),
         futures);
 
     return d;
@@ -156,8 +156,8 @@ int hpx_main(
             d += null_act(here, 0, children, 1, max_depth, delay_iterations);
 
             if (verbose)
-                std::cout << (boost::format("%016u : %f\n") % i % d)
-                          << std::flush;
+                hpx::util::format_to(std::cout, "%016u : %f\n", i, d)
+                    << std::flush;
         }
     }
 

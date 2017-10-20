@@ -93,7 +93,7 @@ namespace hpx { namespace actions
                     F,return_type,sequence_type>::type;
         };
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 // suppress: 'operator +=': in C++14 'constexpr' will not imply 'const';
 // consider explicitly specifying 'const'
 #pragma warning(push)
@@ -117,7 +117,7 @@ namespace hpx { namespace actions
             }
         };
 
-#if defined(HPX_MSVC)
+#if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
     }

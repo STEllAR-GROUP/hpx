@@ -8,7 +8,7 @@ macro(add_hpx_library name)
   # retrieve arguments
   set(options EXCLUDE_FROM_ALL NOLIBS AUTOGLOB STATIC PLUGIN)
   set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
-  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER_FLAGS LINK_FLAGS)
+  set(multi_value_args SOURCES HEADERS AUXILIARY DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_SOURCE_ROOT)
@@ -115,7 +115,7 @@ macro(add_hpx_library name)
     set(_target_flags ${_target_flags} PLUGIN)
   endif()
 
-  if(${${name}_STATIC})
+  if(${name}_STATIC)
     set(${name}_lib_linktype STATIC)
   else()
     if(HPX_WITH_STATIC_LINKING)
@@ -125,12 +125,23 @@ macro(add_hpx_library name)
     endif()
   endif()
 
+  # Manage files with .cu extension in case When Cuda Clang is used
+  if(HPX_WITH_CUDA_CLANG)
+    foreach(source ${${name}_SOURCES})
+      get_filename_component(extension ${source} EXT)
+      if(${extension} STREQUAL ".cu")
+        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
+          LANGUAGE CXX)
+      endif()
+    endforeach()
+  endif()
+
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
     cuda_add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
-      ${${name}_SOURCES} ${${name}_HEADERS})
+      ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   else()
     add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
-      ${${name}_SOURCES} ${${name}_HEADERS})
+      ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   endif()
 
   if(${name}_OUTPUT_SUFFIX)

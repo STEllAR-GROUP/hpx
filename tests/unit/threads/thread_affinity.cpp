@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2012-2016 Thomas Heller
 //
@@ -40,8 +40,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hpx::runtime & rt = hpx::get_runtime();
         hpx::threads::topology const& t = rt.get_topology();
         hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(
-            rt.get_thread_manager().get_pu_num(current),
-            numa_sensitive);
+            hpx::resource::get_partitioner().get_pu_num(current));
 
         std::size_t logical_idx = hpx::threads::find_first(desired_mask);
 
@@ -135,7 +134,7 @@ void thread_affinity_foreman()
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
         using hpx::util::placeholders::_1;
-        hpx::lcos::wait_each(hpx::util::unwrapped(
+        hpx::lcos::wait_each(hpx::util::unwrapping(
             hpx::util::bind(&check_in, std::ref(attendance), _1)), futures);
     }
 }

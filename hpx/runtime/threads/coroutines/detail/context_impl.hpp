@@ -107,17 +107,11 @@
 
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
-#if BOOST_VERSION >= 105100
-
 #include <hpx/runtime/threads/coroutines/detail/context_generic_context.hpp>
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
     typedef generic_context::context_impl default_context_impl;
 }}}}
-
-#else
-#error Boost.Context is available only with Boost V1.51 or later
-#endif
 
 #elif (defined(__linux) || defined(linux) || defined(__linux__)) \
        && !defined(__bgq__) && !defined(__powerpc__)

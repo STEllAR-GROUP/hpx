@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Hartmut Kaiser
+# Copyright (c) 2015-2017 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,12 @@ set(exclude_from_all_headers
   "util/hardware/timestamp/linux_x86_64.hpp"
   "util/hardware/timestamp/linux_generic.hpp"
   "util/hardware/timestamp/bgq.hpp"
+)
+
+set(exclude_from_headers
+  "parallel/executors/execution_fwd.hpp"
+  "parallel/executors/execution_information_fwd.hpp"
+  "parallel/executors/timed_execution_fwd.hpp"
 )
 
 # If we compile with the MPI parcelport enabled, we need to additionally
@@ -50,41 +56,49 @@ foreach(header ${headers})
     # .hpp --> .cpp
     string(REGEX REPLACE ".hpp" ".cpp" full_test_file "${relpath}")
 
-    # remove extension, '/' --> '_'
-    string(REGEX REPLACE ".hpp" "_hpp" test_file "${relpath}")
-    string(REGEX REPLACE "/" "_" test_name "${test_file}")
-
-    # generate the test
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
-      "#include <hpx/${relpath}>\n"
-      "#ifndef HPX_MAIN_DEFINED\n"
-      "int main(int argc, char** argv) { return 0; }\n"
-      "#endif\n")
-
+    # exclude marked files
     set(detail_pos -1)
-    list(FIND exclude_from_all_headers "${relpath}" detail_pos)
+    list(FIND exclude_from_headers "${relpath}" detail_pos)
     if(${detail_pos} EQUAL -1)
-      set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+
+      # remove extension, '/' --> '_'
+      string(REGEX REPLACE ".hpp" "_hpp" test_file "${relpath}")
+      string(REGEX REPLACE "/" "_" test_name "${test_file}")
+
+      # generate the test
+      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
+        "#include <hpx/${relpath}>\n"
+        "#ifndef HPX_MAIN_DEFINED\n"
+        "int main(int argc, char** argv) { return 0; }\n"
+        "#endif\n")
+
+      # exclude from all files
+      set(detail_pos -1)
+      list(FIND exclude_from_all_headers "${relpath}" detail_pos)
+      if(${detail_pos} EQUAL -1)
+        set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+      endif()
+
+      get_filename_component(header_dir "${relpath}" DIRECTORY)
+
+      # add compile only test
+      add_hpx_headers_compile_test(
+        "headers"
+        ${test_name}
+        SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
+        SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
+        FOLDER "Tests/Headers/${header_dir}")
+
+      # add a custom target for this example
+      add_hpx_pseudo_target(tests.headers.${test_name})
+
+      # make pseudo-targets depend on master pseudo-target
+      add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
+
+      # add dependencies to pseudo-target
+      add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")
     endif()
 
-    get_filename_component(header_dir "${relpath}" DIRECTORY)
-
-    # add compile only test
-    add_hpx_headers_compile_test(
-      "headers"
-      ${test_name}
-      SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
-      SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
-      FOLDER "Tests/Headers/${header_dir}")
-
-    # add a custom target for this example
-    add_hpx_pseudo_target(tests.headers.${test_name})
-
-    # make pseudo-targets depend on master pseudo-target
-    add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
-
-    # add dependencies to pseudo-target
-    add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")
   endif()
 
 endforeach()

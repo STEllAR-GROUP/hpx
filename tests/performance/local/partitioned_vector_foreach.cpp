@@ -8,14 +8,12 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/partitioned_vector.hpp>
+#include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-
-#include <boost/format.hpp>
-#include <boost/range/functions.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -24,8 +22,8 @@
 #include "worker_timed.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Define the vector types to be used.
-HPX_REGISTER_PARTITIONED_VECTOR(int);
+// The vector types to be used are defined in partitioned_vector module.
+// HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
 int delay = 1000;
@@ -57,7 +55,7 @@ std::uint64_t foreach_vector(Policy && policy, Vector const& v)
     {
         hpx::parallel::for_each(
             std::forward<Policy>(policy),
-            boost::begin(v), boost::end(v), wait_op<Vector>()
+            std::begin(v), std::end(v), wait_op<Vector>()
         );
     }
 
@@ -82,7 +80,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     else {
         // create executor parameters object
-        hpx::parallel::static_chunk_size cs(chunk_size);
+        hpx::parallel::execution::static_chunk_size cs(chunk_size);
 
         // retrieve reference time
         std::vector<int> ref(vector_size);

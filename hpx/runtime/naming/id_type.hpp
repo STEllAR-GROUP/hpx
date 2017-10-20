@@ -88,7 +88,7 @@ namespace hpx { namespace naming
         id_type& operator++();
         id_type operator++(int);
 
-        explicit operator bool() const HPX_NOEXCEPT;
+        explicit operator bool() const noexcept;
 
         // comparison is required as well
         friend bool operator== (id_type const& lhs, id_type const& rhs);

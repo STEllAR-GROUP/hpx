@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2016      Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
@@ -11,9 +11,10 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/promise_base.hpp>
 
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
+#include <memory>
 #include <utility>
+#include <type_traits>
 
 namespace hpx {
 namespace lcos {
@@ -61,8 +62,6 @@ namespace lcos {
       : public detail::promise_base<
             Result, RemoteResult, detail::promise_data<Result> >
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<
                 Result, RemoteResult, detail::promise_data<Result>
            > base_type;
@@ -73,11 +72,19 @@ namespace lcos {
           : base_type()
         {}
 
+        // Effects: constructs a promise object and a shared state. The
+        // constructor uses the allocator a to allocate the memory for the
+        // shared state.
+        template <typename Allocator>
+        promise(std::allocator_arg_t, Allocator const& a)
+          : base_type(std::allocator_arg, a)
+        {}
+
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) HPX_NOEXCEPT : base_type(std::move(other))
+        promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
         // Effects: Abandons any shared state
@@ -88,7 +95,7 @@ namespace lcos {
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) HPX_NOEXCEPT
+        promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -98,7 +105,7 @@ namespace lcos {
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) HPX_NOEXCEPT
+        void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
@@ -143,8 +150,6 @@ namespace lcos {
       : public detail::promise_base<
             void, hpx::util::unused_type, detail::promise_data<void> >
     {
-        HPX_MOVABLE_ONLY(promise);
-
         typedef detail::promise_base<
                 void, hpx::util::unused_type, detail::promise_data<void>
             > base_type;
@@ -155,11 +160,19 @@ namespace lcos {
           : base_type()
         {}
 
+        // Effects: constructs a promise object and a shared state. The
+        // constructor uses the allocator a to allocate the memory for the
+        // shared state.
+        template <typename Allocator>
+        promise(std::allocator_arg_t, Allocator const& a)
+          : base_type(std::allocator_arg, a)
+        {}
+
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
         //          constructed object.
         // Postcondition: other has no shared state.
-        promise(promise&& other) HPX_NOEXCEPT : base_type(std::move(other))
+        promise(promise&& other) noexcept : base_type(std::move(other))
         {}
 
         // Effects: Abandons any shared state
@@ -169,7 +182,7 @@ namespace lcos {
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
         // Returns: *this.
-        promise& operator=(promise&& other) HPX_NOEXCEPT
+        promise& operator=(promise&& other) noexcept
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -179,7 +192,7 @@ namespace lcos {
         // Postcondition: *this has the shared state (if any) that other had
         //                prior to the call to swap. other has the shared state
         //                (if any) that *this had prior to the call to swap.
-        void swap(promise& other) HPX_NOEXCEPT
+        void swap(promise& other) noexcept
         {
             base_type::swap(other);
         }
@@ -226,10 +239,19 @@ namespace lcos {
 
     template <typename Result, typename RemoteResult>
     void swap(promise<Result, RemoteResult>& x,
-        promise<Result, RemoteResult>&       y) HPX_NOEXCEPT
+        promise<Result, RemoteResult>&       y) noexcept
     {
         x.swap(y);
     }
 }}
+
+namespace std
+{
+    // Requires: Allocator shall be an allocator (17.6.3.5)
+    template <typename R, typename Allocator>
+    struct uses_allocator<hpx::lcos::promise<R>, Allocator>
+      : std::true_type
+    {};
+}
 
 #endif /*HPX_LCOS_PROMISE_HPP*/

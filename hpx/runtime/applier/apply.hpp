@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,7 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -177,8 +178,7 @@ namespace hpx
             Ts&&... vs)
         {
             return apply_r_p<Action>(std::move(addr), gid,
-                actions::action_priority<Action>(),
-                std::forward<Ts>(vs)...);
+                actions::action_priority<Action>(), std::forward<Ts>(vs)...);
         }
 
         // We know it is local and has to be directly executed.
@@ -193,8 +193,8 @@ namespace hpx
                 typename action_type::component_type>::call(addr));
 
             threads::thread_init_data data;
-            apply_helper<action_type>::call(std::move(data), target, addr.address_,
-                priority, std::forward<Ts>(vs)...);
+            apply_helper<action_type>::call(std::move(data), target,
+                addr.address_, addr.type_, priority, std::forward<Ts>(vs)...);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -210,8 +210,8 @@ namespace hpx
                 typename action_type::component_type>::call(addr));
 
             threads::thread_init_data data;
-            apply_helper<action_type>::call(std::move(data), target, addr.address_,
-                priority, std::move(vs)...);
+            apply_helper<action_type>::call(std::move(data), target,
+                addr.address_, addr.type_, priority, std::move(vs)...);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -403,12 +403,13 @@ namespace hpx
                     action_type_(), priority
                 );
 
-            auto f = [](parcelset::parcel&& p)
+            parcelset::detail::parcel_await(std::move(p),
+                parcelset::write_handler_type(), 0,
+                [](parcelset::parcel&& p, parcelset::write_handler_type&&)
                 {
                     hpx::get_runtime().get_parcel_handler()
                         .sync_put_parcel(std::move(p));
-                };
-            parcelset::detail::parcel_await(std::move(p), 0, std::move(f)).apply();
+                }).apply();
             return false;     // destination is remote
         }
 
@@ -436,8 +437,8 @@ namespace hpx
 
             threads::thread_init_data data;
             apply_helper<action_type>::call(std::move(data),
-                std::forward<Continuation>(cont), target, addr.address_, priority,
-                std::forward<Ts>(vs)...);
+                std::forward<Continuation>(cont), target,
+                addr.address_, addr.type_, priority, std::forward<Ts>(vs)...);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -463,7 +464,8 @@ namespace hpx
         threads::thread_priority priority, Ts&&... vs)
     {
         return hpx::detail::apply_impl<Action>(
-            std::forward<Continuation>(c), gid, priority, std::forward<Ts>(vs)...);
+            std::forward<Continuation>(c), gid, priority,
+            std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename Continuation, typename Client,
@@ -662,8 +664,9 @@ namespace hpx
             remote_result_type;
 
         return apply_p<Action>(
-            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
-            gid, priority, std::forward<Ts>(vs)...);
+            actions::typed_continuation<
+                local_result_type, remote_result_type
+            >(contgid), gid, priority, std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename ...Ts>
@@ -679,8 +682,9 @@ namespace hpx
             remote_result_type;
 
         return apply_p<Action>(
-            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
-            gid, actions::action_priority<Action>(),
+            actions::typed_continuation<
+                local_result_type, remote_result_type
+            >(contgid), gid, actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
     }
 
@@ -700,8 +704,9 @@ namespace hpx
             remote_result_type;
 
         return apply_p<Derived>(
-            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
-            gid, actions::action_priority<Derived>(),
+            actions::typed_continuation<
+                local_result_type, remote_result_type
+            >(contgid), gid, actions::action_priority<Derived>(),
             std::forward<Ts>(vs)...);
     }
 }

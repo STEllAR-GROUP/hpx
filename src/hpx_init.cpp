@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -7,23 +8,26 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
-#include <hpx/runtime_impl.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/compat/mutex.hpp>
+#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/resource/detail/create_partitioner.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime_impl.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/logging.hpp>
@@ -31,8 +35,6 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/exception_ptr.hpp>
-#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <boost/program_options/options_description.hpp>
@@ -45,6 +47,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -207,11 +210,11 @@ namespace hpx { namespace detail
               << performance_counters::get_counter_type_name(info.type_)
               << '\n';
 
-        boost::format fmt("%d.%d.%d\n");
-        strm << "version:  "        // 0xMMmmrrrr
-              << boost::str(fmt % (info.version_ / 0x1000000) %
-                    (info.version_ / 0x10000 % 0x100) %
-                    (info.version_ % 0x10000));
+        strm << "version:  ";        // 0xMMmmrrrr
+        hpx::util::format_to(strm, "%d.%d.%d\n",
+            info.version_ / 0x1000000,
+            info.version_ / 0x10000 % 0x100,
+            info.version_ % 0x10000);
         strm << std::string(78, '-') << '\n';
 
         print(strm.str(), ec);
@@ -275,8 +278,8 @@ namespace hpx { namespace detail
     void list_component_type(std::string const& name,
         components::component_type ctype)
     {
-        print(boost::str(boost::format("%1%, %|40t|%2%") %
-            name % components::get_component_type_name(ctype)));
+        print(hpx::util::format("%1%, %|40t|%2%",
+            name, components::get_component_type_name(ctype)));
     }
 
     void list_component_types()
@@ -300,7 +303,7 @@ namespace hpx { namespace detail
             qc->start();
         }
         catch (...) {
-            std::cerr << hpx::diagnostic_information(boost::current_exception())
+            std::cerr << hpx::diagnostic_information(std::current_exception())
                 << std::flush;
             hpx::terminate();
         }
@@ -340,7 +343,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         void handle_list_and_print_options(hpx::runtime& rt,
-            boost::program_options::variables_map& vm)
+            boost::program_options::variables_map& vm,
+            bool print_counters_locally)
         {
             if (vm.count("hpx:list-counters")) {
                 // Print the names of all registered performance counters.
@@ -437,7 +441,8 @@ namespace hpx
                 std::shared_ptr<util::query_counters> qc =
                     std::make_shared<util::query_counters>(
                         std::ref(counters), std::ref(reset_counters), interval,
-                        destination, counter_format, counter_shortnames, csv_header);
+                        destination, counter_format, counter_shortnames, csv_header,
+                        print_counters_locally);
 
                 // schedule to print counters at shutdown, if requested
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
@@ -498,8 +503,10 @@ namespace hpx
 
             // Add startup function related to listing counter names or counter
             // infos (on console only).
-            if (mode == runtime_mode_console)
-                handle_list_and_print_options(rt, vm);
+            bool print_counters_locally =
+                vm.count("hpx:print-counters-locally") != 0;
+            if (mode == runtime_mode_console || print_counters_locally)
+                handle_list_and_print_options(rt, vm, print_counters_locally);
 
             // Dump the configuration before all components have been loaded.
             if (vm.count("hpx:dump-config-initial")) {
@@ -512,186 +519,6 @@ namespace hpx
             // Dump the configuration after all components have been loaded.
             if (vm.count("hpx:dump-config"))
                 rt.add_startup_function(dump_config(rt));
-        }
-
-        // helper functions testing option compatibility
-        void ensure_high_priority_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            if (vm.count("hpx:high-priority-threads")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:high-priority-threads, valid for "
-                    "--hpx:queuing=local-priority and "
-                    "--hpx:queuing=abp-priority only");
-            }
-        }
-
-        void ensure_numa_sensitivity_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            if (vm.count("hpx:numa-sensitive")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:numa-sensitive, valid for "
-                    "--hpx:queuing=local, --hpx:queuing=local-priority, or "
-                    "--hpx:queuing=abp-priority only");
-            }
-        }
-
-        void ensure_hierarchy_arity_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            if (vm.count("hpx:hierarchy-arity")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:hierarchy-arity, valid for "
-                    "--hpx:queuing=hierarchy only.");
-            }
-        }
-
-        void ensure_queuing_option_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            ensure_high_priority_compatibility(vm);
-            ensure_numa_sensitivity_compatibility(vm);
-            ensure_hierarchy_arity_compatibility(vm);
-        }
-
-        void ensure_hwloc_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-#if defined(HPX_HAVE_HWLOC)
-            // pu control is available for HWLOC only
-            if (vm.count("hpx:pu-offset")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:pu-offset, valid for --hpx:queuing=priority or "
-                    "--hpx:queuing=local-priority only.");
-            }
-            if (vm.count("hpx:pu-step")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:pu-step, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-#endif
-#if defined(HPX_HAVE_HWLOC)
-            // affinity control is available for HWLOC only
-            if (vm.count("hpx:affinity")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:affinity, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-            if (vm.count("hpx:bind")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:bind, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-            if (vm.count("hpx:print-bind")) {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:print-bind, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-#endif
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        std::string get_affinity_domain(util::command_line_handling const& cfg)
-        {
-            std::string affinity_domain("pu");
-#if defined(HPX_HAVE_HWLOC)
-            if (cfg.affinity_domain_ != "pu")
-            {
-                affinity_domain = cfg.affinity_domain_;
-                if (0 != std::string("pu").find(affinity_domain) &&
-                    0 != std::string("core").find(affinity_domain) &&
-                    0 != std::string("numa").find(affinity_domain) &&
-                    0 != std::string("machine").find(affinity_domain))
-                {
-                    throw detail::command_line_error("Invalid command line option "
-                        "--hpx:affinity, value must be one of: pu, core, numa, "
-                        "or machine.");
-                }
-            }
-#endif
-            return affinity_domain;
-        }
-
-        std::size_t get_affinity_description(
-            util::command_line_handling const& cfg, std::string& affinity_desc)
-        {
-#if defined(HPX_HAVE_HWLOC)
-            if (cfg.affinity_bind_.empty())
-                return cfg.numa_sensitive_;
-
-            if (cfg.pu_offset_ != std::size_t(-1) || cfg.pu_step_ != 1 ||
-                cfg.affinity_domain_ != "pu")
-            {
-                throw detail::command_line_error(
-                    "Command line option --hpx:bind "
-                    "should not be used with --hpx:pu-step, --hpx:pu-offset, "
-                    "or --hpx:affinity.");
-            }
-
-            affinity_desc = cfg.affinity_bind_;
-#endif
-            return cfg.numa_sensitive_;
-        }
-
-        std::size_t get_pu_offset(util::command_line_handling const& cfg)
-        {
-            std::size_t pu_offset = std::size_t(-1);
-#if defined(HPX_HAVE_HWLOC)
-            if (cfg.pu_offset_ != std::size_t(-1))
-            {
-                pu_offset = cfg.pu_offset_;
-                if (pu_offset >= hpx::threads::hardware_concurrency())
-                {
-                    throw detail::command_line_error(
-                        "Invalid command line option "
-                        "--hpx:pu-offset, value must be smaller than number of "
-                        "available processing units.");
-                }
-            }
-#endif
-            return pu_offset;
-        }
-
-        std::size_t get_pu_step(util::command_line_handling const& cfg)
-        {
-            std::size_t pu_step = 1;
-#if defined(HPX_HAVE_HWLOC)
-            if (cfg.pu_step_ != 1) {
-                pu_step = cfg.pu_step_;
-                if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
-                {
-                    throw detail::command_line_error(
-                        "Invalid command line option "
-                        "--hpx:pu-step, value must be non-zero and smaller than "
-                        "number of available processing units.");
-                }
-            }
-#endif
-            return pu_step;
-        }
-
-        std::size_t get_num_high_priority_queues(
-            util::command_line_handling const& cfg)
-        {
-            std::size_t num_high_priority_queues = cfg.num_threads_;
-            if (cfg.vm_.count("hpx:high-priority-threads")) {
-                num_high_priority_queues =
-                    cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
-                if (num_high_priority_queues > cfg.num_threads_)
-                {
-                    throw detail::command_line_error(
-                        "Invalid command line option: "
-                        "number of high priority threads ("
-                        "--hpx:high-priority-threads), should not be larger "
-                        "than number of threads (--hpx:threads)");
-                }
-            }
-            return num_high_priority_queues;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -739,356 +566,16 @@ namespace hpx
             startup_function_type startup, shutdown_function_type shutdown)
         {
             if (blocking) {
-                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_,
+                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_,
                     std::move(startup), std::move(shutdown));
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, std::move(startup),
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
                 std::move(shutdown));
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // local scheduler (one queue for each OS threads)
-        int run_local(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-            ensure_high_priority_compatibility(cfg.vm_);
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
-            std::string affinity_domain = get_affinity_domain(cfg);
-            std::string affinity_desc;
-            std::size_t numa_sensitive =
-                get_affinity_description(cfg, affinity_desc);
-
-            // scheduling policy
-            typedef hpx::threads::policies::local_queue_scheduler<>
-                local_queue_policy;
-            local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive,
-                "core-local_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
-
-            LPROGRESS_ << "run_local: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=local "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local'.");
-#endif
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // local scheduler (one queue for each OS threads)
-        int run_throttle(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
-            ensure_high_priority_compatibility(cfg.vm_);
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
-            std::string affinity_domain = get_affinity_domain(cfg);
-            std::string affinity_desc;
-            std::size_t numa_sensitive =
-                get_affinity_description(cfg, affinity_desc);
-
-            // scheduling policy
-            typedef hpx::threads::policies::throttle_queue_scheduler<>
-                throttle_queue_policy;
-            throttle_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive,
-                "core-throttle_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
-
-            LPROGRESS_ << "run_throttle: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<throttle_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=throttle "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle -DHPX_WITH_APEX'.");
-#endif
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // local static scheduler with priority queue (one queue for each OS
-        // threads plus one separate queue for high priority HPX-threads). Doesn't
-        // steal.
-        int run_static_priority(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-
-            std::size_t num_high_priority_queues =
-                get_num_high_priority_queues(cfg);
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
-            std::string affinity_domain = get_affinity_domain(cfg);
-            std::string affinity_desc;
-            std::size_t numa_sensitive =
-                get_affinity_description(cfg, affinity_desc);
-
-            // scheduling policy
-            typedef hpx::threads::policies::static_priority_queue_scheduler<>
-                local_queue_policy;
-            local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, num_high_priority_queues,
-                1000, numa_sensitive,
-                "core-static_priority_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
-
-            LPROGRESS_ << "run_static_priority: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=static-priority "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static-priority'.");
-#endif
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // local static scheduler without priority queue (one queue for each OS
-        // threads plus one separate queue for high priority HPX-threads).
-        // Doesn't steal.
-        int run_static(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-            ensure_high_priority_compatibility(cfg.vm_);
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
-            std::string affinity_domain = get_affinity_domain(cfg);
-            std::string affinity_desc;
-            std::size_t numa_sensitive =
-                get_affinity_description(cfg, affinity_desc);
-
-            // scheduling policy
-            typedef hpx::threads::policies::static_queue_scheduler<>
-                local_queue_policy;
-            local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive,
-                "core-static_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
-
-            LPROGRESS_ << "run_static: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=static "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static'.");
-#endif
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // local scheduler with priority queue (one queue for each OS threads
-        // plus one separate queue for high priority HPX-threads)
-        template <typename Queuing>
-        int run_priority_local(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-
-            std::size_t num_high_priority_queues =
-                get_num_high_priority_queues(cfg);
-            std::size_t pu_offset = get_pu_offset(cfg);
-            std::size_t pu_step = get_pu_step(cfg);
-            std::string affinity_domain = get_affinity_domain(cfg);
-            std::string affinity_desc;
-            std::size_t numa_sensitive =
-                get_affinity_description(cfg, affinity_desc);
-
-            // scheduling policy
-            typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    boost::mutex, Queuing
-                > local_queue_policy;
-
-            typename local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive, "core-local_priority_queue_scheduler");
-            threads::policies::init_affinity_data affinity_init(
-                pu_offset, pu_step, affinity_domain, affinity_desc);
-
-            LPROGRESS_ << "run_priority_local: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
-                    affinity_init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // priority abp scheduler: local priority dequeues for each OS thread,
-        // with work stealing from the "bottom" of each.
-        int run_priority_abp(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_ABP_SCHEDULER)
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-            ensure_hwloc_compatibility(cfg.vm_);
-
-            std::size_t num_high_priority_queues =
-                get_num_high_priority_queues(cfg);
-
-            // scheduling policy
-            typedef hpx::threads::policies::local_priority_queue_scheduler<
-                    boost::mutex, hpx::threads::policies::lockfree_fifo
-                > abp_priority_queue_policy;
-
-            abp_priority_queue_policy::init_parameter_type init(
-                cfg.num_threads_, num_high_priority_queues, 1000,
-                cfg.numa_sensitive_, "core-abp_fifo_priority_queue_scheduler");
-
-            LPROGRESS_ << "run_priority_abp: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=abp-priority "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
-#endif
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // hierarchical scheduler: The thread queues are built up hierarchically
-        // this avoids contention during work stealing
-        int run_hierarchy(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
-            ensure_high_priority_compatibility(cfg.vm_);
-            ensure_numa_sensitivity_compatibility(cfg.vm_);
-            ensure_hwloc_compatibility(cfg.vm_);
-
-            // scheduling policy
-            typedef hpx::threads::policies::hierarchy_scheduler<> queue_policy;
-            std::size_t arity = 2;
-            if (cfg.vm_.count("hpx:hierarchy-arity"))
-                arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
-
-            queue_policy::init_parameter_type init(cfg.num_threads_, arity,
-                1000, 0, "core-hierarchy_scheduler");
-
-            LPROGRESS_ << "run_hierarchy: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=hierarchy "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=hierarchy'.");
-#endif
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // hierarchical scheduler: The thread queues are built up hierarchically
-        // this avoids contention during work stealing
-        int run_periodic(startup_function_type startup,
-            shutdown_function_type shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-            ensure_hierarchy_arity_compatibility(cfg.vm_);
-            ensure_hwloc_compatibility(cfg.vm_);
-
-            std::size_t num_high_priority_queues =
-                get_num_high_priority_queues(cfg);
-
-            // scheduling policy
-            typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
-                local_queue_policy;
-            local_queue_policy::init_parameter_type init(cfg.num_threads_,
-                num_high_priority_queues, 1000, cfg.numa_sensitive_,
-                "core-periodic_priority_queue_scheduler");
-
-            LPROGRESS_ << "run_periodic: create runtime";
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
-
-            return run_or_start(blocking, std::move(rt), cfg,
-                std::move(startup), std::move(shutdown));
-#else
-            throw detail::command_line_error("Command line option "
-                "--hpx:queuing=periodic-priority "
-                "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=periodic-priority'.");
-#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1098,12 +585,10 @@ namespace hpx
             > const& f,
             boost::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> && ini_config,
-            startup_function_type startup,
-            shutdown_function_type shutdown, hpx::runtime_mode mode,
-            bool blocking)
+            startup_function_type startup, shutdown_function_type shutdown,
+            hpx::runtime_mode mode, bool blocking)
         {
-            int result = 0;
-#ifndef HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS
+#if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif
 
@@ -1123,6 +608,8 @@ namespace hpx
             unsetenv("LC_IDENTIFICATION");
             unsetenv("LC_ALL");
 #endif
+
+            int result = 0;
             try {
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)
@@ -1132,101 +619,43 @@ namespace hpx
                     return -1;
                 }
 
-                // handle all common command line switches
-                util::command_line_handling cfg(
-                    mode, f, std::move(ini_config), argv[0]);
+                // Construct resource partitioner if this has not been done yet
+                // and get a handle to it
+                // (if the command-line parsing has not yet been done, do it now)
+                auto& rp = hpx::resource::detail::create_partitioner(f,
+                    desc_cmdline, argc, argv, std::move(ini_config),
+                    resource::mode_default, mode, false);
 
-                result = cfg.call(desc_cmdline, argc, argv);
-
-                if (result != 0) {
+                // check whether HPX should be exited at this point
+                // (if the program options contain --hpx:help or --hpx:version)
+                if (rp.terminate_after_parse())
+                {
                     if (result > 0)
-                        result = 0;     // --hpx:help
+                        result = 0;
                     return result;
                 }
 
+                // Setup all internal parameters of the resource_partitioner
+                rp.configure_pools();
+
                 // initialize logging
-                util::detail::init_logging(cfg.rtcfg_,
-                    cfg.mode_ == runtime_mode_console);
+                util::command_line_handling& cms = rp.get_command_line_switches();
+                util::detail::init_logging(
+                    cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
 
                 util::apex_wrapper_init apex(argc, argv);
 
                 // Initialize and start the HPX runtime.
-                if (0 == std::string("local").find(cfg.queuing_))
-                {
-                    cfg.queuing_ = "local";
-                    result = run_local(std::move(startup), std::move(shutdown),
-                        cfg, blocking);
-                }
-                else if (0 == std::string("static").find(cfg.queuing_))
-                {
-                    cfg.queuing_ = "static";
-                    result = run_static(std::move(startup), std::move(shutdown),
-                        cfg, blocking);
-                }
-                else if (0 == std::string("local-priority-fifo").find(cfg.queuing_))
-                {
-                    // local scheduler with priority queue (one queue for each
-                    // OS thread plus separate dequeues for low/high priority
-                    /// HPX-threads)
-                    cfg.queuing_ = "local-priority-fifo";
-                    result = run_priority_local<
-                            hpx::threads::policies::lockfree_fifo
-                        >(std::move(startup), std::move(shutdown), cfg, blocking);
-                }
-                else if (0 == std::string("local-priority-lifo").find(cfg.queuing_))
-                {
-                    // local scheduler with priority queue (one queue for each
-                    // OS thread plus separate dequeues for low/high priority
-                    /// HPX-threads)
-                    cfg.queuing_ = "local-priority-lifo";
-                    result = run_priority_local<
-                            hpx::threads::policies::lockfree_lifo
-                        >(std::move(startup), std::move(shutdown), cfg, blocking);
-                }
-                else if (0 == std::string("static-priority").find(cfg.queuing_))
-                {
-                    cfg.queuing_ = "static-priority";
-                    result = run_static_priority(std::move(startup),
-                        std::move(shutdown), cfg, blocking);
-                }
-                else if (0 == std::string("abp-priority").find(cfg.queuing_))
-                {
-                    // local scheduler with priority deque (one deque for each
-                    // OS thread plus separate dequeues for high priority
-                    // HPX-threads), uses abp-style stealing
-                    cfg.queuing_ = "abp-priority";
-                    result = run_priority_abp(std::move(startup),
-                        std::move(shutdown), cfg, blocking);
-                }
-                else if (0 == std::string("hierarchy").find(cfg.queuing_))
-                {
-                    // hierarchy scheduler: tree of queues, with work
-                    // stealing from the parent queue in that tree.
-                    cfg.queuing_ = "hierarchy";
-                    result = run_hierarchy(std::move(startup),
-                        std::move(shutdown), cfg, blocking);
-                }
-                else if (0 == std::string("periodic-priority").find(cfg.queuing_))
-                {
-                    cfg.queuing_ = "periodic-priority";
-                    result = run_periodic(std::move(startup),
-                        std::move(shutdown), cfg, blocking);
-                }
-                else if (0 == std::string("throttle").find(cfg.queuing_)) {
-                    cfg.queuing_ = "throttle";
-                    result = run_throttle(std::move(startup),
-                        std::move(shutdown), cfg, blocking);
-                }
-                else {
-                    throw detail::command_line_error(
-                        "Bad value for command line option --hpx:queuing");
-                }
+                LPROGRESS_ << "run_local: create runtime";
+
+                // Build and configure this runtime instance.
+                typedef hpx::runtime_impl runtime_type;
+                std::unique_ptr<hpx::runtime> rt(
+                    new runtime_type(cms.rtcfg_));
+
+                result = run_or_start(blocking, std::move(rt),
+                    cms, std::move(startup), std::move(shutdown));
             }
-//             catch (hpx::exception const& e) {
-//                 std::cerr << "{env}: " << hpx::detail::get_execution_environment();
-//                 std::cerr << "hpx::init: hpx::exception caught: " << e.what() << "\n";
-//                 return -1;
-//             }
             catch (detail::command_line_error const& e) {
                 std::cerr << "{env}: " << hpx::detail::get_execution_environment();
                 std::cerr << "hpx::init: std::exception caught: " << e.what() << "\n";

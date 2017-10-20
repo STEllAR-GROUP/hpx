@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,21 +10,21 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
+#include <hpx/compat/mutex.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The hierarchy_scheduler maintains a tree of queues of work items
     /// (threads). Every OS threads walks that tree to obtain new work
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
@@ -105,7 +105,7 @@ namespace hpx { namespace threads { namespace policies
 
         struct flag_type
         {
-            boost::atomic<bool> v;
+            std::atomic<bool> v;
             flag_type() { v = false; }
             flag_type(flag_type const & f) { v.store(f.v.load()); }
             flag_type & operator=(flag_type const & f)
@@ -787,7 +787,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(num_thread < tree.at(0).size());
             tree.at(0).at(num_thread)->on_stop_thread(num_thread);
         }
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e)
+        void on_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree.at(0).size());

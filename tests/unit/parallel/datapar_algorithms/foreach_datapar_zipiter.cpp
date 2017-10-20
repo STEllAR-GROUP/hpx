@@ -11,12 +11,12 @@
 
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <boost/program_options.hpp>
-#include <boost/range/functions.hpp>
 
 #include "../algorithms/test_utils.hpp"
 
@@ -43,13 +43,13 @@ void for_each_zipiter_test(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007), d(10007);
-    std::iota(boost::begin(c), boost::end(c), std::rand());
-    std::iota(boost::begin(d), boost::end(d), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(d), std::end(d), std::rand());
 
     auto begin = hpx::util::make_zip_iterator(
-        iterator(boost::begin(c)), iterator(boost::begin(d)));
+        iterator(std::begin(c)), iterator(std::begin(d)));
     auto end = hpx::util::make_zip_iterator(
-        iterator(boost::end(c)), iterator(boost::end(d)));
+        iterator(std::end(c)), iterator(std::end(d)));
 
     auto result = hpx::parallel::for_each(std::forward<ExPolicy>(policy),
         begin, end, set_42());
@@ -58,7 +58,7 @@ void for_each_zipiter_test(ExPolicy && policy, IteratorTag)
 
     // verify values
     std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
+    std::for_each(std::begin(c), std::end(c),
         [&count](int v) -> void {
             HPX_TEST_EQ(v, int(42));
             ++count;
@@ -66,7 +66,7 @@ void for_each_zipiter_test(ExPolicy && policy, IteratorTag)
     HPX_TEST_EQ(count, c.size());
 /*
     auto begin = hpx::util::make_zip_iterator(
-        iterator(boost::begin(c)), iterator(boost::begin(d)));
+        iterator(std::begin(c)), iterator(std::begin(d)));
 
     static_assert(
 //        hpx::parallel::traits::is_indirect_callable<

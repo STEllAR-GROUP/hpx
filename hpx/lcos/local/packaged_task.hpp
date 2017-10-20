@@ -12,21 +12,12 @@
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_APEX)
-#include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
-#else
-#include <hpx/util/itt_notify.hpp>
-#endif
-#endif
-
-#include <boost/exception_ptr.hpp>
-
+#include <exception>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -38,8 +29,6 @@ namespace hpx { namespace lcos { namespace local
     template <typename R, typename ...Ts>
     class packaged_task<R(Ts...)>
     {
-        HPX_MOVABLE_ONLY(packaged_task);
-
         typedef util::unique_function_nonser<R(Ts...)> function_type;
 
     public:
@@ -53,12 +42,25 @@ namespace hpx { namespace lcos { namespace local
             typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
                 !std::is_same<FD, packaged_task>::value
-             && traits::is_callable<FD&(Ts...), R>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
             >::type
         >
         explicit packaged_task(F&& f)
           : function_(std::forward<F>(f))
           , promise_()
+        {}
+
+        template <
+            typename Allocator,
+            typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, packaged_task>::value
+             && traits::is_invocable_r<R, FD&, Ts...>::value
+            >::type
+        >
+        explicit packaged_task(std::allocator_arg_t, Allocator const& a, F && f)
+          : function_(std::forward<F>(f))
+          , promise_(std::allocator_arg, a)
         {}
 
         packaged_task(packaged_task&& rhs)
@@ -76,7 +78,7 @@ namespace hpx { namespace lcos { namespace local
             return *this;
         }
 
-        void swap(packaged_task& rhs) HPX_NOEXCEPT
+        void swap(packaged_task& rhs) noexcept
         {
             function_.swap(rhs.function_);
             promise_.swap(rhs.promise_);
@@ -92,23 +94,7 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
-#if HPX_HAVE_ITTNOTIFY != 0
-            util::itt::string_handle const& sh =
-                traits::get_function_annotation_itt<
-                    function_type
-                >::call(function_);
-            util::itt::task task(hpx::get_thread_itt_domain(), sh);
-#elif defined(HPX_HAVE_APEX)
-            char const* name = traits::get_function_annotation<
-                    function_type
-                >::call(function_);
-            if (name != nullptr)
-            {
-                util::apex_wrapper apex_profiler(name, (uint64_t)this);
-                invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
-            }
-            else
-#endif
+            hpx::util::annotate_function annotate(function_);
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 
@@ -125,7 +111,7 @@ namespace hpx { namespace lcos { namespace local
             return promise_.get_future();
         }
 
-        bool valid() const HPX_NOEXCEPT
+        bool valid() const noexcept
         {
             return !function_.empty() && promise_.valid();
         }
@@ -142,6 +128,12 @@ namespace hpx { namespace lcos { namespace local
             promise_ = local::promise<R>();
         }
 
+        // extension
+        void set_exception(std::exception_ptr const& e)
+        {
+            promise_.set_exception(e);
+        }
+
     private:
         // synchronous execution
         template <typename ...Vs>
@@ -151,7 +143,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 promise_.set_value(function_(std::forward<Vs>(vs)...));
             } catch(...) {
-                promise_.set_exception(boost::current_exception());
+                promise_.set_exception(std::current_exception());
             }
         }
 
@@ -163,7 +155,7 @@ namespace hpx { namespace lcos { namespace local
                 function_(std::forward<Ts>(vs)...);
                 promise_.set_value();
             } catch(...) {
-                promise_.set_exception(boost::current_exception());
+                promise_.set_exception(std::current_exception());
             }
         }
 
@@ -172,5 +164,14 @@ namespace hpx { namespace lcos { namespace local
         local::promise<R> promise_;
     };
 }}}
+
+namespace std
+{
+    // Requires: Allocator shall be an allocator (17.6.3.5)
+    template <typename Sig, typename Allocator>
+    struct uses_allocator<hpx::lcos::local::packaged_task<Sig>, Allocator>
+      : std::true_type
+    {};
+}
 
 #endif /*HPX_LCOS_LOCAL_PACKAGED_TASK_HPP*/

@@ -8,7 +8,7 @@
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -16,15 +16,14 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <boost/atomic.hpp>
-#include <boost/exception_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -53,7 +52,7 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex = boost::mutex,
+    template <typename Mutex = compat::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing = lockfree_lifo>
@@ -134,16 +133,23 @@ namespace hpx { namespace threads { namespace policies
 
             if (!deferred_initialization)
             {
-                BOOST_ASSERT(init.num_queues_ != 0);
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4316) // object allocated on the heap may not be aligned 16
+#endif
+                HPX_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
                     queues_[i] = new thread_queue_type(init.max_queue_thread_count_);
 
-                BOOST_ASSERT(init.num_high_priority_queues_ != 0);
-                BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
+                HPX_ASSERT(init.num_high_priority_queues_ != 0);
+                HPX_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
                 for (std::size_t i = 0; i < init.num_high_priority_queues_; ++i) {
                     high_priority_queues_[i] =
                         new thread_queue_type(init.max_queue_thread_count_);
                 }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             }
         }
 
@@ -461,23 +467,38 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
+            // Select a OS thread which hasn't been disabled
+            auto const& rp = resource::get_partitioner();
+            auto mask = rp.get_pu_mask(
+                num_thread + parent_pool_->get_thread_offset());
+            if(!threads::any(mask))
+                threads::set(mask, num_thread + parent_pool_->get_thread_offset());
+            while (true)
+            {
+                if (bit_and(mask, parent_pool_->get_used_processing_units()))
+                    break;
+
+                num_thread = (num_thread + 1) % queue_size;
+            }
+
             // now create the thread
-            if (data.priority == thread_priority_critical) {
+            if (data.priority == thread_priority_high_recursive ||
+                data.priority == thread_priority_high ||
+                data.priority == thread_priority_boost)
+            {
+                if (data.priority == thread_priority_boost)
+                {
+                    data.priority = thread_priority_normal;
+                }
                 std::size_t num = num_thread % high_priority_queues_.size();
+
                 high_priority_queues_[num]->create_thread(data, id,
                     initial_state, run_now, ec);
                 return;
             }
 
-            if (data.priority == thread_priority_boost) {
-                data.priority = thread_priority_normal;
-                std::size_t num = num_thread % high_priority_queues_.size();
-                high_priority_queues_[num]->create_thread(data, id,
-                    initial_state, run_now, ec);
-                return;
-            }
-
-            if (data.priority == thread_priority_low) {
+            if (data.priority == thread_priority_low)
+            {
                 low_priority_queue_.create_thread(data, id, initial_state,
                     run_now, ec);
                 return;
@@ -521,7 +542,7 @@ namespace hpx { namespace threads { namespace policies
                 this_queue->increment_num_pending_misses();
 
                 bool have_staged = this_queue->
-                    get_staged_queue_length(boost::memory_order_relaxed) != 0;
+                    get_staged_queue_length(std::memory_order_relaxed) != 0;
 
                 // Give up, we should have work to convert.
                 if (have_staged)
@@ -561,19 +582,23 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
+            std::size_t queue_size = queues_.size();
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+                num_thread = curr_queue_++ % queue_size;
 
-            if (priority == thread_priority_critical ||
+            if (priority == thread_priority_high_recursive ||
+                priority == thread_priority_high ||
                 priority == thread_priority_boost)
             {
                 std::size_t num = num_thread % high_priority_queues_.size();
                 high_priority_queues_[num]->schedule_thread(thrd);
             }
-            else if (priority == thread_priority_low) {
+            else if (priority == thread_priority_low)
+            {
                 low_priority_queue_.schedule_thread(thrd);
             }
-            else {
+            else
+            {
                 HPX_ASSERT(num_thread < queues_.size());
                 queues_[num_thread]->schedule_thread(thrd);
             }
@@ -583,19 +608,23 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
+            std::size_t queue_size = queues_.size();
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+                num_thread = curr_queue_++ % queue_size;
 
-            if (priority == thread_priority_critical ||
+            if (priority == thread_priority_high_recursive ||
+                priority == thread_priority_high ||
                 priority == thread_priority_boost)
             {
                 std::size_t num = num_thread % high_priority_queues_.size();
                 high_priority_queues_[num]->schedule_thread(thrd, true);
             }
-            else if (priority == thread_priority_low) {
+            else if (priority == thread_priority_low)
+            {
                 low_priority_queue_.schedule_thread(thrd, true);
             }
-            else {
+            else
+            {
                 HPX_ASSERT(num_thread < queues_.size());
                 queues_[num_thread]->schedule_thread(thrd, true);
             }
@@ -691,11 +720,12 @@ namespace hpx { namespace threads { namespace policies
                     return queues_[num_thread]->get_thread_count(state);
 
                 case thread_priority_boost:
-                case thread_priority_critical:
+                case thread_priority_high:
+                case thread_priority_high_recursive:
                     {
                         if (num_thread < high_priority_queues_.size())
                             return high_priority_queues_[num_thread]->
-                            get_thread_count(state);
+                                get_thread_count(state);
                         break;
                     }
 
@@ -737,7 +767,8 @@ namespace hpx { namespace threads { namespace policies
                 }
 
             case thread_priority_boost:
-            case thread_priority_critical:
+            case thread_priority_high:
+            case thread_priority_high_recursive:
                 {
                     for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
                         count += high_priority_queues_[i]->get_thread_count(state);
@@ -904,6 +935,18 @@ namespace hpx { namespace threads { namespace policies
                 running, idle_loop_count, added) && result;
             if (0 != added) return result;
 
+            // Check if we have been disabled
+            {
+                auto const& rp = resource::get_partitioner();
+                auto mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+
+                if (!bit_and(mask, parent_pool_->get_used_processing_units()))
+                {
+                    return added == 0 && !running;
+                }
+            }
+
             for (std::size_t idx: victim_threads_[num_thread])
             {
                 HPX_ASSERT(idx != num_thread);
@@ -965,7 +1008,6 @@ namespace hpx { namespace threads { namespace policies
 
             result = low_priority_queue_.wait_or_add_new(running,
                 idle_loop_count, added) && result;
-            if (0 != added) return result;
 
             return result;
         }
@@ -975,6 +1017,10 @@ namespace hpx { namespace threads { namespace policies
         {
             if (nullptr == queues_[num_thread])
             {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4316) // object allocated on the heap may not be aligned 16
+#endif
                 queues_[num_thread] =
                     new thread_queue_type(max_queue_thread_count_);
 
@@ -983,6 +1029,9 @@ namespace hpx { namespace threads { namespace policies
                     high_priority_queues_[num_thread] =
                         new thread_queue_type(max_queue_thread_count_);
                 }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             }
 
             // forward this call to all queues etc.
@@ -994,16 +1043,17 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_start_thread(num_thread);
 
             std::size_t num_threads = queues_.size();
+            auto const& rp = resource::get_partitioner();
+            auto const& topo = rp.get_topology();
+
             // get numa domain masks of all queues...
             std::vector<mask_type> numa_masks(num_threads);
             std::vector<mask_type> core_masks(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
             {
-                std::size_t num_pu = get_pu_num(i);
-                numa_masks[i] =
-                    topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_ != 0);
-                core_masks[i] =
-                    topology_.get_core_affinity_mask(num_pu, numa_sensitive_ != 0);
+                std::size_t num_pu = rp.get_affinity_data().get_pu_num(i);
+                numa_masks[i] = topo.get_numa_node_affinity_mask(num_pu);
+                core_masks[i] = topo.get_core_affinity_mask(num_pu);
             }
 
             // iterate over the number of threads again to determine where to
@@ -1011,9 +1061,9 @@ namespace hpx { namespace threads { namespace policies
             std::ptrdiff_t radius =
                 static_cast<std::ptrdiff_t>((num_threads / 2.0) + 0.5);
             victim_threads_[num_thread].reserve(num_threads);
-            std::size_t num_pu = get_pu_num(num_thread);
-            mask_cref_type pu_mask =
-                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_ != 0);
+
+            std::size_t num_pu = rp.get_affinity_data().get_pu_num(num_thread);
+            mask_cref_type pu_mask = topo.get_thread_affinity_mask(num_pu);
             mask_cref_type numa_mask = numa_masks[num_thread];
             mask_cref_type core_mask = core_masks[num_thread];
 
@@ -1102,7 +1152,7 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_stop_thread(num_thread);
         }
 
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e)
+        void on_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             if (num_thread < high_priority_queues_.size())
                 high_priority_queues_[num_thread]->on_error(num_thread, e);
@@ -1122,7 +1172,7 @@ namespace hpx { namespace threads { namespace policies
         std::vector<thread_queue_type*> queues_;
         std::vector<thread_queue_type*> high_priority_queues_;
         thread_queue_type low_priority_queue_;
-        boost::atomic<std::size_t> curr_queue_;
+        std::atomic<std::size_t> curr_queue_;
         std::size_t numa_sensitive_;
 
         std::vector<std::vector<std::size_t> > victim_threads_;

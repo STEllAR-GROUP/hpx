@@ -1,5 +1,5 @@
 [/=============================================================================
-    Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (C) 2007-2017 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -52,6 +52,12 @@ removed from the list of values passed to `argc`/`argv` of the function
 `main()`. The list of values passed to `main()` will hold only the commandline
 options which are not recognized by the __hpx__ runtime system (see the section
 __commandline__ for more details on what options are recognized by __hpx__).
+
+[note In this mode all one-letter-shortcuts are disabled which are normally
+      available on the __hpx__ command line (such as `-t` or `-l`, see
+      __commandline__). This is done to minimize any possible interaction between
+      the command line options recognized by the __hpx__ runtime system and
+      any command line options defined by the application.]
 
 The value returned from the function `main()` as shown above will be returned
 to the operating system as usual.
@@ -114,6 +120,11 @@ runtime system.
 The header file to include for this method of using __hpx__ is
 [headerref hpx/hpx_init.hpp `hpx/hpx_init.hpp`].
 
+There are many additional overloads of [funcref hpx::init `hpx::init`]
+available, such as for instance to provide your own entry point function instead
+of [funcref hpx_main `hpx_main`]. Please refer to the function documentation for
+more details (see: [headerref hpx/hpx_init.hpp `hpx/hpx_init.hpp`]).
+
 [heading:flexible Supply your own main __hpx__ entry point while avoiding to block the main thread]
 
 With this method you need to provide an explicit main thread function named
@@ -170,5 +181,10 @@ The value returned from [funcref hpx_main `hpx_main`] will be returned from
 
 The header file to include for this method of using __hpx__ is
 [headerref hpx/hpx_start.hpp `hpx/hpx_start.hpp`].
+
+There are many additional overloads of [funcref hpx::start `hpx::start`]
+available, such as for instance to provide your own entry point function instead
+of [funcref hpx_main `hpx_main`]. Please refer to the function documentation for
+more details (see: [headerref hpx/hpx_start.hpp `hpx/hpx_start.hpp`]).
 
 [endsect]

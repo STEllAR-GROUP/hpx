@@ -17,10 +17,10 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
-#include <boost/exception_ptr.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <mutex>
 #include <utility>
 
@@ -137,9 +137,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 }
 
                 error_code local_ec;
-                threads::set_thread_state(threads::thread_id_type(
-                        reinterpret_cast<threads::thread_data*>(id)),
-                    threads::pending, threads::wait_signaled, priority, local_ec);
+                {
+                    util::ignore_while_checking<std::unique_lock<mutex_type> > il(&lock);
+                    threads::set_thread_state(threads::thread_id_type(
+                            reinterpret_cast<threads::thread_data*>(id)),
+                        threads::pending, threads::wait_signaled, priority, local_ec);
+                }
 
                 if (local_ec)
                 {
@@ -152,7 +155,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     }
                     else
                     {
-                        boost::rethrow_exception(
+                        std::rethrow_exception(
                             hpx::detail::access_exception(local_ec));
                     }
                     return;

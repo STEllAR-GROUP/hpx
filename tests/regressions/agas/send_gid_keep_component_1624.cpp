@@ -8,6 +8,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <iostream>
@@ -21,9 +22,9 @@ namespace server
     {
         int register_view(const hpx::naming::id_type &gid)
         {
-            std::cout <<
-                boost::format("register view at %1% by %2%") %
-                    this->get_unmanaged_id() % gid << std::endl;
+            hpx::util::format_to(std::cout,
+                "register view at %1% by %2%",
+                this->get_unmanaged_id(), gid) << std::endl;
             registered_regions_.push_back(gid);
             return 0;
         }
@@ -96,9 +97,9 @@ namespace server
         {
             for (const auto &id : writers)
             {
-                std::cout <<
-                    boost::format("%1% registering region at %2%") %
-                        this->get_unmanaged_id() % id << std::endl;
+                hpx::util::format_to(std::cout,
+                    "%1% registering region at %2%",
+                    this->get_unmanaged_id(), id) << std::endl;
 
                 client::view_registry listener(id);
                 listener.register_view(this->get_id());

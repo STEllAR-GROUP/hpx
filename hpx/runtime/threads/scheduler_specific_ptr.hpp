@@ -34,9 +34,10 @@ namespace hpx { namespace threads
     template <typename T>
     class scheduler_specific_ptr
     {
-    private:
+    public:
         HPX_NON_COPYABLE(scheduler_specific_ptr);
 
+    private:
         struct delete_data : coroutines::detail::tss_cleanup_function
         {
             void operator()(void* data)

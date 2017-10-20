@@ -7,19 +7,20 @@
 
 #include "worker_timed.hpp"
 
+#include <hpx/compat/barrier.hpp>
+#include <hpx/compat/thread.hpp>
+#include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <chrono>
 #include <cstdint>
+#include <ctime>
 #include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/barrier.hpp>
-#include <boost/format.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/program_options.hpp>
 
 char const* benchmark_name = "Delay Baseline";
@@ -31,6 +32,7 @@ using boost::program_options::store;
 using boost::program_options::command_line_parser;
 using boost::program_options::notify;
 
+namespace compat = hpx::compat;
 using hpx::util::high_resolution_timer;
 
 using std::cout;
@@ -44,12 +46,14 @@ bool header = true;
 ///////////////////////////////////////////////////////////////////////////////
 std::string format_build_date(std::string timestamp)
 {
-    boost::gregorian::date d = boost::gregorian::from_us_string(timestamp);
+    std::chrono::time_point<std::chrono::system_clock> now =
+        std::chrono::system_clock::now();
 
-    char const* fmt = "%02i-%02i-%04i";
+    std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
-    return boost::str(boost::format(fmt)
-                     % d.month().as_number() % d.day() % d.year());
+    std::string ts = std::ctime(&current_time);
+    ts.resize(ts.size()-1);     // remove trailing '\n'
+    return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,11 +81,11 @@ void print_results(
                 ;
     }
 
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    std::string const tasks_str = hpx::util::format("%lu,", tasks);
+    std::string const delay_str = hpx::util::format("%lu,", delay);
 
-    cout << ( boost::format("%lu %lu %lu %.14g\n")
-            % delay % tasks % threads % mean_);
+    hpx::util::format_to(cout, "%lu %lu %lu %.14g\n",
+        delay, tasks, threads, mean_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,7 +117,7 @@ void invoke_n_workers_nowait(
 }
 
 void invoke_n_workers(
-    boost::barrier& b
+    hpx::compat::barrier& b
   , double& elapsed
   , std::uint64_t workers
     )
@@ -132,12 +136,12 @@ int app_main(
         throw std::invalid_argument("error: count of 0 tasks specified\n");
 
     std::vector<double> elapsed(threads - 1);
-    boost::thread_group workers;
-    boost::barrier b(threads - 1);
+    std::vector<compat::thread> workers;
+    hpx::compat::barrier b(threads - 1);
 
     for (std::uint32_t i = 0; i != threads - 1; ++i)
     {
-        workers.add_thread(new boost::thread(invoke_n_workers,
+        workers.push_back(compat::thread(invoke_n_workers,
             std::ref(b), std::ref(elapsed[i]), tasks));
     }
 
@@ -145,7 +149,11 @@ int app_main(
 
     invoke_n_workers_nowait(total_elapsed, tasks);
 
-    workers.join_all();
+    for (compat::thread& thread : workers)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 
     for (std::uint64_t i = 0; i < elapsed.size(); ++i)
     {
