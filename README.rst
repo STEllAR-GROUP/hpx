@@ -398,7 +398,7 @@ HPX is currently funded by
   authors expressed herein do not necessarily state or reflect those of the
   United States Government or any agency thereof.
 
-* The Bavarian Research Foundation (Bayerische Forschungsstfitung) through
+* The Bavarian Research Foundation (Bayerische Forschungsstiftung) through
   the grant AZ-987-11.
 
 * The European Commission's Horizon 2020 programme through the grant

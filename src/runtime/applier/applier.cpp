@@ -178,7 +178,7 @@ namespace hpx { namespace applier
         }
 
         util::thread_description d =
-            desc ? desc : util::thread_description(func, "register_thread_nullary");
+            desc ? desc : util::thread_description(func, "register_work_nullary");
 
         threads::thread_init_data data(
             util::bind(util::one_shot(&thread_function_nullary), std::move(func)),
