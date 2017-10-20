@@ -70,6 +70,15 @@ namespace hpx { namespace util
             return APEX_NOERROR;
         }   
 
+        apex_event_type apex_parcel_coalescing_event(
+                apex_event_type in_type = APEX_INVALID_EVENT) {
+            static apex_event_type event_type;
+            if (in_type != APEX_INVALID_EVENT) {
+                event_type = in_type;
+            }
+            return event_type;
+        }
+
         /* Constructor */
         apex_parcel_coalescing_policy() : tuning_window(3),
             name("HPX parcel coalescing")
@@ -100,7 +109,9 @@ namespace hpx { namespace util
             apex::setup_custom_tuning(*request);
 
             /* register the tuning policy */
-            policy_handle = apex::register_periodic_policy(500000, policy);
+            //policy_handle = apex::register_periodic_policy(500000, policy);
+            apex_parcel_coalescing_event(apex::register_custom_event("APEX parcel coalescing event"));
+            policy_handle = apex::register_policy(apex_parcel_coalescing_event(), policy);
             if(policy_handle == nullptr) {
                 std::cerr << "Error registering policy!" << std::endl;
             }
