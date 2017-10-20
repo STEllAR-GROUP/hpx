@@ -378,7 +378,7 @@ namespace hpx { namespace resource { namespace detail
         std::unique_lock<mutex_type> l(mtx_);
 
         // @TODO allow empty pools
-        if (get_pool_data(get_default_pool_name()).num_threads_ == 0)
+        if (get_pool_data(l, get_default_pool_name()).num_threads_ == 0)
         {
             l.unlock();
             throw_runtime_error("partitioner::setup_pools",
@@ -651,7 +651,7 @@ namespace hpx { namespace resource { namespace detail
         if (mode_ & mode_allow_oversubscription)
         {
             // increment occupancy counter
-            get_pool_data(pool_name).add_resource(
+            get_pool_data(l, pool_name).add_resource(
                 p.id_, exclusive, num_threads);
             ++p.thread_occupancy_count_;
             return;
@@ -660,7 +660,7 @@ namespace hpx { namespace resource { namespace detail
         // check occupancy counter and increment it
         if (p.thread_occupancy_count_ == 0)
         {
-            get_pool_data(pool_name).add_resource(
+            get_pool_data(l, pool_name).add_resource(
                 p.id_, exclusive, num_threads);
             ++p.thread_occupancy_count_;
 
@@ -737,8 +737,8 @@ namespace hpx { namespace resource { namespace detail
     void partitioner::set_scheduler(
         scheduling_policy sched, std::string const& pool_name)
     {
-        std::lock_guard<mutex_type> l(mtx_);
-        get_pool_data(pool_name).scheduling_policy_ = sched;
+        std::unique_lock<mutex_type> l(mtx_);
+        get_pool_data(l, pool_name).scheduling_policy_ = sched;
     }
 
     void partitioner::configure_pools()
@@ -758,7 +758,7 @@ namespace hpx { namespace resource { namespace detail
 
         // look up which scheduler is needed
         scheduling_policy sched_type =
-            get_pool_data(pool_name).scheduling_policy_;
+            get_pool_data(l, pool_name).scheduling_policy_;
         if (sched_type == unspecified)
         {
             l.unlock();
@@ -790,11 +790,11 @@ namespace hpx { namespace resource { namespace detail
         std::size_t num_threads = 0;
 
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             std::size_t num_thread_pools = initial_thread_pools_.size();
             for (size_t i = 0; i != num_thread_pools; ++i)
             {
-                num_threads += get_pool_data(i).num_threads_;
+                num_threads += get_pool_data(l, i).num_threads_;
             }
         }
 
@@ -815,22 +815,23 @@ namespace hpx { namespace resource { namespace detail
     std::size_t partitioner::get_num_threads(
         std::size_t pool_index) const
     {
-        std::lock_guard<mutex_type> l(mtx_);
-        return get_pool_data(pool_index).num_threads_;
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_index).num_threads_;
     }
 
     std::size_t partitioner::get_num_threads(
         const std::string &pool_name) const
     {
-        std::lock_guard<mutex_type> l(mtx_);
-        return get_pool_data(pool_name).num_threads_;
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_name).num_threads_;
     }
 
     detail::init_pool_data const& partitioner::get_pool_data(
-        std::size_t pool_index) const
+        std::unique_lock<mutex_type>&l, std::size_t pool_index) const
     {
         if (pool_index >= initial_thread_pools_.size())
         {
+            l.unlock();
             throw_invalid_argument(
                 "partitioner::get_pool_data",
                 "pool index " + std::to_string(pool_index) +
@@ -914,23 +915,23 @@ namespace hpx { namespace resource { namespace detail
             throw std::invalid_argument(
                 "partitioner::get_pool_creator: pool requested out of bounds.");
         }
-        return get_pool_data(index).create_function_;
+        return get_pool_data(l, index).create_function_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void partitioner::assign_pu(
         std::string const& pool_name, std::size_t virt_core)
     {
-        std::lock_guard<mutex_type> l(mtx_);
-        detail::init_pool_data& data = get_pool_data(pool_name);
+        std::unique_lock<mutex_type> l(mtx_);
+        detail::init_pool_data& data = get_pool_data(l, pool_name);
         data.assign_pu(virt_core);
     }
 
     void partitioner::unassign_pu(
         std::string const& pool_name, std::size_t virt_core)
     {
-        std::lock_guard<mutex_type> l(mtx_);
-        detail::init_pool_data& data = get_pool_data(pool_name);
+        std::unique_lock<mutex_type> l(mtx_);
+        detail::init_pool_data& data = get_pool_data(l, pool_name);
         data.unassign_pu(virt_core);
     }
 
@@ -956,8 +957,8 @@ namespace hpx { namespace resource { namespace detail
         bool has_non_exclusive_pus = false;
 
         {
-            std::lock_guard<mutex_type> l(mtx_);
-            detail::init_pool_data const& data = get_pool_data(pool_name);
+            std::unique_lock<mutex_type> l(mtx_);
+            detail::init_pool_data const& data = get_pool_data(l, pool_name);
 
             pu_nums_to_remove.reserve(data.num_threads_);
 
@@ -1012,8 +1013,8 @@ namespace hpx { namespace resource { namespace detail
         bool has_non_exclusive_pus = false;
 
         {
-            std::lock_guard<mutex_type> l(mtx_);
-            detail::init_pool_data const& data = get_pool_data(pool_name);
+            std::unique_lock<mutex_type> l(mtx_);
+            detail::init_pool_data const& data = get_pool_data(l, pool_name);
 
             pu_nums_to_add.reserve(data.num_threads_);
 
@@ -1076,7 +1077,7 @@ namespace hpx { namespace resource { namespace detail
     // has to be private bc pointers become invalid after data member
     // thread_pools_ is resized we don't want to allow the user to use it
     detail::init_pool_data const& partitioner::get_pool_data(
-        std::string const& pool_name) const
+        std::unique_lock<mutex_type>&l, std::string const& pool_name) const
     {
         auto pool = std::find_if(
             initial_thread_pools_.begin(), initial_thread_pools_.end(),
@@ -1090,6 +1091,7 @@ namespace hpx { namespace resource { namespace detail
             return *pool;
         }
 
+        l.unlock();
         throw_invalid_argument(
             "partitioner::get_pool_data",
             "the resource partitioner does not own a thread pool named '" +
@@ -1097,7 +1099,7 @@ namespace hpx { namespace resource { namespace detail
     }
 
     detail::init_pool_data& partitioner::get_pool_data(
-        std::string const& pool_name)
+        std::unique_lock<mutex_type>& l, std::string const& pool_name)
     {
         auto pool = std::find_if(
             initial_thread_pools_.begin(), initial_thread_pools_.end(),
@@ -1111,6 +1113,7 @@ namespace hpx { namespace resource { namespace detail
             return *pool;
         }
 
+        l.unlock();
         throw_invalid_argument(
             "partitioner::get_pool_data",
             "the resource partitioner does not own a thread pool named '" +

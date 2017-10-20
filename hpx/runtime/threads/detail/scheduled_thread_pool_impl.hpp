@@ -292,7 +292,7 @@ namespace hpx { namespace threads { namespace detail
                          << " failed with: " << e.what();
 
             // trigger the barrier
-            pool_threads -= thread_num;
+            pool_threads -= (thread_num + 1);
             while (pool_threads-- != 0)
                 startup->wait();
 
@@ -1344,14 +1344,15 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<compat::barrier> startup, error_code& ec)
     {
-        std::lock_guard<pu_mutex_type> l(used_processing_units_mtx_);
         resource::get_partitioner().assign_pu(id_.name(), virt_core);
 
+        std::unique_lock<pu_mutex_type> l(used_processing_units_mtx_);
         if (threads_.size() <= virt_core)
             threads_.resize(virt_core + 1);
 
         if (threads_[virt_core].joinable())
         {
+            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
                 "the given virtual core has already been added to this "
@@ -1406,9 +1407,10 @@ namespace hpx { namespace threads { namespace detail
             oldstate == state_stopping || oldstate == state_stopped);
 
         {
-            std::lock_guard<pu_mutex_type> l(used_processing_units_mtx_);
+            std::unique_lock<pu_mutex_type> l(used_processing_units_mtx_);
             if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
             {
+                l.unlock();
                 HPX_THROWS_IF(ec, bad_parameter,
                     "scheduled_thread_pool<Scheduler>::remove_processing_unit",
                     "the given virtual core has already been stopped to run on "
