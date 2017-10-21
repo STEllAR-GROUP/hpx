@@ -6,8 +6,12 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/parallel/algorithms/merge.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
+#include <algorithm>
 #include <iostream>
+#include <string>
+#include <vector>
 
 int main(int argc, char* argv[])
 {
@@ -40,43 +44,58 @@ int hpx_main(int argc, char **argv)
     };
 
     std::vector<std::tuple<int, char>> result(a1.size() + a2.size());
+    std::vector<std::tuple<int, char>> solution(a1.size() + a2.size());
 
     // I expect a stable merge to order {3, 'a'} and {3, 'b'} before {3, 'c'}
     // because they come from the first sequence
-    using namespace hpx::parallel;
-    using namespace hpx::util;
-    merge(execution::par,
-          a1.begin(), a1.end(),
-          a2.begin(), a2.end(),
-          result.begin(),
-          [](auto const& a, auto const& b)
-          {
-              return std::get<0>(a) < std::get<0>(b);
-          });
-
-    std::for_each(result.begin(), result.end(),
-        [](auto const& a)
+    hpx::parallel::merge(
+        hpx::parallel::execution::par,
+        a1.begin(), a1.end(),
+        a2.begin(), a2.end(),
+        result.begin(),
+        [](auto const& a, auto const& b)
         {
-            std::cout << "(" << std::get<0>(a) << ", " << std::get<1>(a) << ") ";
+            return std::get<0>(a) < std::get<0>(b);
         });
-    std::cout << "\n";
+    std::merge(
+        a1.begin(), a1.end(),
+        a2.begin(), a2.end(),
+        solution.begin(),
+        [](auto const& a, auto const& b)
+        {
+            return std::get<0>(a) < std::get<0>(b);
+        });
+
+    bool equality = std::equal(
+        result.begin(), result.end(),
+        solution.begin(), solution.end());
+
+    HPX_TEST(equality);
 
     // Expect {3, 'c'}, {3, 'a'}, {3, 'b'} in order.
-    merge(execution::par,
-          a2.begin(), a2.end(),
-          a1.begin(), a1.end(),
-          result.begin(),
-          [](auto const& a, auto const& b)
-          {
-              return std::get<0>(a) < std::get<0>(b);
-          });
-
-    std::for_each(result.begin(), result.end(),
-        [](auto const& a)
+    hpx::parallel::merge(
+        hpx::parallel::execution::par,
+        a2.begin(), a2.end(),
+        a1.begin(), a1.end(),
+        result.begin(),
+        [](auto const& a, auto const& b)
         {
-            std::cout << "(" << std::get<0>(a) << ", " << std::get<1>(a) << ") ";
+            return std::get<0>(a) < std::get<0>(b);
         });
-    std::cout << "\n";
+    std::merge(
+        a2.begin(), a2.end(),
+        a1.begin(), a1.end(),
+        solution.begin(),
+        [](auto const& a, auto const& b)
+        {
+            return std::get<0>(a) < std::get<0>(b);
+        });
+    
+    equality = std::equal(
+        result.begin(), result.end(),
+        solution.begin(), solution.end());
+
+    HPX_TEST(equality);
 
     return hpx::finalize();
 }
