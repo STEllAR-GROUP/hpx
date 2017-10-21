@@ -61,5 +61,22 @@ int hpx_main(int argc, char **argv)
         });
     std::cout << "\n";
 
+    // Expect {3, 'c'}, {3, 'a'}, {3, 'b'} in order.
+    merge(execution::par,
+          a2.begin(), a2.end(),
+          a1.begin(), a1.end(),
+          result.begin(),
+          [](auto const& a, auto const& b)
+          {
+              return std::get<0>(a) < std::get<0>(b);
+          });
+
+    std::for_each(result.begin(), result.end(),
+        [](auto const& a)
+        {
+            std::cout << "(" << std::get<0>(a) << ", " << std::get<1>(a) << ") ";
+        });
+    std::cout << "\n";
+
     return hpx::finalize();
 }
