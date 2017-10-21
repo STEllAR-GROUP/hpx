@@ -19,7 +19,6 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -51,35 +50,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
-    // dispatch point used for dataflow implementations
-    template <typename Func, typename Enable = void>
-    struct dataflow_dispatch;
-
-    // dispatch point used for dataflow<Action> implementations
-    template <typename Action, typename Policy, typename Enable = void>
-    struct dataflow_action_dispatch;
-
-    // dispatch point used for launch_policy implementations
-    template <typename Action, typename Enable = void>
-    struct dataflow_launch_policy_dispatch;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename Args, typename Enable = void>
-    struct dataflow_return;
-
-    template <typename F, typename Args>
-    struct dataflow_return<F, Args,
-        typename std::enable_if<!traits::is_action<F>::value>::type
-    > : util::detail::invoke_fused_result<F, Args>
-    {};
+    template <bool IsAction, typename F, typename Args>
+    struct dataflow_return_impl;
 
     template <typename Action, typename Args>
-    struct dataflow_return<Action, Args,
-        typename std::enable_if<traits::is_action<Action>::value>::type
-    >
+    struct dataflow_return_impl</*IsAction=*/true, Action, Args>
     {
         typedef typename Action::result_type type;
     };
+
+    template <typename F, typename Args>
+    struct dataflow_return_impl</*IsAction=*/false, F, Args>
+      : util::detail::invoke_fused_result<F, Args>
+    {};
+
+    template <typename F, typename Args>
+    struct dataflow_return
+      : dataflow_return_impl<traits::is_action<F>::value, F, Args>
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
@@ -310,29 +298,25 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // any action
-    template <typename Action>
-    struct dataflow_dispatch<Action,
-        typename std::enable_if<traits::is_action<Action>::value>::type>
+    template <typename Action, typename T0, typename Enable = void>
+    struct dataflow_action_dispatch;
+
+    // launch
+    template <typename Policy, typename Action>
+    struct dataflow_action_dispatch<Policy, Action,
+        typename std::enable_if<
+            traits::is_action<typename std::decay<Action>::type>::value &&
+            traits::is_launch_policy<typename std::decay<Policy>::type>::value
+        >::type>
     {
-        template <typename Policy,
+        template <
             typename Component, typename Signature, typename Derived,
             typename ...Ts>
-        HPX_FORCEINLINE static
-        typename std::enable_if<
-            traits::is_launch_policy<
-                typename std::decay<Policy>::type
-            >::value,
-            typename dataflow_frame<
-                typename std::decay<Policy>::type
-              , Derived
-              , util::tuple<
-                    hpx::id_type
-                  , typename traits::acquire_future<Ts>::type...
-                >
-            >::type
-        >::type
-        call(Policy && launch_policy,
+        HPX_FORCEINLINE static lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::traits::extract_action<Action>::remote_result_type
+            >::type>
+        call(Policy && policy,
             hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         {
@@ -349,7 +333,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // Create the data which is used to construct the dataflow_frame
             auto data = frame_type::construct_from(
-                std::forward<Policy>(launch_policy), Derived{});
+                std::forward<Policy>(policy), Derived{});
 
             // Construct the dataflow_frame and traverse
             // the arguments asynchronously
@@ -362,29 +346,48 @@ namespace hpx { namespace lcos { namespace detail
             return future_access<typename frame_type::type>::create(
                 std::move(p));
         }
+    };
 
+    // any action
+    template <typename Action, typename T0>
+    struct dataflow_action_dispatch<Action, T0,
+        typename std::enable_if<
+            traits::is_action<typename std::decay<Action>::type>::value &&
+            !traits::is_launch_policy<typename std::decay<T0>::type>::value
+        >::type>
+    {
         template <
             typename Component, typename Signature, typename Derived,
             typename ...Ts>
-        HPX_FORCEINLINE static
-        typename dataflow_frame<
-            hpx::detail::async_policy
-          , Derived
-          , util::tuple<
-                hpx::id_type
-              , typename traits::acquire_future<Ts>::type...
-            >
-        >::type
+        HPX_FORCEINLINE static auto
         call(hpx::actions::basic_action<Component, Signature, Derived> const& act,
-            naming::id_type const& id, Ts &&... ts)
+            Ts &&... ts)
+        ->  decltype(dataflow_action_dispatch<launch, Action>::call(
+                launch::async, act, std::forward<Ts>(ts)...))
         {
-            return call(launch::async, act, id, std::forward<Ts>(ts)...);
+            return dataflow_action_dispatch<launch, Action>::call(
+                launch::async, act, std::forward<Ts>(ts)...);
         }
     };
 
-    // launch
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename T0, typename Enable = void>
+    struct dataflow_explicit_action_dispatch
+    {
+        template <typename ...Ts>
+        HPX_FORCEINLINE static lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::traits::extract_action<Action>::remote_result_type
+            >::type>
+        call(Ts &&... ts)
+        {
+            return dataflow_action_dispatch<Action, T0>::call(
+                Action(), std::forward<Ts>(ts)...);
+        }
+    };
+
     template <typename Action, typename Policy>
-    struct dataflow_action_dispatch<Action, Policy,
+    struct dataflow_explicit_action_dispatch<Action, Policy,
         typename std::enable_if<
             traits::is_launch_policy<typename std::decay<Policy>::type>::value
         >::type>
@@ -392,121 +395,13 @@ namespace hpx { namespace lcos { namespace detail
         template <typename Policy_, typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
-                typename hpx::traits::extract_action<
-                    Action
-                >::remote_result_type
+                typename hpx::traits::extract_action<Action>::remote_result_type
             >::type>
-        call(Policy_ && launch_policy, naming::id_type const& id, Ts &&... ts)
+        call(Policy_ && policy, Ts &&... ts)
         {
-            return dataflow_dispatch<Action>::call(
-                std::forward<Policy_>(launch_policy), Action(), id,
-                std::forward<Ts>(ts)...);
+            return dataflow_action_dispatch<Policy, Action>::call(
+                std::forward<Policy_>(policy), Action(), std::forward<Ts>(ts)...);
         }
-
-//         template <typename DistPolicy, typename ...Ts>
-//         HPX_FORCEINLINE static
-//         typename std::enable_if<
-//             traits::is_distribution_policy<DistPolicy>::value,
-//             lcos::future<
-//                 typename traits::promise_local_result<
-//                     typename hpx::traits::extract_action<
-//                         Action
-//                     >::remote_result_type
-//                 >::type
-//             >
-//         >::type
-//         call(Policy launch_policy, DistPolicy const& policy, Ts&&... ts)
-//         {
-//             return policy.template async<Action>(launch_policy,
-//                 std::forward<Ts>(ts)...);
-//         }
-    };
-
-    // naming::id_type
-    template <typename Action>
-    struct dataflow_action_dispatch<Action, naming::id_type>
-    {
-        template <typename ...Ts>
-        HPX_FORCEINLINE static
-        lcos::future<
-            typename traits::promise_local_result<
-                typename hpx::traits::extract_action<
-                    Action
-                >::remote_result_type
-            >::type>
-        call(naming::id_type const& id, Ts&&... ts)
-        {
-            return dataflow_action_dispatch<
-                    Action, hpx::detail::async_policy
-                >::call(launch::async, id, std::forward<Ts>(ts)...);
-        }
-    };
-
-    // distribution policy
-//     template <typename Action, typename Policy>
-//     struct dataflow_action_dispatch<Action, Policy,
-//         typename std::enable_if<
-//             traits::is_distribution_policy<Policy>::value
-//         >::type>
-//     {
-//         template <typename DistPolicy, typename ...Ts>
-//         HPX_FORCEINLINE static
-//         lcos::future<
-//             typename traits::promise_local_result<
-//                 typename hpx::traits::extract_action<
-//                     Action
-//                 >::remote_result_type
-//             >::type>
-//         call(DistPolicy const& policy, Ts&&... ts)
-//         {
-//             return dataflow_action_dispatch<
-//                     Action, hpx::detail::async_policy
-//                 >::call(launch::async, policy, std::forward<Ts>(ts)...);
-//         }
-//     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action>
-    struct dataflow_launch_policy_dispatch<Action,
-        typename std::enable_if<traits::is_action<Action>::value>::type>
-    {
-        typedef typename traits::promise_local_result<
-                typename hpx::traits::extract_action<
-                    Action
-                >::remote_result_type
-            >::type result_type;
-
-        template <typename Policy, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<result_type>
-        call(Policy && launch_policy, Action const&, naming::id_type const& id,
-            Ts&&... ts)
-        {
-            static_assert(
-                traits::is_launch_policy<
-                    typename std::decay<Policy>::type
-                >::value,
-                "Policy must be a valid launch policy");
-
-            return dataflow_action_dispatch<
-                    Action, launch
-                >::call(std::forward<Policy>(launch_policy), id,
-                    std::forward<Ts>(ts)...);
-        }
-
-//         template <typename Policy, typename DistPolicy, typename ...Ts>
-//         HPX_FORCEINLINE static
-//         typename std::enable_if<
-//             traits::is_distribution_policy<DistPolicy>::value,
-//             lcos::future<result_type>
-//         >::type
-//         call(Policy launch_policy, Action const&, DistPolicy const& policy,
-//             Ts&&... ts)
-//         {
-//             static_assert(traits::is_launch_policy<Policy>::value,
-//                 "Policy must be a valid launch policy");
-//
-//             return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);
-//         }
     };
 }}}
 
@@ -514,16 +409,29 @@ namespace hpx { namespace lcos { namespace detail
 // distributed dataflow: invokes action when ready
 namespace hpx
 {
-    template <typename Action, typename F, typename ...Ts>
+    template <typename Action, typename T0, typename ...Ts>
     HPX_FORCEINLINE
-    auto dataflow(F && f, Ts &&... ts)
-    ->  decltype(lcos::detail::dataflow_action_dispatch<
-                    Action, typename std::decay<F>::type
-            >::call(std::forward<F>(f), std::forward<Ts>(ts)...))
+    auto dataflow(Action && action, T0 && t0, Ts &&... ts)
+    ->  decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
+            std::forward<Action>(action), std::forward<T0>(t0),
+            std::forward<Ts>(ts)...))
     {
-        return lcos::detail::dataflow_action_dispatch<
-                typename std::decay<Action>::type, typename std::decay<F>::type
-            >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
+        return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
+            std::forward<Action>(action), std::forward<T0>(t0),
+            std::forward<Ts>(ts)...);
+    }
+
+    template <
+        typename Action, typename T0, typename ...Ts,
+        typename Enable =
+            typename std::enable_if<traits::is_action<Action>::value>::type>
+    HPX_FORCEINLINE
+    auto dataflow(T0 && t0, Ts &&... ts)
+    ->  decltype(lcos::detail::dataflow_explicit_action_dispatch<Action, T0>::call(
+            std::forward<T0>(t0), std::forward<Ts>(ts)...))
+    {
+        return lcos::detail::dataflow_explicit_action_dispatch<Action, T0>::call(
+            std::forward<T0>(t0), std::forward<Ts>(ts)...);
     }
 }
 
