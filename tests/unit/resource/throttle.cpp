@@ -89,7 +89,8 @@ int hpx_main(int argc, char* argv[])
 //     hpx::util::high_resolution_timer t;
 //     while (t.elapsed() < 2)
 //     {
-//         for (std::size_t i = 0; i < hpx::resource::get_num_threads("default") * 10; ++i)
+//         for (std::size_t i = 0; i < hpx::resource::get_num_threads("default") * 10; 
+//              ++i)
 //         {
 //             fs.push_back(hpx::async([](){}));
 //         }
