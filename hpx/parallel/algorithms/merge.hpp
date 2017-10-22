@@ -20,6 +20,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -91,8 +92,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
-                using hpx::util::invoke;
-
                 difference_type count = std::distance(first, last);
 
                 while (count > 0)
@@ -100,7 +99,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     difference_type step = count / 2;
                     RandIter mid = std::next(first, step);
 
-                    if (!invoke(comp, value, invoke(proj, *mid)))
+                    if (!hpx::util::invoke(comp,
+                        value,
+                        hpx::util::invoke(proj, *mid)))
                     {
                         first = ++mid;
                         count -= step + 1;
@@ -128,8 +129,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
-                using hpx::util::invoke;
-
                 difference_type count = std::distance(first, last);
 
                 while (count > 0)
@@ -137,7 +136,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     difference_type step = count / 2;
                     RandIter mid = std::next(first, step);
 
-                    if (invoke(comp, invoke(proj, *mid), value))
+                    if (hpx::util::invoke(comp,
+                        hpx::util::invoke(proj, *mid),
+                        value))
                     {
                         first = ++mid;
                         count -= step + 1;
@@ -342,11 +343,11 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam RandIter1   The type of the source iterators used (deduced)
-    ///                     representing the first range.
+    ///                     representing the first sorted range.
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam RandIter2   The type of the source iterators used (deduced)
-    ///                     representing the second range.
+    ///                     representing the second sorted range.
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam RandIter3   The type of the iterator representing the
@@ -376,14 +377,12 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \param last2        Refers to the end of the second range of elements
     ///                     the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param comp         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is an
-    ///                     binary predicate which returns \a true if the first
-    ///                     argument is less than the second. The signature of
-    ///                     this predicate should be equivalent to:
+    /// \param comp         \a comp is a callable object which returns true if
+    ///                     the first argument is less than the second,
+    ///                     and false otherwise. The signature of this
+    ///                     comparison should be equivalent to:
     ///                     \code
-    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     bool comp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
@@ -490,6 +489,341 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::forward<Comp>(comp),
                 std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2)));
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    // inplace_merge
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+
+        // sequential inplace_merge with projection function.
+        template <typename BidirIter, typename Comp, typename Proj>
+        inline BidirIter
+        sequential_inplace_merge(
+            BidirIter first, BidirIter middle, BidirIter last,
+            Comp && comp, Proj && proj)
+        {
+            std::inplace_merge(first, middle, last,
+                util::compare_projected<Comp, Proj>(
+                    std::forward<Comp>(comp),
+                    std::forward<Proj>(proj)));
+            return last;
+        }
+
+        template <typename ExPolicy, typename RandIter,
+            typename Comp, typename Proj,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_random_access_iterator<RandIter>::value)>
+        void
+        parallel_inplace_merge_helper(ExPolicy policy,
+            RandIter first, RandIter middle, RandIter last,
+            Comp && comp, Proj && proj)
+        {
+            const std::size_t threshold = 65536ul;
+            HPX_ASSERT(threshold >= 5ul);
+
+            std::size_t left_size = middle - first;
+            std::size_t right_size = last - middle;
+
+            // Perform sequential inplace_merge
+            //   if data size is smaller than threshold.
+            if (left_size + right_size <= threshold)
+            {
+                sequential_inplace_merge(first, middle, last, comp, proj);
+                return;
+            }
+
+            if (left_size >= right_size)
+            {
+                // Means that always 'pivot' < 'middle'.
+                HPX_ASSERT(left_size >= 3ul);
+
+                // Select pivot in leftside range.
+                RandIter pivot = first + left_size / 2;
+                RandIter boundary = lower_bound_helper::call(
+                    middle, last, hpx::util::invoke(proj, *pivot), comp, proj);
+                RandIter target = pivot + (boundary - middle);
+
+                // Swap two blocks, [pivot, middle) and [middle, boundary).
+                // After this, [first, last) will be divided into three blocks,
+                //   [first, target), target, and [target+1, last).
+                // And all elements of [first, target) are less than
+                //   the thing of target.
+                // And all elements of [target+1, last) are greater or equal than
+                //   the thing of target.
+                std::rotate(pivot, middle, boundary);
+
+                hpx::future<void> fut = execution::async_execute(
+                    policy.executor(),
+                    [&]() -> void
+                    {
+                        // Process the range which is leftside of 'target'.
+                        parallel_inplace_merge_helper(policy,
+                            first, pivot, target,
+                            comp, proj);
+                    });
+
+                try {
+                    // Process the range which is rightside of 'target'.
+                    parallel_inplace_merge_helper(policy,
+                        target + 1, boundary, last,
+                        comp, proj);
+                }
+                catch (...) {
+                    fut.wait();
+
+                    std::vector<hpx::future<void>> futures(2);
+                    futures[0] = std::move(fut);
+                    futures[1] = hpx::make_exceptional_future<void>(
+                        std::current_exception());
+
+                    std::list<std::exception_ptr> errors;
+                    util::detail::handle_local_exceptions<ExPolicy>::call(
+                        futures, errors);
+
+                    // Not reachable.
+                    HPX_ASSERT(false);
+                }
+
+                fut.get();
+            }
+            else /* left_size < right_size */
+            {
+                // Means that always 'pivot' < 'last'.
+                HPX_ASSERT(right_size >= 3ul);
+
+                // Select pivot in rightside range.
+                RandIter pivot = middle + right_size / 2;
+                RandIter boundary = upper_bound_helper::call(
+                    first, middle, hpx::util::invoke(proj, *pivot), comp, proj);
+                RandIter target = boundary + (pivot - middle);
+
+                // Swap two blocks, [boundary, middle) and [middle, pivot+1).
+                // After this, [first, last) will be divided into three blocks,
+                //   [first, target), target, and [target+1, last).
+                // And all elements of [first, target) are less than
+                //   the thing of target.
+                // And all elements of [target+1, last) are greater or equal than
+                //   the thing of target.
+                std::rotate(boundary, middle, pivot + 1);
+
+                hpx::future<void> fut = execution::async_execute(
+                    policy.executor(),
+                    [&]() -> void
+                    {
+                        // Process the range which is leftside of 'target'.
+                        parallel_inplace_merge_helper(policy,
+                            first, boundary, target,
+                            comp, proj);
+                    });
+
+                try {
+                    // Process the range which is rightside of 'target'.
+                    parallel_inplace_merge_helper(policy,
+                        target + 1, pivot + 1, last,
+                        comp, proj);
+                }
+                catch (...) {
+                    fut.wait();
+
+                    std::vector<hpx::future<void>> futures(2);
+                    futures[0] = std::move(fut);
+                    futures[1] = hpx::make_exceptional_future<void>(
+                        std::current_exception());
+
+                    std::list<std::exception_ptr> errors;
+                    util::detail::handle_local_exceptions<ExPolicy>::call(
+                        futures, errors);
+
+                    // Not reachable.
+                    HPX_ASSERT(false);
+                }
+
+                fut.get();
+            }
+        }
+
+        template <typename ExPolicy, typename RandIter,
+            typename Comp, typename Proj,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_random_access_iterator<RandIter>::value)>
+        inline RandIter
+        parallel_inplace_merge(ExPolicy policy,
+            RandIter first, RandIter middle, RandIter last,
+            Comp && comp, Proj && proj)
+        {
+            parallel_inplace_merge_helper(
+                std::forward<ExPolicy>(policy),
+                first, middle, last,
+                std::forward<Comp>(comp),
+                std::forward<Proj>(proj));
+
+            return last;
+        }
+
+        template <typename Iter>
+        struct inplace_merge : public detail::algorithm<inplace_merge<Iter>, Iter>
+        {
+            inplace_merge()
+              : inplace_merge::algorithm("inplace_merge")
+            {}
+
+            template <typename ExPolicy, typename RandIter,
+                typename Comp, typename Proj>
+            static RandIter
+            sequential(ExPolicy,
+                RandIter first, RandIter middle, RandIter last,
+                Comp && comp, Proj && proj)
+            {
+                return sequential_inplace_merge(
+                    first, middle, last,
+                    std::forward<Comp>(comp),
+                    std::forward<Proj>(proj));
+            }
+
+            template <typename ExPolicy, typename RandIter,
+                typename Comp, typename Proj>
+            static typename util::detail::algorithm_result<
+                ExPolicy, RandIter
+            >::type
+            parallel(ExPolicy && policy,
+                RandIter first, RandIter middle, RandIter last,
+                Comp && comp, Proj && proj)
+            {
+                typedef util::detail::algorithm_result<
+                    ExPolicy, RandIter
+                > algorithm_result;
+
+                try {
+                    return algorithm_result::get(
+                        parallel_inplace_merge(
+                            std::forward<ExPolicy>(policy),
+                            first, middle, last,
+                            std::forward<Comp>(comp),
+                            std::forward<Proj>(proj)));
+                }
+                catch (...) {
+                    return algorithm_result::get(
+                        detail::handle_exception<ExPolicy, RandIter>::call(
+                            std::current_exception()));
+                }
+            }
+        };
+        /// \endcond
+    }
+
+    // TODO: Support bidirectional iterator. (#2826)
+    // For now, only support random access iterator.
+    /// Merges two consecutive sorted ranges [first, middle) and
+    /// [middle, last) into one sorted range [first, last). The order of
+    /// equivalent elements in the each of original two ranges is preserved.
+    /// For equivalent elements in the original two ranges, the elements from
+    /// the first range precede the elements from the second range.
+    ///
+    /// \note   Complexity: Performs O(std::distance(first, last))
+    ///         applications of the comparison \a comp and the each projection.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RandIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a inplace_merge requires \a Comp
+    ///                     to meet the requirements of \a CopyConstructible.
+    ///                     This defaults to std::less<>
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the first sorted range
+    ///                     the algorithm will be applied to.
+    /// \param middle       Refers to the end of the first sorted range and
+    ///                     the beginning of the second sorted range
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the second sorted range
+    ///                     the algorithm will be applied to.
+    /// \param comp         \a comp is a callable object which returns true if
+    ///                     the first argument is less than the second,
+    ///                     and false otherwise. The signature of this
+    ///                     comparison should be equivalent to:
+    ///                     \code
+    ///                     bool comp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be
+    ///                     such that objects of types \a RandIter can be
+    ///                     dereferenced and then implicitly converted to both
+    ///                     \a Type1 and \a Type2
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a inplace_merge algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a inplace_merge algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a inplace_merge algorithm returns a
+    ///           \a hpx::future<RandIter> if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy
+    ///           and returns \a RandIter otherwise.
+    ///           The \a inplace_merge algorithm returns
+    ///           the source iterator \a last
+    ///
+    template <typename ExPolicy, typename RandIter,
+        typename Comp = detail::less,
+        typename Proj = util::projection_identity,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<RandIter>::value &&
+        traits::is_projected<Proj, RandIter>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, Comp,
+            traits::projected<Proj, RandIter>,
+            traits::projected<Proj, RandIter>
+        >::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy, RandIter
+    >::type
+    inplace_merge(ExPolicy && policy,
+        RandIter first, RandIter middle, RandIter last,
+        Comp && comp = Comp(), Proj && proj = Proj())
+    {
+#if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
+        static_assert(
+            (hpx::traits::is_bidirectional_iterator<RandIter>::value),
+            "Required at least bidirectional iterator.");
+
+        typedef std::integral_constant<bool,
+                execution::is_sequenced_execution_policy<ExPolicy>::value ||
+               !hpx::traits::is_random_access_iterator<RandIter>::value ||
+            > is_seq;
+#else
+        static_assert(
+            (hpx::traits::is_random_access_iterator<RandIter>::value),
+            "Required at least random access iterator.");
+
+        typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
+#endif
+
+        return detail::inplace_merge<RandIter>().call(
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, middle, last,
+            std::forward<Comp>(comp),
+            std::forward<Proj>(proj));
     }
 }}}
 
