@@ -35,8 +35,8 @@ void run_template_accumulator(char const* type)
     // Create an accumulator component either on this locality (if the
     // example is executed on one locality only) or on any of the remote
     // localities (otherwise).
-    examples::template_accumulator<T> accu(
-        hpx::components::new_<accumulator_type>(localities.back()));
+    examples::template_accumulator<T> accu =
+        hpx::new_<accumulator_type>(localities.back());
 
     // Print out the available commands.
     std::cout << std::endl

@@ -41,8 +41,12 @@ namespace examples
 
         /// Create a client side representation for the existing
         /// \a server::accumulator instance with the given GID.
-        accumulator(hpx::future<hpx::id_type> && gid)
-          : base_type(std::move(gid))
+        accumulator(hpx::future<hpx::id_type> && id)
+          : base_type(std::move(id))
+        {}
+
+        accumulator(hpx::id_type && id)
+          : base_type(std::move(id))
         {}
 
         ///////////////////////////////////////////////////////////////////////

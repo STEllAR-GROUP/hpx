@@ -315,6 +315,52 @@ namespace hpx { namespace components
                     });
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component>
+        struct local_new_component
+        {
+            typedef typename hpx::future<hpx::id_type> type;
+
+            template <typename ...Ts>
+            static type call(Ts &&... ts)
+            {
+                typedef typename Component::wrapping_type component_type;
+
+                hpx::id_type id(
+                    components::server::construct<component_type>(
+                        std::forward<Ts>(ts)...
+                    ),
+                    hpx::id_type::managed);
+                return hpx::make_ready_future(std::move(id));
+            }
+        };
+
+        template <typename Component>
+        struct local_new_component<Component[]>
+        {
+            typedef hpx::future<std::vector<hpx::id_type> > type;
+
+            template <typename ...Ts>
+            static type call(std::size_t count, Ts&&... ts)
+            {
+                typedef typename Component::wrapping_type component_type;
+
+                std::vector<hpx::id_type> result;
+                result.reserve(count);
+
+                for (std::size_t i = 0; i != count; ++i)
+                {
+                    result.push_back(hpx::id_type(
+                        components::server::construct<component_type>(
+                            std::forward<Ts>(ts)...
+                        ),
+                        hpx::id_type::managed));
+                }
+
+                return hpx::make_ready_future(result);
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -325,6 +371,12 @@ namespace hpx { namespace components
     >::type
     new_(id_type const& locality, Ts&&... vs)
     {
+        if (locality == hpx::find_here())
+        {
+            return detail::local_new_component<Component>::call(
+                std::forward<Ts>(vs)...);
+        }
+
         return detail::new_component<Component>::call(
             locality, std::forward<Ts>(vs)...);
     }
@@ -391,6 +443,49 @@ namespace hpx { namespace components
                     );
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Client>
+        struct local_new_client
+        {
+            typedef Client type;
+            typedef typename Client::server_component_type::wrapping_type
+                component_type;
+
+            template <typename ...Ts>
+            static type call(Ts &&... ts)
+            {
+                hpx::id_type id(
+                    components::server::construct<component_type>(
+                        std::forward<Ts>(ts)...
+                    ),
+                    hpx::id_type::managed);
+                return make_client<Client>(std::move(id));
+            }
+        };
+
+        template <typename Client>
+        struct local_new_client<Client[]>
+        {
+            typedef hpx::future<std::vector<Client> > type;
+            typedef typename Client::server_component_type::wrapping_type
+                component_type;
+
+            template <typename ...Ts>
+            static type call(Ts &&... ts)
+            {
+                return local_new_component<component_type[]>::call(
+                        std::forward<Ts>(ts)...
+                    )
+                    .then(
+                        [](hpx::future<std::vector<hpx::id_type> > && v)
+                            -> std::vector<Client>
+                        {
+                            return make_clients<Client>(v.get());
+                        }
+                    );
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -401,6 +496,12 @@ namespace hpx { namespace components
     >::type
     new_(id_type const& locality, Ts&&... vs)
     {
+        if (locality == hpx::find_here())
+        {
+            return detail::local_new_client<Client>::call(
+                std::forward<Ts>(vs)...);
+        }
+
         return detail::new_client<Client>::call(
             locality, std::forward<Ts>(vs)...);
     }
@@ -421,60 +522,20 @@ namespace hpx { namespace components
     // Same as above, but just on this locality. This does not go through an
     // action, that means that the constructor arguments can be non-copyable
     // and non-movable.
-    namespace detail
-    {
-        template <typename Component>
-        struct local_new_component
-        {
-            typedef typename hpx::future<hpx::id_type> type;
-
-            template <typename ...Ts>
-            static type call(Ts &&... ts)
-            {
-                typedef typename Component::wrapping_type component_type;
-
-                hpx::id_type id(
-                    components::server::construct<component_type>(
-                        std::forward<Ts>(ts)...
-                    ),
-                    hpx::id_type::managed);
-                return hpx::make_ready_future(std::move(id));
-            }
-        };
-
-        template <typename Client>
-        struct local_new_client
-        {
-            typedef Client type;
-            typedef typename Client::server_component_type::wrapping_type
-                component_type;
-
-            template <typename ...Ts>
-            static type call(Ts &&... ts)
-            {
-                hpx::id_type id(
-                    components::server::construct<component_type>(
-                        std::forward<Ts>(ts)...
-                    ),
-                    hpx::id_type::managed);
-                return make_client<Client>(std::move(id));
-            }
-        };
-    }
-
     template <typename Component, typename ...Ts>
     inline typename util::lazy_enable_if<
-        traits::is_component<Component>::value,
+        traits::is_component_or_component_array<Component>::value,
         detail::local_new_component<Component>
     >::type
     local_new(Ts &&... ts)
     {
-        return detail::local_new_component<Component>::call(std::forward<Ts>(ts)...);
+        return detail::local_new_component<Component>::call(
+            std::forward<Ts>(ts)...);
     }
 
     template <typename Client, typename ...Ts>
     inline typename util::lazy_enable_if<
-        traits::is_client<Client>::value,
+        traits::is_client_or_client_array<Client>::value,
         detail::local_new_client<Client>
     >::type
     local_new(Ts &&... ts)

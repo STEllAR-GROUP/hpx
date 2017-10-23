@@ -76,10 +76,37 @@ void test_create_single_instance_non_copyable_arg()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_create_multiple_instances()
+{
+    // make sure created objects live on locality they are supposed to be
+    {
+        std::vector<hpx::id_type> ids = hpx::local_new<test_server[]>(10).get();
+        HPX_TEST_EQ(ids.size(), std::size_t(10));
+
+        for (hpx::id_type const& id: ids)
+        {
+            HPX_TEST(hpx::async<call_action>(id).get() == hpx::find_here());
+        }
+    }
+
+    {
+        std::vector<test_client> ids = hpx::local_new<test_client[]>(10).get();
+        HPX_TEST_EQ(ids.size(), std::size_t(10));
+
+        for (test_client const& c: ids)
+        {
+            HPX_TEST(c.call() == hpx::find_here());
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     test_create_single_instance();
     test_create_single_instance_non_copyable_arg();
+
+    test_create_multiple_instances();
 
     return 0;
 }
