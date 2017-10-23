@@ -762,6 +762,8 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
         }
+
+        reset_thread_itt_domain();
     }
 }}}
 

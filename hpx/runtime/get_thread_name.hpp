@@ -26,6 +26,7 @@ namespace hpx
 
     /// \cond NOINTERNAL
     HPX_API_EXPORT hpx::util::itt::domain const& get_thread_itt_domain();
+    HPX_API_EXPORT void reset_thread_itt_domain();
     /// \endcond
 }
 

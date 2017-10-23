@@ -1245,6 +1245,11 @@ namespace hpx
         return *d;
     }
 
+    void reset_thread_itt_domain()
+    {
+        d.reset();
+    }
+
     std::uint64_t get_system_uptime()
     {
         return runtime::get_system_uptime();
