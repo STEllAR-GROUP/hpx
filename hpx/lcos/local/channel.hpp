@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace local
             virtual bool try_get(std::size_t generation,
                 hpx::future<T>* f = nullptr) = 0;
             virtual hpx::future<void> set(std::size_t generation, T && t) = 0;
-            virtual void close(bool force_delete_entries = false) = 0;
+            virtual std::size_t close(bool force_delete_entries = false) = 0;
 
             virtual bool requires_delete()
             {
@@ -186,7 +186,7 @@ namespace hpx { namespace lcos { namespace local
                 return hpx::make_ready_future();
             }
 
-            void close(bool force_delete_entries = false)
+            std::size_t close(bool force_delete_entries = false)
             {
                 std::unique_lock<mutex_type> l(mtx_);
                 if(closed_)
@@ -195,13 +195,13 @@ namespace hpx { namespace lcos { namespace local
                     HPX_THROW_EXCEPTION(hpx::invalid_status,
                         "hpx::lcos::local::channel::close",
                         "attempting to close an already closed channel");
-                    return;
+                    return 0;
                 }
 
                 closed_ = true;
 
                 if (buffer_.empty())
-                    return;
+                    return 0;
 
                 std::exception_ptr e;
 
@@ -216,7 +216,7 @@ namespace hpx { namespace lcos { namespace local
                 // all pending requests which can't be satisfied have to be
                 // canceled at this point, force deleting possibly waiting
                 // requests
-                buffer_.cancel_waiting(e, force_delete_entries);
+                return buffer_.cancel_waiting(e, force_delete_entries);
             }
 
         private:
@@ -305,14 +305,16 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename Lock>
-            void cancel(std::exception_ptr const& e, Lock& l)
+            std::size_t cancel(std::exception_ptr const& e, Lock& l)
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 if (pop_active_)
                 {
                     pop_.set_exception(e);
                     pop_active_ = false;
+                    return 1;
                 }
+                return 0;
             }
 
             template <typename Lock>
@@ -454,7 +456,7 @@ namespace hpx { namespace lcos { namespace local
                 return buffer_.push(std::move(t), l);
             }
 
-            void close(bool force_delete_entries = false)
+            std::size_t close(bool force_delete_entries = false)
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
@@ -464,13 +466,13 @@ namespace hpx { namespace lcos { namespace local
                     HPX_THROW_EXCEPTION(hpx::invalid_status,
                         "hpx::lcos::local::channel::close",
                         "attempting to close an already closed channel");
-                    return;
+                    return 0;
                 }
 
                 closed_ = true;
 
                 if (buffer_.is_empty(l) || !buffer_.has_pending_request(l))
-                    return;
+                    return 0;
 
                 // all pending requests which can't be satisfied have to be
                 // canceled at this point
@@ -482,7 +484,8 @@ namespace hpx { namespace lcos { namespace local
                             "hpx::lcos::local::close",
                             "canceled waiting on this entry"));
                 }
-                buffer_.cancel(std::move(e), l);
+
+                return buffer_.cancel(std::move(e), l);
             }
 
             void set_exception(std::exception_ptr e)
@@ -693,9 +696,9 @@ namespace hpx { namespace lcos { namespace local
                 return channel_->set(generation, std::move(val));
             }
 
-            void close(bool force_delete_entries = false)
+            std::size_t close(bool force_delete_entries = false)
             {
-                channel_->close(force_delete_entries);
+                return channel_->close(force_delete_entries);
             }
 
             ///////////////////////////////////////////////////////////////////
@@ -958,9 +961,9 @@ namespace hpx { namespace lcos { namespace local
                 return channel_->set(generation, hpx::util::unused_type());
             }
 
-            void close(bool force_delete_entries = false)
+            std::size_t close(bool force_delete_entries = false)
             {
-                channel_->close(force_delete_entries);
+                return channel_->close(force_delete_entries);
             }
 
             ///////////////////////////////////////////////////////////////////
