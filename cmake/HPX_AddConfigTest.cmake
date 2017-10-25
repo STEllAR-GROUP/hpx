@@ -542,6 +542,14 @@ macro(hpx_check_for_cxx11_std_unordered_set)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_thread_local)
+  add_hpx_config_test(HPX_WITH_CXX11_THREAD_LOCAL
+    SOURCE cmake/tests/cxx11_thread_local.cpp
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_thread_local)
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_noreturn_attribute)
   add_hpx_config_test(HPX_WITH_CXX11_NORETURN_ATTRIBUTE
     SOURCE cmake/tests/cxx11_noreturn_attribute.cpp

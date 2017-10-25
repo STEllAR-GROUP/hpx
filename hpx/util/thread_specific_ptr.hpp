@@ -29,6 +29,8 @@
 #  if __has_feature(cxx_thread_local)
 #    define HPX_NATIVE_TLS thread_local
 #  endif
+#elif defined(HPX_HAVE_CXX11_THREAD_LOCAL)
+#  define HPX_NATIVE_TLS thread_local
 #endif
 
 #if !defined(HPX_NATIVE_TLS)
