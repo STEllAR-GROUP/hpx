@@ -52,7 +52,7 @@ void plain_actions(hpx::id_type const& there)
     hpx::launch policies[] =
     {
         hpx::launch::async,
-//        hpx::launch::deferred,    // FIXME: enable once #1523 has been fixed
+        hpx::launch::deferred,
         hpx::launch::sync
     };
 

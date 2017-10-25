@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
