@@ -11,6 +11,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 
 #include <utility>
 

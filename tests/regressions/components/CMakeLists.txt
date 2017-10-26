@@ -4,6 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    client_base_registration
     create_n_components_2323
     create_remote_component_2334
     moveonly_constructor_arguments_1405

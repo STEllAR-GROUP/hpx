@@ -37,6 +37,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -269,16 +270,17 @@ namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
-    struct future_data;
+    struct future_data_base;
 
     template <>
-    struct future_data<traits::detail::future_data_void> : future_data_refcnt_base
+    struct future_data_base<traits::detail::future_data_void>
+      : future_data_refcnt_base
     {
-        future_data()
+        future_data_base()
           : state_(empty)
         {}
 
-        future_data(init_no_addref no_addref)
+        future_data_base(init_no_addref no_addref)
           : future_data_refcnt_base(no_addref), state_(empty)
         {}
 
@@ -286,7 +288,7 @@ namespace detail
         typedef util::unused_type result_type;
         typedef future_data_refcnt_base::init_no_addref init_no_addref;
 
-        virtual ~future_data() noexcept {}
+        virtual ~future_data_base() noexcept {}
         virtual void execute_deferred(error_code& = throws) = 0;
         virtual bool cancelable() const = 0;
         virtual void cancel() = 0;
@@ -295,6 +297,19 @@ namespace detail
         virtual future_status wait_until(util::steady_clock::time_point const&,
             error_code& = throws) = 0;
         virtual std::exception_ptr get_exception_ptr() const = 0;
+
+        virtual std::string const& get_registered_name() const
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "future_data_base::get_registered_name",
+                "this future does not support name registration");
+        }
+        virtual void register_as(std::string const& name, bool manage_lifetime)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "future_data_base::set_registered_name",
+                "this future does not support name registration");
+        }
 
         enum state
         {
@@ -337,27 +352,27 @@ namespace detail
     };
 
     template <typename Result>
-    struct future_data : future_data<traits::detail::future_data_void>
+    struct future_data_base
+      : future_data_base<traits::detail::future_data_void>
     {
-        HPX_NON_COPYABLE(future_data);
+        HPX_NON_COPYABLE(future_data_base);
 
         typedef typename future_data_result<Result>::type result_type;
         typedef util::unique_function_nonser<void()> completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
-        typedef typename future_data<
+        typedef typename future_data_base<
                 traits::detail::future_data_void
             >::init_no_addref init_no_addref;
 
-        future_data()
-        {}
+        future_data_base() = default;
 
-        future_data(init_no_addref no_addref)
-          : future_data<traits::detail::future_data_void>(no_addref)
+        future_data_base(init_no_addref no_addref)
+          : future_data_base<traits::detail::future_data_void>(no_addref)
         {}
 
         template <typename Target>
-        future_data(Target && data, init_no_addref no_addref)
-          : future_data<traits::detail::future_data_void>(no_addref)
+        future_data_base(Target && data, init_no_addref no_addref)
+          : future_data_base<traits::detail::future_data_void>(no_addref)
         {
             result_type* value_ptr =
                 reinterpret_cast<result_type*>(&storage_);
@@ -366,16 +381,16 @@ namespace detail
             state_ = value;
         }
 
-        future_data(std::exception_ptr const& e, init_no_addref no_addref)
-          : future_data<traits::detail::future_data_void>(no_addref)
+        future_data_base(std::exception_ptr const& e, init_no_addref no_addref)
+          : future_data_base<traits::detail::future_data_void>(no_addref)
         {
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             ::new ((void*)exception_ptr) std::exception_ptr(e);
             state_ = exception;
         }
-        future_data(std::exception_ptr && e, init_no_addref no_addref)
-          : future_data<traits::detail::future_data_void>(no_addref)
+        future_data_base(std::exception_ptr && e, init_no_addref no_addref)
+          : future_data_base<traits::detail::future_data_void>(no_addref)
         {
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
@@ -383,7 +398,7 @@ namespace detail
             state_ = exception;
         }
 
-        virtual ~future_data() noexcept
+        virtual ~future_data_base() noexcept
         {
             reset();
         }
@@ -398,7 +413,7 @@ namespace detail
         virtual void cancel()
         {
             HPX_THROW_EXCEPTION(future_does_not_support_cancellation,
-                "future_data::cancel",
+                "future_data_base::cancel",
                 "this future does not support cancellation");
         }
 
@@ -434,7 +449,7 @@ namespace detail
             if (state_ == empty) {
                 // the value has already been moved out of this future
                 HPX_THROWS_IF(ec, no_state,
-                    "future_data::get_result",
+                    "future_data_base::get_result",
                     "this future has no valid shared state");
                 return nullptr;
             }
@@ -476,7 +491,7 @@ namespace detail
             if (state_ == empty) {
                 // the value has already been moved out of this future
                 HPX_THROWS_IF(ec, no_state,
-                    "future_data::get_result",
+                    "future_data_base::get_result",
                     "this future has no valid shared state");
                 return nullptr;
             }
@@ -547,12 +562,13 @@ namespace detail
             else
             {
                 // re-spawn continuation on a new thread
-                boost::intrusive_ptr<future_data> this_(this);
+                boost::intrusive_ptr<future_data_base> this_(this);
 
                 error_code ec(lightweight);
                 std::exception_ptr ptr;
                 if (!run_on_completed_on_new_thread(
-                        util::deferred_call(&future_data::run_on_completed,
+                        util::deferred_call(
+                            &future_data_base::run_on_completed,
                             std::move(this_), std::move(on_completed),
                             std::ref(ptr)),
                         ec))
@@ -580,7 +596,7 @@ namespace detail
             if (is_ready_locked(l)) {
                 l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
-                    "future_data::set_value",
+                    "future_data_base::set_value",
                     "data has already been set for this future");
                 return;
             }
@@ -625,7 +641,7 @@ namespace detail
             if (is_ready_locked(l)) {
                 l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
-                    "future_data::set_exception",
+                    "future_data_base::set_exception",
                     "data has already been set for this future");
                 return;
             }
@@ -761,7 +777,7 @@ namespace detail
 
             // block if this entry is empty
             if (state_ == empty) {
-                cond_.wait(l, "future_data::wait", ec);
+                cond_.wait(l, "future_data_base::wait", ec);
                 if (ec) return;
             }
 
@@ -779,7 +795,7 @@ namespace detail
             if (state_ == empty) {
                 threads::thread_state_ex_enum const reason =
                     cond_.wait_until(l, abs_time,
-                        "future_data::wait_until", ec);
+                        "future_data_base::wait_until", ec);
                 if (ec) return future_status::uninitialized;
 
                 if (reason == threads::wait_timeout)
@@ -807,6 +823,41 @@ namespace detail
         local::detail::condition_variable cond_;    // threads waiting in read
         typename future_data_storage<Result>::type storage_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Customization point to have the ability for creating distinct shared
+    // states depending on the value type held.
+    template <typename Result>
+    struct future_data : future_data_base<Result>
+    {
+        HPX_NON_COPYABLE(future_data);
+
+        typedef typename future_data_base<Result>::init_no_addref init_no_addref;
+
+        future_data() = default;
+
+        future_data(init_no_addref no_addref)
+          : future_data_base<Result>(no_addref)
+        {}
+
+        template <typename Target>
+        future_data(Target && data, init_no_addref no_addref)
+          : future_data_base<Result>(std::move(data), no_addref)
+        {}
+
+        future_data(std::exception_ptr const& e, init_no_addref no_addref)
+          : future_data_base<Result>(e, no_addref)
+        {}
+        future_data(std::exception_ptr && e, init_no_addref no_addref)
+          : future_data_base<Result>(std::move(e), no_addref)
+        {}
+
+        ~future_data() noexcept override = default;
+    };
+
+    // Specialization for shared state of id_type, additionally (optionally)
+    // holds a registered name for the object it refers to.
+    template <> struct future_data<id_type>;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename Allocator>
