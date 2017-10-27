@@ -32,6 +32,8 @@ int hpx_main(int argc, char* argv[])
     // Check number of used resources
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
     {
+        HPX_TEST_EQ(std::size_t(num_threads - thread_num),
+                    hpx::threads::count(tp.get_used_processing_units()));
         tp.remove_processing_unit(thread_num);
         HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
             hpx::threads::count(tp.get_used_processing_units()));
@@ -39,8 +41,10 @@ int hpx_main(int argc, char* argv[])
 
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
     {
-        tp.add_processing_unit(thread_num, thread_num + tp.get_thread_offset());
         HPX_TEST_EQ(std::size_t(thread_num + 1),
+                    hpx::threads::count(tp.get_used_processing_units()));
+        tp.add_processing_unit(thread_num, thread_num + tp.get_thread_offset());
+        HPX_TEST_EQ(std::size_t(thread_num + 2),
             hpx::threads::count(tp.get_used_processing_units()));
     }
 
@@ -52,7 +56,7 @@ int hpx_main(int argc, char* argv[])
             hpx::get_worker_thread_num());
     };
 
-    for (std::size_t num_thread = 0;
+    for (num_thread = 0;
         num_thread < num_threads;
         ++num_thread)
     {
@@ -98,7 +102,6 @@ int hpx_main(int argc, char* argv[])
             if (thread_num != hpx::resource::get_num_threads("default") - 1)
             {
                 tp.remove_processing_unit(thread_num);
-                std::cout << "Removing pu " << thread_num << "\n";
             }
 
             ++thread_num;
@@ -113,7 +116,6 @@ int hpx_main(int argc, char* argv[])
         {
             tp.add_processing_unit(
                 thread_num - 1, thread_num + tp.get_thread_offset() - 1);
-            std::cout << "Adding pu " << thread_num - 1 << "\n";
 
             --thread_num;
 
