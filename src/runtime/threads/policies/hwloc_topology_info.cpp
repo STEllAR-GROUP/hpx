@@ -428,7 +428,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        hwloc_membind_policy_t policy = HWLOC_MEMBIND_DEFAULT;
+        hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_DEFAULT;
         hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
 
         {
@@ -1151,7 +1151,7 @@ namespace hpx { namespace threads
     bool hwloc_topology_info::set_area_membind_nodeset(
         const void *addr, std::size_t len, void *nodeset) const
     {
-        hwloc_membind_policy_t policy = HWLOC_MEMBIND_BIND;
+        hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
         int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
         if (ret<0) {

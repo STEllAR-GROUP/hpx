@@ -71,13 +71,13 @@ namespace hpx { namespace threads
     /// \brief Please see hwloc documentation for the corresponding
     /// enums HWLOC_MEMBIND_XXX
     enum hpx_hwloc_membind_policy : int {
-        HPX_MEMBIND_DEFAULT = 0,
-        HPX_MEMBIND_FIRSTTOUCH = 1,
-        HPX_MEMBIND_BIND = 2,
-        HPX_MEMBIND_INTERLEAVE = 3,
-        HPX_MEMBIND_REPLICATE = 4,
-        HPX_MEMBIND_NEXTTOUCH = 5,
-        HPX_MEMBIND_MIXED = -1
+        membind_default    = HWLOC_MEMBIND_DEFAULT,
+        membind_firsttouch = HWLOC_MEMBIND_FIRSTTOUCH,
+        membind_bind       = HWLOC_MEMBIND_BIND,
+        membind_interleave = HWLOC_MEMBIND_INTERLEAVE,
+        membind_replicate  = HWLOC_MEMBIND_REPLICATE,
+        membind_nexttouch  = HWLOC_MEMBIND_NEXTTOUCH,
+        membind_mixed      = HWLOC_MEMBIND_MIXED
     };
 
     struct HPX_EXPORT hwloc_topology_info : topology
