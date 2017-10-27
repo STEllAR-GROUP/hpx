@@ -44,15 +44,15 @@ using namespace hpx::threads::policies;
 void do_stuff(std::size_t n, bool printout)
 {
     if (printout)
-        hpx::cout << "[do stuff] " << n << "\n";
+        std::cout << "[do stuff] " << n << "\n";
     for (std::size_t i(0); i < n; ++i)
     {
         double f = std::sin(2 * M_PI * i / n);
         if (printout)
-            hpx::cout << "sin(" << i << ") = " << f << ", ";
+            std::cout << "sin(" << i << ") = " << f << ", ";
     }
     if (printout)
-        hpx::cout << "\n";
+        std::cout << "\n";
 }
 
 // ------------------------------------------------------------------------
@@ -69,7 +69,7 @@ int hpx_main(boost::program_options::variables_map& vm)
               << "use_scheduler " << use_scheduler << "\n";
 
     std::size_t num_threads = hpx::get_num_worker_threads();
-    hpx::cout << "HPX using threads = " << num_threads << std::endl;
+    std::cout << "HPX using threads = " << num_threads << std::endl;
 
     std::size_t loop_count = num_threads * 1;
     std::size_t async_count = num_threads * 1;
@@ -86,7 +86,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // get executors
         hpx::threads::executors::pool_executor mpi_exec("mpi");
         mpi_executor = mpi_exec;
-        hpx::cout << "\n[hpx_main] got mpi executor " << std::endl;
+        std::cout << "\n[hpx_main] got mpi executor " << std::endl;
     }
     else
     {
@@ -149,12 +149,12 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " high priority i " << std::dec << i << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
@@ -165,13 +165,13 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " normal priority i " << std::dec << i
                           << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
@@ -182,12 +182,12 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " mpi pool i " << std::dec << i << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
@@ -206,13 +206,13 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " high priority mpi i " << std::dec << i
                           << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
