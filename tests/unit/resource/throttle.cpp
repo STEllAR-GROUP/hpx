@@ -17,7 +17,7 @@
 
 int hpx_main(int argc, char* argv[])
 {
-    auto const num_threads = hpx::resource::get_num_threads("default");
+    std::size_t const num_threads = hpx::resource::get_num_threads("default");
 
     HPX_ASSERT(num_threads >= 2);
 
@@ -81,7 +81,7 @@ int hpx_main(int argc, char* argv[])
     }
 
     // Check random scheduling with reducing resources.
-    auto thread_num = 0;
+    std::size_t thread_num = 0;
     bool up = true;
     std::vector<hpx::future<void>> fs;
     hpx::util::high_resolution_timer t;
