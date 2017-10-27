@@ -666,7 +666,7 @@ namespace hpx { namespace threads { namespace detail
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-                    // clean up terminated threads one more time before existing
+                    // clean up terminated threads one more time before exiting
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
                         // if this is an inner scheduler, exit immediately

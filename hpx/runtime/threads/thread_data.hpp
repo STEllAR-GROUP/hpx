@@ -77,7 +77,7 @@ namespace hpx { namespace threads
     ///  - A block of registers (not implemented yet)
     ///
     /// Generally, \a threads are not created or executed directly. All
-    /// functionality related to the management of \a thread's is
+    /// functionality related to the management of \a threads is
     /// implemented by the thread-manager.
     class thread_data
     {
