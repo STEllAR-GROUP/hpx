@@ -1063,6 +1063,12 @@ namespace hpx { namespace threads { namespace policies
 
                 cleanup_terminated_locked();
             }
+            bool canexit = cleanup_terminated_locked(true);
+            if (!running && canexit)
+            {
+                // we don't have any registered work items anymore
+                return true; // terminate scheduling loop
+            }
             return false;
         }
 

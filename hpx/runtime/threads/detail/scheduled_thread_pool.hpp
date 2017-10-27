@@ -93,7 +93,7 @@ namespace hpx { namespace threads { namespace detail
 
         bool cleanup_terminated(bool delete_all)
         {
-            return sched_->Scheduler::cleanup_terminated(delete_all);
+            return sched_->Scheduler::cleanup_terminated(std::size_t(-1), delete_all);
         }
 
         std::int64_t get_thread_count(thread_state_enum state,

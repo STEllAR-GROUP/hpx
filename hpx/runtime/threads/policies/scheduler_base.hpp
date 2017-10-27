@@ -311,7 +311,7 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void abort_all_suspended_threads() = 0;
 
-        virtual bool cleanup_terminated(bool delete_all = false) = 0;
+        virtual bool cleanup_terminated(std::size_t num_thread, bool delete_all) = 0;
 
         virtual void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,

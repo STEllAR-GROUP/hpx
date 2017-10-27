@@ -565,7 +565,8 @@ namespace threads {
             }
 
             ///////////////////////////////////////////////////////////////////////
-            bool cleanup_terminated(bool delete_all = false)
+            bool cleanup_terminated(std_size_t num_threads = std::size_t(-1),
+                bool delete_all = false)
             {
                 bool empty = true;
                 for (std::size_t i = 0; i != queues_.size(); ++i)

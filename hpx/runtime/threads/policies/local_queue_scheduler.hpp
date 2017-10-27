@@ -278,11 +278,18 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(bool delete_all = false)
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
         {
             bool empty = true;
-            for (std::size_t i = 0; i != queues_.size(); ++i)
-                empty = queues_[i]->cleanup_terminated(delete_all) && empty;
+            if (num_thread == std::size_t(-1))
+            {
+                for (std::size_t i = 0; i != queues_.size(); ++i)
+                    empty = queues_[i]->cleanup_terminated(delete_all) && empty;
+            }
+            else
+            {
+                empty = queues_[num_thread]->cleanup_terminated(delete_all);
+            }
             return empty;
         }
 
