@@ -91,11 +91,6 @@ const std::vector<std::string> user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"
 };
 
-std::ostream& operator<<(std::ostream& os, user_defined_type& t)
-{
-    return os << "(" << t.name << ", " << t.val << ")";
-}
-
 struct random_fill
 {
     random_fill() = default;
