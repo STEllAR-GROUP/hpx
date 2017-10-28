@@ -18,6 +18,7 @@
 #include <random>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -486,7 +487,7 @@ void test_inplace_merge_stable(ExPolicy policy, IteratorTag,
 
     bool stable = true;
     int check_count = 0;
-    for (auto i = 1; i < left_size + right_size; ++i)
+    for (std::size_t i = 1u; i < left_size + right_size; ++i)
     {
         if (res[i - 1].first == res[i].first)
         {

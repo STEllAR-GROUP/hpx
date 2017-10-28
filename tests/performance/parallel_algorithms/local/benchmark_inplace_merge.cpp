@@ -183,13 +183,13 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t vector_right_size = vector_size - vector_left_size;
 
     std::cout << "-------------- Benchmark Config --------------" << std::endl;
-    std::cout << "seed         : " << seed << std::endl;
-    std::cout << "vector_left_size : " << vector_left_size << std::endl;
+    std::cout << "seed              : " << seed << std::endl;
+    std::cout << "vector_left_size  : " << vector_left_size << std::endl;
     std::cout << "vector_right_size : " << vector_right_size << std::endl;
-    std::cout << "random_range : " << random_range << std::endl;
-    std::cout << "iterator_tag : " << iterator_tag_str << std::endl;
-    std::cout << "test_count   : " << test_count << std::endl;
-    std::cout << "os threads   : " << os_threads << std::endl;
+    std::cout << "random_range      : " << random_range << std::endl;
+    std::cout << "iterator_tag      : " << iterator_tag_str << std::endl;
+    std::cout << "test_count        : " << test_count << std::endl;
+    std::cout << "os threads        : " << os_threads << std::endl;
     std::cout << "----------------------------------------------\n" << std::endl;
 
     if (iterator_tag_str == "random")
