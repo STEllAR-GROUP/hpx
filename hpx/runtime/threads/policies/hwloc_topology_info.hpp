@@ -19,6 +19,7 @@
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/resource/partitioner_fwd.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
@@ -41,6 +42,44 @@ namespace hpx { namespace resource
 
 namespace hpx { namespace threads
 {
+    struct hpx_hwloc_bitmap_wrapper
+    {
+        HPX_NON_COPYABLE(hpx_hwloc_bitmap_wrapper);
+
+        // take ownership of the hwloc allocated bitmap
+        hpx_hwloc_bitmap_wrapper(void *bmp) {
+            bmp_ = reinterpret_cast<hwloc_bitmap_t >(bmp);
+        }
+        // frees the hwloc allocated bitmap
+        ~hpx_hwloc_bitmap_wrapper() {
+            hwloc_bitmap_free(bmp_);
+        }
+
+        hwloc_bitmap_t get_bmp() const {
+            return bmp_;
+        }
+
+        // stringify the bitmp using hwloc
+        friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
+            hpx_hwloc_bitmap_wrapper const* bmp);
+
+    private:
+        // the raw bitmap object
+        hwloc_bitmap_t bmp_;
+    };
+
+    /// \brief Please see hwloc documentation for the corresponding
+    /// enums HWLOC_MEMBIND_XXX
+    enum hpx_hwloc_membind_policy : int {
+        membind_default    = HWLOC_MEMBIND_DEFAULT,
+        membind_firsttouch = HWLOC_MEMBIND_FIRSTTOUCH,
+        membind_bind       = HWLOC_MEMBIND_BIND,
+        membind_interleave = HWLOC_MEMBIND_INTERLEAVE,
+        membind_replicate  = HWLOC_MEMBIND_REPLICATE,
+        membind_nexttouch  = HWLOC_MEMBIND_NEXTTOUCH,
+        membind_mixed      = HWLOC_MEMBIND_MIXED
+    };
+
     struct HPX_EXPORT hwloc_topology_info : topology
     {
         friend resource::resource_partitioner;
@@ -163,8 +202,11 @@ namespace hpx { namespace threads
             std::size_t numa_node
             ) const;
 
+        /// convert a cpu mask into a numa node mask in hwloc bitmap form
+        hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type cpuset) const;
+
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-            mask_type const& m, std::string pool_name) const;
+            mask_cref_type m, const std::string &pool_name) const;
 
         struct hwloc_topology_tag {};
 
@@ -174,14 +216,29 @@ namespace hpx { namespace threads
         /// page-aligned memory from the OS.
         void* allocate(std::size_t len) const;
 
+        void* allocate_membind(std::size_t len,
+            hwloc_bitmap_ptr bitmap,
+            hpx_hwloc_membind_policy policy, int flags) const;
+
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const;
+
+        threads::mask_type get_area_membind_nodeset(
+            const void *addr, std::size_t len, void *nodeset) const;
+
+        bool set_area_membind_nodeset(
+            const void *addr, std::size_t len, void *nodeset) const;
+
+        int get_numa_domain(const void *addr, void *nodeset) const;
 
         void print_vector(
             std::ostream& os, std::vector<std::size_t> const& v) const;
         void print_mask_vector(
             std::ostream& os, std::vector<mask_type> const& v) const;
         void print_hwloc(std::ostream&) const;
+
+        hwloc_bitmap_t mask_to_bitmap(mask_cref_type mask, hwloc_obj_type_t htype) const;
+        mask_type bitmap_to_mask(hwloc_bitmap_t bitmap, hwloc_obj_type_t htype) const;
 
     private:
         static mask_type empty_mask;

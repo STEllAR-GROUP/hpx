@@ -29,6 +29,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <hwloc.h>
 
@@ -89,6 +90,15 @@ namespace hpx { namespace threads
 
             return static_cast<std::size_t>(obj->logical_index);
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::ostream& operator<<(std::ostream& os, hpx_hwloc_bitmap_wrapper const* bmp)
+    {
+        char buffer[256];
+        hwloc_bitmap_snprintf(buffer, 256, bmp->bmp_);
+        os << buffer;
+        return os;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -418,7 +428,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        hwloc_membind_policy_t policy = HWLOC_MEMBIND_DEFAULT;
+        hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_DEFAULT;
         hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
 
         {
@@ -737,6 +747,15 @@ namespace hpx { namespace threads
         return get_number_of_cores();
     }
 
+    hwloc_bitmap_ptr hwloc_topology_info::cpuset_to_nodeset(
+        mask_cref_type mask) const
+    {
+        hwloc_bitmap_t cpuset  = mask_to_bitmap(mask, HWLOC_OBJ_PU);
+        hwloc_bitmap_t nodeset = hwloc_bitmap_alloc();
+        hwloc_cpuset_to_nodeset_strict(topo, cpuset, nodeset);
+        return std::make_shared<hpx::threads::hpx_hwloc_bitmap_wrapper>(nodeset);
+    }
+
     namespace detail
     {
         void print_info(std::ostream& os, hwloc_obj_t obj, char const* name,
@@ -778,7 +797,7 @@ namespace hpx { namespace threads
     }
 
     void hwloc_topology_info::print_affinity_mask(std::ostream& os,
-        std::size_t num_thread, mask_type const& m, std::string pool_name) const
+        std::size_t num_thread, mask_cref_type m, const std::string &pool_name) const
     {
         boost::io::ios_flags_saver ifs(os);
         bool first = true;
@@ -1109,6 +1128,8 @@ namespace hpx { namespace threads
         return mask;
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
     /// This is equivalent to malloc(), except that it tries to allocate
     /// page-aligned memory from the OS.
     void* hwloc_topology_info::allocate(std::size_t len) const
@@ -1116,10 +1137,101 @@ namespace hpx { namespace threads
         return hwloc_alloc(topo, len);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Allocate some memory on NUMA memory nodes specified by nodeset
+    /// as specified by the hwloc hwloc_alloc_membind_nodeset call
+    void* hwloc_topology_info::allocate_membind(std::size_t len,
+        hwloc_bitmap_ptr bitmap,
+        hpx_hwloc_membind_policy policy, int flags) const
+    {
+        return hwloc_alloc_membind_nodeset(topo, len, bitmap->get_bmp(),
+            (hwloc_membind_policy_t)(policy), flags);
+    }
+
+    bool hwloc_topology_info::set_area_membind_nodeset(
+        const void *addr, std::size_t len, void *nodeset) const
+    {
+        hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
+        if (ret<0) {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::hwloc_topology_info::set_area_membind_nodeset"
+              , "hwloc_set_area_membind_nodeset failed");
+            return false;
+        }
+        return true;
+    }
+
+    threads::mask_type hwloc_topology_info::get_area_membind_nodeset(
+        const void *addr, std::size_t len, void *nodeset) const
+    {
+        hwloc_membind_policy_t policy;
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        hwloc_get_area_membind_nodeset(topo, addr, len, ns, &policy, 0);
+        return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
+    }
+
+    int hwloc_topology_info::get_numa_domain(const void *addr, void *nodeset) const
+    {
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        int ret = hwloc_get_area_memlocation(topo, addr, 1,  ns,
+            HWLOC_MEMBIND_BYNODESET);
+        if (ret<0) {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::hwloc_topology_info::set_area_membind_nodeset"
+              , "hwloc_set_area_membind_nodeset failed");
+            return -1;
+        }
+        threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
+        return threads::find_first(mask);
+    }
+
     /// Free memory that was previously allocated by allocate
     void hwloc_topology_info::deallocate(void* addr, std::size_t len) const
     {
         hwloc_free(topo, addr, len);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    hwloc_bitmap_t hwloc_topology_info::mask_to_bitmap(mask_cref_type mask,
+        hwloc_obj_type_t htype) const
+    {
+        hwloc_bitmap_t bitmap = hwloc_bitmap_alloc();
+        hwloc_bitmap_zero(bitmap);
+        //
+        int const depth =
+            hwloc_get_type_or_below_depth(topo, htype);
+
+        for (std::size_t i = 0; i != mask_size(mask); ++i) {
+            if (test(mask, i)) {
+                hwloc_obj_t const hw_obj =
+                    hwloc_get_obj_by_depth(topo, depth, unsigned(i));
+                HPX_ASSERT(i == detail::get_index(hw_obj));
+                hwloc_bitmap_set(bitmap,
+                    static_cast<unsigned int>(hw_obj->os_index));
+            }
+        }
+        return bitmap;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    mask_type hwloc_topology_info::bitmap_to_mask(hwloc_bitmap_t bitmap,
+        hwloc_obj_type_t htype) const
+    {
+        mask_type mask = mask_type();
+        std::size_t num = hwloc_get_nbobjs_by_type(topo, htype);
+        //
+        int const pu_depth = hwloc_get_type_or_below_depth(topo, htype);
+        for (unsigned int i=0; std::size_t(i)!=num; ++i) //-V104
+        {
+            hwloc_obj_t const pu_obj =
+                hwloc_get_obj_by_depth(topo, pu_depth, i);
+            unsigned idx = static_cast<unsigned>(pu_obj->os_index);
+            if (hwloc_bitmap_isset(bitmap, idx) != 0)
+                set(mask, detail::get_index(pu_obj));
+        }
+        return mask;
     }
 
     ///////////////////////////////////////////////////////////////////////////
