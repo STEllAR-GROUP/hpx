@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Jeff Trull
+//  Copyright (c) 2017 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,9 +10,94 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
+#include <random>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
+
+///////////////////////////////////////////////////////////////////////////////
+struct random_fill
+{
+    random_fill() = default;
+    random_fill(int rand_base, int range)
+      : gen(std::rand()),
+        dist(rand_base - range / 2, rand_base + range / 2)
+    {}
+
+    int operator()()
+    {
+        return dist(gen);
+    }
+
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename DataType>
+void test_merge_stable(ExPolicy policy, DataType, int rand_base)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    typedef typename std::pair<DataType, int> ElemType;
+
+    using hpx::util::get;
+
+    std::size_t const size1 = 1000007, size2 = 960202;
+    std::vector<ElemType> src1(size1), src2(size2), dest(size1 + size2);
+
+    int no = 0;
+    auto rf = random_fill(rand_base, 6);
+    std::generate(std::begin(src1), std::end(src1),
+        [&no, &rf]() -> std::pair<int, int> {
+            return { rf(), no++ };
+        });
+    rf = random_fill(rand_base, 8);
+    std::generate(std::begin(src2), std::end(src2),
+        [&no, &rf]() -> std::pair<int, int> {
+            return { rf(), no++ };
+        });
+    std::sort(std::begin(src1), std::end(src1));
+    std::sort(std::begin(src2), std::end(src2));
+
+    hpx::parallel::merge(policy,
+        std::begin(src1), std::end(src1),
+        std::begin(src2), std::end(src2),
+        std::begin(dest),
+        [](DataType const& a, DataType const& b) -> bool {
+            return a < b;
+        },
+        [](ElemType const& elem) -> DataType const& {
+            // This is projection.
+            return elem.first;
+        },
+        [](ElemType const& elem) -> DataType const& {
+            // This is projection.
+            return elem.first;
+        });
+
+    bool stable = true;
+    int check_count = 0;
+    for (auto i = 1u; i < size1 + size2; ++i)
+    {
+        if (dest[i - 1].first == dest[i].first)
+        {
+            ++check_count;
+            if (dest[i - 1].second > dest[i].second)
+                stable = false;
+        }
+    }
+
+    bool test_is_meaningful = check_count >= 100;
+
+    HPX_TEST(test_is_meaningful);
+    HPX_TEST(stable);
+}
 
 int main(int argc, char* argv[])
 {
@@ -90,12 +176,21 @@ int hpx_main(int argc, char **argv)
         {
             return std::get<0>(a) < std::get<0>(b);
         });
-    
+
     equality = std::equal(
         result.begin(), result.end(),
         solution.begin(), solution.end());
 
     HPX_TEST(equality);
+
+    // Do moduler operation for avoiding overflow in ramdom_fill. (#2954)
+    int rand_base = std::rand() % 10000;
+
+    using namespace hpx::parallel;
+
+    test_merge_stable(execution::seq, int(), rand_base);
+    test_merge_stable(execution::par, int(), rand_base);
+    test_merge_stable(execution::par_unseq, int(), rand_base);
 
     return hpx::finalize();
 }
