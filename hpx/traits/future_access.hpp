@@ -22,7 +22,7 @@ namespace hpx { namespace lcos
 
     namespace detail
     {
-        template <typename Result> struct future_data;
+        template <typename Result> struct future_data_base;
     }
 }}
 
@@ -55,7 +55,8 @@ namespace hpx { namespace traits
         struct shared_state_ptr
         {
             typedef typename shared_state_ptr_result<R>::type result_type;
-            typedef boost::intrusive_ptr<lcos::detail::future_data<result_type> >
+            typedef boost::intrusive_ptr<
+                lcos::detail::future_data_base<result_type>>
                 type;
         };
 
@@ -82,7 +83,6 @@ namespace hpx { namespace traits
         template <typename Future>
         struct shared_state_ptr_for<std::vector<Future> >
         {
-//             typedef typename traits::future_traits<Future>::type data_type;
             typedef std::vector<
                     typename shared_state_ptr_for<Future>::type
                 > type;
@@ -100,7 +100,8 @@ namespace hpx { namespace traits
     {};
 
     template <typename R>
-    struct is_shared_state<boost::intrusive_ptr<lcos::detail::future_data<R> > >
+    struct is_shared_state<
+            boost::intrusive_ptr<lcos::detail::future_data_base<R> > >
       : std::true_type
     {};
 
