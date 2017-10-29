@@ -174,7 +174,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                 sigaltstack(&segv_stack, nullptr);
                 sigfillset(&action.sa_mask);
-                sigaction(SIGSEGV, &action, nullptr);
+                sigaction(SIGSEGV, &action, m_stack);
             }
 #else
             {}
@@ -244,26 +244,38 @@ namespace hpx { namespace threads { namespace coroutines
             }
 
 #if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+
+// heuristic value 1 kilobyte
+//
+#define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000
+
             static void sigsegv_handler(int signum, siginfo_t *info,
-                void *data)
+                void *m_stack_ptr_)
             {
                 void *addr = info->si_addr;
+                std::ptrdiff_t addr_delta = (addr > m_stack_ptr_) ? addr - m_stack_ptr_ : m_stack_ptr_ - addr;
 
-                std::cerr << "Stack overflow in coroutine at address "
-                    << std::internal << std::hex
-                    << std::setw(sizeof(addr)*2+2)
-                    << std::setfill('0') << static_cast<int*>(addr)
-                    << ".\n\n";
+                // check the stack addresses, if they're < 10 apart, terminate program 
+                // should filter segmentation faults caused by coroutine stack overflows
+                // from 'genuine' stack overflows
+                //
+                if(addr_delta < static_cast<std::ptrdiff_t>(COROUTINE_STACKOVERFLOW_ADDR_EPSILON)) {
+                    std::cerr << "Stack overflow in coroutine at address "
+                        << std::internal << std::hex
+                        << std::setw(sizeof(addr)*2+2)
+                        << std::setfill('0') << static_cast<int*>(addr)
+                        << ".\n\n";
 
-                std::cerr
-                    << "Configure the hpx runtime to allocate a larger coroutine "
-                       "stack size.\n Use the hpx.stacks.small_size, "
-                       "hpx.stacks.medium_size,\n hpx.stacks.large_size, "
-                       "or hpx.stacks.huge_size configuration\nflags to configure "
-                       "coroutine stack sizes.\n"
-                    << std::endl;
+                    std::cerr
+                        << "Configure the hpx runtime to allocate a larger coroutine "
+                           "stack size.\n Use the hpx.stacks.small_size, "
+                           "hpx.stacks.medium_size,\n hpx.stacks.large_size, "
+                           "or hpx.stacks.huge_size configuration\nflags to configure "
+                           "coroutine stack sizes.\n"
+                        << std::endl;
 
-                std::terminate();
+                    std::terminate();
+                }
             }
 #endif
             ~x86_linux_context_impl()
