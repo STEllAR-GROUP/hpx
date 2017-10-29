@@ -31,8 +31,8 @@
 #include <exception>
 #include <functional>
 #include <mutex>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -720,9 +720,9 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Executor, typename Future, typename F, typename ... Ts>
     inline typename hpx::traits::future_then_executor_result<
-        Executor, Future, F, Ts...
+        Executor, typename std::decay<Future>::type, F, Ts...
     >::type
-    then_execute_helper(Executor const& exec, F && f, Future const& predecessor,
+    then_execute_helper(Executor const& exec, F && f, Future && predecessor,
         Ts &&... ts)
     {
         // simply forward this to executor
