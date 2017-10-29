@@ -130,9 +130,9 @@ namespace hpx { namespace traits
 
         template <typename R>
         HPX_FORCEINLINE
-        boost::intrusive_ptr<lcos::detail::future_data<R> > const&
+        boost::intrusive_ptr<lcos::detail::future_data_base<R> > const&
         get_shared_state(
-            boost::intrusive_ptr<lcos::detail::future_data<R> > const& t)
+            boost::intrusive_ptr<lcos::detail::future_data_base<R> > const& t)
         {
             return t;
         }

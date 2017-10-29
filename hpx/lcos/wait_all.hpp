@@ -143,7 +143,7 @@ namespace hpx { namespace lcos
 
         template <typename R>
         struct is_future_or_shared_state<
-                boost::intrusive_ptr<future_data<R> > >
+                boost::intrusive_ptr<future_data_base<R> > >
           : std::true_type
         {};
 
@@ -185,7 +185,7 @@ namespace hpx { namespace lcos
 
         template <typename R>
         struct future_or_shared_state_result<
-            boost::intrusive_ptr<future_data<R> > >
+            boost::intrusive_ptr<future_data_base<R> > >
         {
             typedef R type;
         };

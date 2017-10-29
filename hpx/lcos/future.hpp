@@ -451,7 +451,7 @@ namespace hpx { namespace lcos { namespace detail
     {
     public:
         typedef R result_type;
-        typedef future_data<
+        typedef future_data_base<
                 typename traits::detail::shared_state_ptr_result<R>::type
             > shared_state_type;
 
