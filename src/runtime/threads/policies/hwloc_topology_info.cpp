@@ -33,6 +33,10 @@
 
 #include <hwloc.h>
 
+#if HWLOC_API_VERSION < 0x00010b00
+# define HWLOC_OBJ_NUMANODE HWLOC_OBJ_NODE
+#endif
+
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -1174,7 +1178,7 @@ namespace hpx { namespace threads
 
     int hwloc_topology_info::get_numa_domain(const void *addr, void *nodeset) const
     {
-#if HWLOC_API_VERSION >= 0x00010b00
+#if HWLOC_API_VERSION >= 0x00010b03
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
         int ret = hwloc_get_area_memlocation(topo, addr, 1,  ns,
             HWLOC_MEMBIND_BYNODESET);
