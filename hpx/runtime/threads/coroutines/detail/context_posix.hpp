@@ -269,7 +269,7 @@ namespace hpx { namespace threads { namespace coroutines
 
 // heuristic value 1 kilobyte
 //
-#define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000
+#define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
 
             static void sigsegv_handler(int signum, siginfo_t *info,
                 void *m_stack_ptr_)
@@ -281,7 +281,7 @@ namespace hpx { namespace threads { namespace coroutines
                 // should filter segmentation faults caused by coroutine stack overflows
                 // from 'genuine' stack overflows
                 //
-                if(addr_delta < static_cast<std::ptrdiff_t>(COROUTINE_STACKOVERFLOW_ADDR_EPSILON)) {
+                if(static_cast<size_t>(addr_delta) < COROUTINE_STACKOVERFLOW_ADDR_EPSILON) {
                     std::cerr << "Stack overflow in coroutine at address "
                         << std::internal << std::hex
                         << std::setw(sizeof(addr)*2+2)
