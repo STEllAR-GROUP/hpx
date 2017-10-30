@@ -1174,6 +1174,7 @@ namespace hpx { namespace threads
 
     int hwloc_topology_info::get_numa_domain(const void *addr, void *nodeset) const
     {
+#if HWLOC_API_VERSION >= 0x00010b00
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
         int ret = hwloc_get_area_memlocation(topo, addr, 1,  ns,
             HWLOC_MEMBIND_BYNODESET);
@@ -1185,6 +1186,9 @@ namespace hpx { namespace threads
         }
         threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
         return threads::find_first(mask);
+#else
+        return 0;
+#endif
     }
 
     /// Free memory that was previously allocated by allocate
