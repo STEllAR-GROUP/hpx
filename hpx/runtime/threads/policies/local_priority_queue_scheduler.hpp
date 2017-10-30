@@ -445,8 +445,8 @@ namespace hpx { namespace threads { namespace policies
             else
             {
                 empty = queues_[num_thread]->cleanup_terminated(delete_all);
-                if (delete_all)
-                    return true;
+                if (!delete_all)
+                    return empty;
 
                 if (num_thread < high_priority_queues_.size())
                     empty = high_priority_queues_[num_thread]->
