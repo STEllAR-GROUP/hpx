@@ -319,17 +319,21 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
 
             // Select a OS thread which hasn't been disabled
+            HPX_ASSERT(threads::any(parent_pool_->get_used_processing_units()));
+
             auto const& rp = resource::get_partitioner();
             auto mask = rp.get_pu_mask(
                 num_thread + parent_pool_->get_thread_offset());
             if(!threads::any(mask))
                 threads::set(mask, num_thread + parent_pool_->get_thread_offset());
-            while (true)
-            {
-                if (bit_and(mask, parent_pool_->get_used_processing_units()))
-                    break;
 
+            while (!bit_and(mask, parent_pool_->get_used_processing_units()))
+            {
                 num_thread = (num_thread + 1) % queue_size;
+                mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+                if(!threads::any(mask))
+                    threads::set(mask, num_thread + parent_pool_->get_thread_offset());
             }
 
             HPX_ASSERT(num_thread < queue_size);
