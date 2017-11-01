@@ -70,33 +70,36 @@ namespace hpx { namespace traits
         template <typename Future, typename F>
         struct continuation_not_callable
         {
-            void error(Future future, F& f)
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
+            static auto error(Future future, F& f)
             {
-                f(future);
+                f(std::move(future));
             }
+#else
+            static auto error(Future future, F& f)
+             -> decltype(f(std::move(future)));
+#endif
 
-            ~continuation_not_callable()
-            {
-                error(std::declval<Future>(), std::declval<F&>());
-            }
+            using type = decltype(
+                error(std::declval<Future>(), std::declval<F&>()));
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename F, typename Enable = void>
         struct future_then_result
         {
-            typedef continuation_not_callable<Future, F> type;
+            typedef typename continuation_not_callable<Future, F>::type type;
         };
 
         template <typename Future, typename F>
         struct future_then_result<
             Future, F,
             typename hpx::util::always_void<
-                typename hpx::util::invoke_result<F, Future>::type
+                typename hpx::util::invoke_result<F&, Future>::type
             >::type
         >
         {
-            typedef typename hpx::util::invoke_result<F, Future>::type
+            typedef typename hpx::util::invoke_result<F&, Future>::type
                 cont_result;
 
             // perform unwrapping of future<future<R>>
@@ -114,17 +117,17 @@ namespace hpx { namespace traits
             typename Enable = void>
         struct future_then_executor_result
         {
-            typedef continuation_not_callable<Future, F> type;
+            typedef typename continuation_not_callable<Future, F>::type type;
         };
 
         template <typename Executor, typename Future, typename F>
         struct future_then_executor_result<
                 Executor, Future, F,
                 typename hpx::util::always_void<
-                    typename hpx::util::invoke_result<F, Future>::type
+                    typename hpx::util::invoke_result<F&, Future>::type
                 >::type>
         {
-            typedef typename hpx::util::invoke_result<F, Future>::type
+            typedef typename hpx::util::invoke_result<F&, Future>::type
                 func_result_type;
 
             typedef typename traits::executor_future<
