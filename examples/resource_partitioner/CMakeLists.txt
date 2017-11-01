@@ -9,6 +9,7 @@ set(example_programs
   simple_resource_partitioner
   simplest_resource_partitioner_1
   simplest_resource_partitioner_2
+  async_customization
 )
 
 set(guided_pool_test_FLAGS DEPENDENCIES iostreams_component)
