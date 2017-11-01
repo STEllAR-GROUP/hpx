@@ -74,12 +74,11 @@ namespace hpx { namespace components
                 values.push_back(counter.get_value<std::uint64_t>());
 
             return hpx::dataflow(hpx::launch::sync,
-                hpx::util::unwrapping(
-                    [](std::vector<std::uint64_t> && values)
-                     -> std::vector<std::uint64_t>
-                    {
-                        return std::move(values);
-                    }),
+                [](std::vector<hpx::future<std::uint64_t>> && values)
+                 -> std::vector<std::uint64_t>
+                {
+                    return hpx::util::unwrap(values);
+                },
                 std::move(values));
         }
 
