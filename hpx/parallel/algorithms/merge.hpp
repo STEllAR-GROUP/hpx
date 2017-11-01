@@ -52,15 +52,13 @@ namespace hpx { namespace parallel { inline namespace v1
             InIter2 first2, InIter2 last2,
             OutIter dest, Comp && comp, Proj1 && proj1, Proj2 && proj2)
         {
-            using hpx::util::invoke;
-
             if (first1 != last1 && first2 != last2)
             {
                 while (true)
                 {
-                    if (invoke(comp,
-                        invoke(proj2, *first2),
-                        invoke(proj1, *first1)))
+                    if (hpx::util::invoke(comp,
+                        hpx::util::invoke(proj2, *first2),
+                        hpx::util::invoke(proj1, *first1)))
                     {
                         *dest++ = *first2++;
                         if (first2 == last2)
@@ -91,8 +89,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
-                using hpx::util::invoke;
-
                 difference_type count = std::distance(first, last);
 
                 while (count > 0)
@@ -100,7 +96,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     difference_type step = count / 2;
                     RandIter mid = std::next(first, step);
 
-                    if (!invoke(comp, value, invoke(proj, *mid)))
+                    if (!hpx::util::invoke(
+                            comp, value, hpx::util::invoke(proj, *mid)))
                     {
                         first = ++mid;
                         count -= step + 1;
@@ -128,8 +125,6 @@ namespace hpx { namespace parallel { inline namespace v1
                 typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
-                using hpx::util::invoke;
-
                 difference_type count = std::distance(first, last);
 
                 while (count > 0)
@@ -137,7 +132,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     difference_type step = count / 2;
                     RandIter mid = std::next(first, step);
 
-                    if (invoke(comp, invoke(proj, *mid), value))
+                    if (hpx::util::invoke(
+                            comp, hpx::util::invoke(proj, *mid), value))
                     {
                         first = ++mid;
                         count -= step + 1;
@@ -166,10 +162,9 @@ namespace hpx { namespace parallel { inline namespace v1
             RandIter1 first1, RandIter1 last1,
             RandIter2 first2, RandIter2 last2,
             RandIter3 dest, Comp comp,
-            Proj1 proj1, Proj2 proj2, BinarySearchHelper)
+            Proj1 proj1, Proj2 proj2,
+            bool range_reversal, BinarySearchHelper)
         {
-            using hpx::util::invoke;
-
             const std::size_t threshold = 65536ul;
             HPX_ASSERT(threshold >= 1ul);
 
@@ -179,8 +174,16 @@ namespace hpx { namespace parallel { inline namespace v1
             // Perform sequential merge if data size is smaller than threshold.
             if (size1 + size2 <= threshold)
             {
-                sequential_merge(first1, first1 + size1,
-                    first2, first2 + size2, dest, comp, proj1, proj2);
+                if (range_reversal)
+                {
+                    sequential_merge(first2, first2 + size2,
+                        first1, first1 + size1, dest, comp, proj2, proj1);
+                }
+                else
+                {
+                    sequential_merge(first1, first1 + size1,
+                        first2, first2 + size2, dest, comp, proj1, proj2);
+                }
                 return;
             }
 
@@ -191,6 +194,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 //   when swapping size1 and size2.
                 parallel_merge_helper(policy,
                     first2, last2, first1, last1, dest, comp, proj2, proj1,
+                    !range_reversal,
                     typename BinarySearchHelper::another_type());
                 return;
             }
@@ -200,7 +204,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             RandIter1 mid1 = first1 + size1 / 2;
             RandIter2 boundary2 = BinarySearchHelper::call(
-                first2, last2, invoke(proj1, *mid1), comp, proj2);
+                first2, last2, hpx::util::invoke(proj1, *mid1), comp, proj2);
             RandIter3 target = dest + (mid1 - first1) + (boundary2 - first2);
 
             *target = *mid1;
@@ -211,14 +215,16 @@ namespace hpx { namespace parallel { inline namespace v1
                     // Process leftside ranges.
                     parallel_merge_helper(policy,
                         first1, mid1, first2, boundary2,
-                        dest, comp, proj1, proj2, BinarySearchHelper());
+                        dest, comp, proj1, proj2,
+                        range_reversal, BinarySearchHelper());
                 });
 
             try {
                 // Process rightside ranges.
                 parallel_merge_helper(policy,
                     mid1 + 1, last1, boundary2, last2,
-                    target + 1, comp, proj1, proj2, BinarySearchHelper());
+                    target + 1, comp, proj1, proj2,
+                    range_reversal, BinarySearchHelper());
             }
             catch (...) {
                 fut.wait();
@@ -258,7 +264,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::forward<Comp>(comp),
                 std::forward<Proj1>(proj1),
                 std::forward<Proj2>(proj2),
-                upper_bound_helper());
+                false,
+                lower_bound_helper());
 
             return hpx::util::make_tuple(last1, last2,
                 dest + (last1 - first1) + (last2 - first2));
