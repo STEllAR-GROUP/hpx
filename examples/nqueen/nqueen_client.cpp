@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser, Richard D Guidry Jr.
+//  Copyright (c) 2007-2017 Hartmut Kaiser, Richard D Guidry Jr.
 //  Copyright (c) 2011 Vinay C Amatya
 //  Copyright (c) 2011 Bryce Lelbach
 //
@@ -114,8 +114,5 @@ int hpx_main(boost::program_options::variables_map&)
 
 int main(int argc, char* argv[])
 {
-    boost::program_options::options_description
-        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(argc, argv);
 }

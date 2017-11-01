@@ -33,6 +33,15 @@ namespace hpx { namespace components
     inline typename std::enable_if<
         traits::is_client<Client>::value, Client
     >::type
+    make_client(hpx::id_type && id)
+    {
+        return Client(std::move(id));
+    }
+
+    template <typename Client>
+    inline typename std::enable_if<
+        traits::is_client<Client>::value, Client
+    >::type
     make_client(hpx::future<hpx::id_type> const& id)
     {
         return Client(id);
@@ -56,6 +65,15 @@ namespace hpx { namespace components
         return Client(id);
     }
 
+    template <typename Client>
+    inline typename std::enable_if<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::shared_future<hpx::id_type> && id)
+    {
+        return Client(std::move(id));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Client>
     inline typename std::enable_if<
@@ -68,6 +86,21 @@ namespace hpx { namespace components
         for (hpx::id_type const& id: ids)
         {
             result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename std::enable_if<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_clients(std::vector<hpx::id_type> && ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::id_type& id : ids)
+        {
+            result.push_back(Client(std::move(id)));
         }
         return result;
     }
@@ -95,7 +128,7 @@ namespace hpx { namespace components
     {
         std::vector<Client> result;
         result.reserve(ids.size());
-        for (hpx::future<hpx::id_type>& id: ids)
+        for (hpx::future<hpx::id_type>& id : ids)
         {
             result.push_back(Client(std::move(id)));
         }
@@ -113,6 +146,21 @@ namespace hpx { namespace components
         for (hpx::shared_future<hpx::id_type> const& id: ids)
         {
             result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename std::enable_if<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_clients(std::vector<hpx::shared_future<hpx::id_type> > && ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::shared_future<hpx::id_type>& id : ids)
+        {
+            result.push_back(Client(std::move(id)));
         }
         return result;
     }

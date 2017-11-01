@@ -44,6 +44,7 @@ struct test_client : client_base<test_client, stub_base<test_server> >
     typedef client_base<test_client, stub_base<test_server> > base_type;
 
     test_client(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
+    test_client(hpx::id_type && id) : base_type(std::move(id)) {}
 
     void check_gid() { async<check_gid_action>(this->get_id()).get(); }
 };
