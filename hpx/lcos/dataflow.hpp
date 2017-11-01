@@ -23,6 +23,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/util/always_void.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
@@ -50,8 +51,29 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
-    template <bool IsAction, typename F, typename Args>
-    struct dataflow_return_impl;
+    template <typename F, typename Args>
+    struct dataflow_not_callable
+    {
+#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
+        static auto error(F f, Args args)
+        {
+            hpx::util::invoke_fused(std::move(f), std::move(args));
+        }
+#else
+        static auto error(F f, Args args)
+         -> decltype(hpx::util::invoke_fused(std::move(f), std::move(args)));
+#endif
+
+        using type = decltype(
+            error(std::declval<F>(), std::declval<Args>()));
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    template <bool IsAction, typename F, typename Args, typename Enable = void>
+    struct dataflow_return_impl
+    {
+        typedef typename dataflow_not_callable<F, Args>::type type;
+    };
 
     template <typename Action, typename Args>
     struct dataflow_return_impl</*IsAction=*/true, Action, Args>
@@ -60,13 +82,17 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename F, typename Args>
-    struct dataflow_return_impl</*IsAction=*/false, F, Args>
-      : util::detail::invoke_fused_result<F, Args>
+    struct dataflow_return_impl<
+        /*IsAction=*/false, F, Args,
+        typename hpx::util::always_void<
+            typename hpx::util::detail::invoke_fused_result<F, Args>::type
+        >::type
+    > : util::detail::invoke_fused_result<F, Args>
     {};
 
     template <typename F, typename Args>
     struct dataflow_return
-      : dataflow_return_impl<traits::is_action<F>::value, F, Args>
+      : detail::dataflow_return_impl<traits::is_action<F>::value, F, Args>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
