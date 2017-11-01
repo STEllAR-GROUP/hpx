@@ -32,7 +32,10 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 {
     typedef hpx::components::client_base<test_client, test_server> base_type;
 
-    test_client(hpx::future<hpx::id_type> && id)
+    test_client(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
+    {}
+    test_client(hpx::id_type&& id)
       : base_type(std::move(id))
     {}
 

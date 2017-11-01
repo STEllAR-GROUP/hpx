@@ -30,8 +30,8 @@ struct test : hpx::components::client_base<test, test_server>
 {
     typedef hpx::components::client_base<test, test_server> base_type;
 
+    test(hpx::id_type && id) : base_type(std::move(id)) {}
     test(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
-    test(hpx::shared_future<hpx::id_type> const& id) : base_type(id) {}
 
     hpx::future<hpx::id_type> call() const
     {

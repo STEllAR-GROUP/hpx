@@ -12,22 +12,17 @@ set(client_sources
 set(client_headers
     random_mem_access.hpp)
 
-set(stubs_headers
-    stubs/random_mem_access.hpp)
-
 set(server_headers
     server/random_mem_access.hpp)
 
 ###############################################################################
 set(headers
     ${client_headers}
-    ${stubs_headers}
     ${server_headers})
 
 ###############################################################################
-source_group("Source Files\\Client" FILES ${client_sources})
-source_group("Header Files\\Client" FILES ${client_headers})
-source_group("Header Files\\Stubs"  FILES ${stubs_headers})
+source_group("Source Files" FILES ${client_sources})
+source_group("Header Files" FILES ${client_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################

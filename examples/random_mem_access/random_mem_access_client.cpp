@@ -7,13 +7,12 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/wait_all.hpp>
-
-#include <boost/foreach.hpp>
 
 #include <cstddef>
+#include <ctime>
 #include <vector>
-#include <time.h>
+
+#include <boost/program_options.hpp>
 
 #include "random_mem_access/random_mem_access.hpp"
 
@@ -36,32 +35,33 @@ int hpx_main(boost::program_options::variables_map& vm)
                     array_size).get();
 
         // initialize the array
-        for (std::size_t i=0;i<array_size;i++) {
-          accu[i].init(i);
+        for (std::size_t i = 0; i < array_size; i++)
+        {
+            accu[i].init(i);
         }
 
-        srand( time(nullptr) );
+        std::srand((unsigned int)std::time(nullptr));
 
-        std::vector<hpx::lcos::future<void> > barrier;
-        for (std::size_t i=0;i<iterations;i++) {
-          std::size_t rn = rand() % array_size;
-          //std::cout << " Random element access: " << rn << std::endl;
-          barrier.push_back(accu[rn].add_async());
+        std::vector<hpx::future<void> > barrier;
+        for (std::size_t i = 0; i < iterations; i++)
+        {
+            std::size_t rn = std::rand() % array_size;
+            //std::cout << " Random element access: " << rn << std::endl;
+            barrier.push_back(accu[rn].add_async());
         }
 
         hpx::wait_all(barrier);
 
-        std::vector<hpx::lcos::future<void> > barrier2;
-        for (std::size_t i=0;i<array_size;i++) {
-          barrier2.push_back(accu[i].print_async());
+        std::vector<hpx::future<void> > barrier2;
+        for (std::size_t i = 0; i < array_size; i++)
+        {
+            barrier2.push_back(accu[i].print_async());
         }
 
         hpx::wait_all(barrier2);
     }
 
-    hpx::finalize();
-
-    return 0;
+    return hpx::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

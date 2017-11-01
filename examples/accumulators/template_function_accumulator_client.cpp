@@ -33,7 +33,7 @@ int hpx_main()
     {
         // Create an accumulator component on this locality.
         examples::template_function_accumulator accu =
-            hpx::components::new_<examples::template_function_accumulator>(
+            hpx::new_<examples::template_function_accumulator>(
                 hpx::find_here());
 
         // Print out the available commands.
