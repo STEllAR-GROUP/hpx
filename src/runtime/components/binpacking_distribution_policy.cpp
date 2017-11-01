@@ -76,8 +76,9 @@ namespace hpx { namespace components
             return hpx::dataflow(hpx::launch::sync,
                 hpx::util::unwrapping(
                     [](std::vector<std::uint64_t> && values)
+                     -> std::vector<std::uint64_t>
                     {
-                        return values;
+                        return std::move(values);
                     }),
                 std::move(values));
         }
