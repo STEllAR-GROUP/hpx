@@ -7,6 +7,7 @@ set(example_programs
   guided_pool_test
   oversubscribing_resource_partitioner
   simple_resource_partitioner
+  async_customization
 )
 
 set(guided_pool_test_FLAGS DEPENDENCIES iostreams_component)
