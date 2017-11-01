@@ -718,16 +718,15 @@ namespace hpx { namespace lcos { namespace detail
         return p;
     }
 
-    template <typename Executor, typename Future, typename F, typename ... Ts>
+    template <typename Executor, typename Future, typename F>
     inline typename hpx::traits::future_then_executor_result<
-        Executor, typename std::decay<Future>::type, F, Ts...
+        Executor, typename std::decay<Future>::type, F
     >::type
-    then_execute_helper(Executor const& exec, F && f, Future && predecessor,
-        Ts &&... ts)
+    then_execute_helper(Executor const& exec, F && f, Future && predecessor)
     {
         // simply forward this to executor
         return parallel::execution::then_execute(exec, std::forward<F>(f),
-            predecessor, std::forward<Ts>(ts)...);
+            predecessor);
     }
 }}}
 
