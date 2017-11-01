@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_ALL_ANY_NONE_OF_JUL_07_2014_1246PM
 
 #include <hpx/parallel/algorithms/all_any_none.hpp>
+#include <hpx/parallel/container_algorithms/all_any_none.hpp>
 
 #endif
 

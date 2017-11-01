@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
-//
+//                2017 Bruno Pitrus
+
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,6 @@
 #include <hpx/include/parallel_all_any_none_of.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-
 
 #include <cstddef>
 #include <iostream>
@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag,
     typename Proj = hpx::parallel::util::projection_identity>
-void test_any_of(ExPolicy policy, IteratorTag,Proj proj=Proj())
+void test_none_of(ExPolicy policy, IteratorTag,Proj proj=Proj())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -30,23 +30,22 @@ void test_any_of(ExPolicy policy, IteratorTag,Proj proj=Proj())
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::size_t iseq[] = { 0, 23, 10007 };
+    std::size_t iseq[] = { 0, 1, 3 };
     for (std::size_t i: iseq)
     {
-        std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
+        std::vector<std::size_t> c = test::fill_all_any_none(3, i); //-V106
 
         bool result =
-            hpx::parallel::any_of(policy,
-                iterator(std::begin(c)), iterator(std::end(c)),
+            hpx::parallel::none_of(policy, c,
                 [](std::size_t v) {
                     return v != 0;
                 },proj);
 
         // verify values
         bool expected =
-            std::any_of(std::begin(c), std::end(c),
+            std::none_of(std::begin(c), std::end(c),
                 [proj](std::size_t v) {
-                    return proj(v) != 0;
+                    return proj(v)!= 0;
                 });
 
         HPX_TEST_EQ(result, expected);
@@ -55,27 +54,26 @@ void test_any_of(ExPolicy policy, IteratorTag,Proj proj=Proj())
 
 template <typename ExPolicy, typename IteratorTag,
     typename Proj = hpx::parallel::util::projection_identity>
-void test_any_of_async(ExPolicy p, IteratorTag,Proj proj=Proj())
+void test_none_of_async(ExPolicy p, IteratorTag,Proj proj=Proj())
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::size_t iseq[] = { 0, 23, 10007 };
-    for (std::size_t i: iseq)
+    for (std::size_t i : iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         hpx::future<bool> f =
-            hpx::parallel::any_of(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                [](std::size_t v) {
+            hpx::parallel::none_of(p, c,
+                [proj](std::size_t v) {
                     return v != 0;
                 },proj);
         f.wait();
 
         // verify values
         bool expected =
-            std::any_of(std::begin(c), std::end(c),
+            std::none_of(std::begin(c), std::end(c),
                 [proj](std::size_t v) {
                     return proj(v) != 0;
                 });
@@ -85,7 +83,7 @@ void test_any_of_async(ExPolicy p, IteratorTag,Proj proj=Proj())
 }
 
 template <typename IteratorTag>
-void test_any_of()
+void test_none_of()
 {
     struct proj
     {
@@ -98,77 +96,77 @@ void test_any_of()
     };
     using namespace hpx::parallel;
 
-    test_any_of(execution::seq, IteratorTag());
-    test_any_of(execution::par, IteratorTag());
-    test_any_of(execution::par_unseq, IteratorTag());
+    test_none_of(execution::seq, IteratorTag());
+    test_none_of(execution::par, IteratorTag());
+    test_none_of(execution::par_unseq, IteratorTag());
 
-    test_any_of(execution::seq, IteratorTag(), proj());
-    test_any_of(execution::par, IteratorTag(), proj());
-    test_any_of(execution::par_unseq, IteratorTag(), proj());
+    test_none_of(execution::seq, IteratorTag(), proj());
+    test_none_of(execution::par, IteratorTag(), proj());
+    test_none_of(execution::par_unseq, IteratorTag(), proj());
 
-    test_any_of_async(execution::seq(execution::task), IteratorTag());
-    test_any_of_async(execution::par(execution::task), IteratorTag());
+    test_none_of_async(execution::seq(execution::task), IteratorTag());
+    test_none_of_async(execution::par(execution::task), IteratorTag());
 
-    test_any_of_async(execution::seq(execution::task), IteratorTag(), proj());
-    test_any_of_async(execution::par(execution::task), IteratorTag(), proj());
+    test_none_of_async(execution::seq(execution::task), IteratorTag(), proj());
+    test_none_of_async(execution::par(execution::task), IteratorTag(), proj());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_any_of(execution_policy(execution::seq), IteratorTag());
-    test_any_of(execution_policy(execution::par), IteratorTag());
-    test_any_of(execution_policy(execution::par_unseq), IteratorTag());
+    test_none_of(execution_policy(execution::seq), IteratorTag());
+    test_none_of(execution_policy(execution::par), IteratorTag());
+    test_none_of(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_any_of(execution_policy(execution::seq), IteratorTag(), proj());
-    test_any_of(execution_policy(execution::par), IteratorTag(), proj());
-    test_any_of(execution_policy(execution::par_unseq), IteratorTag(), proj());
+    test_none_of(execution_policy(execution::seq), IteratorTag(), proj());
+    test_none_of(execution_policy(execution::par), IteratorTag(), proj());
+    test_none_of(execution_policy(execution::par_unseq), IteratorTag(), proj());
 
-    test_any_of(execution_policy(execution::seq(execution::task)),
+    test_none_of(execution_policy(execution::seq(execution::task)),
         IteratorTag());
-    test_any_of(execution_policy(execution::par(execution::task)),
+    test_none_of(execution_policy(execution::par(execution::task)),
         IteratorTag());
 
-    test_any_of(execution_policy(execution::seq(execution::task)),
+    test_none_of(execution_policy(execution::seq(execution::task)),
         IteratorTag(), proj());
-    test_any_of(execution_policy(execution::par(execution::task)),
+    test_none_of(execution_policy(execution::par(execution::task)),
         IteratorTag()), proj();
 #endif
 }
 
 // template <typename IteratorTag>
-// void test_any_of_exec()
+// void test_none_of_exec()
 // {
 //     using namespace hpx::parallel;
 //
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(execution::par(exec), IteratorTag());
+//         test_none_of(execution::par(exec), IteratorTag());
 //     }
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(task(exec), IteratorTag());
+//         test_none_of(task(exec), IteratorTag());
 //     }
 //
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(execution_policy(execution::par(exec)), IteratorTag());
+//         test_none_of(execution_policy(execution::par(exec)), IteratorTag());
 //     }
 //     {
 //         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(execution_policy(task(exec)), IteratorTag());
+//         test_none_of(execution_policy(task(exec)), IteratorTag());
 //     }
 // }
 
-void any_of_test()
+void none_of_test()
 {
-    test_any_of<std::random_access_iterator_tag>();
-    test_any_of<std::forward_iterator_tag>();
+    test_none_of<std::random_access_iterator_tag>();
+    test_none_of<std::forward_iterator_tag>();
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_any_of<std::input_iterator_tag>();
+    test_none_of<std::input_iterator_tag>();
 #endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_any_of_exception(ExPolicy policy, IteratorTag)
+void test_none_of_exception(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -178,14 +176,13 @@ void test_any_of_exception(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::size_t iseq[] = { 0, 23, 10007 };
-    for (std::size_t i: iseq)
+    for (std::size_t i : iseq)
     {
         std::vector<std::size_t> c = test::fill_all_any_none(10007, i); //-V106
 
         bool caught_exception = false;
         try {
-            hpx::parallel::any_of(policy,
-                iterator(std::begin(c)), iterator(std::end(c)),
+            hpx::parallel::none_of(policy, c,
                 [](std::size_t v) {
                     return throw std::runtime_error("test"), v != 0;
                 });
@@ -205,7 +202,7 @@ void test_any_of_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_any_of_exception_async(ExPolicy p, IteratorTag)
+void test_none_of_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -219,8 +216,7 @@ void test_any_of_exception_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
         try {
             hpx::future<void> f =
-                hpx::parallel::any_of(p,
-                    iterator(std::begin(c)), iterator(std::end(c)),
+                hpx::parallel::none_of(p, c,
                     [](std::size_t v) {
                         return throw std::runtime_error("test"), v != 0;
                     });
@@ -243,42 +239,42 @@ void test_any_of_exception_async(ExPolicy p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_any_of_exception()
+void test_none_of_exception()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_any_of_exception(execution::seq, IteratorTag());
-    test_any_of_exception(execution::par, IteratorTag());
+    test_none_of_exception(execution::seq, IteratorTag());
+    test_none_of_exception(execution::par, IteratorTag());
 
-    test_any_of_exception_async(execution::seq(execution::task), IteratorTag());
-    test_any_of_exception_async(execution::par(execution::task), IteratorTag());
+    test_none_of_exception_async(execution::seq(execution::task), IteratorTag());
+    test_none_of_exception_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_any_of_exception(execution_policy(execution::seq), IteratorTag());
-    test_any_of_exception(execution_policy(execution::par), IteratorTag());
+    test_none_of_exception(execution_policy(execution::seq), IteratorTag());
+    test_none_of_exception(execution_policy(execution::par), IteratorTag());
 
-    test_any_of_exception(execution_policy(execution::seq(execution::task)),
+    test_none_of_exception(execution_policy(execution::seq(execution::task)),
         IteratorTag());
-    test_any_of_exception(execution_policy(execution::par(execution::task)),
+    test_none_of_exception(execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }
 
-void any_of_exception_test()
+void none_of_exception_test()
 {
-    test_any_of_exception<std::random_access_iterator_tag>();
-    test_any_of_exception<std::forward_iterator_tag>();
+    test_none_of_exception<std::random_access_iterator_tag>();
+    test_none_of_exception<std::forward_iterator_tag>();
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_any_of_exception<std::input_iterator_tag>();
+    test_none_of_exception<std::input_iterator_tag>();
 #endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_any_of_bad_alloc(ExPolicy policy, IteratorTag)
+void test_none_of_bad_alloc(ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -294,8 +290,7 @@ void test_any_of_bad_alloc(ExPolicy policy, IteratorTag)
 
         bool caught_exception = false;
         try {
-            hpx::parallel::any_of(policy,
-                iterator(std::begin(c)), iterator(std::end(c)),
+            hpx::parallel::none_of(policy, c,
                 [](std::size_t v) {
                     return throw std::bad_alloc(), v != 0;
                 });
@@ -314,7 +309,7 @@ void test_any_of_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_any_of_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_none_of_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -328,8 +323,7 @@ void test_any_of_bad_alloc_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
         try {
             hpx::future<void> f =
-                hpx::parallel::any_of(p,
-                    iterator(std::begin(c)), iterator(std::end(c)),
+                hpx::parallel::none_of(p, c,
                     [](std::size_t v) {
                         return throw std::bad_alloc(), v != 0;
                     });
@@ -351,36 +345,36 @@ void test_any_of_bad_alloc_async(ExPolicy p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_any_of_bad_alloc()
+void test_none_of_bad_alloc()
 {
     using namespace hpx::parallel;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_any_of_bad_alloc(execution::seq, IteratorTag());
-    test_any_of_bad_alloc(execution::par, IteratorTag());
+    test_none_of_bad_alloc(execution::seq, IteratorTag());
+    test_none_of_bad_alloc(execution::par, IteratorTag());
 
-    test_any_of_bad_alloc_async(execution::seq(execution::task), IteratorTag());
-    test_any_of_bad_alloc_async(execution::par(execution::task), IteratorTag());
+    test_none_of_bad_alloc_async(execution::seq(execution::task), IteratorTag());
+    test_none_of_bad_alloc_async(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_any_of_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_any_of_bad_alloc(execution_policy(execution::par), IteratorTag());
+    test_none_of_bad_alloc(execution_policy(execution::seq), IteratorTag());
+    test_none_of_bad_alloc(execution_policy(execution::par), IteratorTag());
 
-    test_any_of_bad_alloc(execution_policy(execution::seq(execution::task)),
+    test_none_of_bad_alloc(execution_policy(execution::seq(execution::task)),
         IteratorTag());
-    test_any_of_bad_alloc(execution_policy(execution::par(execution::task)),
+    test_none_of_bad_alloc(execution_policy(execution::par(execution::task)),
         IteratorTag());
 #endif
 }
 
-void any_of_bad_alloc_test()
+void none_of_bad_alloc_test()
 {
-    test_any_of_bad_alloc<std::random_access_iterator_tag>();
-    test_any_of_bad_alloc<std::forward_iterator_tag>();
+    test_none_of_bad_alloc<std::random_access_iterator_tag>();
+    test_none_of_bad_alloc<std::forward_iterator_tag>();
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
-    test_any_of_bad_alloc<std::input_iterator_tag>();
+    test_none_of_bad_alloc<std::input_iterator_tag>();
 #endif
 }
 
@@ -394,9 +388,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    any_of_test();
-    any_of_exception_test();
-    any_of_bad_alloc_test();
+    none_of_test();
+    none_of_exception_test();
+    none_of_bad_alloc_test();
     return hpx::finalize();
 }
 
@@ -411,7 +405,6 @@ int main(int argc, char* argv[])
         ("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run")
         ;
-
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {
         "hpx.os_threads=all"
