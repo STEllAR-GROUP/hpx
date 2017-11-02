@@ -247,7 +247,9 @@ namespace test
     {
         std::vector<std::size_t> c(size);
         std::iota(std::begin(c), std::end(c), 0);
-        std::random_shuffle(std::begin(c), std::end(c));
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(std::begin(c), std::end(c), g);
         return c;
     }
 
@@ -256,7 +258,9 @@ namespace test
     {
         Vector c(size);
         std::iota(std::begin(c.base()), std::end(c.base()), 0);
-        std::random_shuffle(std::begin(c.base()), std::end(c.base()));
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(std::begin(c.base()), std::end(c.base()), g);
         return c;
     }
 
