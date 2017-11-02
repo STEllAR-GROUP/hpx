@@ -425,13 +425,13 @@ namespace hpx { namespace lcos { namespace detail
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline typename traits::detail::shared_state_ptr<ContResult>::type
-    make_continuation_exec(Future const& future, Executor const& exec, F && f);
+    make_continuation_exec(Future const& future, Executor && exec, F && f);
 
     template <typename Executor, typename Future, typename F>
     inline typename hpx::traits::future_then_executor_result<
         Executor, typename std::decay<Future>::type, F
     >::type
-    then_execute_helper(Executor const&, F &&, Future &&);
+    then_execute_helper(Executor &&, F &&, Future &&);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename FD, typename Enable = void>
@@ -558,7 +558,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future>
     typename hpx::traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
-    unwrap(Future&& future, error_code& ec = throws);
+    unwrap(Future && future, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
@@ -1084,7 +1084,7 @@ namespace hpx { namespace lcos
             hpx::traits::is_executor<Executor>::value
           , hpx::traits::future_then_result<future, F>
         >::type
-        then(Executor& exec, F && f, error_code& ec = throws)
+        then(Executor && exec, F && f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
             return base_type::then(std::move(*this),
@@ -1422,7 +1422,7 @@ namespace hpx { namespace lcos
             hpx::traits::is_executor<Executor>::value
           , hpx::traits::future_then_result<shared_future, F>
         >::type
-        then(Executor& exec, F && f, error_code& ec = throws) const
+        then(Executor && exec, F && f, error_code& ec = throws) const
         {
             return base_type::then(shared_future(*this),
                 exec, std::forward<F>(f), ec);
