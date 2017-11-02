@@ -687,11 +687,13 @@ namespace hpx { namespace threads { namespace detail
                                 break;
                             }
                         }
-
-                        // otherwise, keep idling for some time
-                        if (!may_exit)
-                            idle_loop_count = 0;
-                        may_exit = true;
+                        else
+                        {
+                            // otherwise, keep idling for some time
+                            if (!may_exit)
+                                idle_loop_count = 0;
+                            may_exit = true;
+                        }
                     }
                 }
 
@@ -750,7 +752,6 @@ namespace hpx { namespace threads { namespace detail
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
                 idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
-                // clean up terminated threads
                 if (idle_loop_count > params.max_idle_loop_count_)
                     idle_loop_count = 0;
 

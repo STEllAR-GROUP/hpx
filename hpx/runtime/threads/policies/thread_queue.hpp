@@ -516,7 +516,7 @@ namespace hpx { namespace threads { namespace policies
         bool cleanup_terminated(bool delete_all = false)
         {
             if (terminated_items_count_ == 0)
-                return thread_map_count_ == 0;
+                return true;
 
             if (delete_all) {
                 // do not lock mutex while deleting all threads, do it piece-wise
