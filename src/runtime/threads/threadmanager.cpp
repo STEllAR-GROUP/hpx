@@ -901,7 +901,7 @@ namespace hpx { namespace threads
 
         for (auto& pool_iter : pools_)
         {
-            result = result && pool_iter->cleanup_terminated(delete_all);
+            result = pool_iter->cleanup_terminated(delete_all) && result;
         }
 
         return result;
