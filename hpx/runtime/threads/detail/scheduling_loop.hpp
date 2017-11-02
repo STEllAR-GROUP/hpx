@@ -287,6 +287,10 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t const max_busy_loop_count_;
     };
 
+    std::int64_t get_background_thread_count();
+    void increment_background_thread_count();
+    void decrement_background_thread_count();
+
     template <typename SchedulingPolicy>
     thread_id_type create_background_thread(SchedulingPolicy& scheduler,
         scheduling_callbacks& callbacks, std::shared_ptr<bool>& background_running,
@@ -311,6 +315,9 @@ namespace hpx { namespace threads { namespace detail
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "background_work");
                 }
+
+                decrement_background_thread_count();
+
                 return thread_result_type(terminated, nullptr);
             },
             hpx::util::thread_description("background_work"),
@@ -322,6 +329,7 @@ namespace hpx { namespace threads { namespace detail
 
         // Create in suspended to prevent the thread from being scheduled
         // directly...
+        increment_background_thread_count();
         scheduler.SchedulingPolicy::create_thread(background_init,
             &background_thread, suspended, true, hpx::throws, num_thread);
         HPX_ASSERT(background_thread);

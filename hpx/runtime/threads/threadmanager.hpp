@@ -181,6 +181,8 @@ namespace hpx { namespace threads
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1), bool reset = false);
 
+        std::int64_t get_background_thread_count();
+
         // Enumerate all matching threads
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
