@@ -58,7 +58,7 @@ namespace hpx { namespace parcelset
           : data_(std::move(other.data_))
           , chunks_(std::move(other.chunks_))
           , transmission_chunks_(std::move(other.transmission_chunks_))
-          , num_chunks_(other.num_chunks_)
+          , num_chunks_(std::move(other.num_chunks_))
           , size_(other.size_)
           , data_size_(other.data_size_)
           , header_size_(other.header_size_)

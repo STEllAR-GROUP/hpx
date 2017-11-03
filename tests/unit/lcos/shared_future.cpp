@@ -385,7 +385,7 @@ void test_shared_future_can_be_move_assigned_from_shared_future()
 
     hpx::lcos::shared_future<int> sf;
     sf = std::move(fi);
-    HPX_TEST(!fi.valid());
+    HPX_TEST(!fi.valid()); // NOLINT
 
     HPX_TEST(!sf.is_ready());
     HPX_TEST(!sf.has_value());
@@ -398,7 +398,7 @@ void test_shared_future_void()
     hpx::lcos::shared_future<void> fi = pt.get_future();
 
     hpx::lcos::shared_future<void> sf(std::move(fi));
-    HPX_TEST(!fi.valid());
+    HPX_TEST(!fi.valid()); // NOLINT
 
     pt();
 
@@ -532,7 +532,7 @@ void test_packaged_task_can_be_moved()
     HPX_TEST(!fi.is_ready());
 
     try {
-        pt();
+        pt(); // NOLINT
         HPX_TEST(!"Can invoke moved task!");
     }
     catch (hpx::exception const& e) {

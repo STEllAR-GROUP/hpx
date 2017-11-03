@@ -142,7 +142,7 @@ namespace hpx { namespace performance_counters
             util::expand(n);
 
             // find matching counter types
-            discover_counter_type(n, std::move(func), discover_counters_full, ec);
+            discover_counter_type(n, func, discover_counters_full, ec);
             if (ec) return;
         }
 

@@ -114,7 +114,8 @@ namespace hpx { namespace applier { namespace detail
 
             // now, schedule the thread
             data.func = Action::construct_thread_function(target,
-                std::move(cont), lva, comptype, std::forward<Ts>(vs)...);
+                std::forward<Continuation>(cont), lva, comptype,
+                std::forward<Ts>(vs)...);
 
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             data.lva = lva;

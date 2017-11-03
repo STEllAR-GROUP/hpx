@@ -206,19 +206,19 @@ namespace hpx { namespace parallel { inline namespace v2
                 if (size == 0)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                auto && args =
-                    hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
-
                 // we need to decay copy here to properly transport everything
                 // to a GPU device
                 typedef
                     hpx::util::tuple<typename hpx::util::decay<Ts>::type...>
                     args_type;
 
+                args_type args =
+                    hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
+
                 return util::partitioner<ExPolicy>::call_with_index(
                     policy, first, size, stride,
                     part_iterations<F, S, args_type>{
-                        std::forward<F>(f), stride, std::move(args)
+                        std::forward<F>(f), stride, args
                     },
                     [=] (std::vector<hpx::future<void> > &&) mutable -> void
                     {

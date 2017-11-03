@@ -103,12 +103,12 @@ int main()
     }
 
     hpx::parallel::v2::define_spmd_block(
-        num_images, std::move(bulk_test), c1.data() );
+        num_images, bulk_test, c1.data() );
 
     std::vector<hpx::future<void>> join =
         hpx::parallel::v2::define_spmd_block(
             par(task),
-                num_images, std::move(bulk_test), c2.data() );
+                num_images, bulk_test, c2.data() );
 
     hpx::wait_all(join);
 

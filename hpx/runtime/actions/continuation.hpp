@@ -163,7 +163,7 @@ namespace hpx { namespace actions
 
         typed_continuation& operator=(typed_continuation&& o)
         {
-            continuation::operator=(std::move(o));
+            continuation::operator=(std::move(static_cast<continuation&&>(o)));
             f_ = std::move(o.f_);
             return *this;
         }
@@ -392,7 +392,7 @@ namespace hpx { namespace actions
 
         typed_continuation& operator=(typed_continuation&& o)
         {
-            continuation::operator=(std::move(o));
+            continuation::operator=(std::move(static_cast<continuation&&>(o)));
             f_ = std::move(o.f_);
             return *this;
         }

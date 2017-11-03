@@ -17,6 +17,7 @@
 
 #include <mutex>
 #include <utility>
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -66,7 +67,9 @@ namespace hpx { namespace components
 
         struct decorate_wrapper
         {
-            template <typename F>
+            template <typename F, typename Enable = typename
+                std::enable_if<!std::is_same<typename hpx::util::decay<F>::type,
+                    decorate_wrapper>::value>::type>
             decorate_wrapper(F && f)
             {
                 threads::get_self().decorate_yield(std::forward<F>(f));

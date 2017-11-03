@@ -437,21 +437,11 @@ bool symbol_namespace::on_event(
         on_event_data_map_type::iterator it = on_event_data_.insert(
             on_event_data_map_type::value_type(std::move(name), lco));
 
-        l.unlock();
-
-        if (it == on_event_data_.end())
-        {
-            LAGAS_(info) << hpx::util::format(
-                "symbol_namespace::on_event, name(%1%), response(no_success)",
-                name);
-
-            return false;
-        }
+        // This overload of insert always returns the iterator pointing
+        // to the inserted value. It should never point to end
+        HPX_ASSERT(it != on_event_data_.end());
     }
-    else
-    {
-        l.unlock();
-    }
+    l.unlock();
 
     LAGAS_(info) << "symbol_namespace::on_event";
 
