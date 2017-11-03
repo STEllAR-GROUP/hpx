@@ -32,7 +32,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
-#include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util_fwd.hpp>
