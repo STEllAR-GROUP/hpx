@@ -12,7 +12,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_client.hpp>
@@ -325,10 +325,12 @@ namespace hpx { namespace components
             template <typename ...Ts>
             static type call(Ts &&... ts)
             {
-                typedef typename Component::wrapping_type component_type;
+                typedef Component component_type;
 
+                auto rts_ptr = hpx::get_runtime_support_ptr();
+                HPX_ASSERT(rts_ptr);
                 hpx::id_type id(
-                    components::server::construct<component_type>(
+                    rts_ptr->create_component<component_type>(
                         std::forward<Ts>(ts)...
                     ),
                     hpx::id_type::managed);
@@ -344,15 +346,17 @@ namespace hpx { namespace components
             template <typename ...Ts>
             static type call(std::size_t count, Ts&&... ts)
             {
-                typedef typename Component::wrapping_type component_type;
+                typedef Component component_type;
 
                 std::vector<hpx::id_type> result;
                 result.reserve(count);
 
+                auto rts_ptr = hpx::get_runtime_support_ptr();
+                HPX_ASSERT(rts_ptr);
                 for (std::size_t i = 0; i != count; ++i)
                 {
                     result.push_back(hpx::id_type(
-                        components::server::construct<component_type>(
+                        rts_ptr->create_component<component_type>(
                             std::forward<Ts>(ts)...
                         ),
                         hpx::id_type::managed));
