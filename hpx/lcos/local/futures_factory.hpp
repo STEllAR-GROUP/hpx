@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
