@@ -286,30 +286,10 @@ namespace detail
 
         typedef lcos::local::spinlock mutex_type;
         typedef util::unused_type result_type;
+        typedef util::unique_function_nonser<void()> completed_callback_type;
         typedef future_data_refcnt_base::init_no_addref init_no_addref;
 
         virtual ~future_data_base() noexcept {}
-        virtual void execute_deferred(error_code& = throws) = 0;
-        virtual bool cancelable() const = 0;
-        virtual void cancel() = 0;
-        virtual result_type* get_result_void(error_code& = throws) = 0;
-        virtual void wait(error_code& = throws) = 0;
-        virtual future_status wait_until(util::steady_clock::time_point const&,
-            error_code& = throws) = 0;
-        virtual std::exception_ptr get_exception_ptr() const = 0;
-
-        virtual std::string const& get_registered_name() const
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "future_data_base::get_registered_name",
-                "this future does not support name registration");
-        }
-        virtual void register_as(std::string const& name, bool manage_lifetime)
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "future_data_base::set_registered_name",
-                "this future does not support name registration");
-        }
 
         enum state
         {
@@ -346,64 +326,7 @@ namespace detail
             return state_ == exception;
         }
 
-    protected:
-         mutable mutex_type mtx_;
-         state state_;                               // current state
-    };
-
-    template <typename Result>
-    struct future_data_base
-      : future_data_base<traits::detail::future_data_void>
-    {
-        HPX_NON_COPYABLE(future_data_base);
-
-        typedef typename future_data_result<Result>::type result_type;
-        typedef util::unique_function_nonser<void()> completed_callback_type;
-        typedef lcos::local::spinlock mutex_type;
-        typedef typename future_data_base<
-                traits::detail::future_data_void
-            >::init_no_addref init_no_addref;
-
-        future_data_base() = default;
-
-        future_data_base(init_no_addref no_addref)
-          : future_data_base<traits::detail::future_data_void>(no_addref)
-        {}
-
-        template <typename Target>
-        future_data_base(Target && data, init_no_addref no_addref)
-          : future_data_base<traits::detail::future_data_void>(no_addref)
-        {
-            result_type* value_ptr =
-                reinterpret_cast<result_type*>(&storage_);
-            ::new ((void*)value_ptr) result_type(
-                future_data_result<Result>::set(std::forward<Target>(data)));
-            state_ = value;
-        }
-
-        future_data_base(std::exception_ptr const& e, init_no_addref no_addref)
-          : future_data_base<traits::detail::future_data_void>(no_addref)
-        {
-            std::exception_ptr* exception_ptr =
-                reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) std::exception_ptr(e);
-            state_ = exception;
-        }
-        future_data_base(std::exception_ptr && e, init_no_addref no_addref)
-          : future_data_base<traits::detail::future_data_void>(no_addref)
-        {
-            std::exception_ptr* exception_ptr =
-                reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) std::exception_ptr(std::move(e));
-            state_ = exception;
-        }
-
-        virtual ~future_data_base() noexcept
-        {
-            reset();
-        }
-
-        virtual void execute_deferred(error_code& ec = throws) {}
+        virtual void execute_deferred(error_code& /*ec*/ = throws) {}
 
         // cancellation is disabled by default
         virtual bool cancelable() const
@@ -417,23 +340,7 @@ namespace detail
                 "this future does not support cancellation");
         }
 
-        /// Get the result of the requested action. This call blocks (yields
-        /// control) if the result is not ready. As soon as the result has been
-        /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function will return.
-        ///
-        /// \param ec     [in,out] this represents the error status on exit,
-        ///               if this is pre-initialized to \a hpx#throws
-        ///               the function will throw on error instead. If the
-        ///               operation blocks and is aborted because the object
-        ///               went out of scope, the code \a hpx#yield_aborted is
-        ///               set or thrown.
-        ///
-        /// \note         If there has been an error reported (using the action
-        ///               \a base_lco#set_exception), this function will throw an
-        ///               exception encapsulating the reported error code and
-        ///               error description if <code>&ec == &throws</code>.
-        virtual result_type* get_result(error_code& ec = throws)
+        result_type* get_result_void(void const* storage, error_code& ec = throws)
         {
             // yields control if needed
             wait(ec);
@@ -459,50 +366,8 @@ namespace detail
             // and promise::set_exception).
             if (state_ == exception)
             {
-                std::exception_ptr* exception_ptr =
-                    reinterpret_cast<std::exception_ptr*>(&storage_);
-                // an error has been reported in the meantime, throw or set
-                // the error code
-                if (&ec == &throws) {
-                    std::rethrow_exception(*exception_ptr);
-                    // never reached
-                }
-                else {
-                    ec = make_error_code(*exception_ptr);
-                }
-                return nullptr;
-            }
-            return reinterpret_cast<result_type*>(&storage_);
-        }
-
-        virtual util::unused_type* get_result_void(error_code& ec = throws)
-        {
-            // yields control if needed
-            wait(ec);
-            if (ec) return nullptr;
-
-            // No locking is required. Once a future has been made ready, which
-            // is a postcondition of wait, either:
-            //
-            // - there is only one writer (future), or
-            // - there are multiple readers only (shared_future, lock hurts
-            //   concurrency)
-
-            if (state_ == empty) {
-                // the value has already been moved out of this future
-                HPX_THROWS_IF(ec, no_state,
-                    "future_data_base::get_result",
-                    "this future has no valid shared state");
-                return nullptr;
-            }
-
-            // the thread has been re-activated by one of the actions
-            // supported by this promise (see promise::set_event
-            // and promise::set_exception).
-            if (state_ == exception)
-            {
-                std::exception_ptr* exception_ptr =
-                    reinterpret_cast<std::exception_ptr*>(&storage_);
+                std::exception_ptr const* exception_ptr =
+                    static_cast<std::exception_ptr const*>(storage);
                 // an error has been reported in the meantime, throw or set
                 // the error code
                 if (&ec == &throws) {
@@ -518,6 +383,10 @@ namespace detail
             static util::unused_type unused_;
             return &unused_;
         }
+        virtual result_type* get_result_void(error_code& ec = throws) = 0;
+
+        virtual void set_exception(std::exception_ptr data,
+            error_code& ec = throws) = 0;
 
         // deferred execution of a given continuation
         bool run_on_completed(completed_callback_type && on_completed,
@@ -586,11 +455,179 @@ namespace detail
             }
         }
 
+        /// Set the callback which needs to be invoked when the future becomes
+        /// ready. If the future is ready the function will be invoked
+        /// immediately.
+        void set_on_completed(completed_callback_type data_sink)
+        {
+            if (!data_sink) return;
+
+            std::unique_lock<mutex_type> l(mtx_);
+
+            if (is_ready_locked(l)) {
+
+                HPX_ASSERT(!on_completed_);
+
+                // invoke the callback (continuation) function right away
+                l.unlock();
+
+                handle_on_completed(std::move(data_sink));
+            }
+            else {
+                // store a combined callback wrapping the old and the new one
+                // make sure continuations are evaluated in the order they are
+                // attached
+                on_completed_ = compose_cb(
+                    std::move(on_completed_), std::move(data_sink));
+            }
+        }
+
+        void wait(local::detail::condition_variable& cond, error_code& ec = throws)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                cond.wait(l, "future_data_base::wait", ec);
+                if (ec) return;
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+        virtual void wait(error_code& = throws) = 0;
+
+        future_status wait_until(local::detail::condition_variable& cond,
+            util::steady_clock::time_point const& abs_time, error_code& ec = throws)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_state_ex_enum const reason =
+                    cond.wait_until(l, abs_time,
+                        "future_data_base::wait_until", ec);
+                if (ec) return future_status::uninitialized;
+
+                if (reason == threads::wait_timeout)
+                    return future_status::timeout;
+
+                return future_status::ready;
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return future_status::ready; //-V110
+        }
+        virtual future_status wait_until(util::steady_clock::time_point const&,
+            error_code& = throws) = 0;
+
+        virtual std::exception_ptr get_exception_ptr() const = 0;
+
+        virtual std::string const& get_registered_name() const
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "future_data_base::get_registered_name",
+                "this future does not support name registration");
+        }
+        virtual void register_as(std::string const& name, bool manage_lifetime)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "future_data_base::set_registered_name",
+                "this future does not support name registration");
+        }
+
+    protected:
+        mutable mutex_type mtx_;
+        state state_;                               // current state
+        completed_callback_type on_completed_;
+    };
+
+    template <typename Result>
+    struct future_data_base
+      : future_data_base<traits::detail::future_data_void>
+    {
+        HPX_NON_COPYABLE(future_data_base);
+
+        typedef typename future_data_result<Result>::type result_type;
+        typedef util::unique_function_nonser<void()> completed_callback_type;
+        typedef future_data_base<traits::detail::future_data_void> base_type;
+        typedef lcos::local::spinlock mutex_type;
+        typedef typename base_type::init_no_addref init_no_addref;
+
+        future_data_base() = default;
+
+        future_data_base(init_no_addref no_addref)
+          : base_type(no_addref)
+        {}
+
+        template <typename Target>
+        future_data_base(Target && data, init_no_addref no_addref)
+          : base_type(no_addref)
+        {
+            result_type* value_ptr =
+                reinterpret_cast<result_type*>(&storage_);
+            ::new ((void*)value_ptr) result_type(
+                future_data_result<Result>::set(std::forward<Target>(data)));
+            state_ = value;
+        }
+
+        future_data_base(std::exception_ptr const& e, init_no_addref no_addref)
+          : base_type(no_addref)
+        {
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(e);
+            state_ = exception;
+        }
+        future_data_base(std::exception_ptr && e, init_no_addref no_addref)
+          : base_type(no_addref)
+        {
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(std::move(e));
+            state_ = exception;
+        }
+
+        virtual ~future_data_base() noexcept
+        {
+            reset();
+        }
+
+        /// Get the result of the requested action. This call blocks (yields
+        /// control) if the result is not ready. As soon as the result has been
+        /// returned and the waiting thread has been re-scheduled by the thread
+        /// manager the function will return.
+        ///
+        /// \param ec     [in,out] this represents the error status on exit,
+        ///               if this is pre-initialized to \a hpx#throws
+        ///               the function will throw on error instead. If the
+        ///               operation blocks and is aborted because the object
+        ///               went out of scope, the code \a hpx#yield_aborted is
+        ///               set or thrown.
+        ///
+        /// \note         If there has been an error reported (using the action
+        ///               \a base_lco#set_exception), this function will throw an
+        ///               exception encapsulating the reported error code and
+        ///               error description if <code>&ec == &throws</code>.
+        virtual result_type* get_result(error_code& ec = throws)
+        {
+            if (!get_result_void(ec))
+                return nullptr;
+            return reinterpret_cast<result_type*>(&storage_);
+        }
+
+        virtual util::unused_type* get_result_void(error_code& ec = throws)
+        {
+            return base_type::get_result_void(&storage_, ec);
+        }
+
         /// Set the result of the requested action.
         template <typename Target>
         void set_value(Target && data, error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked(l)) {
@@ -601,7 +638,7 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed = std::move(this->on_completed_);
+            completed_callback_type on_completed = std::move(on_completed_);
 
             // set the data
             result_type* value_ptr =
@@ -621,7 +658,7 @@ namespace detail
             //       re-lock the mutex while exiting from condition_variable::wait
             while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
             {
-                l = std::unique_lock<mutex_type>(this->mtx_);
+                l = std::unique_lock<mutex_type>(mtx_);
             }
 
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
@@ -632,10 +669,9 @@ namespace detail
                 handle_on_completed(std::move(on_completed));
         }
 
-        template <typename Target>
-        void set_exception(Target && data, error_code& ec = throws)
+        void set_exception(std::exception_ptr data, error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked(l)) {
@@ -646,13 +682,12 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed = std::move(this->on_completed_);
+            completed_callback_type on_completed = std::move(on_completed_);
 
             // set the data
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) std::exception_ptr(
-                std::forward<Target>(data));
+            ::new ((void*)exception_ptr) std::exception_ptr(std::move(data));
             state_ = exception;
 
             // handle all threads waiting for the future to become ready
@@ -666,7 +701,7 @@ namespace detail
             //       re-lock the mutex while exiting from condition_variable::wait
             while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
             {
-                l = std::unique_lock<mutex_type>(this->mtx_);
+                l = std::unique_lock<mutex_type>(mtx_);
             }
 
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
@@ -744,70 +779,15 @@ namespace detail
 
         // continuation support
 
-        /// Set the callback which needs to be invoked when the future becomes
-        /// ready. If the future is ready the function will be invoked
-        /// immediately.
-        void set_on_completed(completed_callback_type data_sink)
-        {
-            if (!data_sink) return;
-
-            std::unique_lock<mutex_type> l(this->mtx_);
-
-            if (is_ready_locked(l)) {
-
-                HPX_ASSERT(!on_completed_);
-
-                // invoke the callback (continuation) function right away
-                l.unlock();
-
-                handle_on_completed(std::move(data_sink));
-            }
-            else {
-                // store a combined callback wrapping the old and the new one
-                // make sure continuations are evaluated in the order they are
-                // attached
-                this->on_completed_ = compose_cb(
-                    std::move(on_completed_), std::move(data_sink));
-            }
-        }
-
         virtual void wait(error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(mtx_);
-
-            // block if this entry is empty
-            if (state_ == empty) {
-                cond_.wait(l, "future_data_base::wait", ec);
-                if (ec) return;
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
+            return base_type::wait(cond_, ec);
         }
 
-        virtual future_status
-        wait_until(util::steady_clock::time_point const& abs_time,
-            error_code& ec = throws)
+        virtual future_status wait_until(
+            util::steady_clock::time_point const& abs_time, error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(mtx_);
-
-            // block if this entry is empty
-            if (state_ == empty) {
-                threads::thread_state_ex_enum const reason =
-                    cond_.wait_until(l, abs_time,
-                        "future_data_base::wait_until", ec);
-                if (ec) return future_status::uninitialized;
-
-                if (reason == threads::wait_timeout)
-                    return future_status::timeout;
-
-                return future_status::ready;
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return future_status::ready; //-V110
+            return base_type::wait_until(cond_, abs_time, ec);
         }
 
         std::exception_ptr get_exception_ptr() const
@@ -817,7 +797,9 @@ namespace detail
         }
 
     protected:
-        completed_callback_type on_completed_;
+        using base_type::mtx_;
+        using base_type::state_;
+        using base_type::on_completed_;
 
     private:
         local::detail::condition_variable cond_;    // threads waiting in read
@@ -1083,9 +1065,9 @@ namespace detail
         }
 
         void set_exception(
-            std::exception_ptr const& e, error_code& ec = throws)
+            std::exception_ptr e, error_code& ec = throws)
         {
-            this->future_data<Result>::set_exception(e, ec);
+            this->future_data<Result>::set_exception(std::move(e), ec);
         }
 
         virtual void do_run()
