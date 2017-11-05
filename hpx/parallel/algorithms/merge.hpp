@@ -648,18 +648,30 @@ namespace hpx { namespace parallel { inline namespace v1
             typename Comp, typename Proj,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_random_access_iterator<RandIter>::value)>
-        inline RandIter
+        inline hpx::future<RandIter>
         parallel_inplace_merge(ExPolicy policy,
             RandIter first, RandIter middle, RandIter last,
             Comp && comp, Proj && proj)
         {
-            parallel_inplace_merge_helper(
-                std::forward<ExPolicy>(policy),
-                first, middle, last,
-                std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+            hpx::future<RandIter> f = execution::async_execute(
+                policy.executor(),
+                [=]() mutable -> RandIter
+                {
+                    try {
+                        parallel_inplace_merge_helper(
+                            policy, first, middle, last, comp, proj);
+                        return last;
+                    }
+                    catch (...) {
+                        util::detail::handle_local_exceptions<ExPolicy>::call(
+                            std::current_exception());
+                    }
 
-            return last;
+                    // Not reachable.
+                    HPX_ASSERT(false);
+                });
+
+            return f;
         }
 
         template <typename Iter>
