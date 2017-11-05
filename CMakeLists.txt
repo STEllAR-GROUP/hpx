@@ -361,7 +361,7 @@ endif()
 ################################################################################
 set(HPX_WITH_NATIVE_TLS_DEFAULT ON)
 if(APPLE)
-  set(HPX_WITH_NATIVE_TLS_DEFAULT OFF)
+  set(HPX_WITH_NATIVE_TLS_DEFAULT ${HPX_WITH_CXX11_THREAD_LOCAL})
 endif()
 hpx_option(HPX_WITH_NATIVE_TLS BOOL
   "Use native TLS support if available (default: ${HPX_WITH_NATIVE_TLS_DEFAULT})"
@@ -438,9 +438,13 @@ hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 
+set(HPX_MORE_THAN_64_THREADS_DEFAULT OFF)
+if(HPX_WITH_MAX_CPU_COUNT GREATER 65)
+  set(HPX_MORE_THAN_64_THREADS_DEFAULT ON)
+endif()
 hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
-  "HPX applications will be able to run on more than 64 cores"
-  (NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
+  "HPX applications will be able to run on more than 64 cores (default: ${HPX_MORE_THAN_64_THREADS_DEFAULT})"
+  ${HPX_MORE_THAN_64_THREADS_DEFAULT}
   CATEGORY "Thread Manager" ADVANCED)
 if(HPX_WITH_MORE_THAN_64_THREADS)
   hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
@@ -903,7 +907,7 @@ endif()
 # HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.99
 hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
     "Enable backwards compatibility for hpx::lcos::local::dataflow() functions"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
 endif()
@@ -1554,7 +1558,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v1.2
+    master
     ${_hpx_apex_no_update}
     VERBOSE)
 
@@ -1698,11 +1702,6 @@ macro(generate_config_defines_header TARGET_DIRECTORY)
     NAMESPACE default
     FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
 endmacro()
-
-###############################################################################
-# Perform the on framework CXX feature tests
-###############################################################################
-hpx_perform_on_framework_cxx_feature_tests()
 
 ################################################################################
 # Set basic search paths for the generated HPX headers

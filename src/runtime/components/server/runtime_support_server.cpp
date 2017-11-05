@@ -591,6 +591,7 @@ namespace hpx { namespace components { namespace server
             tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
             ++k)
         {
+            tm.cleanup_terminated(true);
             // avoid timed suspension, don't boost priority
             util::detail::yield_k(k % 32,
                 "runtime_support::dijkstra_termination",
@@ -632,6 +633,7 @@ namespace hpx { namespace components { namespace server
                 tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
                 ++k)
             {
+                tm.cleanup_terminated(true);
                 // avoid timed suspension, don't boost priority
                 util::detail::yield_k(k % 32,
                     "runtime_support::dijkstra_termination_detection",
@@ -695,6 +697,7 @@ namespace hpx { namespace components { namespace server
             tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
             ++k)
         {
+            tm.cleanup_terminated(true);
             // avoid timed suspension, don't boost priority
             util::detail::yield_k(k % 32,
                 "runtime_support::send_dijkstra_termination_token",
@@ -774,6 +777,7 @@ namespace hpx { namespace components { namespace server
                 tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
                 ++k)
             {
+                tm.cleanup_terminated(true);
                 // avoid timed suspension, don't boost priority
                 util::detail::yield_k(k % 32,
                     "runtime_support::dijkstra_termination_detection",

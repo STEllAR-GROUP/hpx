@@ -77,6 +77,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 "OS-threads");
             return;
         }
+        scheduler_.set_parent_pool(this_thread::get_pool());
 
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the

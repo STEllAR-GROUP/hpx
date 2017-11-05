@@ -313,12 +313,12 @@ namespace hpx { namespace threads { namespace policies
 
             // Select a OS thread which hasn't been disabled
             auto const& rp = resource::get_partitioner();
-            std::size_t count = queue_size;
-            while (count-- != 0)
+            auto mask = rp.get_pu_mask(
+                num_thread + parent_pool_->get_thread_offset());
+            if(!threads::any(mask))
+                threads::set(mask, num_thread + parent_pool_->get_thread_offset());
+            while (true)
             {
-                auto mask = rp.get_pu_mask(
-                    num_thread + parent_pool_->get_thread_offset());
-
                 if (bit_and(mask, parent_pool_->get_used_processing_units()))
                     break;
 
@@ -643,6 +643,18 @@ namespace hpx { namespace threads { namespace policies
             result = queues_[num_thread]->wait_or_add_new(running,
                 idle_loop_count, added) && result;
             if (0 != added) return result;
+
+            // Check if we have been disabled
+            {
+                auto const& rp = resource::get_partitioner();
+                auto mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+
+                if (!bit_and(mask, parent_pool_->get_used_processing_units()))
+                {
+                    return added == 0 && !running;
+                }
+            }
 
             if (numa_sensitive_ != 0)   // limited or no stealing across domains
             {

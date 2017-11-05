@@ -178,7 +178,7 @@ namespace hpx { namespace util
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
-            "os_threads = 1",
+            "os_threads = all",
             "cores = all",
             "localities = 1",
             "first_pu = 0",
@@ -344,11 +344,8 @@ namespace hpx { namespace util
         std::string& hpx_ini_file_,
         std::vector<std::string> const& cmdline_ini_defs_)
     {
-        // add explicit configuration information if its provided
-        if (!hpx_ini_file_.empty()) {
-            util::init_ini_data_base(*this, hpx_ini_file_);
-            need_to_call_pre_initialize = true;
-        }
+        util::init_ini_data_base(*this, hpx_ini_file_);
+        need_to_call_pre_initialize = true;
 
         // let the command line override the config file.
         if (!cmdline_ini_defs_.empty()) {

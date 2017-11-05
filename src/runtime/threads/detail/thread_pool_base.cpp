@@ -51,6 +51,11 @@ namespace hpx { namespace threads { namespace detail
         return used_processing_units_;
     }
 
+    hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const
+    {
+        return used_numa_domains_;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     std::size_t thread_pool_base::get_worker_thread_num() const
     {
@@ -97,8 +102,16 @@ namespace hpx { namespace threads { namespace detail
         auto const& rp = resource::get_partitioner();
         for (std::size_t i = 0; i != pool_threads; ++i)
         {
-            used_processing_units_ |= rp.get_pu_mask(threads_offset + i);
+            auto const& mask = rp.get_pu_mask(threads_offset + i);
+            // if bind=none, we get an empty mask back. In the cas of an
+            // empty mask, we still need to account for the used units, so
+            // we just mark the specific bit.
+            if (threads::any(mask))
+                used_processing_units_ |= rp.get_pu_mask(threads_offset + i);
+            else
+                threads::set(used_processing_units_, threads_offset + i);
         }
+        used_numa_domains_ = rp.get_topology().cpuset_to_nodeset(used_processing_units_);
     }
 }}}
 

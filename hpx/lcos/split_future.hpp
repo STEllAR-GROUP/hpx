@@ -40,6 +40,27 @@ namespace hpx
     template <typename ... Ts>
     inline tuple<future<Ts>...>
     split_future(future<tuple<Ts...> > && f);
+
+    /// The function \a split_future is an operator allowing to split a given
+    /// future of a sequence of values (any std::vector)
+    /// into a std::vector of futures where each future represents
+    /// one of the values from the original std::vector. In some sense this
+    /// function provides the inverse operation of \a when_all.
+    ///
+    /// \param f    [in] A future holding an arbitrary sequence of values stored
+    ///             in a std::vector.
+    /// \param size [in] The number of elements the vector will hold once the
+    ///             input future has become ready
+    ///
+    /// \return     Returns a std::vector of futures, where each future refers
+    ///             to the corresponding value in the input parameter. All of
+    ///             the returned futures become ready once the input future has
+    ///             become ready. If the input future is exceptional, all output
+    ///             futures will be exceptional as well.
+    ///
+    template <typename T>
+    inline std::vector<future<T>>
+    split_future(future<std::vector<T> > && f, std::size_t size);
 }
 
 #else // DOXYGEN
@@ -65,6 +86,7 @@ namespace hpx
 #include <exception>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -217,6 +239,12 @@ namespace hpx { namespace lcos
                 try {
                     typedef typename traits::future_traits<T>::type result_type;
                     result_type* result = state->get_result();
+                    if (i >= result->size())
+                    {
+                        HPX_THROW_EXCEPTION(length_error,
+                            "split_continuation::on_ready",
+                            "index out of bounds");
+                    }
                     this->base_type::set_value(std::move((*result)[i]));
                 }
                 catch (...) {
@@ -267,6 +295,19 @@ namespace hpx { namespace lcos
 
             for (std::size_t i = 0; i != N; ++i)
                 result[i] = extract_future_array<T>(i, f);
+
+            return result;
+        }
+
+        template <typename T, typename Future>
+        inline std::vector<hpx::future<T> >
+        split_future_helper_vector(Future && f, std::size_t size)
+        {
+            std::vector<hpx::future<T> > result;
+            result.reserve(size);
+
+            for (std::size_t i = 0; i != size; ++i)
+                result.push_back(extract_future_array<T>(i, f));
 
             return result;
         }
@@ -351,6 +392,21 @@ namespace hpx { namespace lcos
         std::array<hpx::future<void>, 1> result;
         result[0] = hpx::make_future<void>(std::move(f));
         return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    HPX_FORCEINLINE std::vector<hpx::future<T> >
+    split_future(hpx::future<std::vector<T> > && f, std::size_t size)
+    {
+        return detail::split_future_helper_vector<T>(std::move(f), size);
+    }
+
+    template <typename T>
+    HPX_FORCEINLINE std::vector<hpx::future<T> >
+    split_future(hpx::shared_future<std::vector<T> > && f, std::size_t size)
+    {
+        return detail::split_future_helper_vector<T>(std::move(f), size);
     }
 }}
 

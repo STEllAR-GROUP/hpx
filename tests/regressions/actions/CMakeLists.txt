@@ -9,6 +9,7 @@ set(tests
     async_deferred_1523
     component_action_move_semantics
     make_continuation_1615
+    missing_include_2958
     plain_action_1330
     plain_action_1550
     plain_action_move_semantics

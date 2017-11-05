@@ -7,7 +7,7 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFER
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
 

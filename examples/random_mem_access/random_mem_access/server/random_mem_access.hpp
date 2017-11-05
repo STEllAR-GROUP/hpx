@@ -8,15 +8,10 @@
 #define HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM
 
 #include <hpx/hpx.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
-#include <mutex>
 #include <sstream>
 
 namespace hpx { namespace components { namespace server
@@ -37,26 +32,21 @@ namespace hpx { namespace components { namespace server
     /// from.
     ///
     class random_mem_access
-      : public component_base<random_mem_access>
+      : public hpx::components::locking_hook<
+            hpx::components::component_base<random_mem_access> >
     {
     public:
         // constructor: initialize random_mem_access value
         random_mem_access()
-          : arg_(0), arg_init_(0), prefix_(0)
-        {
-            applier::applier* appl = applier::get_applier_ptr();
-            if (appl)
-                prefix_ = appl->get_locality_id();
-        }
+          : arg_(0), arg_init_(0), prefix_(hpx::get_locality_id())
+        {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        void init(int i)
+        void init(std::size_t i)
         {
-            std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
-
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
                 << " Initializing count to " << i << "\n";
@@ -69,8 +59,6 @@ namespace hpx { namespace components { namespace server
         /// Add the given number to the accumulator
         void add()
         {
-            std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
-
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
                 << " Incrementing count from " << arg_
@@ -81,10 +69,8 @@ namespace hpx { namespace components { namespace server
         }
 
         /// Return the current value to the caller
-        int query()
+        std::size_t query()
         {
-            std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
-
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
                 << " Querying count, current value is " << arg_ << "\n";
@@ -96,8 +82,6 @@ namespace hpx { namespace components { namespace server
         /// Print the current value of the accumulator
         void print()
         {
-            std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
-
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
                 << " Initial count was " << arg_init_
@@ -115,10 +99,9 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(random_mem_access, print);
 
     private:
-        int arg_;
-        int arg_init_;
+        std::size_t arg_;
+        std::size_t arg_init_;
         std::uint32_t prefix_;
-        hpx::lcos::local::mutex mtx_;
     };
 
 }}}

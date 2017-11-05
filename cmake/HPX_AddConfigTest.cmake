@@ -241,13 +241,6 @@ macro(hpx_check_for_cxx11_sfinae_expression)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_sfinae_expression_complete)
-  add_hpx_in_framework_config_test(HPX_WITH_CXX11_SFINAE_EXPRESSION_COMPLETE
-    SOURCE cmake/tests/cxx11_sfinae_expression_complete.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_defaulted_functions)
   add_hpx_config_test(HPX_WITH_CXX11_DEFAULTED_FUNCTIONS
     SOURCE cmake/tests/cxx11_defaulted_functions.cpp
@@ -549,10 +542,26 @@ macro(hpx_check_for_cxx11_std_unordered_set)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_thread_local)
+  add_hpx_config_test(HPX_WITH_CXX11_THREAD_LOCAL
+    SOURCE cmake/tests/cxx11_thread_local.cpp
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_thread_local)
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_noreturn_attribute)
   add_hpx_config_test(HPX_WITH_CXX11_NORETURN_ATTRIBUTE
     SOURCE cmake/tests/cxx11_noreturn_attribute.cpp
     FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_override)
+  add_hpx_config_test(HPX_WITH_CXX11_OVERRIDE
+    SOURCE cmake/tests/cxx11_override.cpp
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_override)
 endmacro()
 
 ###############################################################################

@@ -64,6 +64,7 @@ struct test_client
 
     test_client() {}
     test_client(hpx::shared_future<hpx::id_type> const& id) : base_type(id) {}
+    test_client(hpx::id_type && id) : base_type(std::move(id)) {}
 
     hpx::id_type call() const { return call_action()(this->get_id()); }
 };

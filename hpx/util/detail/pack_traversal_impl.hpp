@@ -7,10 +7,10 @@
 #define HPX_UTIL_DETAIL_PACK_TRAVERSAL_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/detail/reserve.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_range.hpp>
-#include <hpx/traits/is_tuple_like.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/detail/container_category.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
@@ -346,45 +346,6 @@ namespace util {
             {
             };
 
-            /// Deduces to a true type if the given parameter T
-            /// supports a `reserve` method.
-            template <typename T, typename = void>
-            struct is_reservable : std::false_type
-            {
-            };
-            template <typename T>
-            struct is_reservable<T,
-                typename always_void<decltype(std::declval<T>().reserve(
-                    std::declval<std::size_t>()))>::type> : std::true_type
-            {
-            };
-
-            template <typename Dest, typename Source>
-            void reserve_if_possible(
-                std::true_type, Dest& dest, Source const& source)
-            {
-                // Reserve the mapped size
-                dest.reserve(source.size());
-            }
-            template <typename Dest, typename Source>
-            void reserve_if_possible(
-                std::false_type, Dest const&, Source const&) noexcept
-            {
-                // We do nothing here, since the container doesn't
-                // support reserve
-            }
-
-            /// Rebind the given allocator to NewType
-            template <typename NewType, typename Allocator>
-            auto rebind_allocator(Allocator&& allocator) ->
-                typename std::allocator_traits<
-                    Allocator>::template rebind_alloc<NewType>
-            {
-                return typename std::allocator_traits<Allocator>::
-                    template rebind_alloc<NewType>(
-                        std::forward<Allocator>(allocator));
-            }
-
             /// Specialization for a container with a single type T
             template <typename NewType, template <class> class Base,
                 typename OldType>
@@ -399,21 +360,22 @@ namespace util {
             /// which is preserved across the remap.
             /// -> We remap the allocator through std::allocator_traits.
             template <typename NewType, template <class, class> class Base,
-                typename OldType, typename Allocator,
+                typename OldType, typename OldAllocator,
                 // Check whether the second argument of the container was
                 // the used allocator.
                 typename std::enable_if<std::uses_allocator<
-                    Base<OldType, Allocator>, Allocator>::value>::type* =
-                    nullptr>
+                    Base<OldType, OldAllocator>, OldAllocator>::value>::type* =
+                    nullptr,
+                typename NewAllocator = typename std::allocator_traits<
+                    OldAllocator>::template rebind_alloc<NewType>>
             auto rebind_container(
-                Base<OldType, Allocator> const& container) -> Base<NewType,
-                decltype(rebind_allocator<NewType>(container.get_allocator()))>
+                Base<OldType, OldAllocator> const& container)
+                -> Base<NewType, NewAllocator>
             {
-                // Create a new version of the allpcator, that is capable of
+                // Create a new version of the allocator, that is capable of
                 // allocating the mapped type.
-                auto allocator =
-                    rebind_allocator<NewType>(container.get_allocator());
-                return Base<NewType, decltype(allocator)>(std::move(allocator));
+                return Base<NewType, NewAllocator>(
+                    NewAllocator(container.get_allocator()));
             }
 
             /// Returns the default iterators of the container in case
@@ -534,26 +496,26 @@ namespace util {
             /// \tparam CanReuse Identifies whether the container can be
             ///         re-used through the mapping.
             template <bool IsEmptyMapped, bool CanReuse>
-            struct container_category_tag
+            struct container_mapping_tag
             {
             };
 
-            /// Categorizes the given container through a container_category_tag
+            /// Categorizes the given container through a container_mapping_tag
             template <typename T, typename M>
-            using container_category_of_t =
-                container_category_tag<is_empty_mapped<T, M>::value,
+            using container_mapping_tag_of_t =
+                container_mapping_tag<is_empty_mapped<T, M>::value,
                     can_reuse<T, M>::value>;
 
             /// We create a new container, which may hold the resulting type
             template <typename M, typename T>
             auto remap_container(
-                container_category_tag<false, false>, M&& mapper, T&& container)
+                container_mapping_tag<false, false>, M&& mapper, T&& container)
                 -> decltype(
                     rebind_container<mapped_type_from_t<T, M>>(container))
             {
                 static_assert(has_push_back<typename std::decay<T>::type,
                                   element_of_t<T>>::value,
-                    "Can only remap containers, that provide a push_back "
+                    "Can only remap containers that provide a push_back "
                     "method!");
 
                 // Create the new container, which is capable of holding
@@ -563,8 +525,7 @@ namespace util {
 
                 // We try to reserve the original size from the source
                 // container to the destination container.
-                reserve_if_possible(
-                    is_reservable<decltype(remapped)>{}, remapped, container);
+                traits::detail::reserve_if_reservable(remapped, container.size());
 
                 // Perform the actual value remapping from the source to
                 // the destination.
@@ -583,8 +544,8 @@ namespace util {
             /// The remapper optimized for the case that we map to the same
             /// type we accepted such as int -> int.
             template <typename M, typename T>
-            auto remap_container(container_category_tag<false, true>,
-                M&& mapper, T&& container) -> typename std::decay<T>::type
+            auto remap_container(container_mapping_tag<false, true>, M&& mapper,
+                T&& container) -> typename std::decay<T>::type
             {
                 for (auto&& val :
                     container_accessor_of(std::forward<T>(container)))
@@ -597,9 +558,8 @@ namespace util {
 
             /// Remap the container to zero arguments
             template <typename M, typename T>
-            auto remap_container(
-                container_category_tag<true, false>, M&& mapper, T&& container)
-                -> decltype(spreading::empty_spread())
+            auto remap_container(container_mapping_tag<true, false>, M&& mapper,
+                T&& container) -> decltype(spreading::empty_spread())
             {
                 for (auto&& val :
                     container_accessor_of(std::forward<T>(container)))
@@ -615,32 +575,22 @@ namespace util {
             /// Remaps the content of the given container with type T,
             /// to a container of the same type which may contain
             /// different types.
-            template <typename T, typename M
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
-                // Support for skipping completely untouched types
+            template <typename T, typename M>
+            auto remap(strategy_remap_tag, T&& container, M&& mapper,
                 typename std::enable_if<
-                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr
-#endif
-                >
-            auto remap(strategy_remap_tag, T&& container, M&& mapper)
-                -> decltype(remap_container(container_category_of_t<T, M>{},
+                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr)
+                -> decltype(remap_container(container_mapping_tag_of_t<T, M>{},
                     std::forward<M>(mapper), std::forward<T>(container)))
             {
-                return remap_container(container_category_of_t<T, M>{},
+                return remap_container(container_mapping_tag_of_t<T, M>{},
                     std::forward<M>(mapper), std::forward<T>(container));
             }
 
             /// Just call the visitor with the content of the container
-            template <typename T, typename M
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
-                // Support for skipping completely untouched types
+            template <typename T, typename M>
+            void remap(strategy_traverse_tag, T&& container, M&& mapper,
                 typename std::enable_if<
-                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr
-#endif
-                >
-            void remap(strategy_traverse_tag, T&& container, M&& mapper)
+                    is_effective_t<M, element_of_t<T>>::value>::type* = nullptr)
             {
                 for (auto&& element : std::forward<T>(container))
                 {
@@ -653,26 +603,18 @@ namespace util {
         /// Provides utilities for remapping the whole content of a
         /// tuple like type to the same type holding different types.
         namespace tuple_like_remapping {
-            template <typename Strategy, typename Mapper, typename T
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
-                typename = void
-#endif
-                >
+            template <typename Strategy, typename Mapper, typename T,
+                typename Enable = void>
             struct tuple_like_remapper;
 
             /// Specialization for std::tuple like types which contain
             /// an arbitrary amount of heterogenous arguments.
             template <typename M, template <typename...> class Base,
                 typename... OldArgs>
-            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArgs...>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArgs...>,
                 // Support for skipping completely untouched types
                 typename std::enable_if<
-                    is_effective_any_of_t<M, OldArgs...>::value>::type
-#endif
-                >
+                    is_effective_any_of_t<M, OldArgs...>::value>::type>
             {
                 M mapper_;
 
@@ -688,14 +630,10 @@ namespace util {
             template <typename M, template <typename...> class Base,
                 typename... OldArgs>
             struct tuple_like_remapper<strategy_traverse_tag, M,
-                Base<OldArgs...>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+                Base<OldArgs...>,
                 // Support for skipping completely untouched types
                 typename std::enable_if<
-                    is_effective_any_of_t<M, OldArgs...>::value>::type
-#endif
-                >
+                    is_effective_any_of_t<M, OldArgs...>::value>::type>
             {
                 M mapper_;
 
@@ -713,13 +651,9 @@ namespace util {
             /// compile-time known amount of homogeneous types.
             template <typename M, template <typename, std::size_t> class Base,
                 typename OldArg, std::size_t Size>
-            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArg, Size>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+            struct tuple_like_remapper<strategy_remap_tag, M, Base<OldArg, Size>,
                 // Support for skipping completely untouched types
-                typename std::enable_if<is_effective_t<M, OldArg>::value>::type
-#endif
-                >
+                typename std::enable_if<is_effective_t<M, OldArg>::value>::type>
             {
                 M mapper_;
 
@@ -735,13 +669,9 @@ namespace util {
             template <typename M, template <typename, std::size_t> class Base,
                 typename OldArg, std::size_t Size>
             struct tuple_like_remapper<strategy_traverse_tag, M,
-                Base<OldArg, Size>
-#ifdef HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE
-                ,
+                Base<OldArg, Size>,
                 // Support for skipping completely untouched types
-                typename std::enable_if<is_effective_t<M, OldArg>::value>::type
-#endif
-                >
+                typename std::enable_if<is_effective_t<M, OldArg>::value>::type>
             {
                 M mapper_;
 
@@ -771,18 +701,6 @@ namespace util {
                     std::forward<T>(container));
             }
         }    // end namespace tuple_like_remapping
-
-        /// Tag for dispatching based on the tuple like
-        /// or container requirements
-        template <bool IsContainer, bool IsTupleLike>
-        struct container_match_tag
-        {
-        };
-
-        template <typename T>
-        using container_match_of =
-            container_match_tag<traits::is_range<T>::value,
-                traits::is_tuple_like<T>::value>;
 
         /// Base class for making strategy dependent behaviour available
         /// to the mapping_helper class.
@@ -885,21 +803,22 @@ namespace util {
             /// because some compilers (MSVC) tend to instantiate the invocation
             /// before matching the tag, which leads to build failures.
             template <typename T>
-            auto match(container_match_tag<false, false>, T&& element)
+            auto match(container_category_tag<false, false>, T&& element)
                 -> decltype(std::declval<mapping_helper>().invoke_mapper(
                     std::forward<T>(element)));
 
             /// SFINAE helper for elements satisfying the container
             /// requirements, which are not tuple like.
             template <typename T>
-            auto match(container_match_tag<true, false>, T&& container)
+            auto match(container_category_tag<true, false>, T&& container)
                 -> decltype(container_remapping::remap(Strategy{},
                     std::forward<T>(container), std::declval<traversor>()));
 
             /// SFINAE helper for elements which are tuple like and
             /// that also may satisfy the container requirements
             template <bool IsContainer, typename T>
-            auto match(container_match_tag<IsContainer, true>, T&& tuple_like)
+            auto match(
+                container_category_tag<IsContainer, true>, T&& tuple_like)
                 -> decltype(tuple_like_remapping::remap(Strategy{},
                     std::forward<T>(tuple_like),
                     std::declval<traversor>()));
@@ -926,7 +845,7 @@ namespace util {
             /// because some compilers (MSVC) tend to instantiate the invocation
             /// before matching the tag, which leads to build failures.
             template <typename T>
-            auto try_match(container_match_tag<false, false>, T&& element)
+            auto try_match(container_category_tag<false, false>, T&& element)
                 -> decltype(std::declval<mapping_helper>().invoke_mapper(
                     std::forward<T>(element)))
             {
@@ -938,7 +857,7 @@ namespace util {
             /// Match elements satisfying the container requirements,
             /// which are not tuple like.
             template <typename T>
-            auto try_match(container_match_tag<true, false>, T&& container)
+            auto try_match(container_category_tag<true, false>, T&& container)
                 -> decltype(container_remapping::remap(Strategy{},
                     std::forward<T>(container), std::declval<try_traversor>()))
             {
@@ -951,7 +870,7 @@ namespace util {
             /// -> We match tuple like types over container like ones
             template <bool IsContainer, typename T>
             auto try_match(
-                container_match_tag<IsContainer, true>, T&& tuple_like)
+                container_category_tag<IsContainer, true>, T&& tuple_like)
                 -> decltype(tuple_like_remapping::remap(Strategy{},
                     std::forward<T>(tuple_like), std::declval<try_traversor>()))
             {
@@ -966,23 +885,23 @@ namespace util {
             template <typename T>
             auto traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().match(
-                    std::declval<
-                        container_match_of<typename std::decay<T>::type>>(),
+                    std::declval<container_category_of_t<
+                        typename std::decay<T>::type>>(),
                     std::declval<T>()));
 
             /// \copybrief traverse
             template <typename T>
             auto try_traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().try_match(
-                    std::declval<
-                        container_match_of<typename std::decay<T>::type>>(),
+                    std::declval<container_category_of_t<
+                        typename std::decay<T>::type>>(),
                     std::declval<T>()))
             {
                 // We use tag dispatching here, to categorize the type T whether
                 // it satisfies the container or tuple like requirements.
                 // Then we can choose the underlying implementation accordingly.
                 return try_match(
-                    container_match_of<typename std::decay<T>::type>{},
+                    container_category_of_t<typename std::decay<T>::type>{},
                     std::forward<T>(element));
             }
 

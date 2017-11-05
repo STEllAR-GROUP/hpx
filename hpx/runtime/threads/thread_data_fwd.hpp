@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <memory>
 
 namespace hpx
 {
@@ -36,6 +37,9 @@ namespace hpx { namespace threads
     struct HPX_EXPORT topology;
 
     class HPX_EXPORT executor;
+
+    struct hpx_hwloc_bitmap_wrapper;
+    typedef std::shared_ptr<hpx_hwloc_bitmap_wrapper> hwloc_bitmap_ptr;
 
     typedef coroutines::coroutine coroutine_type;
 

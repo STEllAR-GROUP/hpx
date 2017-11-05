@@ -297,6 +297,7 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data background_init(
             [&, background_running](thread_state_ex_enum) -> thread_result_type
             {
+
                 while(*background_running)
                 {
                     if (callbacks.background_())
@@ -665,7 +666,7 @@ namespace hpx { namespace threads { namespace detail
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-                    // clean up terminated threads one more time before existing
+                    // clean up terminated threads one more time before exiting
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
                         // if this is an inner scheduler, exit immediately
@@ -678,15 +679,6 @@ namespace hpx { namespace threads { namespace detail
                         // otherwise, keep idling for some time
                         if (!may_exit)
                             idle_loop_count = 0;
-                        may_exit = true;
-                    }
-                }
-                // In the case of dynamic reassining of cores this branch is
-                // taken and causes the scheduling loop to stop.
-                else
-                {
-                    if(!running)
-                    {
                         may_exit = true;
                     }
                 }
@@ -704,6 +696,7 @@ namespace hpx { namespace threads { namespace detail
                     // possible. No need to reschedule, as another LCO will
                     // set it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
+                    HPX_ASSERT(background_running);
                     *background_running = false;
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
@@ -733,6 +726,7 @@ namespace hpx { namespace threads { namespace detail
                     // possible. No need to reschedule, as another LCO will
                     // set it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
+                    HPX_ASSERT(background_running);
                     *background_running = false;
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
@@ -752,18 +746,19 @@ namespace hpx { namespace threads { namespace detail
                 if (!params.outer_.empty())
                     params.outer_();
 
-                // We just call cleanup_terminated and ignore the return value
-                // in case of dynamic assigning of PU, this always returns
-                // false in a running application due to thread_map_ not
-                // being empty. We perform a similar check in the termination
-                // detection anyways...
-                scheduler.SchedulingPolicy::cleanup_terminated(true);
-
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    this_state.store(state_stopped);
-                    break;
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    {
+                        this_state.store(state_stopped);
+                        break;
+                    }
+                    may_exit = false;
+                }
+                else
+                {
+                    scheduler.SchedulingPolicy::cleanup_terminated(true);
                 }
             }
         }

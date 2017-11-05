@@ -216,7 +216,6 @@ int main()
     }
     checkpoint archive10_1(char_vec_10);  // Write data to checkpoint
     restore_checkpoint(archive10_1, vec10_1);
-    //]
 
     HPX_TEST(vec10 == vec10_1);
 

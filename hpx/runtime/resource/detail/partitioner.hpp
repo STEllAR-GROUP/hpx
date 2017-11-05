@@ -197,13 +197,15 @@ namespace hpx { namespace resource { namespace detail
 
         // helper functions
         detail::init_pool_data const& get_pool_data(
-            std::size_t pool_index) const;
+            std::unique_lock<mutex_type>& l, std::size_t pool_index) const;
 
         // has to be private because pointers become invalid after data member
         // thread_pools_ is resized we don't want to allow the user to use it
         detail::init_pool_data const& get_pool_data(
+            std::unique_lock<mutex_type>& l,
             std::string const& pool_name) const;
-        detail::init_pool_data& get_pool_data(std::string const& pool_name);
+        detail::init_pool_data& get_pool_data(
+            std::unique_lock<mutex_type>& l, std::string const& pool_name);
 
         void set_scheduler(scheduling_policy sched, std::string const& pool_name);
 

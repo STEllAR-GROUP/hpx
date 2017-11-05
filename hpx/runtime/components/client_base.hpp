@@ -155,6 +155,65 @@ namespace hpx { namespace lcos { namespace detail
     };
 }}}
 
+namespace hpx { namespace lcos { namespace detail
+{
+    // Specialization for shared state of id_type, additionally (optionally)
+    // holds a registered name for the object it refers to.
+    template <>
+    struct future_data<id_type> : future_data_base<id_type>
+    {
+        HPX_NON_COPYABLE(future_data);
+
+        using init_no_addref =
+            typename future_data_base<id_type>::init_no_addref;
+
+        future_data() = default;
+
+        future_data(init_no_addref no_addref)
+          : future_data_base<id_type>(no_addref)
+        {}
+
+        template <typename Target>
+        future_data(Target && data, init_no_addref no_addref)
+          : future_data_base<id_type>(std::move(data), no_addref)
+        {}
+
+        future_data(std::exception_ptr const& e, init_no_addref no_addref)
+          : future_data_base<id_type>(e, no_addref)
+        {}
+        future_data(std::exception_ptr && e, init_no_addref no_addref)
+          : future_data_base<id_type>(std::move(e), no_addref)
+        {}
+
+        ~future_data() noexcept override
+        {
+            if (!registered_name_.empty())
+            {
+                std::string name = std::move(registered_name_);
+                error_code ec(lightweight);
+                agas::unregister_name(launch::sync, name, ec);
+            }
+        }
+
+        std::string const& get_registered_name() const override
+        {
+            return registered_name_;
+        }
+        void register_as(std::string const& name, bool manage_lifetime) override
+        {
+            HPX_ASSERT(registered_name_.empty());   // call only once
+            registered_name_ = name;
+            if (manage_lifetime)
+            {
+                hpx::agas::register_name(launch::sync, name, *this->get_result());
+            }
+        }
+
+    private:
+        std::string registered_name_;
+    };
+}}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
@@ -193,18 +252,9 @@ namespace hpx { namespace components
 
     protected:
         typedef typename detail::make_stub<Stub>::type stub_type;
-        typedef lcos::detail::future_data<id_type> shared_state_type;
+        typedef lcos::detail::future_data_base<id_type> shared_state_type;
 
         typedef shared_future<id_type> future_type;
-
-        void unregister_held_object(error_code& ec = throws)
-        {
-            if (!registered_name_.empty())
-            {
-                std::string name = std::move(registered_name_);
-                agas::unregister_name(launch::sync, name, ec);
-            }
-        }
 
         client_base(boost::intrusive_ptr<shared_state_type> const& state)
           : shared_state_(state)
@@ -226,12 +276,12 @@ namespace hpx { namespace components
         {}
 
         explicit client_base(id_type const& id)
-          : shared_state_(new shared_state_type)
+          : shared_state_(new lcos::detail::future_data<id_type>)
         {
             shared_state_->set_value(id);
         }
         explicit client_base(id_type && id)
-          : shared_state_(new shared_state_type)
+          : shared_state_(new lcos::detail::future_data<id_type>)
         {
             shared_state_->set_value(std::move(id));
         }
@@ -255,8 +305,7 @@ namespace hpx { namespace components
           : shared_state_(rhs.shared_state_)
         {}
         client_base(client_base && rhs) noexcept
-          : registered_name_(std::move(rhs.registered_name_)),
-            shared_state_(std::move(rhs.shared_state_))
+          : shared_state_(std::move(rhs.shared_state_))
         {
             rhs.shared_state_ = nullptr;
         }
@@ -268,23 +317,17 @@ namespace hpx { namespace components
           : shared_state_(d.valid() ? lcos::detail::unwrap(std::move(d)) : nullptr)
         {}
 
-        ~client_base()
-        {
-            error_code ec;              // ignore all exceptions
-            unregister_held_object(ec);
-        }
+        ~client_base() = default;
 
         // copy assignment and move assignment
         client_base& operator=(id_type const& id)
         {
-            unregister_held_object();
             shared_state_ = new shared_state_type;
             shared_state_->set_value(id);
             return *this;
         }
         client_base& operator=(id_type && id)
         {
-            unregister_held_object();
             shared_state_ = new shared_state_type;
             shared_state_->set_value(std::move(id));
             return *this;
@@ -292,21 +335,18 @@ namespace hpx { namespace components
 
         client_base& operator=(shared_future<id_type> const& f)
         {
-            unregister_held_object();
             shared_state_ = hpx::traits::future_access<future_type>::
                 get_shared_state(f);
             return *this;
         }
         client_base& operator=(shared_future<id_type> && f)
         {
-            unregister_held_object();
             shared_state_ = hpx::traits::future_access<future_type>::
                 get_shared_state(std::move(f));
             return *this;
         }
         client_base& operator=(future<id_type> && f)
         {
-            unregister_held_object();
             shared_state_ = hpx::traits::future_access<future_type>::
                 get_shared_state(std::move(f));
             return *this;
@@ -314,15 +354,12 @@ namespace hpx { namespace components
 
         client_base& operator=(client_base const& rhs)
         {
-            unregister_held_object();
             shared_state_ = rhs.shared_state_;
             return *this;
         }
         client_base& operator=(client_base && rhs)
         {
-            unregister_held_object();
             shared_state_ = std::move(rhs.shared_state_);
-            registered_name_ = std::move(rhs.registered_name_);
             return *this;
         }
 
@@ -357,7 +394,6 @@ namespace hpx { namespace components
 
         void free()
         {
-            unregister_held_object();
             shared_state_.reset();
         }
 
@@ -383,7 +419,6 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         shared_future<id_type> detach()
         {
-            unregister_held_object();
             return hpx::traits::future_access<future_type>::
                 create(std::move(shared_state_));
         }
@@ -521,9 +556,9 @@ namespace hpx { namespace components
     private:
         ///////////////////////////////////////////////////////////////////////
         static void register_as_helper(client_base const& f,
-            std::string const& symbolic_name)
+            std::string const& symbolic_name, bool manage_lifetime)
         {
-            hpx::agas::register_name(launch::sync, symbolic_name, f.get());
+            f.shared_state_->register_as(symbolic_name, manage_lifetime);
         }
 
     public:
@@ -538,15 +573,11 @@ namespace hpx { namespace components
                     "this client_base has no valid shared state");
             }
 
-            HPX_ASSERT(registered_name_.empty());   // call only once
-            if (manage_lifetime)
-                registered_name_ = symbolic_name;
-
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
                     *this, launch::sync,
                     util::bind(&client_base::register_as_helper,
-                        util::placeholders::_1, symbolic_name
+                        util::placeholders::_1, symbolic_name, manage_lifetime
                     ));
             return hpx::traits::future_access<future<void> >::
                 create(std::move(p));
@@ -560,23 +591,18 @@ namespace hpx { namespace components
         }
 
         // Make sure this instance does not manage the lifetime of the
-        // registered object anymore.
-        void reset_registered_name()
+        // registered object anymore (obsolete).
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG) void reset_registered_name()
         {
-            HPX_ASSERT(!registered_name_.empty());   // call only once
-            registered_name_.clear();
         }
 
         // Access registered name for the component
         std::string const& registered_name() const
         {
-            return registered_name_;
+            return shared_state_->get_registered_name();
         }
 
     protected:
-        // will be set for created (non-attached) objects
-        std::string registered_name_;
-
         // shared state holding the id_type this client refers to
         boost::intrusive_ptr<shared_state_type> shared_state_;
     };

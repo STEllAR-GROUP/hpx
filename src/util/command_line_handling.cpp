@@ -281,13 +281,15 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_threads(util::manage_config& cfgmap,
+            util::runtime_configuration const& rtcfg,
             boost::program_options::variables_map& vm,
             util::batch_environment& env, bool using_nodelist, bool initial)
         {
             std::size_t batch_threads = env.retrieve_number_of_threads();
             std::size_t default_threads = thread::hardware_concurrency();
             std::string threads_str = cfgmap.get_value<std::string>(
-                "hpx.os_threads", "");
+                "hpx.os_threads", rtcfg.get_entry("hpx.os_threads",
+                    std::to_string(default_threads)));
 
             if ("all" == threads_str)
             {
@@ -295,13 +297,15 @@ namespace hpx { namespace util
                     batch_threads = thread::hardware_concurrency();
                 else
                     default_threads = batch_threads;
-
-                cfgmap.config_["hpx.os_threads"] =
-                    std::to_string(batch_threads);
             }
             else if (batch_threads != std::size_t(-1))
             {
                 default_threads = batch_threads;
+            }
+            else
+            {
+                default_threads =
+                    hpx::util::safe_lexical_cast<std::size_t>(threads_str);
             }
 
             std::size_t threads = cfgmap.get_value<std::size_t>(
@@ -320,7 +324,8 @@ namespace hpx { namespace util
                 }
                 else
                 {
-                    threads = hpx::util::safe_lexical_cast<std::size_t>(threads_str);
+                    threads =
+                        hpx::util::safe_lexical_cast<std::size_t>(threads_str);
                 }
 
                 if (threads == 0)
@@ -557,7 +562,7 @@ namespace hpx { namespace util
 
         // handle number of cores and threads
         num_threads_ = detail::handle_num_threads(
-            cfgmap, vm, env, using_nodelist, initial);
+            cfgmap, rtcfg_, vm, env, using_nodelist, initial);
         num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
         bool expect_connections = false;

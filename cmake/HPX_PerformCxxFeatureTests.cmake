@@ -79,6 +79,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_variadic_templates(
     REQUIRED "HPX needs support for C++11 variadic templates")
 
+  hpx_check_for_cxx11_override(
+    REQUIRED "HPX needs support for C++11 override")
+
   # Check the availability of certain C++11 library features
   hpx_check_for_cxx11_std_array(
     REQUIRED "HPX needs support for C++11 std::array")
@@ -143,6 +146,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_unordered_set(
     REQUIRED "HPX needs support for C++11 std::unordered_set")
 
+  hpx_check_for_cxx11_thread_local(
+    DEFINITIONS HPX_HAVE_CXX11_THREAD_LOCAL)
+
   hpx_check_for_cxx11_noreturn_attribute(
     DEFINITIONS HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
 
@@ -172,7 +178,7 @@ macro(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx14_deprecated_attribute(
       DEFINITIONS HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
-    
+
     hpx_check_for_cxx14_return_type_deduction()
 
     # check for experimental facilities
@@ -190,16 +196,4 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
   endif()
-endmacro()
-
-################################################################################
-# C++ feature tests which require 3. party libraries
-# and a present config file to work.
-#
-# This tests are meant for testing the compiler on the capability
-# to compile parts of HPX directly without relying on generic feature tests.
-################################################################################
-macro(hpx_perform_on_framework_cxx_feature_tests)
-  hpx_check_for_cxx11_sfinae_expression_complete(
-    DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION_COMPLETE)
 endmacro()

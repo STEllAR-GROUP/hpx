@@ -557,6 +557,9 @@ map_pack                              "" "header\.hpx\.util\.pack_traversal.*"
 spread_this                           "" "header\.hpx\.util\.pack_traversal.*"
 traverse_pack                         "" "header\.hpx\.util\.pack_traversal.*"
 
+# hpx/util/pack_traversal_async.hpp
+traverse_pack_async                   "" "header\.hpx\.util\.pack_traversal_async.*"
+
 # hpx/util/unwrap.hpp
 unwrap                                "" "header\.hpx\.util\.unwrap.*"
 unwrap_n                              "" "header\.hpx\.util\.unwrap_n.*"
