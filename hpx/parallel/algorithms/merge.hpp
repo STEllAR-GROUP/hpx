@@ -157,11 +157,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename ExPolicy,
             typename RandIter1, typename RandIter2, typename RandIter3,
-            typename Comp, typename Proj1, typename Proj2, typename BinarySearchHelper,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_random_access_iterator<RandIter1>::value &&
-            hpx::traits::is_random_access_iterator<RandIter2>::value &&
-            hpx::traits::is_random_access_iterator<RandIter3>::value)>
+            typename Comp, typename Proj1, typename Proj2,
+            typename BinarySearchHelper>
         void
         parallel_merge_helper(ExPolicy policy,
             RandIter1 first1, RandIter1 last1,
@@ -242,11 +239,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename ExPolicy,
             typename RandIter1, typename RandIter2, typename RandIter3,
-            typename Comp, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_random_access_iterator<RandIter1>::value &&
-            hpx::traits::is_random_access_iterator<RandIter2>::value &&
-            hpx::traits::is_random_access_iterator<RandIter3>::value)>
+            typename Comp, typename Proj1, typename Proj2>
         hpx::util::tuple<RandIter1, RandIter2, RandIter3>
         parallel_merge(ExPolicy && policy,
             RandIter1 first1, RandIter1 last1,
@@ -512,9 +505,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename RandIter,
-            typename Comp, typename Proj,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_random_access_iterator<RandIter>::value)>
+            typename Comp, typename Proj>
         void
         parallel_inplace_merge_helper(ExPolicy policy,
             RandIter first, RandIter middle, RandIter last,
@@ -645,9 +636,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         template <typename ExPolicy, typename RandIter,
-            typename Comp, typename Proj,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_random_access_iterator<RandIter>::value)>
+            typename Comp, typename Proj>
         inline hpx::future<RandIter>
         parallel_inplace_merge(ExPolicy policy,
             RandIter first, RandIter middle, RandIter last,
