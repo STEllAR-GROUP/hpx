@@ -346,17 +346,6 @@ namespace util {
             {
             };
 
-            /// Rebind the given allocator to NewType
-            template <typename NewType, typename Allocator>
-            auto rebind_allocator(Allocator&& allocator) ->
-                typename std::allocator_traits<
-                    Allocator>::template rebind_alloc<NewType>
-            {
-                return typename std::allocator_traits<Allocator>::
-                    template rebind_alloc<NewType>(
-                        std::forward<Allocator>(allocator));
-            }
-
             /// Specialization for a container with a single type T
             template <typename NewType, template <class> class Base,
                 typename OldType>
@@ -371,21 +360,22 @@ namespace util {
             /// which is preserved across the remap.
             /// -> We remap the allocator through std::allocator_traits.
             template <typename NewType, template <class, class> class Base,
-                typename OldType, typename Allocator,
+                typename OldType, typename OldAllocator,
                 // Check whether the second argument of the container was
                 // the used allocator.
                 typename std::enable_if<std::uses_allocator<
-                    Base<OldType, Allocator>, Allocator>::value>::type* =
-                    nullptr>
+                    Base<OldType, OldAllocator>, OldAllocator>::value>::type* =
+                    nullptr,
+                typename NewAllocator = typename std::allocator_traits<
+                    OldAllocator>::template rebind_alloc<NewType>>
             auto rebind_container(
-                Base<OldType, Allocator> const& container) -> Base<NewType,
-                decltype(rebind_allocator<NewType>(container.get_allocator()))>
+                Base<OldType, OldAllocator> const& container)
+                -> Base<NewType, NewAllocator>
             {
-                // Create a new version of the allpcator, that is capable of
+                // Create a new version of the allocator, that is capable of
                 // allocating the mapped type.
-                auto allocator =
-                    rebind_allocator<NewType>(container.get_allocator());
-                return Base<NewType, decltype(allocator)>(std::move(allocator));
+                return Base<NewType, NewAllocator>(
+                    NewAllocator(container.get_allocator()));
             }
 
             /// Returns the default iterators of the container in case
