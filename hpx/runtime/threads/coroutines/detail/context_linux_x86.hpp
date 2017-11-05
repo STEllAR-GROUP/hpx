@@ -172,9 +172,9 @@ namespace hpx { namespace threads { namespace coroutines
                 action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
                 action.sa_sigaction = &sigsegv_handler;
 
-                sigaltstack(&segv_stack, nullptr);
+                sigaltstack(&segv_stack, static_cast<stack_t*>(m_stack) );
                 sigfillset(&action.sa_mask);
-                sigaction(SIGSEGV, &action, m_stack);
+                sigaction(SIGSEGV, &action, nullptr);
             }
 #else
             {}
@@ -237,9 +237,9 @@ namespace hpx { namespace threads { namespace coroutines
                 action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
                 action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
 
-                sigaltstack(&segv_stack, nullptr);
+                sigaltstack(&segv_stack, static_cast<stack_t*>(m_stack) );
                 sigfillset(&action.sa_mask);
-                sigaction(SIGSEGV, &action, m_stack);
+                sigaction(SIGSEGV, &action, nullptr);
 #endif
             }
 
@@ -249,11 +249,19 @@ namespace hpx { namespace threads { namespace coroutines
 //
 #define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
 
-            static void sigsegv_handler(int signum, siginfo_t *info,
-                void *m_stack_ptr_)
+            static void sigsegv_handler(int signum, siginfo_t *infoptr,
+                void *ctxptr)
             {
-                void *addr = info->si_addr;
-                std::ptrdiff_t addr_delta = (addr > m_stack_ptr_) ? addr - m_stack_ptr_ : m_stack_ptr_ - addr;
+                ucontext_t * uc_ctx = static_cast< ucontext_t* >(ctxptr);
+                char* sigsegv_ptr = static_cast< char* >(infoptr->si_addr);
+        
+                // https://www.gnu.org/software/libc/manual/html_node/Signal-Stack.html
+                //
+                char* stk_ptr = static_cast<char*>(uc_ctx->uc_stack.ss_sp);
+
+                std::ptrdiff_t addr_delta = (sigsegv_ptr > stk_ptr) 
+                    ? (sigsegv_ptr - stk_ptr)
+                    : (stk_ptr - sigsegv_ptr);
 
                 // check the stack addresses, if they're < 10 apart, terminate program 
                 // should filter segmentation faults caused by coroutine stack overflows
@@ -262,8 +270,8 @@ namespace hpx { namespace threads { namespace coroutines
                 if(static_cast<size_t>(addr_delta) < COROUTINE_STACKOVERFLOW_ADDR_EPSILON) {
                     std::cerr << "Stack overflow in coroutine at address "
                         << std::internal << std::hex
-                        << std::setw(sizeof(addr)*2+2)
-                        << std::setfill('0') << static_cast<int*>(addr)
+                        << std::setw(sizeof(sigsegv_ptr)*2+2)
+                        << std::setfill('0') << sigsegv_ptr
                         << ".\n\n";
 
                     std::cerr

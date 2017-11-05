@@ -20,6 +20,7 @@ set(tests
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set(tests ${tests} thread_stacksize_overflow)
+  set(tests ${tests} thread_stacksize_overflow_v2)
 endif()
 
 if(HPX_WITH_THREAD_LOCAL_STORAGE)
@@ -84,5 +85,8 @@ set_property(TARGET lockfree_fifo_test_exe APPEND
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set_tests_properties(tests.unit.threads.thread_stacksize_overflow PROPERTIES
+    PASS_REGULAR_EXPRESSION "Stack overflow in coroutine at address 0x[0-9a-fA-F]*")
+
+  set_tests_properties(tests.unit.threads.thread_stacksize_overflow_v2 PROPERTIES
     PASS_REGULAR_EXPRESSION "Stack overflow in coroutine at address 0x[0-9a-fA-F]*")
 endif()
