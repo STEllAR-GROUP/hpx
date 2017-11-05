@@ -237,6 +237,10 @@ parallel::is_sorted_until             "is_sorted_until"  "hpx\.parallel\.v1\.is_
 # hpx/parallel/algorithms/lexicographical_compare.hpp
 parallel::lexicographical_compare     "lexicographical_compare" "hpx\.parallel\.v1\.lexicographical_compare.*"
 
+# hpx/parallel/algorithms/merge.hpp
+parallel::merge                       "merge"  "hpx\.parallel\.v1\.merge_id.*"
+parallel::inplace_merge               "inplace_merge"  "hpx\.parallel\.v1\.inplace_merge_id.*"
+
 # hpx/parallel/algorithms/minmax.hpp
 parallel::max_element                 "max_element" "hpx\.parallel\.v1\.max_element.*"
 parallel::min_element                 "min_element" "hpx\.parallel\.v1\.min_element.*"
@@ -247,6 +251,10 @@ parallel::mismatch                    "mismatch" "hpx\.parallel\.v1\.mismatch_id
 
 # hpx/parallel/algorithms/move.hpp
 parallel::move                        "move" "hpx\.parallel\.v1\.move$"
+
+# hpx/parallel/algorithms/partition.hpp
+parallel::partition                   "partition"  "hpx\.parallel\.v1\.partition_id.*"
+parallel::partition_copy              "partition_copy"  "hpx\.parallel\.v1\.partition_copy_id.*"
 
 # hpx/parallel/algorithms/reduce.hpp
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
