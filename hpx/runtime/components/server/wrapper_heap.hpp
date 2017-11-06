@@ -26,7 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#define HPX_DEBUG_WRAPPER_HEAP 1
+#define HPX_DEBUG_WRAPPER_HEAP 0
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail
@@ -142,8 +142,11 @@ namespace hpx { namespace components { namespace detail
 
         std::size_t const element_size_;  // size of one element in the heap
 
+        // make sure the ABI of this is stable across configurations
 #if defined(HPX_DEBUG)
         std::size_t heap_count() const override { return heap_count_; }
+#else
+        std::size_t heap_count() const override { return 0; }
 #endif
 
     private:
