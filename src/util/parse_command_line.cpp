@@ -649,24 +649,28 @@ namespace hpx { namespace util
                 store(opts, vm);
             }
 
+            if (vm.count("hpx:help"))
+            {
+                // collect help information
+                if (visible) {
+                    (*visible)
+                        .add(app_options).add(cmdline_options)
+                        .add(hpx_options).add(counter_options)
+                        .add(debugging_options).add(config_options)
+                    ;
+                }
+                return true;
+            }
+
             notify(vm);
 
             detail::handle_generic_config_options(
                 argv[0], vm, desc_cfgfile, rtcfg, node, error_mode);
             detail::handle_config_options(
                 vm, desc_cfgfile, rtcfg, node, error_mode);
-
-            // collect help information
-            if (visible && vm.count("hpx:help")) {
-                (*visible)
-                    .add(app_options).add(cmdline_options)
-                    .add(hpx_options).add(counter_options)
-                    .add(debugging_options).add(config_options)
-                ;
-            }
         }
         catch (std::exception const& e) {
-            if (error_mode == rethrow_on_error)
+            if (error_mode & rethrow_on_error)
                 throw;
 
             std::cerr << "hpx::init: exception caught: "
