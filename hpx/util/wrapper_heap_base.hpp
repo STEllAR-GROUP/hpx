@@ -26,7 +26,9 @@ namespace hpx { namespace util
         virtual naming::gid_type get_gid(util::unique_id_ranges& ids, void* p,
             components::component_type type) = 0;
 
+#if defined(HPX_DEBUG)
         virtual std::size_t heap_count() const = 0;
+#endif
         virtual std::size_t size() const = 0;
         virtual std::size_t free_size() const = 0;
     };

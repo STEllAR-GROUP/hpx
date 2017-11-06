@@ -101,8 +101,13 @@ namespace hpx { namespace util
         // Create new heap.
         bool did_create = false;
         {
+#if defined(HPX_DEBUG)
             heap_list_.push_front(create_heap_(
                 class_name_.c_str(), heap_count_ + 1, heap_step_, heap_size_));
+#else
+            heap_list_.push_front(create_heap_(
+                class_name_.c_str(), 0, heap_step_, heap_size_));
+#endif
 
             iterator itnew = heap_list_.begin();
             typename list_type::value_type heap = *itnew;

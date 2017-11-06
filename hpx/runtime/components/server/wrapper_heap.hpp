@@ -142,7 +142,9 @@ namespace hpx { namespace components { namespace detail
 
         std::size_t const element_size_;  // size of one element in the heap
 
+#if defined(HPX_DEBUG)
         std::size_t heap_count() const override { return heap_count_; }
+#endif
 
     private:
         util::itt::heap_function heap_alloc_function_;
