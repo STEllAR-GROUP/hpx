@@ -88,7 +88,8 @@ namespace hpx { namespace components
             {
                 // The managed_component's controls the lifetime of the
                 // component implementation.
-                delete back_ptr;
+                back_ptr->~BackPtr();
+                BackPtr::heap_type::free(back_ptr);
             }
         };
 
@@ -223,16 +224,6 @@ namespace hpx { namespace components
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
         void finalize() {}
-
-        // This exposes the component type
-        static component_type get_component_type()
-        {
-            return components::get_component_type<Component>();
-        }
-        static void set_component_type(component_type type)
-        {
-            components::set_component_type<Component>(type);
-        }
 
         naming::id_type get_unmanaged_id() const;
         naming::id_type get_id() const;
@@ -421,15 +412,6 @@ namespace hpx { namespace components
         ///        destructed
         void finalize() {}  // finalize the wrapped component in our destructor
 
-        static component_type get_component_type()
-        {
-            return components::get_component_type<wrapped_type>();
-        }
-        static void set_component_type(component_type t)
-        {
-            components::set_component_type<wrapped_type>(t);
-        }
-
         /// \brief Return a pointer to the wrapped instance
         /// \note  Caller must check validity of returned pointer
         Component* get()
@@ -472,49 +454,6 @@ namespace hpx { namespace components
         }
 
     public:
-        /// \brief  The memory for managed_component objects is managed by
-        ///         a class specific allocator. This allocator uses a one size
-        ///         heap implementation, ensuring fast memory allocation.
-        ///         Additionally the heap registers the allocated
-        ///         managed_component instance with the AGAS service.
-        ///
-        /// \param size   [in] The parameter \a size is supplied by the
-        ///               compiler and contains the number of bytes to allocate.
-        static void* operator new(std::size_t size)
-        {
-            if (size > sizeof(managed_component))
-                return ::operator new(size);
-            void* p = heap_type::alloc();
-            if (nullptr == p) {
-                HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
-                    "managed_component::operator new(std::size_t size)");
-            }
-            return p;
-        }
-        static void operator delete(void* p, std::size_t size)
-        {
-            if (nullptr == p)
-                return;     // do nothing if given a nullptr pointer
-
-            if (size != sizeof(managed_component)) {
-                ::operator delete(p);
-                return;
-            }
-            heap_type::free(p);
-        }
-
-        /// \brief  The placement operator new has to be overloaded as well
-        ///         (the global placement operators are hidden because of the
-        ///         new/delete overloads above).
-        static void* operator new(std::size_t, void *p)
-        {
-            return p;
-        }
-        /// \brief  This operator delete is called only if the placement new
-        ///         fails.
-        static void operator delete(void*, void*)
-        {}
-
         /// \brief  The function \a create is used for allocation and
         //          initialization of arrays of wrappers.
         template <typename T = Component>

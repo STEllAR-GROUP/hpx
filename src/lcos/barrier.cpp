@@ -28,7 +28,7 @@ namespace hpx
 
 namespace hpx { namespace lcos {
     barrier::barrier(std::string const& base_name)
-      : node_(new wrapping_type(new wrapped_type(
+      : node_(new (wrapping_type::heap_type::alloc()) wrapping_type(new wrapped_type(
             base_name, hpx::get_num_localities(hpx::launch::sync),
             hpx::get_locality_id()
         )))
@@ -39,7 +39,7 @@ namespace hpx { namespace lcos {
     }
 
     barrier::barrier(std::string const& base_name, std::size_t num)
-      : node_(new wrapping_type(new wrapped_type(
+      : node_(new (wrapping_type::heap_type::alloc()) wrapping_type(new wrapped_type(
             base_name, num, hpx::get_locality_id()
         )))
     {
@@ -49,7 +49,9 @@ namespace hpx { namespace lcos {
     }
 
     barrier::barrier(std::string const& base_name, std::size_t num, std::size_t rank)
-      : node_(new wrapping_type(new wrapped_type(base_name, num, rank)))
+      : node_(new (wrapping_type::heap_type::alloc()) wrapping_type(new wrapped_type(
+            base_name, num, rank
+        )))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
             register_with_basename(

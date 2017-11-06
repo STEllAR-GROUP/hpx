@@ -28,7 +28,6 @@ HPX_REGISTER_ACTION(hpx::lcos::detail::barrier_node::gather_action,
     barrier_node_gather_action);
 
 namespace hpx { namespace lcos { namespace detail {
-
     barrier_node::barrier_node()
       : count_(0),
         local_barrier_(0)

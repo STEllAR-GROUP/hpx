@@ -19,7 +19,7 @@ namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    template <typename Heap, typename Mutex = lcos::local::spinlock>
+    template <typename Heap>
     class wrapper_heap_list : public util::one_size_heap_list
     {
         typedef util::one_size_heap_list base_type;

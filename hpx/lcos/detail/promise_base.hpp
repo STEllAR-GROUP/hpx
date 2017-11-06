@@ -289,6 +289,12 @@ namespace lcos {
                 }
                 return addr_;
             }
+        private:
+            static void wrapping_deleter(wrapping_type *ptr)
+            {
+                ptr->~wrapping_type();
+                wrapping_type::heap_type::free(ptr);
+            }
 
         protected:
             void init_shared_state()
@@ -297,13 +303,15 @@ namespace lcos {
                 // handled by the shared state, we create the object to get our
                 // gid and then attach it to the completion handler of the
                 // shared state.
-                typedef std::unique_ptr<wrapping_type> wrapping_ptr;
-                wrapping_ptr lco_ptr(
-                    new wrapping_type(new wrapped_type(this->shared_state_)));
+                typedef std::unique_ptr<wrapping_type, void(*)(wrapping_type*)>
+                    wrapping_ptr;
+                auto ptr = wrapping_type::heap_type::alloc();
+                wrapping_ptr lco_ptr(new (ptr) wrapping_type(
+                    new wrapped_type(this->shared_state_)), &wrapping_deleter);
 
                 id_ = lco_ptr->get_unmanaged_id();
                 addr_ = naming::address(hpx::get_locality(),
-                    lco_ptr->get_component_type(),
+                    components::get_component_type<wrapped_type>(),
                     lco_ptr.get());
 
                 // Pass id to shared state if it exposes the set_id() function
