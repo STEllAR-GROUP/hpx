@@ -260,28 +260,6 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    void runtime_support::update_agas_cache_entry(
-        naming::id_type const& targetgid, naming::gid_type const& gid,
-        naming::address const& g, std::uint64_t count,
-        std::uint64_t offset)
-    {
-        typedef server::runtime_support::update_agas_cache_entry_action
-            action_type;
-        hpx::apply<action_type>(targetgid, gid, g, count, offset);
-    }
-
-    void runtime_support::update_agas_cache_entry_colocated(
-        naming::id_type const& targetgid, naming::gid_type const& gid,
-        naming::address const& g, std::uint64_t count,
-        std::uint64_t offset)
-    {
-        typedef server::runtime_support::update_agas_cache_entry_action
-            action_type;
-        hpx::detail::apply_colocated<action_type>(
-            targetgid, gid, g, count, offset);
-    }
-
-    ///////////////////////////////////////////////////////////////////////
     void runtime_support::garbage_collect_non_blocking(
         naming::id_type const& targetgid)
     {
@@ -383,9 +361,4 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<action_type>(target, gid, endpoints);
     }
 }}}
-
-HPX_REGISTER_APPLY_COLOCATED(
-    hpx::components::server::runtime_support::update_agas_cache_entry_action
-  , hpx_apply_colocated_update_agas_cache_entry_action
-)
 

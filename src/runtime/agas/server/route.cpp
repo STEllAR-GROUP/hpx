@@ -7,7 +7,9 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/format.hpp>
@@ -19,6 +21,19 @@
 #include <mutex>
 #include <utility>
 #include <vector>
+
+
+namespace {
+    void update_agas_cache(hpx::naming::gid_type const& gid,
+        hpx::naming::address const& addr, std::uint64_t count,
+        std::uint64_t offset)
+    {
+        hpx::naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
+    }
+}
+
+HPX_PLAIN_ACTION_ID(update_agas_cache, update_agas_cache_action,
+    hpx::actions::update_agas_cache_action_id)
 
 namespace hpx { namespace agas { namespace server
 {
@@ -99,8 +114,9 @@ namespace hpx { namespace agas { namespace server
                 gva const& g = hpx::util::get<1>(cache_address);
                 naming::address addr(g.prefix, g.type, g.lva());
 
-                using components::stubs::runtime_support;
-                runtime_support::update_agas_cache_entry_colocated(
+                HPX_ASSERT(naming::is_locality(source));
+
+                hpx::apply<update_agas_cache_action>(
                     source, id, addr, g.count, g.offset);
             }
         }

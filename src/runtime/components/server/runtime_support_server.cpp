@@ -124,10 +124,6 @@ HPX_REGISTER_ACTION_ID(
     get_config_action,
     hpx::actions::get_config_action_id)
 HPX_REGISTER_ACTION_ID(
-    hpx::components::server::runtime_support::update_agas_cache_entry_action,
-    update_agas_cache_entry_action,
-    hpx::actions::update_agas_cache_entry_action_id)
-HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action,
     hpx::actions::garbage_collect_action_id)
@@ -946,15 +942,6 @@ namespace hpx { namespace components { namespace server
     util::section runtime_support::get_config()
     {
         return *(get_runtime().get_config().get_section("application"));
-    }
-
-    /// \brief Insert the given name mapping into the AGAS cache of this
-    ///        locality.
-    void runtime_support::update_agas_cache_entry(naming::gid_type const& gid,
-        naming::address const& addr, std::uint64_t count,
-        std::uint64_t offset)
-    {
-        naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
     }
 
     ///////////////////////////////////////////////////////////////////////////

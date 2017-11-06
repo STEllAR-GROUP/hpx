@@ -144,13 +144,6 @@ namespace hpx { namespace components
             this->base_type::terminate_all(gid_);
         }
 
-        void update_agas_cache_entry(naming::gid_type const& gid,
-            naming::address const& g, std::uint64_t count,
-            std::uint64_t offset)
-        {
-            this->base_type::update_agas_cache_entry(gid_, gid, g, count, offset);
-        }
-
         /// \brief Retrieve configuration information
         void get_config(util::section& ini)
         {

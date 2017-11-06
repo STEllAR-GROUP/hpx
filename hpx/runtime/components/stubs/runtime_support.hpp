@@ -305,17 +305,6 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static void
-        update_agas_cache_entry(naming::id_type const& targetgid,
-            naming::gid_type const& gid, naming::address const& g,
-            std::uint64_t count, std::uint64_t offset);
-
-        static void
-        update_agas_cache_entry_colocated(naming::id_type const& targetgid,
-            naming::gid_type const& gid, naming::address const& g,
-            std::uint64_t count, std::uint64_t offset);
-
-        ///////////////////////////////////////////////////////////////////////
-        static void
         garbage_collect_non_blocking(naming::id_type const& targetgid);
 
         static lcos::future<void>
@@ -355,10 +344,5 @@ namespace hpx { namespace components { namespace stubs
             parcelset::endpoints_type const& endpoints);
     };
 }}}
-
-HPX_REGISTER_APPLY_COLOCATED_DECLARATION(
-    hpx::components::server::runtime_support::update_agas_cache_entry_action
-  , hpx_apply_colocated_update_agas_cache_entry_action
-)
 
 #endif
