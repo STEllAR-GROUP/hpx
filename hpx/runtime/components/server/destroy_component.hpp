@@ -14,7 +14,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/one_size_heap_list_base.hpp>
 
 #include <sstream>
 
