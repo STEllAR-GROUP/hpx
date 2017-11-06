@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,8 +27,10 @@ namespace hpx { namespace threads
         HPX_ASSERT(get_self_ptr() != nullptr);
 
         parallel::execution::io_pool_executor scheduler;
-        return parallel::execution::async_execute(scheduler,
+        auto result = parallel::execution::async_execute(scheduler,
             std::forward<F>(f), std::forward<Ts>(vs)...);
+        scheduler.detach();
+        return result;
     }
 }}
 
