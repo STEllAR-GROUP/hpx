@@ -14,53 +14,48 @@
 #include <hpx/util/demangle_helper.hpp>
 
 // --------------------------------------------------------------------
-// print type information
-// --------------------------------------------------------------------
-template<typename T=void, typename... Args>
-inline std::string print_type(const char *delim="");
-
-template<>
-inline std::string print_type<>(const char *delim)
-{
-    return "";
-}
-
-template<typename T, typename... Args>
-inline std::string print_type(const char *delim)
-{
-    std::string temp(hpx::util::demangle_helper<T>().type_id());
-    if constexpr (sizeof...(Args)>0) {
-        return temp + delim + print_type<Args...>(delim);
-    }
-    return temp;
-}
-
-// --------------------------------------------------------------------
-//
-// --------------------------------------------------------------------
-struct tuple_futures_extract_value
-{
-    template<typename T, template <typename> typename Future>
-    const T& operator()(const Future<T> &el) const
-    {
-        typedef typename hpx::traits::detail::shared_state_ptr_for<Future<T>>::type
-            shared_state_ptr;
-        shared_state_ptr const& state = hpx::traits::detail::get_shared_state(el);
-        const T *future_value = state->get_result();
-        return *future_value;
-    }
-};
-
-// --------------------------------------------------------------------
-// async test
+// custom executor async/then/when/dataflow specialization example
 // --------------------------------------------------------------------
 using namespace hpx;
 
 struct test_async_executor
 {
-    typedef parallel::execution::parallel_execution_tag execution_category;
+    // --------------------------------------------------------------------
+    // helper structs to make future<tuple<f1, f2, f3, ...>>>
+    // detection of futures simpler
+    // --------------------------------------------------------------------
+    template <typename TupleOfFutures>
+    struct is_tuple_of_futures;
 
-    test_async_executor() : executor_() {};
+    template <typename...Futures>
+    struct is_tuple_of_futures<util::tuple<Futures...>>
+        : util::detail::all_of<traits::is_future<Futures>...>
+    {};
+
+    template <typename Future>
+    struct is_future_of_tuple_of_futures
+        : std::integral_constant<bool,
+            traits::is_future<Future>::value &&
+            is_tuple_of_futures<
+                typename traits::future_traits<Future>::result_type>::value>
+    {};
+
+    // --------------------------------------------------------------------
+    // function that returns a const ref to the contents of a future
+    // without callong .get() on the future so that we can use the value
+    // and then pass the original future on to the intended destination.
+    // --------------------------------------------------------------------
+    struct future_extract_value
+    {
+        template<typename T, template <typename> typename Future>
+        const T& operator()(const Future<T> &el) const
+        {
+            typedef typename traits::detail::shared_state_ptr_for<Future<T>>::type
+                shared_state_ptr;
+            shared_state_ptr const& state = traits::detail::get_shared_state(el);
+            return *state->get_result();
+        }
+    };
 
     // --------------------------------------------------------------------
     // async execute specialized for simple arguments typical
@@ -70,14 +65,15 @@ struct test_async_executor
     future<typename util::invoke_result<F, Ts...>::type>
     async_execute(F && f, Ts &&... ts)
     {
-        typedef typename util::detail::invoke_deferred_result<F, Ts...>::type result_type;
+        typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
+            result_type;
 
-        std::cout << "async_execute : Function   : "
-                  << print_type<F>(" | ") << "\n";
-        std::cout << "async_execute : Arguments  : "
-                  << print_type<Ts...>(" | ") << "\n";
-        std::cout << "async_execute : Result     : "
-                  << print_type<result_type>(" | ") << "\n";
+        std::cout << "async_execute : Function    : "
+                  << debug::print_type<F>() << "\n";
+        std::cout << "async_execute : Arguments   : "
+                  << debug::print_type<Ts...>(" | ") << "\n";
+        std::cout << "async_execute : Result      : "
+                  << debug::print_type<result_type>() << "\n";
 
         // forward the task execution on to the real internal executor
         lcos::local::futures_factory<result_type()> p(
@@ -109,16 +105,14 @@ struct test_async_executor
         typedef typename util::detail::invoke_deferred_result<
                 F, Future<P>, Ts...>::type result_type;
 
-        std::cout << "then_execute : Function    : "
-                  << print_type<F>(" | ") << "\n";
-        std::cout << "then_execute : Predecessor : "
-                  << print_type<Future<P>>(" | ") << "\n";
-        std::cout << "then_execute : is_future   : "
-                  << print_type<typename traits::is_future<Future<P>>::type>(" | ") << "\n";
-        std::cout << "then_execute : Arguments   : "
-                  << print_type<Ts...>(" | ") << "\n";
-        std::cout << "then_execute : Result      : "
-                  << print_type<result_type>(" | ") << "\n";
+        std::cout << "then_execute : Function     : "
+                  << debug::print_type<F>() << "\n";
+        std::cout << "then_execute : Predecessor  : "
+                  << debug::print_type<Future<P>>() << "\n";
+        std::cout << "then_execute : Arguments    : "
+                  << debug::print_type<Ts...>(" | ") << "\n";
+        std::cout << "then_execute : Result       : "
+                  << debug::print_type<result_type>() << "\n";
 
         // forward the task on to the 'real' underlying executor
         lcos::local::futures_factory<result_type()> p(
@@ -135,76 +129,6 @@ struct test_async_executor
 
         return p.get_future();
     }
-/*
-    // --------------------------------------------------------------------
-    // .then() execute specialized for a when_all dispatch
-    // a future< tuple< future<a>, future<b>, ...> > is expected and unwrapped
-    // --------------------------------------------------------------------
-    template <typename F, template <typename> typename Future,
-              typename ... Ps, typename ... Ts>
-    auto
-    then_execute(F && f, Future<util::tuple<lcos::future<Ps>...>> & predecessor, Ts &&... ts)
-    ->  future<typename util::detail::invoke_deferred_result<
-        F, Future<util::tuple<lcos::future<Ps>...>>, Ts...>::type>
-    {
-        typedef typename util::detail::invoke_deferred_result<
-            F, Future<util::tuple<lcos::future<Ps>...>>, Ts...>::type result_type;
-
-        // get the arguments from the predecessor future tuple of futures
-        typedef typename traits::detail::shared_state_ptr_for<Future<util::tuple<lcos::future<Ps>...>>>::type
-            shared_state_ptr;
-        shared_state_ptr const& state = traits::detail::get_shared_state(predecessor);
-        util::tuple<lcos::future<Ps>...> *predecessor_value = state->get_result();
-
-        std::cout << "Tuple contents : ";
-        auto unwrapped_futures_tuple = hpx::util::map_pack(
-            tuple_futures_extract_value{},
-            *predecessor_value
-        );
-        std::cout << "\n";
-
-        hpx::util::invoke_fused([](const auto & ...ts) {
-            std::cout << print_args(ts...) << std::endl;
-        }, unwrapped_futures_tuple);
-
-        std::cout << "when_all : Predecessor     : "
-                  << print_type<Future<util::tuple<lcos::future<Ps>...>>>() << "\n";
-        std::cout << "when_all : unwrapped       : "
-                  << print_type<Ps...>() << "\n";
-        std::cout << "when_all : Result          : "
-                  << print_type<result_type>() << "\n";
-
-        // forward the task execution on to the real internal executor
-        lcos::local::futures_factory<result_type()> p(
-            executor_,
-            util::deferred_call(
-                std::forward<F>(f),
-                std::forward<Future<util::tuple<lcos::future<Ps>...>>>(predecessor),
-                std::forward<Ts>(ts)...)
-        );
-
-        p.apply(
-            launch::async,
-            threads::thread_priority_default,
-            threads::thread_stacksize_default);
-
-        return p.get_future();
-    }
-*/
-    template <typename TupleOfFutures>
-    struct is_tuple_of_futures;
-
-    template <typename...Futures>
-    struct is_tuple_of_futures<util::tuple<Futures...>>
-        : util::detail::all_of<traits::is_future<Futures>...>
-    {};
-
-    template <typename Future>
-    struct is_future_of_tuple_of_futures
-        : std::integral_constant<bool,
-            traits::is_future<Future>::value &&
-            is_tuple_of_futures<typename traits::future_traits<Future>::result_type>::value>
-    {};
 
     // --------------------------------------------------------------------
     // .then() execute specialized for a when_all dispatch for any future types
@@ -214,44 +138,47 @@ struct test_async_executor
               template <typename> typename  OuterFuture,
               typename ... InnerFutures,
               typename ... Ts,
-              typename = typename std::enable_if_t<is_future_of_tuple_of_futures<OuterFuture<util::tuple<InnerFutures...>>>::value>,
-              typename = typename std::enable_if_t<is_tuple_of_futures<util::tuple<InnerFutures...>>::value>
+              typename = typename std::enable_if_t<is_future_of_tuple_of_futures<
+                OuterFuture<util::tuple<InnerFutures...>>>::value>,
+              typename = typename std::enable_if_t<is_tuple_of_futures<
+                util::tuple<InnerFutures...>>::value>
               >
     auto
-    then_execute(F && f, OuterFuture<util::tuple<InnerFutures... > > & predecessor, Ts &&... ts)
+    then_execute(F && f,
+                 OuterFuture<util::tuple<InnerFutures... > > & predecessor,
+                 Ts &&... ts)
     ->  future<typename util::detail::invoke_deferred_result<
         F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
     {
-
         typedef typename util::detail::invoke_deferred_result<
             F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type
                 result_type;
 
-        // get the arguments from the predecessor future tuple of futures
-        typedef typename traits::detail::shared_state_ptr_for<
-                OuterFuture<util::tuple<InnerFutures...>>>::type
-                shared_state_ptr;
+        // get the tuple of futures from the predecessor future <tuple of futures>
+        const auto & predecessor_value = future_extract_value().operator()(predecessor);
 
-        shared_state_ptr const& state = traits::detail::get_shared_state(predecessor);
-        util::tuple<InnerFutures...> *predecessor_value = state->get_result();
-
-        auto unwrapped_futures_tuple = hpx::util::map_pack(
-            tuple_futures_extract_value{},
-            *predecessor_value
+        // create a tuple of the unwrapped future values
+        auto unwrapped_futures_tuple = util::map_pack(
+            future_extract_value{},
+            predecessor_value
         );
 
-        std::cout << "when_all(fut) : Predecessor: "
-                  << print_type<OuterFuture<util::tuple<InnerFutures...>>>(" | ") << "\n";
-        std::cout << "when_all(fut) : unwrapped  : "
-                  << print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
-        std::cout << "when_all(fut) : Result     : "
-                  << print_type<result_type>(" | ") << "\n";
-        std::cout << "when_all(fut) : tuple      : ";
-        hpx::util::invoke_fused([](const auto & ...ts) {
-            std::cout << print_type<decltype(ts)...>(" | ") << std::endl;
-        }, unwrapped_futures_tuple);
-        std::cout << "\n";
+        std::cout << "when_all(fut) : Predecessor : "
+                  << debug::print_type<OuterFuture<util::tuple<InnerFutures...>>>()
+                  << "\n";
+        std::cout << "when_all(fut) : unwrapped   : "
+                  << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
+        std::cout << "then_execute  : Arguments   : "
+                  << debug::print_type<Ts...>(" | ") << "\n";
+        std::cout << "when_all(fut) : Result      : "
+                  << debug::print_type<result_type>() << "\n";
 
+        // invoke a function with the unwrapped tuple future types to demonstrate
+        // that we can access them
+        std::cout << "when_all(fut) : tuple       : ";
+        util::invoke_fused([](const auto & ...ts) {
+            std::cout << debug::print_type<decltype(ts)...>(" | ") << "\n";
+        }, unwrapped_futures_tuple);
 
         // forward the task execution on to the real internal executor
         lcos::local::futures_factory<result_type()> p(
@@ -270,10 +197,76 @@ struct test_async_executor
         return p.get_future();
     }
 
+    // --------------------------------------------------------------------
+    // .then() execute specialized for a dataflow dispatch
+    // dataflow unwraps the outer future for us but passes a dataflowframe
+    // function type, result type and tuple of futures as arguments
+    // --------------------------------------------------------------------
+    template <typename F,
+              typename DataFlowFrame,
+              typename Result,
+              typename ... InnerFutures,
+              typename = typename std::enable_if_t<
+                  is_tuple_of_futures<util::tuple<InnerFutures...>>::value>
+              >
+    auto
+    async_execute(F && f,
+                  DataFlowFrame && df,
+                  Result && r,
+                  util::tuple<InnerFutures... > && predecessor)
+    ->  future<typename util::detail::invoke_deferred_result<
+        F, DataFlowFrame, Result, util::tuple<InnerFutures... >>::type>
+    {
+        typedef typename util::detail::invoke_deferred_result<
+            F, DataFlowFrame, Result, util::tuple<InnerFutures... >>::type
+                result_type;
+
+        auto unwrapped_futures_tuple = util::map_pack(
+            future_extract_value{},
+            predecessor
+        );
+
+        std::cout << "dataflow      : Predecessor : "
+                  << debug::print_type<util::tuple<InnerFutures...>>()
+                  << "\n";
+        std::cout << "dataflow      : unwrapped   : "
+                  << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
+        std::cout << "dataflow-frame: Result      : "
+                  << debug::print_type<Result>() << "\n";
+
+        // invoke a function with the unwrapped tuple future types to demonstrate
+        // that we can access them
+        std::cout << "dataflow      : tuple       : ";
+        util::invoke_fused([](const auto & ...ts) {
+            std::cout << debug::print_type<decltype(ts)...>(" | ") << "\n";
+        }, unwrapped_futures_tuple);
+
+        // forward the task execution on to the real internal executor
+        lcos::local::futures_factory<result_type()> p(
+            executor_,
+            util::deferred_call(
+                std::forward<F>(f),
+                std::forward<DataFlowFrame>(df),
+                std::forward<Result>(r),
+                std::forward<util::tuple<InnerFutures...>>(predecessor)
+            )
+        );
+
+        p.apply(
+            launch::async,
+            threads::thread_priority_default,
+            threads::thread_stacksize_default);
+
+        return p.get_future();
+    }
+
 private:
     threads::executors::default_executor executor_;
 };
 
+// --------------------------------------------------------------------
+// set traits for executor to say it is an async executor
+// --------------------------------------------------------------------
 namespace hpx { namespace parallel { namespace execution
 {
     template <>
@@ -282,6 +275,9 @@ namespace hpx { namespace parallel { namespace execution
     {};
 }}}
 
+// --------------------------------------------------------------------
+// test various execution modes
+// --------------------------------------------------------------------
 int main()
 {
     test_async_executor exec;
@@ -305,7 +301,7 @@ int main()
     future<std::string> ft = f.then(exec,
         [](future<int> && f)
         {
-            std::cout << "Inside .then() \n" << std::endl;
+            std::cout << "Inside .then()" << std::endl;
             return std::string("then");
         });
     ft.get();
@@ -319,61 +315,84 @@ int main()
     future<std::string> fts = fs.then(exec,
         [](shared_future<int> && f)
         {
-            std::cout << "Inside .then(shared) \n" << std::endl;
+            std::cout << "Inside .then(shared)" << std::endl;
             return std::string("then(shared)");
         });
     fts.get();
     std::cout << std::endl;
 
-    // test 3
+    // test 3a
     std::cout << "============================" << std::endl;
-    std::cout << "Test 3 : dataflow()" << std::endl;
-    future<int>    f1 = make_ready_future(5);
-    future<double> f2 = make_ready_future(5.0);
-    //
-    auto fd = dataflow(exec,
-            [](future<int> && f1, future<double> && f2)
-            {
-                std::cout << "Inside dataflow \n" << std::endl;
-                return std::complex<double>(f1.get(), f2.get());
-            }
-        , f1, f2
-    );
-    fd.get();
-    std::cout << std::endl;
-
-    // test 4a
-    std::cout << "============================" << std::endl;
-    std::cout << "Test 4a : when_all()" << std::endl;
-    future<int>    fw1 = make_ready_future(42);
-    future<double> fw2 = make_ready_future(3.1415);
+    std::cout << "Test 3a : when_all()" << std::endl;
+    future<int>    fw1 = make_ready_future(123);
+    future<double> fw2 = make_ready_future(4.567);
     //
     auto fw = when_all(fw1, fw2).then(exec,
-        [](future<util::tuple<future<int> , future<double>>> &&)
+        [](future<util::tuple<future<int>, future<double>>> && f)
         {
-            std::cout << "Inside when_all \n" << std::endl;
+            auto tup = f.get();
+            auto cmplx = std::complex<double>(
+                util::get<0>(tup).get(), util::get<1>(tup).get());
+            std::cout << "Inside when_all : " << cmplx << std::endl;
             return std::string("when_all");
         }
     );
     fw.get();
     std::cout << std::endl;
 
-    // test 4b
+    // test 3b
     std::cout << "============================" << std::endl;
-    std::cout << "Test 4b : when_all(shared)" << std::endl;
+    std::cout << "Test 3b : when_all(shared)" << std::endl;
     future<uint64_t>     fws1 = make_ready_future(uint64_t(42));
     shared_future<float> fws2 = make_ready_future(3.1415f).share();
     //
     auto fws = when_all(fws1, fws2).then(exec,
         [](future<util::tuple<future<uint64_t>, shared_future<float>>> && f)
         {
-            std::cout << "Inside when_all(shared) \n" << std::endl;
             auto tup = f.get();
-            return std::complex<double>(util::get<0>(tup).get(), util::get<1>(tup).get());
+            auto cmplx = std::complex<double>(
+                util::get<0>(tup).get(), util::get<1>(tup).get());
+            std::cout << "Inside when_all(shared) : " << cmplx << std::endl;
+            return cmplx;
         }
     );
     fws.get();
     std::cout << std::endl;
 
+    // test 4a
+    std::cout << "============================" << std::endl;
+    std::cout << "Test 4a : dataflow()" << std::endl;
+    future<uint16_t> f1 = make_ready_future(uint16_t(255));
+    future<double>   f2 = make_ready_future(127.890);
+    //
+    auto fd = dataflow(exec,
+        [](future<uint16_t> && f1, future<double> && f2)
+        {
+            auto cmplx = std::complex<uint64_t>(f1.get(), f2.get());
+            std::cout << "Inside dataflow : " << cmplx << std::endl;
+            return cmplx;
+        }
+        , f1, f2
+    );
+    fd.get();
+    std::cout << std::endl;
+
+    // test 4b
+    std::cout << "============================" << std::endl;
+    std::cout << "Test 4b : dataflow(shared)" << std::endl;
+    future<uint16_t>      fs1 = make_ready_future(uint16_t(255));
+    shared_future<double> fs2 = make_ready_future(127.890).share();
+    //
+    auto fds = dataflow(exec,
+        [](future<uint16_t> && f1, shared_future<double> && f2)
+        {
+            auto cmplx = std::complex<uint64_t>(f1.get(), f2.get());
+            std::cout << "Inside dataflow(shared) : " << cmplx << std::endl;
+            return cmplx;
+        }
+        , fs1, fs2
+    );
+    fds.get();
+    std::cout << std::endl;
     return 0;
 }
