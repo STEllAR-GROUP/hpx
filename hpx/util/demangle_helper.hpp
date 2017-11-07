@@ -1,3 +1,4 @@
+//  Copyright (c) 2017 John Biddiscombe
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,14 +8,18 @@
 #define HPX_UTIL_DEMANGLE_HELPER_OCT_28_2011_0410PM
 
 #include <hpx/config.hpp>
+#include <string>
+#include <type_traits>
 
-// disable the code specific to gcc for now as this causes problems
-// (see #811: simple_central_tuplespace_client run error)
-#if 0 // defined(__GNUC__)
+#if defined(__GNUC__)
 #include <cxxabi.h>
+#include <stdlib.h>
 
-namespace hpx { namespace util
+namespace hpx { namespace debug
 {
+    // --------------------------------------------------------------------
+    // demangle an arbitrary c++ type using gnu utility
+    // --------------------------------------------------------------------
     template <typename T>
     class demangle_helper
     {
@@ -36,6 +41,7 @@ namespace hpx { namespace util
     private:
         char* demangled_;
     };
+
 }}
 
 #else
@@ -57,7 +63,7 @@ namespace hpx { namespace util
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
+namespace hpx { namespace debug
 {
     template <typename T>
     struct type_id
@@ -67,6 +73,31 @@ namespace hpx { namespace util
 
     template <typename T>
     demangle_helper<T> type_id<T>::typeid_ = demangle_helper<T>();
+
+    // --------------------------------------------------------------------
+    // print type information
+    // usage : std::cout << print_type<args...>("separator")
+    // separator is appended if the number of types > 1
+    // --------------------------------------------------------------------
+    template <typename T=void>
+    inline std::string print_type(const char *delim="")
+    {
+        return std::string(debug::type_id<T>::typeid_.type_id());;
+    }
+
+    template <>
+    inline std::string print_type<>(const char *)
+    {
+        return "void";
+    }
+
+    template <typename T, typename ...Args>
+    inline typename std::enable_if<sizeof...(Args)!=0, std::string>::type
+    print_type(const char *delim="")
+    {
+        std::string temp(debug::type_id<T>::typeid_.type_id());
+        return temp + delim + print_type<Args...>(delim);
+    }
 }}
 
 #endif

@@ -72,7 +72,7 @@ namespace hpx { namespace actions
             static_assert(
                 traits::needs_automatic_registration<Action>::value,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
-            return util::type_id<Action>::typeid_.type_id();
+            return debug::type_id<Action>::typeid_.type_id();
         }
 #endif
 
