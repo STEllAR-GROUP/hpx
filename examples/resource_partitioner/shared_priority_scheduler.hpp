@@ -593,8 +593,7 @@ namespace threads {
                 return empty;
             }
 
-            bool cleanup_terminated(std_size_t num_threads,
-                bool delete_all = false)
+            bool cleanup_terminated(std::size_t num_threads, bool delete_all)
             {
                 return cleanup_terminated(delete_all);
             }
