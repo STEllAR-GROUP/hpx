@@ -366,20 +366,20 @@ namespace hpx { namespace threads { namespace detail
         init_tss_helper<Scheduler> tss_helper(
             *this, thread_num, this->thread_offset_);
 
-        // wait for all threads to start up before before starting HPX work
         ++thread_count_;
-        startup->wait();
-
-        LTM_(info)    //-V128
-            << "thread_func: " << id_.name()
-            << " starting OS thread: " << thread_num;    //-V128
 
         // set state to running
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(thread_num);
         hpx::state oldstate = state.exchange(state_running);
-
         HPX_ASSERT(oldstate <= state_running);
+
+        // wait for all threads to start up before before starting HPX work
+        startup->wait();
+
+        LTM_(info)    //-V128
+            << "thread_func: " << id_.name()
+            << " starting OS thread: " << thread_num;    //-V128
 
         try
         {
