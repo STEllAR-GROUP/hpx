@@ -289,7 +289,7 @@ namespace hpx { namespace threads { namespace detail
 
     std::int64_t get_background_thread_count();
     void increment_background_thread_count();
-    void decrement_background_thread_count();
+    struct decrement_background_thread_count;
 
     template <typename SchedulingPolicy>
     thread_id_type create_background_thread(SchedulingPolicy& scheduler,
@@ -301,6 +301,7 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data background_init(
             [&, background_running](thread_state_ex_enum) -> thread_result_type
             {
+                decrement_background_thread_count count();
 
                 while(*background_running)
                 {
@@ -316,8 +317,6 @@ namespace hpx { namespace threads { namespace detail
                         "background_work");
                 }
 
-                decrement_background_thread_count();
-
                 return thread_result_type(terminated, nullptr);
             },
             hpx::util::thread_description("background_work"),
@@ -329,10 +328,10 @@ namespace hpx { namespace threads { namespace detail
 
         // Create in suspended to prevent the thread from being scheduled
         // directly...
-        increment_background_thread_count();
         scheduler.SchedulingPolicy::create_thread(background_init,
             &background_thread, suspended, true, hpx::throws, num_thread);
         HPX_ASSERT(background_thread);
+        increment_background_thread_count();
         // We can now set the state to pending
         background_thread->set_state(pending);
         return background_thread;

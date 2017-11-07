@@ -10,7 +10,6 @@
 
 namespace hpx { namespace threads { namespace detail
 {
-    // TODO: Find the right way to do this.
     static std::atomic<std::int64_t> background_thread_count;
 
     std::int64_t get_background_thread_count()
@@ -23,9 +22,12 @@ namespace hpx { namespace threads { namespace detail
         ++background_thread_count;
     }
 
-    void decrement_background_thread_count()
+    struct decrement_background_thread_count
     {
-        --background_thread_count;
-    }
+        ~decrement_background_thread_count()
+        {
+            --background_thread_count;
+        }
+    };
 }}}
 
