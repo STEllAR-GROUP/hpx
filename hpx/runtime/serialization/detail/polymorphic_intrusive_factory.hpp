@@ -157,12 +157,12 @@ namespace hpx { namespace serialization { namespace detail
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(Class)                         \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(                                    \
-      Class, hpx::util::type_id<Class>::typeid_.type_id();)                   \
+      Class, hpx::debug::type_id<Class>::typeid_.type_id();)                   \
 /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED(Class)                \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                           \
-      Class, hpx::util::type_id<T>::typeid_.type_id();)                       \
+      Class, hpx::debug::type_id<T>::typeid_.type_id();)                       \
 /**/
 
 #endif
