@@ -572,7 +572,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        bool cleanup_terminated(bool delete_all)
         {
             HPX_ASSERT(tree.size());
             bool empty = true;
@@ -585,6 +585,11 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
             return empty;
+        }
+
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        {
+            return cleanup_terminated(delete_all);
         }
 
         ///////////////////////////////////////////////////////////////////////

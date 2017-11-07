@@ -792,7 +792,7 @@ namespace hpx { namespace threads { namespace detail
                 }
                 else
                 {
-                    scheduler.SchedulingPolicy::cleanup_terminated(std::size_t(-1), true);
+                    scheduler.SchedulingPolicy::cleanup_terminated(true);
                 }
             }
         }
