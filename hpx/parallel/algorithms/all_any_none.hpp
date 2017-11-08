@@ -15,7 +15,9 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/util/unused.hpp>
@@ -40,19 +42,26 @@ namespace hpx { namespace parallel { inline namespace v1
               : none_of::algorithm("none_of")
             {}
 
-            template <typename ExPolicy, typename InIter, typename F>
+            template <typename ExPolicy, typename InIter,
+                typename F, typename Proj>
             static bool
-            sequential(ExPolicy, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last,
+                F && f, Proj && proj)
             {
-                return std::none_of(first, last, std::forward<F>(f));
+                return std::none_of(first, last,
+                    util::invoke_projected<F, Proj>(
+                        std::forward<F>(f),
+                        std::forward<Proj>(proj)
+                    ));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename FwdIter,
+                typename F, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                F && op)
+                F && op, Proj && proj)
             {
                 if (first == last)
                 {
@@ -63,7 +72,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [op, tok, policy](
+                    [op, tok, policy, proj](
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
@@ -71,9 +80,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
-                            [&op, &tok](FwdIter const& curr)
+                            [&op, &tok, &proj](FwdIter const& curr)
                             {
-                                if (op(*curr))
+                                if (op(proj(*curr)))
                                     tok.cancel();
                             });
 
@@ -115,6 +124,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -135,6 +146,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     to it. The type \a Type must be such that an object
     ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -156,12 +171,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a f returns true for no elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    none_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
+    template <typename ExPolicy, typename FwdIter, typename F,
+        typename Proj = util::projection_identity,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
+        traits::is_projected<Proj, FwdIter>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, F, traits::projected<Proj, FwdIter>
+        >::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    none_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+        Proj && proj = Proj())
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
@@ -182,7 +203,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return detail::none_of().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+            first, last, std::forward<F>(f), std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -196,19 +217,26 @@ namespace hpx { namespace parallel { inline namespace v1
               : any_of::algorithm("any_of")
             {}
 
-            template <typename ExPolicy, typename InIter, typename F>
+            template <typename ExPolicy, typename InIter,
+                typename F, typename Proj>
             static bool
-            sequential(ExPolicy, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last,
+                F && f, Proj && proj)
             {
-                return std::any_of(first, last, std::forward<F>(f));
+                return std::any_of(first, last,
+                    util::invoke_projected<F, Proj>(
+                        std::forward<F>(f),
+                        std::forward<Proj>(proj)
+                    ));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename FwdIter,
+                typename F, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                F && op)
+                F && op, Proj && proj)
             {
                 if (first == last)
                 {
@@ -219,7 +247,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [op, tok, policy](
+                    [op, tok, policy, proj](
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
@@ -227,9 +255,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
-                            [&op, &tok](FwdIter const& curr)
+                            [&op, &tok, &proj](FwdIter const& curr)
                             {
-                                if (op(*curr))
+                                if (op(proj(*curr)))
                                     tok.cancel();
                             });
 
@@ -271,6 +299,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a any_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -291,6 +321,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     to it. The type \a Type must be such that an object
     ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -312,12 +346,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a f returns true for at least one element in the range,
     ///           false otherwise. It returns false if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    any_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
+    template <typename ExPolicy, typename FwdIter, typename F,
+        typename Proj = util::projection_identity,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
+        traits::is_projected<Proj, FwdIter>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, F, traits::projected<Proj, FwdIter>
+        >::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    any_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+        Proj && proj = Proj())
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
@@ -338,7 +378,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return detail::any_of().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+            first, last, std::forward<F>(f), std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -352,18 +392,26 @@ namespace hpx { namespace parallel { inline namespace v1
               : all_of::algorithm("all_of")
             {}
 
-            template <typename ExPolicy, typename InIter, typename F>
+            template <typename ExPolicy, typename InIter,
+                typename F, typename Proj>
             static bool
-            sequential(ExPolicy, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last,
+                F && f, Proj && proj)
             {
-                return std::all_of(first, last, std::forward<F>(f));
+                return std::all_of(first, last,
+                    util::invoke_projected<F, Proj>(
+                        std::forward<F>(f),
+                        std::forward<Proj>(proj)
+                    ));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename FwdIter,
+                typename F, typename Proj>
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last, F && op)
+            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
+                F && op, Proj && proj)
             {
                 if (first == last)
                 {
@@ -374,7 +422,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [op, tok, policy](
+                    [op, tok, policy, proj](
                         FwdIter part_begin, std::size_t part_count
                     ) mutable -> bool
                     {
@@ -382,9 +430,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
-                            [&op, &tok](FwdIter const& curr)
+                            [&op, &tok, &proj](FwdIter const& curr)
                             {
-                                if (!op(*curr))
+                                if (!op(proj(*curr)))
                                     tok.cancel();
                             });
 
@@ -426,6 +474,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a all_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -446,6 +496,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     to it. The type \a Type must be such that an object
     ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -467,12 +521,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           \a f returns true for all elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    all_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
+    template <typename ExPolicy, typename FwdIter, typename F,
+        typename Proj = util::projection_identity,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
+        traits::is_projected<Proj, FwdIter>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, F, traits::projected<Proj, FwdIter>
+        >::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    all_of(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+        Proj && proj = Proj())
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
@@ -493,7 +553,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         return detail::all_of().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first, last, std::forward<F>(f));
+            first, last, std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}
 

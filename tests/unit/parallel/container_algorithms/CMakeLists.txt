@@ -4,6 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    all_of_range
+    any_of_range
     copy_range
     copyif_range
     foreach_range
@@ -16,6 +18,7 @@ set(tests
     merge_range
     min_element_range
     minmax_element_range
+    none_of_range
     partition_range
     partition_copy_range
     remove_copy_range
