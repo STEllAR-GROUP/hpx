@@ -42,7 +42,7 @@ struct test_async_executor
 
     // --------------------------------------------------------------------
     // function that returns a const ref to the contents of a future
-    // without callong .get() on the future so that we can use the value
+    // without calling .get() on the future so that we can use the value
     // and then pass the original future on to the intended destination.
     // --------------------------------------------------------------------
     struct future_extract_value
@@ -94,21 +94,25 @@ struct test_async_executor
     // .then() execute specialized for a future<P> predecessor argument
     // note that future<> and shared_future<> are both supported
     // --------------------------------------------------------------------
-    template <typename F, template <typename> typename Future,
-              typename P, typename ... Ts,
-              typename = typename std::enable_if_t<traits::is_future<Future<P>>::value>>
+    template <typename F,
+              typename Future,
+              typename ... Ts,
+              typename = typename std::enable_if_t<traits::is_future<Future>::value>>
     auto
-    then_execute(F && f, Future<P> & predecessor, Ts &&... ts)
+    then_execute(F && f, Future & predecessor, Ts &&... ts)
     ->  future<typename util::detail::invoke_deferred_result<
-        F, Future<P>, Ts...>::type>
+        F, Future, Ts...>::type>
     {
         typedef typename util::detail::invoke_deferred_result<
-                F, Future<P>, Ts...>::type result_type;
+                F, Future, Ts...>::type result_type;
 
         std::cout << "then_execute : Function     : "
                   << debug::print_type<F>() << "\n";
         std::cout << "then_execute : Predecessor  : "
-                  << debug::print_type<Future<P>>() << "\n";
+                  << debug::print_type<Future>() << "\n";
+        std::cout << "then_execute : Future       : "
+                  << debug::print_type<typename
+                     traits::future_traits<Future>::result_type>() << "\n";
         std::cout << "then_execute : Arguments    : "
                   << debug::print_type<Ts...>(" | ") << "\n";
         std::cout << "then_execute : Result       : "
@@ -168,7 +172,7 @@ struct test_async_executor
                   << "\n";
         std::cout << "when_all(fut) : unwrapped   : "
                   << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
-        std::cout << "then_execute  : Arguments   : "
+        std::cout << "when_all(fut) : Arguments   : "
                   << debug::print_type<Ts...>(" | ") << "\n";
         std::cout << "when_all(fut) : Result      : "
                   << debug::print_type<result_type>() << "\n";
