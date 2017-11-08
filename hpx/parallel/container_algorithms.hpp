@@ -13,6 +13,7 @@
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/container_algorithms/generate.hpp>
 #include <hpx/parallel/container_algorithms/is_heap.hpp>
+#include <hpx/parallel/container_algorithms/merge.hpp>
 #include <hpx/parallel/container_algorithms/minmax.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>
 #include <hpx/parallel/container_algorithms/remove_copy.hpp>

@@ -7,6 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/parallel_copy.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/include/parallel_sort.hpp>
@@ -44,42 +45,52 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename InIter1, typename InIter2, typename OutIter>
-double run_merge_benchmark_std(int test_count,
-    InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest)
+template <typename OrgIter, typename BidirIter>
+double run_inplace_merge_benchmark_std(int test_count,
+    OrgIter org_first, OrgIter org_last,
+    BidirIter first, BidirIter middle, BidirIter last)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = std::uint64_t(0);
 
     for (int i = 0; i < test_count; ++i)
     {
-        std::merge(first1, last1, first2, last2, dest);
-    }
+        // Restore [first, last) with original data.
+        hpx::parallel::copy(hpx::parallel::execution::par,
+            org_first, org_last, first);
 
-    time = hpx::util::high_resolution_clock::now() - time;
+        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        std::inplace_merge(first, middle, last);
+        time += hpx::util::high_resolution_clock::now() - elapsed;
+    }
 
     return (time * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename FwdIter3>
-double run_merge_benchmark_hpx(int test_count, ExPolicy policy,
-    FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest)
+template <typename ExPolicy, typename OrgIter, typename BidirIter>
+double run_inplace_merge_benchmark_hpx(int test_count, ExPolicy policy,
+    OrgIter org_first, OrgIter org_last,
+    BidirIter first, BidirIter middle, BidirIter last)
 {
-    std::uint64_t time = hpx::util::high_resolution_clock::now();
+    std::uint64_t time = std::uint64_t(0);
 
     for (int i = 0; i < test_count; ++i)
     {
-        hpx::parallel::merge(policy, first1, last1, first2, last2, dest);
-    }
+        // Restore [first, last) with original data.
+        hpx::parallel::copy(hpx::parallel::execution::par,
+            org_first, org_last, first);
 
-    time = hpx::util::high_resolution_clock::now() - time;
+        std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
+        hpx::parallel::inplace_merge(policy, first, middle, last);
+        time += hpx::util::high_resolution_clock::now() - elapsed;
+    }
 
     return (time * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
+void run_benchmark(std::size_t vector_left_size, std::size_t vector_right_size,
     int test_count, std::size_t random_range, IteratorTag)
 {
     std::cout << "* Preparing Benchmark..." << std::endl;
@@ -87,48 +98,48 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     typedef test_container<IteratorTag> test_container;
     typedef typename test_container::type container;
 
-    container src1 = test_container::get_container(vector_size1);
-    container src2 = test_container::get_container(vector_size2);
-    container result = test_container::get_container(vector_size1 + vector_size2);
+    container c = test_container::get_container(
+        vector_left_size + vector_right_size);
+    container org_c;
 
-    auto first1 = std::begin(src1);
-    auto last1 = std::end(src1);
-    auto first2 = std::begin(src2);
-    auto last2 = std::end(src2);
-    auto dest = std::begin(result);
+    auto first = std::begin(c);
+    auto middle = first + vector_left_size;
+    auto last = std::end(c);
 
     // initialize data
     using namespace hpx::parallel;
-    generate(execution::par, std::begin(src1), std::end(src1),
-        random_fill(random_range));
-    generate(execution::par, std::begin(src2), std::end(src2),
-        random_fill(random_range));
-    sort(execution::par, std::begin(src1), std::end(src1));
-    sort(execution::par, std::begin(src2), std::end(src2));
+    generate(execution::par, first, middle, random_fill(random_range));
+    generate(execution::par, middle, last, random_fill(random_range));
+    sort(execution::par, first, middle);
+    sort(execution::par, middle, last);
+    org_c = c;
+
+    auto org_first = std::begin(org_c);
+    auto org_last = std::end(org_c);
 
     std::cout << "* Running Benchmark..." << std::endl;
-    std::cout << "--- run_merge_benchmark_std ---" << std::endl;
+    std::cout << "--- run_inplace_merge_benchmark_std ---" << std::endl;
     double time_std =
-        run_merge_benchmark_std(test_count,
-            first1, last1, first2, last2, dest);
+        run_inplace_merge_benchmark_std(test_count,
+            org_first, org_last, first, middle, last);
 
-    std::cout << "--- run_merge_benchmark_seq ---" << std::endl;
+    std::cout << "--- run_inplace_merge_benchmark_seq ---" << std::endl;
     double time_seq =
-        run_merge_benchmark_hpx(test_count, execution::seq,
-            first1, last1, first2, last2, dest);
+        run_inplace_merge_benchmark_hpx(test_count, execution::seq,
+            org_first, org_last, first, middle, last);
 
-    std::cout << "--- run_merge_benchmark_par ---" << std::endl;
+    std::cout << "--- run_inplace_merge_benchmark_par ---" << std::endl;
     double time_par =
-        run_merge_benchmark_hpx(test_count, execution::par,
-            first1, last1, first2, last2, dest);
+        run_inplace_merge_benchmark_hpx(test_count, execution::par,
+            org_first, org_last, first, middle, last);
 
-    std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
+    std::cout << "--- run_inplace_merge_benchmark_par_unseq ---" << std::endl;
     double time_par_unseq =
-        run_merge_benchmark_hpx(test_count, execution::par_unseq,
-            first1, last1, first2, last2, dest);
+        run_inplace_merge_benchmark_hpx(test_count, execution::par_unseq,
+            org_first, org_last, first, middle, last);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "merge (%1%) : %2%(sec)";
+    auto fmt = "inplace_merge (%1%) : %2%(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
@@ -140,8 +151,7 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 std::string correct_iterator_tag_str(std::string iterator_tag)
 {
     if (iterator_tag != "random"/* &&
-        iterator_tag != "bidirectional" &&
-        iterator_tag != "forward"*/)
+        iterator_tag != "bidirectional"*/)
         return "random";
     else
         return iterator_tag;
@@ -169,28 +179,27 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (random_range < 1)
         random_range = 1;
 
-    std::size_t vector_size1 = std::size_t(vector_size * vector_ratio);
-    std::size_t vector_size2 = vector_size - vector_size1;
+    std::size_t vector_left_size = std::size_t(vector_size * vector_ratio);
+    std::size_t vector_right_size = vector_size - vector_left_size;
 
     std::cout << "-------------- Benchmark Config --------------" << std::endl;
-    std::cout << "seed         : " << seed << std::endl;
-    std::cout << "vector_size1 : " << vector_size1 << std::endl;
-    std::cout << "vector_size2 : " << vector_size2 << std::endl;
-    std::cout << "random_range : " << random_range << std::endl;
-    std::cout << "iterator_tag : " << iterator_tag_str << std::endl;
-    std::cout << "test_count   : " << test_count << std::endl;
-    std::cout << "os threads   : " << os_threads << std::endl;
+    std::cout << "seed              : " << seed << std::endl;
+    std::cout << "vector_left_size  : " << vector_left_size << std::endl;
+    std::cout << "vector_right_size : " << vector_right_size << std::endl;
+    std::cout << "random_range      : " << random_range << std::endl;
+    std::cout << "iterator_tag      : " << iterator_tag_str << std::endl;
+    std::cout << "test_count        : " << test_count << std::endl;
+    std::cout << "os threads        : " << os_threads << std::endl;
     std::cout << "----------------------------------------------\n" << std::endl;
 
     if (iterator_tag_str == "random")
-        run_benchmark(vector_size1, vector_size2, test_count, random_range,
+        run_benchmark(vector_left_size, vector_right_size,
+            test_count, random_range,
             std::random_access_iterator_tag());
-    //else if (iterator_tag_str == "bidirectional")
-    //    run_benchmark(vector_size1, vector_size2, test_count, random_range,
+    //else // bidirectional
+    //    run_benchmark(vector_left_size, vector_right_size,
+    //        test_count, random_range,
     //        std::bidirectional_iterator_tag());
-    //else // forward
-    //    run_benchmark(vector_size1, vector_size2, test_count, random_range,
-    //        std::forward_iterator_tag());
 
     return hpx::finalize();
 }

@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
+    benchmark_inplace_merge
     benchmark_is_heap
     benchmark_is_heap_until
     benchmark_merge
