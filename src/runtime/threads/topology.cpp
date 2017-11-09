@@ -31,6 +31,8 @@
 #include <vector>
 #include <memory>
 
+#include <errno.h>
+
 #include <hwloc.h>
 
 #if HWLOC_API_VERSION < 0x00010b00
@@ -58,58 +60,58 @@ namespace hpx { namespace threads { namespace detail
         return top.get_number_of_pus();
     }
 
-    void write_to_log(char const* valuename, std::size_t value)
-    {
-        LTM_(debug) << "topology: "
-                    << valuename << ": " << value; //-V128
-    }
-
-    void write_to_log_mask(char const* valuename, mask_cref_type value)
-    {
-        LTM_(debug) << "topology: " << valuename
-                    << ": " HPX_CPU_MASK_PREFIX
-                    << std::hex << value;
-    }
-
-    void write_to_log(char const* valuename,
-                      std::vector<std::size_t> const& values)
-    {
-        LTM_(debug) << "topology: "
-                    << valuename << "s, size: " //-V128
-                    << values.size();
-
-        std::size_t i = 0;
-        for (std::size_t value : values)
+        void write_to_log(char const* valuename, std::size_t value)
         {
-            LTM_(debug) << "topology: " << valuename //-V128
-                        << "(" << i++ << "): " << value;
+        LTM_(debug) << "topology: "
+                        << valuename << ": " << value; //-V128
         }
-    }
 
-    void write_to_log_mask(char const* valuename,
-                           std::vector<mask_type> const& values)
-    {
-        LTM_(debug) << "topology: "
-                    << valuename << "s, size: " //-V128
-                    << values.size();
-
-        std::size_t i = 0;
-        for (mask_cref_type value : values)
+        void write_to_log_mask(char const* valuename, mask_cref_type value)
         {
-            LTM_(debug) << "topology: " << valuename //-V128
-                        << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
+        LTM_(debug) << "topology: " << valuename
+                        << ": " HPX_CPU_MASK_PREFIX
                         << std::hex << value;
         }
-    }
 
-    std::size_t get_index(hwloc_obj_t obj)
-    {
-        // on Windows logical_index is always -1
-        if (obj->logical_index == ~0x0u)
-            return static_cast<std::size_t>(obj->os_index);
+        void write_to_log(char const* valuename,
+            std::vector<std::size_t> const& values)
+        {
+        LTM_(debug) << "topology: "
+                        << valuename << "s, size: " //-V128
+                        << values.size();
 
-        return static_cast<std::size_t>(obj->logical_index);
-    }
+            std::size_t i = 0;
+            for (std::size_t value : values)
+            {
+            LTM_(debug) << "topology: " << valuename //-V128
+                            << "(" << i++ << "): " << value;
+            }
+        }
+
+        void write_to_log_mask(char const* valuename,
+            std::vector<mask_type> const& values)
+        {
+        LTM_(debug) << "topology: "
+                        << valuename << "s, size: " //-V128
+                        << values.size();
+
+            std::size_t i = 0;
+            for (mask_cref_type value : values)
+            {
+            LTM_(debug) << "topology: " << valuename //-V128
+                            << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
+                            << std::hex << value;
+            }
+        }
+
+        std::size_t get_index(hwloc_obj_t obj)
+        {
+            // on Windows logical_index is always -1
+            if (obj->logical_index == ~0x0u)
+                return static_cast<std::size_t>(obj->os_index);
+
+            return static_cast<std::size_t>(obj->logical_index);
+        }
 }}}
 
 namespace hpx { namespace threads
@@ -1223,33 +1225,63 @@ namespace hpx { namespace threads
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
         int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
         if (ret<0) {
+            std::string msg = std::strerror(errno);
+            if (errno == ENOSYS) msg = "the action is not supported";
+            if (errno == EXDEV)  msg = "the binding cannot be enforced";
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::topology::set_area_membind_nodeset"
-              , "hwloc_set_area_membind_nodeset failed");
+              , "hwloc_set_area_membind_nodeset failed : " + msg);
             return false;
         }
         return true;
     }
 
+    util::thread_specific_ptr<hpx_hwloc_bitmap_wrapper, topology::tls_tag> topology::bitmap_storage_;
+
     threads::mask_type topology::get_area_membind_nodeset(
-        const void *addr, std::size_t len, void *nodeset) const
+        const void *addr, std::size_t len) const
     {
+        hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
+        if (nullptr == nodeset)
+        {
+            hwloc_bitmap_t nodeset_ = hwloc_bitmap_alloc();
+            topology::bitmap_storage_.reset(new hpx_hwloc_bitmap_wrapper(nodeset_));
+            nodeset = topology::bitmap_storage_.get();
+        }
+        //
         hwloc_membind_policy_t policy;
-        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
-        hwloc_get_area_membind_nodeset(topo, addr, len, ns, &policy, 0);
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset->get_bmp());
+
+        if (hwloc_get_area_membind_nodeset(topo, addr, len, ns, &policy, 0)==-1) {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::topology::get_area_membind_nodeset"
+              , "hwloc_get_area_membind_nodeset failed");
+            return -1;
+            std::cout << "error in  " ;
+        }
         return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
     }
 
-    int topology::get_numa_domain(const void *addr, void *nodeset) const
+    int topology::get_numa_domain(const void *addr) const
     {
 #if HWLOC_API_VERSION >= 0x00010b03
-        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
+        if (nullptr == nodeset)
+        {
+            hwloc_bitmap_t nodeset_ = hwloc_bitmap_alloc();
+            topology::bitmap_storage_.reset(new hpx_hwloc_bitmap_wrapper(nodeset_));
+            nodeset = topology::bitmap_storage_.get();
+        }
+        //
+        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset->get_bmp());
+
         int ret = hwloc_get_area_memlocation(topo, addr, 1,  ns,
             HWLOC_MEMBIND_BYNODESET);
         if (ret<0) {
+            std::string msg(strerror(errno));
             HPX_THROW_EXCEPTION(kernel_error
-              , "hpx::threads::topology::set_area_membind_nodeset"
-              , "hwloc_set_area_membind_nodeset failed");
+              , "hpx::threads::topology::get_numa_domain"
+              , "hwloc_get_area_memlocation failed " + msg);
             return -1;
         }
         threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
