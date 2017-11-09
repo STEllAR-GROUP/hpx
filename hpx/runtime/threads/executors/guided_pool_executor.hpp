@@ -262,11 +262,17 @@ namespace hpx { namespace threads { namespace executors
                       << debug::print_type<result_type>() << "\n";
 #endif
 
-            // Note : The Ts &&... args are not actually used in a continuation since
+            // Note 1 : The Ts &&... args are not actually used in a continuation since
             // only the future becoming ready (predecessor) is actually passed onwards.
-            // Note : we do not need to use unwrapping here, because continuations
-            // are only invoked once the futures are already ready
-            return dataflow(
+
+            // Note 2 : we do not need to use unwrapping here, because dataflow
+            // continuations are only invoked once the futures are already ready
+
+            // Note 3 : launch::sync is used here to make wrapped task run on
+            // the thread of the predecessor continuation coming ready.
+            // the numa_hint_function will be evaluated on that thread and then
+            // the real task will be spawned on a new task with hints - as intended
+            return dataflow(launch::sync,
                 [&](Future && predecessor, Ts &&... ts)
                 {
                     pre_execution_then_domain_schedule<pool_executor,
@@ -325,7 +331,8 @@ namespace hpx { namespace threads { namespace executors
                       << debug::print_type<result_type>() << "\n";
 #endif
 
-            return dataflow(
+            // Please see notes for previous then_execute function above
+            return dataflow(launch::sync,
                 [&](OuterFuture<util::tuple<InnerFutures...>> && predecessor, Ts &&... ts)
                 {
                     pre_execution_then_domain_schedule<pool_executor,
