@@ -288,8 +288,8 @@ namespace hpx { namespace threads { namespace detail
     };
 
     std::int64_t get_background_thread_count();
-    void increment_background_thread_count();
-    struct decrement_background_thread_count;
+    HPX_EXPORT void increment_background_thread_count();
+    HPX_EXPORT struct decrement_background_thread_count;
 
     template <typename SchedulingPolicy>
     thread_id_type create_background_thread(SchedulingPolicy& scheduler,
