@@ -81,8 +81,10 @@ namespace hpx { namespace threads { namespace executors
 
             if (stacksize == threads::thread_stacksize_default)
                 stacksize = stacksize_;
-            data.stacksize = threads::get_stack_size(stacksize);
-            data.priority = priority_;
+            //
+            data.stacksize     = threads::get_stack_size(stacksize);
+            data.priority      = priority_;
+            data.num_os_thread = schedulehint;
 
             threads::thread_id_type id = threads::invalid_thread_id;
             pool_.create_thread(data, id, initial_state, ec);
