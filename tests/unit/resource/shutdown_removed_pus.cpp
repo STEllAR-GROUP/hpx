@@ -30,7 +30,6 @@ int hpx_main(int argc, char* argv[])
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
     {
         tp.remove_processing_unit(thread_num);
-        std::cout << "Removed pu " << thread_num << "\n";
     }
 
     // Schedule lots of dummy work
