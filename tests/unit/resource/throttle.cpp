@@ -44,6 +44,13 @@ int hpx_main(int argc, char* argv[])
     }
 
     {
+        // Check removing pu on which current thread is running
+        std::size_t worker_thread_num = hpx::get_worker_thread_num();
+        tp.remove_processing_unit(worker_thread_num);
+        tp.add_processing_unit(worker_thread_num, worker_thread_num + tp.get_thread_offset());
+    }
+
+    {
         // Check when removing all but one, we end up on the same thread
         std::size_t thread_num = 0;
         auto test_function = [&thread_num, &tp]()
