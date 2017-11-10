@@ -765,7 +765,7 @@ namespace hpx { namespace applier
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint = threads::thread_schedule_hint_none,
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws);
 
@@ -844,7 +844,7 @@ namespace hpx { namespace applier
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint_none,
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {
@@ -874,7 +874,7 @@ namespace hpx { namespace applier
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint_none,
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {
@@ -940,7 +940,7 @@ namespace hpx { namespace applier
         std::uint64_t /*naming::address_type*/ lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint = threads::thread_schedule_hint_none,
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws);
 
@@ -977,7 +977,7 @@ namespace hpx { namespace applier
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint_none,
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {
@@ -1007,7 +1007,7 @@ namespace hpx { namespace applier
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
+        threads::thread_schedule_hint os_thread = threads::thread_schedule_hint_none,
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws)
     {

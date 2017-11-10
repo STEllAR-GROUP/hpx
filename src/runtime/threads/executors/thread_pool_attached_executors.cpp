@@ -72,7 +72,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             stacksize = stacksize_;
 
         register_thread_nullary(std::move(f), desc, initial_state,
-            priority_, get_next_thread_num(), stacksize, ec);
+            priority_,
+            threads::thread_schedule_hint(get_next_thread_num()),
+            stacksize, ec);
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -90,7 +92,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // create new thread
         thread_id_type id = register_thread_nullary(
             std::move(f), description, suspended,
-            priority_, get_next_thread_num(), stacksize, ec);
+            priority_,
+            threads::thread_schedule_hint(get_next_thread_num()),
+            stacksize, ec);
         if (ec) return;
 
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise

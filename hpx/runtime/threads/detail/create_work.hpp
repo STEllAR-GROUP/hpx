@@ -94,7 +94,7 @@ namespace hpx { namespace threads { namespace detail
 
         // create the new thread
         scheduler->create_thread(data, nullptr, initial_state, ec,
-            data.num_os_thread);
+            data.schedulehint);
     }
 }}}
 

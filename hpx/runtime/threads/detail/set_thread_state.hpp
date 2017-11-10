@@ -360,7 +360,7 @@ namespace hpx { namespace threads { namespace detail
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_time_point const& abs_time, thread_id_type const& thrd,
         thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, std::size_t thread_num,
+        thread_priority priority, thread_schedule_hint schedulehint, 
         std::atomic<bool>* started, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd)) {
@@ -376,7 +376,7 @@ namespace hpx { namespace threads { namespace detail
             util::bind(&at_timer<SchedulingPolicy>,
                 std::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
                 priority, started),
-            "at_timer (expire at)", 0, priority, thread_num);
+                "at_timer (expire at)", 0, priority, schedulehint);
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, pending, ec); //-V601
@@ -389,7 +389,8 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<bool>* started, error_code& ec)
     {
         return set_thread_state_timed(scheduler, abs_time, id, pending,
-            wait_timeout, thread_priority_normal, std::size_t(-1), started, ec);
+            wait_timeout, thread_priority_normal,
+            thread_schedule_hint_none, started, ec);
     }
 
     /// Set a timer to set the state of the given \a thread to the given

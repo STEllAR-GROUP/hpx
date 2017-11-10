@@ -353,7 +353,9 @@ namespace hpx {
         threads::thread_init_data data(
             util::bind(&runtime_impl::run_helper, this, func,
                 std::ref(result_)),
-            "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
+            "run_helper", 0,
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(0),
             threads::get_stack_size(threads::thread_stacksize_large));
 
         this->runtime::starting();

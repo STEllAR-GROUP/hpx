@@ -709,7 +709,8 @@ namespace hpx { namespace threads { namespace detail
         thread_priority priority, error_code& ec)
     {
         return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,
-            newstate_ex, priority, get_worker_thread_num(), nullptr, ec);
+            newstate_ex, priority, 
+            thread_schedule_hint(get_worker_thread_num()), nullptr, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

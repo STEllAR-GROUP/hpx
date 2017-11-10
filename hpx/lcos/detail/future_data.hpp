@@ -701,7 +701,7 @@ namespace detail
                 },
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, threads::thread_priority_boost,
-                std::size_t(-1), threads::thread_stacksize_current, ec);
+                threads::thread_schedule_hint_none, threads::thread_stacksize_current, ec);
             if (ec) {
                 // thread creation failed, report error to the new future
                 this->base_type::set_exception(hpx::detail::access_exception(ec));

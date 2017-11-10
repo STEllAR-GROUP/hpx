@@ -33,7 +33,7 @@ namespace hpx { namespace threads { namespace executors
             default_executor();
 
             default_executor(thread_priority priority,
-                thread_stacksize stacksize, std::size_t os_thread);
+                thread_stacksize stacksize, thread_schedule_hint schedulehint);
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
@@ -82,7 +82,7 @@ namespace hpx { namespace threads { namespace executors
         private:
             thread_stacksize stacksize_;
             thread_priority priority_;
-            std::size_t os_thread_;
+            thread_schedule_hint schedulehint_;
         };
     }
 
@@ -95,19 +95,19 @@ namespace hpx { namespace threads { namespace executors
 
         default_executor(thread_stacksize stacksize)
           : scheduled_executor(new detail::default_executor(
-                thread_priority_default, stacksize, std::size_t(-1)))
+                thread_priority_default, stacksize, thread_schedule_hint_none))
         {}
 
         default_executor(thread_priority priority,
                 thread_stacksize stacksize = thread_stacksize_default,
-                std::size_t os_thread = std::size_t(-1))
+                thread_schedule_hint schedulehint = thread_schedule_hint_none)
           : scheduled_executor(new detail::default_executor(
-                priority, stacksize, os_thread))
+                priority, stacksize, schedulehint))
         {}
 
-        default_executor(std::size_t os_thread)
+        default_executor(thread_schedule_hint schedulehint)
           : scheduled_executor(new detail::default_executor(
-                thread_priority_default, thread_stacksize_default, os_thread))
+                thread_priority_default, thread_stacksize_default, schedulehint))
         {}
     };
 }}}
