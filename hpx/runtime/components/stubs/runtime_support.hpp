@@ -12,7 +12,7 @@
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/runtime/applier/register_apply_colocated.hpp>
+// #include <hpx/runtime/applier/register_apply_colocated.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -229,18 +229,6 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<std::vector<naming::id_type> >
-        bulk_create_components_async(
-            naming::id_type const& gid, components::component_type type,
-            std::size_t count = 1);
-
-        /// Create a new component \a type using the runtime_support with the
-        /// given \a targetgid. Block for the creation to finish.
-        static std::vector<naming::id_type> bulk_create_components(
-            naming::id_type const& gid, components::component_type type,
-            std::size_t count = 1);
-
-        ///////////////////////////////////////////////////////////////////////
         /// Create a new memory block using the runtime_support with the
         /// given \a targetgid. This is a non-blocking call. The caller needs
         /// to call \a future#get on the result of this function
@@ -272,11 +260,6 @@ namespace hpx { namespace components { namespace stubs
             bool pre_startup);
         static void call_startup_functions(naming::id_type const& gid,
             bool pre_startup);
-
-        static void free_component_sync(agas::gva const& g,
-            naming::gid_type const& gid, std::uint64_t count = 1);
-        static void free_component_locally(agas::gva const& g,
-            naming::gid_type const& gid);
 
         /// \brief Shutdown the given runtime system
         static lcos::future<void>
@@ -328,14 +311,6 @@ namespace hpx { namespace components { namespace stubs
             naming::id_type const& targetgid);
         static void get_config(naming::id_type const& targetgid,
             util::section& ini);
-
-        ///////////////////////////////////////////////////////////////////////
-        /// \brief Retrieve instance count for given component type
-        static lcos::future<std::int32_t > get_instance_count_async(
-            naming::id_type const& targetgid, components::component_type type);
-        static std::int32_t  get_instance_count(
-            naming::id_type const& targetgid,
-            components::component_type type);
 
         ///////////////////////////////////////////////////////////////////////
         static void

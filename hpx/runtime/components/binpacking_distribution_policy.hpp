@@ -12,8 +12,8 @@
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
@@ -242,11 +242,8 @@ namespace hpx { namespace components
             // schedule creation of all objects across given localities
             hpx::future<std::vector<std::uint64_t> > values =
                 detail::get_counter_values(
-                    hpx::components::unique_component_name<
-                        hpx::components::component_factory<
-                            typename Component::wrapping_type
-                        >
-                    >::call(), counter_name_, localities_);
+                    get_component_name<Component>(),
+                    counter_name_, localities_);
 
             using hpx::util::placeholders::_1;
             return values.then(hpx::util::bind(
@@ -280,11 +277,8 @@ namespace hpx { namespace components
                 // schedule creation of all objects across given localities
                 hpx::future<std::vector<std::uint64_t> > values =
                     detail::get_counter_values(
-                        hpx::components::unique_component_name<
-                            hpx::components::component_factory<
-                                typename Component::wrapping_type
-                            >
-                        >::call(), counter_name_, localities_);
+                    get_component_name<Component>(),
+                    counter_name_, localities_);
 
                 using hpx::util::placeholders::_1;
                 return values.then(

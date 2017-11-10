@@ -28,37 +28,6 @@
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////
-    lcos::future<std::vector<naming::id_type> >
-    runtime_support::bulk_create_components_async(
-        naming::id_type const& gid, components::component_type type,
-        std::size_t count)
-    {
-        if (!naming::is_locality(gid))
-        {
-            HPX_THROW_EXCEPTION(bad_parameter,
-                "stubs::runtime_support::bulk_create_components_async",
-                "The id passed as the first argument is not representing"
-                    " a locality");
-            return make_ready_future(std::vector<naming::id_type>());
-        }
-
-        // Create a future, execute the required action,
-        // we simply return the initialized future, the caller needs
-        // to call get() on the return value to obtain the result
-        typedef server::runtime_support::bulk_create_components_action action_type;
-        return hpx::async<action_type>(gid, type, count);
-    }
-
-    std::vector<naming::id_type> runtime_support::bulk_create_components(
-        naming::id_type const& gid, components::component_type type,
-        std::size_t count)
-    {
-        // The following get yields control while the action above
-        // is executed and the result is returned to the future
-        return bulk_create_components_async(gid, type, count).get();
-    }
-
-    ///////////////////////////////////////////////////////////////////////
     /// Create a new memory block using the runtime_support with the
     /// given \a targetgid. This is a non-blocking call. The caller needs
     /// to call \a future#get on the result of this function
@@ -115,64 +84,6 @@ namespace hpx { namespace components { namespace stubs
         bool pre_startup)
     {
         call_startup_functions_async(gid, pre_startup).get();
-    }
-
-    void runtime_support::free_component_sync(agas::gva const& g,
-        naming::gid_type const& gid, std::uint64_t count)
-    {
-        typedef server::runtime_support::free_component_action action_type;
-
-        // Determine whether the gid of the component to delete is local or
-        // remote
-        std::pair<bool, components::pinned_ptr> r;
-
-        naming::address addr;
-        if (g.prefix == hpx::get_locality() ||
-            agas::is_local_address_cached(gid, addr))
-        {
-            typedef action_type::component_type component_type;
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<action_type>::call(
-                    hpx::id_type(gid, hpx::id_type::unmanaged), addr.address_);
-                if (!r.first)
-                {
-                    // apply locally
-                    components::server::runtime_support* p =
-                        reinterpret_cast<components::server::runtime_support*>(
-                            hpx::get_runtime().get_runtime_support_lva());
-                    p->free_component(g, gid, count);
-                    return;
-                }
-            }
-            else
-            {
-                // apply locally
-                components::server::runtime_support* p =
-                    reinterpret_cast<components::server::runtime_support*>(
-                        hpx::get_runtime().get_runtime_support_lva());
-                p->free_component(g, gid, count);
-                return;
-            }
-        }
-
-        // apply remotely (only if runtime is not stopping)
-        naming::id_type id = get_colocation_id(
-            launch::sync, naming::id_type(gid, naming::id_type::unmanaged));
-
-        lcos::packaged_action<action_type, void> p;
-        lcos::future<void> f = p.get_future();
-        p.apply(id, g, gid, count);
-        f.get();
-    }
-
-    void runtime_support::free_component_locally(agas::gva const& g,
-        naming::gid_type const& gid)
-    {
-        components::server::runtime_support* p =
-            reinterpret_cast<components::server::runtime_support*>(
-                  get_runtime().get_runtime_support_lva());
-        p->free_component(g, gid, 1);
     }
 
     /// \brief Shutdown the given runtime system
@@ -328,27 +239,6 @@ namespace hpx { namespace components { namespace stubs
         // The following get yields control while the action above
         // is executed and the result is returned to the future
         ini = get_config_async(targetgid).get();
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    /// \brief Retrieve instance count for given component type
-    lcos::future<std::int32_t> runtime_support::get_instance_count_async(
-        naming::id_type const& targetgid, components::component_type type)
-    {
-        // Create a future, execute the required action,
-        // we simply return the initialized future, the caller needs
-        // to call get() on the return value to obtain the result
-        typedef server::runtime_support::get_instance_count_action
-            action_type;
-        return hpx::async<action_type>(targetgid, type);
-    }
-
-    std::int32_t runtime_support::get_instance_count(
-        naming::id_type const& targetgid, components::component_type type)
-    {
-        // The following get yields control while the action above
-        // is executed and the result is returned to the future
-        return get_instance_count_async(targetgid, type).get();
     }
 
     ///////////////////////////////////////////////////////////////////////

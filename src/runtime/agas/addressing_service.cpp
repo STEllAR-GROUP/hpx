@@ -227,22 +227,22 @@ void addressing_service::launch_bootstrap(
 
     naming::id_type const locality_gid = locality_ns_->gid();
     gva locality_gva(here,
-        server::locality_namespace::get_component_type(), 1U,
+        hpx::components::component_agas_locality_namespace, 1U,
             locality_ns_->ptr());
 
     naming::id_type const primary_gid = primary_ns_.gid();
     gva primary_gva(here,
-        server::primary_namespace::get_component_type(), 1U,
+        hpx::components::component_agas_primary_namespace, 1U,
             primary_ns_.ptr());
 
     naming::id_type const component_gid = component_ns_->gid();
     gva component_gva(here,
-         server::component_namespace::get_component_type(), 1U,
+         hpx::components::component_agas_component_namespace, 1U,
             component_ns_->ptr());
 
     naming::id_type const symbol_gid = symbol_ns_.gid();
     gva symbol_gva(here,
-        server::symbol_namespace::get_component_type(), 1U,
+        hpx::components::component_agas_symbol_namespace, 1U,
             symbol_ns_.ptr());
 
     rt.get_config().parse("assigned locality",
@@ -989,7 +989,7 @@ bool addressing_service::resolve_locally_known_addresses(
         else
         {
             addr.locality_ = dest;
-            addr.type_ = server::primary_namespace::get_component_type();
+            addr.type_ = hpx::components::component_agas_primary_namespace;
             // addr.address_ will be supplied on the target locality
             return true;
         }
@@ -1006,7 +1006,7 @@ bool addressing_service::resolve_locally_known_addresses(
         else
         {
             addr.locality_ = dest;
-            addr.type_ = server::symbol_namespace::get_component_type();
+            addr.type_ = hpx::components::component_agas_symbol_namespace;
             // addr.address_ will be supplied on the target locality
         }
 

@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
-//  Copyright (c)      2011 Thomas Heller
+//  Copyright (c) 2011-2017 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,7 @@
 
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/components_fwd.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <cstddef>
@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -88,8 +89,9 @@ namespace hpx { namespace components
             {
                 // The managed_component's controls the lifetime of the
                 // component implementation.
+                back_ptr->finalize();
                 back_ptr->~BackPtr();
-                BackPtr::heap_type::free(back_ptr);
+                component_heap<typename BackPtr::wrapped_type>().free(back_ptr);
             }
         };
 
@@ -276,48 +278,6 @@ namespace hpx { namespace components
         managed_component<Component, Wrapper>* back_ptr_;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Component, typename Derived>
-        struct heap_factory
-        {
-            // the memory for the wrappers is managed by a one_size_heap_list
-            typedef detail::wrapper_heap_list<
-                detail::fixed_wrapper_heap<Derived> > heap_type;
-
-            typedef detail::fixed_wrapper_heap<Derived> block_type;
-            typedef Derived value_type;
-
-        private:
-            struct wrapper_heap_tag {};
-
-            static heap_type& get_heap()
-            {
-                // ensure thread-safe initialization
-                static components::component_type t =
-                    components::get_component_type<Component>();
-
-                util::reinitializable_static<heap_type, wrapper_heap_tag> heap(t);
-                return heap.get();
-            }
-
-        public:
-            static void* alloc(std::size_t count = 1)
-            {
-                return get_heap().alloc(count);
-            }
-            static void free(void* p, std::size_t count = 1)
-            {
-                get_heap().free(p, count);
-            }
-            static naming::gid_type get_gid(void* p)
-            {
-                return get_heap().get_gid(p);
-            }
-        };
-    }
     // reference counting
     template <typename Component, typename Derived>
     void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
@@ -367,8 +327,9 @@ namespace hpx { namespace components
         typedef Component type_holder;
         typedef typename Component::base_type_holder base_type_holder;
 
-        typedef detail::heap_factory<Component, derived_type> heap_type;
-        typedef typename heap_type::value_type value_type;
+        typedef detail::wrapper_heap_list<
+            detail::fixed_wrapper_heap<derived_type> > heap_type;
+        typedef derived_type value_type;
 
         /// \brief Construct a managed_component instance holding a
         ///        wrapped instance. This constructor takes ownership of the
@@ -454,70 +415,6 @@ namespace hpx { namespace components
         }
 
     public:
-        /// \brief  The function \a create is used for allocation and
-        //          initialization of arrays of wrappers.
-        template <typename T = Component>
-        static typename std::enable_if<
-            std::is_default_constructible<T>::value, value_type*
-        >::type
-        create(std::size_t count = 1)
-        {
-            // allocate the memory
-            void* p = heap_type::alloc(count);
-            if (nullptr == p) {
-                HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
-                    "managed_component::create");
-            }
-
-            if (1 == count)
-                return new (p) value_type();
-
-            // call constructors
-            std::size_t succeeded = 0;
-            try {
-                value_type* curr = reinterpret_cast<value_type*>(p);
-                for (std::size_t i = 0; i != count; ++i, ++curr) {
-                    // call placement new, might throw
-                    new (curr) value_type();
-                    ++succeeded;
-                }
-            }
-            catch (...) {
-                // call destructors for successfully constructed objects
-                value_type* curr = reinterpret_cast<value_type*>(p);
-                for (std::size_t i = 0; i != succeeded; ++i)
-                {
-                    curr->finalize();
-                    curr->~derived_type();
-                    ++curr;
-                }
-                heap_type::free(p, count);     // free memory
-                throw;      // rethrow
-            }
-            return reinterpret_cast<value_type*>(p);
-        }
-
-        /// \brief  The function \a destroy is used for deletion and
-        //          de-allocation of arrays of wrappers
-        static void destroy(value_type* p, std::size_t count = 1)
-        {
-            if (nullptr == p || 0 == count)
-                return;     // do nothing if given a nullptr pointer
-
-            // call destructors for all managed_component instances
-            value_type* curr = p;
-            for (std::size_t i = 0; i != count; ++i)
-            {
-                curr->finalize();
-                curr->~derived_type();
-                ++curr;
-            }
-
-            // free memory itself
-            heap_type::free(p, count);
-        }
-
-    public:
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
         Component* operator-> ()
@@ -556,9 +453,9 @@ namespace hpx { namespace components
         }
 #endif
 
+    private:
 #if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS) && !defined(__NVCC__) && \
     !defined(__CUDACC__)
-    private:
         // declare friends which are allowed to access get_base_gid()
         friend Component;
 
@@ -566,19 +463,15 @@ namespace hpx { namespace components
             typename CtorPolicy, typename DtorPolicy>
         friend class managed_component_base;
 
-        template <typename Component_>
-        friend naming::gid_type server::create(std::size_t count);
+        template <typename Component_, typename...Ts>
+        friend naming::gid_type server::create(Ts&&... ts);
 
-        template <typename Component_>
-        friend naming::gid_type server::create(
-            util::unique_function_nonser<void(void*)> const& ctor);
+        template <typename Component_, typename...Ts>
+        friend naming::gid_type server::create_migrated(
+            naming::gid_type const& gid, void** p, Ts&&...ts);
 
-        template <typename Component_>
-        friend naming::gid_type server::create(naming::gid_type const& gid,
-            util::unique_function_nonser<void(void*)> const& ctor, void** p);
-
-        template <typename Component_, typename ...Ts>
-        friend naming::gid_type server::create_with_args(Ts&&... ts);
+        template <typename Component_, typename...Ts>
+        friend std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&...ts);
 #endif
 
         naming::gid_type get_base_gid(
@@ -591,7 +484,8 @@ namespace hpx { namespace components
                     "managed_components must be assigned new gids on creation");
                 return naming::invalid_gid;
             }
-            return heap_type::get_gid(const_cast<managed_component*>(this));
+            return component_heap<managed_component>().
+                get_gid(const_cast<managed_component*>(this));
         }
 
     public:

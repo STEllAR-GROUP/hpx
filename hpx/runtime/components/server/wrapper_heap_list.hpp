@@ -12,6 +12,7 @@
 #include <hpx/util/one_size_heap_list.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <iostream>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,23 +24,22 @@ namespace hpx { namespace components { namespace detail
     class wrapper_heap_list : public util::one_size_heap_list
     {
         typedef util::one_size_heap_list base_type;
-        typedef typename Heap::value_type value_ype;
-
-        typedef typename std::aligned_storage<
-                sizeof(value_ype), std::alignment_of<value_ype>::value
-            >::type storage_type;
+        typedef typename Heap::value_type value_type;
 
         enum
         {
             heap_step = 0xFFF,          // default initial number of elements
-            heap_size = sizeof(storage_type)  // size of one element in the heap
         };
 
     public:
-        wrapper_heap_list(component_type type)
-          : base_type(get_component_type_name(type), heap_step, heap_size,
+        wrapper_heap_list()
+          : base_type(get_component_type_name(
+                get_component_type<typename value_type::wrapped_type>()),
+                heap_step, sizeof(typename std::aligned_storage<
+                    sizeof(value_type), std::alignment_of<value_type>::value
+                >::type),
                 (Heap*) nullptr)
-          , type_(type)
+          , type_(get_component_type<typename value_type::wrapped_type>())
         {}
 
         ///

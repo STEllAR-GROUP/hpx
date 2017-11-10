@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
-//  Copyright (c) 2016      Thomas Heller
+//  Copyright (c) 2016-2017 Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
 #include <hpx/lcos/local/promise.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -293,7 +294,7 @@ namespace lcos {
             static void wrapping_deleter(wrapping_type *ptr)
             {
                 ptr->~wrapping_type();
-                wrapping_type::heap_type::free(ptr);
+                hpx::components::component_heap<wrapping_type>().free(ptr);
             }
 
         protected:
@@ -305,7 +306,7 @@ namespace lcos {
                 // shared state.
                 typedef std::unique_ptr<wrapping_type, void(*)(wrapping_type*)>
                     wrapping_ptr;
-                auto ptr = wrapping_type::heap_type::alloc();
+                auto ptr = hpx::components::component_heap<wrapping_type>().alloc();
                 wrapping_ptr lco_ptr(new (ptr) wrapping_type(
                     new wrapped_type(this->shared_state_)), &wrapping_deleter);
 
