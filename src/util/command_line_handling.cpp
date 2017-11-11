@@ -1163,6 +1163,13 @@ namespace hpx { namespace util
         for (std::string const& e : ini_config_)
             rtcfg_.parse("<user supplied config>", e, true, false);
 
+        // support re-throwing command line exceptions for testing purposes
+        int error_mode = util::allow_unregistered;
+        if (cfgmap.get_value("hpx.commandline.rethrow_errors", 0) != 0)
+        {
+            error_mode |= util::rethrow_on_error;
+        }
+
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as
         // defined in any of the runtime configuration files.
@@ -1173,7 +1180,7 @@ namespace hpx { namespace util
             // command line handling.
             boost::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argc,
-                    argv, prevm, std::size_t(-1), util::allow_unregistered,
+                    argv, prevm, std::size_t(-1), error_mode,
                     rtcfg_.mode_))
             {
                 return -1;
@@ -1224,7 +1231,7 @@ namespace hpx { namespace util
         std::vector<std::string> unregistered_options;
 
         if (!util::parse_commandline(rtcfg_, desc_cmdline,
-                argc, argv, vm_, node_, util::allow_unregistered, rtcfg_.mode_,
+                argc, argv, vm_, node_, error_mode, rtcfg_.mode_,
                 &help, &unregistered_options))
         {
             return -1;
