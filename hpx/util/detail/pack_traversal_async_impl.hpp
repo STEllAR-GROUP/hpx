@@ -32,11 +32,13 @@ namespace util {
         struct async_traverse_visit_tag
         {
         };
+
         /// A tag which is passed to the `operator()` of the visitor
         /// if an element is visited after the traversal was detached.
         struct async_traverse_detach_tag
         {
         };
+
         /// A tag which is passed to the `operator()` of the visitor
         /// if the asynchronous pack traversal was finished.
         struct async_traverse_complete_tag
@@ -203,6 +205,7 @@ namespace util {
                 return false;
             }
         };
+
         /// Specialization for the end marker which doesn't provide
         /// a particular element dereference
         template <typename Target, std::size_t Begin>
@@ -354,19 +357,19 @@ namespace util {
                 if (!frame_->traverse(*current))
                 {
                     // Store the current call hierarchy into a tuple for
-                    // later reentrance.
+                    // later re-entrance.
                     auto state =
                         util::tuple_cat(util::make_tuple(current.next()),
                             std::move(hierarchy_));
+
+                    // First detach the current execution context
+                    detach();
 
                     // If the traversal method returns false, we detach the
                     // current execution context and call the visitor with the
                     // element and a continue callable object again.
 
                     frame_->async_continue(*current, std::move(state));
-
-                    // Then detach the current execution context
-                    detach();
                 }
             }
 
@@ -450,7 +453,7 @@ namespace util {
             async_traversal_point<typename std::decay<Frame>::type,
                 typename std::decay<Hierarchy>::type...>;
 
-        /// A callable object which is cabale of resuming an asynchronous
+        /// A callable object which is capable of resuming an asynchronous
         /// pack traversal.
         struct resume_state_callable
         {
@@ -535,6 +538,7 @@ namespace util {
             /// The type of the demoted visitor type
             using visitor_pointer_type = boost::intrusive_ptr<Visitor>;
         };
+
         template <typename Visitor, typename VisitorArg, typename... Args>
         struct async_traversal_types<async_traverse_in_place_tag<Visitor>,
             VisitorArg, Args...> : async_traversal_types<Visitor, Args...>
