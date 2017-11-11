@@ -196,6 +196,11 @@ namespace hpx { namespace threads
                 return create_id(reinterpret_cast<std::size_t>(this));
             }
 
+            virtual void detach()
+            {
+                // by default, do nothing
+            }
+
         protected:
             static executor_id create_id(std::size_t id)
             {
@@ -427,6 +432,11 @@ namespace hpx { namespace threads
         {
             return add_after(rel_time.value(), std::move(f), desc,
                 stacksize, ec);
+        }
+
+        void detach()
+        {
+            executor_data_->detach();
         }
 
         /// Return a reference to the default executor for this process.

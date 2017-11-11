@@ -7,6 +7,7 @@
 set(tests
     block_os_threads_1036
     resume_priority
+    run_as_os_thread_lockup_2991
     thread_data_1111
     thread_pool_executor_1112
     thread_rescheduling
