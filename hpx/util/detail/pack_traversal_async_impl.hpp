@@ -181,6 +181,27 @@ namespace util {
         {
             Target* target_;
 
+            explicit static_async_range(Target* target) : target_(target) {}
+
+            static_async_range(static_async_range const& rhs) = default;
+            static_async_range(static_async_range && rhs)
+              : target_(rhs.target_)
+            {
+                rhs.target_ = nullptr;
+            }
+
+            static_async_range& operator=(
+                static_async_range const& rhs) = default;
+            static_async_range& operator=(static_async_range && rhs)
+            {
+                if (&rhs != this)
+                {
+                    target_ = rhs.target_;
+                    rhs.target_ = nullptr;
+                }
+                return *this;
+            }
+
             HPX_CONSTEXPR auto operator*() const noexcept
                 -> decltype(util::get<Begin>(*target_))
             {
@@ -517,8 +538,7 @@ namespace util {
         template <typename Frame, typename State>
         void resume_traversal_callable<Frame, State>::operator()()
         {
-            auto hierarchy =
-                util::tuple_cat(util::make_tuple(frame_), std::move(state_));
+            auto hierarchy = util::tuple_cat(util::make_tuple(frame_), state_);
             util::invoke_fused(resume_state_callable{}, std::move(hierarchy));
         }
 
