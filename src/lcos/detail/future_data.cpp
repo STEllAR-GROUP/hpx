@@ -26,6 +26,9 @@
 
 namespace hpx { namespace lcos { namespace detail
 {
+    future_data_refcnt_base::~future_data_refcnt_base() = default;
+
+    ///////////////////////////////////////////////////////////////////////////
     static bool run_on_completed_on_new_thread(
         util::unique_function_nonser<bool()> && f, error_code& ec)
     {
