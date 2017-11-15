@@ -92,7 +92,7 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
 #endif
 
 //
-namespace debug {
+namespace hpx { namespace debug {
     template<typename T>
     void output(const std::string &name, const std::vector<T> &v) {
 #ifdef EXTRA_DEBUG
@@ -118,11 +118,67 @@ namespace debug {
 #else
 # define debug_msg(a)
 #endif
-};
+}}
 
 #include <hpx/config/warnings_prefix.hpp>
 
-// TODO: add branch prediction and function heat
+
+///////////////////////////////////////////////////////////////////////////////
+// if abp scheduler is disabled in hpx, then we cannot see certain structs
+// ... so make them visible here
+//
+// FIFO + stealing at opposite end.
+#if !defined(HPX_HAVE_ABP_SCHEDULER)
+struct lockfree_abp_fifo;
+struct lockfree_abp_lifo;
+
+template <typename T>
+struct lockfree_abp_fifo_backend
+{
+    typedef boost::lockfree::deque<T> container_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef T const& const_reference;
+    typedef std::uint64_t size_type;
+
+    lockfree_abp_fifo_backend(
+        size_type initial_size = 0
+      , size_type num_thread = size_type(-1)
+        )
+      : queue_(std::size_t(initial_size))
+    {}
+
+    bool push(const_reference val, bool /*other_end*/ = false)
+    {
+        return queue_.push_left(val);
+    }
+
+    bool pop(reference val, bool steal = true)
+    {
+        if (steal)
+            return queue_.pop_left(val);
+        return queue_.pop_right(val);
+    }
+
+    bool empty()
+    {
+        return queue_.empty();
+    }
+
+  private:
+    container_type queue_;
+};
+
+struct lockfree_abp_fifo
+{
+    template <typename T>
+    struct apply
+    {
+        typedef lockfree_abp_fifo_backend<T> type;
+    };
+};
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -591,16 +647,19 @@ namespace threads {
             // to pending
             void create_thread(thread_init_data& data, thread_id_type* thrd,
                 thread_state_enum initial_state, error_code& ec,
-                std::size_t pool_queue_num,
-                std::size_t /*pool_queue_num_fallback*/)
+                thread_schedule_hint schedulehint,
+                thread_schedule_hint)
             {
                 HPX_ASSERT(data.scheduler_base == this);
 
-                if (pool_queue_num == std::size_t(-1))
+                std::size_t pool_queue_num = std::size_t(schedulehint);
+
+                if (schedulehint == thread_schedule_hint_none)
                 {
-                    std::size_t t = threads::detail::thread_num_tss_
-                                        .get_worker_thread_num();
-                    pool_queue_num = this->global_to_local_thread_index(t);
+                    std::size_t t =
+                        threads::detail::thread_num_tss_.get_worker_thread_num();
+                    pool_queue_num =
+                        this->global_to_local_thread_index(t);
                 }
 
                 // now create the thread
