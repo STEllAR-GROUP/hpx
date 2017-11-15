@@ -88,6 +88,7 @@ namespace hpx { namespace threads { namespace executors
         {
             // call the numa hint function
             int domain = numa_function_(ts...);
+            std::cout << "pre_execution_async_domain_schedule returning " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
@@ -101,7 +102,7 @@ namespace hpx { namespace threads { namespace executors
                 launch::async,
                 threads::thread_priority_default,
                 threads::thread_stacksize_default,
-                threads::thread_schedule_hint(domain));
+                threads::thread_schedule_hint(domain+32768));
 
             return p.get_future();
         }
@@ -126,6 +127,7 @@ namespace hpx { namespace threads { namespace executors
 
             // call the numa hint function
             int domain = numa_function_(predecessor_value, ts...);
+            std::cout << "pre_execution_async_domain_schedule 2 returning " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename
@@ -142,7 +144,7 @@ namespace hpx { namespace threads { namespace executors
                 launch::async,
                 threads::thread_priority_default,
                 threads::thread_stacksize_default,
-                threads::thread_schedule_hint(domain));
+                threads::thread_schedule_hint(domain+32768));
 
             return p.get_future();
         }
@@ -389,6 +391,7 @@ namespace hpx { namespace threads { namespace executors
 
             // invoke the hint function with the unwrapped tuple futures
             int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
+            std::cout << "dataflow returning " << domain << "\n";
 
             // forward the task execution on to the real internal executor
             lcos::local::futures_factory<result_type()> p(
@@ -405,7 +408,7 @@ namespace hpx { namespace threads { namespace executors
                 launch::async,
                 threads::thread_priority_default,
                 threads::thread_stacksize_default,
-                threads::thread_schedule_hint(domain));
+                threads::thread_schedule_hint(domain+32768));
 
             return p.get_future();
         }
