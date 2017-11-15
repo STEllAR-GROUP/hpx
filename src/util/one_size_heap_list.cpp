@@ -103,10 +103,10 @@ namespace hpx { namespace util
         {
 #if defined(HPX_DEBUG)
             heap_list_.push_front(create_heap_(
-                class_name_.c_str(), heap_count_ + 1, heap_step_, heap_size_));
+                class_name_.c_str(), heap_count_ + 1, parameters_));
 #else
             heap_list_.push_front(create_heap_(
-                class_name_.c_str(), 0, heap_step_, heap_size_));
+                class_name_.c_str(), 0, parameters_));
 #endif
 
             iterator itnew = heap_list_.begin();
