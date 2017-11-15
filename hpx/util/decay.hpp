@@ -50,17 +50,6 @@ namespace hpx { namespace util
     struct decay_unwrap
       : detail::decay_unwrap_impl<typename std::decay<T>::type>
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename T>
-        HPX_FORCEINLINE typename decay<T>::type
-        decay_copy(T&& v)
-        {
-            return std::forward<T>(v);
-        }
-    }
 }}
 
 #endif
