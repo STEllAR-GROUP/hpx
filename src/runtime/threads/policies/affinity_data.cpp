@@ -28,15 +28,6 @@ namespace hpx { namespace detail
 
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
-    static mask_type get_full_machine_mask(std::size_t num_threads)
-    {
-        threads::mask_type m = threads::mask_type();
-        threads::resize(m, hardware_concurrency());
-        for (std::size_t i = 0; i != num_threads; ++i)
-            threads::set(m, i);
-        return m;
-    }
-
     std::size_t get_pu_offset(util::command_line_handling const& cfg)
     {
         std::size_t pu_offset = std::size_t(-1);
