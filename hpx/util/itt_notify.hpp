@@ -7,6 +7,7 @@
 #define HPX_UTIL_ITT_NOTIFY_AUG_17_2010_1237PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -219,11 +220,16 @@ namespace hpx { namespace util { namespace itt
     };
 
     //////////////////////////////////////////////////////////////////////////
+    struct itt_domain_tag {};
+
     struct domain
     {
-        HPX_EXPORT domain(char const* name);
+        HPX_NON_COPYABLE(domain);
 
-        ___itt_domain* domain_;
+        HPX_EXPORT domain();
+        HPX_EXPORT ~domain();
+
+        HPX_EXPORT static hpx::util::thread_specific_ptr<___itt_domain, itt_domain_tag> domain_;
     };
 
     struct id
@@ -231,7 +237,7 @@ namespace hpx { namespace util { namespace itt
         id (domain const& domain, void* addr, unsigned long extra = 0)
         {
             id_ = HPX_ITT_MAKE_ID(addr, extra);
-            HPX_ITT_ID_CREATE(domain.domain_, id_);
+            HPX_ITT_ID_CREATE(domain.domain_.get(), id_);
         }
         ~id()
         {
@@ -265,11 +271,11 @@ namespace hpx { namespace util { namespace itt
         frame_context(domain const& domain, id* ident = nullptr)
           : domain_(domain), ident_(ident)
         {
-            HPX_ITT_FRAME_BEGIN(domain_.domain_, ident_? ident_->id_ : 0);
+            HPX_ITT_FRAME_BEGIN(domain_.domain_.get(), ident_? ident_->id_ : 0);
         }
         ~frame_context()
         {
-            HPX_ITT_FRAME_END(domain_.domain_, ident_ ? ident_->id_ : 0);
+            HPX_ITT_FRAME_END(domain_.domain_.get(), ident_ ? ident_->id_ : 0);
         }
 
         domain const& domain_;
@@ -281,11 +287,11 @@ namespace hpx { namespace util { namespace itt
         undo_frame_context(frame_context& frame)
           : frame_(frame)
         {
-            HPX_ITT_FRAME_END(frame_.domain_.domain_, nullptr);
+            HPX_ITT_FRAME_END(frame_.domain_.domain_.get(), nullptr);
         }
         ~undo_frame_context()
         {
-            HPX_ITT_FRAME_BEGIN(frame_.domain_.domain_, nullptr);
+            HPX_ITT_FRAME_BEGIN(frame_.domain_.domain_.get(), nullptr);
         }
 
         frame_context& frame_;
@@ -358,25 +364,25 @@ namespace hpx { namespace util { namespace itt
 
         ~task()
         {
-            HPX_ITT_TASK_END(domain_.domain_);
+            HPX_ITT_TASK_END(domain_.domain_.get());
         }
 
         void add_metadata(string_handle const& name, std::uint64_t val)
         {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+            HPX_ITT_METADATA_ADD(domain_.domain_.get(), id_, name.handle_, val);
         }
         void add_metadata(string_handle const& name, double val)
         {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+            HPX_ITT_METADATA_ADD(domain_.domain_.get(), id_, name.handle_, val);
         }
         void add_metadata(string_handle const& name, char const* val)
         {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+            HPX_ITT_METADATA_ADD(domain_.domain_.get(), id_, name.handle_, val);
         }
         template <typename T>
         void add_metadata(string_handle const& name, T const& val)
         {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_,
+            HPX_ITT_METADATA_ADD(domain_.domain_.get(), id_, name.handle_,
                 static_cast<void const*>(&val));
         }
 
@@ -629,7 +635,9 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
-        domain(char const*) {}
+        HPX_NON_COPYABLE(domain);
+
+        domain() {}
         ~domain() {}
     };
 

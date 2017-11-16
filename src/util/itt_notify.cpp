@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/thread_description.hpp>
 
@@ -252,11 +253,21 @@ bool use_ittnotify_api = false;
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt
 {
-    domain::domain(char const* name)
-      : domain_(HPX_ITT_DOMAIN_CREATE(name))
+    domain::domain()
     {
-        if (domain_) domain_->flags = 1;    // enable domain
+        if (nullptr == domain_.get())
+        {
+            domain_.reset(HPX_ITT_DOMAIN_CREATE(hpx::get_thread_name().c_str()));
+            if (domain_.get())
+            {
+                domain_.get()->flags = 1;    // enable domain
+            }
+        }
     }
+
+    domain::~domain() {}
+
+    hpx::util::thread_specific_ptr<___itt_domain, itt_domain_tag> domain::domain_;
 
     task::task(domain const& domain, util::thread_description const& name)
       : domain_(domain), id_(0), sh_()
@@ -270,10 +281,10 @@ namespace hpx { namespace util { namespace itt
             sh_ = HPX_ITT_STRING_HANDLE_CREATE("address");
         }
 
-        id_ = HPX_ITT_MAKE_ID(domain_.domain_,
+        id_ = HPX_ITT_MAKE_ID(domain_.domain_.get(),
             reinterpret_cast<std::size_t>(sh_.handle_));
 
-        HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+        HPX_ITT_TASK_BEGIN_ID(domain_.domain_.get(), id_, sh_.handle_);
 
         if (name.kind() == util::thread_description::data_type_address)
         {
@@ -284,10 +295,10 @@ namespace hpx { namespace util { namespace itt
     task::task(domain const& domain, string_handle const& name)
       : domain_(domain), id_(0), sh_(name)
     {
-        id_ = HPX_ITT_MAKE_ID(domain_.domain_,
+        id_ = HPX_ITT_MAKE_ID(domain_.domain_.get(),
             reinterpret_cast<std::size_t>(sh_.handle_));
 
-        HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+        HPX_ITT_TASK_BEGIN_ID(domain_.domain_.get(), id_, sh_.handle_);
     }
 }}}
 
