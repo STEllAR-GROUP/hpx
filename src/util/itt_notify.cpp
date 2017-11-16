@@ -300,6 +300,13 @@ namespace hpx { namespace util { namespace itt
 
         HPX_ITT_TASK_BEGIN_ID(domain_.domain_.get(), id_, sh_.handle_);
     }
+
+    task::~task()
+    {
+        HPX_ITT_TASK_END(domain_.domain_.get());
+
+        delete id_;
+    }
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

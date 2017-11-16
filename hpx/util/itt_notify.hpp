@@ -361,11 +361,7 @@ namespace hpx { namespace util { namespace itt
     {
         HPX_EXPORT task(domain const&, util::thread_description const&);
         HPX_EXPORT task(domain const&, string_handle const&);
-
-        ~task()
-        {
-            HPX_ITT_TASK_END(domain_.domain_.get());
-        }
+        HPX_EXPORT ~task();
 
         void add_metadata(string_handle const& name, std::uint64_t val)
         {
