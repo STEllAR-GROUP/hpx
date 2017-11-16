@@ -10,6 +10,8 @@
 #include <hpx/util/optional.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <utility>
+
 namespace hpx { namespace serialization
 {
     template <typename T>
