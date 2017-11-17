@@ -229,7 +229,9 @@ namespace hpx { namespace util { namespace itt
         HPX_EXPORT domain();
         HPX_EXPORT ~domain();
 
-        HPX_EXPORT static hpx::util::thread_specific_ptr<___itt_domain, itt_domain_tag> domain_;
+        HPX_EXPORT static hpx::util::thread_specific_ptr<
+                ___itt_domain, itt_domain_tag
+            > domain_;
     };
 
     struct id
