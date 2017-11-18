@@ -377,9 +377,8 @@ namespace util {
                 {
                     // Store the current call hierarchy into a tuple for
                     // later re-entrance.
-                    auto state =
-                        util::tuple_cat(util::make_tuple(current.next()),
-                            std::move(hierarchy_));
+                    auto hierarchy = util::tuple_cat(
+                        util::make_tuple(current.next()), hierarchy_);
 
                     // First detach the current execution context
                     detach();
@@ -388,7 +387,7 @@ namespace util {
                     // current execution context and call the visitor with the
                     // element and a continue callable object again.
 
-                    frame_->async_continue(*current, std::move(state));
+                    frame_->async_continue(*current, std::move(hierarchy));
                 }
             }
 
@@ -458,9 +457,14 @@ namespace util {
             template <typename Begin, typename Sentinel>
             void async_traverse(dynamic_async_range<Begin, Sentinel> range)
             {
-                for (/**/; !is_detached() && !range.is_finished(); ++range)
+                if (!is_detached())
                 {
-                    async_traverse_one(range);
+                    for (/**/; !range.is_finished(); ++range)
+                    {
+                        async_traverse_one(range);
+                        if (is_detached())          // test before increment
+                            break;
+                    }
                 }
             }
         };
@@ -478,12 +482,14 @@ namespace util {
         {
             /// Reenter an asynchronous iterator pack and continue
             /// its traversal.
-            template <typename Frame, typename Current>
-            void operator()(Frame&& frame, Current&& current) const
+            template <typename Frame, typename Current, typename... Hierarchy>
+            void operator()(Frame&& frame, Current&& current,
+                Hierarchy&&... hierarchy) const
             {
                 std::atomic<bool> detached{false};
                 next(detached, std::forward<Frame>(frame),
-                    std::forward<Current>(current));
+                    std::forward<Current>(current),
+                    std::forward<Hierarchy>(hierarchy)...);
             }
 
             template <typename Frame, typename Current>
@@ -500,7 +506,7 @@ namespace util {
                     point.async_traverse(std::forward<Current>(current));
 
                     // Don't continue the frame when the execution was detached
-                    if (point.is_detached())
+                    if (detached)
                     {
                         return;
                     }
@@ -511,17 +517,6 @@ namespace util {
 
             /// Reenter an asynchronous iterator pack and continue
             /// its traversal.
-            template <typename Frame, typename Current, typename Parent,
-                typename... Hierarchy>
-            void operator()(Frame&& frame, Current&& current, Parent&& parent,
-                Hierarchy&&... hierarchy) const
-            {
-                std::atomic<bool> detached{false};
-                next(detached, std::forward<Frame>(frame),
-                    std::forward<Current>(current), std::forward<Parent>(parent),
-                    std::forward<Hierarchy>(hierarchy)...);
-            }
-
             template <typename Frame, typename Current, typename Parent,
                 typename... Hierarchy>
             void next(std::atomic<bool>& detached, Frame&& frame,
@@ -598,8 +593,9 @@ namespace util {
                     typename types::frame_type(std::forward<Visitor>(visitor),
                         std::forward<Args>(args)...);
 
-                // Create a intrusive_ptr from the heap object
-                return typename types::frame_pointer_type(ptr);
+                // Create an intrusive_ptr from the heap object, don't increase
+                // reference count (it's already 'one').
+                return typename types::frame_pointer_type(ptr, false);
             }();
 
             // Create a static range for the top level tuple
