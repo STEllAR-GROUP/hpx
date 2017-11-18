@@ -460,7 +460,7 @@ namespace util {
             template <typename Begin, typename Sentinel>
             void async_traverse(dynamic_async_range<Begin, Sentinel> range)
             {
-                for (; !range.is_finished() && !is_detached(); ++range)
+                for (/**/; !is_detached() && !range.is_finished(); ++range)
                 {
                     async_traverse_one(range);
                 }
