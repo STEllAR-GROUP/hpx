@@ -17,6 +17,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <iterator>
@@ -299,14 +300,15 @@ namespace util {
         {
             Frame frame_;
             tuple<Hierarchy...> hierarchy_;
-            bool detached_;
+            std::atomic<bool>& detached_;
 
         public:
             explicit async_traversal_point(
-                Frame frame, tuple<Hierarchy...> hierarchy)
+                    Frame frame, tuple<Hierarchy...> hierarchy,
+                    std::atomic<bool>& detached)
               : frame_(std::move(frame))
               , hierarchy_(std::move(hierarchy))
-              , detached_(false)
+              , detached_(detached)
             {
             }
 
@@ -320,22 +322,24 @@ namespace util {
             /// Returns true when we should abort the current control flow
             bool is_detached() const noexcept
             {
-                return detached_;
+                return detached_.load();
             }
 
             /// Creates a new traversal point which
             template <typename Parent>
-            auto push(Parent&& parent) -> async_traversal_point<Frame,
-                typename std::decay<Parent>::type, Hierarchy...>
+            auto push(Parent&& parent)
+            ->  async_traversal_point<
+                    Frame, typename std::decay<Parent>::type, Hierarchy...
+                >
             {
                 // Create a new hierarchy which contains the
                 // the parent (the last traversed element).
                 auto hierarchy = util::tuple_cat(
                     util::make_tuple(std::forward<Parent>(parent)), hierarchy_);
 
-                return async_traversal_point<Frame,
-                    typename std::decay<Parent>::type, Hierarchy...>(
-                    frame_, std::move(hierarchy));
+                return async_traversal_point<
+                        Frame, typename std::decay<Parent>::type, Hierarchy...
+                    >(frame_, std::move(hierarchy), detached_);
             }
 
             /// Forks the current traversal point and continues the child
@@ -348,12 +352,6 @@ namespace util {
 
                 // Continue the traversal with the current element
                 point.async_traverse(std::forward<Child>(child));
-
-                // Propagate the control detach back
-                if (point.is_detached())
-                {
-                    detach();
-                }
             }
 
             /// Async traverse a single element, and do nothing.
@@ -370,9 +368,9 @@ namespace util {
             template <typename Current>
             auto async_traverse_one_impl(container_category_tag<false, false>,
                 Current&& current)
-                /// SFINAE this out, if the visitor doesn't accept
+                /// SFINAE this out if the visitor doesn't accept
                 /// the given element
-                -> typename always_void<decltype(
+            -> typename always_void<decltype(
                     std::declval<Frame>()->traverse(*current))>::type
             {
                 if (!frame_->traverse(*current))
@@ -401,8 +399,8 @@ namespace util {
                 container_category_tag<true, IsTupleLike>,
                 Current&& current)
             {
-                fork(make_dynamic_async_range(*current),
-                    std::forward<Current>(current));
+                auto range = make_dynamic_async_range(*current);
+                fork(std::move(range), std::forward<Current>(current));
             }
 
             /// Async traverse a single element which is a tuple like type only.
@@ -410,8 +408,8 @@ namespace util {
             void async_traverse_one_impl(container_category_tag<false, true>,
                 Current&& current)
             {
-                fork(make_static_range(*current),
-                    std::forward<Current>(current));
+                auto range = make_static_range(*current);
+                fork(std::move(range), std::forward<Current>(current));
             }
 
             /// Async traverse the current iterator
@@ -483,12 +481,21 @@ namespace util {
             template <typename Frame, typename Current>
             void operator()(Frame&& frame, Current&& current) const
             {
+                std::atomic<bool> detached{false};
+                next(detached, std::forward<Frame>(frame),
+                    std::forward<Current>(current));
+            }
+
+            template <typename Frame, typename Current>
+            void next(std::atomic<bool>& detached, Frame&& frame,
+                Current&& current) const
+            {
                 // Only process the next element if the current iterator
                 // hasn't reached its end.
                 if (!current.is_finished())
                 {
                     traversal_point_of_t<Frame> point(
-                        frame, util::make_tuple());
+                        frame, util::make_tuple(), detached);
 
                     point.async_traverse(std::forward<Current>(current));
 
@@ -509,6 +516,18 @@ namespace util {
             void operator()(Frame&& frame, Current&& current, Parent&& parent,
                 Hierarchy&&... hierarchy) const
             {
+                std::atomic<bool> detached{false};
+                next(detached, std::forward<Frame>(frame),
+                    std::forward<Current>(current), std::forward<Parent>(parent),
+                    std::forward<Hierarchy>(hierarchy)...);
+            }
+
+            template <typename Frame, typename Current, typename Parent,
+                typename... Hierarchy>
+            void next(std::atomic<bool>& detached, Frame&& frame,
+                Current&& current, Parent&& parent,
+                Hierarchy&&... hierarchy) const
+            {
                 // Only process the element if the current iterator
                 // hasn't reached its end.
                 if (!current.is_finished())
@@ -516,12 +535,13 @@ namespace util {
                     // Don't forward the arguments here, since we still need
                     // the objects in a valid state later.
                     traversal_point_of_t<Frame, Parent, Hierarchy...> point(
-                        frame, util::make_tuple(parent, hierarchy...));
+                        frame, util::make_tuple(parent, hierarchy...),
+                        detached);
 
                     point.async_traverse(std::forward<Current>(current));
 
                     // Don't continue the frame when the execution was detached
-                    if (point.is_detached())
+                    if (detached)
                     {
                         return;
                     }
@@ -529,7 +549,7 @@ namespace util {
 
                 // Pop the top element from the hierarchy, and shift the
                 // parent element one to the right
-                (*this)(std::forward<Frame>(frame),
+                next(detached, std::forward<Frame>(frame),
                     std::forward<Parent>(parent).next(),
                     std::forward<Hierarchy>(hierarchy)...);
             }
