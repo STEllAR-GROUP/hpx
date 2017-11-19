@@ -103,6 +103,7 @@ namespace util {
         class async_traversal_frame : public Visitor
         {
             tuple<Args...> args_;
+            std::atomic<bool> finished_;
 
             Visitor& visitor() noexcept
             {
@@ -118,17 +119,22 @@ namespace util {
             explicit async_traversal_frame(Visitor visitor, Args... args)
               : Visitor(std::move(visitor))
               , args_(util::make_tuple(std::move(args)...))
+              , finished_(false)
             {
             }
 
             /// We require a virtual base
-            ~async_traversal_frame() noexcept override {}
+            ~async_traversal_frame() override
+            {
+                HPX_ASSERT(finished_);
+            }
 
             template <typename MapperArg>
             explicit async_traversal_frame(async_traverse_in_place_tag<Visitor>,
                 MapperArg&& mapper_arg, Args... args)
               : Visitor(std::forward<MapperArg>(mapper_arg))
               , args_(util::make_tuple(std::move(args)...))
+              , finished_(false)
             {
             }
 
@@ -172,8 +178,12 @@ namespace util {
             /// asynchronous traversal was finished.
             void async_complete()
             {
-                util::invoke(
-                    visitor(), async_traverse_complete_tag{}, std::move(args_));
+                bool expected = false;
+                if (finished_.compare_exchange_strong(expected, true))
+                {
+                    util::invoke(visitor(), async_traverse_complete_tag{},
+                        std::move(args_));
+                }
             }
         };
 
@@ -300,12 +310,11 @@ namespace util {
         {
             Frame frame_;
             tuple<Hierarchy...> hierarchy_;
-            std::atomic<bool>& detached_;
+            bool& detached_;
 
         public:
             explicit async_traversal_point(
-                    Frame frame, tuple<Hierarchy...> hierarchy,
-                    std::atomic<bool>& detached)
+                    Frame frame, tuple<Hierarchy...> hierarchy, bool& detached)
               : frame_(std::move(frame))
               , hierarchy_(std::move(hierarchy))
               , detached_(detached)
@@ -322,7 +331,7 @@ namespace util {
             /// Returns true when we should abort the current control flow
             bool is_detached() const noexcept
             {
-                return detached_.load();
+                return detached_;
             }
 
             /// Creates a new traversal point which
@@ -486,14 +495,14 @@ namespace util {
             void operator()(Frame&& frame, Current&& current,
                 Hierarchy&&... hierarchy) const
             {
-                std::atomic<bool> detached{false};
+                bool detached = false;
                 next(detached, std::forward<Frame>(frame),
                     std::forward<Current>(current),
                     std::forward<Hierarchy>(hierarchy)...);
             }
 
             template <typename Frame, typename Current>
-            void next(std::atomic<bool>& detached, Frame&& frame,
+            void next(bool& detached, Frame&& frame,
                 Current&& current) const
             {
                 // Only process the next element if the current iterator
@@ -519,7 +528,7 @@ namespace util {
             /// its traversal.
             template <typename Frame, typename Current, typename Parent,
                 typename... Hierarchy>
-            void next(std::atomic<bool>& detached, Frame&& frame,
+            void next(bool& detached, Frame&& frame,
                 Current&& current, Parent&& parent,
                 Hierarchy&&... hierarchy) const
             {
