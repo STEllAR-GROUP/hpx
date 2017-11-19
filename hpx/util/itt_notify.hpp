@@ -469,7 +469,11 @@ namespace hpx { namespace util { namespace itt
         template <typename T>
         void set_value(T const& value)
         {
-            if (id_) HPX_ITT_COUNTER_SET_VALUE(id_, (void*)&value);
+            if (id_)
+            {
+                HPX_ITT_COUNTER_SET_VALUE(id_,
+                    const_cast<void*>(static_cast<const void*>(&value)));
+            }
         }
 
         counter(counter const& rhs) = delete;
