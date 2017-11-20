@@ -37,6 +37,42 @@ namespace hpx { namespace detail
         naming::id_type id_;
     };
 
+    template <typename T>
+    future<T> keep_alive(future<T> && f, id_type const& id)
+    {
+        if (id.get_management_type() == naming::id_type::managed)
+        {
+            traits::detail::get_shared_state(f)->set_on_completed(
+                hpx::detail::keep_id_alive(id));
+        }
+        return std::move(f);
+    }
+
+    struct keep_id_and_ptr_alive
+    {
+        explicit keep_id_and_ptr_alive(
+                naming::id_type const& id, components::pinned_ptr&& p)
+          : id_(id), p_(std::move(p))
+        {}
+
+        void operator()() const {}
+
+        naming::id_type id_;
+        components::pinned_ptr p_;
+    };
+
+    template <typename T>
+    future<T> keep_alive(
+        future<T>&& f, id_type const& id, components::pinned_ptr&& p)
+    {
+        if (id.get_management_type() == naming::id_type::managed)
+        {
+            traits::detail::get_shared_state(f)->set_on_completed(
+                hpx::detail::keep_id_and_ptr_alive(id, std::move(p)));
+        }
+        return std::move(f);
+    }
+
     template <typename Result>
     class handle_managed_target
     {
@@ -96,16 +132,43 @@ namespace hpx { namespace detail
         static lcos::future<Result>
         call(naming::id_type const& id, naming::address && addr, Ts &&... vs)
         {
-            future<Result> f;
+            try
             {
-                handle_managed_target<Result> hmt(id, f);
-                lcos::packaged_action<Action, Result> p;
+                auto&& result = Action::execute_function(
+                    addr.address_, addr.type_, std::forward<Ts>(vs)...);
 
-                f = p.get_future();
-                p.apply(std::move(addr), hmt.get_id(), std::forward<Ts>(vs)...);
-                f.wait();
+                typedef typename util::decay<decltype(result)>::type naked_type;
+                typedef traits::get_remote_result<Result, naked_type>
+                    get_remote_result_type;
+
+                return make_ready_future(
+                    get_remote_result_type::call(std::move(result)));
             }
-            return f;
+            catch (...)
+            {
+                return make_exceptional_future<Result>(std::current_exception());
+            }
+        }
+    };
+
+    template <typename Action>
+    struct sync_local_invoke<Action, void>
+    {
+        template <typename ...Ts>
+        static lcos::future<void>
+        call(naming::id_type const& id, naming::address && addr, Ts &&... vs)
+        {
+            try
+            {
+                Action::execute_function(
+                    addr.address_, addr.type_, std::forward<Ts>(vs)...);
+
+                return make_ready_future();
+            }
+            catch (...)
+            {
+                return make_exceptional_future<void>(std::current_exception());
+            }
         }
     };
 
@@ -240,6 +303,24 @@ namespace hpx { namespace detail
         return f;
     }
 
+    template <typename Action>
+    struct action_invoker
+    {
+        typedef typename Action::remote_result_type remote_result_type;
+        typedef typename Action::local_result_type result_type;
+        typedef traits::get_remote_result<result_type, remote_result_type>
+            get_remote_result_type;
+
+        template <typename... Ts>
+        HPX_FORCEINLINE result_type operator()(
+            naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs) const
+        {
+            return get_remote_result_type::call(typename Action::invoker()(
+                lva, comptype, std::forward<Ts>(vs)...));
+        }
+    };
+
     template <typename Action, typename ...Ts>
     hpx::future<
         typename hpx::traits::extract_action<Action>::type::local_result_type
@@ -248,11 +329,35 @@ namespace hpx { namespace detail
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
-
-        naming::address addr;
-        agas::is_local_address_cached(id, addr);
+        typedef typename action_type::component_type component_type;
 
         future<result_type> f;
+        std::pair<bool, components::pinned_ptr> r;
+
+        naming::address addr;
+        if (agas::is_local_address_cached(id, addr))
+        {
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    f = hpx::async(action_invoker<action_type>(),
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+
+                    return keep_alive(std::move(f), id, std::move(r.second));
+                }
+            }
+            else
+            {
+                f = hpx::async(action_invoker<action_type>(),
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+
+                return keep_alive(std::move(f), id);
+            }
+        }
+
         {
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
@@ -260,6 +365,7 @@ namespace hpx { namespace detail
             f = p.get_future();
             p.apply(std::move(addr), hmt.get_id(), std::forward<Ts>(vs)...);
         }
+
         return f;
     }
 
@@ -271,11 +377,36 @@ namespace hpx { namespace detail
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
-
-        naming::address addr;
-        agas::is_local_address_cached(id, addr);
+        typedef typename action_type::component_type component_type;
 
         future<result_type> f;
+        std::pair<bool, components::pinned_ptr> r;
+
+        naming::address addr;
+        if (agas::is_local_address_cached(id, addr))
+        {
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                        id, addr.address_);
+                if (!r.first)
+                {
+                    f = hpx::async(launch::deferred,
+                            action_invoker<action_type>(), addr.address_,
+                            addr.type_, std::forward<Ts>(vs)...);
+
+                    return keep_alive(std::move(f), id, std::move(r.second));
+                }
+            }
+            else
+            {
+                f = hpx::async(launch::deferred, action_invoker<action_type>(),
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+
+                return keep_alive(std::move(f), id);
+            }
+        }
+
         {
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
@@ -284,6 +415,7 @@ namespace hpx { namespace detail
             p.apply_deferred(std::move(addr), hmt.get_id(),
                 std::forward<Ts>(vs)...);
         }
+
         return f;
     }
 
