@@ -287,6 +287,10 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t const max_busy_loop_count_;
     };
 
+    std::int64_t get_background_thread_count();
+    HPX_EXPORT void increment_background_thread_count();
+    HPX_EXPORT struct decrement_background_thread_count;
+
     template <typename SchedulingPolicy>
     thread_id_type create_background_thread(SchedulingPolicy& scheduler,
         scheduling_callbacks& callbacks, std::shared_ptr<bool>& background_running,
@@ -297,6 +301,7 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data background_init(
             [&, background_running](thread_state_ex_enum) -> thread_result_type
             {
+                decrement_background_thread_count count();
 
                 while(*background_running)
                 {
@@ -311,6 +316,7 @@ namespace hpx { namespace threads { namespace detail
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "background_work");
                 }
+
                 return thread_result_type(terminated, nullptr);
             },
             hpx::util::thread_description("background_work"),
@@ -325,6 +331,7 @@ namespace hpx { namespace threads { namespace detail
         scheduler.SchedulingPolicy::create_thread(background_init,
             &background_thread, suspended, true, hpx::throws, num_thread);
         HPX_ASSERT(background_thread);
+        increment_background_thread_count();
         // We can now set the state to pending
         background_thread->set_state(pending);
         return background_thread;
@@ -667,19 +674,33 @@ namespace hpx { namespace threads { namespace detail
                         num_thread, running, idle_loop_count))
                 {
                     // clean up terminated threads one more time before exiting
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
                     {
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                         {
-                            this_state.store(state_stopped);
-                            break;
+                            if (background_thread.get() != nullptr)
+                            {
+                                HPX_ASSERT(background_running);
+                                *background_running = false;
+                                scheduler.SchedulingPolicy::schedule_thread(
+                                    background_thread.get(), num_thread);
+                                background_thread.reset();
+                                background_running.reset();
+                            }
+                            else
+                            {
+                                this_state.store(state_stopped);
+                                break;
+                            }
                         }
-
-                        // otherwise, keep idling for some time
-                        if (!may_exit)
-                            idle_loop_count = 0;
-                        may_exit = true;
+                        else
+                        {
+                            // otherwise, keep idling for some time
+                            if (!may_exit)
+                                idle_loop_count = 0;
+                            may_exit = true;
+                        }
                     }
                 }
 
@@ -738,7 +759,6 @@ namespace hpx { namespace threads { namespace detail
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
                 idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
-                // clean up terminated threads
                 if (idle_loop_count > params.max_idle_loop_count_)
                     idle_loop_count = 0;
 
@@ -749,10 +769,23 @@ namespace hpx { namespace threads { namespace detail
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    if (background_thread)
                     {
-                        this_state.store(state_stopped);
-                        break;
+                        HPX_ASSERT(background_running);
+                        *background_running = false;
+                        scheduler.SchedulingPolicy::schedule_thread(
+                            background_thread.get(), num_thread);
+                        background_thread.reset();
+                        background_running.reset();
+                    }
+                    else
+                    {
+                        if (scheduler.SchedulingPolicy::cleanup_terminated(
+                                num_thread, true))
+                        {
+                            this_state.store(state_stopped);
+                            break;
+                        }
                     }
                     may_exit = false;
                 }

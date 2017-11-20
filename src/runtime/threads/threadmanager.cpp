@@ -18,6 +18,7 @@
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
+#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
@@ -859,6 +860,11 @@ namespace hpx { namespace threads
         return total_count;
     }
 
+    std::int64_t threadmanager::get_background_thread_count()
+    {
+        return hpx::threads::detail::get_background_thread_count();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Enumerate all matching threads
     bool threadmanager::enumerate_threads(
@@ -901,7 +907,7 @@ namespace hpx { namespace threads
 
         for (auto& pool_iter : pools_)
         {
-            result = result && pool_iter->cleanup_terminated(delete_all);
+            result = pool_iter->cleanup_terminated(delete_all) && result;
         }
 
         return result;

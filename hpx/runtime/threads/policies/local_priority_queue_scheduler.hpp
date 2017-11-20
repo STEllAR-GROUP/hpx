@@ -426,9 +426,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(bool delete_all = false)
+        bool cleanup_terminated(bool delete_all)
         {
             bool empty = true;
+
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 empty = queues_[i]->cleanup_terminated(delete_all) && empty;
             if (!delete_all)
@@ -439,6 +440,22 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated(delete_all) && empty;
 
             empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
+
+            return empty;
+        }
+
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        {
+            bool empty = true;
+
+            empty = queues_[num_thread]->cleanup_terminated(delete_all);
+            if (!delete_all)
+                return empty;
+
+            if (num_thread < high_priority_queues_.size())
+                empty = high_priority_queues_[num_thread]->
+                    cleanup_terminated(delete_all) && empty;
+
             return empty;
         }
 
@@ -468,17 +485,21 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
 
             // Select a OS thread which hasn't been disabled
+            HPX_ASSERT(threads::any(parent_pool_->get_used_processing_units()));
+
             auto const& rp = resource::get_partitioner();
             auto mask = rp.get_pu_mask(
                 num_thread + parent_pool_->get_thread_offset());
             if(!threads::any(mask))
                 threads::set(mask, num_thread + parent_pool_->get_thread_offset());
-            while (true)
-            {
-                if (bit_and(mask, parent_pool_->get_used_processing_units()))
-                    break;
 
+            while (!bit_and(mask, parent_pool_->get_used_processing_units()))
+            {
                 num_thread = (num_thread + 1) % queue_size;
+                mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+                if(!threads::any(mask))
+                    threads::set(mask, num_thread + parent_pool_->get_thread_offset());
             }
 
             // now create the thread
