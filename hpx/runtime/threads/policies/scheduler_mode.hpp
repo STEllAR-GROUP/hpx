@@ -14,7 +14,8 @@ namespace hpx { namespace threads { namespace policies
         do_background_work = 0x1,
         reduce_thread_priority = 0x02,
         delay_exit = 0x04,
-        fast_idle_mode = 0x08
+        fast_idle_mode = 0x08,
+        enable_elasticity = 0x10
     };
 }}}
 
