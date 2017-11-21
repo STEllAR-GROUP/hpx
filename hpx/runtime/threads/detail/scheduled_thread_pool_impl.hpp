@@ -174,6 +174,9 @@ namespace hpx { namespace threads { namespace detail
 
         if (!threads_.empty())
         {
+            // wake up if suspended
+            resume(std::size_t(-1));
+
             // set state to stopping
             sched_->Scheduler::set_all_states(state_stopping);
 
@@ -1403,11 +1406,29 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
+        // TODO: Best way to do this?
+        if (hpx::get_runtime_ptr())
+        {
+            while (state.load() == state_suspending)
+            {
+                hpx::this_thread::suspend();
+            }
+        }
+        else
+        {
+            while (state.load() == state_suspending) {}
+        }
+
+        if (state.load() == state_suspended)
+        {
+            resume_processing_unit(virt_core, ec);
+        }
+
         hpx::state oldstate = state.exchange(state_stopping);
 
         HPX_ASSERT(oldstate == state_starting ||
-            oldstate == state_running || oldstate == state_suspended ||
-            oldstate == state_stopping || oldstate == state_stopped);
+            oldstate == state_running || oldstate == state_stopping ||
+            oldstate == state_stopped);
 
         {
             std::unique_lock<pu_mutex_type> l(used_processing_units_mtx_);
@@ -1438,6 +1459,80 @@ namespace hpx { namespace threads { namespace detail
                 hpx::this_thread::suspend();
             }
         }
+
         t.join();
+    }
+
+    // TODO: Fix the interface. This is for waking up during shutdown, so don't
+    // care about statuses for now.
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume(std::size_t virt_core,
+        error_code& ec)
+    {
+        if (virt_core == std::size_t(-1))
+        {
+            for (std::size_t i = 0; i != threads_.size(); ++i)
+            {
+                sched_->Scheduler::resume(i);
+            }
+        }
+        else
+        {
+            sched_->Scheduler::resume(virt_core);
+        }
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::suspend_processing_unit(
+        std::size_t virt_core, error_code& ec)
+    {
+        // inform the scheduler to stop the virtual core
+        std::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(virt_core);
+
+        hpx::state oldstate = state.exchange(state_suspending);
+        HPX_ASSERT(oldstate == state_running);
+
+        if (hpx::get_runtime_ptr())
+        {
+            while (virt_core == hpx::get_worker_thread_num())
+            {
+                hpx::this_thread::suspend();
+            }
+
+            while (state.load() == state_suspending)
+            {
+                hpx::this_thread::suspend();
+            }
+        }
+        else
+        {
+            // TODO: Best way to do this?
+            while (state.load() == state_suspending) {}
+        }
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume_processing_unit(
+        std::size_t virt_core, error_code& ec)
+    {
+        std::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(virt_core);
+
+        HPX_ASSERT(state.load() == state_suspended);
+        sched_->Scheduler::resume(virt_core);
+
+        if (hpx::get_runtime_ptr())
+        {
+            while (state.load() == state_suspended)
+            {
+                hpx::this_thread::suspend();
+            }
+        }
+        else
+        {
+            // TODO: Best way to do this?
+            while (state.load() == state_suspended) {}
+        }
     }
 }}}

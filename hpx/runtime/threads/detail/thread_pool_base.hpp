@@ -277,6 +277,18 @@ namespace hpx { namespace threads { namespace detail
         virtual void remove_processing_unit(std::size_t thread_num,
             error_code& ec = throws) = 0;
 
+        // Suspend the given processing unit on the scheduler.
+        virtual void suspend_processing_unit(std::size_t virt_core,
+            error_code& ec = throws) = 0;
+
+        // Resume the given processing unit on the scheduler.
+        virtual void resume_processing_unit(std::size_t virt_core,
+            error_code& ec = throws) = 0;
+
+        // Resume the given processing unit on the scheduler (without checks).
+        // Only implemented for scheduled_thread_pool for now.
+        virtual void resume(std::size_t virt_core, error_code& ec = throws) {};
+
         // return the description string of the underlying scheduler
         char const* get_description() const;
 

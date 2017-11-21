@@ -76,6 +76,8 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
+          , suspend_mtxs_(num_threads)
+          , suspend_conds_(num_threads)
           , states_(num_threads)
           , description_(description)
           , parent_pool_(nullptr)
@@ -148,6 +150,29 @@ namespace hpx { namespace threads { namespace policies
             else
                 cond_.notify_one();
 #endif
+        }
+
+        void suspend(std::size_t num_thread)
+        {
+            HPX_ASSERT(num_thread < suspend_conds_.size());
+            std::unique_lock<compat::mutex> l(suspend_mtxs_[num_thread]);
+            suspend_conds_[num_thread].wait(l);
+        }
+
+        void resume(std::size_t num_thread)
+        {
+            if (num_thread == std::size_t(-1))
+            {
+                for (compat::condition_variable& c : suspend_conds_)
+                {
+                    c.notify_one();
+                }
+            }
+            else
+            {
+                HPX_ASSERT(num_thread < suspend_conds_.size());
+                suspend_conds_[num_thread].notify_one();
+            }
         }
 
         // allow to access/manipulate states
@@ -361,6 +386,10 @@ namespace hpx { namespace threads { namespace policies
         compat::condition_variable cond_;
         std::atomic<std::uint32_t> wait_count_;
 #endif
+
+        // support for suspension of pus
+        std::vector<compat::mutex> suspend_mtxs_;
+        std::vector<compat::condition_variable> suspend_conds_;
 
         std::vector<std::atomic<hpx::state> > states_;
         char const* description_;

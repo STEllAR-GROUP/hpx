@@ -493,7 +493,10 @@ namespace hpx { namespace threads { namespace policies
             if(!threads::any(mask))
                 threads::set(mask, num_thread + parent_pool_->get_thread_offset());
 
-            while (!bit_and(mask, parent_pool_->get_used_processing_units()))
+            // TODO: Speed up check?
+            while (get_state(num_thread).load() == state_suspending ||
+                  get_state(num_thread).load() == state_suspended ||
+                  !bit_and(mask, parent_pool_->get_used_processing_units()))
             {
                 num_thread = (num_thread + 1) % queue_size;
                 mask = rp.get_pu_mask(

@@ -592,6 +592,10 @@ namespace hpx { namespace components { namespace server
                 std::int64_t(1) + tm.get_background_thread_count();
             ++k)
         {
+            // wake up suspended pus
+            // TODO: Needed?
+            //tm.resume();
+
             tm.cleanup_terminated(true);
             // avoid timed suspension, don't boost priority
             util::detail::yield_k(k % 32,
@@ -635,6 +639,10 @@ namespace hpx { namespace components { namespace server
                     std::int64_t(1) + tm.get_background_thread_count();
                 ++k)
             {
+                // wake up suspended pus
+                // TODO: Needed?
+                //tm.resume();
+
                 tm.cleanup_terminated(true);
                 // avoid timed suspension, don't boost priority
                 util::detail::yield_k(k % 32,
@@ -700,6 +708,10 @@ namespace hpx { namespace components { namespace server
                 std::int64_t(1) + tm.get_background_thread_count();
             ++k)
         {
+            // wake up suspended pus
+            // TODO: Needed?
+            //tm.resume();
+
             tm.cleanup_terminated(true);
             // avoid timed suspension, don't boost priority
             util::detail::yield_k(k % 32,
@@ -781,6 +793,10 @@ namespace hpx { namespace components { namespace server
                    std::int64_t(1) + tm.get_background_thread_count();
                 ++k)
             {
+                // wake up suspended pus
+                // TODO: Needed?
+                //tm.resume();
+
                 tm.cleanup_terminated(true);
                 // avoid timed suspension, don't boost priority
                 util::detail::yield_k(k % 32,
@@ -867,7 +883,13 @@ namespace hpx { namespace components { namespace server
                       "passed first termination detection (count: "
                    << count << ").";
 
+        // wake up suspended pus
+        // TODO: Needed?
+        //threads::threadmanager& tm = appl.get_thread_manager();
+        //tm.resume();
+
         // execute registered shutdown functions on all localities
+        // NOTE: This hangs if there are suspended pus.
         invoke_shutdown_functions(locality_ids, true);
         invoke_shutdown_functions(locality_ids, false);
 
@@ -1109,6 +1131,10 @@ namespace hpx { namespace components { namespace server
             bool timed_out = false;
             error_code ec(lightweight);
 
+            // wake up suspended pus
+            // TODO: Needed?
+            //tm.resume();
+
             stopped_ = true;
 
             for (std::size_t k = 0;
@@ -1116,6 +1142,10 @@ namespace hpx { namespace components { namespace server
                     std::int64_t(1) + tm.get_background_thread_count();
                 ++k)
             {
+                // wake up suspended pus
+                // TODO: Needed?
+                //tm.resume();
+
                 // let thread-manager clean up threads
                 cleanup_threads(tm, l);
 
@@ -1143,6 +1173,10 @@ namespace hpx { namespace components { namespace server
                         std::int64_t(1) + tm.get_background_thread_count();
                     ++k)
                 {
+                    // wake up suspended pus
+                    // TODO: Needed?
+                    //tm.resume();
+
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
 

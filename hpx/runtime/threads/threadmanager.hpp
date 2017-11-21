@@ -306,6 +306,10 @@ namespace hpx { namespace threads
         std::size_t shrink_pool(std::string const& pool_name);
         std::size_t expand_pool(std::string const& pool_name);
 
+        // \brief Wake up all suspended pus.
+        // TODO: Rethink interface.
+        void resume();
+
     private:
         // counter creator functions
         naming::gid_type thread_counts_counter_creator(

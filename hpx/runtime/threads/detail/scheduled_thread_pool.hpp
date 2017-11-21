@@ -241,6 +241,16 @@ namespace hpx { namespace threads { namespace detail
         // Remove the given processing unit from the scheduler.
         void remove_processing_unit(std::size_t virt_core, error_code&);
 
+        // Suspend the given processing unit on the scheduler.
+        void suspend_processing_unit(std::size_t virt_core, error_code&);
+
+        // Resume the given processing unit on the scheduler.
+        void resume_processing_unit(std::size_t virt_core, error_code&);
+
+        // Resume the given processing unit on the scheduler (without checks).
+        // TODO: Clean up API.
+        void resume(std::size_t virt_core, error_code& ec = throws);
+
     protected:
         friend struct init_tss_helper<Scheduler>;
 

@@ -468,8 +468,7 @@ namespace hpx { namespace threads { namespace detail
             // Get the next HPX thread from the queue
             thrd = next_thrd;
             bool running = this_state.load(
-                std::memory_order_relaxed) < state_stopping;
-
+                std::memory_order_relaxed) < state_suspending;
 
             if (HPX_LIKELY(thrd ||
                     scheduler.SchedulingPolicy::get_next_thread(
@@ -676,8 +675,9 @@ namespace hpx { namespace threads { namespace detail
                     // clean up terminated threads one more time before exiting
                     if (scheduler.SchedulingPolicy::cleanup_terminated(
                             num_thread, true) &&
+                        ( /* TODO: this_state.load() == state_suspending || */
                         scheduler.SchedulingPolicy::get_thread_count(unknown,
-                            thread_priority_default, num_thread) == 0)
+                            thread_priority_default, num_thread) == 0))
                     {
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
@@ -693,8 +693,18 @@ namespace hpx { namespace threads { namespace detail
                             }
                             else
                             {
-                                this_state.store(state_stopped);
-                                break;
+                                if (this_state.load() == state_suspending)
+                                {
+                                    this_state.store(state_suspended);
+                                    scheduler.SchedulingPolicy::suspend(num_thread);
+                                    this_state.store(state_running);
+                                    continue;
+                                }
+                                else
+                                {
+                                    this_state.store(state_stopped);
+                                    break;
+                                }
                             }
                         }
                         else
@@ -785,11 +795,23 @@ namespace hpx { namespace threads { namespace detail
                     {
                         if (scheduler.SchedulingPolicy::cleanup_terminated(
                                 num_thread, true) &&
+                            ( /* TODO: this_state.load() == state_suspending || */
                             scheduler.SchedulingPolicy::get_thread_count(unknown,
-                                thread_priority_default, num_thread) == 0)
+                                thread_priority_default, num_thread) == 0))
                         {
-                            this_state.store(state_stopped);
-                            break;
+                            if (this_state.load() == state_suspending)
+                            {
+                                this_state.store(state_suspended);
+                                scheduler.SchedulingPolicy::suspend(num_thread);
+                                may_exit = false;
+                                this_state.store(state_running);
+                                continue;
+                            }
+                            else
+                            {
+                                this_state.store(state_stopped);
+                                break;
+                            }
                         }
                     }
                     may_exit = false;
