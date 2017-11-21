@@ -884,9 +884,11 @@ namespace hpx { namespace components { namespace server
                    << count << ").";
 
         // wake up suspended pus
-        // TODO: Needed?
-        //threads::threadmanager& tm = appl.get_thread_manager();
-        //tm.resume();
+        // TODO: Too early? Wakes up threads that should be suspended?
+        // After dijkstra_termination_detection is too late though,
+        // as that blocks until all work is done.
+        threads::threadmanager& tm = appl.get_thread_manager();
+        tm.resume();
 
         // execute registered shutdown functions on all localities
         // NOTE: This hangs if there are suspended pus.
