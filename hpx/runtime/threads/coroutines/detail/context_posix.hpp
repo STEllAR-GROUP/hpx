@@ -109,7 +109,7 @@ namespace posix { namespace pth
 #include <cstddef>                  // ptrdiff_t
 #include <ucontext.h>
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
 #include <signal.h>
 #include <stdlib.h>
@@ -245,7 +245,7 @@ namespace hpx { namespace threads { namespace coroutines
                 HPX_UNUSED(error);
                 HPX_ASSERT(error == 0);
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
                 // concept inspired by the following links:
                 //
                 // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
@@ -265,7 +265,7 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
             }
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             static void sigsegv_handler(int signum, siginfo_t *info,
                 void *data)
             {
