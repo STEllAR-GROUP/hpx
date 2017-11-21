@@ -146,14 +146,36 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg = {
+    std::vector<std::string> cfg =
+    {
         "hpx.os_threads=4"
     };
 
-    // set up the resource partitioner
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+    using hpx::resource::scheduling_policy;
 
-    // now run the test
-    HPX_TEST_EQ(hpx::init(), 0);
+    // TODO: Loop through integer values?
+    // TODO: Should all schedulers support suspension?
+    std::vector<scheduling_policy> const policies =
+    {
+        //scheduling_policy::local,
+        scheduling_policy::local_priority_fifo,
+        scheduling_policy::local_priority_lifo,
+        //scheduling_policy::static_,
+        //scheduling_policy::static_priority,
+        //scheduling_policy::abp_priority,
+        //scheduling_policy::hierarchy,
+        //scheduling_policy::periodic_priority,
+        //scheduling_policy::throttle
+    };
+
+    for (auto policy : policies)
+    {
+        // Set up the resource partitioner
+        hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+        rp.create_thread_pool("default", policy);
+
+        HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    }
+
     return hpx::util::report_errors();
 }
