@@ -20,6 +20,7 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
@@ -1407,7 +1408,7 @@ namespace hpx { namespace threads { namespace detail
             sched_->Scheduler::get_state(virt_core);
 
         // TODO: Best way to do this?
-        if (hpx::get_runtime_ptr())
+        if (threads::get_self_ptr())
         {
             while (state.load() == state_suspending)
             {
@@ -1452,7 +1453,7 @@ namespace hpx { namespace threads { namespace detail
             std::swap(threads_[virt_core], t);
         }
 
-        if (hpx::get_runtime_ptr())
+        if (threads::get_self_ptr())
         {
             while (virt_core == hpx::get_worker_thread_num())
             {
@@ -1493,7 +1494,7 @@ namespace hpx { namespace threads { namespace detail
         hpx::state oldstate = state.exchange(state_suspending);
         HPX_ASSERT(oldstate == state_running);
 
-        if (hpx::get_runtime_ptr())
+        if (threads::get_self_ptr())
         {
             while (virt_core == hpx::get_worker_thread_num())
             {
@@ -1522,7 +1523,7 @@ namespace hpx { namespace threads { namespace detail
         HPX_ASSERT(state.load() == state_suspended);
         sched_->Scheduler::resume(virt_core);
 
-        if (hpx::get_runtime_ptr())
+        if (threads::get_self_ptr())
         {
             while (state.load() == state_suspended)
             {
