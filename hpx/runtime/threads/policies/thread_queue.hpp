@@ -450,7 +450,7 @@ namespace hpx { namespace threads { namespace policies
         ///
         /// This returns 'true' if there are no more terminated threads waiting
         /// to be deleted.
-        bool cleanup_terminated_locked_helper(bool delete_all = false)
+        bool cleanup_terminated_locked(bool delete_all = false)
         {
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(cleanup_terminated_time_);
@@ -506,11 +506,6 @@ namespace hpx { namespace threads { namespace policies
             return terminated_items_count_ == 0;
         }
 
-        bool cleanup_terminated_locked(bool delete_all = false)
-        {
-            return cleanup_terminated_locked_helper(delete_all);
-        }
-
     public:
         bool cleanup_terminated(bool delete_all = false)
         {
@@ -522,7 +517,7 @@ namespace hpx { namespace threads { namespace policies
                 while (true)
                 {
                     std::lock_guard<mutex_type> lk(mtx_);
-                    if (cleanup_terminated_locked_helper(false))
+                    if (cleanup_terminated_locked(false))
                     {
                         return true;
                     }
@@ -531,7 +526,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             std::lock_guard<mutex_type> lk(mtx_);
-            return cleanup_terminated_locked_helper(false);
+            return cleanup_terminated_locked(false);
         }
 
         // The maximum number of active threads this thread manager should
@@ -737,6 +732,7 @@ namespace hpx { namespace threads { namespace policies
                         thread_map_.insert(thrd);
 
                     if (HPX_UNLIKELY(!p.second)) {
+                        lk.unlock();
                         HPX_THROWS_IF(ec, hpx::out_of_memory,
                             "threadmanager::register_thread",
                             "Couldn't add new thread to the map of threads");
@@ -1057,8 +1053,10 @@ namespace hpx { namespace threads { namespace policies
                 }
 
                 cleanup_terminated_locked();
+
+                if (added_new) return false;
             }
-            bool canexit = cleanup_terminated_locked(true);
+            bool canexit = cleanup_terminated(true);
             if (!running && canexit)
             {
                 // we don't have any registered work items anymore
