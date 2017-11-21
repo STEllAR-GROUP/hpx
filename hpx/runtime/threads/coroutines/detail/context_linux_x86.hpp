@@ -170,7 +170,7 @@ namespace hpx { namespace threads { namespace coroutines
 
                 std::memset(&action, '\0', sizeof(action));
                 action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
-                action.sa_sigaction = &sigsegv_handler;
+                action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
 
                 sigaltstack(&segv_stack, static_cast<stack_t*>(m_stack) );
                 sigfillset(&action.sa_mask);
