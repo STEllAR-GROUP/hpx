@@ -6,7 +6,7 @@
 set(tests
     named_pool_executor
     resource_partitioner
-    shutdown_removed_pus
+    shutdown_suspended_pus
     throttle
     throttle_timed
     used_pus
@@ -14,7 +14,7 @@ set(tests
 
 set(named_pool_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4)
-set(shutdown_removed_pus_PARAMETERS THREADS_PER_LOCALITY 4)
+set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
 set(throttle_PARAMETERS THREADS_PER_LOCALITY 4)
 set(throttle_timed_PARAMETERS THREADS_PER_LOCALITY 4)
 set(used_pus_PARAMETERS THREADS_PER_LOCALITY 4)

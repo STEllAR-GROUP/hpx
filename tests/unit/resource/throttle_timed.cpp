@@ -55,7 +55,7 @@ int hpx_main(int argc, char* argv[])
             {
                 if (thread_num != hpx::resource::get_num_threads("default") - 1)
                 {
-                    tp.remove_processing_unit(thread_num);
+                    tp.suspend_processing_unit(thread_num);
                 }
 
                 ++thread_num;
@@ -68,8 +68,7 @@ int hpx_main(int argc, char* argv[])
             }
             else
             {
-                tp.add_processing_unit(
-                    thread_num - 1, thread_num + tp.get_thread_offset() - 1);
+                tp.resume_processing_unit(thread_num - 1);
 
                 --thread_num;
 
@@ -82,12 +81,11 @@ int hpx_main(int argc, char* argv[])
 
         hpx::when_all(std::move(fs)).get();
 
-        // Don't exit with removed pus
-        for (std::size_t thread_num_add = 0; thread_num_add < thread_num;
-            ++thread_num_add)
+        // Don't exit with suspended pus
+        for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
+            ++thread_num_resume)
         {
-            tp.add_processing_unit(
-                thread_num_add, thread_num_add + tp.get_thread_offset());
+            tp.resume_processing_unit(thread_num_resume);
         }
     }
 

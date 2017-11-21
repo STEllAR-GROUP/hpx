@@ -30,29 +30,28 @@ int hpx_main(int argc, char* argv[])
         // Check number of used resources
         for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
         {
-            tp.remove_processing_unit(thread_num);
+            tp.suspend_processing_unit(thread_num);
             HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
                 hpx::threads::count(tp.get_used_processing_units()));
         }
 
         for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
         {
-            tp.add_processing_unit(thread_num, thread_num + tp.get_thread_offset());
+            tp.resume_processing_unit(thread_num);
             HPX_TEST_EQ(std::size_t(thread_num + 2),
                 hpx::threads::count(tp.get_used_processing_units()));
         }
     }
 
     {
-        // Check removing pu on which current thread is running
+        // Check suspending pu on which current thread is running
         std::size_t worker_thread_num = hpx::get_worker_thread_num();
-        tp.remove_processing_unit(worker_thread_num);
-        tp.add_processing_unit(worker_thread_num,
-            worker_thread_num + tp.get_thread_offset());
+        tp.suspend_processing_unit(worker_thread_num);
+        tp.resume_processing_unit(worker_thread_num);
     }
 
     {
-        // Check when removing all but one, we end up on the same thread
+        // Check when suspending all but one, we end up on the same thread
         std::size_t thread_num = 0;
         auto test_function = [&thread_num, &tp]()
         {
@@ -63,26 +62,25 @@ int hpx_main(int argc, char* argv[])
         for (thread_num = 0; thread_num < num_threads;
             ++thread_num)
         {
-            for (std::size_t thread_num_remove = 0;
-                thread_num_remove < num_threads;
-                ++thread_num_remove)
+            for (std::size_t thread_num_suspend = 0;
+                thread_num_suspend < num_threads;
+                ++thread_num_suspend)
             {
-                if (thread_num != thread_num_remove)
+                if (thread_num != thread_num_suspend)
                 {
-                    tp.remove_processing_unit(thread_num_remove);
+                    tp.suspend_processing_unit(thread_num_suspend);
                 }
             }
 
             hpx::async(test_function).get();
 
-            for (std::size_t thread_num_add = 0;
-                thread_num_add < num_threads;
-                ++thread_num_add)
+            for (std::size_t thread_num_resume = 0;
+                thread_num_resume < num_threads;
+                ++thread_num_resume)
             {
-                if (thread_num != thread_num_add)
+                if (thread_num != thread_num_resume)
                 {
-                    tp.add_processing_unit(thread_num_add,
-                        thread_num_add + tp.get_thread_offset());
+                    tp.resume_processing_unit(thread_num_resume);
                 }
             }
         }
@@ -107,7 +105,7 @@ int hpx_main(int argc, char* argv[])
             {
                 if (thread_num != hpx::resource::get_num_threads("default") - 1)
                 {
-                    tp.remove_processing_unit(thread_num);
+                    tp.suspend_processing_unit(thread_num);
                 }
 
                 ++thread_num;
@@ -120,8 +118,7 @@ int hpx_main(int argc, char* argv[])
             }
             else
             {
-                tp.add_processing_unit(
-                    thread_num - 1, thread_num + tp.get_thread_offset() - 1);
+                tp.resume_processing_unit(thread_num - 1);
 
                 --thread_num;
 
@@ -134,12 +131,11 @@ int hpx_main(int argc, char* argv[])
 
         hpx::when_all(std::move(fs)).get();
 
-        // Don't exit with removed pus
-        for (std::size_t thread_num_add = 0; thread_num_add < thread_num;
-            ++thread_num_add)
+        // Don't exit with suspended pus
+        for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
+            ++thread_num_resume)
         {
-            tp.add_processing_unit(
-                thread_num_add, thread_num_add + tp.get_thread_offset());
+            tp.resume_processing_unit(thread_num_resume);
         }
     }
 

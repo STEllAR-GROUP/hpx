@@ -29,10 +29,10 @@ int hpx_main(int argc, char* argv[])
     // Remove all but one pu
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
     {
-        tp.remove_processing_unit(thread_num);
+        tp.suspend_processing_unit(thread_num);
     }
 
-    // Schedule lots of dummy work
+    // Schedule some dummy work
     for (std::size_t i = 0;
          i < hpx::resource::get_num_threads("default") * 10000;
          ++i)
