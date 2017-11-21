@@ -674,7 +674,10 @@ namespace hpx { namespace threads { namespace detail
                         num_thread, running, idle_loop_count))
                 {
                     // clean up terminated threads one more time before exiting
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(
+                            num_thread, true) &&
+                        scheduler.SchedulingPolicy::get_thread_count(unknown,
+                            thread_priority_default, num_thread) == 0)
                     {
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
@@ -781,7 +784,9 @@ namespace hpx { namespace threads { namespace detail
                     else
                     {
                         if (scheduler.SchedulingPolicy::cleanup_terminated(
-                                num_thread, true))
+                                num_thread, true) &&
+                            scheduler.SchedulingPolicy::get_thread_count(unknown,
+                                thread_priority_default, num_thread) == 0)
                         {
                             this_state.store(state_stopped);
                             break;
