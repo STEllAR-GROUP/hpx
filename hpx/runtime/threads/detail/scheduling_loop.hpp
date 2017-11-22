@@ -674,11 +674,29 @@ namespace hpx { namespace threads { namespace detail
                 {
                     // clean up terminated threads one more time before exiting
                     // TODO: Clean up this condition.
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(
-                            num_thread, true) &&
-                        (this_state.load() == state_suspending || // TODO: Wait for suspended threads?
-                         scheduler.SchedulingPolicy::get_thread_count(unknown,
-                             thread_priority_default, num_thread) == 0))
+                    bool canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
+                    if (this_state.load() == state_suspending)
+                    {
+                        canexit = canexit &&
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                staged, thread_priority_default, num_thread) == 0; // Should be 0
+                        canexit = canexit &&
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                pending, thread_priority_default, num_thread) == 0; // Should be 0
+                        // Not necessary for individual pus but needed to
+                        // avoid suspended threads when suspending last pu
+                        canexit = canexit &&
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                suspended, thread_priority_default, num_thread) == 0;
+                    }
+                    else
+                    {
+                        canexit = canexit &&
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                unknown, thread_priority_default, num_thread) == 0;
+                    }
+
+                    if (canexit)
                     {
                         // if this is an inner scheduler, exit immediately
                         if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
@@ -795,11 +813,29 @@ namespace hpx { namespace threads { namespace detail
                     else
                     {
                         // TODO: Clean up this condition.
-                        if (scheduler.SchedulingPolicy::cleanup_terminated(
-                                num_thread, true) &&
-                            (this_state.load() == state_suspending || // TODO: Wait for suspended threads?
-                             scheduler.SchedulingPolicy::get_thread_count(unknown,
-                                 thread_priority_default, num_thread) == 0))
+                        bool canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
+                        if (this_state.load() == state_suspending)
+                        {
+                            canexit = canexit &&
+                                scheduler.SchedulingPolicy::get_thread_count(
+                                    staged, thread_priority_default, num_thread) == 0; // Should be 0
+                            canexit = canexit &&
+                                scheduler.SchedulingPolicy::get_thread_count(
+                                    pending, thread_priority_default, num_thread) == 0; // Should be 0
+                            // Not necessary for individual pus but needed to
+                            // avoid suspended threads when suspending last pu
+                            canexit = canexit &&
+                                scheduler.SchedulingPolicy::get_thread_count(
+                                    suspended, thread_priority_default, num_thread) == 0;
+                        }
+                        else
+                        {
+                            canexit = canexit &&
+                                scheduler.SchedulingPolicy::get_thread_count(
+                                    unknown, thread_priority_default, num_thread) == 0;
+                        }
+
+                        if (canexit)
                         {
                             if (this_state.load() == state_suspending)
                             {
