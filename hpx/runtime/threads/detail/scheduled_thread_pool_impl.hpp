@@ -1517,6 +1517,9 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_processing_unit(
         std::size_t virt_core, error_code& ec)
     {
+        std::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(virt_core);
+
         // NOTE: Require suspended?
         sched_->Scheduler::resume(virt_core);
 
