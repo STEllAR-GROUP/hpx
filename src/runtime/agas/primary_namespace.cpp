@@ -27,9 +27,8 @@ using hpx::components::component_agas_primary_namespace;
 
 using hpx::agas::server::primary_namespace;
 
-HPX_REGISTER_COMPONENT(
-    hpx::components::fixed_component<primary_namespace>,
-    primary_namespace, hpx::components::factory_enabled)
+HPX_DEFINE_COMPONENT_NAME(primary_namespace,
+    hpx_primary_namespace);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     primary_namespace, component_agas_primary_namespace)
 
@@ -157,7 +156,7 @@ namespace hpx { namespace agas {
     {
         return naming::address(
             hpx::get_locality(),
-            server::primary_namespace::get_component_type(),
+            hpx::components::component_agas_primary_namespace,
             this->ptr()
         );
     }

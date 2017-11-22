@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
-//  Copyright (c) 2016      Thomas Heller
+//  Copyright (c) 2016-2017 Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
 #include <hpx/lcos/local/promise.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -289,6 +290,12 @@ namespace lcos {
                 }
                 return addr_;
             }
+        private:
+            static void wrapping_deleter(wrapping_type *ptr)
+            {
+                ptr->~wrapping_type();
+                hpx::components::component_heap<wrapping_type>().free(ptr);
+            }
 
         protected:
             void init_shared_state()
@@ -297,13 +304,15 @@ namespace lcos {
                 // handled by the shared state, we create the object to get our
                 // gid and then attach it to the completion handler of the
                 // shared state.
-                typedef std::unique_ptr<wrapping_type> wrapping_ptr;
-                wrapping_ptr lco_ptr(
-                    new wrapping_type(new wrapped_type(this->shared_state_)));
+                typedef std::unique_ptr<wrapping_type, void(*)(wrapping_type*)>
+                    wrapping_ptr;
+                auto ptr = hpx::components::component_heap<wrapping_type>().alloc();
+                wrapping_ptr lco_ptr(new (ptr) wrapping_type(
+                    new wrapped_type(this->shared_state_)), &wrapping_deleter);
 
                 id_ = lco_ptr->get_unmanaged_id();
                 addr_ = naming::address(hpx::get_locality(),
-                    lco_ptr->get_component_type(),
+                    components::get_component_type<wrapped_type>(),
                     lco_ptr.get());
 
                 // Pass id to shared state if it exposes the set_id() function

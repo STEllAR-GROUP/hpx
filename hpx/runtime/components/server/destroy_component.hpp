@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
-//  Copyright (c)      2011 Thomas Heller
+//  Copyright (c) 2011-2017 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/throw_exception.hpp>
@@ -21,19 +21,18 @@
 namespace hpx { namespace components { namespace server
 {
     HPX_EXPORT void destroy_component(naming::gid_type const& gid,
-        naming::address const& addr, error_code& ec = throws);
+        naming::address const& addr);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(naming::gid_type const& gid, naming::address const& addr,
-        error_code& ec = throws)
+    void destroy(naming::gid_type const& gid, naming::address const& addr)
     {
         // make sure this component is located here
         if (get_locality() != addr.locality_)
         {
             // This component might have been migrated, find out where it is
             // and instruct that locality to delete it.
-            destroy_component(gid, addr, ec);
+            destroy_component(gid, addr);
             return;
         }
 
@@ -48,35 +47,36 @@ namespace hpx { namespace components { namespace server
                     "instance of type: " << get_component_type_name(type)
                  << " (it is bound to a " << get_component_type_name(addr.type_)
                  << ")";
-            HPX_THROWS_IF(ec, hpx::unknown_component_address,
+            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                 "destroy<Component>", strm.str());
             return;
         }
 
+        --instance_count(type);
+
         // delete the local instances
-        Component::destroy(reinterpret_cast<Component*>(addr.address_));
-        if (&ec != &throws)
-            ec = make_success_code();
+        Component *c = reinterpret_cast<Component*>(addr.address_);
+        c->finalize();
+        c->~Component();
+        component_heap<Component>().free(c, 1);
     }
 
     template <typename Component>
-    void destroy(naming::gid_type const& gid, error_code& ec = throws)
+    void destroy(naming::gid_type const& gid)
     {
-        // retrieve the local address bound to the given global id
-        applier::applier& appl = hpx::applier::get_applier();
 
         naming::address addr;
-        if (!appl.get_agas_client().resolve_local(gid, addr))
+        if (!naming::get_agas_client().resolve_local(gid, addr))
         {
             std::ostringstream strm;
             strm << "global id " << gid << " is not bound to any "
                     "component instance";
-            HPX_THROWS_IF(ec, hpx::unknown_component_address,
+            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                 "destroy<Component>", strm.str());
             return;
         }
 
-        destroy<Component>(gid, addr, ec);
+        destroy<Component>(gid, addr);
     }
 }}}
 

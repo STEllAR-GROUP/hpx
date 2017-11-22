@@ -13,7 +13,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
@@ -161,11 +161,9 @@ namespace hpx { namespace naming
                 // Third parameter is the count of how many components to destroy.
                 // FIXME: The address should still be in the cache, but it could
                 // be evicted. It would be nice to have a way to pass the address
-                // directly to free_component_sync.
+                // directly to destroy_component.
                 try {
-                    using components::stubs::runtime_support;
-                    agas::gva g (addr.locality_, addr.type_, 1, addr.address_);
-                    runtime_support::free_component_sync(g, *p);
+                    components::server::destroy_component(*p, addr);
                 }
                 catch (hpx::exception const& e) {
                     // This request might come in too late and the thread manager

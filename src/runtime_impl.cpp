@@ -769,12 +769,6 @@ namespace hpx {
         runtime_support_->add_shutdown_function(std::move(f));
     }
 
-    bool runtime_impl::
-        keep_factory_alive(components::component_type type)
-    {
-        return runtime_support_->keep_factory_alive(type);
-    }
-
     hpx::util::io_service_pool* runtime_impl::
         get_thread_pool(char const* name)
     {

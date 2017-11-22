@@ -9,6 +9,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/ini.hpp>
@@ -222,16 +223,18 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
-    void load_component_factory_static(util::section& ini, std::string name,
+    std::vector<std::shared_ptr<components::component_registry_base>>
+    load_component_factory_static(util::section& ini, std::string name,
         hpx::util::plugin::get_plugins_list_type get_factory, error_code& ec)
     {
         hpx::util::plugin::static_plugin_factory<
             components::component_registry_base> pf(get_factory);
+        std::vector<std::shared_ptr<components::component_registry_base>> registries;
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
         pf.get_names(names, ec);
-        if (ec) return;
+        if (ec) return registries;
 
         std::vector<std::string> ini_data;
         if (names.empty()) {
@@ -251,21 +254,24 @@ namespace hpx { namespace util
             ini_data += "static = 1";
         }
         else {
+            registries.reserve(names.size());
             // ask all registries
             for (std::string const& s : names)
             {
                 // create the component registry object
-                std::shared_ptr<components::component_registry_base>
-                    registry (pf.create(s, ec));
+                std::shared_ptr<components::component_registry_base> registry(
+                    pf.create(s, ec));
                 if (ec) continue;
 
                 registry->get_component_info(ini_data, "", true);
+                registries.push_back(registry);
             }
         }
 
         // incorporate all information from this module's
         // registry into our internal ini object
         ini.parse("<component registry>", ini_data, false, false);
+        return registries;
     }
 
     void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
@@ -306,6 +312,10 @@ namespace hpx { namespace util
                 if (ec) return;
 
                 registry->get_component_info(ini_data, curr);
+                hpx::register_startup_function([registry]()
+                {
+                    registry->register_component_type();
+                });
             }
         }
 

@@ -45,12 +45,13 @@ namespace hpx { namespace parcelset
                 return *this;
             }
 
-            void operator()(boost::system::error_code const& e) const
+            void operator()(boost::system::error_code const& e)
             {
                 HPX_ASSERT(parcels_.size() == handlers_.size());
                 for(std::size_t i = 0; i < parcels_.size(); ++i)
                 {
                     handlers_[i](e, parcels_[i]);
+                    handlers_[i].reset();
                 }
             }
         };

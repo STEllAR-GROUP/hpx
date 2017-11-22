@@ -13,6 +13,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
@@ -219,6 +220,30 @@ namespace traits {
         lcos::detail::promise_lco<Result, RemoteResult>>::value =
         components::component_invalid;
 }
+namespace components { namespace detail {
+    // Forward declare promise_lco<void> to avoid duplicate instantiations
+    template <> HPX_ALWAYS_EXPORT
+    hpx::components::managed_component<
+        lcos::detail::promise_lco<void, hpx::util::unused_type>>::heap_type&
+    component_heap_helper<hpx::components::managed_component<
+        lcos::detail::promise_lco<void, hpx::util::unused_type>>>(...);
+
+    template <typename Result, typename RemoteResult>
+    struct component_heap_impl<hpx::components::managed_component<
+        lcos::detail::promise_lco<Result, RemoteResult>>>
+    {
+        typedef void valid;
+
+        HPX_ALWAYS_EXPORT static
+        typename hpx::components::managed_component<
+            lcos::detail::promise_lco<Result, RemoteResult>>::heap_type& call()
+        {
+            util::reinitializable_static<typename hpx::components::managed_component<
+                lcos::detail::promise_lco<Result, RemoteResult>>::heap_type> heap;
+            return heap.get();
+        }
+    };
+}}
 }
 
 #endif

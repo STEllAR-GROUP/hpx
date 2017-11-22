@@ -7,7 +7,6 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/lcos/server/latch.hpp>
 #include <hpx/util/serialize_exception.hpp>
 

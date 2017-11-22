@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
-//  Copyright (c)      2011 Thomas Heller
+//  Copyright (c) 2011-2017 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,102 +8,102 @@
 #define HPX_COMPONENTS_SERVER_CREATE_COMPONENT_JUN_02_2008_0146PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/functional/new.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/unique_function.hpp>
 
 #include <cstddef>
 #include <sstream>
 #include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Create arrays of components using their default constructor
-    template <typename Component>
-    naming::gid_type create(std::size_t count)
+    /// Create a component and forward the passed parameters
+    template <typename Component, typename...Ts>
+    naming::gid_type create(Ts&&...ts)
     {
-        Component* c = static_cast<Component*>(Component::create(count));
-
-        naming::gid_type gid = c->get_base_gid();
-        if (gid)
+        component_type type = get_component_type<typename Component::wrapped_type>();
+        if(!enabled(type))
         {
-            // everything is ok, return the new id
-            return gid;
+            HPX_THROW_EXCEPTION(bad_request,
+                "components::server::::create",
+                "the component is disabled for this locality (" +
+                get_component_type_name(type) + ")");
+            return naming::invalid_gid;
         }
 
-        Component::destroy(c, count);
+        void *storage = component_heap<Component>().alloc(1);
 
-        HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-            "create<Component>",
-            "can't assign global id");
-
-        return naming::invalid_gid;
-    }
-
-    template <typename Component>
-    naming::gid_type create(
-        util::unique_function_nonser<void(void*)> const& ctor)
-    {
-        void * cv = Component::heap_type::alloc(1);
-        try {
-            ctor(cv);
+        Component* c = nullptr;
+        try
+        {
+            c = new(storage) Component(std::forward<Ts>(ts)...);
         }
         catch(...)
         {
-            Component::heap_type::free(cv, 1); //-V107
+            component_heap<Component>().free(c, 1);
             throw;
         }
-        Component *c = static_cast<Component *>(cv);
-
         naming::gid_type gid = c->get_base_gid();
-        if (gid)
+        if (!gid)
         {
-            // everything is ok, return the new id
-            return gid;
+            c->finalize();
+            c->~Component();
+            component_heap<Component>().free(c, 1);
+            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                "create<Component>",
+                "can't assign global id");
         }
+        ++instance_count(type);
 
-        Component::destroy(c, 1);
-
-        HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-            "create<Component>(ctor)",
-            "can't assign global id");
-
-        return naming::invalid_gid;
+        return gid;
     }
 
-    template <typename Component>
-    naming::gid_type create(naming::gid_type const& gid,
-        util::unique_function_nonser<void(void*)> const& ctor, void** p)
+    template <typename Component, typename...Ts>
+    naming::gid_type create_migrated(naming::gid_type const& gid, void** p,
+        Ts&&...ts)
     {
-        void * cv = Component::heap_type::alloc(1);
-        try {
-            ctor(cv);
+        component_type type = get_component_type<typename Component::wrapped_type>();
+        if(!enabled(type))
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "components::server::create_migrated",
+                "the component is disabled for this locality (" +
+                get_component_type_name(type) + ")");
+            return naming::invalid_gid;
+        }
+
+        void *storage = component_heap<Component>().alloc(1);
+
+        Component* c = nullptr;
+        try
+        {
+            c = new(storage) Component(std::forward<Ts>(ts)...);
         }
         catch(...)
         {
-            Component::heap_type::free(cv, 1); //-V107
+            component_heap<Component>().free(c, 1);
             throw;
         }
-        Component *c = static_cast<Component *>(cv);
-
         naming::gid_type assigned_gid = c->get_base_gid(gid);
         if (assigned_gid && assigned_gid == gid)
         {
             // everything is ok, return the new id
             if (p != nullptr)
                 *p = c;         // return the raw address as well
+
+            ++instance_count(type);
             return gid;
         }
 
-        Component::destroy(c, 1);
+        c->finalize();
+        c->~Component();
+        component_heap<Component>().free(c, 1);
 
         std::ostringstream strm;
         strm << "global id " << gid <<
@@ -115,59 +115,64 @@ namespace hpx { namespace components { namespace server
         return naming::invalid_gid;
     }
 
-    template <typename Component, typename ...Ts>
-    naming::gid_type create_with_args(Ts&&... ts)
+    ///////////////////////////////////////////////////////////////////////////
+    /// Create count components and forward the passed parameters
+    template <typename Component, typename...Ts>
+    std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&...ts)
     {
-        void * cv = Component::heap_type::alloc(1);
-        try {
-            new (cv) Component(std::forward<Ts>(ts)...);
+        component_type type = get_component_type<typename Component::wrapped_type>();
+        std::vector<naming::gid_type> gids;
+        if(!enabled(type))
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "components::server::bulk_create",
+                "the component is disabled for this locality (" +
+                get_component_type_name(type) + ")");
+            return gids;
+        }
+
+        gids.reserve(count);
+
+        Component *storage =
+            static_cast<Component*>(component_heap<Component>().alloc(count));
+        Component *storage_it = storage;
+        std::size_t succeeded = 0;
+        try
+        {
+            // Call constructors and try to get the GID...
+            for (std::size_t i = 0; i != count; ++i, ++storage_it)
+            {
+                Component* c = nullptr;
+                c = new(storage_it) Component(std::forward<Ts>(ts)...);
+                naming::gid_type gid = c->get_base_gid();
+                if (!gid)
+                {
+                    c->finalize();
+                    c->~Component();
+                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                        "bulk_create<Component>",
+                        "can't assign global id");
+                }
+                gids.push_back(std::move(gid));
+                ++instance_count(type);
+                ++succeeded;
+            }
         }
         catch(...)
         {
-            Component::heap_type::free(cv, 1); //-V107
+            // If an exception wsa thrown, roll back
+            storage_it = storage;
+            for (std::size_t i = 0; i != succeeded; ++i, ++storage_it)
+            {
+                storage_it->finalize();
+                storage_it->~Component();
+                --instance_count(type);
+            }
+            component_heap<Component>().free(storage, count);
             throw;
         }
-        Component *c = static_cast<Component *>(cv);
 
-        naming::gid_type gid = c->get_base_gid();
-        if (gid)
-        {
-            // everything is ok, return the new id
-            return gid;
-        }
-
-        Component::destroy(c, 1);
-
-        HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-            "create_with_args<Component>(Ts&&...)",
-            "can't assign global id");
-
-        return naming::invalid_gid;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Create component with arguments
-    namespace detail
-    {
-        template <typename Component, typename ...Ts>
-        util::detail::bound<
-            util::detail::one_shot_wrapper<
-                util::functional::placement_new<typename Component::derived_type>
-            >(util::detail::placeholder<1> const&, Ts&&...)
-        > construct_function(Ts&&... vs)
-        {
-            typedef typename Component::derived_type type;
-
-            return util::bind(
-                util::one_shot(util::functional::placement_new<type>()),
-                util::placeholders::_1, std::forward<Ts>(vs)...);
-        }
-    }
-
-    template <typename Component, typename ...Ts>
-    naming::gid_type construct(Ts&&... vs)
-    {
-        return server::create_with_args<Component>(std::forward<Ts>(vs)...);
+        return gids;
     }
 }}}
 

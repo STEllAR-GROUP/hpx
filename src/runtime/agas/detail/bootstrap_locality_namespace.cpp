@@ -35,7 +35,7 @@ namespace hpx { namespace agas { namespace detail
     {
         return naming::address(
             hpx::get_locality(),
-            server::locality_namespace::get_component_type(),
+            components::component_agas_locality_namespace,
             this->ptr()
         );
     }
