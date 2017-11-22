@@ -185,7 +185,6 @@ namespace hpx { namespace actions
         static R invoke(naming::address::address_type /*lva*/,
             naming::address::component_type /*comptype*/, Ts&&... /*vs*/);
 
-    protected:
         struct invoker
         {
             typedef
@@ -221,6 +220,7 @@ namespace hpx { namespace actions
             }
         };
 
+    protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
