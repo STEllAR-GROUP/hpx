@@ -80,15 +80,15 @@ namespace hpx { namespace threads { namespace executors
     template <typename Executor, typename NumaFunction>
     struct pre_execution_async_domain_schedule
     {
-        Executor     executor_;
-        NumaFunction numa_function_;
+        Executor     &executor_;
+        NumaFunction &numa_function_;
         //
         template <typename F, typename ... Ts>
         auto operator()(F && f, Ts &&... ts) const
         {
             // call the numa hint function
             int domain = numa_function_(ts...);
-            std::cout << "pre_execution_async_domain_schedule returning " << domain << "\n";
+            //std::cout << "pre_execution_async_domain_schedule returning " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
@@ -116,18 +116,18 @@ namespace hpx { namespace threads { namespace executors
     template <typename Executor, typename NumaFunction>
     struct pre_execution_then_domain_schedule
     {
-        Executor     executor_;
-        NumaFunction numa_function_;
+        Executor     &executor_;
+        NumaFunction &numa_function_;
         //
         template <typename F, template <typename> typename Future, typename P, typename ... Ts>
-        auto operator()(F && f, Future<P> && predecessor, Ts &&... ts)
+        auto operator()(F && f, Future<P> && predecessor, Ts &&... ts) const
         {
             // get the argument for the numa hint function from the predecessor future
             const auto & predecessor_value = future_extract_value().operator()(predecessor);
 
             // call the numa hint function
             int domain = numa_function_(predecessor_value, ts...);
-            std::cout << "pre_execution_async_domain_schedule 2 returning " << domain << "\n";
+            //std::cout << "pre_execution_then_domain_schedule 2 returning " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename
@@ -136,7 +136,8 @@ namespace hpx { namespace threads { namespace executors
 
             lcos::local::futures_factory<result_type()> p(
                 const_cast<Executor&>(executor_),
-                util::deferred_call(std::forward<F>(f), std::move(predecessor),
+                util::deferred_call(std::forward<F>(f),
+                                    std::forward<Future<P>>(predecessor),
                                     std::forward<Ts>(ts)...)
             );
 
@@ -152,7 +153,7 @@ namespace hpx { namespace threads { namespace executors
 
     // --------------------------------------------------------------------
     // base class for guided executors
-    // these differ by the numa_hint fnuction type that is called
+    // these differ by the numa_hint function type that is called
     // --------------------------------------------------------------------
     struct HPX_EXPORT guided_pool_executor_base {
     public:
@@ -243,7 +244,7 @@ namespace hpx { namespace threads { namespace executors
                   typename = typename std::enable_if_t<traits::is_future<Future>::value>
                   >
         auto
-        then_execute(F && f, Future & predecessor, Ts &&... ts)
+        then_execute(F && f, Future && predecessor, Ts &&... ts)
         ->  future<typename util::detail::invoke_deferred_result<
             F, Future, Ts...>::type>
         {
@@ -277,14 +278,17 @@ namespace hpx { namespace threads { namespace executors
             return dataflow(launch::sync,
                 [&](Future && predecessor, Ts &&... ts)
                 {
-                    pre_execution_then_domain_schedule<pool_executor,
+                    pre_execution_then_domain_schedule<
+                        pool_executor,
                         pool_numa_hint<H,Tag>>
-                        pre_exec { pool_executor_, hint_ };
+                            pre_exec { pool_executor_, hint_ };
 
                     return pre_exec.operator ()(
-                        std::forward<F>(f), std::forward<Future>(predecessor));
+                        std::forward<F>(f),
+                        std::forward<Future>(predecessor));
                 },
-                std::move(predecessor), std::forward<Ts>(ts)...
+                std::forward<Future>(predecessor),
+                std::forward<Ts>(ts)...
             );
         }
 
@@ -344,9 +348,10 @@ namespace hpx { namespace threads { namespace executors
                     return pre_exec.operator ()(
                         std::forward<F>(f),
                         std::forward<OuterFuture<util::tuple<InnerFutures...>>>
-                            (predecessor));
+                        (predecessor));
                 },
-                std::move(predecessor), std::forward<Ts>(ts)...
+                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(predecessor),
+                std::forward<Ts>(ts)...
             );
         }
 
@@ -391,7 +396,7 @@ namespace hpx { namespace threads { namespace executors
 
             // invoke the hint function with the unwrapped tuple futures
             int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
-            std::cout << "dataflow returning " << domain << "\n";
+            //std::cout << "dataflow returning " << domain << "\n";
 
             // forward the task execution on to the real internal executor
             lcos::local::futures_factory<result_type()> p(
