@@ -297,6 +297,31 @@ namespace lcos {
                 hpx::components::component_heap<wrapping_type>().free(ptr);
             }
 
+            // This helper is used to keep the component alive until the
+            // completion handler has been called. We need to manually free
+            // the component here, since we don't rely on reference counting
+            // anymore
+            struct keep_alive
+            {
+                typedef std::unique_ptr<wrapping_type, void(*)(wrapping_type*)>
+                    wrapping_ptr;
+
+                wrapping_ptr ptr_;
+
+                keep_alive(wrapping_ptr& ptr)
+                  : ptr_(ptr.release(), &wrapping_deleter)
+                {}
+
+                keep_alive(keep_alive&& o)
+                  : ptr_(o.ptr_.release(), &wrapping_deleter)
+                {}
+
+                void operator()()
+                {
+                    delete ptr_->get(); // delete wrapped_type
+                }
+            };
+
         protected:
             void init_shared_state()
             {
@@ -304,8 +329,7 @@ namespace lcos {
                 // handled by the shared state, we create the object to get our
                 // gid and then attach it to the completion handler of the
                 // shared state.
-                typedef std::unique_ptr<wrapping_type, void(*)(wrapping_type*)>
-                    wrapping_ptr;
+                typedef typename keep_alive::wrapping_ptr wrapping_ptr;
                 auto ptr = hpx::components::component_heap<wrapping_type>().alloc();
                 wrapping_ptr lco_ptr(new (ptr) wrapping_type(
                     new wrapped_type(this->shared_state_)), &wrapping_deleter);
@@ -318,17 +342,7 @@ namespace lcos {
                 // Pass id to shared state if it exposes the set_id() function
                 detail::call_set_id(this->shared_state_, id_, id_retrieved_);
 
-                // This helper is used to keep the component alive until the
-                // completion handler has been called. We need to manually free
-                // the component here, since we don't rely on reference counting
-                // anymore
-                auto keep_alive = hpx::util::deferred_call(
-                    [](wrapping_ptr ptr)
-                    {
-                        delete ptr->get();      // delete wrapped_type
-                    },
-                    std::move(lco_ptr));
-                this->shared_state_->set_on_completed(std::move(keep_alive));
+                this->shared_state_->set_on_completed(keep_alive(lco_ptr));
             }
 
             void check_abandon_shared_state(const char* fun)
