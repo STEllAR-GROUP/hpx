@@ -1464,8 +1464,7 @@ namespace hpx { namespace threads { namespace detail
         t.join();
     }
 
-    // TODO: Fix the interface. This is for waking up during shutdown, so don't
-    // care about statuses for now.
+    // TODO: Clean up the interface.
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume(std::size_t virt_core,
         error_code& ec)
@@ -1474,12 +1473,12 @@ namespace hpx { namespace threads { namespace detail
         {
             for (std::size_t i = 0; i != threads_.size(); ++i)
             {
-                sched_->Scheduler::resume(i);
+                resume_processing_unit(i, ec);
             }
         }
         else
         {
-            sched_->Scheduler::resume(virt_core);
+            resume_processing_unit(virt_core, ec);
         }
     }
 
@@ -1491,6 +1490,7 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
+        // TODO: Check if already suspending or suspended.
         hpx::state oldstate = state.exchange(state_suspending);
         HPX_ASSERT(oldstate == state_running);
 
@@ -1517,10 +1517,7 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_processing_unit(
         std::size_t virt_core, error_code& ec)
     {
-        std::atomic<hpx::state>& state =
-            sched_->Scheduler::get_state(virt_core);
-
-        HPX_ASSERT(state.load() == state_suspended);
+        // NOTE: Require suspended?
         sched_->Scheduler::resume(virt_core);
 
         if (threads::get_self_ptr())
