@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -155,9 +156,9 @@ namespace hpx { namespace components { namespace server
 
             return runtime_support::migrate_component_async<Component>(
                         policy, ptr, to_migrate)
-                .then(util::bind(
+                .then(util::bind_back(
                     &detail::migrate_component_cleanup<Component>,
-                    util::placeholders::_1, ptr, to_migrate));
+                    ptr, to_migrate));
         }
     }
 

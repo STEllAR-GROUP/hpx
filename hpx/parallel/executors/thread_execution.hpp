@@ -16,6 +16,7 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/range.hpp>
@@ -81,9 +82,9 @@ namespace hpx { namespace threads
                 F, Future, Ts...
             >::type result_type;
 
-        auto func = hpx::util::bind(
+        auto func = hpx::util::bind_back(
             hpx::util::one_shot(std::forward<F>(f)),
-            hpx::util::placeholders::_1, std::forward<Ts>(ts)...);
+            std::forward<Ts>(ts)...);
 
         typename hpx::traits::detail::shared_state_ptr<result_type>::type
             p = hpx::lcos::detail::make_continuation_thread_exec<result_type>(

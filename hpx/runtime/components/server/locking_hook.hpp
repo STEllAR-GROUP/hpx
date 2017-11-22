@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -103,8 +104,7 @@ namespace hpx { namespace components
             {
                 // register our yield decorator
                 decorate_wrapper yield_decorator(
-                    util::bind(&locking_hook::yield_function, this,
-                        util::placeholders::_1));
+                    util::bind_front(&locking_hook::yield_function, this));
 
                 result = f(state);
 

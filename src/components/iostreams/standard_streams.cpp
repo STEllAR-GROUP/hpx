@@ -11,6 +11,7 @@
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
@@ -52,7 +53,7 @@ namespace hpx { namespace iostreams { namespace detail
                 naming::id_type::managed);
 
             return agas::register_name(cout_name, cout_id).then(
-                util::bind(&return_id_type, util::placeholders::_1, cout_id));
+                util::bind_back(&return_id_type, cout_id));
         }
 
         // the console locality will create the ostream during startup
