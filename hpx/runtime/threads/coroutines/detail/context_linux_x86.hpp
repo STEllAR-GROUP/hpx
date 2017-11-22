@@ -169,11 +169,12 @@ namespace hpx { namespace threads { namespace coroutines
                 segv_stack.ss_size = SEGV_STACK_SIZE;
 
                 std::memset(&action, '\0', sizeof(action));
-                action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK;
                 action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
 
-                sigaltstack(&segv_stack, static_cast<stack_t*>(m_stack) );
-                sigfillset(&action.sa_mask);
+                sigaltstack(&segv_stack, nullptr);
+                sigemptyset(&action.sa_mask);
+                sigaddset(&action.sa_mask, SIGSEGV);
                 sigaction(SIGSEGV, &action, nullptr);
             }
 #else
@@ -229,19 +230,25 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
 
 #if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+                // concept inspired by the following links:
+                //
+                // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
+                // http://www.evanjones.ca/software/threading.html
+                //
                 segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
                 segv_stack.ss_flags = 0;
                 segv_stack.ss_size = SEGV_STACK_SIZE;
 
                 std::memset(&action, '\0', sizeof(action));
-                action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK;
                 action.sa_sigaction = &x86_linux_context_impl::sigsegv_handler;
 
-                sigaltstack(&segv_stack, static_cast<stack_t*>(m_stack) );
-                sigfillset(&action.sa_mask);
+                sigaltstack(&segv_stack, nullptr);
+                sigemptyset(&action.sa_mask);
+                sigaddset(&action.sa_mask, SIGSEGV);
                 sigaction(SIGSEGV, &action, nullptr);
-#endif
-            }
+#else
+           }
 
 #if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
 

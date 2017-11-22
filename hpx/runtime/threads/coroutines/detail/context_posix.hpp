@@ -256,11 +256,12 @@ namespace hpx { namespace threads { namespace coroutines
                 segv_stack.ss_size = SEGV_STACK_SIZE;
 
                 std::memset(&action, '\0', sizeof(action));
-                action.sa_flags = SA_SIGINFO|SA_ONSTACK; //SA_STACK
-                action.sa_sigaction = &ucontext_context_impl_base::sigsegv_handler;
+                action.sa_flags = SA_SIGINFO|SA_ONSTACK;
+                action.sa_sigaction = &ucontext_context_impl::sigsegv_handler;
 
-                sigaltstack(&segv_stack, static_cast<stack_t*>(m_stack) );
-                sigfillset(&action.sa_mask);
+                sigaltstack(&segv_stack, nullptr);
+                sigemptyset(&action.sa_mask);
+                sigaddset(&action.sa_mask, SIGSEGV);
                 sigaction(SIGSEGV, &action, nullptr);
 #endif
             }
