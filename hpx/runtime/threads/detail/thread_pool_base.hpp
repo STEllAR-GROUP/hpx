@@ -122,6 +122,12 @@ namespace hpx { namespace threads { namespace detail
         mask_cref_type   get_used_processing_units() const;
         hwloc_bitmap_ptr get_numa_domain_bitmap() const;
 
+        // TODO
+        virtual std::size_t get_active_threads_count() const
+        {
+            return 0;
+        }
+
         // performance counters
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         virtual std::int64_t get_executed_threads(

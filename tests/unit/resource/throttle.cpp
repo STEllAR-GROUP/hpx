@@ -31,17 +31,15 @@ int hpx_main(int argc, char* argv[])
         for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
         {
             tp.suspend_processing_unit(thread_num);
-            // TODO: Get count of active pus.
-            // HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
-            //     hpx::threads::count(tp.get_used_processing_units()));
+            HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
+                tp.get_active_threads_count());
         }
 
         for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
         {
             tp.resume_processing_unit(thread_num);
-            // TODO: Get count of active pus.
-            // HPX_TEST_EQ(std::size_t(thread_num + 2),
-            //     hpx::threads::count(tp.get_used_processing_units()));
+            HPX_TEST_EQ(std::size_t(thread_num + 2),
+                tp.get_active_threads_count());
         }
     }
 

@@ -144,6 +144,23 @@ namespace hpx { namespace threads { namespace detail
             return threads_.size();
         }
 
+        std::size_t get_active_threads_count() const
+        {
+            // TODO: Don't recompute every time?
+            std::size_t active_threads_count = 0;
+            for (std::size_t thread_num = 0; thread_num < threads_.size();
+                ++thread_num)
+            {
+                if (sched_->Scheduler::get_state(thread_num).load() ==
+                        state_running)
+                {
+                    ++active_threads_count;
+                }
+            }
+
+            return active_threads_count;
+        }
+
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         std::int64_t get_num_pending_misses(std::size_t num, bool reset)
         {
