@@ -1414,6 +1414,8 @@ else()
     # Uninitialized variables are bad, earlier compilers issue spurious warnings
     hpx_add_compile_flag_if_available(-Werror=uninitialized LANGUAGES CXX C)
     hpx_add_compile_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C)
+    # -Werror=maybe-uninitialized leads to false positives.
+    hpx_add_compile_flag_if_available(-Wno-maybe-unitialized LANGUAGES CXX C)
   endif()
 
   # Silence warning about __sync_fetch_and_nand changing semantics

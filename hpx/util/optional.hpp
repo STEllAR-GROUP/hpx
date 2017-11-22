@@ -293,15 +293,9 @@ namespace hpx { namespace util
     template <typename T>
     constexpr bool operator==(optional<T> const& lhs, optional<T> const& rhs)
     {
-        if (bool(lhs) != bool(rhs))
-        {
-            return false;
-        }
-        if (!bool(lhs) && !bool(rhs))
-        {
-            return true;
-        }
-        return *lhs == *rhs;
+        return (bool(lhs) != bool(rhs)) ? false :
+            (!bool(lhs) && !bool(rhs)) ? true :
+            (*lhs == *rhs);
     }
 
     template <typename T>
@@ -313,15 +307,7 @@ namespace hpx { namespace util
     template <typename T>
     constexpr bool operator<(optional<T> const& lhs, optional<T> const& rhs)
     {
-        if (!bool(rhs))
-        {
-            return false;
-        }
-        if (!bool(lhs))
-        {
-            return true;
-        }
-        return *rhs < *lhs;
+        return (!bool(rhs)) ? false : (!bool(lhs)) ? true : *rhs < *lhs;
     }
 
     template <typename T>
@@ -333,15 +319,7 @@ namespace hpx { namespace util
     template <typename T>
     constexpr bool operator>(optional<T> const& lhs, optional<T> const& rhs)
     {
-        if (!bool(lhs))
-        {
-            return false;
-        }
-        if (!bool(rhs))
-        {
-            return true;
-        }
-        return *rhs > *lhs;
+        return (!bool(rhs)) ? false : (!bool(lhs)) ? true : *rhs > *lhs;
     }
 
     template <typename T>
