@@ -109,16 +109,16 @@ namespace hpx { namespace lcos { namespace local
             {}
 
             ~debug_object() {
-                check();
+                check_();
                 magic = ~debug_magic;
             }
 
-            void check() {
+            void check_() {
                 HPX_ASSERT(magic != ~debug_magic);
                 HPX_ASSERT(magic == debug_magic);
             }
 #else
-            void check() {}
+            void check_() {}
 #endif
         };
 

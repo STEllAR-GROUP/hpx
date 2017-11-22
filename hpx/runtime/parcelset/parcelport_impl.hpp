@@ -883,7 +883,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_DEBUG)
             // verify the connection points to the right destination
 //            HPX_ASSERT(parcel_locality_id == sender_connection->destination());
-            sender_connection->verify(parcel_locality_id);
+            sender_connection->verify_(parcel_locality_id);
 #endif
             // encode the parcels
             std::size_t num_parcels = encode_parcels(*this, &parcels[0],

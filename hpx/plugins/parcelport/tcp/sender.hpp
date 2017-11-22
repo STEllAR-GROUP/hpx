@@ -74,7 +74,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             return there_;
         }
 
-        void verify(parcelset::locality const & parcel_locality_id) const
+        void verify_(parcelset::locality const & parcel_locality_id) const
         {
 #if defined(HPX_DEBUG)
             boost::system::error_code ec;

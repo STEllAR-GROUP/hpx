@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-auto check(int a, int b)
+auto check1(int a, int b)
 {
     int c = a + b;
     return c;
@@ -24,7 +24,7 @@ int main()
 {
     int a = 10;
     int b = 20;
-    check(a, b);
+    check1(a, b);
     double c = check2(30.0);
 }
 
