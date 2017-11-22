@@ -106,7 +106,9 @@ macro(add_parcelport_modules)
     set(_parcelport_init)
     foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
       set(_parcelport_export
-        "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_init(std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n")
+        "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *parcelport_${parcelport}_factory_init(\n")
+      set(_parcelport_export
+        "${_parcelport_export}    std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n")
       set(_parcelport_init
         "${_parcelport_init}        parcelport_${parcelport}_factory_init(factories);\n")
     endforeach()
