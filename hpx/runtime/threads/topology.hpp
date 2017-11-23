@@ -71,7 +71,9 @@ namespace hpx { namespace threads
         membind_interleave = HWLOC_MEMBIND_INTERLEAVE,
         membind_replicate  = HWLOC_MEMBIND_REPLICATE,
         membind_nexttouch  = HWLOC_MEMBIND_NEXTTOUCH,
-        membind_mixed      = HWLOC_MEMBIND_MIXED
+        membind_mixed      = HWLOC_MEMBIND_MIXED,
+        // special HPX addition
+        membind_user       = HWLOC_MEMBIND_MIXED + 256
     };
 
 #include <hpx/config/warnings_prefix.hpp>
