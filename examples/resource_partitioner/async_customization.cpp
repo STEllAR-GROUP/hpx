@@ -29,7 +29,8 @@ struct test_async_executor
 
     template <typename...Futures>
     struct is_tuple_of_futures<util::tuple<Futures...>>
-        : util::detail::all_of<traits::is_future<Futures>...>
+        : util::detail::all_of<traits::is_future<
+            typename std::remove_reference<Futures>::type>...>
     {};
 
     template <typename Future>
@@ -37,7 +38,9 @@ struct test_async_executor
         : std::integral_constant<bool,
             traits::is_future<Future>::value &&
             is_tuple_of_futures<
-                typename traits::future_traits<Future>::result_type>::value>
+                typename traits::future_traits<
+                    typename std::remove_reference<Future>::type
+                >::result_type>::value>
     {};
 
     // --------------------------------------------------------------------
@@ -97,9 +100,10 @@ struct test_async_executor
     template <typename F,
               typename Future,
               typename ... Ts,
-              typename = typename std::enable_if_t<traits::is_future<Future>::value>>
+              typename = typename std::enable_if_t<traits::is_future<
+              typename std::remove_reference<Future>::type>::value>>
     auto
-    then_execute(F && f, Future & predecessor, Ts &&... ts)
+    then_execute(F && f, Future&& predecessor, Ts &&... ts)
     ->  future<typename util::detail::invoke_deferred_result<
         F, Future, Ts...>::type>
     {
@@ -122,7 +126,7 @@ struct test_async_executor
         lcos::local::futures_factory<result_type()> p(
             executor_,
             util::deferred_call(std::forward<F>(f),
-                                std::move(predecessor),
+                                std::forward<Future>(predecessor),
                                 std::forward<Ts>(ts)...)
         );
 
@@ -149,7 +153,7 @@ struct test_async_executor
               >
     auto
     then_execute(F && f,
-                 OuterFuture<util::tuple<InnerFutures... > > & predecessor,
+                 OuterFuture<util::tuple<InnerFutures... > >&& predecessor,
                  Ts &&... ts)
     ->  future<typename util::detail::invoke_deferred_result<
         F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
