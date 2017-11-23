@@ -484,11 +484,28 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
-            // Select an active OS thread
-            // TODO: What should be checked here?
-            while (get_state(num_thread).load() != state_running)
+            // Select a OS thread which hasn't been disabled
+            HPX_ASSERT(threads::any(parent_pool_->get_used_processing_units()));
+
+            auto const& rp = resource::get_partitioner();
+            auto mask = rp.get_pu_mask(
+                num_thread + parent_pool_->get_thread_offset());
+            if(!threads::any(mask))
+                threads::set(mask, num_thread + parent_pool_->get_thread_offset());
+
+            // NOTE: Could be just:
+            // get_state(num_thread).load() != state_running
+            // assuming thread_pool_executor (others) waits for
+            // work to finish before setting state to stopping.
+            while (get_state(num_thread).load() == state_suspending ||
+                get_state(num_thread).load() == state_suspended ||
+                !bit_and(mask, parent_pool_->get_used_processing_units()))
             {
                 num_thread = (num_thread + 1) % queue_size;
+                mask = rp.get_pu_mask(
+                    num_thread + parent_pool_->get_thread_offset());
+                if(!threads::any(mask))
+                    threads::set(mask, num_thread + parent_pool_->get_thread_offset());
             }
 
             // now create the thread
