@@ -75,7 +75,7 @@ namespace hpx { namespace threads
             >::type
         >
     >::type
-    then_execute(Executor && exec, F && f, Future& predecessor, Ts &&... ts)
+    then_execute(Executor && exec, F && f, Future&& predecessor, Ts &&... ts)
     {
         typedef typename hpx::util::detail::invoke_deferred_result<
                 F, Future, Ts...
@@ -87,7 +87,7 @@ namespace hpx { namespace threads
 
         typename hpx::traits::detail::shared_state_ptr<result_type>::type
             p = hpx::lcos::detail::make_continuation_thread_exec<result_type>(
-                    predecessor, std::forward<Executor>(exec),
+                    std::forward<Future>(predecessor), std::forward<Executor>(exec),
                     std::move(func));
 
         return hpx::traits::future_access<hpx::lcos::future<result_type> >::
@@ -177,7 +177,7 @@ namespace hpx { namespace threads
         >
     >::type
     bulk_then_execute(Executor && exec, F && f, Shape const& shape,
-        Future& predecessor, Ts &&... ts)
+        Future&& predecessor, Ts &&... ts)
     {
         typedef typename parallel::execution::detail::then_bulk_function_result<
                 F, Shape, Future, Ts...
