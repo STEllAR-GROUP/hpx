@@ -674,9 +674,10 @@ namespace hpx { namespace threads { namespace detail
                 {
                     // clean up terminated threads one more time before exiting
                     // TODO: Clean up this condition.
-                    bool canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
+                    bool canexit;
                     if (this_state.load() == state_suspending)
                     {
+                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
                         canexit = canexit &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 staged, thread_priority_default, num_thread) == 0; // Should be 0
@@ -691,9 +692,10 @@ namespace hpx { namespace threads { namespace detail
                     }
                     else
                     {
+                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(true);
                         canexit = canexit &&
-                            scheduler.SchedulingPolicy::get_thread_count(
-                                unknown, thread_priority_default, num_thread) == 0;
+                            scheduler.SchedulingPolicy::get_thread_count(unknown)
+                                == 0;
                     }
 
                     if (canexit)
@@ -812,10 +814,10 @@ namespace hpx { namespace threads { namespace detail
                     }
                     else
                     {
-                        // TODO: Clean up this condition.
-                        bool canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
+                        bool canexit;
                         if (this_state.load() == state_suspending)
                         {
+                            canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
                             canexit = canexit &&
                                 scheduler.SchedulingPolicy::get_thread_count(
                                     staged, thread_priority_default, num_thread) == 0; // Should be 0
@@ -830,9 +832,10 @@ namespace hpx { namespace threads { namespace detail
                         }
                         else
                         {
+                            canexit = scheduler.SchedulingPolicy::cleanup_terminated(true);
                             canexit = canexit &&
-                                scheduler.SchedulingPolicy::get_thread_count(
-                                    unknown, thread_priority_default, num_thread) == 0;
+                                scheduler.SchedulingPolicy::get_thread_count(unknown)
+                                    == 0;
                         }
 
                         if (canexit)
