@@ -119,11 +119,11 @@ namespace hpx { namespace threads { namespace executors
         Executor     &executor_;
         NumaFunction &numa_function_;
         //
-        template <typename F, template <typename> typename Future, typename P, typename ... Ts>
-        auto operator()(F && f, Future<P> && predecessor, Ts &&... ts) const
+        template <typename F, typename Future, typename ... Ts>
+        auto operator()(F && f, Future && predecessor, Ts &&... ts) const
         {
             // get the argument for the numa hint function from the predecessor future
-            const auto & predecessor_value = future_extract_value().operator()(predecessor);
+            const auto & predecessor_value = future_extract_value()(predecessor);
 
             // call the numa hint function
             int domain = numa_function_(predecessor_value, ts...);
@@ -131,13 +131,13 @@ namespace hpx { namespace threads { namespace executors
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename
-                util::detail::invoke_deferred_result<F, Future<P>, Ts...>::type
+                util::detail::invoke_deferred_result<F, Future, Ts...>::type
                         result_type;
 
             lcos::local::futures_factory<result_type()> p(
                 const_cast<Executor&>(executor_),
                 util::deferred_call(std::forward<F>(f),
-                                    std::forward<Future<P>>(predecessor),
+                                    std::forward<Future>(predecessor),
                                     std::forward<Ts>(ts)...)
             );
 
@@ -276,15 +276,14 @@ namespace hpx { namespace threads { namespace executors
             // the numa_hint_function will be evaluated on that thread and then
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(launch::sync,
-                [&](Future && predecessor, Ts &&... ts)
+                [f{std::move(f)}, this](Future && predecessor, Ts &&... ts)
                 {
                     pre_execution_then_domain_schedule<
-                        pool_executor,
-                        pool_numa_hint<H,Tag>>
+                        pool_executor, pool_numa_hint<H,Tag>>
                             pre_exec { pool_executor_, hint_ };
 
-                    return pre_exec.operator ()(
-                        std::forward<F>(f),
+                    return pre_exec(
+                        std::move(f),
                         std::forward<Future>(predecessor));
                 },
                 std::forward<Future>(predecessor),
@@ -313,7 +312,7 @@ namespace hpx { namespace threads { namespace executors
             F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
         {
             // get the tuple of futures from the predecessor future <tuple of futures>
-            const auto & predecessor_value = future_extract_value().operator()(predecessor);
+            const auto & predecessor_value = future_extract_value()(predecessor);
 
             // create a tuple of the unwrapped future values
             auto unwrapped_futures_tuple = util::map_pack(
@@ -339,14 +338,15 @@ namespace hpx { namespace threads { namespace executors
 
             // Please see notes for previous then_execute function above
             return dataflow(launch::sync,
-                [&](OuterFuture<util::tuple<InnerFutures...>> && predecessor, Ts &&... ts)
+                [f{std::move(f)}, this]
+                (OuterFuture<util::tuple<InnerFutures...>> && predecessor, Ts &&... ts)
                 {
                     pre_execution_then_domain_schedule<pool_executor,
                         pool_numa_hint<H,Tag>>
                         pre_exec { pool_executor_, hint_ };
 
-                    return pre_exec.operator ()(
-                        std::forward<F>(f),
+                    return pre_exec(
+                        std::move(f),
                         std::forward<OuterFuture<util::tuple<InnerFutures...>>>
                         (predecessor));
                 },
