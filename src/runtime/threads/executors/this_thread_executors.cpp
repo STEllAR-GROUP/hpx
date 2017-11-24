@@ -75,6 +75,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             this_thread::suspend();
         }
 
+        // Wait for work to finish.
+        while (scheduler_.get_thread_count() >
+            scheduler_.get_background_thread_count())
+        {
+            hpx::this_thread::suspend();
+        }
+
         // Inform the resource manager that this executor is about to be
         // destroyed. This will cause it to invoke remove_processing_unit below
         // for each of the currently allocated virtual cores.
