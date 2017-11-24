@@ -316,6 +316,8 @@ namespace lcos {
                   : ptr_(o.ptr_.release(), &wrapping_deleter)
                 {}
 
+                keep_alive& operator=(keep_alive&& o) = default;
+
                 void operator()()
                 {
                     delete ptr_->get(); // delete wrapped_type

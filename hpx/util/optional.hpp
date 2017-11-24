@@ -319,7 +319,7 @@ namespace hpx { namespace util
     template <typename T>
     constexpr bool operator>(optional<T> const& lhs, optional<T> const& rhs)
     {
-        return (!bool(rhs)) ? false : (!bool(lhs)) ? true : *rhs > *lhs;
+        return (!bool(lhs)) ? false : (!bool(rhs)) ? true : *rhs > *lhs;
     }
 
     template <typename T>
