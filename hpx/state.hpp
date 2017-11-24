@@ -22,13 +22,14 @@ namespace hpx
         state_pre_main = 3,
         state_starting = 4,
         state_running = 5,
-        state_suspending = 6,
-        state_suspended = 7,
-        state_pre_shutdown = 8,
-        state_shutdown = 9,
-        state_stopping = 10,
-        state_terminating = 11,
-        state_stopped = 12,
+        state_suspended = 6,
+        state_going_to_sleep = 7,
+        state_sleeping = 8,
+        state_pre_shutdown = 9,
+        state_shutdown = 10,
+        state_stopping = 11,
+        state_terminating = 12,
+        state_stopped = 13,
         last_valid_runtime_state = state_stopped
     };
 

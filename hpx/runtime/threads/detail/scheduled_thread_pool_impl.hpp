@@ -1410,17 +1410,17 @@ namespace hpx { namespace threads { namespace detail
         // TODO: Best way to do this?
         if (threads::get_self_ptr())
         {
-            while (state.load() == state_suspending)
+            while (state.load() == state_going_to_sleep)
             {
                 hpx::this_thread::suspend();
             }
         }
         else
         {
-            while (state.load() == state_suspending) {}
+            while (state.load() == state_going_to_sleep) {}
         }
 
-        if (state.load() == state_suspended)
+        if (state.load() == state_sleeping)
         {
             resume_processing_unit(virt_core, ec);
         }
@@ -1491,7 +1491,7 @@ namespace hpx { namespace threads { namespace detail
             sched_->Scheduler::get_state(virt_core);
 
         // TODO: Check if already suspending or suspended.
-        hpx::state oldstate = state.exchange(state_suspending);
+        hpx::state oldstate = state.exchange(state_going_to_sleep);
         HPX_ASSERT(oldstate == state_running);
 
         if (threads::get_self_ptr())
@@ -1501,7 +1501,7 @@ namespace hpx { namespace threads { namespace detail
                 hpx::this_thread::suspend();
             }
 
-            while (state.load() == state_suspending)
+            while (state.load() == state_going_to_sleep)
             {
                 hpx::this_thread::suspend();
             }
@@ -1509,7 +1509,7 @@ namespace hpx { namespace threads { namespace detail
         else
         {
             // TODO: Best way to do this?
-            while (state.load() == state_suspending) {}
+            while (state.load() == state_going_to_sleep) {}
         }
     }
 
@@ -1525,7 +1525,7 @@ namespace hpx { namespace threads { namespace detail
 
         if (threads::get_self_ptr())
         {
-            while (state.load() == state_suspended)
+            while (state.load() == state_sleeping)
             {
                 hpx::this_thread::suspend();
             }
@@ -1533,7 +1533,7 @@ namespace hpx { namespace threads { namespace detail
         else
         {
             // TODO: Best way to do this?
-            while (state.load() == state_suspended) {}
+            while (state.load() == state_sleeping) {}
         }
     }
 }}}

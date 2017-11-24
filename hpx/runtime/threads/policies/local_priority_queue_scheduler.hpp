@@ -497,8 +497,8 @@ namespace hpx { namespace threads { namespace policies
             // get_state(num_thread).load() != state_running
             // assuming thread_pool_executor (others) waits for
             // work to finish before setting state to stopping.
-            while (get_state(num_thread).load() == state_suspending ||
-                get_state(num_thread).load() == state_suspended ||
+            while (get_state(num_thread).load() == state_going_to_sleep ||
+                get_state(num_thread).load() == state_sleeping ||
                 !bit_and(mask, parent_pool_->get_used_processing_units()))
             {
                 num_thread = (num_thread + 1) % queue_size;

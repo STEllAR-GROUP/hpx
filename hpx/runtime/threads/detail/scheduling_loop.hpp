@@ -462,7 +462,7 @@ namespace hpx { namespace threads { namespace detail
             // Get the next HPX thread from the queue
             thrd = next_thrd;
             bool running = this_state.load(
-                std::memory_order_relaxed) < state_suspending;
+                std::memory_order_relaxed) < state_going_to_sleep;
 
             if (HPX_LIKELY(thrd ||
                     scheduler.SchedulingPolicy::get_next_thread(
@@ -669,9 +669,11 @@ namespace hpx { namespace threads { namespace detail
                     // clean up terminated threads one more time before exiting
                     // TODO: Clean up this condition.
                     bool canexit;
-                    if (this_state.load() == state_suspending)
+                    if (this_state.load() == state_going_to_sleep)
                     {
-                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
+                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(
+                            num_thread, true);
+
                         canexit = canexit &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 staged, thread_priority_default, num_thread) == 0; // Should be 0
@@ -682,14 +684,18 @@ namespace hpx { namespace threads { namespace detail
                         // avoid suspended threads when suspending last pu
                         canexit = canexit &&
                             scheduler.SchedulingPolicy::get_thread_count(
-                                suspended, thread_priority_default, num_thread) == 0;
+                                suspended, thread_priority_default, num_thread)
+                                    == 0;
                     }
                     else
                     {
-                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(true);
+                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(
+                            num_thread, true);
+
                         canexit = canexit &&
-                            scheduler.SchedulingPolicy::get_thread_count(unknown)
-                                == 0;
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                unknown, thread_priority_default, num_thread)
+                                    == 0;
                     }
 
                     if (canexit)
@@ -708,16 +714,15 @@ namespace hpx { namespace threads { namespace detail
                             }
                             else
                             {
-                                if (this_state.load() == state_suspending)
+                                if (this_state.load() == state_going_to_sleep)
                                 {
-                                    this_state.store(state_suspended);
                                     scheduler.SchedulingPolicy::suspend(num_thread);
-                                    this_state.store(state_running);
                                     continue;
                                 }
                                 else
                                 {
                                     this_state.store(state_stopped);
+                                    std::cout << "exit scheduling_loop in middle\n";
                                     break;
                                 }
                             }
@@ -809,7 +814,7 @@ namespace hpx { namespace threads { namespace detail
                     else
                     {
                         bool canexit;
-                        if (this_state.load() == state_suspending)
+                        if (this_state.load() == state_going_to_sleep)
                         {
                             canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
                             canexit = canexit &&
@@ -834,12 +839,10 @@ namespace hpx { namespace threads { namespace detail
 
                         if (canexit)
                         {
-                            if (this_state.load() == state_suspending)
+                            if (this_state.load() == state_going_to_sleep)
                             {
-                                this_state.store(state_suspended);
                                 scheduler.SchedulingPolicy::suspend(num_thread);
                                 may_exit = false;
-                                this_state.store(state_running);
                                 continue;
                             }
                             else
