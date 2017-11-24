@@ -81,6 +81,7 @@ namespace hpx { namespace threads { namespace policies
           , states_(num_threads)
           , description_(description)
           , parent_pool_(nullptr)
+          , background_thread_count_(0)
         {
             for (std::size_t i = 0; i != num_threads; ++i)
                 states_[i].store(state_initialized);
@@ -329,6 +330,11 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
 
+        std::atomic<std::int64_t>& get_background_thread_count()
+        {
+            return background_thread_count_;
+        }
+
         // Enumerate all matching threads
         virtual bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
@@ -396,6 +402,8 @@ namespace hpx { namespace threads { namespace policies
 
         // the pool that owns this scheduler
         threads::detail::thread_pool_base *parent_pool_;
+
+        std::atomic<std::int64_t> background_thread_count_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

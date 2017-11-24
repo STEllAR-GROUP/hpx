@@ -862,7 +862,16 @@ namespace hpx { namespace threads
 
     std::int64_t threadmanager::get_background_thread_count()
     {
-        return hpx::threads::detail::get_background_thread_count();
+        std::int64_t total_count = 0;
+        std::lock_guard<mutex_type> lk(mtx_);
+
+        for (auto& pool_iter : pools_)
+        {
+            total_count +=
+                pool_iter->get_background_thread_count();
+        }
+
+        return total_count;
     }
 
     ///////////////////////////////////////////////////////////////////////////
