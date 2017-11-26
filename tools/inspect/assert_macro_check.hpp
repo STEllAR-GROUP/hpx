@@ -19,7 +19,6 @@ namespace boost
     class assert_macro_check : public inspector
     {
       long m_files_with_errors;
-      bool m_from_boost_root;
     public:
 
       assert_macro_check();

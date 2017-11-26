@@ -205,7 +205,7 @@ namespace tests
         trivial_iterator_test(i, i1, v2);
         trivial_iterator_test(i, i2, v2);
 
-//         lvalue_test<(std::is_pointer<Iterator>::value)>::check(i);
+//         lvalue_test<(std::is_pointer<Iterator>::value)>::check_(i);
     }
 
     template <typename Iterator, typename T>
