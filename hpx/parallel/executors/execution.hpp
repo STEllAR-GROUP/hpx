@@ -1283,7 +1283,7 @@ namespace hpx { namespace parallel { namespace execution
 
                 shared_state_type p =
                     lcos::detail::make_continuation_exec<result_type>(
-                        std::forward<Executor>(predecessor),
+                        std::forward<Future>(predecessor),
                         std::forward<BulkExecutor>(exec), std::move(func));
 
                 return hpx::traits::future_access<result_future_type>::create(

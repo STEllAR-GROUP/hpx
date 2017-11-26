@@ -377,7 +377,8 @@ namespace hpx { namespace parallel { namespace execution
             Executor&& exec, F&& f, Future& predecessor, Ts&&... ts) const
         {
             return then_execute(std::forward<Executor>(exec),
-                std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
+                std::forward<F>(f), std::forward<Future>(predecessor),
+                std::forward<Ts>(ts)...);
         }
 #else
         template <>

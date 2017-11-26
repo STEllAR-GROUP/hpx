@@ -25,6 +25,7 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/thread_execution.hpp>
 
 #include <exception>
@@ -224,8 +225,9 @@ namespace hpx { namespace detail
         >::type
         call(F && f, Ts &&... ts)
         {
-            return async_dispatch<hpx::detail::async_policy>::call(
-                launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
+            parallel::execution::parallel_executor exec;
+            return parallel::execution::async_execute(
+                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
 
