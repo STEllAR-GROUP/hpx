@@ -401,12 +401,6 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, Policy && policy, F && f);
 
-    template <typename ContResult, typename Future, typename F>
-    inline typename hpx::traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation(Future const& future, threads::executor& sched, F && f);
-
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     template <typename ContResult, typename Future, typename Executor,
         typename F>
@@ -417,11 +411,6 @@ namespace hpx { namespace lcos { namespace detail
 #endif
 
     // create non-unwrapping continuations
-    template <typename ContResult, typename Future, typename F>
-    inline typename traits::detail::shared_state_ptr<ContResult>::type
-    make_continuation_thread_exec(Future const& future,
-        threads::executor& sched, F && f);
-
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline typename traits::detail::shared_state_ptr<ContResult>::type
@@ -439,7 +428,8 @@ namespace hpx { namespace lcos { namespace detail
 
     // launch
     template <typename Future, typename Policy>
-    struct future_then_dispatch<Future, Policy, typename std::enable_if<
+    struct future_then_dispatch<Future, Policy,
+        typename std::enable_if<
             traits::is_launch_policy<Policy>::value
         >::type>
     {
@@ -457,31 +447,8 @@ namespace hpx { namespace lcos { namespace detail
                 detail::make_continuation<continuation_result_type>(
                     std::move(fut), std::forward<Policy_>(policy),
                     std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(std::move(p));
-        }
-    };
-
-    // threads::executor
-    template <typename Future, typename Executor>
-    struct future_then_dispatch<Future, Executor, typename std::enable_if<
-            traits::is_threads_executor<Executor>::value
-        >::type>
-    {
-        template <typename Executor_, typename F>
-        HPX_FORCEINLINE
-        static typename hpx::traits::future_then_result<Future, F>::type
-        call(Future && fut, Executor_& sched, F && f)
-        {
-            using result_type =
-                typename hpx::traits::future_then_result<Future, F>::result_type;
-            using continuation_result_type =
-                typename hpx::util::invoke_result<F, Future>::type;
-
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                detail::make_continuation<continuation_result_type>(
-                    std::move(fut), static_cast<threads::executor&>(sched),
-                    std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(std::move(p));
+            return hpx::traits::future_access<future<result_type> >::create(
+                std::move(p));
         }
     };
 
@@ -506,16 +473,22 @@ namespace hpx { namespace lcos { namespace detail
                 detail::make_continuation_exec_v1<continuation_result_type>(
                     std::move(fut), std::forward<Executor_>(exec),
                     std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(std::move(p));
+            return hpx::traits::future_access<future<result_type> >::create(
+                std::move(p));
         }
     };
 #endif
 
+    // The overload for future::then taking an executor simply forwards to the
+    // corresponding executor customization point.
+    //
     // parallel executors v2
+    // threads::executor
     template <typename Future, typename Executor>
     struct future_then_dispatch<Future, Executor, typename std::enable_if<
             traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
+            traits::is_two_way_executor<Executor>::value ||
+            traits::is_threads_executor<Executor>::value
         >::type>
     {
         template <typename Executor_, typename F>
@@ -525,8 +498,8 @@ namespace hpx { namespace lcos { namespace detail
         call(Future && fut, Executor_ && exec, F && f)
         {
             // simply forward this to executor
-            return detail::then_execute_helper(exec, std::forward<F>(f),
-                std::move(fut));
+            return detail::then_execute_helper(std::forward<Executor_>(exec),
+                std::forward<F>(f), std::move(fut));
         }
     };
 
@@ -534,13 +507,13 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future, typename FD>
     struct future_then_dispatch<Future, FD, typename std::enable_if<
         !traits::is_launch_policy<FD>::value &&
-        !traits::is_threads_executor<FD>::value &&
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         !traits::is_executor<FD>::value &&
 #endif
         !(
             traits::is_one_way_executor<FD>::value ||
-            traits::is_two_way_executor<FD>::value)
+            traits::is_two_way_executor<FD>::value ||
+            traits::is_threads_executor<FD>::value)
         >::type>
     {
         template <typename F>

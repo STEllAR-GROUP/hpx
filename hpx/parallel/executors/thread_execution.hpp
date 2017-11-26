@@ -9,15 +9,14 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_JAN_03_2017_1145AM
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
-#include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap.hpp>
@@ -45,8 +44,14 @@ namespace hpx { namespace threads
     >::type
     async_execute(Executor && exec, F && f, Ts &&... ts)
     {
-        return hpx::async(std::forward<Executor>(exec), std::forward<F>(f),
-            std::forward<Ts>(ts)...);
+        typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
+            result_type;
+
+        lcos::local::futures_factory<result_type()> p(
+            std::forward<Executor>(exec),
+            util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+        p.apply();
+        return p.get_future();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -59,8 +64,8 @@ namespace hpx { namespace threads
     >::type
     sync_execute(Executor && exec, F && f, Ts &&... ts)
     {
-        return hpx::async(std::forward<Executor>(exec), std::forward<F>(f),
-            std::forward<Ts>(ts)...).get();
+        return async_execute(std::forward<Executor>(exec),
+            std::forward<F>(f), std::forward<Ts>(ts)...).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,10 +90,10 @@ namespace hpx { namespace threads
             hpx::util::one_shot(std::forward<F>(f)),
             hpx::util::placeholders::_1, std::forward<Ts>(ts)...);
 
-        typename hpx::traits::detail::shared_state_ptr<result_type>::type
-            p = hpx::lcos::detail::make_continuation_thread_exec<result_type>(
-                    predecessor, std::forward<Executor>(exec),
-                    std::move(func));
+        typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
+            hpx::lcos::detail::make_continuation_exec<result_type>(
+                std::forward<Future>(predecessor), std::forward<Executor>(exec),
+                std::move(func));
 
         return hpx::traits::future_access<hpx::lcos::future<result_type> >::
             create(std::move(p));
@@ -103,8 +108,9 @@ namespace hpx { namespace threads
     >::type
     post(Executor && exec, F && f, Ts &&... ts)
     {
-        hpx::apply(std::forward<Executor>(exec), std::forward<F>(f),
-            std::forward<Ts>(ts)...);
+        exec.add(
+            util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
+            "hpx::parallel::execution::post");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -129,8 +135,8 @@ namespace hpx { namespace threads
 
         for (auto const& elem: shape)
         {
-            results.push_back(hpx::async(exec, std::forward<F>(f),
-                elem, ts...));
+            results.push_back(
+                async_execute(exec, std::forward<F>(f), elem, ts...));
         }
 
         return results;
@@ -156,8 +162,8 @@ namespace hpx { namespace threads
 
         for (auto const& elem: shape)
         {
-            results.push_back(hpx::async(exec, std::forward<F>(f),
-                elem, ts...));
+            results.push_back(
+                async_execute(exec, std::forward<F>(f), elem, ts...));
         }
 
         return hpx::util::unwrap(results);
@@ -190,11 +196,10 @@ namespace hpx { namespace threads
         // packs (gcc < 4.9)
         auto args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
         auto func =
-            [exec, f, shape, args](Future predecessor) mutable
-            ->  result_type
+            [exec, f, shape, args](Future predecessor) mutable -> result_type
             {
                 return parallel::execution::detail::fused_bulk_async_execute(
-                    exec, f, shape, predecessor,
+                    exec, f, shape, std::move(predecessor),
                     typename hpx::util::detail::make_index_pack<
                         sizeof...(Ts)
                     >::type(), args);
@@ -205,12 +210,12 @@ namespace hpx { namespace threads
             >::type shared_state_type;
 
         shared_state_type p =
-            lcos::detail::make_continuation_thread_exec<result_type>(
-                predecessor, std::forward<Executor>(exec),
-                std::move(func));
+            lcos::detail::make_continuation_exec<result_type>(
+                std::forward<Future>(predecessor),
+                std::forward<Executor>(exec), std::move(func));
 
-        return hpx::traits::future_access<result_future_type>::
-            create(std::move(p));
+        return hpx::traits::future_access<result_future_type>::create(
+            std::move(p));
     }
 }}
 

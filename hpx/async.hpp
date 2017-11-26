@@ -9,9 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -23,6 +25,7 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/thread_execution.hpp>
 
 #include <exception>
 #include <functional>
@@ -126,21 +129,6 @@ namespace hpx { namespace detail
             return p.get_future();
         }
 
-//         template <typename Pred, typename F, typename ...Ts>
-//         HPX_FORCEINLINE static
-//         typename std::enable_if<
-//             traits::detail::is_deferred_invocable<F, Ts...>::value,
-//             hpx::future<
-//                 typename util::detail::invoke_deferred_result<F, Ts...>::type
-//             >
-//         >::type
-//         call(hpx::detail::lazy_policy<Pred> const& policy, F && f,
-//             Ts&&... ts)
-//         {
-//             return call(policy.policy(), std::forward<F>(f),
-//                 std::forward<Ts>(ts)...);
-//         }
-
         template <typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
@@ -241,34 +229,6 @@ namespace hpx { namespace detail
         }
     };
 
-    // threads::executor
-    template <typename Executor>
-    struct async_dispatch<Executor,
-        typename std::enable_if<
-            traits::is_threads_executor<Executor>::value
-        >::type>
-    {
-        template <typename Executor_, typename F, typename ...Ts>
-        HPX_FORCEINLINE static
-        typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-            >
-        >::type
-        call(Executor_ && sched, F && f, Ts &&... ts)
-        {
-            typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
-                result_type;
-
-            lcos::local::futures_factory<result_type()> p(
-                std::forward<Executor_>(sched),
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
-            p.apply();
-            return p.get_future();
-        }
-    };
-
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     // parallel::executor
     template <typename Executor>
@@ -293,12 +253,17 @@ namespace hpx { namespace detail
     };
 #endif
 
+    // The overload for hpx::async taking an executor simply forwards to the
+    // corresponding executor customization point.
+    //
     // parallel::execution::executor
+    // threads::executor
     template <typename Executor>
     struct async_dispatch<Executor,
         typename std::enable_if<
             traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
+            traits::is_two_way_executor<Executor>::value ||
+            traits::is_threads_executor<Executor>::value
         >::type>
     {
         template <typename Executor_, typename F, typename ...Ts>

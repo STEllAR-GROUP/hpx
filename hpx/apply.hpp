@@ -24,6 +24,7 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/thread_execution.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -55,28 +56,6 @@ namespace hpx { namespace detail
         }
     };
 
-    // threads::executor
-    template <typename Executor>
-    struct apply_dispatch<Executor,
-        typename std::enable_if<
-            traits::is_threads_executor<Executor>::value
-        >::type>
-    {
-        template <typename F, typename ...Ts>
-        HPX_FORCEINLINE static
-        typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            bool
-        >::type
-        call(Executor& sched, F&& f, Ts&&... ts)
-        {
-            sched.add(
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-                "hpx::apply");
-            return false;
-        }
-    };
-
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     // parallel::executor
     template <typename Executor>
@@ -100,12 +79,17 @@ namespace hpx { namespace detail
     };
 #endif
 
+    // The overload for hpx::apply taking an executor simply forwards to the
+    // corresponding executor customization point.
+    //
     // parallel::execution::executor
+    // threads::executor
     template <typename Executor>
     struct apply_dispatch<Executor,
         typename std::enable_if<
             traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
+            traits::is_two_way_executor<Executor>::value ||
+            traits::is_threads_executor<Executor>::value
         >::type>
     {
         template <typename F, typename ...Ts>
