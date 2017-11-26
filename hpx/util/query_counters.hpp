@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/itt_notify.hpp>

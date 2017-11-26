@@ -10,33 +10,35 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
+#include <hpx/runtime/agas/detail/hosted_locality_namespace.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/runtime/agas/server/locality_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/parcelset/detail/parcel_await.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset/put_parcel.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/format.hpp>
-#include <hpx/util/reinitializable_static.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
-#include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/agas/server/symbol_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
-#include <hpx/runtime/agas/detail/hosted_locality_namespace.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -222,6 +224,52 @@ namespace hpx { namespace agas { namespace detail
 
 namespace hpx { namespace agas
 {
+
+    template <typename Action, typename... Args>
+    void big_boot_barrier::apply(
+        std::uint32_t source_locality_id
+      , std::uint32_t target_locality_id
+      , parcelset::locality dest
+      , Action act
+      , Args &&... args)
+    { // {{{
+        HPX_ASSERT(pp);
+        naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
+        parcelset::parcel p(
+            parcelset::detail::create_parcel::call(std::false_type(),
+                naming::get_gid_from_locality_id(target_locality_id),
+                std::move(addr), act, std::forward<Args>(args)...));
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        if (!p.parcel_id())
+        {
+            p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
+        }
+#endif
+
+        parcelset::detail::parcel_await_apply(std::move(p),
+            parcelset::write_handler_type(), 0,
+            [this, dest](parcelset::parcel&& p, parcelset::write_handler_type&&)
+            {
+                pp->send_early_parcel(dest, std::move(p));
+            });
+    } // }}}
+
+    template <typename Action, typename... Args>
+    void big_boot_barrier::apply_late(
+        std::uint32_t source_locality_id
+      , std::uint32_t target_locality_id
+      , parcelset::locality const & dest
+      , Action act
+      , Args &&... args)
+    { // {{{
+        naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
+
+        parcelset::put_parcel(
+            naming::id_type(
+                naming::get_gid_from_locality_id(target_locality_id),
+                naming::id_type::unmanaged),
+            std::move(addr), act, std::forward<Args>(args)...);
+    } // }}}
 
 //typedef components::detail::heap_factory<
 //    lcos::detail::promise<

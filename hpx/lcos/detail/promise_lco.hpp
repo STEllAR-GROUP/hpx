@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>

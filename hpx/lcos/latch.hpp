@@ -7,6 +7,7 @@
 #define HPX_LCOS_LATCH_APR_19_2015_1002AM
 
 #include <hpx/config.hpp>
+#include <hpx/async.hpp>
 #include <hpx/lcos/server/latch.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>

@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -60,7 +60,8 @@ namespace hpx { namespace parallel { namespace execution
         sync_execute(F && f, Ts &&... ts)
         {
             try {
-                return hpx::util::invoke(f, std::forward<Ts>(ts)...);
+                return hpx::util::invoke(
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
             }
             catch (std::bad_alloc const& ba) {
                 throw ba;

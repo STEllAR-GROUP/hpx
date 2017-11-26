@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 //
 #include <hpx/parallel/algorithms/for_loop.hpp>
-#include <hpx/parallel/executors.hpp>
+#include <hpx/parallel/execution.hpp>
 //
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>

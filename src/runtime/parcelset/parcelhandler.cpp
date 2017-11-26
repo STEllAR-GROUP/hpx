@@ -1604,5 +1604,19 @@ namespace hpx { namespace parcelset
 
         return ini_defs;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void parcelhandler::init_parcel(parcel& p)
+    {
+        // ensure the source locality id is set (if no component id is given)
+        if (!p.source_id())
+            p.set_source_id(naming::id_type(get_locality(),
+                naming::id_type::unmanaged));
+
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        // set the current local time for this locality
+        p.set_start_time(get_current_time());
+#endif
+    }
 }}
 

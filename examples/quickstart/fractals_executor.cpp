@@ -7,10 +7,10 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/thread_executors.hpp>
+#include <hpx/include/lcos.hpp>
+#include <hpx/include/parallel_execution.hpp>
+#include <hpx/include/util.hpp>
 
 #include <vector>
 
@@ -63,7 +63,7 @@ int hpx_main()
         t.restart();
 
         {
-            hpx::threads::executors::local_queue_executor exec;
+            hpx::parallel::execution::local_queue_executor exec;
 
             for (int i = 0; i < sizeX; ++i)
             {

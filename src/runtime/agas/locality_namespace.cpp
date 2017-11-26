@@ -13,6 +13,7 @@
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 using hpx::components::component_agas_locality_namespace;
 

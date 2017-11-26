@@ -9,17 +9,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/bind.hpp>
@@ -29,8 +30,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/scoped_timer.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
 
 #include <atomic>
 #include <cstddef>

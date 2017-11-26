@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/raw_values_counter.hpp>

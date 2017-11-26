@@ -36,7 +36,7 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/thread_execution.hpp>
+#include <hpx/parallel/executors/parallel_executor.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/ref.hpp>
@@ -188,19 +188,13 @@ namespace hpx { namespace lcos { namespace detail
         void finalize(hpx::detail::async_policy policy, Futures&& futures)
         {
             // schedule the final function invocation with high priority
-            util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
             // simply schedule new thread
-            threads::register_thread_nullary(
-                util::deferred_call(&dataflow_frame::done, std::move(this_),
-                                    std::move(futures))
-              , desc
-              , threads::pending
-              , true
-              , policy.priority()
-              , std::size_t(-1)
-              , threads::thread_stacksize_current);
+            parallel::execution::parallel_policy_executor<launch::async_policy>
+                exec{policy};
+            parallel::execution::post(exec, &dataflow_frame::done,
+                std::move(this_), std::move(futures));
         }
 
         HPX_FORCEINLINE
@@ -212,24 +206,12 @@ namespace hpx { namespace lcos { namespace detail
         void finalize(hpx::detail::fork_policy policy, Futures&& futures)
         {
             // schedule the final function invocation with high priority
-            util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
-            threads::thread_id_type tid = threads::register_thread_nullary(
-                util::deferred_call(&dataflow_frame::done, std::move(this_),
-                                    std::move(futures))
-              , desc
-              , threads::pending_do_not_schedule
-              , true
-              , policy.priority()
-              , get_worker_thread_num()
-              , threads::thread_stacksize_current);
-
-            if (tid)
-            {
-                // make sure this thread is executed last
-                hpx::this_thread::yield_to(thread::id(std::move(tid)));
-            }
+            parallel::execution::parallel_policy_executor<launch::fork_policy>
+                exec{policy};
+            parallel::execution::post(exec, &dataflow_frame::done,
+                std::move(this_), std::move(futures));
         }
 
         void finalize(launch policy, Futures&& futures)

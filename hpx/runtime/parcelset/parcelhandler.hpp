@@ -61,18 +61,7 @@ namespace hpx { namespace parcelset
             performance_counters::parcels::data_point receive_data);
 
         // make sure the parcel has been properly initialized
-        void init_parcel(parcel& p)
-        {
-            // ensure the source locality id is set (if no component id is given)
-            if (!p.source_id())
-                p.set_source_id(naming::id_type(get_locality(),
-                    naming::id_type::unmanaged));
-
-#if defined(HPX_HAVE_PARCEL_PROFILING)
-            // set the current local time for this locality
-            p.set_start_time(get_current_time());
-#endif
-        }
+        void init_parcel(parcel& p);
 
         typedef lcos::local::spinlock mutex_type;
 

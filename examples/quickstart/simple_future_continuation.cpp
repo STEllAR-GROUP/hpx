@@ -1,12 +1,12 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/include/thread_executors.hpp>
 
 #include <iostream>
 
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
     // executing continuation cont2 on UI (main) thread
     {
-        hpx::threads::executors::main_pool_executor exec;
+        hpx::parallel::execution::main_pool_executor exec;
         hpx::future<int> t = hpx::async(&func1);
         hpx::future<int> t2 = t.then(exec, &cont2);
         t2.get();

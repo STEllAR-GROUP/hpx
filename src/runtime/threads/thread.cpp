@@ -3,13 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

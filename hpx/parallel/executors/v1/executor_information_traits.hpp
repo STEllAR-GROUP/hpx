@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/v1/is_executor.hpp>

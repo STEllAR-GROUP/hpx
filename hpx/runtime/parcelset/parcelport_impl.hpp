@@ -213,9 +213,9 @@ namespace hpx { namespace parcelset
 
             // We create a shared pointer of the parcels_await object since it
             // needs to be kept alive as long as there are futures not ready
-            // or GIDs to be split. This is necessary to preserve the identiy
+            // or GIDs to be split. This is necessary to preserve the identity
             // of the this pointer.
-            std::make_shared<detail::parcel_await>(std::move(p), std::move(f),
+            detail::parcel_await_apply(std::move(p), std::move(f),
                 archive_flags_, [this, dest](parcel&& p, write_handler_type&& f)
                 {
                     if (connection_handler_traits<ConnectionHandler>::
@@ -232,7 +232,7 @@ namespace hpx { namespace parcelset
 
                         get_connection_and_send_parcels(dest);
                     }
-                })->apply();
+                });
         }
 
         void put_parcels(locality const& dest, std::vector<parcel> parcels,
@@ -256,9 +256,9 @@ namespace hpx { namespace parcelset
 #endif
             // We create a shared pointer of the parcels_await object since it
             // needs to be kept alive as long as there are futures not ready
-            // or GIDs to be split. This is necessary to preserve the identiy
+            // or GIDs to be split. This is necessary to preserve the identity
             // of the this pointer.
-            std::make_shared<detail::parcels_await>(std::move(parcels),
+            detail::parcels_await_apply(std::move(parcels),
                 std::move(handlers), archive_flags_,
                 [this, dest](std::vector<parcel>&& parcels,
                     std::vector<write_handler_type>&& handlers)
@@ -278,7 +278,7 @@ namespace hpx { namespace parcelset
 
                         get_connection_and_send_parcels(dest);
                     }
-                })->apply();
+                });
         }
 
         void send_early_parcel(locality const & dest, parcel p)

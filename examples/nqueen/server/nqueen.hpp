@@ -24,8 +24,6 @@ namespace server
     {
     private:
         list_type list_;
-        std::size_t level_;
-        std::size_t size_;
         std::size_t count_;
 
         // here board is a component
@@ -40,14 +38,14 @@ namespace server
 //         }
 
     public:
-        board():list_(0), level_(0), size_(0), count_(0)
+        board() : list_(0), count_(0)
         {}
 
-        board(list_type const& list, std::size_t size, std::size_t level)
-            : list_(list), level_(level), size_(size), count_(0)
+        board(list_type const& list, std::size_t, std::size_t)
+          : list_(list), count_(0)
         {}
 
-        ~board(){}
+        ~board() = default;
 
 
         void init_board(std::size_t size)

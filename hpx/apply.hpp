@@ -7,7 +7,7 @@
 #define HPX_APPLY_APR_16_20012_0943AM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -24,7 +24,7 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/thread_execution.hpp>
+#include <hpx/parallel/executors/parallel_executor.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -46,12 +46,11 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_invocable<F, Ts...>::value,
             bool
         >::type
-        call(F&& f, Ts&&... ts)
+        call(F && f, Ts &&... ts)
         {
-            util::thread_description desc(f, "apply_dispatch::call");
-            threads::register_thread_nullary(
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc);
+            parallel::execution::parallel_executor exec;
+            parallel::execution::post(
+                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
         }
     };

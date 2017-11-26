@@ -9,12 +9,13 @@
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -51,6 +52,49 @@ namespace hpx { namespace parallel { namespace execution
                 return hpx::launch::async_policy{};
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Policy>
+        struct post_policy_dispatch
+        {
+            template <typename F, typename... Ts>
+            static void call(hpx::util::thread_description const& desc,
+                Policy const& policy, F && f, Ts &&... ts)
+            {
+                threads::register_thread_nullary(
+                    hpx::util::deferred_call(
+                        std::forward<F>(f), std::forward<Ts>(ts)...),
+                    desc, threads::pending, true, policy.priority());
+            }
+        };
+
+        template <>
+        struct post_policy_dispatch<launch::fork_policy>
+        {
+            template <typename F, typename... Ts>
+            static void call(hpx::util::thread_description const& desc,
+                launch::fork_policy const& policy, F && f, Ts &&... ts)
+            {
+                threads::thread_id_type tid = threads::register_thread_nullary(
+                    hpx::util::deferred_call(
+                        std::forward<F>(f), std::forward<Ts>(ts)...),
+                    desc, threads::pending_do_not_schedule, true,
+                    policy.priority(), get_worker_thread_num(),
+                    threads::thread_stacksize_current);
+
+                // make sure this thread is executed last
+                if (tid)
+                {
+                    // yield_to(tid)
+                    hpx::this_thread::suspend(threads::pending, tid,
+                        "hpx::parallel::execution::parallel_executor::post");
+                }
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename Shape, typename ... Ts>
+        struct bulk_function_result;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -113,14 +157,13 @@ namespace hpx { namespace parallel { namespace execution
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename ... Ts>
-        static void post(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
-            util::thread_description desc(f,
+            hpx::util::thread_description desc(f,
                 "hpx::parallel::execution::parallel_executor::post");
-            threads::register_thread_nullary(
-                util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc);
+
+            detail::post_policy_dispatch<Policy>::call(
+                desc, l_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface

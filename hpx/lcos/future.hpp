@@ -455,7 +455,8 @@ namespace hpx { namespace lcos { namespace detail
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     // parallel executors v1
     template <typename Future, typename Executor>
-    struct future_then_dispatch<Future, Executor, typename std::enable_if<
+    struct future_then_dispatch<Future, Executor,
+        typename std::enable_if<
             traits::is_executor<Executor>::value
         >::type>
     {
@@ -485,7 +486,8 @@ namespace hpx { namespace lcos { namespace detail
     // parallel executors v2
     // threads::executor
     template <typename Future, typename Executor>
-    struct future_then_dispatch<Future, Executor, typename std::enable_if<
+    struct future_then_dispatch<Future, Executor,
+        typename std::enable_if<
             traits::is_one_way_executor<Executor>::value ||
             traits::is_two_way_executor<Executor>::value ||
             traits::is_threads_executor<Executor>::value
@@ -1008,8 +1010,6 @@ namespace hpx { namespace lcos
         typename util::lazy_enable_if<
             !hpx::traits::is_launch_policy<
                 typename std::decay<F>::type>::value &&
-            !hpx::traits::is_threads_executor<
-                typename std::decay<F>::type>::value &&
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
             !hpx::traits::is_executor<
                 typename std::decay<F>::type>::value &&
@@ -1017,6 +1017,8 @@ namespace hpx { namespace lcos
             !hpx::traits::is_one_way_executor<
                 typename std::decay<F>::type>::value &&
             !hpx::traits::is_two_way_executor<
+                typename std::decay<F>::type>::value &&
+            !hpx::traits::is_threads_executor<
                 typename std::decay<F>::type>::value
           , hpx::traits::future_then_result<future, F>
         >::type
@@ -1041,15 +1043,6 @@ namespace hpx { namespace lcos
                 std::forward<Policy>(policy), std::forward<F>(f), ec);
         }
 
-        template <typename F>
-        typename hpx::traits::future_then_result<future, F>::type
-        then(threads::executor& sched, F && f, error_code& ec = throws)
-        {
-            invalidate on_exit(*this);
-            return base_type::then(std::move(*this),
-                sched, std::forward<F>(f), ec);
-        }
-
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor, typename F>
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)
@@ -1070,6 +1063,8 @@ namespace hpx { namespace lcos
             hpx::traits::is_one_way_executor<
                 typename std::decay<Executor>::type>::value ||
             hpx::traits::is_two_way_executor<
+                typename std::decay<Executor>::type>::value ||
+            hpx::traits::is_threads_executor<
                 typename std::decay<Executor>::type>::value
           , hpx::traits::future_then_executor_result<Executor, future, F>
         >::type

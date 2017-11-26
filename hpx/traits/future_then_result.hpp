@@ -45,8 +45,7 @@ namespace hpx { namespace traits
         template <typename Executor, typename T, typename Ts>
         struct executor_future<Executor, T, Ts,
             typename std::enable_if<
-                hpx::traits::is_one_way_executor<Executor>::value &&
-               !hpx::traits::is_two_way_executor<Executor>::value
+                !hpx::traits::is_two_way_executor<Executor>::value
             >::type>
         {
             using type = hpx::lcos::future<T>;
