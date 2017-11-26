@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename F, typename Future,
                 typename ... Ts>
             HPX_FORCEINLINE
-            auto operator()(Executor && exec, F && f, Future& predecessor,
+            auto operator()(Executor && exec, F && f, Future&& predecessor,
                 Ts &&... ts) const;
         };
 
@@ -136,7 +136,7 @@ namespace hpx { namespace parallel { namespace execution
                 typename Future, typename ... Ts>
             HPX_FORCEINLINE
             auto operator()(Executor && exec, F && f, Shape const& shape,
-                Future& predecessor, Ts &&... ts) const;
+                Future&& predecessor, Ts &&... ts) const;
         };
 #endif
 
@@ -263,17 +263,17 @@ namespace hpx { namespace parallel { namespace execution
             typename Future, typename ... Ts>
         HPX_FORCEINLINE auto
         bulk_then_execute(Executor && exec, F && f, Shape const& shape,
-                Future& predecessor, Ts &&... ts)
+                Future&& predecessor, Ts &&... ts)
         ->  decltype(bulk_then_execute_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, predecessor, std::forward<Ts>(ts)...
+                    shape, std::forward<Future>(predecessor), std::forward<Ts>(ts)...
             ))
         {
             return bulk_then_execute_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    shape, predecessor, std::forward<Ts>(ts)...);
+                    shape, std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -299,18 +299,18 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Executor, typename F, typename Future,
             typename ... Ts>
         HPX_FORCEINLINE auto
-        then_execute(Executor && exec, F && f, Future& predecessor,
+        then_execute(Executor && exec, F && f, Future&& predecessor,
                 Ts &&... ts)
         ->  decltype(then_execute_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    predecessor, std::forward<Ts>(ts)...
+                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...
             ))
         {
             return then_execute_fn_helper<
                     typename std::decay<Executor>::type
                 >::call(std::forward<Executor>(exec), std::forward<F>(f),
-                    predecessor, std::forward<Ts>(ts)...);
+                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -374,10 +374,10 @@ namespace hpx { namespace parallel { namespace execution
             typename... Ts>
         HPX_FORCEINLINE auto customization_point<then_execute_tag>::
         operator()(
-            Executor&& exec, F&& f, Future& predecessor, Ts&&... ts) const
+            Executor&& exec, F&& f, Future&& predecessor, Ts&&... ts) const
         {
             return then_execute(std::forward<Executor>(exec),
-                std::forward<F>(f), predecessor, std::forward<Ts>(ts)...);
+                std::forward<F>(f), std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 #else
         template <>
@@ -387,14 +387,14 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename F, typename Future,
                 typename... Ts>
             HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
-                Future& predecessor, Ts&&... ts) const
+                Future&& predecessor, Ts&&... ts) const
                 -> decltype(then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), predecessor,
+                    std::forward<F>(f), std::forward<Future>(predecessor),
                     std::forward<Ts>(ts)...))
 
             {
                 return then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), predecessor,
+                    std::forward<F>(f), std::forward<Future>(predecessor),
                     std::forward<Ts>(ts)...);
             }
         };
@@ -494,10 +494,10 @@ namespace hpx { namespace parallel { namespace execution
             typename Future, typename... Ts>
         HPX_FORCEINLINE auto customization_point<bulk_then_execute_tag>::
         operator()(Executor&& exec, F&& f, Shape const& shape,
-            Future& predecessor, Ts&&... ts) const
+            Future&& predecessor, Ts&&... ts) const
         {
             return bulk_then_execute(std::forward<Executor>(exec),
-                std::forward<F>(f), shape, predecessor,
+                std::forward<F>(f), shape, std::forward<Future>(predecessor),
                 std::forward<Ts>(ts)...);
         }
 #else
@@ -508,13 +508,13 @@ namespace hpx { namespace parallel { namespace execution
             template <typename Executor, typename F, typename Shape,
                 typename Future, typename... Ts>
             HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
-                Shape const& shape, Future& predecessor, Ts&&... ts) const
+                Shape const& shape, Future&& predecessor, Ts&&... ts) const
                 -> decltype(bulk_then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), shape, predecessor,
+                    std::forward<F>(f), shape, std::forward<Future>(predecessor),
                     std::forward<Ts>(ts)...))
             {
                 return bulk_then_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), shape, predecessor,
+                    std::forward<F>(f), shape, std::forward<Future>(predecessor),
                     std::forward<Ts>(ts)...);
             }
         };
