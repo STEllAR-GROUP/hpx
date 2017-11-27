@@ -544,7 +544,8 @@ namespace hpx { namespace threads { namespace detail
                             ++counters.executed_thread_phases_;
 #endif
                         }
-                        else {
+                        else
+                        {
                             // some other worker-thread got in between and started
                             // executing this HPX-thread, we just continue with
                             // the next one
@@ -662,81 +663,66 @@ namespace hpx { namespace threads { namespace detail
             }
 
             // if nothing else has to be done either wait or terminate
-            else {
+            else
+            {
                 ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-                    // clean up terminated threads one more time before exiting
-                    // TODO: Clean up this condition.
-                    bool canexit;
+                    // clean up terminated threads one more time before sleeping
                     if (this_state.load() == state_going_to_sleep)
                     {
-                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(
-                            num_thread, true);
-
-                        canexit = canexit &&
-                            scheduler.SchedulingPolicy::get_thread_count(
-                                staged, thread_priority_default, num_thread) == 0; // Should be 0
-                        canexit = canexit &&
-                            scheduler.SchedulingPolicy::get_thread_count(
-                                pending, thread_priority_default, num_thread) == 0; // Should be 0
-                        // Not necessary for individual pus but needed to
-                        // avoid suspended threads when suspending last pu
-                        canexit = canexit &&
+                        bool can_exit =
+                            scheduler.SchedulingPolicy::cleanup_terminated(
+                                num_thread, true) &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 suspended, thread_priority_default, num_thread)
                                     == 0;
+
+                            if (can_exit)
+                        {
+                            scheduler.SchedulingPolicy::suspend(num_thread);
+                        }
                     }
                     else
                     {
-                        canexit = scheduler.SchedulingPolicy::cleanup_terminated(
-                            num_thread, true);
-
-                        canexit = canexit &&
+                        bool can_exit =
+                            scheduler.SchedulingPolicy::cleanup_terminated(
+                                num_thread, true) &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 unknown, thread_priority_default, num_thread)
                                     == 0;
-                    }
 
-                    if (canexit)
-                    {
-                        // if this is an inner scheduler, exit immediately
-                        if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
+                        if (can_exit)
                         {
-                            if (background_thread.get() != nullptr)
+                            if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                             {
-                                HPX_ASSERT(background_running);
-                                *background_running = false;
-                                scheduler.SchedulingPolicy::
-                                    decrement_background_thread_count();
-                                scheduler.SchedulingPolicy::schedule_thread(
-                                    background_thread.get(), num_thread);
-                                background_thread.reset();
-                                background_running.reset();
-                            }
-                            else
-                            {
-                                if (this_state.load() == state_going_to_sleep)
+                                // if this is an inner scheduler, exit immediately
+                                if (background_thread.get() != nullptr)
                                 {
-                                    scheduler.SchedulingPolicy::suspend(num_thread);
-                                    continue;
+                                    HPX_ASSERT(background_running);
+                                    *background_running = false;
+                                    scheduler.SchedulingPolicy::
+                                        decrement_background_thread_count();
+                                    scheduler.SchedulingPolicy::schedule_thread(
+                                        background_thread.get(), num_thread);
+                                    background_thread.reset();
+                                    background_running.reset();
                                 }
                                 else
                                 {
                                     this_state.store(state_stopped);
-                                    std::cout << "exit scheduling_loop in middle\n";
                                     break;
                                 }
                             }
-                        }
-                        else
-                        {
-                            // otherwise, keep idling for some time
-                            if (!may_exit)
-                                idle_loop_count = 0;
-                            may_exit = true;
+                            else
+                            {
+                                // otherwise, keep idling for some time
+                                if (!may_exit)
+                                    idle_loop_count = 0;
+                                may_exit = true;
+                            }
                         }
                     }
                 }
@@ -756,6 +742,8 @@ namespace hpx { namespace threads { namespace detail
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
                     *background_running = false;
+                    scheduler.SchedulingPolicy::
+                        decrement_background_thread_count();
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
@@ -786,6 +774,8 @@ namespace hpx { namespace threads { namespace detail
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
                     *background_running = false;
+                    scheduler.SchedulingPolicy::
+                        decrement_background_thread_count();
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
@@ -819,45 +809,36 @@ namespace hpx { namespace threads { namespace detail
                     }
                     else
                     {
-                        bool canexit;
                         if (this_state.load() == state_going_to_sleep)
                         {
-                            canexit = scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true);
-                            canexit = canexit &&
+                            bool can_exit =
+                                scheduler.SchedulingPolicy::cleanup_terminated(
+                                    num_thread, true) &&
                                 scheduler.SchedulingPolicy::get_thread_count(
-                                    staged, thread_priority_default, num_thread) == 0; // Should be 0
-                            canexit = canexit &&
-                                scheduler.SchedulingPolicy::get_thread_count(
-                                    pending, thread_priority_default, num_thread) == 0; // Should be 0
-                            // Not necessary for individual pus but needed to
-                            // avoid suspended threads when suspending last pu
-                            canexit = canexit &&
-                                scheduler.SchedulingPolicy::get_thread_count(
-                                    suspended, thread_priority_default, num_thread) == 0;
+                                    suspended, thread_priority_default,
+                                    num_thread) == 0;
+
+                            if (can_exit)
+                            {
+                                scheduler.SchedulingPolicy::suspend(num_thread);
+                            }
                         }
                         else
                         {
-                            canexit = scheduler.SchedulingPolicy::cleanup_terminated(true);
-                            canexit = canexit &&
-                                scheduler.SchedulingPolicy::get_thread_count(unknown)
-                                    == 0;
-                        }
+                            bool can_exit =
+                                scheduler.SchedulingPolicy::cleanup_terminated(
+                                    true) &&
+                                scheduler.SchedulingPolicy::get_thread_count(
+                                    unknown) == 0;
 
-                        if (canexit)
-                        {
-                            if (this_state.load() == state_going_to_sleep)
-                            {
-                                scheduler.SchedulingPolicy::suspend(num_thread);
-                                may_exit = false;
-                                continue;
-                            }
-                            else
+                            if (can_exit)
                             {
                                 this_state.store(state_stopped);
                                 break;
                             }
                         }
                     }
+
                     may_exit = false;
                 }
                 else
