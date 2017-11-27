@@ -21,6 +21,8 @@
 #include <cstdint>
 #include <string>
 #include <iostream>
+#include <type_traits>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -89,7 +91,7 @@ namespace hpx { namespace threads { namespace executors
         {
             // call the numa hint function
             int domain = numa_function_(ts...);
-//            std::cout << "pre_execution_async_domain_schedule returning " << domain << "\n";
+//            std::cout << "pre_execution_async_domain_schedule " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
@@ -128,7 +130,7 @@ namespace hpx { namespace threads { namespace executors
 
             // call the numa hint function
             int domain = numa_function_(predecessor_value, ts...);
-//            std::cout << "pre_execution_then_domain_schedule 2 returning " << domain << "\n";
+//            std::cout << "pre_execution_then_domain_schedule 2 " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename
@@ -331,7 +333,8 @@ namespace hpx { namespace threads { namespace executors
                       << debug::print_type<OuterFuture<util::tuple<InnerFutures...>>>()
                       << "\n";
             std::cout << "when_all(fut) : unwrapped   : "
-                      << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
+                      << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ")
+                      << "\n";
             std::cout << "then_execute  : Arguments   : "
                       << debug::print_type<Ts...>(" | ") << "\n";
             std::cout << "when_all(fut) : Result      : "
@@ -391,7 +394,8 @@ namespace hpx { namespace threads { namespace executors
                       << debug::print_type<util::tuple<InnerFutures...>>()
                       << "\n";
             std::cout << "dataflow      : unwrapped   : "
-                      << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
+                      << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ")
+                      << "\n";
             std::cout << "dataflow-frame: Result      : "
                       << debug::print_type<Result>() << "\n";
 #endif

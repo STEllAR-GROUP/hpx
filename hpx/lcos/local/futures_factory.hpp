@@ -513,7 +513,8 @@ namespace hpx { namespace lcos { namespace local
             launch policy = launch::async,
             threads::thread_priority priority = threads::thread_priority_default,
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-            threads::thread_schedule_hint schedulehint = threads::thread_schedule_hint_none,
+            threads::thread_schedule_hint schedulehint =
+                threads::thread_schedule_hint_none,
             error_code& ec = throws) const
         {
             if (!task_) {
