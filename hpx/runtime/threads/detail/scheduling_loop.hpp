@@ -325,6 +325,7 @@ namespace hpx { namespace threads { namespace detail
         scheduler.SchedulingPolicy::create_thread(background_init,
             &background_thread, suspended, true, hpx::throws, num_thread);
         HPX_ASSERT(background_thread);
+        scheduler.SchedulingPolicy::increment_background_thread_count();
         // We can now set the state to pending
         background_thread->set_state(pending);
         return background_thread;
@@ -401,6 +402,8 @@ namespace hpx { namespace threads { namespace detail
                     else if(terminated == state_val)
                     {
                         std::int64_t busy_count = 0;
+                        scheduler.SchedulingPolicy::
+                            decrement_background_thread_count();
                         scheduler.SchedulingPolicy::destroy_thread(
                             background_thread.get(), busy_count);
                         background_thread.reset();
@@ -453,7 +456,6 @@ namespace hpx { namespace threads { namespace detail
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
         {
-            ++scheduler.SchedulingPolicy::get_background_thread_count();
             background_thread = create_background_thread(scheduler, params,
                 background_running, num_thread, idle_loop_count);
         }
@@ -707,6 +709,8 @@ namespace hpx { namespace threads { namespace detail
                             {
                                 HPX_ASSERT(background_running);
                                 *background_running = false;
+                                scheduler.SchedulingPolicy::
+                                    decrement_background_thread_count();
                                 scheduler.SchedulingPolicy::schedule_thread(
                                     background_thread.get(), num_thread);
                                 background_thread.reset();
@@ -806,6 +810,8 @@ namespace hpx { namespace threads { namespace detail
                     {
                         HPX_ASSERT(background_running);
                         *background_running = false;
+                        scheduler.SchedulingPolicy::
+                            decrement_background_thread_count();
                         scheduler.SchedulingPolicy::schedule_thread(
                             background_thread.get(), num_thread);
                         background_thread.reset();

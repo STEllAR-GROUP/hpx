@@ -334,9 +334,19 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
 
-        std::atomic<std::int64_t>& get_background_thread_count()
+        std::int64_t get_background_thread_count()
         {
             return background_thread_count_;
+        }
+
+        void increment_background_thread_count()
+        {
+            ++background_thread_count_;
+        }
+
+        void decrement_background_thread_count()
+        {
+            --background_thread_count_;
         }
 
         // Enumerate all matching threads
