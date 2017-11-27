@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_GUIDED_POOL_EXECUTOR
 
 #include <hpx/async.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/util/thread_description.hpp>
@@ -88,7 +89,7 @@ namespace hpx { namespace threads { namespace executors
         {
             // call the numa hint function
             int domain = numa_function_(ts...);
-            //std::cout << "pre_execution_async_domain_schedule returning " << domain << "\n";
+//            std::cout << "pre_execution_async_domain_schedule returning " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
@@ -127,7 +128,7 @@ namespace hpx { namespace threads { namespace executors
 
             // call the numa hint function
             int domain = numa_function_(predecessor_value, ts...);
-            //std::cout << "pre_execution_then_domain_schedule 2 returning " << domain << "\n";
+//            std::cout << "pre_execution_then_domain_schedule 2 returning " << domain << "\n";
 
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename
@@ -175,6 +176,7 @@ namespace hpx { namespace threads { namespace executors
         scheduled_executor &get_scheduled_executor() {
             return pool_executor_;
         }
+
     protected:
         pool_executor pool_executor_;
     };
@@ -396,7 +398,7 @@ namespace hpx { namespace threads { namespace executors
 
             // invoke the hint function with the unwrapped tuple futures
             int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
-            //std::cout << "dataflow returning " << domain << "\n";
+//            std::cout << "dataflow returning " << domain << "\n";
 
             // forward the task execution on to the real internal executor
             lcos::local::futures_factory<result_type()> p(
@@ -422,39 +424,127 @@ namespace hpx { namespace threads { namespace executors
         pool_numa_hint<H,Tag> hint_;
     };
 
+    // --------------------------------------------------------------------
+    // guided_pool_executor_shim
+    // an executor compatible with scheduled executor API
+    // --------------------------------------------------------------------
+    template <typename H>
+    struct HPX_EXPORT guided_pool_executor_shim {
+    public:
+        guided_pool_executor_shim(bool guided, const std::string& pool_name)
+            : guided_(guided)
+            , guided_exec_(pool_name)
+            , pool_exec_(pool_name)
+        {}
+
+        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+                                  thread_stacksize stacksize)
+            : guided_(guided)
+            , guided_exec_(pool_name, stacksize)
+            , pool_exec_(pool_name, stacksize)
+        {}
+
+        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+                                  thread_priority priority,
+                                  thread_stacksize stacksize = thread_stacksize_default)
+            : guided_(guided)
+            , guided_exec_(pool_name, priority, stacksize)
+            , pool_exec_(pool_name, priority, stacksize)
+        {}
+
+
+        // --------------------------------------------------------------------
+        // --------------------------------------------------------------------
+        template <typename F, typename ... Ts>
+        future<typename util::detail::invoke_deferred_result<F, Ts...>::type>
+        async_execute(F && f, Ts &&... ts)
+        {
+            if (guided_) return guided_exec_.async_execute(
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+            else {
+                typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
+                    result_type;
+
+                lcos::local::futures_factory<result_type()> p(
+                    pool_exec_,
+                    util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...)
+                );
+                p.apply();
+                return p.get_future();
+            }
+        }
+
+        // --------------------------------------------------------------------
+        // --------------------------------------------------------------------
+        template <typename F,
+                  typename Future,
+                  typename ... Ts,
+                  typename = typename std::enable_if_t<traits::is_future<Future>::value>
+                  >
+        auto
+        then_execute(F && f, Future && predecessor, Ts &&... ts)
+        ->  future<typename util::detail::invoke_deferred_result<
+            F, Future, Ts...>::type>
+        {
+            if (guided_) return guided_exec_.then_execute(
+                std::forward<F>(f), std::forward<Future>(predecessor),
+                std::forward<Ts>(ts)...);
+            else {
+                typedef typename hpx::util::detail::invoke_deferred_result<
+                        F, Future, Ts...
+                    >::type result_type;
+
+                auto func = hpx::util::bind(
+                    hpx::util::one_shot(std::forward<F>(f)),
+                    hpx::util::placeholders::_1, std::forward<Ts>(ts)...);
+
+                typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
+                    hpx::lcos::detail::make_continuation_exec<result_type>(
+                        std::forward<Future>(predecessor), pool_exec_,
+                        std::move(func));
+
+                return hpx::traits::future_access<hpx::lcos::future<result_type> >::
+                    create(std::move(p));
+            }
+        }
+
+        // --------------------------------------------------------------------
+
+        bool                    guided_;
+        guided_pool_executor<H> guided_exec_;
+        pool_executor           pool_exec_;
+    };
+
+
 }}}
 
 namespace hpx { namespace parallel { namespace execution
 {
-    template <typename Executor>
+    template <typename Hint>
     struct executor_execution_category<
-        threads::executors::guided_pool_executor<Executor> >
+        threads::executors::guided_pool_executor<Hint> >
     {
         typedef parallel::execution::parallel_execution_tag type;
     };
 
-    template <typename Executor>
-    struct is_one_way_executor<
-            threads::executors::guided_pool_executor<Executor> >
-      : std::true_type
-    {};
-
-    template <typename Executor>
+    template <typename Hint>
     struct is_two_way_executor<
-            threads::executors::guided_pool_executor<Executor> >
+            threads::executors::guided_pool_executor<Hint> >
       : std::true_type
     {};
 
-    template <typename Executor>
-    struct is_bulk_one_way_executor<
-            threads::executors::guided_pool_executor<Executor> >
-      : std::false_type
-    {};
+    // ----------------------------
+    template <typename Hint>
+    struct executor_execution_category<
+        threads::executors::guided_pool_executor_shim<Hint> >
+    {
+        typedef parallel::execution::parallel_execution_tag type;
+    };
 
-    template <typename Executor>
-    struct is_bulk_two_way_executor<
-            threads::executors::guided_pool_executor<Executor> >
-      : std::false_type
+    template <typename Hint>
+    struct is_two_way_executor<
+            threads::executors::guided_pool_executor_shim<Hint> >
+      : std::true_type
     {};
 
 }}}
