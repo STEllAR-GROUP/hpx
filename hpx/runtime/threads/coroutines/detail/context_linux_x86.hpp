@@ -249,6 +249,7 @@ namespace hpx { namespace threads { namespace coroutines
                 sigaction(SIGSEGV, &action, nullptr);
 #else
            }
+#endif
 
 #if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
 
