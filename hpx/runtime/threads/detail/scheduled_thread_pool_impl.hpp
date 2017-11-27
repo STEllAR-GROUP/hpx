@@ -1403,28 +1403,12 @@ namespace hpx { namespace threads { namespace detail
     {
         compat::thread t;
 
-        // inform the scheduler to stop the virtual core
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        // TODO: Best way to do this?
-        if (threads::get_self_ptr())
-        {
-            while (state.load() == state_pre_sleep)
-            {
-                hpx::this_thread::suspend();
-            }
-        }
-        else
-        {
-            while (state.load() == state_pre_sleep) {}
-        }
+        // TODO: Allow removing suspended pu?
 
-        if (state.load() == state_sleeping)
-        {
-            resume_processing_unit(virt_core, ec);
-        }
-
+        // inform the scheduler to stop the virtual core
         hpx::state oldstate = state.exchange(state_stopping);
 
         HPX_ASSERT(oldstate == state_starting ||
@@ -1464,7 +1448,6 @@ namespace hpx { namespace threads { namespace detail
         t.join();
     }
 
-    // TODO: Clean up the interface.
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume(std::size_t virt_core,
         error_code& ec)
@@ -1490,26 +1473,29 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        // TODO: Check if already suspending or suspended.
-        hpx::state oldstate = state.exchange(state_pre_sleep);
-        HPX_ASSERT(oldstate == state_running);
-
-        if (threads::get_self_ptr())
+        hpx::state expected = state_running;
+        if (state.compare_exchange_strong(expected, state_pre_sleep))
         {
-            while (virt_core == hpx::get_worker_thread_num())
+            if (threads::get_self_ptr())
             {
-                hpx::this_thread::suspend();
-            }
+                while (virt_core == hpx::get_worker_thread_num())
+                {
+                    hpx::this_thread::suspend();
+                }
 
-            while (state.load() == state_pre_sleep)
+                while (state.load() == state_pre_sleep)
+                {
+                    hpx::this_thread::suspend();
+                }
+            }
+            else
             {
-                hpx::this_thread::suspend();
+                while (state.load() == state_pre_sleep) {}
             }
         }
         else
         {
-            // TODO: Best way to do this?
-            while (state.load() == state_pre_sleep) {}
+            // TODO: What to do if not state_running?
         }
     }
 
@@ -1520,7 +1506,6 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        // NOTE: Require suspended?
         sched_->Scheduler::resume(virt_core);
 
         if (threads::get_self_ptr())
@@ -1532,7 +1517,6 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            // TODO: Best way to do this?
             while (state.load() == state_sleeping) {}
         }
     }
