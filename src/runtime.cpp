@@ -209,21 +209,21 @@ namespace hpx
     {
         char const* const runtime_state_names[] =
         {
-            "state_invalid",        // -1
-            "state_initialized",    // 0
-            "state_pre_startup",    // 1
-            "state_startup",        // 2
-            "state_pre_main",       // 3
-            "state_starting",       // 4
-            "state_running",        // 5
-            "state_suspended",      // 6
-            "state_going_to_sleep", // 7
-            "state_sleeping",       // 8
-            "state_pre_shutdown",   // 9
-            "state_shutdown",       // 10
-            "state_stopping",       // 11
-            "state_terminating",    // 12
-            "state_stopped"         // 13
+            "state_invalid",      // -1
+            "state_initialized",  // 0
+            "state_pre_startup",  // 1
+            "state_startup",      // 2
+            "state_pre_main",     // 3
+            "state_starting",     // 4
+            "state_running",      // 5
+            "state_suspended",    // 6
+            "state_pre_sleep",    // 7
+            "state_sleeping",     // 8
+            "state_pre_shutdown", // 9
+            "state_shutdown",     // 10
+            "state_stopping",     // 11
+            "state_terminating",  // 12
+            "state_stopped"       // 13
         };
     }
 

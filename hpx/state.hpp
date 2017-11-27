@@ -23,7 +23,7 @@ namespace hpx
         state_starting = 4,
         state_running = 5,
         state_suspended = 6,
-        state_going_to_sleep = 7,
+        state_pre_sleep = 7,
         state_sleeping = 8,
         state_pre_shutdown = 9,
         state_shutdown = 10,

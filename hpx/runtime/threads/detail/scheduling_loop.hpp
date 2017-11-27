@@ -464,7 +464,7 @@ namespace hpx { namespace threads { namespace detail
             // Get the next HPX thread from the queue
             thrd = next_thrd;
             bool running = this_state.load(
-                std::memory_order_relaxed) < state_going_to_sleep;
+                std::memory_order_relaxed) < state_pre_sleep;
 
             if (HPX_LIKELY(thrd ||
                     scheduler.SchedulingPolicy::get_next_thread(
@@ -671,7 +671,7 @@ namespace hpx { namespace threads { namespace detail
                         num_thread, running, idle_loop_count))
                 {
                     // clean up terminated threads one more time before sleeping
-                    if (this_state.load() == state_going_to_sleep)
+                    if (this_state.load() == state_pre_sleep)
                     {
                         bool can_exit =
                             scheduler.SchedulingPolicy::cleanup_terminated(
@@ -809,7 +809,7 @@ namespace hpx { namespace threads { namespace detail
                     }
                     else
                     {
-                        if (this_state.load() == state_going_to_sleep)
+                        if (this_state.load() == state_pre_sleep)
                         {
                             bool can_exit =
                                 scheduler.SchedulingPolicy::cleanup_terminated(
