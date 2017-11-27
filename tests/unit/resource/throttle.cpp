@@ -32,14 +32,14 @@ int hpx_main(int argc, char* argv[])
         {
             tp.suspend_processing_unit(thread_num);
             HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
-                tp.get_active_threads_count());
+                tp.get_active_os_thread_count());
         }
 
         for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
         {
             tp.resume_processing_unit(thread_num);
             HPX_TEST_EQ(std::size_t(thread_num + 2),
-                tp.get_active_threads_count());
+                tp.get_active_os_thread_count());
         }
     }
 

@@ -84,6 +84,11 @@ namespace hpx { namespace threads { namespace detail
         std::size_t get_worker_thread_num() const;
         virtual std::size_t get_os_thread_count() const = 0;
 
+        virtual std::size_t get_active_os_thread_count() const
+        {
+            return get_os_thread_count();
+        }
+
         virtual compat::thread& get_os_thread_handle(
             std::size_t num_thread) = 0;
 
@@ -121,12 +126,6 @@ namespace hpx { namespace threads { namespace detail
 
         mask_cref_type   get_used_processing_units() const;
         hwloc_bitmap_ptr get_numa_domain_bitmap() const;
-
-        // TODO
-        virtual std::size_t get_active_threads_count() const
-        {
-            return 0;
-        }
 
         // performance counters
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
