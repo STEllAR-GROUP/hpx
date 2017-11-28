@@ -57,6 +57,13 @@ inline thread_id_type get_thread_id()
 #endif
 }
 
+typedef bool (*is_enabled_func)();
+
+struct thread_info {
+    thread_info() : last_enabled(nullptr) {}
+    is_enabled_func last_enabled;
+};
+
 #if defined( HPX_LOG_BEFORE_INIT_USE_CACHE_FILTER) \
  || defined( HPX_LOG_BEFORE_INIT_USE_LOG_ALL)
 //////////////////////////////////////////////////////////////////
@@ -73,8 +80,6 @@ inline thread_id_type get_thread_id()
 */
 template<class msg_type> struct cache_before_init {
 private:
-    typedef bool (*is_enabled_func)();
-
     struct message {
         message(is_enabled_func is_enabled_, msg_type string_)
             : is_enabled(is_enabled_), string(string_) {}
@@ -82,11 +87,6 @@ private:
         is_enabled_func is_enabled;
         // the message itself
         msg_type string;
-    };
-
-    struct thread_info {
-        thread_info() : last_enabled(nullptr) {}
-        is_enabled_func last_enabled;
     };
 
     struct cache {

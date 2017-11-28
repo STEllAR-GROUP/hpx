@@ -36,6 +36,19 @@ namespace hpx { namespace components
         ///         implemented in this module.
         virtual bool get_component_info(std::vector<std::string>& fillini,
             std::string const& filepath, bool is_static = false) = 0;
+
+        /// \brief Return the unique identifier of the component type this
+        ///        factory is responsible for
+        ///
+        /// \param locality     [in] The id of the locality this factory
+        ///                     is responsible for.
+        /// \param agas_client  [in] The AGAS client to use for component id
+        ///                     registration (if needed).
+        ///
+        /// \return Returns the unique identifier of the component type this
+        ///         factory instance is responsible for. This function throws
+        ///         on any error.
+        virtual void register_component_type() = 0;
     };
 }}
 

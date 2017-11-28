@@ -3,15 +3,102 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/throw_exception.hpp>
+
+#include <hpx/lcos/local/spinlock.hpp>
+
+#include <hpx/util/atomic_count.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/reinitializable_static.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
+#include <mutex>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    namespace detail
+    {
+        struct component_database
+        {
+            struct component_entry
+            {
+                component_entry()
+                  : enabled_(false)
+                  , instance_count_(0)
+                  , deleter_(nullptr)
+                {}
+
+                // note, this done to be able to put the entry into the map.
+                // a component_entry should not be moved otherwise, but this
+                // saves us a dynamic allocation
+                component_entry(component_entry &&)
+                  : enabled_(false)
+                  , instance_count_(0)
+                  , deleter_(nullptr)
+                {}
+
+                bool enabled_;
+                util::atomic_count instance_count_;
+                component_deleter_type deleter_;
+            };
+
+        private:
+            typedef hpx::lcos::local::spinlock mutex_type;
+            typedef
+                std::map<component_type, component_entry> map_type;
+
+            static mutex_type& mtx()
+            {
+                static mutex_type mtx_;
+                return mtx_;
+            }
+
+            static map_type& data()
+            {
+                static map_type map;
+                return map;
+            }
+
+        public:
+            static component_entry& get_entry(component_type type)
+            {
+                std::lock_guard<mutex_type> l(mtx());
+                auto& d = data();
+
+                auto it = d.find(type);
+                if (it == d.end())
+                {
+                    it = d.emplace(type, component_entry()).first;
+                }
+
+                return it->second;
+            }
+        };
+    }
+
+    bool& enabled(component_type type)
+    {
+        return detail::component_database::get_entry(type).enabled_;
+    }
+
+    util::atomic_count& instance_count(component_type type)
+    {
+        return detail::component_database::get_entry(type).instance_count_;
+    }
+
+    component_deleter_type& deleter(component_type type)
+    {
+        return detail::component_database::get_entry(type).deleter_;
+    }
+
     namespace detail
     {
         // the entries in this array need to be in exactly the same sequence
@@ -63,6 +150,42 @@ namespace hpx { namespace components
                 "]";
         }
         return result;
+    }
+
+    namespace detail {
+        component_type get_agas_component_type(const char* name,
+            const char* base_name, component_type base_type, bool enabled)
+        {
+            component_type type = component_invalid;
+            naming::resolver_client& agas_client = hpx::naming::get_agas_client();
+            naming::gid_type locality = agas_client.get_local_locality();
+
+            if (enabled)
+            {
+                type = agas_client.register_factory(locality, name);
+                if (component_invalid == type) {
+                    HPX_THROW_EXCEPTION(duplicate_component_id,
+                        "get_agas_component_type",
+                        std::string("the component name ") + name +
+                        " is already in use");
+                }
+            }
+            else {
+                type = agas_client.get_component_id(name);
+            }
+
+            if (base_name)
+            {
+                // NOTE: This assumes that the derived component is loaded.
+                if (base_type == component_invalid)
+                {
+                    base_type = agas_client.get_component_id(base_name);
+                }
+                type = derived_component_type(type, base_type);
+            }
+
+            return type;
+        }
     }
 }}
 

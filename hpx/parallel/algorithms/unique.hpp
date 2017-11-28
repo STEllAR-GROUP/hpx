@@ -265,13 +265,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     required elements. The signature of this predicate
     ///                     should be equivalent to:
     ///                     \code
-    ///                     bool pred(const Type &a, const Type &b);
+    ///                     bool pred(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to \a Type.
+    ///                     it. The types \a Type1 and \a Type2 must be
+    ///                     such that objects of types \a FwdIter can be
+    ///                     dereferenced and then implicitly converted to
+    ///                     both \a Type1 and \a Type2
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate

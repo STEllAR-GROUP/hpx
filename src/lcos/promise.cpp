@@ -13,3 +13,8 @@ namespace hpx { namespace traits { namespace detail
     util::atomic_count unique_type(
         static_cast<long>(components::component_last));
 }}}
+
+typedef hpx::components::managed_component<
+    hpx::lcos::detail::promise_lco<void, hpx::util::unused_type>> promise_lco_void;
+
+HPX_REGISTER_COMPONENT_HEAP(promise_lco_void);

@@ -10,8 +10,9 @@ set(tests
     serialization_complex
     serialization_custom_constructor
     serialization_deque
-    serialization_map
     serialization_list
+    serialization_map
+    serialization_optional
     serialization_set
     serialization_simple
     serialization_smart_ptr

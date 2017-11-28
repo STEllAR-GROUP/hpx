@@ -64,7 +64,7 @@ struct fixture
     std::size_t get(counter_type c) const;
 
     template <typename T>
-    bool check(char const* file, int line, char const* function,
+    bool check_(char const* file, int line, char const* function,
                counter_type c, T const& t, char const* msg)
     {
         if (!t)
@@ -209,14 +209,14 @@ inline int report_errors(std::ostream& stream = std::cerr)
 }} // hpx::util
 
 #define HPX_TEST(expr)                                                        \
-    ::hpx::util::detail::global_fixture.check                                 \
+    ::hpx::util::detail::global_fixture.check_                                \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                          \
          ::hpx::util::counter_test,                                           \
          expr, "test '" HPX_PP_STRINGIZE(expr) "'")                           \
     /***/
 
 #define HPX_TEST_MSG(expr, msg)                                               \
-    ::hpx::util::detail::global_fixture.check                                 \
+    ::hpx::util::detail::global_fixture.check_                                \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                          \
          ::hpx::util::counter_test,                                           \
          expr, msg)                                                           \
@@ -278,14 +278,14 @@ inline int report_errors(std::ostream& stream = std::cerr)
     /***/
 
 #define HPX_SANITY(expr)                                                      \
-    ::hpx::util::detail::global_fixture.check                                 \
+    ::hpx::util::detail::global_fixture.check_                                \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                          \
          ::hpx::util::counter_sanity,                                         \
          expr, "sanity check '" HPX_PP_STRINGIZE(expr) "'")                   \
     /***/
 
 #define HPX_SANITY_MSG(expr, msg)                                             \
-    ::hpx::util::detail::global_fixture.check                                 \
+    ::hpx::util::detail::global_fixture.check_                                \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                          \
          ::hpx::util::counter_sanity,                                         \
          expr, msg)                                                           \

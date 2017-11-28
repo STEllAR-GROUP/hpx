@@ -7,8 +7,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_merge.hpp>
 #include <hpx/include/parallel_generate.hpp>
+#include <hpx/include/parallel_merge.hpp>
+#include <hpx/include/parallel_sort.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -102,6 +103,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
         random_fill(random_range));
     generate(execution::par, std::begin(src2), std::end(src2),
         random_fill(random_range));
+    sort(execution::par, std::begin(src1), std::end(src1));
+    sort(execution::par, std::begin(src2), std::end(src2));
 
     std::cout << "* Running Benchmark..." << std::endl;
     std::cout << "--- run_merge_benchmark_std ---" << std::endl;

@@ -34,7 +34,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     service_executor::service_executor(
             char const* pool_name, char const* pool_name_suffix)
       : pool_(get_thread_pool(pool_name, pool_name_suffix)),
-        task_count_(0)
+        task_count_(0),
+        blocking_(true)
     {
         if (!pool_) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -46,16 +47,25 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     service_executor::~service_executor()
     {
         std::unique_lock<mutex_type> l(mtx_);
-        while (task_count_ > 0)
+        if (blocking_)
         {
-            // We need to cancel the wait process here, since we might block
-            // other running HPX threads.
-            shutdown_cv_.wait_for(l, std::chrono::seconds(1));
-            if (hpx::threads::get_self_ptr())
+            while (task_count_ > 0)
             {
-                hpx::this_thread::suspend();
+                // We need to cancel the wait process here, since we might block
+                // other running HPX threads.
+                shutdown_cv_.wait_for(l, std::chrono::seconds(1));
+                if (hpx::threads::get_self_ptr())
+                {
+                    hpx::this_thread::suspend();
+                }
             }
         }
+    }
+
+    void service_executor::detach()
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        blocking_ = false;
     }
 
     void service_executor::thread_wrapper(closure_type&& f) //-V669
@@ -79,15 +89,17 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         typedef void result_type;
 
         thread_wrapper_helper(
-            service_executor* exec
-          , service_executor::closure_type&& f
-        ) : exec_(exec)
+                service_executor* exec, service_executor::closure_type&& f)
+          : exec_(exec)
           , f_(std::move(f))
-        {}
+        {
+            intrusive_ptr_add_ref(exec);
+        }
 
         result_type invoke()
         {
             exec_->thread_wrapper(std::move(f_));
+            intrusive_ptr_release(exec_);
         }
 
         service_executor* exec_;
@@ -128,19 +140,21 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         typedef void result_type;
 
-        delayed_add_helper(
-            service_executor* exec
-          , service_executor::closure_type&& f
-          , boost::asio::io_service& io_service
-          , util::steady_clock::time_point const& abs_time
-        ) : exec_(exec)
+        delayed_add_helper(service_executor* exec,
+                service_executor::closure_type&& f,
+                boost::asio::io_service& io_service,
+                util::steady_clock::time_point const& abs_time)
+          : exec_(exec)
           , f_(std::move(f))
           , timer_(io_service, abs_time)
-        {}
+        {
+            intrusive_ptr_add_ref(exec);
+        }
 
         result_type invoke()
         {
             exec_->add_no_count(std::move(f_));
+            intrusive_ptr_release(exec_);
         }
 
         service_executor* exec_;

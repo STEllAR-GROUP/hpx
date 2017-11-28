@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2013 Hartmut Kaiser
+//  Copyright (c) 1998-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,21 +12,34 @@
 #include <hpx/util/one_size_heap_list.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <iostream>
+#include <type_traits>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    template <typename Heap, typename Mutex = lcos::local::spinlock>
-    class wrapper_heap_list
-      : public util::one_size_heap_list<Heap, Mutex>
+    template <typename Heap>
+    class wrapper_heap_list : public util::one_size_heap_list
     {
-        typedef util::one_size_heap_list<Heap, Mutex> base_type;
+        typedef util::one_size_heap_list base_type;
+        typedef typename Heap::value_type value_type;
+
+        enum
+        {
+            heap_step = 0xFFF,          // default initial number of elements
+        };
 
     public:
-        wrapper_heap_list(component_type type)
-          : base_type(get_component_type_name(type)),
-            type_(type)
+        wrapper_heap_list()
+          : base_type(get_component_type_name(
+                get_component_type<typename value_type::wrapped_type>()),
+                heap_step, sizeof(typename std::aligned_storage<
+                    sizeof(value_type), std::alignment_of<value_type>::value
+                >::type),
+                (Heap*) nullptr)
+          , type_(get_component_type<typename value_type::wrapped_type>())
         {}
 
         ///

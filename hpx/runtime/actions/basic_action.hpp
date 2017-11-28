@@ -185,7 +185,6 @@ namespace hpx { namespace actions
         static R invoke(naming::address::address_type /*lva*/,
             naming::address::component_type /*comptype*/, Ts&&... /*vs*/);
 
-    protected:
         struct invoker
         {
             typedef
@@ -221,6 +220,7 @@ namespace hpx { namespace actions
             }
         };
 
+    protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
@@ -604,7 +604,6 @@ namespace hpx { namespace actions
         broadcast_call_shutdown_functions_action_id,
         broadcast_call_startup_functions_action_id,
         broadcast_symbol_namespace_on_event_action_id,
-        bulk_create_components_action_id,
         call_shutdown_functions_action_id,
         call_startup_functions_action_id,
         component_namespace_bind_prefix_action_id,
@@ -624,7 +623,6 @@ namespace hpx { namespace actions
         free_component_action_id,
         garbage_collect_action_id,
         get_config_action_id,
-        get_instance_count_action_id,
         hpx_get_locality_name_action_id,
         hpx_lcos_server_barrier_create_component_action_id,
         hpx_lcos_server_latch_create_component_action_id,
@@ -688,7 +686,7 @@ namespace hpx { namespace actions
         symbol_namespace_statistics_counter_action_id,
         terminate_action_id,
         terminate_all_action_id,
-        update_agas_cache_entry_action_id,
+        update_agas_cache_action_id,
         register_worker_security_action_id,
         notify_worker_security_action_id,
 

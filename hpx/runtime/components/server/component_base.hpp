@@ -28,6 +28,7 @@
 #include <sstream>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx {
 namespace detail {
@@ -105,16 +106,6 @@ namespace hpx { namespace components {
         {
         }
 
-        // This exposes the component type.
-        static component_type get_component_type()
-        {
-            return components::get_component_type<this_component_type>();
-        }
-        static void set_component_type(component_type type)
-        {
-            components::set_component_type<this_component_type>(type);
-        }
-
         naming::address get_current_address() const
         {
             return naming::address(get_locality(),
@@ -126,19 +117,15 @@ namespace hpx { namespace components {
     !defined(__NVCC__) && !defined(__CUDACC__)
     protected:
         // declare friends which are allowed to access get_base_gid()
-        template <typename Component_>
-        friend naming::gid_type server::create(std::size_t count);
+        template <typename Component_, typename...Ts>
+        friend naming::gid_type server::create(Ts&&... ts);
 
-        template <typename Component_>
-        friend naming::gid_type server::create(
-            util::unique_function_nonser<void(void*)> const& ctor);
+        template <typename Component_, typename...Ts>
+        friend naming::gid_type server::create_migrated(
+            naming::gid_type const& gid, void** p, Ts&&...ts);
 
-        template <typename Component_>
-        friend naming::gid_type server::create(naming::gid_type const& gid,
-            util::unique_function_nonser<void(void*)> const& ctor, void** p);
-
-        template <typename Component_, typename... Ts>
-        friend naming::gid_type server::create_with_args(Ts&&... ts);
+        template <typename Component_, typename...Ts>
+        friend std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&...ts);
 #endif
 
         // Create a new GID (if called for the first time), assign this

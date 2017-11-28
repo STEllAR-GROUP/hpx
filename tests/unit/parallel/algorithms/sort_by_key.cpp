@@ -80,7 +80,9 @@ void sort_by_key_benchmark()
         std::iota(keys.begin(), keys.end(), 0);
 
         // shuffle the keys up,
-        std::random_shuffle(keys.begin(), keys.end());
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(keys.begin(), keys.end(), g);
 
         // make copies of initial states
         o_keys = keys;
@@ -128,7 +130,9 @@ void test_sort_by_key1(ExPolicy &&policy, Tkey, Tval, const Op &op, const Helper
     std::iota(keys.begin(), keys.end(), 0);
 
     // shuffle the keys up,
-    std::random_shuffle(keys.begin(), keys.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(keys.begin(), keys.end(), g);
 
     // make copies of initial states
     o_keys = keys;
@@ -177,7 +181,9 @@ void test_sort_by_key_async(ExPolicy &&policy, Tkey, Tval, const Op &op,
     std::iota(keys.begin(), keys.end(), 0);
 
     // shuffle the keys up,
-    std::random_shuffle(keys.begin(), keys.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(keys.begin(), keys.end(), g);
 
     // make copies of initial states
     o_keys = keys;

@@ -28,21 +28,36 @@ struct user_defined_type
         name(name_list[std::rand() % name_list.size()])
     {}
 
-    bool operator<(int rand_base) const
+    bool operator<(user_defined_type const& t) const
     {
-        static std::string const base_name = "BASE";
-
-        if (this->name < base_name)
+        if (this->name < t.name)
             return true;
-        else if (this->name > base_name)
+        else if (this->name > t.name)
             return false;
         else
-            return this->val < rand_base;
+            return this->val < t.val;
+    }
+
+    bool operator>(user_defined_type const& t) const
+    {
+        if (this->name > t.name)
+            return true;
+        else if (this->name < t.name)
+            return false;
+        else
+            return this->val > t.val;
     }
 
     bool operator==(user_defined_type const& t) const
     {
         return this->name == t.name && this->val == t.val;
+    }
+
+    user_defined_type operator+(int val) const
+    {
+        user_defined_type t(*this);
+        t.val += val;
+        return t;
     }
 
     static const std::vector<std::string> name_list;
@@ -216,6 +231,7 @@ void test_merge_outiter_async(ExPolicy policy, DataType)
 }
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
 template <typename DataType>
 void test_merge()
 {
@@ -263,7 +279,7 @@ void test_merge()
 void test_merge()
 {
     test_merge<int>();
-    //test_merge<user_defined_type>();
+    test_merge<user_defined_type>();
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

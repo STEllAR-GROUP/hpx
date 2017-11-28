@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_all_any_none_of.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 
 #include <cstddef>
@@ -18,8 +19,9 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_all_of(ExPolicy policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag,
+    typename Proj = hpx::parallel::util::projection_identity>
+void test_all_of(ExPolicy policy, IteratorTag,Proj proj=Proj())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -38,21 +40,22 @@ void test_all_of(ExPolicy policy, IteratorTag)
                 iterator(std::begin(c)), iterator(std::end(c)),
                 [](std::size_t v) {
                     return v != 0;
-                });
+                },proj);
 
         // verify values
         bool expected =
             std::all_of(std::begin(c), std::end(c),
-                [](std::size_t v) {
-                    return v != 0;
+                [proj](std::size_t v) {
+                    return proj(v) != 0;
                 });
 
         HPX_TEST_EQ(result, expected);
     }
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_all_of_async(ExPolicy p, IteratorTag)
+template <typename ExPolicy, typename IteratorTag,
+    typename Proj = hpx::parallel::util::projection_identity>
+void test_all_of_async(ExPolicy p, IteratorTag,Proj proj=Proj())
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -67,14 +70,14 @@ void test_all_of_async(ExPolicy p, IteratorTag)
                 iterator(std::begin(c)), iterator(std::end(c)),
                 [](std::size_t v) {
                     return v != 0;
-                });
+                },proj);
         f.wait();
 
         // verify values
         bool expected =
             std::all_of(std::begin(c), std::end(c),
-                [](std::size_t v) {
-                    return v != 0;
+                [proj](std::size_t v) {
+                    return proj(v) != 0;
                 });
 
         HPX_TEST_EQ(expected, f.get());
@@ -84,22 +87,49 @@ void test_all_of_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_all_of()
 {
+    struct proj
+    {
+        //This projection should cause tests to fail if it is not applied
+        //because it causes predicate to evaluate the opposite
+        constexpr std::size_t operator()(std::size_t x)const
+        {
+            return !static_cast<bool>(x);
+        }
+    };
     using namespace hpx::parallel;
 
     test_all_of(execution::seq, IteratorTag());
     test_all_of(execution::par, IteratorTag());
     test_all_of(execution::par_unseq, IteratorTag());
 
+    test_all_of(execution::seq, IteratorTag(), proj());
+    test_all_of(execution::par, IteratorTag(), proj());
+    test_all_of(execution::par_unseq, IteratorTag(), proj());
+
     test_all_of_async(execution::seq(execution::task), IteratorTag());
     test_all_of_async(execution::par(execution::task), IteratorTag());
+
+    test_all_of_async(execution::seq(execution::task), IteratorTag(), proj());
+    test_all_of_async(execution::par(execution::task), IteratorTag(), proj());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_all_of(execution_policy(execution::seq), IteratorTag());
     test_all_of(execution_policy(execution::par), IteratorTag());
     test_all_of(execution_policy(execution::par_unseq), IteratorTag());
 
-    test_all_of(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_all_of(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_all_of(execution_policy(execution::seq), IteratorTag(), proj());
+    test_all_of(execution_policy(execution::par), IteratorTag(), proj());
+    test_all_of(execution_policy(execution::par_unseq), IteratorTag(), proj());
+
+    test_all_of(execution_policy(execution::seq(execution::task)),
+        IteratorTag());
+    test_all_of(execution_policy(execution::par(execution::task)),
+        IteratorTag());
+
+    test_all_of(execution_policy(execution::seq(execution::task)),
+        IteratorTag(), proj());
+    test_all_of(execution_policy(execution::par(execution::task)),
+        IteratorTag()), proj();
 #endif
 }
 

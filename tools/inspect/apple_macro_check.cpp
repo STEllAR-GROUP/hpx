@@ -66,11 +66,6 @@ namespace boost
     {
       if (contents.find( "hpxinspect:" "noapple_macros" ) != string::npos) return;
 
-      // Only check files in the boost directory, as we can avoid including the
-      // apple test headers elsewhere.
-      path relative( relative_to( full_path, search_root_path() ) );
-      if ( relative.empty() || *relative.begin() != "boost") return;
-
       boost::sregex_iterator cur(contents.begin(),
           contents.end(), apple_macro_regex), end;
 

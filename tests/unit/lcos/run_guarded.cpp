@@ -45,7 +45,7 @@ void both() {
 int increments = 3000;
 
 
-void check()
+void check_()
 {
     HPX_TEST(2*increments == i1 && 2*increments == i2);
 }
@@ -65,7 +65,7 @@ int hpx_main(boost::program_options::variables_map& vm) {
         run_guarded(*l2,incr2);
     }
 
-    run_guarded(guards, &::check);
+    run_guarded(guards, &::check_);
     return hpx::finalize();
 }
 

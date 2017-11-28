@@ -5,9 +5,10 @@
 
 #include <hpx/error_code.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/format.hpp>
@@ -28,15 +29,6 @@ namespace hpx { namespace detail
 
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
-    static mask_type get_full_machine_mask(std::size_t num_threads)
-    {
-        threads::mask_type m = threads::mask_type();
-        threads::resize(m, hardware_concurrency());
-        for (std::size_t i = 0; i != num_threads; ++i)
-            threads::set(m, i);
-        return m;
-    }
-
     std::size_t get_pu_offset(util::command_line_handling const& cfg)
     {
         std::size_t pu_offset = std::size_t(-1);
@@ -113,7 +105,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     {
         num_threads_ = cfg_.num_threads_;
         std::size_t num_system_pus = hardware_concurrency();
-        auto& topo = resource::get_partitioner().get_topology();
 
         // initialize from command line
         std::size_t pu_offset = get_pu_offset(cfg_);
@@ -138,6 +129,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                 get_config_entry("hpx.cores", 0), 0);
 
         init_cached_pu_nums(num_system_pus);
+
+        auto const& topo = threads::create_topology();
 
 #if defined(HPX_HAVE_HWLOC)
         std::string affinity_desc;
@@ -206,11 +199,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return (std::max)(num_unique_cores, max_cores);
     }
 
-    mask_cref_type affinity_data::get_pu_mask(std::size_t global_thread_num) const
+    mask_cref_type affinity_data::get_pu_mask(threads::topology const& topo,
+        std::size_t global_thread_num) const
     {
-        // get a topology instance
-        topology const& topology = resource::get_partitioner().get_topology();
-
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, global_thread_num))
         {
@@ -228,27 +219,27 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         {
             // The affinity domain is 'processing unit', just convert the
             // pu-number into a bit-mask.
-            return topology.get_thread_affinity_mask(pu_num);
+            return topo.get_thread_affinity_mask(pu_num);
         }
         if (0 == std::string("core").find(affinity_domain_))
         {
             // The affinity domain is 'core', return a bit mask corresponding
             // to all processing units of the core containing the given
             // pu_num.
-            return topology.get_core_affinity_mask(pu_num);
+            return topo.get_core_affinity_mask(pu_num);
         }
         if (0 == std::string("numa").find(affinity_domain_))
         {
             // The affinity domain is 'numa', return a bit mask corresponding
             // to all processing units of the NUMA domain containing the
             // given pu_num.
-            return topology.get_numa_node_affinity_mask(pu_num);
+            return topo.get_numa_node_affinity_mask(pu_num);
         }
 
         // The affinity domain is 'machine', return a bit mask corresponding
         // to all processing units of the machine.
         HPX_ASSERT(0 == std::string("machine").find(affinity_domain_));
-        return topology.get_machine_affinity_mask();
+        return topo.get_machine_affinity_mask();
     }
 
     mask_type affinity_data::get_used_pus_mask(std::size_t pu_num) const

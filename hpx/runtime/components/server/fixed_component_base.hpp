@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <sstream>
 #include <type_traits>
+#include <vector>
 
 namespace hpx { namespace components
 {
@@ -79,28 +80,17 @@ public:
         }
     }
 
-    // \brief This exposes the component type.
-    static component_type get_component_type()
-    {
-        return components::get_component_type<this_component_type>();
-    }
-    static void set_component_type(component_type type)
-    {
-        components::set_component_type<this_component_type>(type);
-    }
-
 private:
     // declare friends which are allowed to access get_base_gid()
-    template <typename Component_>
-    friend naming::gid_type server::create(std::size_t count);
+    template <typename Component_, typename...Ts>
+    friend naming::gid_type server::create(Ts&&... ts);
 
-    template <typename Component_>
-    friend naming::gid_type server::create(
-        util::unique_function_nonser<void(void*)> const& ctor);
+    template <typename Component_, typename...Ts>
+    friend naming::gid_type server::create_migrated(
+        naming::gid_type const& gid, void** p, Ts&&...ts);
 
-    template <typename Component_>
-    friend naming::gid_type server::create(naming::gid_type const& gid,
-        util::unique_function_nonser<void(void*)> const& ctor, void** p);
+    template <typename Component_, typename...Ts>
+    friend std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&...ts);
 
     // Return the component's fixed GID.
     naming::gid_type get_base_gid(
@@ -204,10 +194,9 @@ private:
 namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
-    template <typename Component>
-    struct fixed_heap_factory
+    struct fixed_heap
     {
-        static Component* alloc(std::size_t count)
+        static void* alloc(std::size_t count)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
             return nullptr;
@@ -227,7 +216,7 @@ class fixed_component : public Component
     typedef Component type_holder;
     typedef fixed_component<Component> component_type;
     typedef component_type derived_type;
-    typedef detail::fixed_heap_factory<component_type> heap_type;
+    typedef detail::fixed_heap heap_type;
 
     /// \brief  The function \a create is used for allocation and
     ///         initialization of instances of the derived components.

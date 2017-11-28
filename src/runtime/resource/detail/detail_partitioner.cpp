@@ -213,9 +213,10 @@ namespace hpx { namespace resource { namespace detail
 
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
-        : first_core_(std::size_t(-1))
-        , cores_needed_(std::size_t(-1))
-        , mode_(mode_default)
+      : first_core_(std::size_t(-1))
+      , cores_needed_(std::size_t(-1))
+      , mode_(mode_default)
+      , topo_(threads::create_topology())
     {
         // allow only one partitioner instance
         if (++instance_number_counter_ > 1)
@@ -771,7 +772,7 @@ namespace hpx { namespace resource { namespace detail
 
     threads::topology &partitioner::get_topology() const
     {
-        return threads::create_topology();
+        return topo_;
     }
 
     util::command_line_handling &
@@ -865,7 +866,7 @@ namespace hpx { namespace resource { namespace detail
     threads::mask_cref_type partitioner::get_pu_mask(
         std::size_t global_thread_num) const
     {
-        return affinity_data_.get_pu_mask(global_thread_num);
+        return affinity_data_.get_pu_mask(topo_, global_thread_num);
     }
 
     bool partitioner::cmd_line_parsed() const

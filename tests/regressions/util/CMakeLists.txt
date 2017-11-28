@@ -6,6 +6,7 @@
 
 set(tests
     command_line_arguments_706
+    command_line_required_arguments_2990
     configuration_1572
     function_argument
     function_serialization_728

@@ -32,6 +32,7 @@ struct A : hpx::components::abstract_managed_component_base<A>
     HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
 };
 
+HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<A>);
 HPX_DEFINE_GET_COMPONENT_TYPE(A);
 
 typedef A::test0_action test0_action;
@@ -58,6 +59,7 @@ struct B : A, hpx::components::abstract_managed_component_base<B>
     HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action);
 };
 
+HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<B>);
 HPX_DEFINE_GET_COMPONENT_TYPE(B);
 
 typedef B::test1_action test1_action;

@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2017      Thomas Heller
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,12 +13,15 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
-#include <hpx/runtime/components/unique_component_name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/traits/component_config_data.hpp>
 
@@ -58,9 +62,10 @@ namespace hpx { namespace components
         bool get_component_info(std::vector<std::string>& fillini,
             std::string const& filepath, bool is_static = false)
         {
+            typedef typename Component::type_holder type_holder;
             using namespace boost::assign;
             fillini += std::string("[hpx.components.") +
-                unique_component_name<component_registry>::call() + "]";
+                get_component_name<type_holder>() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
 
             if(!is_static)
@@ -98,6 +103,52 @@ namespace hpx { namespace components
             }
             return true;
         }
+
+        /// \brief Return the unique identifier of the component type this
+        ///        factory is responsible for
+        ///
+        /// \param locality     [in] The id of the locality this factory
+        ///                     is responsible for.
+        /// \param agas_client  [in] The AGAS client to use for component id
+        ///                     registration (if needed).
+        ///
+        /// \return Returns the unique identifier of the component type this
+        ///         factory instance is responsible for. This function throws
+        ///         on any error.
+        void register_component_type()
+        {
+            typedef typename Component::type_holder type_holder;
+
+            const char* name = components::get_component_name<type_holder>();
+            bool enabled = true;
+            hpx::util::runtime_configuration const& config = hpx::get_config();
+            std::string enabled_entry = config.get_entry(
+                std::string("hpx.components.") + name + ".enabled", "0");
+
+            boost::algorithm::to_lower (enabled_entry);
+            if (enabled_entry == "no" || enabled_entry == "false" ||
+                enabled_entry == "0")
+            {
+                LRT_(info) << "plugin factory disabled: " << name;
+                enabled = false;     // this component has been disabled
+            }
+
+            component_type type = components::get_component_type<type_holder>();
+            typedef typename Component::base_type_holder base_type_holder;
+            component_type base_type = components::get_component_type<base_type_holder>();
+            if (component_invalid == type)
+            {
+                // First call to get_component_type, ask AGAS for a unique id.
+                type = detail::get_agas_component_type(name,
+                    components::get_component_base_name<type_holder>(),
+                    base_type,
+                    enabled
+                );
+                components::set_component_type<type_holder>(type);
+            }
+            components::enabled(type) = enabled;
+            components::deleter(type) = &server::destroy<Component>;
+        }
     };
 }}
 
@@ -126,8 +177,6 @@ namespace hpx { namespace components
         componentname ## _component_registry_type;                            \
     HPX_REGISTER_COMPONENT_REGISTRY(                                          \
         componentname ## _component_registry_type, componentname)             \
-    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
-        componentname ## _component_registry_type, componentname)             \
     template struct hpx::components::component_registry<                      \
         ComponentType, state>;                                                \
 /**/
@@ -154,8 +203,6 @@ namespace hpx { namespace components
     typedef hpx::components::component_registry<ComponentType, state>         \
         componentname ## _component_registry_type;                            \
     HPX_REGISTER_COMPONENT_REGISTRY_DYNAMIC(                                  \
-        componentname ## _component_registry_type, componentname)             \
-    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
         componentname ## _component_registry_type, componentname)             \
     template struct hpx::components::component_registry<                      \
         ComponentType, state>;                                                \

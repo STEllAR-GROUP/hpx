@@ -69,7 +69,7 @@
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 namespace posix { namespace pth
 {
-    inline int check(int rc)
+    inline int check_(int rc)
     {
         // The makecontext() functions return zero for success, nonzero for
         // error. The Pth library returns TRUE for success, FALSE for error,
@@ -83,16 +83,17 @@ namespace posix { namespace pth
 #define HPX_COROUTINE_POSIX_IMPL "Pth implementation"
 #define HPX_COROUTINE_DECLARE_CONTEXT(name) pth_uctx_t name
 #define HPX_COROUTINE_CREATE_CONTEXT(ctx)                                     \
-    hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_create(&(ctx)))
+    hpx::threads::coroutines::detail::posix::pth::check_(pth_uctx_create(&(ctx)))
 #define HPX_COROUTINE_MAKE_CONTEXT(ctx, stack, size, startfunc, startarg, exitto) \
     /* const sigset_t* sigmask = nullptr: we don't expect per-context signal masks */ \
-    hpx::threads::coroutines::detail::posix::pth::check(                      \
-        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), nullptr,        \
+    hpx::threads::coroutines::detail::posix::pth::check_(                   \
+        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), nullptr,     \
         (startfunc), (startarg), (exitto)))
 #define HPX_COROUTINE_SWAP_CONTEXT(from, to)                                  \
-    hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_switch(*(from), *(to)))
+    hpx::threads::coroutines::detail::posix::pth::check_(                   \
+        pth_uctx_switch(*(from), *(to)))                                      \
 #define HPX_COROUTINE_DESTROY_CONTEXT(ctx)                                    \
-    hpx::threads::coroutines::detail::posix::pth::check(pth_uctx_destroy(ctx))
+    hpx::threads::coroutines::detail::posix::pth::check_(pth_uctx_destroy(ctx))
 
 #else // generic Posix platform (e.g. OS X >= 10.5)
 
@@ -266,10 +267,11 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
             }
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
 // heuristic value 1 kilobyte
 //
+
 #define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
 
             static void sigsegv_handler(int signum, siginfo_t *infoptr,

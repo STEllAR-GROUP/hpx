@@ -59,8 +59,10 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
     std::vector<int> d1(c1.size()); //-V656
-    std::iota(std::begin(c1), std::end(c1), std::rand());
-    std::iota(std::begin(c2), std::end(c2), std::rand());
+    std::iota(std::begin(c1), std::end(c1),
+        std::rand() % ((std::numeric_limits<int>::max)()/2));
+    std::iota(std::begin(c2), std::end(c2),
+        std::rand() % ((std::numeric_limits<int>::max)()/2));
 
     auto result =
         hpx::parallel::transform(policy,
@@ -95,8 +97,10 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
     std::vector<int> d1(c1.size()); //-V656
-    std::iota(std::begin(c1), std::end(c1), std::rand());
-    std::iota(std::begin(c2), std::end(c2), std::rand());
+    std::iota(std::begin(c1), std::end(c1),
+        std::rand() % ((std::numeric_limits<int>::max)()/2));
+    std::iota(std::begin(c2), std::end(c2),
+        std::rand() % ((std::numeric_limits<int>::max)()/2));
 
     auto f =
         hpx::parallel::transform(p,
