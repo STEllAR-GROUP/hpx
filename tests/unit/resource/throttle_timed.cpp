@@ -28,6 +28,14 @@ int hpx_main(int argc, char* argv[])
     hpx::threads::detail::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
+    // Enable elasticity
+    tp.set_scheduler_mode(
+        hpx::threads::policies::scheduler_mode(
+            hpx::threads::policies::do_background_work |
+            hpx::threads::policies::reduce_thread_priority |
+            hpx::threads::policies::delay_exit |
+            hpx::threads::policies::enable_elasticity));
+
     {
         // Check random scheduling with reducing resources.
         std::size_t thread_num = 0;

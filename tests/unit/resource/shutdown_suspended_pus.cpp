@@ -26,6 +26,14 @@ int hpx_main(int argc, char* argv[])
 
     HPX_TEST_EQ(hpx::threads::count(tp.get_used_processing_units()), std::size_t(4));
 
+    // Enable elasticity
+    tp.set_scheduler_mode(
+        hpx::threads::policies::scheduler_mode(
+            hpx::threads::policies::do_background_work |
+            hpx::threads::policies::reduce_thread_priority |
+            hpx::threads::policies::delay_exit |
+            hpx::threads::policies::enable_elasticity));
+
     // Remove all but one pu
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
     {

@@ -25,6 +25,15 @@ int hpx_main(int argc, char* argv[])
         hpx::resource::get_thread_pool("default");
 
     HPX_TEST_EQ(hpx::threads::count(tp.get_used_processing_units()), std::size_t(4));
+    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(4));
+
+    // Enable elasticity
+    tp.set_scheduler_mode(
+        hpx::threads::policies::scheduler_mode(
+            hpx::threads::policies::do_background_work |
+            hpx::threads::policies::reduce_thread_priority |
+            hpx::threads::policies::delay_exit |
+            hpx::threads::policies::enable_elasticity));
 
     {
         // Check number of used resources
