@@ -682,19 +682,16 @@ namespace hpx { namespace components { namespace server
 
         stop_evaluating_counters();
 
+        // wake up suspended pus
+        threads::threadmanager& tm = appl.get_thread_manager();
+        tm.resume();
+
         std::vector<naming::id_type> locality_ids = find_all_localities();
         std::size_t count = dijkstra_termination_detection(locality_ids);
 
         LRT_(info) << "runtime_support::shutdown_all: " //-V128
                       "passed first termination detection (count: "
                    << count << ").";
-
-        // wake up suspended pus
-        // TODO: Too early? Wakes up threads that should be suspended?
-        // After dijkstra_termination_detection is too late though,
-        // as that blocks until all work is done.
-        threads::threadmanager& tm = appl.get_thread_manager();
-        tm.resume();
 
         // execute registered shutdown functions on all localities
         invoke_shutdown_functions(locality_ids, true);
