@@ -361,9 +361,14 @@ namespace hpx { namespace util
     void runtime_configuration::load_components_static(std::vector<
         components::static_factory_load_data_type> const& static_modules)
     {
+        std::vector<std::shared_ptr<components::component_registry_base>> registries;
         for (components::static_factory_load_data_type const& d : static_modules)
         {
-            util::load_component_factory_static(*this, d.name, d.get_factory);
+            auto new_registries =
+                util::load_component_factory_static(*this, d.name, d.get_factory);
+            registries.reserve(registries.size() + new_registries.size());
+            std::copy(new_registries.begin(), new_registries.end(),
+                std::back_inserter(registries));
         }
 
         // read system and user ini files _again_, to allow the user to
@@ -381,6 +386,10 @@ namespace hpx { namespace util
 
         // invoke last reconfigure
         reconfigure();
+        for (auto& registry: registries)
+        {
+            registry->register_component_type();
+        }
     }
 
     // load information about dynamically discovered plugins

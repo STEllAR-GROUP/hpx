@@ -38,6 +38,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -62,7 +64,7 @@ namespace detail
     void intrusive_ptr_release(future_data_refcnt_base* p);
 
     ///////////////////////////////////////////////////////////////////////
-    struct future_data_refcnt_base
+    struct HPX_EXPORT future_data_refcnt_base
     {
     private:
         typedef util::unique_function_nonser<void()> completed_callback_type;
@@ -70,7 +72,7 @@ namespace detail
     public:
         typedef void has_future_data_refcnt_base;
 
-        virtual ~future_data_refcnt_base() {}
+        virtual ~future_data_refcnt_base();
 
         virtual void set_on_completed(completed_callback_type) = 0;
 
@@ -1049,5 +1051,7 @@ namespace hpx { namespace traits
 #endif
 #endif
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

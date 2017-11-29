@@ -85,7 +85,7 @@ void rnd_strings(std::vector<std::string> &V) {
 // --------------------------------------------------------------------
 // check that the array is sorted correctly
 template <class IA, typename Compare>
-int verify(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
+int verify_(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
     bool print)
 {
     if (A.size()<2) {
@@ -137,7 +137,7 @@ void test_sort1(ExPolicy && policy, T)
     hpx::parallel::sort(std::forward<ExPolicy>(policy), c);
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, std::less<T>(), elapsed, true) != 0);
+    bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
@@ -162,7 +162,7 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     hpx::parallel::sort(std::forward<ExPolicy>(policy), c, comp);
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -189,7 +189,7 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     f.get();
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -557,7 +557,7 @@ void test_sort2(ExPolicy && policy, T)
             c.begin(), c.end());
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, std::less<T>(), elapsed, true) != 0);
+    bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
@@ -581,7 +581,7 @@ void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
             c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -606,7 +606,7 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
     f.get();
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -631,7 +631,7 @@ void test_sort1(ExPolicy && policy, const std::string &)
             c.begin(), c.end());
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, std::less<std::string>(), elapsed, true) != 0);
+    bool is_sorted = (verify_(c, std::less<std::string>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
@@ -658,7 +658,7 @@ template <typename ExPolicy, typename Compare = std::less<std::string>>
             c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -686,7 +686,7 @@ template <typename ExPolicy, typename Compare = std::less<std::string>>
     f.get();
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 

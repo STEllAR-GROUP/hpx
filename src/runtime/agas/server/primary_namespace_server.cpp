@@ -19,7 +19,7 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/bind.hpp>
@@ -1057,12 +1057,8 @@ void primary_namespace::free_components_sync(
 { // {{{ free_components_sync implementation
     using hpx::util::get;
 
-    std::vector<lcos::future<void> > futures;
-
     ///////////////////////////////////////////////////////////////////////////
     // Delete the objects on the free list.
-    components::server::runtime_support::free_component_action act;
-
     for (free_entry const& e : free_list)
     {
         // Bail if we're in late shutdown and non-local.
@@ -1086,23 +1082,14 @@ void primary_namespace::free_components_sync(
             upper,
             e.gid_, e.gva_, e.locality_);
 
-        // Free the object directly, if local (this avoids creating another
-        // local promise via async which would create a snowball effect of
-        // free_component calls.
+        // Destroy the component.
+        HPX_ASSERT(e.locality_ == e.gva_.prefix);
+        naming::address addr(e.locality_, e.gva_.type, e.gva_.lva());
         if (e.locality_ == locality_)
-        {
-            get_runtime_support_ptr()->free_component(e.gva_, e.gid_, 1);
-        }
+            components::deleter(e.gva_.type)(e.gid_, std::move(addr));
         else
-        {
-            naming::id_type const target_locality(e.locality_
-              , naming::id_type::unmanaged);
-            futures.push_back(hpx::async(act, target_locality, e.gva_, e.gid_, 1));
-        }
+            components::server::destroy_component(e.gid_, addr);
     }
-
-    if (!futures.empty())
-        hpx::wait_all(futures);
 
     if (&ec != &throws)
         ec = make_success_code();

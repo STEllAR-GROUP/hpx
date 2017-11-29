@@ -10,6 +10,8 @@
 
 #include <hpx/util/assert.hpp>
 
+#include <vector>
+
 @_parcelport_export@
 namespace hpx { namespace parcelset
 {

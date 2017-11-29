@@ -17,10 +17,8 @@ using hpx::components::component_agas_component_namespace;
 
 using hpx::agas::server::component_namespace;
 
-HPX_REGISTER_COMPONENT(
-    hpx::components::fixed_component<component_namespace>,
-    component_namespace, hpx::components::factory_enabled)
-
+HPX_DEFINE_COMPONENT_NAME(component_namespace,
+    hpx_component_namespace);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     component_namespace, component_agas_component_namespace)
 

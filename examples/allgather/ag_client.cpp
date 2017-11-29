@@ -24,7 +24,7 @@ void test_allgather(std::size_t np)
 {
     // Get the component type for our point component.
     hpx::components::component_type block_type =
-        ag::server::allgather::get_component_type();
+        hpx::components::get_component_type<ag::server::allgather>();
 
     std::vector<hpx::id_type> localities =
         hpx::find_all_localities(block_type);
@@ -74,7 +74,7 @@ void test_allgather_and_gate(std::size_t np)
 {
     // Get the component type for our point component.
     hpx::components::component_type block_type =
-        ag::server::allgather_and_gate::get_component_type();
+        hpx::components::get_component_type<ag::server::allgather>();
 
     std::vector<hpx::naming::id_type> localities =
         hpx::find_all_localities(block_type);

@@ -43,7 +43,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (task == nullptr)
                 return;
-            task->check();
+            task->check_();
             delete task;
         }
     }
@@ -52,7 +52,7 @@ namespace hpx { namespace lcos { namespace local
     {
         if (!sorted) {
             std::sort(guards.begin(), guards.end());
-            (*guards.begin())->check();
+            (*guards.begin())->check_();
             sorted = true;
         }
     }
@@ -88,10 +88,10 @@ namespace hpx { namespace lcos { namespace local
     static void run_guarded(guard& g, detail::guard_task* task)
     {
         HPX_ASSERT(task != nullptr);
-        task->check();
+        task->check_();
         detail::guard_task* prev = g.task.exchange(task);
         if (prev != nullptr) {
-            prev->check();
+            prev->check_();
             detail::guard_task* zero = nullptr;
             if (!prev->next.compare_exchange_strong(zero, task)) {
                 run_composable(task);
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace local
             // continue processing.
             for (std::size_t k=0; k<n; k++) {
                 detail::guard_task* lt = sd->stages[k];
-                lt->check();
+                lt->check_();
                 HPX_ASSERT(!lt->single_guard);
                 zero = nullptr;
                 if (!lt->next.compare_exchange_strong(zero, lt)) {
@@ -151,7 +151,7 @@ namespace hpx { namespace lcos { namespace local
             return;
         } else if (n == 1) {
             run_guarded(*guards.guards[0], std::move(task));
-            guards.check();
+            guards.check_();
             return;
         }
         guards.sort();
@@ -185,7 +185,7 @@ namespace hpx { namespace lcos { namespace local
             // the next field, we halt processing on items queued
             // to this guard.
             HPX_ASSERT(task != nullptr);
-            task->check();
+            task->check_();
             if (!task->next.compare_exchange_strong(zero, task)) {
                 HPX_ASSERT(zero != nullptr);
                 run_composable(zero);
@@ -202,7 +202,7 @@ namespace hpx { namespace lcos { namespace local
         if(task == empty)
             return;
         HPX_ASSERT(task != nullptr);
-        task->check();
+        task->check_();
         if (task->single_guard) {
             run_composable_cleanup rcc(task);
             task->run();

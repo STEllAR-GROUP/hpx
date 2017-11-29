@@ -18,9 +18,8 @@ using hpx::components::component_agas_locality_namespace;
 
 using hpx::agas::server::locality_namespace;
 
-HPX_REGISTER_COMPONENT(
-    hpx::components::fixed_component<locality_namespace>,
-    locality_namespace, hpx::components::factory_enabled)
+HPX_DEFINE_COMPONENT_NAME(locality_namespace,
+    hpx_locality_namespace);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     locality_namespace, component_agas_locality_namespace)
 

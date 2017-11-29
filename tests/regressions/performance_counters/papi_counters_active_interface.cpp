@@ -58,7 +58,7 @@ int hpx_main(boost::program_options::variables_map&)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int check(int fd)
+int check_(int fd)
 {
     std::string out;
     std::vector<double> cnt;
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
     hpx::start(argc+1, opt);
 
     // Collect and process the output.
-    int rc = check(pipefd[0]);
+    int rc = check_(pipefd[0]);
 
     hpx::stop();
     return rc;

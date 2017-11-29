@@ -7,10 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#if defined(HPX_DEBUG)
 #include <hpx/runtime/components/component_type.hpp>
-#endif
-#include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>

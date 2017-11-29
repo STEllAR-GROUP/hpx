@@ -79,19 +79,22 @@ namespace boost
             vector<string> someline, lineorder;
 
             char_separator<char> sep("\n", "", boost::keep_empty_tokens);
-            tokenizer<char_separator<char> > tokens(contents, sep);
+            tokenizer<char_separator<char>> tokens(contents, sep);
             for (const auto& t : tokens) {
                 std::size_t rend = t.find_first_of("\r"), size = t.size();
                 if (rend == size - 1)
                 {
-                    someline.push_back(t);
+                    someline.push_back(t.substr(0, t.size() - 1));
                 }
                 else
                 {
                     char_separator<char> sep2("\r", "", boost::keep_empty_tokens);
-                    tokenizer<char_separator<char> > tokens2(t, sep2);
+                    tokenizer<char_separator<char>> tokens2(t, sep2);
                     for (const auto& u : tokens2) {
-                        someline.push_back(u);
+                        if (!u.empty() && u.back() == '\r')
+                            someline.push_back(u.substr(0, u.size() - 1));
+                        else
+                            someline.push_back(u);
                     }
                 }
             }

@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2017 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +16,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/is_component.hpp>
@@ -236,6 +238,43 @@ namespace hpx { namespace traits
             HPX_ASSERT(false);
         }
     };
+}}
+namespace hpx { namespace components {
+    namespace detail {
+        template <typename Result, typename RemoteResult>
+        struct component_heap_impl<
+            hpx::components::managed_component<hpx::lcos::base_lco_with_value<
+                Result, RemoteResult, traits::detail::managed_component_tag>>>
+        {
+            typedef void valid;
+            typedef hpx::components::managed_component<hpx::lcos::base_lco_with_value<
+                Result, RemoteResult, traits::detail::managed_component_tag>>
+                component_type;
+            HPX_ALWAYS_EXPORT static typename component_type::heap_type& call()
+            {
+                util::reinitializable_static<typename component_type::heap_type>
+                    heap;
+                return heap.get();
+            }
+        };
+        template <typename Result, typename RemoteResult>
+        struct component_heap_impl<
+            hpx::components::managed_component<hpx::lcos::base_lco_with_value<
+                Result, RemoteResult, traits::detail::component_tag>>>
+        {
+            typedef void valid;
+            typedef hpx::components::managed_component<hpx::lcos::base_lco_with_value<
+                Result, RemoteResult, traits::detail::component_tag>>
+                component_type;
+            HPX_ALWAYS_EXPORT static
+            typename component_type::heap_type& call()
+            {
+                util::reinitializable_static<typename component_type::heap_type>
+                    heap;
+                return heap.get();
+            }
+        };
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -51,9 +51,6 @@ namespace hpx { namespace performance_counters
             base_type_holder::finalize();
             base_type::finalize();
         }
-
-        using base_type::get_component_type;
-        using base_type::set_component_type;
     };
 }}
 

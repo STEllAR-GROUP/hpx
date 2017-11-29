@@ -47,6 +47,13 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     mask_cref_type thread_pool_base::get_used_processing_units() const
     {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            return used_processing_units_;
+        }
+
+        // FIXME: this is broken as the function returns a reference allowing
+        // to access the value of the mask without it being guarded.
         std::lock_guard<pu_mutex_type> l(used_processing_units_mtx_);
         return used_processing_units_;
     }

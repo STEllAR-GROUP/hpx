@@ -12,6 +12,7 @@
 #include <hpx/util/one_size_heap_list.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <iostream>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,7 +20,7 @@ namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    template <typename Heap, typename Mutex = lcos::local::spinlock>
+    template <typename Heap>
     class wrapper_heap_list : public util::one_size_heap_list
     {
         typedef util::one_size_heap_list base_type;
@@ -40,11 +41,12 @@ namespace hpx { namespace components { namespace detail
         };
 
     public:
-        wrapper_heap_list(component_type type)
-          : base_type(get_component_type_name(type),
+        wrapper_heap_list()
+          : base_type(get_component_type_name(
+                get_component_type<typename value_type::wrapped_type>()),
                 base_type::heap_parameters{heap_capacity, heap_element_alignment,
                 heap_element_size}, (Heap*) nullptr)
-          , type_(type)
+          , type_(get_component_type<typename value_type::wrapped_type>())
         {}
 
         ///

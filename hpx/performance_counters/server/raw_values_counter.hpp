@@ -46,15 +46,6 @@ namespace hpx { namespace performance_counters { namespace server
             base_type::finalize();
         }
 
-        static components::component_type get_component_type()
-        {
-            return base_type::get_component_type();
-        }
-        static void set_component_type(components::component_type t)
-        {
-            base_type::set_component_type(t);
-        }
-
     private:
         hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f_;
         bool reset_;
