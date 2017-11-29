@@ -27,9 +27,10 @@
 //
 int HPX_CDECL main(int argc, char** argv)
 {
-    // allow for unknown options
+    // allow for unknown options and inhibit aliasing of short options
     std::vector<std::string> const cfg = {
-        "hpx.commandline.allow_unknown=1"
+        "hpx.commandline.allow_unknown=1",
+        "hpx.commandline.aliasing=0"
     };
 
     return hpx::init(argc, argv, cfg);

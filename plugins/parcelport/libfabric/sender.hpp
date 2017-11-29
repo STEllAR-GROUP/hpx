@@ -95,7 +95,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // @TODO: unused, but required by the parcelport interface
-        void verify(parcelset::locality const & parcel_locality_id) const {}
+        void verify_(parcelset::locality const & parcel_locality_id) const {}
 
         // --------------------------------------------------------------------
         // The main message send routine : package the header, send it

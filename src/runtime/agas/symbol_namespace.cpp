@@ -25,9 +25,8 @@ using hpx::components::component_agas_symbol_namespace;
 
 using hpx::agas::server::symbol_namespace;
 
-HPX_REGISTER_COMPONENT(
-    hpx::components::fixed_component<symbol_namespace>,
-    symbol_namespace, hpx::components::factory_enabled)
+HPX_DEFINE_COMPONENT_NAME(symbol_namespace,
+    hpx_symbol_namespace);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     symbol_namespace, component_agas_symbol_namespace)
 
@@ -121,7 +120,7 @@ namespace hpx { namespace agas {
     {
         return naming::address(
             hpx::get_locality(),
-            server::symbol_namespace::get_component_type(),
+            components::component_agas_symbol_namespace,
             this->ptr()
         );
     }

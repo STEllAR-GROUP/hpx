@@ -29,7 +29,7 @@
 #include <stdexcept>
 #include <sys/param.h>
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
 #include <signal.h>
 #include <stdlib.h>
@@ -156,7 +156,7 @@ namespace hpx { namespace threads { namespace coroutines
 
             x86_linux_context_impl()
                 : m_stack(nullptr)
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             {
 
                 // concept inspired by the following links:
@@ -228,7 +228,7 @@ namespace hpx { namespace threads { namespace coroutines
                 }
 #endif
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
                 segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
                 segv_stack.ss_flags = 0;
                 segv_stack.ss_size = SEGV_STACK_SIZE;
@@ -243,7 +243,7 @@ namespace hpx { namespace threads { namespace coroutines
 #endif
             }
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             static void sigsegv_handler(int signum, siginfo_t *info,
                 void *data)
             {
@@ -420,7 +420,7 @@ namespace hpx { namespace threads { namespace coroutines
             std::ptrdiff_t m_stack_size;
             void* m_stack;
 
-#if defined(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             struct sigaction action;
             stack_t segv_stack;
 #endif

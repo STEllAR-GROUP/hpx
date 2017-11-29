@@ -449,16 +449,16 @@ void register_worker(registration_header const& header)
 //     agas_client.bind_local(symbol_ns_gid, symbol_ns_address);
 
     naming::address locality_addr(hpx::get_locality(),
-        server::locality_namespace::get_component_type(),
+        hpx::components::component_agas_locality_namespace,
             agas_client.locality_ns_->ptr());
     naming::address primary_addr(hpx::get_locality(),
-        server::primary_namespace::get_component_type(),
+        hpx::components::component_agas_primary_namespace,
             agas_client.primary_ns_.ptr());
     naming::address component_addr(hpx::get_locality(),
-        server::component_namespace::get_component_type(),
+        hpx::components::component_agas_component_namespace,
             agas_client.component_ns_->ptr());
     naming::address symbol_addr(hpx::get_locality(),
-        server::symbol_namespace::get_component_type(),
+        hpx::components::component_agas_symbol_namespace,
             agas_client.symbol_ns_.ptr());
 
     // assign cores to the new locality

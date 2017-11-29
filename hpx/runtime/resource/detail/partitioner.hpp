@@ -233,6 +233,9 @@ namespace hpx { namespace resource { namespace detail
         // store policy flags determining the general behavior of the
         // resource_partitioner
         resource::partitioner_mode mode_;
+
+        // topology information
+        threads::topology& topo_;
     };
 }}}
 

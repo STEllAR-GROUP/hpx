@@ -68,6 +68,9 @@ namespace hpx { namespace threads { namespace executors
             void add_no_count(closure_type&& f);
             void thread_wrapper(closure_type&& f);
 
+            // detaches this object from the underlying thread pool object
+            void detach();
+
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(
@@ -79,6 +82,7 @@ namespace hpx { namespace threads { namespace executors
             mutex_type mtx_;
             hpx::util::atomic_count task_count_;
             compat::condition_variable shutdown_cv_;
+            bool blocking_;
         };
     }
 
@@ -179,4 +183,4 @@ namespace hpx { namespace threads { namespace executors
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif /*HPX_RUNTIME_THREADS_EXECUTORS_SERVICE_EXECUTOR_HPP*/
+#endif /* HPX_RUNTIME_THREADS_EXECUTORS_SERVICE_EXECUTOR_HPP */

@@ -71,12 +71,10 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \param rng2         Refers to the second range of elements the algorithm
     ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param comp         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is an
-    ///                     binary compicate which returns \a true if the first
-    ///                     argument is less than the second. The signature of
-    ///                     this compicate should be equivalent to:
+    /// \param comp         \a comp is a callable object which returns true if
+    ///                     the first argument is less than the second,
+    ///                     and false otherwise. The signature of this
+    ///                     comparison should be equivalent to:
     ///                     \code
     ///                     bool comp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -152,7 +150,107 @@ namespace hpx { namespace parallel { inline namespace v1
             std::forward<Proj1>(proj1),
             std::forward<Proj2>(proj2));
     }
-    /// \endcond
+
+    // TODO: Support bidirectional iterator. (#2826)
+    // For now, only support random access iterator.
+    /// Merges two consecutive sorted ranges [first, middle) and
+    /// [middle, last) into one sorted range [first, last). The order of
+    /// equivalent elements in the each of original two ranges is preserved.
+    /// For equivalent elements in the original two ranges, the elements from
+    /// the first range precede the elements from the second range.
+    ///
+    /// \note   Complexity: Performs O(std::distance(first, last))
+    ///         applications of the comparison \a comp and the each projection.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an random access iterator.
+    /// \tparam RandIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a inplace_merge requires \a Comp
+    ///                     to meet the requirements of \a CopyConstructible.
+    ///                     This defaults to std::less<>
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the range of elements the algorithm
+    ///                     will be applied to.
+    /// \param middle       Refers to the end of the first sorted range and
+    ///                     the beginning of the second sorted range
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the second sorted range
+    ///                     the algorithm will be applied to.
+    /// \param comp         \a comp is a callable object which returns true if
+    ///                     the first argument is less than the second,
+    ///                     and false otherwise. The signature of this
+    ///                     comparison should be equivalent to:
+    ///                     \code
+    ///                     bool comp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be
+    ///                     such that objects of types \a RandIter can be
+    ///                     dereferenced and then implicitly converted to both
+    ///                     \a Type1 and \a Type2
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a inplace_merge algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a inplace_merge algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a inplace_merge algorithm returns a
+    ///           \a hpx::future<RandIter> if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy
+    ///           and returns \a RandIter otherwise.
+    ///           The \a inplace_merge algorithm returns
+    ///           the source iterator \a last
+    ///
+    template <typename ExPolicy,
+        typename Rng, typename RandIter,
+        typename Comp = detail::less,
+        typename Proj = util::projection_identity,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_range<Rng>::value &&
+        hpx::traits::is_iterator<RandIter>::value &&
+        traits::is_projected_range<Proj, Rng>::value &&
+        traits::is_projected<Proj, RandIter>::value &&
+        traits::is_indirect_callable<
+            ExPolicy, Comp,
+            traits::projected_range<Proj, Rng>,
+            traits::projected_range<Proj, Rng>
+        >::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy, RandIter
+    >::type
+    inplace_merge(ExPolicy && policy,
+        Rng && rng, RandIter middle,
+        Comp && comp = Comp(), Proj && proj = Proj())
+    {
+        return inplace_merge(std::forward<ExPolicy>(policy),
+            hpx::util::begin(rng), middle, hpx::util::end(rng),
+            std::forward<Comp>(comp),
+            std::forward<Proj>(proj));
+    }
 }}}
 
 #endif

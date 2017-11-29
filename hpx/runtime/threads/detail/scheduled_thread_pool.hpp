@@ -259,10 +259,11 @@ namespace hpx { namespace threads { namespace detail
 
         // Provide the given processing unit to the scheduler.
         void add_processing_unit(std::size_t virt_core,
-            std::size_t thread_num, error_code&);
+            std::size_t thread_num, error_code&  = hpx::throws);
 
         // Remove the given processing unit from the scheduler.
-        void remove_processing_unit(std::size_t virt_core, error_code&);
+        void remove_processing_unit(
+            std::size_t virt_core, error_code& = hpx::throws);
 
         // Suspend the given processing unit on the scheduler.
         void suspend_processing_unit(std::size_t virt_core, error_code&);
@@ -277,7 +278,9 @@ namespace hpx { namespace threads { namespace detail
     protected:
         friend struct init_tss_helper<Scheduler>;
 
-        void add_processing_unit(std::size_t virt_core,
+        void remove_processing_unit_internal(
+            std::size_t virt_core, error_code& = hpx::throws);
+        void add_processing_unit_internal(std::size_t virt_core,
             std::size_t thread_num, std::shared_ptr<compat::barrier> startup,
             error_code& ec = hpx::throws);
 

@@ -316,9 +316,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(std::exception_ptr e, error_code& ec = throws)
         {
-            base_type::set_exception(e, ec);
+            base_type::set_exception(std::move(e), ec);
         }
     };
 
@@ -412,9 +412,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(std::exception_ptr e, error_code& ec = throws)
         {
-            base_type::set_exception(e, ec);
+            base_type::set_exception(std::move(e), ec);
         }
     };
 
@@ -510,9 +510,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr const& e, error_code& ec = throws)
+        void set_exception(std::exception_ptr e, error_code& ec = throws)
         {
-            base_type::set_exception(e, ec);
+            base_type::set_exception(std::move(e), ec);
         }
     };
 

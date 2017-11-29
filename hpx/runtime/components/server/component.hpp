@@ -20,14 +20,14 @@ namespace hpx { namespace components {
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Component>
-        struct simple_heap_factory
+        struct simple_heap
         {
-            static void* alloc(std::size_t count)
+            void* alloc(std::size_t count)
             {
                 HPX_ASSERT(1 == count);
                 return ::operator new(sizeof(Component));
             }
-            static void free(void* p, std::size_t count)
+            void free(void* p, std::size_t count)
             {
                 HPX_ASSERT(1 == count);
                 ::operator delete(p);
@@ -43,7 +43,7 @@ namespace hpx { namespace components {
         typedef Component type_holder;
         typedef component<Component> component_type;
         typedef component_type derived_type;
-        typedef detail::simple_heap_factory<component_type> heap_type;
+        typedef detail::simple_heap<Component> heap_type;
 
         /// \brief Construct a simple_component instance holding a new wrapped
         ///        instance
@@ -51,25 +51,6 @@ namespace hpx { namespace components {
         component(Ts&&... vs)
           : Component(std::forward<Ts>(vs)...)
         {}
-
-        /// \brief  The function \a create is used for allocation and
-        ///         initialization of instances of the derived components.
-        static component_type* create(std::size_t count)
-        {
-            // simple components can be created individually only
-            HPX_ASSERT(1 == count);
-            return new component_type();    //-V572
-        }
-
-        /// \brief  The function \a destroy is used for destruction and
-        ///         de-allocation of instances of the derived components.
-        static void destroy(Component* p, std::size_t count = 1)
-        {
-            // simple components can be deleted individually only
-            HPX_ASSERT(1 == count);
-            p->finalize();
-            delete p;
-        }
     };
 }}
 

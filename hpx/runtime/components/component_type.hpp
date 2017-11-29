@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c)      2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +9,16 @@
 #define HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/atomic_count.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp/strip_parens.hpp>
+#include <hpx/util/detail/pp/cat.hpp>
+#include <hpx/util/detail/pp/expand.hpp>
+#include <hpx/util/detail/pp/nargs.hpp>
+#include <hpx/util/detail/pp/stringize.hpp>
 
 #include <cstdint>
 #include <string>
@@ -18,7 +26,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-    typedef std::int32_t component_type;
+    // declared in naming_fwd.hpp
+    // typedef std::int32_t component_type;
 
     enum component_enum_type
     {
@@ -79,6 +88,12 @@ namespace hpx { namespace components
         factory_disabled = 1,
         factory_check    = 2
     };
+
+    HPX_EXPORT bool& enabled(component_type type);
+    HPX_EXPORT util::atomic_count& instance_count(component_type type);
+    typedef void(*component_deleter_type)(
+        hpx::naming::gid_type const&, hpx::naming::address const&);
+    HPX_EXPORT component_deleter_type& deleter(component_type type);
 
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(component_type type);
@@ -151,18 +166,33 @@ namespace hpx { namespace components
         return false;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
-    inline component_type get_component_type()
-    {
-        return traits::component_type_database<Component>::get();
+    namespace detail {
+        // Resolve the type from AGAS
+        HPX_EXPORT component_type get_agas_component_type(
+            const char* name, const char* base_name, component_type, bool);
     }
+
+    // Returns the (unique) name for a given component
+    template <typename Component, typename Enable = void>
+    const char* get_component_name();
+
+    // Returns the (unique) name of the base component. If there is none,
+    // nullptr is returned
+    template <typename Component, typename Enable = void>
+    const char* get_component_base_name();
 
     template <typename Component>
     inline void set_component_type(component_type type)
     {
         traits::component_type_database<Component>::set(type);
     }
+
+    template <typename Component>
+    inline component_type get_component_type()
+    {
+        return traits::component_type_database<Component>::get();
+    }
+
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,6 +232,7 @@ namespace hpx { namespace components
 #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
     namespace hpx { namespace traits                                          \
     {                                                                         \
+        typedef void static_;                                                 \
         template <> HPX_ALWAYS_EXPORT                                         \
         components::component_type component_type_database< component>::get() \
             { return type; }                                                  \
@@ -209,6 +240,45 @@ namespace hpx { namespace components
         void component_type_database< component>::set(components::component_type)\
             { HPX_ASSERT(false); }                                            \
     }}                                                                        \
+/**/
+
+#define HPX_DEFINE_COMPONENT_NAME(...)                                        \
+    HPX_DEFINE_COMPONENT_NAME_(__VA_ARGS__)                                   \
+
+#define HPX_DEFINE_COMPONENT_NAME_(...)                                       \
+    HPX_PP_EXPAND(HPX_PP_CAT(                                                 \
+        HPX_DEFINE_COMPONENT_NAME_, HPX_PP_NARGS(__VA_ARGS__)                 \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_DEFINE_COMPONENT_NAME_2(Component, name)                          \
+namespace hpx { namespace components {                                        \
+    template <> HPX_ALWAYS_EXPORT                                             \
+    const char* get_component_name< Component, void>()                        \
+    {                                                                         \
+        return HPX_PP_STRINGIZE(name);                                        \
+    }                                                                         \
+    template <> HPX_ALWAYS_EXPORT                                             \
+    const char* get_component_base_name< Component, void>()                   \
+    {                                                                         \
+        return nullptr;                                                       \
+    }                                                                         \
+}}                                                                            \
+/**/
+
+#define HPX_DEFINE_COMPONENT_NAME_3(Component, name, base_name)               \
+namespace hpx { namespace components {                                        \
+    template <> HPX_ALWAYS_EXPORT                                             \
+    const char* get_component_name< Component, void>()                        \
+    {                                                                         \
+        return HPX_PP_STRINGIZE(name);                                        \
+    }                                                                         \
+    template <> HPX_ALWAYS_EXPORT                                             \
+    const char* get_component_base_name< Component, void>()                   \
+    {                                                                         \
+        return base_name;                                                     \
+    }                                                                         \
+}}                                                                            \
 /**/
 
 #endif /*HPX_RUNTIME_COMPONENTS_COMPONENT_TYPE_HPP*/

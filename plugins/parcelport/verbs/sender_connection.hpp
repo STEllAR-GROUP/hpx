@@ -62,7 +62,7 @@ namespace verbs
             return snd_buffer_type(snd_data_type(chunk_pool_), chunk_pool_);
         }
 
-        void verify(parcelset::locality const & parcel_locality_id) const
+        void verify_(parcelset::locality const & parcel_locality_id) const
         {
         }
 

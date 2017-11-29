@@ -161,17 +161,17 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-  set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT OFF)
+  set(HPX_WITH_STACKOVERFLOW_DETECTION_DEFAULT OFF)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UC)
   if("${CMAKE_BUILD_TYPE_UC}" STREQUAL "DEBUG")
-    set(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT ON)
+    set(HPX_WITH_STACKOVERFLOW_DETECTION_DEFAULT ON)
   endif()
-  hpx_option(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION
+  hpx_option(HPX_WITH_STACKOVERFLOW_DETECTION
     BOOL
     "Enable stackoverflow detection for HPX threads/coroutines. (default: OFF, debug: ON)"
-    ${HPX_WITH_THREAD_STACKOVERFLOW_DETECTION_DEFAULT} ADVANCED)
-  if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
-    hpx_add_config_define(HPX_HAVE_THREAD_STACKOVERFLOW_DETECTION)
+    ${HPX_WITH_STACKOVERFLOW_DETECTION_DEFAULT} ADVANCED)
+  if(HPX_WITH_STACKOVERFLOW_DETECTION)
+    hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION)
   endif()
 endif()
 
@@ -185,11 +185,6 @@ hpx_option(HPX_WITH_HWLOC
   BOOL
   "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
   ON ADVANCED)
-
-hpx_option(HPX_WITH_STACKOVERFLOW_DETECTION
-  BOOL
-  "Enable Stack Overflow Detection (default: OFF)"
-  OFF ADVANCED)
 
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
@@ -1419,6 +1414,8 @@ else()
     # Uninitialized variables are bad, earlier compilers issue spurious warnings
     hpx_add_compile_flag_if_available(-Werror=uninitialized LANGUAGES CXX C)
     hpx_add_compile_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C)
+    # -Werror=maybe-uninitialized leads to false positives.
+    hpx_add_compile_flag_if_available(-Wno-maybe-uninitialized LANGUAGES CXX C)
   endif()
 
   # Silence warning about __sync_fetch_and_nand changing semantics
@@ -1518,18 +1515,6 @@ if(HPX_WITH_HWLOC)
   hpx_libraries(${HWLOC_LIBRARIES})
   include_directories(${HWLOC_INCLUDE_DIR})
   hpx_add_config_define(HPX_HAVE_HWLOC)
-endif()
-
-hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION "\"${HPX_WITH_STACKOVERFLOW_DETECTION}\"")
-
-if(HPX_WITH_STACKOVERFLOW_DETECTION)
-  find_package(LibSigSegv)
-  if(NOT LIBSIGSEGV_FOUND)
-    hpx_error("LibSigSegv could not be found and HPX_WITH_STACKOVERFLOW_DETECTION=ON, please specify LIBSIGSEGV_ROOT to point to the correct location or set HPX_WITH_STACKOVERFLOW_DETECTION to OFF")
-  endif()
-  hpx_libraries(${LIBSIGSEGV_LIBRARIES})
-  include_directories(${LIBSIGSEGV_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_STACKOVERFLOW_DETECTION)
 endif()
 
 ################################################################################

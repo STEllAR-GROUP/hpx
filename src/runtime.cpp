@@ -13,7 +13,6 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -1089,20 +1088,6 @@ namespace hpx
         if (std::size_t(-1) !=
             rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
             return numa_sensitive;
-        return false;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    bool keep_factory_alive(components::component_type type)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr != rt)
-            return rt->keep_factory_alive(type);
-
-        HPX_THROW_EXCEPTION(
-            invalid_status,
-            "hpx::keep_factory_alive",
-            "the runtime system has not been initialized yet");
         return false;
     }
 

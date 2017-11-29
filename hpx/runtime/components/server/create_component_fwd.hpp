@@ -10,29 +10,32 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/unique_function.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     /// Create arrays of components using their default constructor
-    template <typename Component>
-    naming::gid_type create(std::size_t count);
+    template <typename Component, typename...Ts>
+    naming::gid_type create(Ts&&...ts);
 
-    template <typename Component>
-    naming::gid_type create(
-        util::unique_function_nonser<void(void*)> const& ctor);
+    template <typename Component, typename...Ts>
+    naming::gid_type create_migrated(naming::gid_type const& gid, void** p,
+        Ts&&...ts);
 
-    template <typename Component>
-    naming::gid_type create(naming::gid_type const& gid,
-        util::unique_function_nonser<void(void*)> const& ctor, void** p);
+    template <typename Component, typename...Ts>
+    std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&...ts);
 
-    template <typename Component, typename ...Ts>
-    naming::gid_type create_with_args(Ts&&... ts);
+    template <typename Component, typename...Ts>
+    inline naming::gid_type construct(Ts&&...ts)
+    {
+        return create<Component>(std::forward<Ts>(ts)...);
+    }
 }}}
 
 #endif

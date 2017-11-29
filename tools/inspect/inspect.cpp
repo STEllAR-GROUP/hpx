@@ -204,15 +204,15 @@ namespace
 
 //   string info( const fs::path & inspect_root )
 //   {
-//     svn_check check(inspect_root);
+//     svn_check check_(inspect_root);
 //
 // #if !INSPECT_USE_BOOST_TEST
-//     check();
+//     check_();
 // #else
 //
 //     try {
 //       boost::execution_monitor e;
-//       e.execute(nullary_function_ref<svn_check, int>(check));
+//       e.execute(nullary_function_ref<svn_check, int>(check_));
 //     }
 //     catch(boost::execution_exception const& e) {
 //       if (e.code() == boost::execution_exception::system_error) {
@@ -314,7 +314,7 @@ namespace
 
 //  check  -------------------------------------------------------------------//
 
-  void check( const string & lib,
+  void check_( const string & lib,
     const path & pth, const string & content, const inspector_list & insp_list )
   {
     // invoke each inspector
@@ -345,7 +345,7 @@ namespace
         if ( visit_predicate( *itr ) )
         {
           string cur_lib( boost::inspect::impute_library( *itr ) );
-          check( cur_lib, *itr, "", insps );
+          check_( cur_lib, *itr, "", insps );
           visit_all<DirectoryIterator>( cur_lib, *itr, insps );
         }
       }
@@ -355,7 +355,7 @@ namespace
         string content;
         load_content( *itr, content );
         if (content.find(hpx_no_inspect) == string::npos)
-          check( lib.empty() ? library_from_content( content ) : lib,
+          check_( lib.empty() ? library_from_content( content ) : lib,
                  *itr, content, insps );
       }
     }

@@ -35,7 +35,7 @@ void sort_benchmark()
         hpx::parallel::sort(execution::par, c.begin(), c.end());
         double elapsed = t.elapsed();
 
-        bool is_sorted = (verify(c, std::less<double>(), elapsed, true)!=0);
+        bool is_sorted = (verify_(c, std::less<double>(), elapsed, true)!=0);
         HPX_TEST(is_sorted);
         if (is_sorted) {
             std::cout << "<DartMeasurement name=\"SortDoublesTime\" \n"

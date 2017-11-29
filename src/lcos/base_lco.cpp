@@ -9,6 +9,7 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <cstddef>
@@ -82,7 +83,10 @@ HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::connect_action,
 HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::disconnect_action,
     base_disconnect_action, hpx::actions::base_disconnect_action_id)
 
+HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<hpx::lcos::base_lco>)
+
 ///////////////////////////////////////////////////////////////////////////////
+HPX_DEFINE_COMPONENT_NAME(hpx::lcos::base_lco, hpx_lcos_base_lco);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco, hpx::components::component_base_lco)
 

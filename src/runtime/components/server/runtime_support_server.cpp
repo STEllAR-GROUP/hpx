@@ -20,14 +20,14 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/components/component_factory_base.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
+#include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
@@ -80,10 +80,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
 HPX_REGISTER_ACTION_ID(
-    hpx::components::server::runtime_support::bulk_create_components_action,
-    bulk_create_components_action,
-    hpx::actions::bulk_create_components_action_id)
-HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::create_memory_block_action,
     create_memory_block_action,
     hpx::actions::create_memory_block_action_id)
@@ -99,10 +95,6 @@ HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
     call_shutdown_functions_action,
     hpx::actions::call_shutdown_functions_action_id)
-HPX_REGISTER_ACTION_ID(
-    hpx::components::server::runtime_support::free_component_action,
-    free_component_action,
-    hpx::actions::free_component_action_id)
 HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::shutdown_action,
     shutdown_action,
@@ -124,10 +116,6 @@ HPX_REGISTER_ACTION_ID(
     get_config_action,
     hpx::actions::get_config_action_id)
 HPX_REGISTER_ACTION_ID(
-    hpx::components::server::runtime_support::update_agas_cache_entry_action,
-    update_agas_cache_entry_action,
-    hpx::actions::update_agas_cache_entry_action_id)
-HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action,
     hpx::actions::garbage_collect_action_id)
@@ -135,10 +123,6 @@ HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::create_performance_counter_action,
     create_performance_counter_action,
     hpx::actions::create_performance_counter_action_id)
-HPX_REGISTER_ACTION_ID(
-    hpx::components::server::runtime_support::get_instance_count_action,
-    get_instance_count_action,
-    hpx::actions::get_instance_count_action_id)
 HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action,
@@ -149,6 +133,8 @@ HPX_REGISTER_ACTION_ID(
     hpx::actions::dijkstra_termination_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
+HPX_DEFINE_COMPONENT_NAME(hpx::components::server::runtime_support,
+    hpx_runtime_support);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::runtime_support,
     hpx::components::component_runtime_support)
@@ -290,45 +276,6 @@ namespace hpx { namespace components { namespace server
         modules_(cfg.modules())
     {}
 
-    /// \brief Action to create N new default constructed components
-    std::vector<naming::gid_type> runtime_support::bulk_create_components(
-        components::component_type type, std::size_t count)
-    {
-        // locate the factory for the requested component type
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-
-        std::vector<naming::gid_type> ids;
-
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end() || !(*it).second.first) {
-            // we don't know anything about this component
-            std::ostringstream strm;
-            strm << "attempt to create component instance of invalid/unknown type: "
-                 << components::get_component_type_name(type);
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::bulk_create_components",
-                strm.str());
-            return ids;
-        }
-
-        l.unlock();
-
-    // create new component instance
-        std::shared_ptr<component_factory_base> factory((*it).second.first);
-
-        ids.reserve(count);
-        for (std::size_t i = 0; i < count; ++i)
-            ids.push_back(factory->create());
-
-    // log result if requested
-        LRT_(info) << "successfully created " << count << " components " //-V128
-                    << " of type: "
-                    << components::get_component_type_name(type);
-        return ids;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a memory block
     // FIXME: error code?
@@ -353,131 +300,6 @@ namespace hpx { namespace components { namespace server
             strm.str());
 
         return naming::invalid_gid;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // delete an existing instance of a component
-    void runtime_support::free_component(
-        agas::gva const& g, naming::gid_type const& gid, std::uint64_t count)
-    {
-        // Special case: component_memory_block.
-        if (g.type == components::component_memory_block) {
-            for (std::size_t i = 0; i != count; ++i)
-            {
-                naming::gid_type target = gid + i;
-
-                // make sure this component is located here
-                if (get_locality() != g.prefix)
-                {
-                    // FIXME: should the component be re-bound ?
-                    std::ostringstream strm;
-                    strm << "global id " << target << " is not bound to any "
-                            "local component instance";
-
-                    // FIXME: If this throws then we leak the rest of count.
-                    // What should we do instead?
-                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                        "runtime_support::free_component",
-                        strm.str());
-                    return;
-                }
-
-                // free the memory block
-                components::server::memory_block::destroy(
-                    reinterpret_cast<components::server::memory_block*>(
-                        g.lva(target, gid)));
-
-                LRT_(info) << "successfully destroyed memory block " << target;
-            }
-
-            return;
-        }
-        else if (naming::refers_to_virtual_memory(gid))
-        {
-            // simply delete the memory
-            delete [] reinterpret_cast<std::uint8_t*>(gid.get_lsb());
-            return;
-        }
-
-        // locate the factory for the requested component type
-        std::shared_ptr<component_factory_base> factory;
-
-        {
-            std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-            component_map_type::const_iterator it = components_.find(g.type);
-            if (it == components_.end()) {
-                // we don't know anything about this component
-                std::ostringstream strm;
-
-                naming::resolver_client& client = naming::get_agas_client();
-                error_code ec(lightweight);
-                strm << "attempt to destroy component "
-                     << gid
-                     << " of invalid/unknown type: "
-                     << components::get_component_type_name(g.type)
-                     << " ("
-                     << client.get_component_type_name(g.type, ec)
-                     << ")" << std::endl;
-
-                strm << "list of registered components: \n";
-                component_map_type::iterator end = components_.end();
-                for (component_map_type::iterator cit = components_.begin();
-                    cit!= end; ++cit)
-                {
-                    strm << "  "
-                         << components::get_component_type_name((*cit).first)
-                         << " ("
-                         << client.get_component_type_name((*cit).first, ec)
-                         << ")" << std::endl;
-                }
-
-                l.unlock();
-                HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                    "runtime_support::free_component",
-                    strm.str());
-                return;
-            }
-
-            factory = (*it).second.first;
-        }
-
-        // we might end up with the same address, so cache the already deleted
-        // ones here.
-#if defined(HPX_DEBUG)
-        std::vector<naming::address> freed_components;
-        freed_components.reserve(std::size_t(count));
-#endif
-
-        for (std::size_t i = 0; i != count; ++i)
-        {
-            naming::gid_type target(gid + i);
-            naming::address addr(g.prefix, g.type, g.lva(target, gid));
-
-#if defined(HPX_DEBUG)
-            bool found = false;
-            for (naming::address const& a : freed_components)
-            {
-                if(a == addr)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            HPX_ASSERT(!found);
-#endif
-            // FIXME: If this throws then we leak the rest of count.
-            // What should we do instead?
-
-            // destroy the component instance
-            factory->destroy(target, addr);
-
-            LRT_(info) << "successfully destroyed component " << (gid + i)
-                << " of type: " << components::get_component_type_name(g.type);
-
-#if defined(HPX_DEBUG)
-            freed_components.push_back(std::move(addr));
-#endif
-        }
     }
 
     // function to be called during shutdown
@@ -959,15 +781,6 @@ namespace hpx { namespace components { namespace server
         return *(get_runtime().get_config().get_section("application"));
     }
 
-    /// \brief Insert the given name mapping into the AGAS cache of this
-    ///        locality.
-    void runtime_support::update_agas_cache_entry(naming::gid_type const& gid,
-        naming::address const& addr, std::uint64_t count,
-        std::uint64_t offset)
-    {
-        naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Force a garbage collection operation in the AGAS layer.
     void runtime_support::garbage_collect()
@@ -994,56 +807,10 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::tidy()
     {
-        std::lock_guard<component_map_mutex_type> l(cm_mtx_);
-
         // Only after releasing the components we are allowed to release
         // the modules. This is done in reverse order of loading.
-        component_map_type::iterator end = components_.end();
-        for (component_map_type::iterator it = components_.begin(); it != end; /**/)
-        {
-            component_map_type::iterator curr = it;
-            ++it;
-            if ((*curr).second.first)
-            {
-                // this is a workaround for sloppy memory management...
-                // keep module in memory until application terminated
-                if (!(*curr).second.first->may_unload())
-                    (*curr).second.second.keep_alive();
-
-                // delete factory in any case
-                (*curr).second.first.reset();
-            }
-
-            // now delete the entry
-            components_.erase(curr);
-        }
-
         plugins_.clear();       // unload all plugins
         modules_.clear();       // unload all modules
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    std::int32_t runtime_support::get_instance_count(components::component_type type)
-    {
-        std::unique_lock<component_map_mutex_type> l(cm_mtx_);
-
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end() || !(*it).second.first) {
-            // we don't know anything about this component
-            std::ostringstream strm;
-            strm << "attempt to query instance count for components of "
-                    "invalid/unknown type: "
-                 << components::get_component_type_name(type);
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::get_instance_count",
-                strm.str());
-            return std::int32_t(-1);
-        }
-
-        // ask for the factory's capabilities
-        return (*it).second.first->instance_count();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1396,21 +1163,6 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::keep_factory_alive(component_type type)
-    {
-        std::lock_guard<component_map_mutex_type> l(cm_mtx_);
-
-        // Only after releasing the components we are allowed to release
-        // the modules. This is done in reverse order of loading.
-        component_map_type::iterator it = components_.find(type);
-        if (it == components_.end() || !(*it).second.first)
-            return false;
-
-        (*it).second.second.keep_alive();
-        return true;
-    }
-
     // working around non-copy-ability of packaged_task
     struct indirect_packaged_task
     {
@@ -1688,56 +1440,8 @@ namespace hpx { namespace components { namespace server
                     return false;
                 }
 
-                // get the factory
-                hpx::util::plugin::static_plugin_factory<
-                    component_factory_base> pf (f);
-
-                // create the component factory object, if not disabled
-                std::shared_ptr<component_factory_base> factory (
-                    pf.create(instance, ec, glob_ini, component_ini, isenabled));
-                if (ec) {
-                    LRT_(warning) << "static loading failed: " << lib.string()
-                                    << ": " << instance << ": "
-                                    << get_error_what(ec);
-                    return false;
-                }
-
-                component_type t = factory->get_component_type(
-                    prefix, agas_client);
-                if (0 == t) {
-                    LRT_(info) << "component refused to load: "  << instance;
-                    return false;   // module refused to load
-                }
-
-                // store component factory and module for later use
-                std::lock_guard<component_map_mutex_type> l(cm_mtx_);
-
-                component_factory_type data(factory, isenabled);
-                std::pair<component_map_type::iterator, bool> p =
-                    components_.insert(component_map_type::value_type(t, data));
-
-                if (components::get_derived_type(t) != 0) {
-                // insert three component types, the base type, the derived
-                // type and the combined one.
-                    if (p.second) {
-                        p = components_.insert(component_map_type::value_type(
-                                components::get_derived_type(t), data));
-                    }
-                    if (p.second) {
-                        components_.insert(component_map_type::value_type(
-                                components::get_base_type(t), data));
-                    }
-                }
-
-                if (!p.second) {
-                    LRT_(fatal) << "duplicate component id: " << instance
-                        << ": " << components::get_component_type_name(t);
-                    return false;   // duplicate component id?
-                }
-
                 LRT_(info) << "static loading succeeded: " << lib.string()
-                            << ": " << instance << ": "
-                            << components::get_component_type_name(t);
+                            << ": " << instance;
             }
 
             // make sure startup/shutdown registration is called once for each
@@ -2166,52 +1870,8 @@ namespace hpx { namespace components { namespace server
                 hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
                     "factory");
 
-                // create the component factory object, if not disabled
-                std::shared_ptr<component_factory_base> factory (
-                    pf.create(instance, ec, glob_ini, component_ini, isenabled));
-                if (ec) {
-                    LRT_(warning) << "dynamic loading failed: " << lib.string()
-                                  << ": " << instance << ": "
-                                  << get_error_what(ec);
-                    return false;
-                }
-
-                component_type t = factory->get_component_type(
-                    prefix, agas_client);
-                if (0 == t) {
-                    LRT_(info) << "component refused to load: "  << instance;
-                    return false;   // module refused to load
-                }
-
-                // store component factory and module for later use
-                std::lock_guard<component_map_mutex_type> l(cm_mtx_);
-
-                component_factory_type data(factory, d, isenabled);
-                std::pair<component_map_type::iterator, bool> p =
-                    components_.insert(component_map_type::value_type(t, data));
-
-                if (components::get_derived_type(t) != 0) {
-                // insert three component types, the base type, the derived
-                // type and the combined one.
-                    if (p.second) {
-                        p = components_.insert(component_map_type::value_type(
-                                components::get_derived_type(t), data));
-                    }
-                    if (p.second) {
-                        components_.insert(component_map_type::value_type(
-                                components::get_base_type(t), data));
-                    }
-                }
-
-                if (!p.second) {
-                    LRT_(fatal) << "duplicate component id: " << instance
-                        << ": " << components::get_component_type_name(t);
-                    return false;   // duplicate component id?
-                }
-
                 LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                            << ": " << instance << ": "
-                            << components::get_component_type_name(t);
+                            << ": " << instance;
             }
 
             // make sure startup/shutdown registration is called once for each

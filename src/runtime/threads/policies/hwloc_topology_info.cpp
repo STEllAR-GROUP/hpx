@@ -757,6 +757,7 @@ namespace hpx { namespace threads
         hwloc_bitmap_t cpuset  = mask_to_bitmap(mask, HWLOC_OBJ_PU);
         hwloc_bitmap_t nodeset = hwloc_bitmap_alloc();
         hwloc_cpuset_to_nodeset_strict(topo, cpuset, nodeset);
+        hwloc_bitmap_free(cpuset);
         return std::make_shared<hpx::threads::hpx_hwloc_bitmap_wrapper>(nodeset);
     }
 

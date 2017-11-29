@@ -9,12 +9,12 @@
 
 # hpx_run_test.py is a script that is designed to manage the execution of HPX
 # tests. It is designed to:
-# 
+#
 # * Robustly clean up failed tests by killing them and all their subprocesses.
 # * Robustly enforce user-specified timeouts for tests with minimal overheads.
 # * Control the output of tests.
 #
-# hpx_run_test.py takes a number of command line arguments, described in 
+# hpx_run_test.py takes a number of command line arguments, described in
 # --help. Additionally, it takes a positional argument that describes
 # the test. This argument should be formatted as a python list. Its format is
 # described in --help.
@@ -114,10 +114,10 @@ if __name__ == '__main__':
 
   (options, files) = parser.parse_args()
 
-  if 'HPX_TEST_ARGUMENTS' in os.environ: 
+  if 'HPX_TEST_ARGUMENTS' in os.environ:
     options.args += os.environ['HPX_TEST_ARGUMENTS']
 
-  if 'HPX_TEST_LAUNCHER' in os.environ: 
+  if 'HPX_TEST_LAUNCHER' in os.environ:
     options.launcher += os.environ['HPX_TEST_LAUNCHER']
 
   if not (lambda x: "always" == x or "never" == x or "fail" == x)(options.log):

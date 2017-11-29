@@ -9,6 +9,7 @@
 #include <hpx/include/parallel_execution_policy.hpp>
 #include <hpx/include/util.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <iterator>
@@ -220,7 +221,9 @@ namespace test
     {
         std::vector<std::size_t> c(size);
         std::iota(std::begin(c), std::end(c), 0);
-        std::random_shuffle(std::begin(c), std::end(c));
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(std::begin(c), std::end(c), g);
         return c;
     }
 
@@ -229,7 +232,9 @@ namespace test
     {
         std::vector<T> c(size);
         std::iota(std::begin(c), std::end(c), 0);
-        std::random_shuffle(std::begin(c), std::end(c));
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(std::begin(c), std::end(c), g);
         return c;
     }
 

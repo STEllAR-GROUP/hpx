@@ -62,11 +62,11 @@ void iota_vector(hpx::partitioned_vector<T>& v, T val)
 }
 
 template <typename Value>
-struct verify :
-    public hpx::parallel::v1::detail::algorithm<verify<Value>, Value>
+struct verify_ :
+    public hpx::parallel::v1::detail::algorithm<verify_<Value>, Value>
 {
-    verify()
-        : verify::algorithm("verify")
+    verify_()
+        : verify_::algorithm("verify")
     {}
 
     template <typename ExPolicy, typename SegIter, typename InIter>
@@ -112,7 +112,7 @@ void verify_values(hpx::partitioned_vector<T> v1, std::vector<T> v2)
 
         results.push_back(
             hpx::parallel::v1::detail::dispatch(traits::get_id(sit),
-                verify<bool>(), hpx::parallel::execution::seq,
+                verify_<bool>(), hpx::parallel::execution::seq,
                 std::true_type(), beg, end, test
         ));
 

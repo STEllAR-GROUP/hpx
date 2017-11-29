@@ -51,7 +51,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             return num_threads_;
         }
 
-        mask_cref_type get_pu_mask(std::size_t num_thread) const;
+        mask_cref_type get_pu_mask(threads::topology const& topo,
+            std::size_t num_thread) const;
 
         mask_type get_used_pus_mask(std::size_t pu_num) const;
         std::size_t get_thread_occupancy(std::size_t pid) const;
@@ -86,7 +87,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::vector<mask_type> affinity_masks_;
         std::vector<std::size_t> pu_nums_;
         mask_type no_affinity_;                             ///< mask of processing units which have no affinity
-        static std::atomic<int> instance_number_counter_; ///< counter for instance numbers
+        static std::atomic<int> instance_number_counter_;   ///< counter for instance numbers
     };
 }}}}
 

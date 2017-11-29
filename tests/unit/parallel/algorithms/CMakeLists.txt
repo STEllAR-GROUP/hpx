@@ -66,6 +66,7 @@ set(tests
     is_heap_until
     includes
     inclusive_scan
+    inplace_merge
     is_partitioned
     is_sorted
     is_sorted_until

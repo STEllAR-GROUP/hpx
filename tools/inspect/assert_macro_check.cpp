@@ -49,9 +49,6 @@ namespace boost
   {
    assert_macro_check::assert_macro_check()
      : m_files_with_errors(0)
-     , m_from_boost_root(
-         fs::exists(search_root_path() / "boost") &&
-         fs::exists(search_root_path() / "libs"))
    {
      register_signature( ".c" );
      register_signature( ".cpp" );
@@ -69,17 +66,6 @@ namespace boost
     {
       if (contents.find( "hpxinspect:" "noassert_macro" ) != string::npos)
         return;
-
-      // Check files iff (a) they are in the boost directory, or (b) they
-      // are in the src directory under libs.
-      if (m_from_boost_root) {
-        path relative( relative_to( full_path, search_root_path() ) );
-        path::const_iterator pbeg = relative.begin(), pend = relative.end();
-        if (pbeg != std::find(pbeg, pend, "boost") &&
-          !(pbeg == std::find(pbeg, pend, "libs") &&
-              pend != std::find(pbeg, pend, "src")))
-          return;
-      }
 
       long errors = 0;
       boost::sregex_iterator cur(contents.begin(),

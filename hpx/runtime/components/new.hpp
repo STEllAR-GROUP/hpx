@@ -328,7 +328,7 @@ namespace hpx { namespace components
                 typedef typename Component::wrapping_type component_type;
 
                 hpx::id_type id(
-                    components::server::construct<component_type>(
+                    components::server::create<component_type>(
                         std::forward<Ts>(ts)...
                     ),
                     hpx::id_type::managed);
@@ -352,7 +352,7 @@ namespace hpx { namespace components
                 for (std::size_t i = 0; i != count; ++i)
                 {
                     result.push_back(hpx::id_type(
-                        components::server::construct<component_type>(
+                        components::server::create<component_type>(
                             std::forward<Ts>(ts)...
                         ),
                         hpx::id_type::managed));
@@ -456,7 +456,7 @@ namespace hpx { namespace components
             static type call(Ts &&... ts)
             {
                 hpx::id_type id(
-                    components::server::construct<component_type>(
+                    components::server::create<component_type>(
                         std::forward<Ts>(ts)...
                     ),
                     hpx::id_type::managed);

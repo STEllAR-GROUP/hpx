@@ -313,12 +313,6 @@ namespace hpx
         ///             application (uninstall performance counters, etc.)
         void add_shutdown_function(shutdown_function_type f);
 
-        /// Keep the factory object alive which is responsible for the given
-        /// component type. This a purely internal function allowing to work
-        /// around certain library specific problems related to dynamic
-        /// loading of external libraries.
-        bool keep_factory_alive(components::component_type type);
-
         /// Access one of the internal thread pools (io_service instances)
         /// HPX is using to perform specific tasks. The three possible values
         /// for the argument \p name are "main_pool", "io_pool", "parcel_pool",
