@@ -24,7 +24,7 @@ int hpx_main(int argc, char* argv[])
     hpx::threads::detail::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
-    HPX_TEST_EQ(hpx::threads::count(tp.get_used_processing_units()), std::size_t(4));
+    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(4));
 
     // Enable elasticity
     tp.set_scheduler_mode(
