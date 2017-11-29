@@ -122,6 +122,7 @@ namespace hpx { namespace threads { namespace detail
 
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
+            mode_ = mode;
             return sched_->Scheduler::set_scheduler_mode(mode);
         }
 
