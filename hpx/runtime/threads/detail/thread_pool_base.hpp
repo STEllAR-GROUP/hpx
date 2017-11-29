@@ -84,13 +84,10 @@ namespace hpx { namespace threads { namespace detail
         std::size_t get_worker_thread_num() const;
         virtual std::size_t get_os_thread_count() const = 0;
 
-        virtual std::size_t get_active_os_thread_count() const
-        {
-            return get_os_thread_count();
-        }
-
         virtual compat::thread& get_os_thread_handle(
             std::size_t num_thread) = 0;
+
+        virtual std::size_t get_active_os_thread_count() const;
 
         virtual void create_thread(thread_init_data& data, thread_id_type& id,
             thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
@@ -124,7 +121,7 @@ namespace hpx { namespace threads { namespace detail
             return nullptr;
         }
 
-        mask_cref_type   get_used_processing_units() const;
+        mask_type get_used_processing_units() const;
         hwloc_bitmap_ptr get_numa_domain_bitmap() const;
 
         // performance counters
@@ -304,13 +301,6 @@ namespace hpx { namespace threads { namespace detail
 
     protected:
         pool_id_type id_;
-
-        // Stores the mask identifying all processing units used by this
-        // thread pool.
-        typedef hpx::lcos::local::spinlock pu_mutex_type;
-        mutable pu_mutex_type used_processing_units_mtx_;
-        mask_type used_processing_units_;
-        hwloc_bitmap_ptr used_numa_domains_;
 
         // Mode of operation of the pool
         policies::scheduler_mode mode_;

@@ -485,28 +485,15 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
-            // Select a OS thread which hasn't been disabled
-            HPX_ASSERT(threads::any(parent_pool_->get_used_processing_units()));
+            // Select an OS thread which hasn't been disabled
 
-            auto const& rp = resource::get_partitioner();
-            auto mask = rp.get_pu_mask(
-                num_thread + parent_pool_->get_thread_offset());
-            if(!threads::any(mask))
-                threads::set(mask, num_thread + parent_pool_->get_thread_offset());
-
-            // NOTE: Could be just:
-            // get_state(num_thread).load() != state_running
-            // assuming thread_pool_executor (others) waits for
-            // work to finish before setting state to stopping.
-            while (get_state(num_thread).load() == state_pre_sleep ||
-                get_state(num_thread).load() == state_sleeping ||
-                !bit_and(mask, parent_pool_->get_used_processing_units()))
+            // NOTE: Not thread safe. Might schedule work on disabled pus.
+            if (mode_ & threads::policies::enable_elasticity)
             {
-                num_thread = (num_thread + 1) % queue_size;
-                mask = rp.get_pu_mask(
-                    num_thread + parent_pool_->get_thread_offset());
-                if(!threads::any(mask))
-                    threads::set(mask, num_thread + parent_pool_->get_thread_offset());
+                while (states_[num_thread] > state_suspended)
+                {
+                    num_thread = (num_thread + 1) % queue_size;
+                }
             }
 
             // now create the thread
@@ -964,14 +951,9 @@ namespace hpx { namespace threads { namespace policies
             if (0 != added) return result;
 
             // Check if we have been disabled
+            if (!running)
             {
-                auto mask = rp_.get_pu_mask(
-                    num_thread + parent_pool_->get_thread_offset());
-
-                if (!bit_and(mask, parent_pool_->get_used_processing_units()))
-                {
-                    return added == 0 && !running;
-                }
+                return true;
             }
 
             for (std::size_t idx: victim_threads_[num_thread])

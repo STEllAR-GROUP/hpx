@@ -317,22 +317,13 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
-            // Select a OS thread which hasn't been disabled
-            HPX_ASSERT(threads::any(parent_pool_->get_used_processing_units()));
-
-            auto const& rp = resource::get_partitioner();
-            auto mask = rp.get_pu_mask(
-                num_thread + parent_pool_->get_thread_offset());
-            if(!threads::any(mask))
-                threads::set(mask, num_thread + parent_pool_->get_thread_offset());
-
-            while (!bit_and(mask, parent_pool_->get_used_processing_units()))
+            // Select an OS thread which hasn't been disabled
+            if (mode_ & threads::policies::enable_elasticity)
             {
-                num_thread = (num_thread + 1) % queue_size;
-                mask = rp.get_pu_mask(
-                    num_thread + parent_pool_->get_thread_offset());
-                if(!threads::any(mask))
-                    threads::set(mask, num_thread + parent_pool_->get_thread_offset());
+                while (states_[num_thread] > state_suspended)
+                {
+                    num_thread = (num_thread + 1) % queue_size;
+                }
             }
 
             HPX_ASSERT(num_thread < queue_size);
@@ -655,15 +646,9 @@ namespace hpx { namespace threads { namespace policies
             if (0 != added) return result;
 
             // Check if we have been disabled
+            if (!running)
             {
-                auto const& rp = resource::get_partitioner();
-                auto mask = rp.get_pu_mask(
-                    num_thread + parent_pool_->get_thread_offset());
-
-                if (!bit_and(mask, parent_pool_->get_used_processing_units()))
-                {
-                    return added == 0 && !running;
-                }
+                return true;
             }
 
             if (numa_sensitive_ != 0)   // limited or no stealing across domains
