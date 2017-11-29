@@ -113,15 +113,15 @@ int main(int argc, char* argv[])
     // TODO: Should all schedulers support suspension?
     std::vector<scheduling_policy> const policies =
     {
-        //scheduling_policy::local,
+        scheduling_policy::local,
         scheduling_policy::local_priority_fifo,
         scheduling_policy::local_priority_lifo,
         //scheduling_policy::static_,
         //scheduling_policy::static_priority,
-        //scheduling_policy::abp_priority,
-        //scheduling_policy::hierarchy,
-        //scheduling_policy::periodic_priority,
-        //scheduling_policy::throttle
+        scheduling_policy::abp_priority,
+        scheduling_policy::hierarchy,
+        scheduling_policy::periodic_priority,
+        scheduling_policy::throttle
     };
 
     for (auto policy : policies)
