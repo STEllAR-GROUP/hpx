@@ -1459,6 +1459,11 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume(std::size_t virt_core,
         error_code& ec)
     {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            return;
+        }
+
         if (virt_core == std::size_t(-1))
         {
             for (std::size_t i = 0; i != threads_.size(); ++i)
@@ -1476,6 +1481,15 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::suspend_processing_unit(
         std::size_t virt_core, error_code& ec)
     {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units");
+            return;
+        }
+
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -1515,6 +1529,15 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_processing_unit(
         std::size_t virt_core, error_code& ec)
     {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units");
+            return;
+        }
+
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
             HPX_THROWS_IF(ec, bad_parameter,
