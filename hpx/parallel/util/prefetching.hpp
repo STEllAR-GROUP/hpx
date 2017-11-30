@@ -253,7 +253,9 @@ namespace hpx { namespace parallel { namespace util
         HPX_FORCEINLINE void prefetch_addresses(T const& ... ts)
         {
             int const sequencer[] = {
-                (_mm_prefetch((char*)&ts, _MM_HINT_T0), 0)..., 0
+                (_mm_prefetch(
+                    const_cast<char*>((char const*)&ts), _MM_HINT_T0), 0
+                )..., 0
             };
             (void)sequencer;
         }

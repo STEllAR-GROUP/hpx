@@ -395,7 +395,7 @@ void test_merge_etc(ExPolicy policy, IteratorTag,
         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
         DataType val;
-        auto result = hpx::parallel::merge(policy,
+        hpx::parallel::merge(policy,
             iterator(std::begin(src1)), iterator(std::end(src1)),
             iterator(std::begin(src2)), iterator(std::end(src2)),
             iterator(std::begin(dest_res)),

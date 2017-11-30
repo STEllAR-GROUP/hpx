@@ -44,7 +44,7 @@ void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 {
     // use the default random engine and an uniform distribution
     std::mt19937 eng(static_cast<unsigned int>(seed));
-    std::uniform_real_distribution<double> distr(lower, upper);
+    std::uniform_real_distribution<double> distr{double(lower), double(upper)};
 
     for (auto &elem : V) {
         elem = static_cast<T>(distr(eng));

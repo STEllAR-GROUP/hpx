@@ -66,15 +66,18 @@ void test_none_of_async(ExPolicy p, IteratorTag,Proj proj=Proj())
 
         hpx::future<bool> f =
             hpx::parallel::none_of(p, c,
-                [proj](std::size_t v) {
+                [](std::size_t v)
+                {
                     return v != 0;
-                },proj);
+                },
+                proj);
         f.wait();
 
         // verify values
         bool expected =
             std::none_of(std::begin(c), std::end(c),
-                [proj](std::size_t v) {
+                [proj](std::size_t v)
+                {
                     return proj(v) != 0;
                 });
 

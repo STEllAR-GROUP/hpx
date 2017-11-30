@@ -881,10 +881,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     FwdIter boundary = block_manager.boundary();
                     remaining_blocks.erase(std::remove_if(
                         std::begin(remaining_blocks), std::end(remaining_blocks),
-                        [boundary](block<FwdIter> const& block) -> bool
-                    {
-                        return block.empty();
-                    }), std::end(remaining_blocks));
+                        [](block<FwdIter> const& block) -> bool
+                        {
+                            return block.empty();
+                        }),
+                        std::end(remaining_blocks));
 
                     // Sort remaining blocks to be listed from left to right.
                     std::sort(std::begin(remaining_blocks),
@@ -895,11 +896,10 @@ namespace hpx { namespace parallel { inline namespace v1
 
                     // Merge remaining blocks into one block
                     //     which is adjacent to boundary.
-                    block<FwdIter> unpartitioned_block =
-                        merge_remaining_blocks(remaining_blocks,
-                            block_manager.boundary(), first);
+                    block<FwdIter> unpartitioned_block = merge_remaining_blocks(
+                        remaining_blocks, boundary, first);
 
-                    // Perform sequetial partition to unpartitioned range.
+                    // Perform sequential partition to unpartitioned range.
                     FwdIter real_boundary = sequential_partition(
                         unpartitioned_block.first, unpartitioned_block.last,
                         pred, proj);
