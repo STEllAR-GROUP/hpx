@@ -1542,18 +1542,24 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        sched_->Scheduler::resume(virt_core);
-
         if (threads::get_self_ptr())
         {
+            sched_->Scheduler::resume(virt_core);
+
             while (state.load() == state_sleeping)
             {
+                sched_->Scheduler::resume(virt_core);
                 hpx::this_thread::suspend();
             }
         }
         else
         {
-            while (state.load() == state_sleeping) {}
+            sched_->Scheduler::resume(virt_core);
+
+            while (state.load() == state_sleeping)
+            {
+                sched_->Scheduler::resume(virt_core);
+            }
         }
     }
 }}}

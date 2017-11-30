@@ -156,12 +156,11 @@ namespace hpx { namespace threads { namespace policies
         void suspend(std::size_t num_thread)
         {
             HPX_ASSERT(num_thread < suspend_conds_.size());
-            {
-                states_[num_thread].store(state_sleeping);
-                std::unique_lock<compat::mutex> l(suspend_mtxs_[num_thread]);
-                suspend_conds_[num_thread].wait(l);
-                states_[num_thread].store(state_running);
-            }
+
+            states_[num_thread].store(state_sleeping);
+            std::unique_lock<compat::mutex> l(suspend_mtxs_[num_thread]);
+            suspend_conds_[num_thread].wait(l);
+            states_[num_thread].store(state_running);
         }
 
         void resume(std::size_t num_thread)
