@@ -25,7 +25,7 @@
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/parallel_executor.hpp>
+#include <hpx/parallel/executors/post_policy_dispatch.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -323,10 +323,13 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::detail::shared_state_ptr_for<Future>::type &&
             ) = &continuation::async_impl;
 
-            parallel::execution::parallel_executor exec{
-                hpx::launch::async_policy{priority}};
-            parallel::execution::post(
-                exec, async_impl_ptr, std::move(this_), std::move(f));
+            hpx::util::thread_description desc(async_impl_ptr,
+                "hpx::parallel::execution::parallel_executor::post");
+
+            parallel::execution::detail::post_policy_dispatch<
+                    hpx::launch::async_policy
+                >::call(desc, hpx::launch::async, async_impl_ptr,
+                    std::move(this_), std::move(f));
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -549,7 +552,7 @@ namespace hpx { namespace lcos { namespace detail
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
             void (continuation::*cb)(shared_state_ptr &&, executor_type&) =
-                &continuation::async_exec<executor_type&>;
+                &continuation::async_exec;
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
@@ -581,7 +584,7 @@ namespace hpx { namespace lcos { namespace detail
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
             void (continuation::*cb)(shared_state_ptr &&, executor_type&&) =
-                &continuation::async_exec<executor_type&&>;
+                &continuation::async_exec;
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();

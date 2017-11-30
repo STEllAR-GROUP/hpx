@@ -30,6 +30,8 @@ typedef std::vector<int>::iterator iter;
 struct void_parallel_executor
   : hpx::parallel::execution::parallel_executor
 {
+    using base_type = hpx::parallel::execution::parallel_executor;
+
     template <typename F, typename Shape, typename ... Ts>
     std::vector<hpx::future<void> >
     bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
@@ -37,8 +39,7 @@ struct void_parallel_executor
         std::vector<hpx::future<void> > results;
         for(auto const& elem: shape)
         {
-            results.push_back(this->parallel_executor::async_execute(
-                f, elem, ts...));
+            results.push_back(this->base_type::async_execute(f, elem, ts...));
         }
         return results;
     }

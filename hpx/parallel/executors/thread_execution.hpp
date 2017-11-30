@@ -80,7 +80,7 @@ namespace hpx { namespace threads
             >::type
         >
     >::type
-    then_execute(Executor && exec, F && f, Future& predecessor, Ts &&... ts)
+    then_execute(Executor && exec, F && f, Future&& predecessor, Ts &&... ts)
     {
         typedef typename hpx::util::detail::invoke_deferred_result<
                 F, Future, Ts...
@@ -183,7 +183,7 @@ namespace hpx { namespace threads
         >
     >::type
     bulk_then_execute(Executor && exec, F && f, Shape const& shape,
-        Future& predecessor, Ts &&... ts)
+        Future&& predecessor, Ts &&... ts)
     {
         typedef typename parallel::execution::detail::then_bulk_function_result<
                 F, Shape, Future, Ts...
@@ -192,18 +192,11 @@ namespace hpx { namespace threads
         typedef std::vector<hpx::lcos::future<func_result_type> > result_type;
         typedef hpx::lcos::future<result_type> result_future_type;
 
-        // older versions of gcc are not able to capture parameter
-        // packs (gcc < 4.9)
-        auto args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
         auto func =
-            [exec, f, shape, args](Future predecessor) mutable -> result_type
-            {
-                return parallel::execution::detail::fused_bulk_async_execute(
-                    exec, f, shape, std::move(predecessor),
-                    typename hpx::util::detail::make_index_pack<
-                        sizeof...(Ts)
-                    >::type(), args);
-            };
+            parallel::execution::detail::make_fused_bulk_async_execute_helper<
+                result_type
+            >(exec, std::forward<F>(f), shape,
+                hpx::util::make_tuple(std::forward<Ts>(ts)...));
 
         typedef typename hpx::traits::detail::shared_state_ptr<
                 result_type

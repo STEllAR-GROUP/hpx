@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstddef>

@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -298,24 +299,6 @@ namespace hpx { namespace lcos { namespace detail
         typedef R result_type;
 
         typedef future<result_type> type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
-    struct future_iterator_traits
-    {};
-
-    template <typename Iterator>
-    struct future_iterator_traits<Iterator,
-        typename hpx::util::always_void<
-            typename std::iterator_traits<Iterator>::value_type
-        >::type>
-    {
-        typedef
-            typename std::iterator_traits<Iterator>::value_type
-            type;
-
-        typedef hpx::traits::future_traits<type> traits_type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

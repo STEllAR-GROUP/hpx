@@ -13,13 +13,14 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/executors/post_policy_dispatch.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_traits.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/range.hpp>
@@ -50,45 +51,6 @@ namespace hpx { namespace parallel { namespace execution
             static HPX_CONSTEXPR hpx::launch::async_policy call()
             {
                 return hpx::launch::async_policy{};
-            }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Policy>
-        struct post_policy_dispatch
-        {
-            template <typename F, typename... Ts>
-            static void call(hpx::util::thread_description const& desc,
-                Policy const& policy, F && f, Ts &&... ts)
-            {
-                threads::register_thread_nullary(
-                    hpx::util::deferred_call(
-                        std::forward<F>(f), std::forward<Ts>(ts)...),
-                    desc, threads::pending, true, policy.priority());
-            }
-        };
-
-        template <>
-        struct post_policy_dispatch<launch::fork_policy>
-        {
-            template <typename F, typename... Ts>
-            static void call(hpx::util::thread_description const& desc,
-                launch::fork_policy const& policy, F && f, Ts &&... ts)
-            {
-                threads::thread_id_type tid = threads::register_thread_nullary(
-                    hpx::util::deferred_call(
-                        std::forward<F>(f), std::forward<Ts>(ts)...),
-                    desc, threads::pending_do_not_schedule, true,
-                    policy.priority(), get_worker_thread_num(),
-                    threads::thread_stacksize_current);
-
-                // make sure this thread is executed last
-                if (tid)
-                {
-                    // yield_to(tid)
-                    hpx::this_thread::suspend(threads::pending, tid,
-                        "hpx::parallel::execution::parallel_executor::post");
-                }
             }
         };
 

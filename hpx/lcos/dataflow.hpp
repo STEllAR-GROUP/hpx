@@ -36,7 +36,6 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/parallel_executor.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/ref.hpp>
