@@ -1870,14 +1870,6 @@ namespace hpx { namespace threads
             });
     }
 
-    void threadmanager::resume()
-    {
-        for (auto& pool_iter : pools_)
-        {
-            pool_iter->resume(std::size_t(-1));
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     bool threadmanager::run()
     {
@@ -1941,6 +1933,14 @@ namespace hpx { namespace threads
             timer_pool_.clear();
         }
 #endif
+    }
+
+    void threadmanager::resume()
+    {
+        for (auto& pool_iter : pools_)
+        {
+            pool_iter->resume();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

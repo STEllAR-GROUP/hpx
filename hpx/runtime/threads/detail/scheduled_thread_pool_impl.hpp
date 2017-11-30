@@ -177,7 +177,7 @@ namespace hpx { namespace threads { namespace detail
         if (!threads_.empty())
         {
             // wake up if suspended
-            resume(std::size_t(-1));
+            resume();
 
             // set state to stopping
             sched_->Scheduler::set_all_states(state_stopping);
@@ -313,6 +313,20 @@ namespace hpx { namespace threads { namespace detail
 
         LTM_(info) << "run: " << id_.name() << " running";
         return true;
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume(error_code& ec)
+    {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            return;
+        }
+
+        for (std::size_t i = 0; i != threads_.size(); ++i)
+        {
+            resume_processing_unit(i, ec);
+        }
     }
 
     template <typename Scheduler>
@@ -1453,28 +1467,6 @@ namespace hpx { namespace threads { namespace detail
         }
 
         t.join();
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::resume(std::size_t virt_core,
-        error_code& ec)
-    {
-        if (!(mode_ & threads::policies::enable_elasticity))
-        {
-            return;
-        }
-
-        if (virt_core == std::size_t(-1))
-        {
-            for (std::size_t i = 0; i != threads_.size(); ++i)
-            {
-                resume_processing_unit(i, ec);
-            }
-        }
-        else
-        {
-            resume_processing_unit(virt_core, ec);
-        }
     }
 
     template <typename Scheduler>

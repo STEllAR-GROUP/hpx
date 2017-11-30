@@ -158,6 +158,9 @@ namespace hpx { namespace threads
         ///
         void stop (bool blocking = true);
 
+        // \brief Resume all suspended threads.
+        void resume();
+
         /// \brief Return whether the thread manager is still running
         //! This returns the "minimal state", i.e. the state of the
         //! least advanced thread pool
@@ -305,10 +308,6 @@ namespace hpx { namespace threads
     public:
         std::size_t shrink_pool(std::string const& pool_name);
         std::size_t expand_pool(std::string const& pool_name);
-
-        // \brief Wake up all suspended pus.
-        // TODO: Rethink interface.
-        void resume();
 
     private:
         // counter creator functions

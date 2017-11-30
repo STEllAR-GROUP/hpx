@@ -80,6 +80,8 @@ namespace hpx { namespace threads { namespace detail
         virtual void stop(
             std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 
+        virtual void resume(error_code& ec = throws) = 0;
+
     public:
         std::size_t get_worker_thread_num() const;
         virtual std::size_t get_os_thread_count() const = 0;
@@ -288,10 +290,6 @@ namespace hpx { namespace threads { namespace detail
         // Resume the given processing unit on the scheduler.
         virtual void resume_processing_unit(std::size_t virt_core,
             error_code& ec = throws) = 0;
-
-        // Resume the given processing unit on the scheduler (without checks).
-        // Only implemented for scheduled_thread_pool for now.
-        virtual void resume(std::size_t virt_core, error_code& ec = throws) {};
 
         // return the description string of the underlying scheduler
         char const* get_description() const;

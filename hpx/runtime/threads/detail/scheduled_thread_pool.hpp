@@ -133,6 +133,8 @@ namespace hpx { namespace threads { namespace detail
         void stop_locked(Lock& l, bool blocking = true);
         void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
 
+        void resume(error_code& ec = throws);
+
         ///////////////////////////////////////////////////////////////////
         compat::thread& get_os_thread_handle(std::size_t global_thread_num)
         {
@@ -152,8 +154,6 @@ namespace hpx { namespace threads { namespace detail
 
         std::size_t get_active_os_thread_count() const
         {
-            // TODO: Don't recompute every time?
-            // TODO: Take elasticity option into account.
             std::size_t active_os_thread_count = 0;
             for (std::size_t thread_num = 0; thread_num < threads_.size();
                 ++thread_num)
@@ -271,10 +271,6 @@ namespace hpx { namespace threads { namespace detail
 
         // Resume the given processing unit on the scheduler.
         void resume_processing_unit(std::size_t virt_core, error_code&);
-
-        // Resume the given processing unit on the scheduler (without checks).
-        // TODO: Clean up API.
-        void resume(std::size_t virt_core, error_code& ec = throws);
 
     protected:
         friend struct init_tss_helper<Scheduler>;
