@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
         //scheduling_policy::static_priority,
         scheduling_policy::abp_priority,
         scheduling_policy::hierarchy,
-        scheduling_policy::periodic_priority,
+        //scheduling_policy::periodic_priority,
     };
 
     for (auto policy : policies)
