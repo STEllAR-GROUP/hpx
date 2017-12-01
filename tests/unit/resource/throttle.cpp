@@ -11,6 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -25,6 +26,19 @@ int hpx_main(int argc, char* argv[])
         hpx::resource::get_thread_pool("default");
 
     HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(4));
+
+    {
+        // Try suspending without elasticity enabled, should throw an exception
+        try
+        {
+            tp.suspend_processing_unit(0);
+            HPX_TEST_MSG(false, "Suspending should not be allowed with "
+                 "elasticity disabled");
+        }
+        catch (std::runtime_error const&)
+        {
+        }
+    }
 
     // Enable elasticity
     tp.set_scheduler_mode(
