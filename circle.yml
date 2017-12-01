@@ -18,10 +18,15 @@ general:
 dependencies:
     pre:
         - docker pull ${IMAGE_NAME}
+
+compile:
+    pre:
         - mkdir build
     override:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" -DHPX_WITH_TESTS_HEADERS=On -DHPX_WITH_DEPRECATION_WARNINGS=Off -DCMAKE_EXPORT_COMPILE_COMMANDS=On
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ../tools/clang-tidy.sh -diff-master
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ../tools/inspect.sh ${CIRCLE_ARTIFACTS}
+
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
@@ -30,7 +35,7 @@ dependencies:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.headers
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tools.inspect
+    post:
         # TODO replace this line with "docker build" once docker managed to
         # introduce temporal file copies that don't show in the resulting image
         # size.
@@ -44,8 +49,6 @@ dependencies:
 
 test:
     override:
-        - docker run -v $PWD:/hpx -w /hpx ${IMAGE_NAME} ./build/bin/inspect --all --output=./build/hpx_inspect_report.html /hpx
-        - cp $PWD/build/hpx_inspect_report.html ${CIRCLE_ARTIFACTS}/
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ./bin/hello_world --hpx:bind=none
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.unit --output-on-failure
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.regressions --output-on-failure
