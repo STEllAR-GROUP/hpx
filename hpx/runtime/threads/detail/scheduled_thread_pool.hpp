@@ -281,6 +281,11 @@ namespace hpx { namespace threads { namespace detail
             std::size_t thread_num, std::shared_ptr<compat::barrier> startup,
             error_code& ec = hpx::throws);
 
+        void suspend_processing_unit_internal(std::size_t virt_core,
+            error_code& = hpx::throws);
+        void resume_processing_unit_internal(std::size_t virt_core,
+            error_code& = hpx::throws);
+
     private:
         std::vector<compat::thread> threads_;           // vector of OS-threads
 
