@@ -133,6 +133,7 @@ namespace hpx { namespace threads { namespace detail
         void stop_locked(Lock& l, bool blocking = true);
         void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
 
+        void suspend(error_code& ec = throws);
         void resume(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////

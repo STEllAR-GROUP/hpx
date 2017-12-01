@@ -316,13 +316,32 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::resume(error_code& ec)
+    void scheduled_thread_pool<Scheduler>::suspend(error_code& ec)
     {
-        if (!(mode_ & threads::policies::enable_elasticity))
+        // TODO: Check pool.
+        if (threads::get_self_ptr() /*&& self->get_pool() == this*/)
         {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::suspend",
+                "cannot suspend a pool from itself");
             return;
         }
 
+        // TODO: Check if in runtime.
+        while (get_thread_count() > get_background_thread_count())
+        {
+            hpx::this_thread::suspend();
+        }
+
+        for (std::size_t i = 0; i != threads_.size(); ++i)
+        {
+            suspend_processing_unit_internal(i, ec);
+        }
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume(error_code& ec)
+    {
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
             resume_processing_unit_internal(i, ec);
