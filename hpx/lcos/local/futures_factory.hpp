@@ -314,7 +314,9 @@ namespace hpx { namespace lcos { namespace local
             future_obtained_(false)
         {}
 
-        template <typename F>
+        template <typename F, typename Enable = typename
+            std::enable_if<!std::is_same<typename hpx::util::decay<F>::type,
+                futures_factory>::value>::type>
         explicit futures_factory(F&& f)
           : task_(detail::create_task_object<Result, Cancelable>::call(
                 std::forward<F>(f))),

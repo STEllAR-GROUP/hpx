@@ -251,7 +251,7 @@ namespace hpx { namespace util
         >::type bound_impl(one_shot_wrapper<F>& f, Ts& bound, Us&& /*unbound*/,
             pack_c<std::size_t, Is...>)
         {
-            return util::invoke(std::move(f), util::get<Is>(std::move(bound))...);
+            return util::invoke(std::move(f), std::move(util::get<Is>(bound))...);
         }
 
         template <typename T>

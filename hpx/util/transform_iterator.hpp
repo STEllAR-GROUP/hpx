@@ -83,7 +83,7 @@ namespace hpx { namespace util
                 typename std::enable_if<
                     std::is_convertible<OtherIterator, Iterator>::value &&
                     std::is_convertible<OtherTransformer, Transformer>::value
-                >::type* = 0)
+                >::type* = nullptr)
           : base_type(t.base()), transformer_(t.transformer())
         {}
 

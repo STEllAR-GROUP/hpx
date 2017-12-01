@@ -184,7 +184,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         papi_counter():
             event_(PAPI_NULL), index_(-1), value_(0), timestamp_(-1),
-            status_(PAPI_COUNTER_STOPPED), counters_(0) { }
+            status_(PAPI_COUNTER_STOPPED), counters_(nullptr) { }
         papi_counter(hpx::performance_counters::counter_info const& info);
 
         // start the counter

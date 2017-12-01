@@ -25,7 +25,7 @@ namespace hpx { namespace actions
 
             // Yep, 't' is a zombie, however we don't use the returned value
             // anyways. We need it for result type calculation, though.
-            return std::move(t);
+            return std::forward<T>(t);
         }
     };
 
@@ -39,7 +39,7 @@ namespace hpx { namespace actions
 
             // Yep, 't' is a zombie, however we don't use the returned value
             // anyways. We need it for result type calculation, though.
-            return std::move(t);
+            return std::forward<T>(t);
         }
     };
 }}

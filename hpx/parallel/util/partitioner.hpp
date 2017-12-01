@@ -192,9 +192,9 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2>
+                typename F1, typename F2, typename...Args>
             static R call_with_index(ExPolicy && policy, FwdIter first,
-                std::size_t count, Stride stride, F1 && f1, F2 && f2)
+                std::size_t count, Stride stride, F1 && f1, F2 && f2, Args &&...args)
             {
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
@@ -219,13 +219,14 @@ namespace hpx { namespace parallel { namespace util
 
                     auto shapes =
                         get_bulk_iteration_shape_idx(policy, inititems, f1,
-                            first, count, stride, has_variable_chunk_size());
+                            first, count, stride, has_variable_chunk_size(),
+                            std::forward<Args>(args)...);
 
                     std::vector<hpx::future<Result> > workitems =
                         execution::bulk_async_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                            std::move(shapes));
+                            std::move(shapes), std::forward<Args>(args)...);
 
                     inititems.reserve(inititems.size() + workitems.size());
                     std::move(workitems.begin(), workitems.end(),
@@ -244,7 +245,7 @@ namespace hpx { namespace parallel { namespace util
                 handle_local_exceptions<ExPolicy>::call(inititems, errors);
 
                 try {
-                    return f2(std::move(inititems));
+                    return f2(std::move(inititems), std::forward<Args>(args)...);
                 }
                 catch (...) {
                     // rethrow either bad_alloc or exception_list
@@ -409,10 +410,10 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2>
+                typename F1, typename F2, typename...Args>
             static hpx::future<R> call_with_index(ExPolicy && policy,
                 FwdIter first, std::size_t count, Stride stride,
-                F1 && f1, F2 && f2)
+                F1 && f1, F2 && f2, Args &&...args)
             {
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
@@ -442,13 +443,14 @@ namespace hpx { namespace parallel { namespace util
 
                     auto shapes =
                         get_bulk_iteration_shape_idx(policy, inititems, f1,
-                            first, count, stride, has_variable_chunk_size());
+                            first, count, stride, has_variable_chunk_size(),
+                            std::forward<Args>(args)...);
 
                     std::vector<hpx::future<Result> > workitems =
                         execution::bulk_async_execute(
                             policy.executor(),
                             partitioner_iteration<Result, F1>{std::forward<F1>(f1)},
-                            std::move(shapes));
+                            std::move(shapes), std::forward<Args>(args)...);
 
                     std::move(workitems.begin(), workitems.end(),
                         std::back_inserter(inititems));
@@ -464,15 +466,16 @@ namespace hpx { namespace parallel { namespace util
                 // wait for all tasks to finish
                 return hpx::dataflow(
                     [f2, errors, scoped_param](
-                        std::vector<hpx::future<Result> > && r) mutable -> R
+                        std::vector<hpx::future<Result> > && r,
+                        typename hpx::util::decay<Args>::type&&... args) mutable -> R
                     {
                         HPX_UNUSED(scoped_param);
 
                         // inform parameter traits
                         handle_local_exceptions<ExPolicy>::call(r, errors);
-                        return f2(std::move(r));
+                        return f2(std::move(r), std::move(args)...);
                     },
-                    std::move(inititems));
+                    std::move(inititems), std::forward<Args>(args)...);
             }
         };
 
@@ -523,15 +526,16 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename ExPolicy, typename FwdIter, typename Stride, typename F1,
-                typename F2>
+                typename F2, typename...Args>
             static R call_with_index(ExPolicy && policy, FwdIter first,
-                std::size_t count, Stride stride, F1 && f1, F2 && f2)
+                std::size_t count, Stride stride, F1 && f1, F2 && f2, Args &&... args)
             {
                 return static_partitioner<
                         typename hpx::util::decay<ExPolicy>::type, R, Result
                     >::call_with_index(
                         std::forward<ExPolicy>(policy), first, count, stride,
-                        std::forward<F1>(f1), std::forward<F2>(f2));
+                        std::forward<F1>(f1), std::forward<F2>(f2),
+                        std::forward<Args>(args)...);
             }
         };
 
@@ -566,16 +570,17 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2>
+                typename F1, typename F2, typename... Args>
             static hpx::future<R> call_with_index(ExPolicy && policy,
                 FwdIter first, std::size_t count, Stride stride,
-                F1 && f1, F2 && f2)
+                F1 && f1, F2 && f2, Args &&... args)
             {
                 return static_partitioner<
                         typename hpx::util::decay<ExPolicy>::type, R, Result
                     >::call_with_index(
                         std::forward<ExPolicy>(policy), first, count, stride,
-                        std::forward<F1>(f1), std::forward<F2>(f2));
+                        std::forward<F1>(f1), std::forward<F2>(f2),
+                        std::forward<Args>(args)...);
             }
         };
 
@@ -611,16 +616,17 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename ExPolicy, typename FwdIter, typename Stride,
-                typename F1, typename F2>
+                typename F1, typename F2, typename... Args>
             static hpx::future<R> call_with_index(ExPolicy && policy,
                 FwdIter first, std::size_t count, Stride stride,
-                F1 && f1, F2 && f2)
+                F1 && f1, F2 && f2, Args &&... args)
             {
                 return static_partitioner<
                         execution::parallel_task_policy, R, Result
                     >::call_with_index(
                         std::forward<ExPolicy>(policy), first, count, stride,
-                        std::forward<F1>(f1), std::forward<F2>(f2));
+                        std::forward<F1>(f1), std::forward<F2>(f2),
+                        std::forward<Args>(args)...);
             }
         };
 #endif

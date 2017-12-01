@@ -175,7 +175,7 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename Target>
         future_data(Target && data, init_no_addref no_addref)
-          : future_data_base<id_type>(std::move(data), no_addref)
+          : future_data_base<id_type>(std::forward<Target>(data), no_addref)
         {}
 
         future_data(std::exception_ptr const& e, init_no_addref no_addref)

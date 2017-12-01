@@ -91,9 +91,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
         PAPI_event_info_t const *operator()()
         {
-            if (!active_) return 0;
+            if (!active_) return nullptr;
             while (!get_info())
-                if (!(active_ = get_next_event())) return 0;
+                if (!(active_ = get_next_event())) return nullptr;
             active_ = get_next_event();
             return &info_;
         }

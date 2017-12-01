@@ -286,7 +286,7 @@ namespace hpx { namespace threads
             "default",
             "low",
             "normal",
-            "high (recursive)"
+            "high (recursive)",
             "boost",
             "high (non-recursive)",
         };
