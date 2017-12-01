@@ -1375,9 +1375,9 @@ namespace hpx { namespace threads { namespace detail
         if (threads_[virt_core].joinable())
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                          "scheduled_thread_pool<Scheduler>::add_processing_unit",
-                          "the given virtual core has already been added to this "
-                          "thread pool");
+                "scheduled_thread_pool<Scheduler>::add_processing_unit",
+                "the given virtual core has already been added to this "
+                "thread pool");
             return;
         }
 
@@ -1405,7 +1405,7 @@ namespace hpx { namespace threads { namespace detail
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
                 "this thread pool does not support dynamically adding "
-                    "processing units");
+                "processing units");
         }
 
         std::shared_ptr<compat::barrier> startup =
