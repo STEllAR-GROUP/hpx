@@ -34,16 +34,17 @@ namespace hpx { namespace util
 
         typedef std::unique_lock<mutex_type> unique_lock_type;
 
+        typedef wrapper_heap_base::heap_parameters heap_parameters;
+
     private:
         template <typename Heap>
         static std::shared_ptr<util::wrapper_heap_base> create_heap(
-            char const* name, std::size_t counter, std::size_t step,
-            std::size_t heap_size)
+            char const* name, std::size_t counter, heap_parameters parameters)
         {
 #if defined(HPX_DEBUG)
-            return std::make_shared<Heap>(name, counter, step, heap_size);
+            return std::make_shared<Heap>(name, counter, parameters);
 #else
-            return std::make_shared<Heap>(name, 0, step, heap_size);
+            return std::make_shared<Heap>(name, 0, parameters);
 #endif
         }
 
@@ -57,15 +58,14 @@ namespace hpx { namespace util
             , max_alloc_count_(0)
 #endif
             , create_heap_(nullptr)
-            , heap_step_(0)
-            , heap_size_(0)
+            , parameters_({0, 0, 0})
         {
             HPX_ASSERT(false); // shouldn't ever be called
         }
 
         template <typename Heap>
         explicit one_size_heap_list(char const* class_name,
-                std::size_t heap_step, std::size_t heap_size, Heap* = nullptr)
+                heap_parameters parameters, Heap* = nullptr)
             : class_name_(class_name)
 #if defined(HPX_DEBUG)
             , alloc_count_(0L)
@@ -74,13 +74,12 @@ namespace hpx { namespace util
             , max_alloc_count_(0L)
 #endif
             , create_heap_(&one_size_heap_list::create_heap<Heap>)
-            , heap_step_(heap_step)
-            , heap_size_(heap_size)
+            , parameters_(parameters)
         {}
 
         template <typename Heap>
         explicit one_size_heap_list(std::string const& class_name,
-                std::size_t heap_step, std::size_t heap_size, Heap* = nullptr)
+                heap_parameters parameters, Heap* = nullptr)
             : class_name_(class_name)
 #if defined(HPX_DEBUG)
             , alloc_count_(0L)
@@ -89,8 +88,7 @@ namespace hpx { namespace util
             , max_alloc_count_(0L)
 #endif
             , create_heap_(&one_size_heap_list::create_heap<Heap>)
-            , heap_step_(heap_step)
-            , heap_size_(heap_size)
+            , parameters_(parameters)
         {}
 
         ~one_size_heap_list() noexcept;
@@ -122,10 +120,9 @@ namespace hpx { namespace util
         std::size_t max_alloc_count_;
 #endif
         std::shared_ptr<util::wrapper_heap_base> (*create_heap_)(
-            char const*, std::size_t, std::size_t, std::size_t);
+            char const*, std::size_t, heap_parameters);
 
-        std::size_t const heap_step_;   // default grow step
-        std::size_t const heap_size_;   // size of the object
+        heap_parameters const parameters_;
     };
 }}
 
