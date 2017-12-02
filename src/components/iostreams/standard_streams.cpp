@@ -111,7 +111,7 @@ namespace hpx { namespace iostreams
 
     std::stringstream const& get_consolestream()
     {
-        if (get_runtime_ptr() != 0 && !agas::is_console())
+        if (get_runtime_ptr() != nullptr && !agas::is_console())
         {
             HPX_THROW_EXCEPTION(service_unavailable,
                 "hpx::iostreams::get_consolestream",

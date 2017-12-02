@@ -65,7 +65,7 @@ public:
         // this view assumes that there is exactly one segment per locality
         typedef typename traits::local_segment_iterator local_segment_iterator;
         local_segment_iterator sit = segment_iterator_;
-        HPX_ASSERT(++sit == data.segment_end(hpx::get_locality_id()));
+        HPX_ASSERT(++sit == data.segment_end(hpx::get_locality_id())); // NOLINT
 #endif
     }
 

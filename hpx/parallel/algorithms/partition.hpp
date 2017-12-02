@@ -168,21 +168,23 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         result = hpx::make_ready_future(std::move(last));
                     }
+                    else
+                    {
+                        typedef typename
+                            hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                            parameters_type;
 
-                    typedef typename
-                        hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                        parameters_type;
+                        std::size_t const cores =
+                            execution::processing_units_count(policy.executor(),
+                                    policy.parameters());
+                        std::size_t max_chunks = execution::maximal_number_of_chunks(
+                            policy.parameters(), policy.executor(), cores, size);
 
-                    std::size_t const cores =
-                        execution::processing_units_count(policy.executor(),
-                                policy.parameters());
-                    std::size_t max_chunks = execution::maximal_number_of_chunks(
-                        policy.parameters(), policy.executor(), cores, size);
-
-                    result = stable_partition_helper()(
-                        std::forward<ExPolicy>(policy), first, last, size,
-                        std::forward<F>(f), std::forward<Proj>(proj),
-                        size == 1 ? 1 : (std::min)(std::size_t(size), max_chunks));
+                        result = stable_partition_helper()(
+                            std::forward<ExPolicy>(policy), first, last, size,
+                            std::forward<F>(f), std::forward<Proj>(proj),
+                            size == 1 ? 1 : (std::min)(std::size_t(size), max_chunks));
+                    }
                 }
                 catch (...) {
                     result = hpx::make_exceptional_future<RandIter>(
@@ -881,10 +883,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     FwdIter boundary = block_manager.boundary();
                     remaining_blocks.erase(std::remove_if(
                         std::begin(remaining_blocks), std::end(remaining_blocks),
-                        [boundary](block<FwdIter> const& block) -> bool
-                    {
-                        return block.empty();
-                    }), std::end(remaining_blocks));
+                        [](block<FwdIter> const& block) -> bool
+                        {
+                            return block.empty();
+                        }),
+                        std::end(remaining_blocks));
 
                     // Sort remaining blocks to be listed from left to right.
                     std::sort(std::begin(remaining_blocks),
@@ -895,11 +898,10 @@ namespace hpx { namespace parallel { inline namespace v1
 
                     // Merge remaining blocks into one block
                     //     which is adjacent to boundary.
-                    block<FwdIter> unpartitioned_block =
-                        merge_remaining_blocks(remaining_blocks,
-                            block_manager.boundary(), first);
+                    block<FwdIter> unpartitioned_block = merge_remaining_blocks(
+                        remaining_blocks, boundary, first);
 
-                    // Perform sequetial partition to unpartitioned range.
+                    // Perform sequential partition to unpartitioned range.
                     FwdIter real_boundary = sequential_partition(
                         unpartitioned_block.first, unpartitioned_block.last,
                         pred, proj);

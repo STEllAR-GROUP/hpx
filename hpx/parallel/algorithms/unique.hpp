@@ -515,7 +515,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [first, last, dest, flags, count](
+                    [last, dest, flags](
                         std::vector<hpx::shared_future<std::size_t> > && items,
                         std::vector<hpx::future<void> > &&) mutable
                     ->  std::pair<FwdIter1, FwdIter2>

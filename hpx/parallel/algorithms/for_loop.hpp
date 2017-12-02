@@ -48,87 +48,66 @@ namespace hpx { namespace parallel { inline namespace v2
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ... Ts, std::size_t ... Is>
+        template <typename ... Ts>
         HPX_HOST_DEVICE
-        HPX_FORCEINLINE void init_iteration(hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>,
-            std::size_t part_index)
+        HPX_FORCEINLINE void init_iteration(std::size_t part_index, Ts &&... args)
         {
             int const _sequencer[] =
             {
-                0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...
+                0, (std::forward<Ts>(args).init_iteration(part_index), 0)...
             };
             (void)_sequencer;
         }
 
-        template <typename ... Ts, std::size_t ... Is, typename F, typename B>
+        template <typename ... Ts>
         HPX_HOST_DEVICE
-        HPX_FORCEINLINE void invoke_iteration(hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>, F && f, B part_begin)
-        {
-            hpx::util::invoke_r<void>(std::forward<F>(f), part_begin,
-                hpx::util::get<Is>(args).iteration_value()...);
-        }
-
-        template <typename ... Ts, std::size_t ... Is>
-        HPX_HOST_DEVICE
-        HPX_FORCEINLINE void next_iteration(hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>)
+        HPX_FORCEINLINE void next_iteration(Ts&&... args)
         {
             int const _sequencer[] =
             {
-                0, (hpx::util::get<Is>(args).next_iteration(), 0)...
+                0, (std::forward<Ts>(args).next_iteration(), 0)...
             };
             (void)_sequencer;
         }
 
-        template <typename ... Ts, std::size_t ... Is>
+        template <typename ... Ts>
         HPX_HOST_DEVICE
-        HPX_FORCEINLINE void exit_iteration(hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>,
-            std::size_t size)
+        HPX_FORCEINLINE void exit_iteration(std::size_t size, Ts &&... args)
         {
             int const _sequencer[] =
             {
-                0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...
+                0, (std::forward<Ts>(args).exit_iteration(size), 0)...
             };
             (void)_sequencer;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename S, typename Tuple>
-        struct part_iterations;
-
-        template <typename F, typename S, typename ...Ts>
-        struct part_iterations<F, S, hpx::util::tuple<Ts...> >
+        template <typename F, typename S>
+        struct part_iterations
         {
             typedef typename hpx::util::decay<F>::type fun_type;
 
             fun_type f_;
             S stride_;
-            hpx::util::tuple<Ts...> args_;
 
-            template <typename F_, typename S_, typename Args>
-            part_iterations(F_&& f, S_&& stride, Args&& args)
+            template <typename F_, typename S_>
+            part_iterations(F_&& f, S_&& stride)
               : f_(std::forward<F_>(f))
               , stride_(std::forward<S_>(stride))
-              , args_(std::forward<Args>(args))
             {}
 
-            template <typename B>
+            template <typename B, typename...Args>
             HPX_HOST_DEVICE
             void execute(B part_begin, std::size_t part_steps,
-                std::size_t part_index)
+                std::size_t part_index, Args &&... args)
             {
-                auto pack = typename hpx::util::detail::make_index_pack<
-                    sizeof...(Ts)>::type();
-                detail::init_iteration(args_, pack, part_index);
+                detail::init_iteration(part_index, std::forward<Args>(args)...);
 
                 while (part_steps != 0)
                 {
-                    detail::invoke_iteration(args_, pack, f_, part_begin);
+                    f_(part_begin, std::forward<Args>(args).iteration_value()...);
 
-                    detail::next_iteration(args_, pack);
+                    detail::next_iteration(std::forward<Args>(args)...);
 
                     // NVCC seems to have a bug with std::min...
                     std::size_t chunk =
@@ -141,13 +120,14 @@ namespace hpx { namespace parallel { inline namespace v2
                 }
             }
 
-            template <typename B>
+            template <typename B, typename...Args>
             HPX_HOST_DEVICE
             void operator()(B part_begin, std::size_t part_steps,
-                std::size_t part_index)
+                std::size_t part_index, Args &&... args)
             {
                 hpx::util::annotate_function annotate(f_);
-                execute(part_begin, part_steps, part_index);
+                execute(part_begin, part_steps, part_index,
+                    std::forward<Args>(args)...);
             }
         };
 
@@ -206,28 +186,18 @@ namespace hpx { namespace parallel { inline namespace v2
                 if (size == 0)
                     return util::detail::algorithm_result<ExPolicy>::get();
 
-                auto && args =
-                    hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
-
-                // we need to decay copy here to properly transport everything
-                // to a GPU device
-                typedef
-                    hpx::util::tuple<typename hpx::util::decay<Ts>::type...>
-                    args_type;
-
                 return util::partitioner<ExPolicy>::call_with_index(
                     policy, first, size, stride,
-                    part_iterations<F, S, args_type>{
-                        std::forward<F>(f), stride, std::move(args)
+                    part_iterations<F, S>{
+                        std::forward<F>(f), stride
                     },
-                    [=] (std::vector<hpx::future<void> > &&) mutable -> void
+                    [size] (std::vector<hpx::future<void> > &&,
+                        typename hpx::util::decay<Ts>::type... ts) -> void
                     {
-                        auto pack = typename hpx::util::detail::make_index_pack<
-                            sizeof...(Ts)>::type();
                         // make sure live-out variables are properly set on
                         // return
-                        detail::exit_iteration(args, pack, size);
-                    });
+                        detail::exit_iteration(size, std::move(ts)...);
+                    }, std::forward<Ts>(ts)...);
             }
         };
 
@@ -1145,12 +1115,12 @@ namespace hpx { namespace parallel { inline namespace v2
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx { namespace traits
 {
-    template <typename F, typename S, typename Tuple>
+    template <typename F, typename S>
     struct get_function_address<
-        parallel::v2::detail::part_iterations<F, S, Tuple> >
+        parallel::v2::detail::part_iterations<F, S> >
     {
         static std::size_t call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+            parallel::v2::detail::part_iterations<F, S> const& f)
                 noexcept
         {
             return get_function_address<
@@ -1159,12 +1129,12 @@ namespace hpx { namespace traits
         }
     };
 
-    template <typename F, typename S, typename Tuple>
+    template <typename F, typename S>
     struct get_function_annotation<
-        parallel::v2::detail::part_iterations<F, S, Tuple> >
+        parallel::v2::detail::part_iterations<F, S> >
     {
         static char const* call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+            parallel::v2::detail::part_iterations<F, S> const& f)
                 noexcept
         {
             return get_function_annotation<
@@ -1174,12 +1144,12 @@ namespace hpx { namespace traits
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F, typename S, typename Tuple>
+    template <typename F, typename S>
     struct get_function_annotation_itt<
-        parallel::v2::detail::part_iterations<F, S, Tuple> >
+        parallel::v2::detail::part_iterations<F, S> >
     {
         static util::itt::string_handle call(
-            parallel::v2::detail::part_iterations<F, S, Tuple> const& f)
+            parallel::v2::detail::part_iterations<F, S> const& f)
                 noexcept
         {
             return get_function_annotation_itt<
