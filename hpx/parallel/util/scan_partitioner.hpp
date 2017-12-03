@@ -349,19 +349,6 @@ namespace hpx { namespace parallel { namespace util
                                 f1, f2, f3, f4);
                     });
 
-                if (f.has_exception())
-                {
-                    try {
-                        std::rethrow_exception(f.get_exception_ptr());
-                    }
-                    catch (std::bad_alloc const& ba) {
-                        throw ba;
-                    }
-                    catch (...) {
-                        return hpx::make_exceptional_future<R>(std::current_exception());
-                    }
-                }
-
                 return f;
             }
         };
