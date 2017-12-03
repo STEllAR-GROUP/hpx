@@ -82,25 +82,41 @@ def random_string(N):
 #----------------------------------------------------------------------------
 # main polling routine
 #----------------------------------------------------------------------------
+master_branch = repo.get_branch(repo.default_branch)
 while True:
+    #
+    master_sha = master_branch.commit
+    #
     for pr in repo.get_pulls('open'):
         if not pr.mergeable:
             continue
-        pr_str = str(pr.number)
-        #print('git fetch origin pull/' + pr_str + '/head:pull_' + pr_str)
-        directory = pycicle_dir + '/src/' + pr_str
-        last_sha  = directory + '/last_build.txt'
-        update = False
+        #
+        pr_str       = str(pr.number)
+        directory    = pycicle_dir + '/src/' + pr_str
+        last_sha     = directory + '/last_pr_sha.txt'
+        update       = False
+        #
         if not os.path.exists(directory):
             os.makedirs(directory)
-            if not os.path.is_file(last_sha):
-                open(last_sha ,'w').write(pr.head.sha + '\n')
+            update = True
+        else:
+            f = open(last_sha,'r')
+            lines = f.readlines()
+            if lines[0] != pr.head.sha:
+                print('PR', pr.number, 'changed : trigger update')
                 update = True
-            else:
-                if pr.head.sha != open(last_sha).read():
-                    update = True
+            if (lines[1] != master_sha.sha):
+                print('master changed : trigger update')
+                update = True
+            f.close()
+        #
         if update:
-            launch_pr_build(pr.number)
+            f = open(last_sha,'w')
+            f.write(pr.head.sha + '\n')
+            f.write(master_sha.sha + '\n')
+            f.close()
+#            launch_pr_build(pr.number)
+            ...
         else:
 #            print(pr.number, 'is up to date', pr.merge_commit_sha)
             ...
