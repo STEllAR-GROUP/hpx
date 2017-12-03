@@ -110,7 +110,8 @@ if (PYCICLE_PR)
                        ${CTEST_GIT_COMMAND} checkout -b ${GIT_BRANCH};
                        ${CTEST_GIT_COMMAND} fetch origin ${PYCICLE_BRANCH};
                        ${CTEST_GIT_COMMAND} merge --no-edit FETCH_HEAD;
-                       ${CTEST_GIT_COMMAND} checkout ${PYCICLE_MASTER};"
+                       ${CTEST_GIT_COMMAND} checkout ${PYCICLE_MASTER};
+                       ${CTEST_GIT_COMMAND} clean -fd;"
     WORKING_DIRECTORY "${WORK_DIR}"
     OUTPUT_VARIABLE output
     ERROR_VARIABLE output
@@ -154,6 +155,7 @@ ctest_start(${CTEST_MODEL}
 #######################################################################
 message("Update source... using ${CTEST_SOURCE_DIRECTORY}")
 ctest_update(RETURN_VALUE NB_CHANGED_FILES)
+ctest_submit(PARTS Update)
 message("Found ${NB_CHANGED_FILES} changed file(s)")
 
 set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}")
@@ -163,13 +165,15 @@ set(CTEST_CONFIGURE_COMMAND "${CTEST_CONFIGURE_COMMAND} \"${CTEST_SOURCE_DIRECTO
 
 message("Configure...")
 ctest_configure()
+ctest_submit(PARTS Configure)
 
-# TARGET simple_resource_partitioner_exe
 message("Build...")
 ctest_build(TARGET "tests" FLAGS "-j ${BUILD_PARALLELISM}")
+ctest_submit(PARTS Build)
 
 message("Test...")
 ctest_test(RETURN_VALUE retval EXCLUDE "compile")
+ctest_submit(PARTS Test)
 
 if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
   ctest_coverage()
@@ -177,11 +181,3 @@ endif (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
 if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
   ctest_memcheck()
 endif (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
-
-message("Submit...")
-ctest_submit()
-
-#if(NOT retval EQUAL 0)
-#  message(FATAL_ERROR "FATAL: Running tests exited with ${retval}")
-#endif()
-
