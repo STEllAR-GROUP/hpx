@@ -44,7 +44,6 @@ set(LDCXXFLAGS "${LDFLAGS} -std c++14")
 set(BUILD_PARALLELISM "8")
 
 set(CTEST_SITE "daint(cray)-gcc-${GCC_VER}-Boost-${BOOST_VER}")
-set(CTEST_BUILD_NAME "PR-${PYCICLE_PR}")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 
 #######################################################################

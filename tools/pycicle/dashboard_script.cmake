@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 # For debugging this script
 #######################################################################
 message("Pull request is  " ${PYCICLE_PR})
+message("PR-Branchname is " ${PYCICLE_BRANCH})
 message("master branch is " ${PYCICLE_MASTER})
 message("Machine name is  " ${PYCICLE_HOST})
 message("PYCICLE_ROOT is  " ${PYCICLE_ROOT})
@@ -44,7 +45,7 @@ else()
 endif()
 
 set(CTEST_BUILD_CONFIGURATION "Release")
-set(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${CTEST_BUILD_CONFIGURATION}")
+set(CTEST_BUILD_NAME "PR-${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 
 #######################################################################
 # Not yet implemented memcheck/coverage/etc

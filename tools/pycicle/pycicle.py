@@ -57,7 +57,7 @@ def get_setting_for_machine(machine, setting) :
 #----------------------------------------------------------------------------
 # launch a script that will do one build
 #----------------------------------------------------------------------------
-def launch_pr_build(pr_number) :
+def launch_pr_build(pr_number, pr_branchname) :
   print('Launching build for PR', str(pr_number))
 
   remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
@@ -65,8 +65,8 @@ def launch_pr_build(pr_number) :
   remote_http = get_setting_for_machine(nickname, 'PYCICLE_HTTP')
 
   cmd = [current_path + '/launch_build.sh',
-         remote_ssh, remote_path, nickname, str(pr_number), random_string(10),
-         compiler, boost]
+         remote_ssh, remote_path, nickname, str(pr_number), pr_branchname,
+         random_string(10), compiler, boost]
 
   print('Executing ', current_path + '/launch_build.sh')
   p = subprocess.Popen(cmd)
@@ -91,10 +91,11 @@ while True:
         if not pr.mergeable:
             continue
         #
-        pr_str       = str(pr.number)
-        directory    = pycicle_dir + '/src/' + pr_str
-        last_sha     = directory + '/last_pr_sha.txt'
-        update       = False
+        pr_str        = str(pr.number)
+        pr_branchname = pr.head.label.rsplit(':',1)[1]
+        directory     = pycicle_dir + '/src/' + pr_str
+        last_sha      = directory + '/last_pr_sha.txt'
+        update        = False
         #
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -103,7 +104,7 @@ while True:
             f = open(last_sha,'r')
             lines = f.readlines()
             if lines[0].strip() != pr.head.sha:
-                print('PR', pr.number, 'changed : trigger update')
+                print('PR', pr.number, pr_branchname, 'changed : trigger update')
                 update = True
             if (lines[1].strip() != master_sha.sha):
                 print('master changed : trigger update')
@@ -115,7 +116,7 @@ while True:
             f.write(pr.head.sha + '\n')
             f.write(master_sha.sha + '\n')
             f.close()
-            launch_pr_build(pr.number)
+            launch_pr_build(pr.number, pr_branchname)
         else:
 #            print(pr.number, 'is up to date', pr.merge_commit_sha)
             pass

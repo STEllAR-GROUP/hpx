@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 # For debugging this script
 #######################################################################
 message("Pull request is  " ${PYCICLE_PR})
+message("PR-Branchname is " ${PYCICLE_BRANCH})
 message("master branch is " ${PYCICLE_MASTER})
 message("Machine name is  " ${PYCICLE_HOST})
 message("PYCICLE_ROOT is  " ${PYCICLE_ROOT})
@@ -31,6 +32,7 @@ string(CONCAT SLURM_TEMPLATE ${SLURM_TEMPLATE}
   "-DPYCICLE_ROOT=${PYCICLE_ROOT} "
   "-DPYCICLE_HOST=${PYCICLE_HOST} "
   "-DPYCICLE_PR=${PYCICLE_PR} "
+  "-DPYCICLE_BRANCH=${PYCICLE_BRANCH} "
   "-DPYCICLE_COMPILER=${PYCICLE_COMPILER} "
   "-DPYCICLE_BOOST=${PYCICLE_BOOST} "
   "-DPYCICLE_MASTER=${PYCICLE_MASTER} \n"
