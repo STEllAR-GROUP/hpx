@@ -9,14 +9,14 @@
 # Simple tool to poll PRs on github and spawn builds
 # ------------------------------------------------------
 
+from __future__ import absolute_import, division, print_function, unicode_literals
 from github import Github
 import os, subprocess, time, re, string, random
-from pathlib import Path
 
 #----------------------------------------------------------------------------
 # user's home dir and pycicle root
 #----------------------------------------------------------------------------
-home = str(Path.home())
+home = str(os.path.expanduser('~'))
 pycicle_dir = os.environ.get('PYCICLE_ROOT', home + '/pycicle')
 print('Pycicle using root path', pycicle_dir)
 
@@ -102,10 +102,10 @@ while True:
         else:
             f = open(last_sha,'r')
             lines = f.readlines()
-            if lines[0] != pr.head.sha:
+            if lines[0].strip() != pr.head.sha:
                 print('PR', pr.number, 'changed : trigger update')
                 update = True
-            if (lines[1] != master_sha.sha):
+            if (lines[1].strip() != master_sha.sha):
                 print('master changed : trigger update')
                 update = True
             f.close()
@@ -115,11 +115,10 @@ while True:
             f.write(pr.head.sha + '\n')
             f.write(master_sha.sha + '\n')
             f.close()
-#            launch_pr_build(pr.number)
-            ...
+            launch_pr_build(pr.number)
         else:
 #            print(pr.number, 'is up to date', pr.merge_commit_sha)
-            ...
+            pass
 
     # Sleep for a while before polling github again
     time.sleep(poll_time)
