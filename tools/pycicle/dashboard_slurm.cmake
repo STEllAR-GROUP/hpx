@@ -42,7 +42,9 @@ file(WRITE "${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh" ${SLURM_TEMP
 
 #######################################################################
 # Launch the dashboard test using slurm
+# cancel any job with the same name first
 #######################################################################
 execute_process(
-  COMMAND sbatch "${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh"
+  COMMAND bash "-c" "scancel $(squeue -n hpx-${PYCICLE_PR} -h -o %A) > /dev/null 2>&1;
+                     sbatch ${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh"
 )
