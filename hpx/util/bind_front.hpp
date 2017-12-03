@@ -24,6 +24,9 @@ namespace hpx { namespace util
 {
     namespace detail
     {
+        template <typename F>
+        class one_shot_wrapper;
+
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename ...Us>
         struct invoke_bound_front_result;
@@ -46,6 +49,17 @@ namespace hpx { namespace util
         template <typename F, typename ...Ts, typename ...Us>
         struct invoke_bound_front_result<F const&&, util::tuple<Ts...> const&&, Us...>
           : util::invoke_result<F const, Ts const..., Us...>
+        {};
+
+        // one-shot wrapper is not const callable
+        template <typename F, typename ...Ts, typename ...Us>
+        struct invoke_bound_front_result<
+            one_shot_wrapper<F> const&, util::tuple<Ts...> const&, Us...>
+        {};
+
+        template <typename F, typename ...Ts, typename ...Us>
+        struct invoke_bound_front_result<
+            one_shot_wrapper<F> const&&, util::tuple<Ts...> const&&, Us...>
         {};
 
         template <typename F, std::size_t ...Is, typename Ts, typename ...Us>
