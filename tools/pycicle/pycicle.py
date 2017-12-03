@@ -58,20 +58,28 @@ def get_setting_for_machine(machine, setting) :
 # launch a script that will do one build
 #----------------------------------------------------------------------------
 def launch_pr_build(pr_number, pr_branchname) :
-  print('Launching build for PR', str(pr_number))
+    print('Launching build for PR', str(pr_number))
 
-  remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
-  remote_path = get_setting_for_machine(nickname, 'PYCICLE_ROOT')
-  remote_http = get_setting_for_machine(nickname, 'PYCICLE_HTTP')
+    remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
+    remote_path = get_setting_for_machine(nickname, 'PYCICLE_ROOT')
+    remote_http = get_setting_for_machine(nickname, 'PYCICLE_HTTP')
 
-  cmd = [current_path + '/launch_build.sh',
-         remote_ssh, remote_path, nickname, str(pr_number), pr_branchname,
-         random_string(10), compiler, boost]
+    #  cmd = ['ssh ' + remote_ssh, 'echo -S ',
+    cmd = ['ssh', remote_ssh, 'ctest -S ',
+           remote_path          +'/repo/tools/pycicle/dashboard_slurm.cmake',
+           '-DPYCICLE_ROOT='    + remote_path,
+           '-DPYCICLE_HOST='    + nickname,
+           '-DPYCICLE_PR='      + str(pr_number),
+           '-DPYCICLE_BRANCH='  + pr_branchname,
+           '-DPYCICLE_RANDOM='  + random_string(10),
+           '-DPYCICLE_COMPILER='+ compiler,
+           '-DPYCICLE_BOOST='   + boost,
+           '-DPYCICLE_MASTER='  + 'master']
 
-  print('Executing ', current_path + '/launch_build.sh')
-  p = subprocess.Popen(cmd)
-  print("pid = ", p.pid)
-  return None
+    print('Executing ', current_path + '/launch_build.sh')
+    p = subprocess.Popen(cmd)
+    print("pid = ", p.pid)
+    return None
 
 #----------------------------------------------------------------------------
 # random string of N chars
