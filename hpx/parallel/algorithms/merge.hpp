@@ -249,23 +249,38 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename ExPolicy,
             typename RandIter1, typename RandIter2, typename RandIter3,
             typename Comp, typename Proj1, typename Proj2>
-        hpx::util::tuple<RandIter1, RandIter2, RandIter3>
+        hpx::future<hpx::util::tuple<RandIter1, RandIter2, RandIter3>>
         parallel_merge(ExPolicy && policy,
             RandIter1 first1, RandIter1 last1,
             RandIter2 first2, RandIter2 last2,
             RandIter3 dest, Comp && comp,
             Proj1 && proj1, Proj2 && proj2)
         {
-            parallel_merge_helper(std::forward<ExPolicy>(policy),
-                first1, last1, first2, last2, dest,
-                std::forward<Comp>(comp),
-                std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2),
-                false,
-                lower_bound_helper());
+            typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3>
+                result_type;
 
-            return hpx::util::make_tuple(last1, last2,
-                dest + (last1 - first1) + (last2 - first2));
+            hpx::future<result_type> f = execution::async_execute(
+                policy.executor(),
+                [=]() mutable -> result_type
+                {
+                    try {
+                        parallel_merge_helper(
+                            policy, first1, last1, first2, last2, dest,
+                            comp, proj1, proj2, false, lower_bound_helper());
+
+                        return hpx::util::make_tuple(last1, last2,
+                            dest + (last1 - first1) + (last2 - first2));
+                    }
+                    catch (...) {
+                        util::detail::handle_local_exceptions<ExPolicy>::call(
+                            std::current_exception());
+                    }
+
+                    // Not reachable.
+                    HPX_ASSERT(false);
+                });
+
+            return f;
         }
 
         template <typename IterTuple>
