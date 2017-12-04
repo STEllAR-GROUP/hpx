@@ -42,7 +42,7 @@ namespace libfabric
 
         typedef pinned_memory_vector<T, Offset, region_type, allocator_type> vector_type;
 
-        typedef std::function<void(void)> deleter_callback;
+        typedef std::function<void()> deleter_callback;
 
         // internal vars
         T                   *m_array_;

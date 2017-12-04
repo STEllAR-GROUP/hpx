@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/unwrap.hpp>
 
@@ -76,11 +76,10 @@ namespace hpx { namespace parallel { inline namespace v1
             typename std::iterator_traits<Iter>::difference_type
             operator()(Iter part_begin, std::size_t part_size)
             {
-                using hpx::util::placeholders::_1;
                 typename std::iterator_traits<Iter>::difference_type ret = 0;
                 util::loop_n<execution_policy_type>(
                     part_begin, part_size,
-                    hpx::util::bind(*this, _1, std::ref(ret))
+                    hpx::util::bind_back(*this, std::ref(ret))
                 );
                 return ret;
             }
@@ -113,12 +112,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     count_iteration<ExPolicy, detail::compare_to<T> >(
                         detail::compare_to<T>(value));
 
-                using hpx::util::placeholders::_1;
                 typename std::iterator_traits<InIter>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,
-                    hpx::util::bind(std::move(f1), _1, std::ref(ret)));
+                    hpx::util::bind_back(std::move(f1), std::ref(ret)));
 
                 return ret;
             }
@@ -283,12 +281,11 @@ namespace hpx { namespace parallel { inline namespace v1
             {
                 auto f1 = count_iteration<ExPolicy, Pred>(op);
 
-                using hpx::util::placeholders::_1;
                 typename std::iterator_traits<InIter>::difference_type ret = 0;
 
                 util::loop(
                     policy, first, last,
-                    hpx::util::bind(std::move(f1), _1, std::ref(ret)));
+                    hpx::util::bind_back(std::move(f1), std::ref(ret)));
 
                 return ret;
             }

@@ -10,6 +10,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/activate_counters.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/apex.hpp>
@@ -68,11 +69,8 @@ namespace hpx { namespace util
         names_.reserve(names.size());
         if (ids_.empty())
         {
-            using util::placeholders::_1;
-            using util::placeholders::_2;
-
             performance_counters::discover_counter_func func(
-                util::bind(&activate_counters::find_counter, this, _1, _2));
+                util::bind_front(&activate_counters::find_counter, this));
 
             ids_.reserve(names.size());
             uoms_.reserve(names.size());
