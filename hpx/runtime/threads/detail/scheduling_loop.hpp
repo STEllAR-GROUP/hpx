@@ -691,7 +691,7 @@ namespace hpx { namespace threads { namespace detail
                             scheduler.SchedulingPolicy::cleanup_terminated(
                                 num_thread, true) &&
                             scheduler.SchedulingPolicy::get_thread_count(
-                                unknown, thread_priority_default, num_thread)
+                                suspended, thread_priority_default, num_thread)
                                     == 0;
 
                         if (can_exit)
@@ -829,7 +829,8 @@ namespace hpx { namespace threads { namespace detail
                                 scheduler.SchedulingPolicy::cleanup_terminated(
                                     true) &&
                                 scheduler.SchedulingPolicy::get_thread_count(
-                                    unknown) == 0;
+                                    suspended, thread_priority_default,
+                                    num_thread) == 0;
 
                             if (can_exit)
                             {
