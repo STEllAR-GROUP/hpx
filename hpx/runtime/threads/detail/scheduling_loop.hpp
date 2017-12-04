@@ -680,7 +680,7 @@ namespace hpx { namespace threads { namespace detail
                                 suspended, thread_priority_default, num_thread)
                                     == 0;
 
-                            if (can_exit)
+                        if (can_exit)
                         {
                             scheduler.SchedulingPolicy::suspend(num_thread);
                         }
