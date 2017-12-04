@@ -10,8 +10,7 @@
 # ------------------------------------------------------
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-from github import Github
-import os, subprocess, time, re, string, random
+import github, os, subprocess, time, re, string, random, socket
 
 #----------------------------------------------------------------------------
 # user's home dir and pycicle root
@@ -30,7 +29,7 @@ reponame  = 'HPX'
 orgname   = 'STEllAR-GROUP'
 poll_time = 60
 
-git  = Github(orgname, user_token)
+git  = github.Github(orgname, user_token)
 org  = git.get_organization(orgname)
 repo = org.get_repo(reponame)
 
@@ -93,41 +92,51 @@ def random_string(N):
 master_branch = repo.get_branch(repo.default_branch)
 while True:
     #
-    master_sha = master_branch.commit
-    #
-    for pr in repo.get_pulls('open'):
-        if not pr.mergeable:
-            continue
+    try:
+        master_sha = master_branch.commit
         #
-        pr_str        = str(pr.number)
-        pr_branchname = pr.head.label.rsplit(':',1)[1]
-        directory     = pycicle_dir + '/src/' + pr_str
-        last_sha      = directory + '/last_pr_sha.txt'
-        update        = False
-        #
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-            update = True
-        else:
-            f = open(last_sha,'r')
-            lines = f.readlines()
-            if lines[0].strip() != pr.head.sha:
-                print('PR', pr.number, pr_branchname, 'changed : trigger update')
+        for pr in repo.get_pulls('open'):
+            if not pr.mergeable:
+                continue
+            #
+            pr_str        = str(pr.number)
+            pr_branchname = pr.head.label.rsplit(':',1)[1]
+            directory     = pycicle_dir + '/src/' + pr_str
+            last_sha      = directory + '/last_pr_sha.txt'
+            update        = False
+            #
+            if not os.path.exists(directory):
+                os.makedirs(directory)
                 update = True
-            if (lines[1].strip() != master_sha.sha):
-                print('master changed : trigger update')
-                update = True
-            f.close()
-        #
-        if update:
-            f = open(last_sha,'w')
-            f.write(pr.head.sha + '\n')
-            f.write(master_sha.sha + '\n')
-            f.close()
-            launch_pr_build(pr.number, pr_branchname)
-        else:
-#            print(pr.number, 'is up to date', pr.merge_commit_sha)
-            pass
+            else:
+                try:
+                    f = open(last_sha,'r')
+                    lines = f.readlines()
+                    if lines[0].strip() != pr.head.sha:
+                        print('PR', pr.number, pr_branchname, 'changed : trigger update')
+                        update = True
+                    if (lines[1].strip() != master_sha.sha):
+                        print('master changed : trigger update')
+                        update = True
+                    f.close()
+                except:
+                    update = True
+            #
+            if update:
+                f = open(last_sha,'w')
+                f.write(pr.head.sha + '\n')
+                f.write(master_sha.sha + '\n')
+                f.close()
+                launch_pr_build(pr.number, pr_branchname)
+            else:
+    #            print(pr.number, 'is up to date', pr.merge_commit_sha)
+                pass
+    except (github.GithubException, socket.timeout) as ex:
+        # github might be down, or there may be a network issue,
+        # just go to the sleep statement and try again in a minute
+        print('Github/Socket exception :',ex)
+        pass
 
     # Sleep for a while before polling github again
     time.sleep(poll_time)
+    print('Checking github')
