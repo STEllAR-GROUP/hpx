@@ -78,6 +78,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
           , suspend_mtxs_(num_threads)
           , suspend_conds_(num_threads)
+          , pu_mtxs_(num_threads)
           , states_(num_threads)
           , description_(description)
           , parent_pool_(nullptr)
@@ -248,6 +249,12 @@ namespace hpx { namespace threads { namespace policies
             mode_.store(mode);
         }
 
+        compat::mutex& get_pu_mutex(std::size_t num_thread)
+        {
+            HPX_ASSERT(num_thread < pu_mtxs_.size());
+            return pu_mtxs_[num_thread];
+        }
+
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
 
@@ -409,6 +416,8 @@ namespace hpx { namespace threads { namespace policies
         // support for suspension of pus
         std::vector<compat::mutex> suspend_mtxs_;
         std::vector<compat::condition_variable> suspend_conds_;
+
+        std::vector<compat::mutex> pu_mtxs_;
 
         std::vector<std::atomic<hpx::state> > states_;
         char const* description_;

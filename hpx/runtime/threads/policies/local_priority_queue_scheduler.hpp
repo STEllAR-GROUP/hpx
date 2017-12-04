@@ -486,13 +486,14 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
 
             // Select an OS thread which hasn't been disabled
-
-            // NOTE: Not thread safe. Might schedule work on disabled pus.
+            std::unique_lock<compat::mutex> l;
             if (mode_ & threads::policies::enable_elasticity)
             {
+                l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread]);
                 while (states_[num_thread] > state_suspended)
                 {
                     num_thread = (num_thread + 1) % queue_size;
+                    l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread]);
                 }
             }
 
