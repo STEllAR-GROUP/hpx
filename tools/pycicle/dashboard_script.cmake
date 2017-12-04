@@ -165,15 +165,15 @@ set(CTEST_CONFIGURE_COMMAND "${CTEST_CONFIGURE_COMMAND} \"${CTEST_SOURCE_DIRECTO
 
 message("Configure...")
 ctest_configure()
-ctest_submit(PARTS Configure)
+ctest_submit(PARTS Update Configure)
 
 message("Build...")
 ctest_build(TARGET "tests" FLAGS "-j ${BUILD_PARALLELISM}")
-ctest_submit(PARTS Build)
+ctest_submit(PARTS Update Configure Build)
 
 message("Test...")
-ctest_test(RETURN_VALUE retval EXCLUDE "compile")
-ctest_submit(PARTS Test)
+ctest_test(RETURN_VALUE test_result_ EXCLUDE "compile")
+ctest_submit(PARTS Update Configure Build Test)
 
 if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
   ctest_coverage()
@@ -181,3 +181,7 @@ endif (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
 if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
   ctest_memcheck()
 endif (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+
+# write a file out so that we know this build has finished before we copy/erase
+# any files that were generated
+file(WRITE "${CTEST_BINARY_DIRECTORY}/pycicle-complete.txt" ${test_result_})

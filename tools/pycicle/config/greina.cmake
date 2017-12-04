@@ -19,7 +19,6 @@ set(PYCICLE_SLURM "TRUE")
 # These are settings you can use to define anything useful
 #######################################################################
 set(GCC_VER       "5.3.0")
-set(CMAKE_VER     "3.8.1")
 set(BOOST_VER     "1.65.1")
 set(HWLOC_VER     "1.11.8")
 set(JEMALLOC_VER  "5.0.1")

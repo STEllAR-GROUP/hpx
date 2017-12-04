@@ -19,8 +19,6 @@ set(PYCICLE_SLURM TRUE)
 # These are settings you can use to define anything useful
 #######################################################################
 set(GCC_VER       "6.2.0")
-set(CMAKE_VER     "3.8.1")
-set(MPI_VER       "7.6.0")
 set(BOOST_VER     "1.65.0")
 set(HWLOC_VER     "1.11.7")
 set(JEMALLOC_VER  "5.0.1")
@@ -37,11 +35,11 @@ set(PAPI_ROOT        "${INSTALL_ROOT}/papi/${PAPI_VER}")
 set(PAPI_INCLUDE_DIR "${INSTALL_ROOT}/papi/${PAPI_VER}/include")
 set(PAPI_LIBRARY     "${INSTALL_ROOT}/papi/${PAPI_VER}/lib/libpfm.so")
 
-set(CFLAGS     "-fPIC")
-set(CXXFLAGS   "-fPIC -march native-mtune native-ffast-math-std c++14")
-set(LDFLAGS    "-dynamic")
-set(LDCXXFLAGS "${LDFLAGS} -std c++14")
-set(BUILD_PARALLELISM "8")
+set(CFLAGS            "-fPIC")
+set(CXXFLAGS          "-fPIC -march native-mtune native-ffast-math-std c++14")
+set(LDFLAGS           "-dynamic")
+set(LDCXXFLAGS        "${LDFLAGS} -std c++14")
+set(BUILD_PARALLELISM "16")
 
 set(CTEST_SITE "daint(cray)-gcc-${GCC_VER}-Boost-${BOOST_VER}")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
@@ -71,7 +69,37 @@ string(CONCAT CTEST_BUILD_OPTIONS
     " -DHPX_WITH_TESTS_HEADERS=OFF "
     " -DHPX_WITH_TESTS_REGRESSIONS=ON "
     " -DHPX_WITH_TESTS_UNIT=ON "
-    " -DHPX_WITH_PARCELPORT_MPI=OFF "
+    " -DHPX_WITH_PARCELPORT_MPI=ON "
+    " -DHPX_WITH_PARCELPORT_MPI_MULTITHREADED=OFF "
     " -DHPX_WITH_THREAD_IDLE_RATES=ON "
+    " -DHPX_WITH_MAX_CPU_COUNT=256 "
+    " -DHPX_WITH_MORE_THAN_64_THREADS=ON "
     " -DDART_TESTING_TIMEOUT=45 "
 )
+
+#######################################################################
+# Setup a slurm job submission template
+# note that this is intentionally multiline
+#######################################################################
+set(SLURM_TEMPLATE "#!/bin/bash
+#SBATCH --job-name=hpx-${PYCICLE_PR}
+#SBATCH --time=04:00:00
+#SBATCH --nodes=1
+#SBATCH --exclusive
+#SBATCH --constraint=mc
+#SBATCH --partition=normal
+
+# ---------------------
+# unload or load modules that differ from the defaults on the system
+# ---------------------
+module load slurm
+module load git
+module load CMake
+module unload gcc
+module load gcc/${GCC_VER}
+
+# use Cray compiler wrappers to make MPI use easy
+export  CC=/opt/cray/pe/craype/default/bin/cc
+export CXX=/opt/cray/pe/craype/default/bin/CC
+
+")

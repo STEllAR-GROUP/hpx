@@ -8,7 +8,6 @@
 # Python Continuous Integration Command Line Engine
 # Simple tool to poll PRs on github and spawn builds
 # ------------------------------------------------------
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 import github, os, subprocess, time, re, string, random, socket, datetime
 
@@ -17,10 +16,25 @@ import github, os, subprocess, time, re, string, random, socket, datetime
 #----------------------------------------------------------------------------
 home = str(os.path.expanduser('~'))
 pycicle_dir = os.environ.get('PYCICLE_ROOT', home + '/pycicle')
-print('Pycicle using root path', pycicle_dir)
+print('pycicle using root path', pycicle_dir)
 
+#----------------------------------------------------------------------------
+# github token used to authenticate access
+#----------------------------------------------------------------------------
 user_token = 'generate a token and paste it here, or set env var'
 user_token = os.environ.get('PYCICLE_GITHUB_TOKEN', user_token)
+
+#----------------------------------------------------------------------------
+# Machines : get a list of machines to use for testing from PYCICLE_MACHINES
+# please use a comma separated list of machine nicknames such as
+# greina;daint;jb-laptop
+# where the names corresond to the name.cmake files in the config dir
+#----------------------------------------------------------------------------
+machines     = os.environ.get('PYCICLE_MACHINES', 'greina')
+machine_list = machines.split(',')
+machine      = machine_list[0]
+print('pycicle using machines', machine_list)
+print('current implementation supports 1 machine :', machine)
 
 #----------------------------------------------------------------------------
 # Debuging - set PYCICLE_DEBUG env var to disable triggering builds
@@ -42,9 +56,6 @@ repo = org.get_repo(reponame)
 # TODO : add support for multiple machines and configs
 #----------------------------------------------------------------------------
 current_path = os.path.dirname(os.path.realpath(__file__))
-nickname = 'greina'
-compiler = 'gcc'
-boost = '1.65.1'
 
 #----------------------------------------------------------------------------
 # read one value from the CMake config for use elsewhere
@@ -60,10 +71,14 @@ def get_setting_for_machine(machine, setting) :
 #----------------------------------------------------------------------------
 # launch a script that will do one build
 #----------------------------------------------------------------------------
-def launch_pr_build(pr_number, pr_branchname) :
+def launch_pr_build(nickname, pr_number, pr_branchname) :
     remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
     remote_path = get_setting_for_machine(nickname, 'PYCICLE_ROOT')
     remote_http = get_setting_for_machine(nickname, 'PYCICLE_HTTP')
+
+    # we are not yet using these as 'options'
+    compiler = 'xxx'
+    boost = 'x.xx.x'
 
     #  cmd = ['ssh ' + remote_ssh, 'echo -S ',
     cmd = ['ssh', remote_ssh, 'ctest -S ',
@@ -145,9 +160,8 @@ while True:
                 f.write(pr.head.sha + '\n')
                 f.write(master_sha.sha + '\n')
                 f.close()
-                launch_pr_build(pr.number, pr_branchname)
+                launch_pr_build(machine, pr.number, pr_branchname)
             else:
-    #            print(pr.number, 'is up to date', pr.merge_commit_sha)
                 pass
     except (github.GithubException, socket.timeout) as ex:
         # github might be down, or there may be a network issue,
