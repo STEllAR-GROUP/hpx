@@ -156,9 +156,8 @@ namespace hpx { namespace threads { namespace coroutines
 
             x86_linux_context_impl()
                 : m_stack(nullptr)
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             {
-
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
                 // concept inspired by the following links:
                 //
                 // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
@@ -176,10 +175,8 @@ namespace hpx { namespace threads { namespace coroutines
                 sigemptyset(&action.sa_mask);
                 sigaddset(&action.sa_mask, SIGSEGV);
                 sigaction(SIGSEGV, &action, nullptr);
-            }
-#else
-            {}
 #endif
+            }
 
             /**
              * Create a context that on restore invokes Functor on
@@ -247,9 +244,8 @@ namespace hpx { namespace threads { namespace coroutines
                 sigemptyset(&action.sa_mask);
                 sigaddset(&action.sa_mask, SIGSEGV);
                 sigaction(SIGSEGV, &action, nullptr);
-#else
-           }
 #endif
+           }
 
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
