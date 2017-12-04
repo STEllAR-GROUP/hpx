@@ -10,7 +10,7 @@
 # ------------------------------------------------------
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import github, os, subprocess, time, re, string, random, socket
+import github, os, subprocess, time, re, string, random, socket, datetime
 
 #----------------------------------------------------------------------------
 # user's home dir and pycicle root
@@ -20,7 +20,12 @@ pycicle_dir = os.environ.get('PYCICLE_ROOT', home + '/pycicle')
 print('Pycicle using root path', pycicle_dir)
 
 user_token = 'generate a token and paste it here, or set env var'
-user_token = os.environ.get('GITHUB_TOKEN', user_token)
+user_token = os.environ.get('PYCICLE_GITHUB_TOKEN', user_token)
+
+#----------------------------------------------------------------------------
+# Debuging - set PYCICLE_DEBUG env var to disable triggering builds
+#----------------------------------------------------------------------------
+debug_mode = os.environ.get('PYCICLE_DEBUG', '') != ''
 
 #----------------------------------------------------------------------------
 # Create a Github instance:
@@ -49,7 +54,6 @@ def get_setting_for_machine(machine, setting) :
     for line in f:
         m = re.findall(setting + ' \"(.+?)\"', line)
         if m:
-            print(setting, ' = ', m[0])
             return m[0]
     return ''
 
@@ -57,8 +61,6 @@ def get_setting_for_machine(machine, setting) :
 # launch a script that will do one build
 #----------------------------------------------------------------------------
 def launch_pr_build(pr_number, pr_branchname) :
-    print('Launching build for PR', str(pr_number))
-
     remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
     remote_path = get_setting_for_machine(nickname, 'PYCICLE_ROOT')
     remote_http = get_setting_for_machine(nickname, 'PYCICLE_HTTP')
@@ -73,11 +75,18 @@ def launch_pr_build(pr_number, pr_branchname) :
            '-DPYCICLE_RANDOM='  + random_string(10),
            '-DPYCICLE_COMPILER='+ compiler,
            '-DPYCICLE_BOOST='   + boost,
-           '-DPYCICLE_MASTER='  + 'master']
+           '-DPYCICLE_MASTER='  + 'master',
+           # Thes are to quiet warnings from ctest about unset vars
+           '-DCTEST_SOURCE_DIRECTORY=.',
+           '-DCTEST_BINARY_DIRECTORY=.',
+           '-DCTEST_COMMAND=":"']
+    if debug_mode:
+        print('Debug ', cmd)
+    else:
+        print('Executing ', cmd)
+        p = subprocess.Popen(cmd)
+        # print("pid = ", p.pid)
 
-    print('Executing ', current_path + '/launch_build.sh')
-    p = subprocess.Popen(cmd)
-    print("pid = ", p.pid)
     return None
 
 #----------------------------------------------------------------------------
@@ -89,10 +98,19 @@ def random_string(N):
 #----------------------------------------------------------------------------
 # main polling routine
 #----------------------------------------------------------------------------
+if debug_mode:
+    print('PYCICLE is in debug mode, no build trigger commands will be sent')
+
+t1 = datetime.datetime.now()
 master_branch = repo.get_branch(repo.default_branch)
 while True:
     #
     try:
+        t2 = datetime.datetime.now()
+        time_diff = t2-t1
+        t1 = t2
+        print('Checking github:', 'Time since last check (s)', time_diff.seconds)
+        #
         master_sha = master_branch.commit
         #
         for pr in repo.get_pulls('open'):
@@ -139,4 +157,3 @@ while True:
 
     # Sleep for a while before polling github again
     time.sleep(poll_time)
-    print('Checking github')
