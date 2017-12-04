@@ -321,11 +321,13 @@ namespace hpx { namespace threads { namespace policies
             std::unique_lock<compat::mutex> l;
             if (mode_ & threads::policies::enable_elasticity)
             {
-                l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread]);
-                while (states_[num_thread] > state_suspended)
+                l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
+                    std::try_to_lock);
+                while (!l.owns_lock() || states_[num_thread] > state_suspended)
                 {
                     num_thread = (num_thread + 1) % queue_size;
-                    l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread]);
+                    l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
+                        std::try_to_lock);
                 }
             }
 
