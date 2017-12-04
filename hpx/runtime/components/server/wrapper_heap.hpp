@@ -76,6 +76,7 @@ namespace hpx { namespace components { namespace detail
         typedef one_size_heap_allocators::fixed_mallocator allocator_type;
         typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::unique_lock<mutex_type> scoped_lock;
+        typedef wrapper_heap_base::heap_parameters heap_parameters;
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
         enum guard_value
@@ -87,7 +88,7 @@ namespace hpx { namespace components { namespace detail
 
     public:
         explicit wrapper_heap(char const* class_name, std::size_t count,
-            std::size_t heap_size, std::size_t step);
+            heap_parameters parameters);
 
         wrapper_heap();
         ~wrapper_heap() override;
@@ -120,10 +121,9 @@ namespace hpx { namespace components { namespace detail
         void tidy();
 
     protected:
-        void* pool_;
-        void* first_free_;
-        std::size_t step_;
-        std::size_t size_;
+        char* pool_;
+        char* first_free_;
+        heap_parameters const parameters_;
         std::size_t free_size_;
 
         // these values are used for AGAS registration of all elements of this
@@ -139,8 +139,6 @@ namespace hpx { namespace components { namespace detail
         std::size_t free_count_;
         std::size_t heap_count_;
 #endif
-
-        std::size_t const element_size_;  // size of one element in the heap
 
         // make sure the ABI of this is stable across configurations
 #if defined(HPX_DEBUG)
@@ -161,13 +159,14 @@ namespace hpx { namespace components { namespace detail
     {
     private:
         typedef wrapper_heap base_type;
+        typedef base_type::heap_parameters heap_parameters;
 
     public:
         typedef T value_type;
 
         explicit fixed_wrapper_heap(char const* class_name,
-                std::size_t count, std::size_t step, std::size_t element_size)
-          : base_type(class_name, count, step, element_size)
+                std::size_t count, heap_parameters parameters)
+          : base_type(class_name, count, parameters)
         {}
     };
 }}} // namespace hpx::components::detail

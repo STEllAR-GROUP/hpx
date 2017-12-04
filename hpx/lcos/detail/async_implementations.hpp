@@ -134,15 +134,15 @@ namespace hpx { namespace detail
         {
             try
             {
-                auto&& result = Action::execute_function(
-                    addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                typedef typename Action::remote_result_type remote_result_type;
 
-                typedef typename util::decay<decltype(result)>::type naked_type;
-                typedef traits::get_remote_result<Result, naked_type>
+                typedef traits::get_remote_result<Result, remote_result_type>
                     get_remote_result_type;
 
                 return make_ready_future(
-                    get_remote_result_type::call(std::move(result)));
+                    get_remote_result_type::call(
+                        Action::execute_function(
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...)));
             }
             catch (...)
             {
@@ -343,16 +343,32 @@ namespace hpx { namespace detail
                         id, addr.address_);
                 if (!r.first)
                 {
-                    f = hpx::async(action_invoker<action_type>(),
-                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                    if (action_type::direct_execution::value)
+                    {
+                        return sync_local_invoke<action_type, result_type>::call(
+                            id, std::move(addr), std::forward<Ts>(vs)...);
+                    }
+                    else
+                    {
+                        f = hpx::async(action_invoker<action_type>(),
+                                addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                    }
 
                     return keep_alive(std::move(f), id, std::move(r.second));
                 }
             }
             else
             {
-                f = hpx::async(action_invoker<action_type>(),
-                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                if (action_type::direct_execution::value)
+                {
+                    return sync_local_invoke<action_type, result_type>::call(
+                        id, std::move(addr), std::forward<Ts>(vs)...);
+                }
+                else
+                {
+                    f = hpx::async(action_invoker<action_type>(),
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                }
 
                 return keep_alive(std::move(f), id);
             }
