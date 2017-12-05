@@ -11,7 +11,9 @@
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -369,20 +371,19 @@ namespace verbs
             chunk_pool_ = rdma_controller_->get_memory_pool();
 
             LOG_DEBUG_MSG("Setting Connection function");
-            auto connection_function = std::bind(
-                &parcelport::handle_verbs_connection, this, std::placeholders::_1);
+            auto connection_function = hpx::util::bind_front(
+                &parcelport::handle_verbs_connection, this);
             rdma_controller_->setConnectionFunction(connection_function);
 
             LOG_DEBUG_MSG("Setting Completion function");
-            auto completion_function = std::bind(
-                &parcelport::handle_verbs_completion, this,
-                std::placeholders::_1, std::placeholders::_2);
+            auto completion_function = hpx::util::bind_front(
+                &parcelport::handle_verbs_completion, this);
             rdma_controller_->setCompletionFunction(completion_function);
 
             if (HPX_PARCELPORT_VERBS_HAVE_BOOTSTRAPPING() && bootstrap_enabled_) {
                 for (std::size_t i=0; i!=io_service_pool_.size(); ++i) {
                     io_service_pool_.get_io_service(int(i)).post(
-                        hpx::util::bind(
+                        hpx::util::deferred_call(
                             &parcelport::io_service_work, this
                         )
                     );
@@ -395,7 +396,8 @@ namespace verbs
             //
             hpx::error_code ec(hpx::lightweight);
             parcelport_scheduler.register_thread_nullary(
-                    util::bind(&parcelport::background_work_scheduler_thread, this),
+                    util::deferred_call(
+                        &parcelport::background_work_scheduler_thread, this),
                     "background_work_scheduler_thread",
                     threads::pending, true,
                     threads::thread_priority_high_recursive,
@@ -824,7 +826,8 @@ namespace verbs
             if (piggy_back) {
                 if (parcel_complete) {
                     rcv_data_type wrapped_pointer(piggy_back, h->size(),
-                        util::bind(&parcelport::delete_recv_data, this, current_recv),
+                        util::deferred_call(
+                            &parcelport::delete_recv_data, this, current_recv),
                         chunk_pool_.get(), nullptr);
                     rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
                     LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
@@ -1028,7 +1031,8 @@ namespace verbs
                 LOG_DEBUG_MSG("Creating a release buffer callback for tag "
                     << hexuint32(recv_data.tag));
                 rcv_data_type wrapped_pointer(message, message_length,
-                        util::bind(&parcelport::delete_recv_data, this, current_recv),
+                        util::deferred_call(
+                            &parcelport::delete_recv_data, this, current_recv),
                         chunk_pool_.get(), nullptr);
                 rcv_buffer_type buffer(std::move(wrapped_pointer), chunk_pool_.get());
                 LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
@@ -1047,7 +1051,8 @@ namespace verbs
                 //buffer.data_.resize(static_cast<std::size_t>(h->size()));
                 //buffer.data_size_ = h->size();
                 buffer.chunks_.resize(recv_data.chunks.size());
-                decode_message_with_chunks(*this, std::move(buffer), 0, recv_data.chunks);
+                decode_message_with_chunks(
+                    *this, std::move(buffer), 0, recv_data.chunks);
                 LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
             }
             else {

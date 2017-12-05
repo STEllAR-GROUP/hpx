@@ -431,8 +431,7 @@ namespace hpx { namespace lcos
             traits::acquire_future_disp());
 
         return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind(&detail::return_iterator<Iterator>,
-                util::placeholders::_1, end));
+            util::bind_back(&detail::return_iterator<Iterator>, end));
     }
 
     template <typename F, typename Iterator>
@@ -451,8 +450,7 @@ namespace hpx { namespace lcos
             lazy_values_.push_back(func(*begin++));
 
         return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind(&detail::return_iterator<Iterator>,
-                util::placeholders::_1, begin));
+            util::bind_back(&detail::return_iterator<Iterator>, begin));
     }
 
     template <typename F>

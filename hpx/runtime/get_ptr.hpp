@@ -20,7 +20,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <memory>
 
@@ -151,11 +151,9 @@ namespace hpx
     hpx::future<std::shared_ptr<Component> >
     get_ptr(naming::id_type const& id)
     {
-        using util::placeholders::_1;
         hpx::future<naming::address> f = agas::resolve(id);
-        return f.then(util::bind(
-            &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>,
-            _1, id));
+        return f.then(util::bind_back(
+            &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>, id));
     }
 
     /// \brief Returns a future referring to the pointer to the

@@ -23,6 +23,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -576,9 +577,8 @@ namespace hpx { namespace components
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
                     *this, launch::sync,
-                    util::bind(&client_base::register_as_helper,
-                        util::placeholders::_1, symbolic_name, manage_lifetime
-                    ));
+                    util::bind_back(&client_base::register_as_helper,
+                        symbolic_name, manage_lifetime));
             return hpx::traits::future_access<future<void> >::
                 create(std::move(p));
         }

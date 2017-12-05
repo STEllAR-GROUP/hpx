@@ -38,7 +38,7 @@ namespace verbs
         typedef typename std::vector<T>::size_type size_type;
         typedef Allocator allocator_type;
 
-        typedef std::function<void(void)> deleter_callback;
+        typedef std::function<void()> deleter_callback;
         T *m_array_;
         int m_size_;
         deleter_callback m_cb_;
