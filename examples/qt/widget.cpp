@@ -48,22 +48,25 @@ widget::widget(std::function<void(widget *, std::size_t)> callback, QWidget *par
     setLayout(main_layout);
 }
 
-void widget::add_label(std::size_t i, double t)
+void widget::threadsafe_add_label(std::size_t i, double t)
 {
-    std::lock_guard<hpx::lcos::local::spinlock> l(mutex);
+    // may be called from any thread, does not interact directly with GUI objects
     QString txt("Thread ");
     txt.append(QString::number(i))
        .append(" finished in ")
        .append(QString::number(t))
        .append(" seconds");
-    list->addItem(txt);
+
+    QGenericArgument arg("const QString&", &txt);
+    QMetaObject::invokeMethod(this, "add_label", arg);
 }
 
-void widget::run_finished()
+void widget::threadsafe_run_finished()
 {
-  bool value = true;
-  QGenericArgument arg("bool",&value);
-  QMetaObject::invokeMethod(run_button, "setEnabled", arg);
+    // may be called from any thread, does not interact directly with GUI objects
+    bool value = true;
+    QGenericArgument arg("bool",&value);
+    QMetaObject::invokeMethod(run_button, "setEnabled", arg);
 }
 
 void widget::set_threads(int no)
@@ -76,4 +79,9 @@ void widget::run_clicked(bool)
     run_button->setEnabled(false);
     list->clear();
     hpx::apply(callback_, this, no_threads);
+}
+
+void widget::add_label(const QString &text)
+{
+    list->addItem(text);
 }
