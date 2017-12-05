@@ -240,6 +240,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 // Not reachable.
                 HPX_ASSERT(false);
+                return;
             }
 
             fut.get();
@@ -585,8 +586,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     // Not reachable.
                     HPX_ASSERT(false);
                 }
-
-                fut.get();
+                if (fut.valid()) // NOLINT
+                    fut.get();
             }
             else /* left_size < right_size */
             {
@@ -640,7 +641,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     HPX_ASSERT(false);
                 }
 
-                fut.get();
+                if (fut.valid()) // NOLINT
+                    fut.get();
             }
         }
 

@@ -100,10 +100,18 @@ int main()
 
     HPX_TEST(test_vec == test_vec2);
 
+    checkpoint archive5(archive2);
+
+    // Test 6
+    //  test the operator= constructor
+    checkpoint archive6;
+    archive6 = archive5;
+
+    HPX_TEST(archive6 == archive5);
+
     // Test 5
     //  test creation of a checkpoint from a checkpoint
     //  test proper handling of futures
-    checkpoint archive5(archive2);
     hpx::future<std::vector<int>> test_vec2_future =
         hpx::make_ready_future(test_vec2);
     hpx::future<checkpoint> f_check =
@@ -112,13 +120,6 @@ int main()
     restore_checkpoint(f_check.get(), test_vec3_future);
 
     HPX_TEST(test_vec2 == test_vec3_future.get());
-
-    // Test 6
-    //  test the operator= constructor
-    checkpoint archive6;
-    archive6 = std::move(archive5);
-
-    HPX_TEST(archive6 == archive5);
 
     // Test 7
     //  test writing to a file

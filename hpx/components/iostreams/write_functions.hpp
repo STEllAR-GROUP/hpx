@@ -9,7 +9,7 @@
 #define HPX_B72D9BF0_B236_46F6_83AA_E45A70BD1FAA
 
 #include <hpx/config.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/function.hpp>
 
 #include <algorithm>
@@ -37,8 +37,7 @@ inline void iterator_write_function(std::vector<char> const& in, Iterator it)
 template <typename Iterator>
 inline write_function_type make_iterator_write_function(Iterator it)
 {
-    return util::bind(iterator_write_function<Iterator>,
-        util::placeholders::_1, it);
+    return util::bind_back(iterator_write_function<Iterator>, it);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,8 +51,7 @@ std_ostream_write_function(std::vector<char> const& in, std::ostream& os)
 // Factory function
 inline write_function_type make_std_ostream_write_function(std::ostream& os)
 {
-    return util::bind(std_ostream_write_function,
-        util::placeholders::_1, std::ref(os));
+    return util::bind_back(std_ostream_write_function, std::ref(os));
 }
 
 }}

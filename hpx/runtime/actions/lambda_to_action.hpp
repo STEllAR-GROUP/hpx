@@ -9,6 +9,7 @@
 #define HPX_RUNTIME_ACTIONS_LAMBDA_TO_ACTION_HPP
 
 #include <hpx/include/plain_actions.hpp>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -35,62 +36,46 @@ namespace hpx { namespace actions
             }
         };
 
-        template<typename F, typename ReturnType, typename ... Args>
-        struct caller{
-          static inline ReturnType call(Args && ... args)
-          {
-             int * dummy = nullptr;
-             return reinterpret_cast<const F&>(*dummy)( std::forward<Args>(args)... );
-          }
-        };
 
-        template<class F, typename ReturnType, typename Sequence>
-        struct make_action_using_sequence
-        {};
-
-        template<class F, typename ReturnType,
-          template <typename...> class T, typename ... Args>
-        struct make_action_using_sequence< F, ReturnType, T<Args...> >
+        template<typename F, typename ReturnType, typename... Args>
+        struct lambda_action
+          : basic_action<detail::plain_function, ReturnType(Args...),
+            lambda_action<F, ReturnType, Args...>>
         {
-          using type =
-              typename hpx::actions::make_action<
-                decltype(&caller<F,ReturnType,Args...>::call),
-                &caller<F,ReturnType,Args...>::call >::type;
+            typedef lambda_action derived_type;
+            typedef std::false_type direct_execution;
+            typedef void is_plain_action;
+
+            static std::string get_action_name(naming::address::address_type /*lva*/)
+            {
+                return "lambda action()";
+            }
+
+            template <typename ...Ts>
+            static ReturnType invoke(naming::address::address_type /*lva*/,
+                naming::address::component_type comptype, Ts&&... vs)
+            {
+                 int * dummy = nullptr;
+                 return reinterpret_cast<const F&>(*dummy)( std::forward<Ts>(vs)... );
+            }
         };
 
-        template <typename T>
-        struct extract_parameters
+        template <typename F, typename T>
+        struct extract_lambda_action
         {};
 
         // Specialization for lambdas
-        template <typename ClassType, typename ReturnType, typename... Args>
-        struct extract_parameters<ReturnType(ClassType::*)(Args...) const>
+        template <typename F, typename ClassType, typename ReturnType, typename... Args>
+        struct extract_lambda_action<F, ReturnType(ClassType::*)(Args...) const>
         {
-            using type = hpx::actions::detail::sequence< Args... >;
-        };
-
-        template <typename T>
-        struct extract_return_type
-        {};
-
-        template <typename ClassType, typename ReturnType, typename... Args>
-        struct extract_return_type<ReturnType(ClassType::*)(Args...) const>
-        {
-            using type = ReturnType;
+            using type = lambda_action<F, ReturnType, Args...>;
         };
 
         template <typename F>
         struct action_from_lambda
         {
-            using sequence_type =
-                typename hpx::actions::detail::extract_parameters<
-                    decltype(&F::operator())>::type;
-            using return_type =
-                typename hpx::actions::detail::extract_return_type<
-                    decltype(&F::operator())>::type;
             using type =
-                typename hpx::actions::detail::make_action_using_sequence<
-                    F,return_type,sequence_type>::type;
+                typename extract_lambda_action<F, decltype(&F::operator())>::type;
         };
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)

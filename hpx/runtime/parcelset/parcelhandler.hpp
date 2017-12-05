@@ -18,7 +18,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
@@ -206,10 +206,8 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         HPX_FORCEINLINE void put_parcel(parcel p)
         {
-            using util::placeholders::_1;
-            using util::placeholders::_2;
-            put_parcel(std::move(p), util::bind(
-                &parcelhandler::invoke_write_handler, this, _1, _2));
+            put_parcel(std::move(p), util::bind_front(
+                &parcelhandler::invoke_write_handler, this));
         }
 
         /// A parcel is submitted for transport at the source locality site to
@@ -244,10 +242,8 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         void put_parcels(std::vector<parcel> parcels)
         {
-            using util::placeholders::_1;
-            using util::placeholders::_2;
             std::vector<write_handler_type> handlers(parcels.size(),
-                util::bind(&parcelhandler::invoke_write_handler, this, _1, _2));
+                util::bind_front(&parcelhandler::invoke_write_handler, this));
 
             put_parcels(std::move(parcels), std::move(handlers));
         }

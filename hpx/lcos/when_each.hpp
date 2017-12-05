@@ -165,14 +165,14 @@ namespace hpx { namespace lcos
             inline static void call(F&& f, IndexType index, FutureType&& future,
                 std::true_type)
             {
-                f(index, std::move(future));
+                f(index, std::forward<FutureType>(future));
             }
 
             template<typename F, typename IndexType, typename FutureType>
             inline static void call(F&& f, IndexType index, FutureType&& future,
                 std::false_type)
             {
-                f(std::move(future));
+                f(std::forward<FutureType>(future));
             }
         };
 
@@ -387,9 +387,10 @@ namespace hpx { namespace lcos
             std::back_inserter(lazy_values_),
             traits::acquire_future_disp());
 
+        std::size_t lazy_values_size = lazy_values_.size();
         boost::intrusive_ptr<frame_type> p(new frame_type(
             util::forward_as_tuple(std::move(lazy_values_)),
-            std::forward<F>(func), lazy_values_.size()));
+            std::forward<F>(func), lazy_values_size));
 
         p->do_await();
 
@@ -430,8 +431,7 @@ namespace hpx { namespace lcos
             traits::acquire_future_disp());
 
         return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind(&detail::return_iterator<Iterator>,
-                util::placeholders::_1, end));
+            util::bind_back(&detail::return_iterator<Iterator>, end));
     }
 
     template <typename F, typename Iterator>
@@ -450,8 +450,7 @@ namespace hpx { namespace lcos
             lazy_values_.push_back(func(*begin++));
 
         return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind(&detail::return_iterator<Iterator>,
-                util::placeholders::_1, begin));
+            util::bind_back(&detail::return_iterator<Iterator>, begin));
     }
 
     template <typename F>
