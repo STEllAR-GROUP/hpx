@@ -258,18 +258,18 @@ namespace hpx { namespace threads { namespace coroutines
             {
                 ucontext_t * uc_ctx = static_cast< ucontext_t* >(ctxptr);
                 char* sigsegv_ptr = static_cast< char* >(infoptr->si_addr);
-        
+
                 // https://www.gnu.org/software/libc/manual/html_node/Signal-Stack.html
                 //
                 char* stk_ptr = static_cast<char*>(uc_ctx->uc_stack.ss_sp);
 
-                std::ptrdiff_t addr_delta = (sigsegv_ptr > stk_ptr) 
+                std::ptrdiff_t addr_delta = (sigsegv_ptr > stk_ptr)
                     ? (sigsegv_ptr - stk_ptr)
                     : (stk_ptr - sigsegv_ptr);
 
-                // check the stack addresses, if they're < 10 apart, terminate program 
-                // should filter segmentation faults caused by coroutine stack overflows
-                // from 'genuine' stack overflows
+                // check the stack addresses, if they're < 10 apart, terminate
+                // program should filter segmentation faults caused by
+                // coroutine stack overflows from 'genuine' stack overflows
                 //
                 if(static_cast<size_t>(addr_delta) < COROUTINE_STACKOVERFLOW_ADDR_EPSILON) {
                     std::cerr << "Stack overflow in coroutine at address "

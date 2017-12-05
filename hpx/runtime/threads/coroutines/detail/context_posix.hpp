@@ -288,11 +288,13 @@ namespace hpx { namespace threads { namespace coroutines
                     ? (sigsegv_ptr - stk_ptr)
                     : (stk_ptr - sigsegv_ptr);
 
-                // check the stack addresses, if they're < 10 apart, terminate program 
-                // should filter segmentation faults caused by coroutine stack overflows
-                // from 'genuine' stack overflows
+                // check the stack addresses, if they're < 10 apart, terminate
+                // program should filter segmentation faults caused by
+                // coroutine stack overflows from 'genuine' stack overflows
                 //
-                if(static_cast<size_t>(addr_delta) < COROUTINE_STACKOVERFLOW_ADDR_EPSILON) {
+                if(static_cast<size_t>(addr_delta) <
+                     COROUTINE_STACKOVERFLOW_ADDR_EPSILON) {
+
                     std::cerr << "Stack overflow in coroutine at address "
                         << std::internal << std::hex
                         << std::setw(sizeof(sigsegv_ptr)*2+2)
