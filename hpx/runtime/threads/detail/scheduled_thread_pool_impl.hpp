@@ -318,8 +318,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::suspend(error_code& ec)
     {
-        // TODO: Check pool.
-        if (threads::get_self_ptr() /*&& self->get_pool() == this*/)
+        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::suspend",
@@ -327,10 +326,19 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
-        // TODO: Check if in runtime.
-        while (get_thread_count() > get_background_thread_count())
+        if (threads::get_self_ptr())
         {
-            hpx::this_thread::suspend();
+            while (sched_->Scheduler::get_thread_count() >
+                get_background_thread_count())
+            {
+                hpx::this_thread::suspend();
+            }
+        }
+
+        {
+            while (sched_->Scheduler::get_thread_count() >
+                get_background_thread_count())
+            {}
         }
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
