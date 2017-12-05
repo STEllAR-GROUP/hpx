@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace detail
         std::false_type)
     {
         try {
-            cont.set_value(func(std::move(future)));
+            cont.set_value(func(std::forward<Future>(future)));
         }
         catch (...) {
             cont.set_exception(std::current_exception());
@@ -92,7 +92,7 @@ namespace hpx { namespace lcos { namespace detail
         std::true_type)
     {
         try {
-            func(std::move(future));
+            func(std::forward<Future>(future));
             cont.set_value(util::unused);
         }
         catch (...) {
@@ -112,7 +112,7 @@ namespace hpx { namespace lcos { namespace detail
         > is_void;
 
         hpx::util::annotate_function annotate(func);
-        invoke_continuation(func, std::move(future), cont, is_void());
+        invoke_continuation(func, std::forward<Future>(future), cont, is_void());
     }
 
     template <typename Func, typename Future, typename Continuation>
@@ -132,7 +132,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // take by value, as the future may go away immediately
             inner_shared_state_ptr inner_state =
-                traits::detail::get_shared_state(func(std::move(future)));
+                traits::detail::get_shared_state(func(std::forward<Future>(future)));
             typename inner_shared_state_ptr::element_type* ptr =
                 inner_state.get();
 
@@ -210,7 +210,10 @@ namespace hpx { namespace lcos { namespace detail
     public:
         typedef typename base_type::init_no_addref init_no_addref;
 
-        template <typename Func>
+        template <typename Func, typename Enable = typename
+            std::enable_if<
+                !std::is_same<typename hpx::util::decay<Func>::type,
+                    continuation>::value>::type>
         continuation(Func && f)
           : started_(false), id_(threads::invalid_thread_id)
           , f_(std::forward<Func>(f))
@@ -850,7 +853,7 @@ namespace hpx { namespace lcos { namespace detail
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
             new shared_state(init_no_addref()), false);
-        static_cast<shared_state*>(p.get())->attach(std::move(future));
+        static_cast<shared_state*>(p.get())->attach(std::forward<Future>(future));
         return p;
     }
 }}}

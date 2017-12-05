@@ -14,6 +14,8 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
@@ -107,8 +109,8 @@ namespace hpx { namespace plugins { namespace parcel
         interval_(detail::get_interval(interval)),
         buffer_(num_coalesced_parcels_),
         timer_(
-            util::bind(&coalescing_message_handler::timer_flush, this_()),
-            util::bind(&coalescing_message_handler::flush_terminate, this_()),
+            util::bind_back(&coalescing_message_handler::timer_flush, this_()),
+            util::bind_back(&coalescing_message_handler::flush_terminate, this_()),
             std::string(action_name) + "_timer"),
         stopped_(false),
         allow_background_flush_(detail::get_background_flush()),
@@ -125,19 +127,15 @@ namespace hpx { namespace plugins { namespace parcel
         histogram_num_buckets_(-1)
     {
         // register performance counter functions
-        using util::placeholders::_1;
-        using util::placeholders::_2;
-        using util::placeholders::_3;
-        using util::placeholders::_4;
         coalescing_counter_registry::instance().register_action(action_name,
-            util::bind(&coalescing_message_handler::get_parcels_count, this, _1),
-            util::bind(&coalescing_message_handler::get_messages_count, this, _1),
-            util::bind(&coalescing_message_handler::
-                get_parcels_per_message_count, this, _1),
-            util::bind(&coalescing_message_handler::
-                get_average_time_between_parcels, this, _1),
-            util::bind(&coalescing_message_handler::
-                get_time_between_parcels_histogram_creator, this, _1, _2, _3, _4));
+            util::bind_front(&coalescing_message_handler::get_parcels_count, this),
+            util::bind_front(&coalescing_message_handler::get_messages_count, this),
+            util::bind_front(&coalescing_message_handler::
+                get_parcels_per_message_count, this),
+            util::bind_front(&coalescing_message_handler::
+                get_average_time_between_parcels, this),
+            util::bind_front(&coalescing_message_handler::
+                get_time_between_parcels_histogram_creator, this));
 
         // register parameter update callbacks
         set_config_entry_callback(
@@ -406,8 +404,8 @@ namespace hpx { namespace plugins { namespace parcel
         std::lock_guard<mutex_type> l(mtx_);
         if (time_between_parcels_)
         {
-            result = util::bind(&coalescing_message_handler::
-                get_time_between_parcels_histogram, this, util::placeholders::_1);
+            result = util::bind_front(&coalescing_message_handler::
+                get_time_between_parcels_histogram, this);
             return;
         }
 
@@ -421,8 +419,8 @@ namespace hpx { namespace plugins { namespace parcel
             hpx::util::tag::histogram::max_range = double(max_boundary)));
         last_parcel_time_ = util::high_resolution_clock::now();
 
-        result = util::bind(&coalescing_message_handler::
-            get_time_between_parcels_histogram, this, util::placeholders::_1);
+        result = util::bind_front(&coalescing_message_handler::
+            get_time_between_parcels_histogram, this);
     }
 
     ///////////////////////////////////////////////////////////////////////////

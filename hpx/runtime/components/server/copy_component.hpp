@@ -12,6 +12,7 @@
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <memory>
 
@@ -77,8 +78,8 @@ namespace hpx { namespace components { namespace server
     {
         future<std::shared_ptr<Component> > f =
             get_ptr<Component>(to_copy);
-        return f.then(util::bind(&detail::copy_component_postproc<Component>,
-            util::placeholders::_1, target_locality));
+        return f.then(util::bind_back(&detail::copy_component_postproc<Component>,
+            target_locality));
     }
 
     template <typename Component>

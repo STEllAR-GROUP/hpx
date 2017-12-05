@@ -91,7 +91,7 @@ int main()
         for (hpx::id_type const& loc : hpx::find_all_localities())
         {
             hpx::id_type id = hpx::async(
-                hpx::launch::deferred, std::move(gl), loc).get();
+                hpx::launch::deferred, gl, loc).get();
             HPX_TEST_EQ(loc, id);
         }
     }

@@ -16,6 +16,8 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/exception_list.hpp>
@@ -192,9 +194,9 @@ namespace hpx { namespace parallel { inline namespace v2
             return
                 result::get(
                     hpx::dataflow(
-                        hpx::util::bind(hpx::
-                            util::one_shot(&task_block::on_ready),
-                            hpx::util::placeholders::_1, std::move(errors)),
+                        hpx::util::bind_back(
+                            hpx::util::one_shot(&task_block::on_ready),
+                            std::move(errors)),
                         std::move(tasks)
                     ));
         }

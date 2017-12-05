@@ -23,6 +23,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -175,7 +176,7 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename Target>
         future_data(Target && data, init_no_addref no_addref)
-          : future_data_base<id_type>(std::move(data), no_addref)
+          : future_data_base<id_type>(std::forward<Target>(data), no_addref)
         {}
 
         future_data(std::exception_ptr const& e, init_no_addref no_addref)
@@ -576,9 +577,8 @@ namespace hpx { namespace components
             typename hpx::traits::detail::shared_state_ptr<void>::type p =
                 lcos::detail::make_continuation<void>(
                     *this, launch::sync,
-                    util::bind(&client_base::register_as_helper,
-                        util::placeholders::_1, symbolic_name, manage_lifetime
-                    ));
+                    util::bind_back(&client_base::register_as_helper,
+                        symbolic_name, manage_lifetime));
             return hpx::traits::future_access<future<void> >::
                 create(std::move(p));
         }

@@ -73,7 +73,7 @@ namespace hpx { namespace threads { namespace coroutines
         }
 
         coroutine(coroutine && src)
-          : m_pimpl(src.m_pimpl)
+          : m_pimpl(std::move(src.m_pimpl))
         {
             src.m_pimpl = nullptr;
         }

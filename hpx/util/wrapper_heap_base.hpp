@@ -17,6 +17,13 @@ namespace hpx { namespace util
 {
     struct wrapper_heap_base
     {
+        struct heap_parameters
+        {
+            std::size_t capacity;
+            std::size_t element_alignment;
+            std::size_t element_size;
+        };
+
         virtual ~wrapper_heap_base() {}
 
         virtual bool alloc(void** result, std::size_t count = 1) = 0;

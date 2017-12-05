@@ -379,11 +379,11 @@ void test_wait_for_either_of_five_futures_1_from_list()
 
     Container t = std::move(raw.futures);
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
-    HPX_TEST(!f3.valid());
-    HPX_TEST(!f4.valid());
-    HPX_TEST(!f5.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
+    HPX_TEST(!f3.valid()); // NOLINT
+    HPX_TEST(!f4.valid()); // NOLINT
+    HPX_TEST(!f5.valid()); // NOLINT
 
     HPX_TEST(t.front().is_ready());
     HPX_TEST_EQ(t.front().get(), 42);
@@ -423,11 +423,11 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
 
     Container t = std::move(raw.futures);
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
-    HPX_TEST(!f3.valid());
-    HPX_TEST(!f4.valid());
-    HPX_TEST(!f5.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
+    HPX_TEST(!f3.valid()); // NOLINT
+    HPX_TEST(!f4.valid()); // NOLINT
+    HPX_TEST(!f5.valid()); // NOLINT
 
     HPX_TEST(t.front().is_ready());
     HPX_TEST_EQ(t.front().get(), 42);
