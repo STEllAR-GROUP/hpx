@@ -12,11 +12,13 @@
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <mutex>
 #include <utility>
+#include <type_traits>
 
 namespace hpx { namespace components
 {
@@ -66,7 +68,9 @@ namespace hpx { namespace components
 
         struct decorate_wrapper
         {
-            template <typename F>
+            template <typename F, typename Enable = typename
+                std::enable_if<!std::is_same<typename hpx::util::decay<F>::type,
+                    decorate_wrapper>::value>::type>
             decorate_wrapper(F && f)
             {
                 threads::get_self().decorate_yield(std::forward<F>(f));
@@ -100,8 +104,7 @@ namespace hpx { namespace components
             {
                 // register our yield decorator
                 decorate_wrapper yield_decorator(
-                    util::bind(&locking_hook::yield_function, this,
-                        util::placeholders::_1));
+                    util::bind_front(&locking_hook::yield_function, this));
 
                 result = f(state);
 

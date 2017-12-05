@@ -204,6 +204,9 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
@@ -263,9 +266,8 @@ namespace hpx { namespace lcos
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                using util::placeholders::_1;
                 hpx::future<std::vector<T> > f = gate_.get_future().then(
-                        util::bind(&gather_server::on_ready, this, _1));
+                        util::bind_front(&gather_server::on_ready, this));
 
                 set_result_locked(which, std::move(t), l);
 
@@ -381,8 +383,8 @@ namespace hpx { namespace lcos
 
         // register the gatherer's id using the given basename
         using util::placeholders::_1;
-        return id.then(util::bind(
-                &detail::register_gather_name, _1, std::move(name), this_site
+        return id.then(util::bind_back(
+                &detail::register_gather_name, std::move(name), this_site
             ));
     }
 

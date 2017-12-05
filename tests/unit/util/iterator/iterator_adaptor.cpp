@@ -122,7 +122,7 @@ public:
     ptr_iterator(const ptr_iterator<V2>& x,
             typename std::enable_if<
                 std::is_convertible<V2*, V*>::value
-            >::type* = 0)
+            >::type* = nullptr)
       : base_adaptor_type(x.base())
     {
     }

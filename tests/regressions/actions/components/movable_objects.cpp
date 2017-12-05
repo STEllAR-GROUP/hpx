@@ -45,7 +45,7 @@ namespace hpx { namespace test
         return *this;
     }
 
-    std::size_t movable_object::get_count() const
+    std::size_t movable_object::get_count()
     {
         return count;
     }
@@ -92,7 +92,7 @@ namespace hpx { namespace test
         return *this;
     }
 
-    std::size_t non_movable_object::get_count() const
+    std::size_t non_movable_object::get_count()
     {
         return count;
     }

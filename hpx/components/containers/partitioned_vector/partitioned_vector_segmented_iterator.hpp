@@ -513,7 +513,7 @@ namespace hpx
 
     public:
         segment_vector_iterator()
-          : data_(0)
+          : data_(nullptr)
         {}
 
         segment_vector_iterator(BaseIter const& it,
@@ -547,7 +547,7 @@ namespace hpx
 
     public:
         const_segment_vector_iterator()
-          : data_(0)
+          : data_(nullptr)
         {}
 
         template<typename RightBaseIter>

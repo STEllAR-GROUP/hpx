@@ -131,7 +131,7 @@ namespace hpx { namespace performance_counters { namespace papi
     {
         typename boost::generator_iterator_generator<T>::type gi =
             boost::make_generator_iterator(gen);
-        for ( ; *gi != 0; ++gi)
+        for ( ; *gi != nullptr; ++gi)
         {
             std::set<std::string>::const_iterator it;
             // iterate over known thread names

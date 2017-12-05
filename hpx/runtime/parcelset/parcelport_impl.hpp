@@ -21,8 +21,9 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -319,7 +320,7 @@ namespace hpx { namespace parcelset
             {
                 error_code ec(lightweight);
                 hpx::applier::register_thread_nullary(
-                    util::bind(
+                    util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache,
                         this, loc),
                     "remove_from_connection_cache_delayed",
@@ -337,7 +338,7 @@ namespace hpx { namespace parcelset
             error_code ec(lightweight);
             threads::thread_id_type id =
                 hpx::applier::register_thread_nullary(
-                    util::bind(
+                    util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache_delayed,
                         this, loc),
                     "remove_from_connection_cache",
@@ -410,11 +411,9 @@ namespace hpx { namespace parcelset
             put_parcel(
                 dest
               , std::move(p)
-              , util::bind(
+              , util::bind_front(
                     &parcelport::early_pending_parcel_handler
                   , this
-                  , util::placeholders::_1
-                  , util::placeholders::_2
                 )
             );
         }
@@ -892,17 +891,14 @@ namespace hpx { namespace parcelset
                     this->get_max_outbound_message_size());
 
             using hpx::parcelset::detail::call_for_each;
-            using hpx::util::placeholders::_1;
-            using hpx::util::placeholders::_2;
-            using hpx::util::placeholders::_3;
             if (num_parcels == parcels.size())
             {
                 ++operations_in_flight_;
                 // send all of the parcels
                 sender_connection->async_write(
                     call_for_each(std::move(handlers), std::move(parcels)),
-                    util::bind(&parcelport_impl::send_pending_parcels_trampoline,
-                        this, _1, _2, _3));
+                    util::bind_front(&parcelport_impl::send_pending_parcels_trampoline,
+                        this));
             }
             else
             {
@@ -925,8 +921,8 @@ namespace hpx { namespace parcelset
                 sender_connection->async_write(
                     call_for_each(
                         std::move(handled_handlers), std::move(handled_parcels)),
-                    util::bind(&parcelport_impl::send_pending_parcels_trampoline,
-                        this, _1, _2, _3));
+                    util::bind_front(&parcelport_impl::send_pending_parcels_trampoline,
+                        this));
 
                 // give back unhandled parcels
                 parcels.erase(parcels.begin(), parcels.begin()+num_parcels);
