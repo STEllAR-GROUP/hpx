@@ -26,7 +26,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/config/${PYCICLE_HOST}.cmake)
 # Generate a slurm job script and launch it
 # we must pass all the parms we received through to the slurm script
 #######################################################################
-string(CONCAT SLURM_TEMPLATE ${SLURM_TEMPLATE}
+string(CONCAT PYCICLE_SLURM_TEMPLATE ${PYCICLE_SLURM_TEMPLATE}
   "ctest "
   "-S ${PYCICLE_ROOT}/repo/tools/pycicle/dashboard_script.cmake "
   "-DPYCICLE_ROOT=${PYCICLE_ROOT} "
@@ -38,13 +38,14 @@ string(CONCAT SLURM_TEMPLATE ${SLURM_TEMPLATE}
   "-DPYCICLE_MASTER=${PYCICLE_MASTER} \n"
 )
 
-file(WRITE "${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh" ${SLURM_TEMPLATE})
+# write the job script into a temp file
+file(WRITE "${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh" ${PYCICLE_SLURM_TEMPLATE})
 
 #######################################################################
 # Launch the dashboard test using slurm
 # 1 Cancel any build using the same name as this one so that multiple
 #   pushes to the same branch are handled cleanly
-# 2 Wipe any ctest XML files in the build tree to make it easier to
+# 2 Should we wipe any ctest XML files in the build tree to make it easier to
 #   get the most up-to-date one?
 # 3 Spawn a new build
 #######################################################################
@@ -53,4 +54,5 @@ execute_process(
                      sbatch ${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh"
 )
 
+# wipe the temp file job script
 file(REMOVE "${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh")

@@ -17,6 +17,9 @@ message("Random string is " ${PYCICLE_RANDOM})
 message("COMPILER is      " ${PYCICLE_COMPILER})
 message("BOOST is         " ${PYCICLE_BOOST})
 
+# need to make this a passed in option
+set(CTEST_BUILD_CONFIGURATION "Release")
+
 #######################################################################
 # Load machine specific settings
 #######################################################################
@@ -35,17 +38,18 @@ set(PYCICLE_BUILD_ROOT     "${PYCICLE_ROOT}/build")
 set(PYCICLE_LOCAL_GIT_COPY "${PYCICLE_ROOT}/repo")
 
 if (PYCICLE_PR)
+  set(PYCICLE_WORK_DIR ${PYCICLE_PR})
   set(CTEST_SOURCE_DIRECTORY "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}/repo")
   set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/${PYCICLE_PR}")
   file(MAKE_DIRECTORY "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}")
+  set(CTEST_BUILD_NAME "${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 else()
+  set(PYCICLE_WORK_DIR "master")
   set(CTEST_SOURCE_DIRECTORY "${PYCICLE_SRC_ROOT}/master/repo")
   set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/master")
   file(MAKE_DIRECTORY "${PYCICLE_SRC_ROOT}/master")
+  set(CTEST_BUILD_NAME "${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 endif()
-
-set(CTEST_BUILD_CONFIGURATION "Release")
-set(CTEST_BUILD_NAME "PR-${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 
 #######################################################################
 # Not yet implemented memcheck/coverage/etc
@@ -119,8 +123,9 @@ if (PYCICLE_PR)
   )
   set(CTEST_UPDATE_OPTIONS "${CTEST_SOURCE_DIRECTORY} ${GIT_BRANCH}")
 else()
-  set(CTEST_SUBMISSION_TRACK "Nightly")
+  set(CTEST_SUBMISSION_TRACK "Pull Requests")
   set(GIT_BRANCH "${PYCICLE_MASTER}")
+  set(WORK_DIR "${PYCICLE_SRC_ROOT}/master")
   execute_process(
     COMMAND bash "-c" "${make_repo_copy_}
                        cd ${CTEST_SOURCE_DIRECTORY};
@@ -134,6 +139,11 @@ else()
   )
   #message("Process output copy : " ${output})
 endif()
+
+#######################################################################
+# Erase any test complete status before starting new dashboard run
+#######################################################################
+file(REMOVE "${CTEST_BINARY_DIRECTORY}/pycicle-TAG.txt")
 
 #######################################################################
 # Dashboard model : @TODO
@@ -168,10 +178,12 @@ ctest_configure()
 ctest_submit(PARTS Update Configure)
 
 message("Build...")
-ctest_build(TARGET "tests" FLAGS "-j ${BUILD_PARALLELISM}")
+set(CTEST_BUILD_FLAGS "-j ${BUILD_PARALLELISM}")
+ctest_build(TARGET "tests" )
 ctest_submit(PARTS Update Configure Build)
 
 message("Test...")
+set(CTEST_TEST_TIMEOUT "30")
 ctest_test(RETURN_VALUE test_result_ EXCLUDE "compile")
 ctest_submit(PARTS Update Configure Build Test)
 
@@ -182,6 +194,21 @@ if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
   ctest_memcheck()
 endif (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
 
-# write a file out so that we know this build has finished before we copy/erase
-# any files that were generated
-file(WRITE "${CTEST_BINARY_DIRECTORY}/pycicle-complete.txt" ${test_result_})
+# Create a file when this build has finished so that pycicle can
+# scrape the most recent results and use them to update the pull request status
+# we will get the TAG from ctest and use it to find the correct XML files
+# with our Configure/Build/Test errors/warnings
+execute_process(
+  COMMAND bash "-c"
+    "TEMP=$(head -n 1 ${PYCICLE_WORK_DIR}/Testing/TAG);
+    {
+    grep '<Error>' ${PYCICLE_WORK_DIR}/Testing/$TEMP/Configure.xml | wc -l
+    grep '<Error>' ${PYCICLE_WORK_DIR}/Testing/$TEMP/Build.xml | wc -l
+    grep '<Test Status=\"failed\">' ${PYCICLE_WORK_DIR}/Testing/$TEMP/Test.xml | wc -l
+    echo $TEMP
+    } > ${CTEST_BINARY_DIRECTORY}/pycicle-TAG.txt"
+  WORKING_DIRECTORY "${PYCICLE_BUILD_ROOT}"
+  OUTPUT_VARIABLE output
+  ERROR_VARIABLE output
+  RESULT_VARIABLE failed
+)

@@ -78,7 +78,7 @@ string(CONCAT CTEST_BUILD_OPTIONS
 # Setup a slurm job submission template
 # note that this is intentionally multiline
 #######################################################################
-set(SLURM_TEMPLATE "#!/bin/bash
+set(PYCICLE_SLURM_TEMPLATE "#!/bin/bash
 #SBATCH --job-name=hpx-${PYCICLE_PR}
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1

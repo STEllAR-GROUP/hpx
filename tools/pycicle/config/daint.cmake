@@ -11,7 +11,7 @@ set(PYCICLE_MACHINE "daint.cscs.ch")
 # the root location of the build/test tree on the machine
 set(PYCICLE_ROOT "/scratch/snx3000/biddisco/pycicle")
 # a flag that says if the machine can send http results to cdash
-set(PYCICLE_HTTP FALSE)
+set(PYCICLE_HTTP TRUE)
 # Launch jobs using slurm rather than directly running them on the machine
 set(PYCICLE_SLURM TRUE)
 
@@ -39,9 +39,9 @@ set(CFLAGS            "-fPIC")
 set(CXXFLAGS          "-fPIC -march native-mtune native-ffast-math-std c++14")
 set(LDFLAGS           "-dynamic")
 set(LDCXXFLAGS        "${LDFLAGS} -std c++14")
-set(BUILD_PARALLELISM "16")
+set(BUILD_PARALLELISM "32")
 
-set(CTEST_SITE "daint(cray)-gcc-${GCC_VER}-Boost-${BOOST_VER}")
+set(CTEST_SITE "cray(daint)-gcc-${GCC_VER}-Boost-${BOOST_VER}")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 
 #######################################################################
@@ -69,7 +69,7 @@ string(CONCAT CTEST_BUILD_OPTIONS
     " -DHPX_WITH_TESTS_HEADERS=OFF "
     " -DHPX_WITH_TESTS_REGRESSIONS=ON "
     " -DHPX_WITH_TESTS_UNIT=ON "
-    " -DHPX_WITH_PARCELPORT_MPI=ON "
+    " -DHPX_WITH_PARCELPORT_MPI=OFF "
     " -DHPX_WITH_PARCELPORT_MPI_MULTITHREADED=OFF "
     " -DHPX_WITH_THREAD_IDLE_RATES=ON "
     " -DHPX_WITH_MAX_CPU_COUNT=256 "
@@ -81,7 +81,7 @@ string(CONCAT CTEST_BUILD_OPTIONS
 # Setup a slurm job submission template
 # note that this is intentionally multiline
 #######################################################################
-set(SLURM_TEMPLATE "#!/bin/bash
+set(PYCICLE_SLURM_TEMPLATE "#!/bin/bash
 #SBATCH --job-name=hpx-${PYCICLE_PR}
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
@@ -101,5 +101,7 @@ module load gcc/${GCC_VER}
 # use Cray compiler wrappers to make MPI use easy
 export  CC=/opt/cray/pe/craype/default/bin/cc
 export CXX=/opt/cray/pe/craype/default/bin/CC
+
+export HPXRUN_RUNWRAPPER=srun
 
 ")
