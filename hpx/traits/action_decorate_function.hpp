@@ -9,6 +9,7 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/traits/has_xxx.hpp>
 #include <hpx/util/unique_function.hpp>
 
 #include <utility>
@@ -50,11 +51,14 @@ namespace hpx { namespace traits
             return decorate_function_helper::template call<Action>(
                 0, lva, std::forward<F>(f));
         }
+
+        HPX_HAS_XXX_TRAIT_DEF(decorates_action);
     }
 
     template <typename Action, typename Enable = void>
     struct action_decorate_function
     {
+        static constexpr bool value = detail::has_decorates_action<Action>::value;
         template <typename F>
         static threads::thread_function_type
         call(naming::address_type lva, F && f)

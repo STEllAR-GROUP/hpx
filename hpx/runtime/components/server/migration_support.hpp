@@ -155,6 +155,8 @@ namespace hpx { namespace components
         /// has been finished
         void on_migrated() {}
 
+        typedef void decorates_action;
+
         /// This is the hook implementation for decorate_action which makes
         /// sure that the object becomes pinned during the execution of an
         /// action.

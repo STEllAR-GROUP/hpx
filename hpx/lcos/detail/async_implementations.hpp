@@ -12,6 +12,8 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
@@ -152,6 +154,19 @@ namespace hpx { namespace detail
     };
 
     template <typename Action>
+    bool can_invoke_locally()
+    {
+        return !traits::action_decorate_function<Action>::value &&
+            this_thread::get_priority() ==
+                static_cast<threads::thread_priority>(
+                    traits::action_priority<Action>::value) &&
+            this_thread::get_stack_size() ==
+                threads::get_stack_size(
+                    static_cast<threads::thread_stacksize>(
+                        traits::action_stacksize<Action>::value));
+    }
+
+    template <typename Action>
     struct sync_local_invoke<Action, void>
     {
         template <typename ...Ts>
@@ -209,7 +224,8 @@ namespace hpx { namespace detail
         std::pair<bool, components::pinned_ptr> r;
 
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+        if (agas::is_local_address_cached(id, addr) &&
+            can_invoke_locally<action_type>())
         {
             if (traits::component_supports_migration<component_type>::call())
             {
@@ -272,7 +288,8 @@ namespace hpx { namespace detail
         std::pair<bool, components::pinned_ptr> r;
 
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+        if (agas::is_local_address_cached(id, addr) &&
+            can_invoke_locally<action_type>())
         {
             if (traits::component_supports_migration<component_type>::call())
             {
@@ -335,7 +352,8 @@ namespace hpx { namespace detail
         std::pair<bool, components::pinned_ptr> r;
 
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+        if (agas::is_local_address_cached(id, addr) &&
+            can_invoke_locally<action_type>())
         {
             if (traits::component_supports_migration<component_type>::call())
             {
@@ -452,7 +470,8 @@ namespace hpx { namespace detail
         std::pair<bool, components::pinned_ptr> r;
 
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+        if (agas::is_local_address_cached(id, addr) &&
+            can_invoke_locally<action_type>())
         {
             if (traits::component_supports_migration<component_type>::call())
             {
