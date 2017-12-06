@@ -7,6 +7,8 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 
+#include <utility>
+
 namespace hpx { namespace parcelset { namespace detail
 {
     void put_parcel_handler::operator()(parcel&& p) const

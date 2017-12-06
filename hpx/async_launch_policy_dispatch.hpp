@@ -1,6 +1,7 @@
+//  Copyright (c) 2007-2017 Hartmut Kaiser
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-/// \file parallel/executors/parallel_executor.hpp
 
 #if !defined(HPX_ASYNC_LAUNCH_POLICY_DISPATCH_NOV_26_2017_1243PM)
 #define HPX_ASYNC_LAUNCH_POLICY_DISPATCH_NOV_26_2017_1243PM
@@ -15,6 +16,7 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 
+#include <functional>
 #include <type_traits>
 #include <utility>
 
