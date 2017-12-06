@@ -56,7 +56,7 @@
 [important These commands will build and install the essential core components of
            __hpx__ only. In order to build and run the tests, please invoke:
            ``
-               gmake tests
+               gmake tests && gmake test
            ``
            and in order to build (and install) all examples invoke:
            ``
