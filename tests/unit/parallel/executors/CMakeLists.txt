@@ -73,7 +73,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER ${folder_name})
 
-  add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("parallel.executors" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.parallel.executors.${test})
