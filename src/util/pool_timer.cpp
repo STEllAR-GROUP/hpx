@@ -9,7 +9,8 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/pool_timer.hpp>
@@ -122,21 +123,21 @@ namespace hpx { namespace util { namespace detail
                 if (pre_shutdown_)
                 {
                     register_pre_shutdown_function(
-                        util::bind(&pool_timer::terminate,
+                        util::deferred_call(&pool_timer::terminate,
                             this->shared_from_this()));
                 }
                 else
                 {
                     register_shutdown_function(
-                        util::bind(&pool_timer::terminate,
+                        util::deferred_call(&pool_timer::terminate,
                             this->shared_from_this()));
                 }
             }
 
             HPX_ASSERT(timer_ != nullptr);
             timer_->expires_from_now(time_duration.value());
-            timer_->async_wait(util::bind(&pool_timer::timer_handler,
-                this->shared_from_this(), util::placeholders::_1));
+            timer_->async_wait(util::bind_front(&pool_timer::timer_handler,
+                this->shared_from_this()));
 
             return true;
         }

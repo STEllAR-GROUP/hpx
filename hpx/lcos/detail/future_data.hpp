@@ -651,7 +651,7 @@ namespace detail
 
         template <typename Target>
         future_data(Target && data, init_no_addref no_addref)
-          : future_data_base<Result>(std::move(data), no_addref)
+          : future_data_base<Result>(std::forward<Target>(data), no_addref)
         {}
 
         future_data(std::exception_ptr const& e, init_no_addref no_addref)
@@ -688,7 +688,7 @@ namespace detail
         template <typename Target>
         future_data_allocator(Target && data, init_no_addref no_addref,
                 other_allocator const& alloc)
-          : future_data<Result>(std::move(data), no_addref), alloc_(alloc)
+          : future_data<Result>(std::forward<Target>(data), no_addref), alloc_(alloc)
         {}
         future_data_allocator(std::exception_ptr const& e,
                 init_no_addref no_addref, other_allocator const& alloc)

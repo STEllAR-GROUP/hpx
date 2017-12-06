@@ -44,7 +44,7 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
 # Build type (needs to be handled before project command below)
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
 endif()
 
 ################################################################################

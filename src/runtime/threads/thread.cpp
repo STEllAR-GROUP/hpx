@@ -51,11 +51,9 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     thread::thread() noexcept
-      : id_(threads::invalid_thread_id)
     {}
 
     thread::thread(thread&& rhs) noexcept
-      : id_(threads::invalid_thread_id)   // the rhs needs to end up with an invalid_id
     {
         std::lock_guard<mutex_type> l(rhs.mtx_);
         id_ = rhs.id_;
@@ -246,7 +244,6 @@ namespace hpx
 
         public:
             thread_task_base(threads::thread_id_type const& id)
-              : id_(threads::invalid_thread_id)
             {
                 if (threads::add_thread_exit_callback(id,
                         util::bind(&thread_task_base::thread_exit_function,

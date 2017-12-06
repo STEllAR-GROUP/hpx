@@ -506,7 +506,6 @@ namespace hpx { namespace resource { namespace detail
         affinity_data_.set_num_threads(new_pu_nums.size());
         affinity_data_.set_pu_nums(std::move(new_pu_nums));
         affinity_data_.set_affinity_masks(std::move(new_affinity_masks));
-        affinity_data_.init_cached_pu_nums(new_pu_nums.size());
     }
 
     // Returns true if any of the pools defined by the user is empty of resources

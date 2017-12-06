@@ -125,7 +125,9 @@ namespace hpx { namespace parallel { namespace execution
         ///
         /// \param policy   The distribution_policy to create an executor from
         ///
-        template <typename DistPolicy_>
+        template <typename DistPolicy_, typename Enable =
+            typename std::enable_if<!std::is_same<distribution_policy_executor,
+                typename hpx::util::decay<DistPolicy_>::type>::value>::type>
         distribution_policy_executor(DistPolicy_ && policy)
           : policy_(std::forward<DistPolicy_>(policy))
         {}
@@ -220,7 +222,9 @@ namespace hpx { namespace parallel { inline namespace v3
     struct distribution_policy_executor
       : execution::distribution_policy_executor<DistPolicy>
     {
-        template <typename DistPolicy_>
+        template <typename DistPolicy_, typename Enable =
+            typename std::enable_if<!std::is_same<distribution_policy_executor,
+                typename hpx::util::decay<DistPolicy_>::type>::value>::type>
         distribution_policy_executor(DistPolicy_ && policy)
           : execution::distribution_policy_executor<DistPolicy>(
                 std::forward<DistPolicy_>(policy))

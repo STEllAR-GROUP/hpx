@@ -64,6 +64,7 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_function
     {
+        static constexpr bool value = true;
         // This wrapper is needed to stop infinite recursion when
         // trying to get the possible additional function decoration
         // from the component

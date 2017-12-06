@@ -13,7 +13,7 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
@@ -70,9 +70,9 @@ namespace hpx { namespace components { namespace server
             using hpx::components::runtime_support;
             return runtime_support::migrate_component_async<Component>(
                         target_locality, ptr, to_resurrect)
-                .then(util::bind(
+                .then(util::bind_back(
                     &detail::migrate_component_cleanup<Component>,
-                    util::placeholders::_1, ptr, to_resurrect));
+                    ptr, to_resurrect));
         }
 
         template <typename Component>
@@ -159,10 +159,9 @@ namespace hpx { namespace components { namespace server
                     typedef typename server::component_storage::migrate_from_here_action
                         action_type;
                     return async<action_type>(r.first, to_resurrect.get_gid())
-                        .then(util::bind(
+                        .then(util::bind_back(
                             &detail::migrate_from_storage_here<Component>,
-                            util::placeholders::_1, to_resurrect,
-                            r.second, target_locality));
+                            to_resurrect, r.second, target_locality));
                 })
             .then(
                 [to_resurrect](future<naming::id_type> && f) -> naming::id_type

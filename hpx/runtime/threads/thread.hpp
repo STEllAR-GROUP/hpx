@@ -19,6 +19,7 @@
 #include <iosfwd>
 #include <mutex>
 #include <utility>
+#include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -37,9 +38,10 @@ namespace hpx
 
         thread() noexcept;
 
-        template <typename F>
+        template <typename F, typename Enable = typename
+            std::enable_if<!std::is_same<typename hpx::util::decay<F>::type,
+                thread>::value>::type>
         explicit thread(F&& f)
-          : id_(threads::invalid_thread_id)
         {
             start_thread(util::deferred_call(std::forward<F>(f)));
         }
@@ -134,7 +136,7 @@ namespace hpx
         friend class thread;
 
     public:
-        id() noexcept : id_(threads::invalid_thread_id) {}
+        id() noexcept {}
         explicit id(threads::thread_id_type const& i) noexcept
           : id_(i)
         {}

@@ -1073,7 +1073,7 @@ namespace hpx { namespace lcos
         >::type
         make_future_helper(Future && f)
         {
-            return std::move(f);
+            return std::forward<Future>(f);
         }
 
         template <typename T, typename Future>
@@ -1114,7 +1114,7 @@ namespace hpx { namespace lcos
         >::type
         convert_future_helper(Future && f, Conv && conv)
         {
-            return std::move(f);
+            return std::forward<Future>(f);
         }
 
         template <typename T, typename Future, typename Conv>

@@ -10,6 +10,7 @@
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/registry.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 
 #include <cstdint>
@@ -58,7 +59,7 @@ namespace hpx { namespace parcelset { namespace detail
                 "unknown action type");
             return nullptr;
         }
-        return util::bind(f, name, util::placeholders::_1);
+        return util::bind_front(f, name);
     }
 
     bool per_action_data_counter_registry::counter_discoverer(

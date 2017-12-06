@@ -367,7 +367,9 @@ namespace hpx { namespace parallel { namespace execution
             unwrapper() : T() {}
 
             // generic poor-man's forwarding constructor
-            template <typename U>
+            template <typename U, typename Enable = typename
+                std::enable_if<!std::is_same<typename hpx::util::decay<U>::type,
+                unwrapper>::value>::type>
             unwrapper(U && u) : T(std::forward<U>(u)) {}
         };
 

@@ -168,21 +168,23 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         result = hpx::make_ready_future(std::move(last));
                     }
+                    else
+                    {
+                        typedef typename
+                            hpx::util::decay<ExPolicy>::type::executor_parameters_type
+                            parameters_type;
 
-                    typedef typename
-                        hpx::util::decay<ExPolicy>::type::executor_parameters_type
-                        parameters_type;
+                        std::size_t const cores =
+                            execution::processing_units_count(policy.executor(),
+                                    policy.parameters());
+                        std::size_t max_chunks = execution::maximal_number_of_chunks(
+                            policy.parameters(), policy.executor(), cores, size);
 
-                    std::size_t const cores =
-                        execution::processing_units_count(policy.executor(),
-                                policy.parameters());
-                    std::size_t max_chunks = execution::maximal_number_of_chunks(
-                        policy.parameters(), policy.executor(), cores, size);
-
-                    result = stable_partition_helper()(
-                        std::forward<ExPolicy>(policy), first, last, size,
-                        std::forward<F>(f), std::forward<Proj>(proj),
-                        size == 1 ? 1 : (std::min)(std::size_t(size), max_chunks));
+                        result = stable_partition_helper()(
+                            std::forward<ExPolicy>(policy), first, last, size,
+                            std::forward<F>(f), std::forward<Proj>(proj),
+                            size == 1 ? 1 : (std::min)(std::size_t(size), max_chunks));
+                    }
                 }
                 catch (...) {
                     result = hpx::make_exceptional_future<RandIter>(

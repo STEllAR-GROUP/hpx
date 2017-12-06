@@ -199,7 +199,7 @@ std::size_t pass_object_void()
     Object obj;
     async<Action>(find_here(), obj).get();
 
-    return obj.get_count();
+    return Object::get_count();
 }
 
 template <typename Action, typename Object>
@@ -216,7 +216,7 @@ std::size_t move_object_void()
     Object obj;
     async<Action>(find_here(), std::move(obj)).get();
 
-    return obj.get_count();
+    return Object::get_count();
 }
 
 template <typename Action, typename Object>
@@ -231,7 +231,7 @@ template <typename Action, typename Object>
 std::size_t return_object(id_type id)
 {
     Object obj(async<Action>(id).get());
-    return obj.get_count();
+    return Object::get_count();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

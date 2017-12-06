@@ -262,8 +262,8 @@ void test_when_each_one_future()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    HPX_TEST(!f.valid());
-    HPX_TEST(!g.valid());
+    HPX_TEST(!f.valid()); // NOLINT
+    HPX_TEST(!g.valid()); // NOLINT
 }
 
 void test_when_each_two_futures()
@@ -312,10 +312,10 @@ void test_when_each_two_futures()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
-    HPX_TEST(!g1.valid());
-    HPX_TEST(!g2.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
+    HPX_TEST(!g1.valid()); // NOLINT
+    HPX_TEST(!g2.valid()); // NOLINT
 }
 
 void test_when_each_three_futures()
@@ -366,12 +366,12 @@ void test_when_each_three_futures()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
-    HPX_TEST(!f3.valid());
-    HPX_TEST(!g1.valid());
-    HPX_TEST(!g2.valid());
-    HPX_TEST(!g3.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
+    HPX_TEST(!f3.valid()); // NOLINT
+    HPX_TEST(!g1.valid()); // NOLINT
+    HPX_TEST(!g2.valid()); // NOLINT
+    HPX_TEST(!g3.valid()); // NOLINT
 }
 
 void test_when_each_four_futures()
@@ -424,14 +424,14 @@ void test_when_each_four_futures()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
-    HPX_TEST(!f3.valid());
-    HPX_TEST(!f4.valid());
-    HPX_TEST(!g1.valid());
-    HPX_TEST(!g2.valid());
-    HPX_TEST(!g3.valid());
-    HPX_TEST(!g4.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
+    HPX_TEST(!f3.valid()); // NOLINT
+    HPX_TEST(!f4.valid()); // NOLINT
+    HPX_TEST(!g1.valid()); // NOLINT
+    HPX_TEST(!g2.valid()); // NOLINT
+    HPX_TEST(!g3.valid()); // NOLINT
+    HPX_TEST(!g4.valid()); // NOLINT
 }
 
 void test_when_each_five_futures()
@@ -486,16 +486,16 @@ void test_when_each_five_futures()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
-    HPX_TEST(!f3.valid());
-    HPX_TEST(!f4.valid());
-    HPX_TEST(!f5.valid());
-    HPX_TEST(!g1.valid());
-    HPX_TEST(!g2.valid());
-    HPX_TEST(!g3.valid());
-    HPX_TEST(!g4.valid());
-    HPX_TEST(!g5.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
+    HPX_TEST(!f3.valid()); // NOLINT
+    HPX_TEST(!f4.valid()); // NOLINT
+    HPX_TEST(!f5.valid()); // NOLINT
+    HPX_TEST(!g1.valid()); // NOLINT
+    HPX_TEST(!g2.valid()); // NOLINT
+    HPX_TEST(!g3.valid()); // NOLINT
+    HPX_TEST(!g4.valid()); // NOLINT
+    HPX_TEST(!g5.valid()); // NOLINT
 }
 
 void test_when_each_late_future()
@@ -545,8 +545,8 @@ void test_when_each_late_future()
 
     r.get();
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
 
     hpx::future<unsigned> g1 = pt2.get_future();
     pt2.apply();
@@ -563,8 +563,8 @@ void test_when_each_late_future()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    HPX_TEST(!g1.valid());
-    HPX_TEST(!g2.valid());
+    HPX_TEST(!g1.valid()); // NOLINT
+    HPX_TEST(!g2.valid()); // NOLINT
 }
 
 void test_when_each_deferred_futures()
@@ -619,11 +619,11 @@ void test_when_each_deferred_futures()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    HPX_TEST(!f1.valid());
-    HPX_TEST(!f2.valid());
+    HPX_TEST(!f1.valid()); // NOLINT
+    HPX_TEST(!f2.valid()); // NOLINT
 
-    HPX_TEST(!g1.valid());
-    HPX_TEST(!g2.valid());
+    HPX_TEST(!g1.valid()); // NOLINT
+    HPX_TEST(!g2.valid()); // NOLINT
 }
 
 ///////////////////////////////////////////////////////////////////////////////

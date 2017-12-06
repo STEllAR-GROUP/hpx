@@ -18,7 +18,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
@@ -43,10 +44,8 @@ void locality_namespace::register_counter_types(
     error_code& ec
     )
 {
-    using util::placeholders::_1;
-    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind_back(&performance_counters::agas_raw_counter_creator
       , agas::server::locality_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -91,10 +90,8 @@ void locality_namespace::register_global_counter_types(
     error_code& ec
     )
 {
-    using util::placeholders::_1;
-    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind_back(&performance_counters::agas_raw_counter_creator
       , agas::server::locality_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -484,37 +481,37 @@ naming::gid_type locality_namespace::statistics_counter(std::string name)
 
     typedef locality_namespace::counter_data cd;
 
-    using util::placeholders::_1;
     util::function_nonser<std::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case locality_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_allocate_count,
+                &counter_data_);
             break;
         case locality_ns_resolve_locality:
-            get_data_func = util::bind(&cd::get_resolve_locality_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_resolve_locality_count,
+                &counter_data_);
             break;
         case locality_ns_free:
-            get_data_func = util::bind(&cd::get_free_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_free_count,
+                &counter_data_);
             break;
         case locality_ns_localities:
-            get_data_func = util::bind(&cd::get_localities_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_localities_count,
+                &counter_data_);
             break;
         case locality_ns_num_localities:
-            get_data_func = util::bind(&cd::get_num_localities_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_num_localities_count,
+                &counter_data_);
             break;
         case locality_ns_num_threads:
-            get_data_func = util::bind(&cd::get_num_threads_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_num_threads_count,
+                &counter_data_);
             break;
         case locality_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_count, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_overall_count,
+                &counter_data_);
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -526,29 +523,32 @@ naming::gid_type locality_namespace::statistics_counter(std::string name)
         HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case locality_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_allocate_time,
+                &counter_data_);
             break;
         case locality_ns_resolve_locality:
-            get_data_func = util::bind(&cd::get_resolve_locality_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_resolve_locality_time,
+                &counter_data_);
             break;
         case locality_ns_free:
-            get_data_func = util::bind(&cd::get_free_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_free_time,
+                &counter_data_);
             break;
         case locality_ns_localities:
-            get_data_func = util::bind(&cd::get_localities_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_localities_time,
+                &counter_data_);
             break;
         case locality_ns_num_localities:
-            get_data_func = util::bind(&cd::get_num_localities_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_num_localities_time,
+                &counter_data_);
             break;
         case locality_ns_num_threads:
-            get_data_func = util::bind(&cd::get_num_threads_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_num_threads_time,
+                &counter_data_);
             break;
         case locality_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_overall_time,
+                &counter_data_);
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter

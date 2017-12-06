@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
     char copt[256];
     snprintf(copt, 256, "--hpx:print-counter=%s", counter_name);
     opt[argc] = copt;
-    opt[argc+1] = 0;
+    opt[argc+1] = nullptr;
 
     // Run test in HPX domain.
     hpx::start(argc+1, opt);
