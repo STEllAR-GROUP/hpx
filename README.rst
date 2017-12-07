@@ -162,7 +162,7 @@ Linux
 
    This will build and install the essential core components of HPX only. Use::
 
-      gmake tests
+      gmake tests && gmake test
 
    to build and run the tests and::
 
@@ -218,7 +218,7 @@ OS X (Mac)
 
    This will build and install the essential core components of HPX only. Use::
 
-      make tests
+      make tests && make test
 
    to build and run the tests and::
 
