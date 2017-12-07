@@ -315,10 +315,6 @@ namespace hpx { namespace threads { namespace detail
 
         // callback functions to invoke at start, stop, and error
         threads::policies::callback_notifier& notifier_;
-
-        // mutexes for adding and removing pus
-        typedef hpx::lcos::local::spinlock pu_mutex_type;
-        std::vector<pu_mutex_type> pu_mutexes_;
     };
 }}}
 
