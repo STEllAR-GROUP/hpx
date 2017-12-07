@@ -24,8 +24,6 @@ namespace server
     {
     private:
         list_type list_;
-        std::size_t level_;
-        std::size_t size_;
         std::size_t count_;
 
         // here board is a component
@@ -33,18 +31,16 @@ namespace server
 //         template <class Archive>
 //         void serialize(Archive& ar, const unsigned int version)
 //         {
-//             ar & size_;
 //             ar & list_;
-//             ar & level_;
 //             ar & count_;
 //         }
 
     public:
-        board():list_(0), level_(0), size_(0), count_(0)
+        board():list_(0), count_(0)
         {}
 
-        board(list_type const& list, std::size_t size, std::size_t level)
-            : list_(list), level_(level), size_(size), count_(0)
+        board(list_type const& list)
+            : list_(list), count_(0)
         {}
 
         ~board(){}
@@ -92,7 +88,7 @@ namespace server
         std::size_t solve_board(list_type const& list, std::size_t size,
             std::size_t level, std::size_t col)
         {
-            board b(list, size, level);
+            board b(list);
 
             if (level == size)
             {
