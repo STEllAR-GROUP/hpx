@@ -104,13 +104,12 @@ def launch_build(nickname, branch_id, branch_name) :
            '-DCTEST_COMMAND=":"']
 
     if debug_mode:
-        print('-' * 20, 'Debug\n', cmd)
+        print('\n' + '-' * 20, 'Debug\n', cmd)
         print('-' * 20 + '\n')
     else:
-        print('-' * 20, 'Executing\n', cmd)
+        print('\n' + '-' * 20, 'Executing\n', cmd)
         p = subprocess.Popen(cmd)
         print('-' * 20 + '\n')
-        # print("pid = ", p.pid)
 
     return None
 
@@ -142,37 +141,45 @@ def scrape_testing_results(nickname, branch_id, branch_name, head_commit) :
         DateURL       = DateStamp[0:4]+'-'+DateStamp[4:6]+'-'+DateStamp[6:8]
         print('Extracted date as ', DateURL)
 
+        # if this file has been scraped before, then don't do it again
+        if len(Errors)>4 and Errors[4]=="PYCICLE_GITHUB_STATUS_SET":
+            print('Scrape not needed, status already set for', branch_id)
+            return True
+
         URL = ('http://cdash.cscs.ch/index.php?project=HPX' +
                '&date=' + DateURL +
                '&filtercount=1' +
                '&field1=buildname/string&compare1=63&value1=' +
                branch_id + '-' + branch_name)
 
-        print ('Updating github PR status')
-        head_commit.create_status(
-            'success' if Config_Errors==0 else 'failure',
-            target_url=URL,
-            description='errors ' + Errors[0],
-            context='pycicle-Config')
-        head_commit.create_status(
-            'success' if Build_Errors==0 else 'failure',
-            target_url=URL,
-            description='errors ' + Errors[1],
-            context='pycicle-Build')
-        head_commit.create_status(
-            'success' if Test_Errors==0 else 'failure',
-            target_url=URL,
-            description='errors ' + Errors[2],
-            context='pycicle-Test')
+        if debug_mode:
+            print ('Debug github PR status', URL)
+        else:
+            print ('Updating github PR status', URL)
+            head_commit.create_status(
+                'success' if Config_Errors==0 else 'failure',
+                target_url=URL,
+                description='errors ' + Errors[0],
+                context='pycicle-Config')
+            head_commit.create_status(
+                'success' if Build_Errors==0 else 'failure',
+                target_url=URL,
+                description='errors ' + Errors[1],
+                context='pycicle-Build')
+            head_commit.create_status(
+                'success' if Test_Errors==0 else 'failure',
+                target_url=URL,
+                description='errors ' + Errors[2],
+                context='pycicle-Test')
 
-        # delete the pycicle scrape file if we have set status
+        # update the pycicle scrape file if we have set status corectly
         try:
-            cmd = ['ssh', remote_ssh, 'rm -rf ' +
+            cmd = ['ssh', remote_ssh, 'echo PYCICLE_GITHUB_STATUS_SET >>' +
                 remote_path + '/build/' + branch_id + '/pycicle-TAG.txt']
             result = subprocess.check_output(cmd).split()
-            print ('Deleted scrape file', cmd)
+            print ('Scrape file updated', cmd)
         except:
-            print ('Delete of scrape file failed', cmd)
+            print ('Scrape file update failed', cmd)
 
         print ('Done scraping and setting github PR status')
         return True
@@ -227,11 +234,11 @@ def needs_update(branch_id, branch_name, branch_sha, master_sha):
 # main polling routine
 #----------------------------------------------------------------------------
 if debug_mode:
-    print('PYCICLE is in debug mode, no build trigger commands will be sent')
+    print('pycicle is in debug mode, no build trigger commands will be sent')
 #
 first_iteration = True
 github_t1       = datetime.datetime.now()
-scrape_t1       = github_t1
+scrape_t1       = github_t1 + datetime.timedelta(hours=-1)
 master_branch   = repo.get_branch(repo.default_branch)
 #
 while True:
@@ -240,7 +247,7 @@ while True:
         github_t2    = datetime.datetime.now()
         github_tdiff = github_t2 - github_t1
         github_t1    = github_t2
-        print('Checking github:', 'Time since last check (s)', github_tdiff.seconds)
+        print('Checking github:', 'Time since last check', github_tdiff.seconds, '(s)')
         #
         for pr in repo.get_pulls('open'):
             if not pr.mergeable:
@@ -275,15 +282,16 @@ while True:
     scrape_t2    = datetime.datetime.now()
     scrape_tdiff = scrape_t2 - scrape_t1
     if (scrape_tdiff.seconds > scrape_time):
-        scrape_t2 = scrape_t1
-        # force a list copy so that we can remove keys during iteration
+        scrape_t1 = scrape_t2
+        print('Scraping results:', 'Time since last check', scrape_tdiff.seconds, '(s)')
+        # force a scrape list copy, remove keys from actual scrape_list during iteration
         for build in list(scrape_list):
             values = scrape_list[build]
-            print('-' * 20, 'Scraping', values[0], values[1], values[2])
+            print('\n' + '-' * 20, 'Scraping', values[0], values[1], values[2])
             # if the scrape suceeds, remove the build from the scrape list
             if scrape_testing_results(values[0], values[1], values[2], values[3]):
                 del scrape_list[build]
-            print('-' * 20, '\n')
+            print('-' * 20)
 
     # Sleep for a while before polling github again
     time.sleep(poll_time)
