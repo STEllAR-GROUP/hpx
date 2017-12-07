@@ -14,6 +14,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -114,19 +115,19 @@ int hpx_main(int argc, char **argv)
 {
     // these two vectors are sorted by the first value of each tuple
     std::vector<std::tuple<int, char>> a1{
-        {1, 'a'},
-        {2, 'b'},
-        {3, 'a'},
-        {3, 'b'},
-        {4, 'a'},
-        {5, 'a'},
-        {5, 'b'}
+        std::make_tuple(1, 'a'),
+        std::make_tuple(2, 'b'),
+        std::make_tuple(3, 'a'),
+        std::make_tuple(3, 'b'),
+        std::make_tuple(4, 'a'),
+        std::make_tuple(5, 'a'),
+        std::make_tuple(5, 'b')
     };
     std::vector<std::tuple<int, char>> a2{
-        {0, 'c'},
-        {3, 'c'},
-        {4, 'c'},
-        {5, 'c'}
+        std::make_tuple(0, 'c'),
+        std::make_tuple(3, 'c'),
+        std::make_tuple(4, 'c'),
+        std::make_tuple(5, 'c')
     };
 
     std::vector<std::tuple<int, char>> result(a1.size() + a2.size());
