@@ -239,15 +239,15 @@ if debug_mode:
 first_iteration = True
 github_t1       = datetime.datetime.now()
 scrape_t1       = github_t1 + datetime.timedelta(hours=-1)
-master_branch   = repo.get_branch(repo.default_branch)
 #
 while True:
     #
     try:
-        github_t2    = datetime.datetime.now()
-        github_tdiff = github_t2 - github_t1
-        github_t1    = github_t2
+        github_t2     = datetime.datetime.now()
+        github_tdiff  = github_t2 - github_t1
+        github_t1     = github_t2
         print('Checking github:', 'Time since last check', github_tdiff.seconds, '(s)')
+        master_branch = repo.get_branch(repo.default_branch)
         #
         for pr in repo.get_pulls('open'):
             if not pr.mergeable:

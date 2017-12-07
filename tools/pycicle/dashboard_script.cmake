@@ -123,7 +123,7 @@ if (PYCICLE_PR)
   )
   set(CTEST_UPDATE_OPTIONS "${CTEST_SOURCE_DIRECTORY} ${GIT_BRANCH}")
 else()
-  set(CTEST_SUBMISSION_TRACK "Pull Requests")
+  set(CTEST_SUBMISSION_TRACK "Master")
   set(GIT_BRANCH "${PYCICLE_MASTER}")
   set(WORK_DIR "${PYCICLE_SRC_ROOT}/master")
   execute_process(
