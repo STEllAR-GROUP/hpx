@@ -253,9 +253,9 @@ namespace hpx { namespace parallel { namespace util
         HPX_FORCEINLINE void prefetch_addresses(T const& ... ts)
         {
             int const sequencer[] = {
-                (_mm_prefetch(
+                0, (_mm_prefetch(
                     const_cast<char*>((char const*)&ts), _MM_HINT_T0), 0
-                )..., 0
+                )...
             };
             (void)sequencer;
         }
@@ -281,8 +281,8 @@ namespace hpx { namespace parallel { namespace util
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Itr, typename ... Ts>
-        struct loop<detail::prefetching_iterator<Itr, Ts...> >
+        template <typename ExPolicy, typename Itr, typename ... Ts>
+        struct loop<ExPolicy, detail::prefetching_iterator<Itr, Ts...> >
         {
             typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
             typedef typename iterator_type::base_iterator type;
@@ -337,8 +337,8 @@ namespace hpx { namespace parallel { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Itr, typename ... Ts>
-        struct loop_n<detail::prefetching_iterator<Itr, Ts...> >
+        template <typename ExPolicy, typename Itr, typename ... Ts>
+        struct loop_n<ExPolicy, detail::prefetching_iterator<Itr, Ts...> >
         {
             typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
             typedef typename iterator_type::base_iterator type;

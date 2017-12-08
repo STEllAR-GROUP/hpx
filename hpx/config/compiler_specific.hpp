@@ -115,5 +115,10 @@
 #define HPX_CDECL
 #endif
 
+// try to enable #pragma omp simd
+#if (defined(_OPENMP) && (_OPENMP >= 201307L)) || (defined(_OPENMP_SIMD) && (_OPENMP_SIMD >= 201307L))
+#define HPX_HAVE_OPENMP_SIMD
+#endif
+
 #endif
 

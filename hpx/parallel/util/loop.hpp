@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { namespace util
         ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
-        template <typename Iterator>
+        template <typename ExPolicy, typename Iterator>
         struct loop
         {
             ///////////////////////////////////////////////////////////////////
@@ -83,13 +83,64 @@ namespace hpx { namespace parallel { namespace util
                 return it;
             }
         };
+
+        template <typename Iterator>
+        struct loop<parallel::execution::parallel_unsequenced_policy, Iterator>
+        {
+            ///////////////////////////////////////////////////////////////////
+            template <typename Begin, typename End, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static Begin call(Begin it, End const end, F && f)
+            {
+#if defined(HPX_MSVC)
+#pragma loop(ivdep)
+#elif defined(HPX_INTEL_VERSION) || defined(HPX_CLANG_VERSION)
+#pragma ivdep
+#elif defined(HPX_GCC_VERSION)
+#pragma GCC ivdep
+#endif
+#if defined(HPX_HAVE_OPENMP_SIMD)
+#pragma omp simd
+#endif
+                for (/**/; it != end; ++it)
+                {
+                    f(it);
+                }
+                return it;
+            }
+
+            template <typename Begin, typename End, typename CancelToken,
+                typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static Begin call(Begin it, End const end, CancelToken& tok, F && f)
+            {
+#if defined(HPX_MSVC)
+#pragma loop(ivdep)
+#elif defined(HPX_INTEL_VERSION) || defined(HPX_CLANG_VERSION)
+#pragma ivdep
+#elif defined(HPX_GCC_VERSION)
+#pragma GCC ivdep
+#endif
+#if defined(HPX_HAVE_OPENMP_SIMD)
+#pragma omp simd
+#endif
+                for (/**/; it != end; ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+                    f(it);
+                }
+                return it;
+            }
+        };
     }
 
     template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
     loop(ExPolicy&&, Begin begin, End end, F && f)
     {
-        return detail::loop<Begin>::call(begin, end, std::forward<F>(f));
+        return detail::loop<typename std::decay<ExPolicy>::type, Begin>::
+            call(begin, end, std::forward<F>(f));
     }
 
     template <typename ExPolicy, typename Begin, typename End,
@@ -97,7 +148,8 @@ namespace hpx { namespace parallel { namespace util
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin
     loop(ExPolicy&&, Begin begin, End end, CancelToken& tok, F && f)
     {
-        return detail::loop<Begin>::call(begin, end, tok, std::forward<F>(f));
+        return detail::loop<typename std::decay<ExPolicy>::type, Begin>::
+            call(begin, end, tok, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -142,7 +194,7 @@ namespace hpx { namespace parallel { namespace util
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
 
-        template <typename Iterator>
+        template <typename ExPolicy, typename Iterator>
         struct loop_n
         {
             ///////////////////////////////////////////////////////////////////
@@ -160,6 +212,56 @@ namespace hpx { namespace parallel { namespace util
             HPX_HOST_DEVICE HPX_FORCEINLINE
             static Iter call(Iter it, std::size_t count, CancelToken& tok, F && f)
             {
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    if (tok.was_cancelled())
+                        break;
+                    f(it);
+                }
+                return it;
+            }
+        };
+
+        template <typename Iterator>
+        struct loop_n<parallel::execution::parallel_unsequenced_policy, Iterator>
+        {
+            ///////////////////////////////////////////////////////////////////
+            // handle sequences of non-futures
+            template <typename Iter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static Iter call(Iter it, std::size_t count, F && f)
+            {
+#if defined(HPX_MSVC)
+#pragma loop(ivdep)
+#elif defined(HPX_INTEL_VERSION) || defined(HPX_CLANG_VERSION)
+#pragma ivdep
+#elif defined(HPX_GCC_VERSION)
+#pragma GCC ivdep
+#endif
+#if defined(HPX_HAVE_OPENMP_SIMD)
+#pragma omp simd
+#endif
+                for (/**/; count != 0; (void) --count, ++it)
+                {
+                    f(it);
+                }
+                return it;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            static Iter call(Iter it, std::size_t count, CancelToken& tok, F && f)
+            {
+#if defined(HPX_MSVC)
+#pragma loop(ivdep)
+#elif defined(HPX_INTEL_VERSION) || defined(HPX_CLANG_VERSION)
+#pragma ivdep
+#elif defined(HPX_GCC_VERSION)
+#pragma GCC ivdep
+#endif
+#if defined(HPX_HAVE_OPENMP_SIMD)
+#pragma omp simd
+#endif
                 for (/**/; count != 0; (void) --count, ++it)
                 {
                     if (tok.was_cancelled())
@@ -212,7 +314,8 @@ namespace hpx { namespace parallel { namespace util
     >::type
     loop_n(Iter it, std::size_t count, F && f)
     {
-        return detail::loop_n<Iter>::call(it, count, std::forward<F>(f));
+        return detail::loop_n<ExPolicy, Iter>::call(it, count,
+            std::forward<F>(f));
     }
 
     template <typename ExPolicy, typename Iter, typename CancelToken, typename F>
@@ -222,7 +325,8 @@ namespace hpx { namespace parallel { namespace util
     >::type
     loop_n(Iter it, std::size_t count, CancelToken& tok, F && f)
     {
-        return detail::loop_n<Iter>::call(it, count, tok, std::forward<F>(f));
+        return detail::loop_n<ExPolicy, Iter>::call(it, count, tok,
+            std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////

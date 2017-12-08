@@ -70,7 +70,42 @@ namespace hpx { namespace parallel { inline namespace v1
             call(T && t)
             {
                 auto tmp = hpx::util::invoke(proj_, std::forward<T>(t));
-                hpx::util::invoke_r<void>(f_,tmp);
+                hpx::util::invoke_r<void>(f_, tmp);
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            void operator()(Iter curr)
+            {
+                call(*curr);
+            }
+        };
+
+        template <typename F>
+        struct invoke_projected<F, parallel::util::projection_identity>
+        {
+            typename hpx::util::decay<F>::type& f_;
+            parallel::util::projection_identity proj_;  // unused
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+               !hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                hpx::util::invoke(f_, std::forward<T>(t));
+            }
+
+            template <typename T>
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename std::enable_if<
+                hpx::traits::is_value_proxy<T>::value
+            >::type
+            call(T && t)
+            {
+                auto tmp = std::forward<T>(t);
+                hpx::util::invoke_r<void>(f_, tmp);
             }
 
             template <typename Iter>
@@ -148,7 +183,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 F && f, Proj && proj/* = Proj()*/)
             {
                 return util::loop_n<ExPolicy>(first, count,
-                    invoke_projected<F, Proj>{f, proj});
+                    invoke_projected<F, typename hpx::util::decay<Proj>::type>{
+                        f, proj});
             }
 
             template <typename ExPolicy, typename FwdIter, typename F,
@@ -173,6 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::move(first));
             }
         };
+
         /// Non Segmented implementation
         template <typename ExPolicy, typename FwdIter, typename Size, typename F,
             typename Proj>
@@ -196,6 +233,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 first, std::size_t(count), std::forward<F>(f),
                 std::forward<Proj>(proj));
         }
+
         // forward declare the segmented version of for_each_ algorithm
         template <typename ExPolicy, typename SegIter, typename F,
             typename Proj>
@@ -358,7 +396,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 Proj && proj)
             {
                 return util::loop(std::forward<ExPolicy>(policy), first, last,
-                    invoke_projected<F, Proj>{f, proj});
+                    invoke_projected<F, typename hpx::util::decay<Proj>::type>{
+                        f, proj});
             }
 
             template <typename ExPolicy, typename FwdIter, typename F,

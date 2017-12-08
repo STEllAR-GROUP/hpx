@@ -1390,6 +1390,16 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
+
+    # try to enable simd parallelization for par_unseq
+    find_package(OpenMP QUIET)
+    if(OPENMP_FOUND)
+      if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+        hpx_add_compile_flag_if_available(-openmp-simd)
+      else()
+        hpx_add_compile_flag_if_available(-fopenmp-simd)
+      endif()
+    endif()
   endif()
 endif()
 
