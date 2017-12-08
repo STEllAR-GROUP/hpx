@@ -620,14 +620,6 @@ namespace hpx
                     desc_cmdline, argc, argv, std::move(ini_config),
                     resource::mode_default, mode, false);
 
-                // check whether HPX should be exited at this point
-                // (if the program options contain --hpx:help or --hpx:version)
-                if (rp.terminate_after_parse())
-                {
-                    if (result > 0)
-                        result = 0;
-                    return result;
-                }
 
                 // Setup all internal parameters of the resource_partitioner
                 rp.configure_pools();
@@ -646,6 +638,13 @@ namespace hpx
                 typedef hpx::runtime_impl runtime_type;
                 std::unique_ptr<hpx::runtime> rt(
                     new runtime_type(cms.rtcfg_));
+
+                // check whether HPX should be exited at this point
+                // (if the program options contain --hpx:help or --hpx:version)
+                if (rp.terminate_after_parse())
+                {
+                    return result;
+                }
 
                 result = run_or_start(blocking, std::move(rt),
                     cms, std::move(startup), std::move(shutdown));
