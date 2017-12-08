@@ -37,7 +37,6 @@ namespace hpx { namespace threads { namespace detail
             std::size_t index, std::string const& pool_name,
             policies::scheduler_mode m, std::size_t thread_offset)
       : id_(index, pool_name),
-        used_processing_units_(),
         mode_(m),
         thread_offset_(thread_offset),
         timestamp_scale_(1.0),
@@ -45,22 +44,48 @@ namespace hpx { namespace threads { namespace detail
     {}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_cref_type thread_pool_base::get_used_processing_units() const
+    mask_type thread_pool_base::get_used_processing_units() const
     {
-        if (!(mode_ & threads::policies::enable_elasticity))
+        auto const& rp = resource::get_partitioner();
+        auto const sched = get_scheduler();
+
+        mask_type used_processing_units = mask_type();
+        threads::resize(used_processing_units, hardware_concurrency());
+
+        for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
+            ++thread_num)
         {
-            return used_processing_units_;
+            if (sched->get_state(thread_num).load() <= state_suspended)
+            {
+                used_processing_units |=
+                    rp.get_pu_mask(thread_num + get_thread_offset());
+            }
         }
 
-        // FIXME: this is broken as the function returns a reference allowing
-        // to access the value of the mask without it being guarded.
-        std::lock_guard<pu_mutex_type> l(used_processing_units_mtx_);
-        return used_processing_units_;
+        return used_processing_units;
     }
 
     hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const
     {
-        return used_numa_domains_;
+        auto const& rp = resource::get_partitioner();
+        mask_type used_processing_units = get_used_processing_units();
+        return rp.get_topology().cpuset_to_nodeset(used_processing_units);
+    }
+
+    std::size_t thread_pool_base::get_active_os_thread_count() const
+    {
+        std::size_t active_os_thread_count = 0;
+
+        for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
+            ++thread_num)
+        {
+            if (get_scheduler()->get_state(thread_num).load() <= state_suspended)
+            {
+                ++active_os_thread_count;
+            }
+        }
+
+        return active_os_thread_count;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -102,23 +127,6 @@ namespace hpx { namespace threads { namespace detail
         std::size_t threads_offset)
     {
         thread_offset_ = threads_offset;
-
-        threads::resize(used_processing_units_, threads::hardware_concurrency());
-        threads::reset(used_processing_units_);
-
-        auto const& rp = resource::get_partitioner();
-        for (std::size_t i = 0; i != pool_threads; ++i)
-        {
-            auto const& mask = rp.get_pu_mask(threads_offset + i);
-            // if bind=none, we get an empty mask back. In the cas of an
-            // empty mask, we still need to account for the used units, so
-            // we just mark the specific bit.
-            if (threads::any(mask))
-                used_processing_units_ |= rp.get_pu_mask(threads_offset + i);
-            else
-                threads::set(used_processing_units_, threads_offset + i);
-        }
-        used_numa_domains_ = rp.get_topology().cpuset_to_nodeset(used_processing_units_);
     }
 }}}
 

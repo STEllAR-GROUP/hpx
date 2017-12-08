@@ -216,11 +216,13 @@ namespace hpx
             "state_starting",     // 4
             "state_running",      // 5
             "state_suspended",    // 6
-            "state_pre_shutdown", // 7
-            "state_shutdown",     // 8
-            "state_stopping",     // 9
-            "state_terminating",  // 10
-            "state_stopped"       // 11
+            "state_pre_sleep",    // 7
+            "state_sleeping",     // 8
+            "state_pre_shutdown", // 9
+            "state_shutdown",     // 10
+            "state_stopping",     // 11
+            "state_terminating",  // 12
+            "state_stopped"       // 13
         };
     }
 

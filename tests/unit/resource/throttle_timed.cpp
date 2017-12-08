@@ -6,12 +6,15 @@
 // Simple test verifying basic resource_partitioner functionality.
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
 #include <cstddef>
-#include <stdexcept>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -25,21 +28,6 @@ int hpx_main(int argc, char* argv[])
     hpx::threads::detail::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
-    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(4));
-
-    {
-        // Try suspending without elasticity enabled, should throw an exception
-        try
-        {
-            tp.suspend_processing_unit(0);
-            HPX_TEST_MSG(false, "Suspending should not be allowed with "
-                 "elasticity disabled");
-        }
-        catch (std::runtime_error const&)
-        {
-        }
-    }
-
     // Enable elasticity
     tp.set_scheduler_mode(
         hpx::threads::policies::scheduler_mode(
@@ -49,78 +37,26 @@ int hpx_main(int argc, char* argv[])
             hpx::threads::policies::enable_elasticity));
 
     {
-        // Check number of used resources
-        for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
-        {
-            tp.suspend_processing_unit(thread_num);
-            HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
-                tp.get_active_os_thread_count());
-        }
-
-        for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
-        {
-            tp.resume_processing_unit(thread_num);
-            HPX_TEST_EQ(std::size_t(thread_num + 2),
-                tp.get_active_os_thread_count());
-        }
-    }
-
-    {
-        // Check suspending pu on which current thread is running
-        std::size_t worker_thread_num = hpx::get_worker_thread_num();
-        tp.suspend_processing_unit(worker_thread_num);
-        tp.resume_processing_unit(worker_thread_num);
-    }
-
-    {
-        // Check when suspending all but one, we end up on the same thread
-        std::size_t thread_num = 0;
-        auto test_function = [&thread_num, &tp]()
-        {
-            HPX_TEST_EQ(thread_num + tp.get_thread_offset(),
-                hpx::get_worker_thread_num());
-        };
-
-        for (thread_num = 0; thread_num < num_threads;
-            ++thread_num)
-        {
-            for (std::size_t thread_num_suspend = 0;
-                thread_num_suspend < num_threads;
-                ++thread_num_suspend)
-            {
-                if (thread_num != thread_num_suspend)
-                {
-                    tp.suspend_processing_unit(thread_num_suspend);
-                }
-            }
-
-            hpx::async(test_function).get();
-
-            for (std::size_t thread_num_resume = 0;
-                thread_num_resume < num_threads;
-                ++thread_num_resume)
-            {
-                if (thread_num != thread_num_resume)
-                {
-                    tp.resume_processing_unit(thread_num_resume);
-                }
-            }
-        }
-    }
-
-    {
         // Check random scheduling with reducing resources.
         std::size_t thread_num = 0;
         bool up = true;
         std::vector<hpx::future<void>> fs;
+
+        hpx::threads::executors::pool_executor exec("default");
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dist(1,100);
+
         hpx::util::high_resolution_timer t;
-        while (t.elapsed() < 2)
+
+        while (t.elapsed() < 1)
         {
             for (std::size_t i = 0;
-                i < hpx::resource::get_num_threads("default") * 10;
-                ++i)
+                i < hpx::resource::get_num_threads("default"); ++i)
             {
-                fs.push_back(hpx::async([](){}));
+                fs.push_back(hpx::parallel::execution::async_execute_after(
+                    exec, std::chrono::milliseconds(dist(gen)), [](){}));
             }
 
             if (up)

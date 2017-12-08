@@ -21,6 +21,7 @@
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
@@ -124,13 +125,13 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::print_pool(std::ostream& os)
     {
-        std::lock_guard<pu_mutex_type> l(used_processing_units_mtx_);
         os << "[pool \"" << id_.name() << "\", #" << id_.index()
            << "] with scheduler " << sched_->Scheduler::get_scheduler_name()
            << "\n"
            << "is running on PUs : \n";
-        os << std::hex << HPX_CPU_MASK_PREFIX << used_processing_units_ << '\n';
-        os << "on numa domains : \n" << used_numa_domains_ << '\n';
+        os << std::hex << HPX_CPU_MASK_PREFIX << get_used_processing_units()
+           << '\n';
+        os << "on numa domains : \n" << get_numa_domain_bitmap() << '\n';
     }
 
     template <typename Scheduler>
@@ -175,6 +176,9 @@ namespace hpx { namespace threads { namespace detail
 
         if (!threads_.empty())
         {
+            // wake up if suspended
+            resume();
+
             // set state to stopping
             sched_->Scheduler::set_all_states(state_stopping);
 
@@ -312,6 +316,20 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume(error_code& ec)
+    {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            return;
+        }
+
+        for (std::size_t i = 0; i != threads_.size(); ++i)
+        {
+            resume_processing_unit_internal(i, ec);
+        }
+    }
+
+    template <typename Scheduler>
     void hpx::threads::detail::scheduled_thread_pool<Scheduler>::thread_func(
         std::size_t thread_num, std::size_t global_thread_num,
         std::shared_ptr<compat::barrier> startup)
@@ -350,8 +368,7 @@ namespace hpx { namespace threads { namespace detail
         // needs to
         // be done in order to give the parcel pool threads higher
         // priority
-        if ((mode_ & policies::reduce_thread_priority) &&
-            any(mask & used_processing_units_))
+        if (mode_ & policies::reduce_thread_priority)
         {
             topo.reduce_thread_priority(ec);
             if (ec)
@@ -368,20 +385,20 @@ namespace hpx { namespace threads { namespace detail
         init_tss_helper<Scheduler> tss_helper(
             *this, thread_num, this->thread_offset_);
 
-        // wait for all threads to start up before before starting HPX work
         ++thread_count_;
-        startup->wait();
-
-        LTM_(info)    //-V128
-            << "thread_func: " << id_.name()
-            << " starting OS thread: " << thread_num;    //-V128
 
         // set state to running
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(thread_num);
         hpx::state oldstate = state.exchange(state_running);
-
         HPX_ASSERT(oldstate <= state_running);
+
+        // wait for all threads to start up before before starting HPX work
+        startup->wait();
+
+        LTM_(info)    //-V128
+            << "thread_func: " << id_.name()
+            << " starting OS thread: " << thread_num;    //-V128
 
         try
         {
@@ -1349,21 +1366,22 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<compat::barrier> startup, error_code& ec)
     {
-        resource::get_partitioner().assign_pu(id_.name(), virt_core);
-
-        std::unique_lock<pu_mutex_type> l(used_processing_units_mtx_);
         if (threads_.size() <= virt_core)
             threads_.resize(virt_core + 1);
 
         if (threads_[virt_core].joinable())
         {
-            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
                 "the given virtual core has already been added to this "
                 "thread pool");
             return;
         }
+
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
+        resource::get_partitioner().assign_pu(id_.name(), virt_core);
 
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
@@ -1373,12 +1391,6 @@ namespace hpx { namespace threads { namespace detail
         threads_[virt_core] =
             compat::thread(&scheduled_thread_pool::thread_func, this,
                 virt_core, thread_num, std::move(startup));
-
-        auto const& rp = resource::get_partitioner();
-        auto mask = rp.get_pu_mask(thread_num);
-        if(!threads::any(mask))
-            threads::set(mask, thread_num + this->thread_offset_);
-        used_processing_units_ |= mask;
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1393,7 +1405,7 @@ namespace hpx { namespace threads { namespace detail
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
                 "this thread pool does not support dynamically adding "
-                    "processing units");
+                "processing units");
         }
 
         std::shared_ptr<compat::barrier> startup =
@@ -1413,8 +1425,9 @@ namespace hpx { namespace threads { namespace detail
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::remove_processing_unit",
                 "this thread pool does not support dynamically removing "
-                    "processing units");
+                "processing units");
         }
+
         remove_processing_unit_internal(virt_core, ec);
     }
 
@@ -1422,47 +1435,155 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
+        if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::remove_processing_unit",
+                "the given virtual core has already been stopped to run on "
+                "this thread pool");
+            return;
+        }
+
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
         compat::thread t;
 
-        // inform the scheduler to stop the virtual core
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
+        // inform the scheduler to stop the virtual core
         hpx::state oldstate = state.exchange(state_stopping);
 
         HPX_ASSERT(oldstate == state_starting ||
-            oldstate == state_running || oldstate == state_suspended ||
-            oldstate == state_stopping || oldstate == state_stopped);
+            oldstate == state_running || oldstate == state_stopping ||
+            oldstate == state_stopped);
 
-        {
-            std::unique_lock<pu_mutex_type> l(used_processing_units_mtx_);
-            if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
-            {
-                l.unlock();
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "scheduled_thread_pool<Scheduler>::remove_processing_unit",
-                    "the given virtual core has already been stopped to run on "
-                    "this thread pool");
-                return;
-            }
+        resource::get_partitioner().unassign_pu(id_.name(), virt_core);
+        std::swap(threads_[virt_core], t);
 
-            auto const& rp = resource::get_partitioner();
-            auto mask = rp.get_pu_mask(virt_core + this->thread_offset_);
-            if(!threads::any(mask))
-                threads::set(mask, virt_core + this->thread_offset_);
-            used_processing_units_ &= not_(mask);
-
-            resource::get_partitioner().unassign_pu(id_.name(), virt_core);
-            std::swap(threads_[virt_core], t);
-        }
-
-        if (hpx::get_runtime_ptr())
+        if (threads::get_self_ptr())
         {
             while (virt_core == hpx::get_worker_thread_num())
             {
                 hpx::this_thread::suspend();
             }
         }
+
         t.join();
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::suspend_processing_unit_internal(
+        std::size_t virt_core, error_code& ec)
+    {
+        if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
+                "the given virtual core has already been stopped to run on "
+                "this thread pool");
+            return;
+        }
+
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
+        // inform the scheduler to suspend the virtual core
+        std::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(virt_core);
+
+        hpx::state oldstate = state.exchange(state_pre_sleep);
+
+        HPX_ASSERT(oldstate == state_running);
+
+        if (threads::get_self_ptr())
+        {
+            while (virt_core == hpx::get_worker_thread_num())
+            {
+                hpx::this_thread::suspend();
+            }
+
+            while (state.load() == state_pre_sleep)
+            {
+                hpx::this_thread::suspend();
+            }
+        }
+        else
+        {
+            while (state.load() == state_pre_sleep) {}
+        }
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::suspend_processing_unit(
+        std::size_t virt_core, error_code& ec)
+    {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units");
+            return;
+        }
+
+        suspend_processing_unit_internal(virt_core, ec);
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume_processing_unit_internal(
+        std::size_t virt_core, error_code& ec)
+    {
+        if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
+                "the given virtual core has already been stopped to run on "
+                "this thread pool");
+            return;
+        }
+
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
+        std::atomic<hpx::state>& state =
+            sched_->Scheduler::get_state(virt_core);
+
+        if (threads::get_self_ptr())
+        {
+            sched_->Scheduler::resume(virt_core);
+
+            while (state.load() == state_sleeping)
+            {
+                sched_->Scheduler::resume(virt_core);
+                hpx::this_thread::suspend();
+            }
+        }
+        else
+        {
+            sched_->Scheduler::resume(virt_core);
+
+            while (state.load() == state_sleeping)
+            {
+                sched_->Scheduler::resume(virt_core);
+            }
+        }
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume_processing_unit(
+        std::size_t virt_core, error_code& ec)
+    {
+        if (!(mode_ & threads::policies::enable_elasticity))
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units");
+            return;
+        }
+
+        resume_processing_unit_internal(virt_core, ec);
     }
 }}}
