@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/runtime/get_locality_id.hpp>

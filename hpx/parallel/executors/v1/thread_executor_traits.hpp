@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/apply.hpp>
-#include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
@@ -76,8 +76,10 @@ namespace hpx { namespace parallel { inline namespace v3
         template <typename Executor_, typename F, typename ... Ts>
         static void post(Executor_ && sched, F && f, Ts &&... ts)
         {
-            hpx::apply(std::forward<Executor_>(sched), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            sched.add(
+                util::deferred_call(
+                    std::forward<F>(f), std::forward<Ts>(ts)...),
+                "hpx::parallel::v3::thread_executor_traits::post");
         }
 
         /// \brief Singleton form of asynchronous execution agent creation.
@@ -100,8 +102,14 @@ namespace hpx { namespace parallel { inline namespace v3
         >
         async_execute(Executor_ && sched, F && f, Ts &&... ts)
         {
-            return hpx::async(std::forward<Executor_>(sched),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
+                result_type;
+
+            lcos::local::futures_factory<result_type()> p(
+                std::forward<Executor_>(sched),
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+            p.apply();
+            return p.get_future();
         }
 
         /// \brief Singleton form of synchronous execution agent creation.
@@ -123,7 +131,7 @@ namespace hpx { namespace parallel { inline namespace v3
         static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         execute(Executor_ && sched, F && f, Ts &&... ts)
         {
-            return hpx::async(std::forward<Executor_>(sched),
+            return async_execute(std::forward<Executor_>(sched),
                 std::forward<F>(f), std::forward<Ts>(ts)...).get();
         }
 
@@ -172,6 +180,7 @@ namespace hpx { namespace parallel { inline namespace v3
 
             spawn(sched, results, 0, size, num_tasks, f, hpx::util::begin(shape),
                 ts...).get();
+
             return results;
         }
 
@@ -204,7 +213,7 @@ namespace hpx { namespace parallel { inline namespace v3
                 {
                     std::size_t curr_chunk_size = (std::min)(chunk_size, size);
 
-                    hpx::future<void> f = hpx::async(
+                    hpx::future<void> f = async_execute(sched,
                         spawn_func, std::ref(sched), std::ref(results), base,
                         curr_chunk_size, num_tasks, std::ref(func), it,
                         std::ref(ts)...);
@@ -225,7 +234,7 @@ namespace hpx { namespace parallel { inline namespace v3
 
             for (std::size_t i = 0; i != size; ++i, ++it)
             {
-                results[base + i] = hpx::async(sched, func, *it, ts...);
+                results[base + i] = async_execute(sched, func, *it, ts...);
             }
 
             return hpx::make_ready_future();
@@ -271,7 +280,7 @@ namespace hpx { namespace parallel { inline namespace v3
 
             for (auto const& elem: shape)
             {
-                results.push_back(hpx::async(sched, std::forward<F>(f),
+                results.push_back(async_execute(sched, std::forward<F>(f),
                     elem, ts...));
             }
 

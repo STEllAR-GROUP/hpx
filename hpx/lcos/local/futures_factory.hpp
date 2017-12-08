@@ -19,6 +19,8 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
+#include <hpx/parallel/executors/execution.hpp>
+
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
@@ -31,9 +33,12 @@ namespace hpx { namespace lcos { namespace local
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result, typename F,
+        template <typename Result, typename F, typename Executor,
             typename Base = lcos::detail::task_base<Result> >
-        struct task_object : Base
+        struct task_object;
+
+        template <typename Result, typename F, typename Base>
+        struct task_object<Result, F, void, Base> : Base
         {
             typedef Base base_type;
             typedef typename Base::result_type result_type;
@@ -45,37 +50,21 @@ namespace hpx { namespace lcos { namespace local
               : f_(f)
             {}
 
-            task_object(F && f)
+            task_object(F&& f)
               : f_(std::move(f))
             {}
 
-            task_object(threads::executor& sched, F const& f)
-              : base_type(sched), f_(f)
-            {}
-
-            task_object(threads::executor& sched, F && f)
-              : base_type(sched), f_(std::move(f))
-            {}
-
             task_object(F const& f, init_no_addref no_addref)
-              : base_type(no_addref), f_(f)
+              : base_type(no_addref)
+              , f_(f)
             {}
 
-            task_object(F && f, init_no_addref no_addref)
-              : base_type(no_addref), f_(std::move(f))
+            task_object(F&& f, init_no_addref no_addref)
+              : base_type(no_addref)
+              , f_(std::move(f))
             {}
 
-            task_object(threads::executor& sched, F const& f,
-                    init_no_addref no_addref)
-              : base_type(sched, no_addref), f_(f)
-            {}
-
-            task_object(threads::executor& sched, F && f,
-                    init_no_addref no_addref)
-              : base_type(sched, no_addref), f_(std::move(f))
-            {}
-
-            void do_run()
+            void do_run() override
             {
                 return do_run_impl(std::is_void<Result>());
             }
@@ -106,31 +95,26 @@ namespace hpx { namespace lcos { namespace local
             // run in a separate thread
             threads::thread_id_type apply(launch policy,
                 threads::thread_priority priority,
-                threads::thread_stacksize stacksize, error_code& ec)
+                threads::thread_stacksize stacksize, error_code& ec) override
             {
                 this->check_started();
 
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
-                if (this->sched_) {
-                    this->sched_->add(
-                        util::deferred_call(&base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_, "task_object::apply"),
-                        threads::pending, false, stacksize, ec);
-                    return threads::invalid_thread_id;
-                }
-                else if (policy == launch::fork) {
+                if (policy == launch::fork) {
                     return threads::register_thread_nullary(
-                        util::deferred_call(&base_type::run_impl, std::move(this_)),
+                        util::deferred_call(
+                            &base_type::run_impl, std::move(this_)),
                         util::thread_description(f_, "task_object::apply"),
                         threads::pending_do_not_schedule, true,
-                        threads::thread_priority_boost,
-                        get_worker_thread_num(), stacksize, ec);
+                        threads::thread_priority_boost, get_worker_thread_num(),
+                        stacksize, ec);
                 }
                 else {
                     threads::register_thread_nullary(
-                        util::deferred_call(&base_type::run_impl, std::move(this_)),
+                        util::deferred_call(
+                            &base_type::run_impl, std::move(this_)),
                         util::thread_description(f_, "task_object::apply"),
                         threads::pending, false, priority, std::size_t(-1),
                         stacksize, ec);
@@ -139,12 +123,106 @@ namespace hpx { namespace lcos { namespace local
             }
         };
 
+        template <typename Result, typename F, typename Executor, typename Base>
+        struct task_object
+          : task_object<Result, F, void, Base>
+        {
+            typedef task_object<Result, F, void, Base> base_type;
+            typedef typename Base::result_type result_type;
+            typedef typename Base::init_no_addref init_no_addref;
+
+            Executor* exec_;
+
+            task_object(F const& f)
+              : base_type(f)
+              , exec_(nullptr)
+            {}
+
+            task_object(F&& f)
+              : base_type(std::move(f))
+              , exec_(nullptr)
+            {}
+
+            task_object(Executor& exec, F const& f)
+              : base_type(f)
+              , exec_(&exec)
+            {}
+
+            task_object(Executor& exec, F&& f)
+              : base_type(std::move(f))
+              , exec_(&exec)
+            {}
+
+            task_object(F const& f, init_no_addref no_addref)
+              : base_type(f, no_addref)
+              , exec_(nullptr)
+            {}
+
+            task_object(F&& f, init_no_addref no_addref)
+              : base_type(std::move(f), no_addref)
+              , exec_(nullptr)
+            {}
+
+            task_object(Executor& exec, F const& f, init_no_addref no_addref)
+              : base_type(f, no_addref)
+              , exec_(&exec)
+            {}
+
+            task_object(Executor& exec, F&& f, init_no_addref no_addref)
+              : base_type(std::move(f), no_addref)
+              , exec_(&exec)
+            {}
+
+        protected:
+            // run in a separate thread
+            threads::thread_id_type apply(launch policy,
+                threads::thread_priority priority,
+                threads::thread_stacksize stacksize, error_code& ec) override
+            {
+                this->check_started();
+
+                typedef typename Base::future_base_type future_base_type;
+                future_base_type this_(this);
+
+                if (exec_) {
+                    parallel::execution::post(*exec_,
+                        util::deferred_call(
+                            &base_type::run_impl, std::move(this_)));
+                    return threads::invalid_thread_id;
+                }
+                else if (policy == launch::fork) {
+                    return threads::register_thread_nullary(
+                        util::deferred_call(
+                            &base_type::run_impl, std::move(this_)),
+                        util::thread_description(this->f_, "task_object::apply"),
+                        threads::pending_do_not_schedule, true,
+                        threads::thread_priority_boost, get_worker_thread_num(),
+                        stacksize, ec);
+                }
+                else {
+                    threads::register_thread_nullary(
+                        util::deferred_call(
+                            &base_type::run_impl, std::move(this_)),
+                        util::thread_description(this->f_, "task_object::apply"),
+                        threads::pending, false, priority, std::size_t(-1),
+                        stacksize, ec);
+                    return threads::invalid_thread_id;
+                }
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result, typename F, typename Executor>
+        struct cancelable_task_object;
+
         template <typename Result, typename F>
-        struct cancelable_task_object
-          : task_object<Result, F, lcos::detail::cancelable_task_base<Result> >
+        struct cancelable_task_object<Result, F, void>
+          : task_object<Result, F, void,
+                lcos::detail::cancelable_task_base<Result> >
         {
             typedef task_object<
-                    Result, F, lcos::detail::cancelable_task_base<Result>
+                    Result, F, void,
+                    lcos::detail::cancelable_task_base<Result>
                 > base_type;
             typedef typename base_type::result_type result_type;
             typedef typename base_type::init_no_addref init_no_addref;
@@ -157,12 +235,41 @@ namespace hpx { namespace lcos { namespace local
               : base_type(std::move(f))
             {}
 
-            cancelable_task_object(threads::executor& sched, F const& f)
-              : base_type(sched, f)
+            cancelable_task_object(F const& f, init_no_addref no_addref)
+              : base_type(f, no_addref)
             {}
 
-            cancelable_task_object(threads::executor& sched, F && f)
-              : base_type(sched, std::move(f))
+            cancelable_task_object(F && f, init_no_addref no_addref)
+              : base_type(std::move(f), no_addref)
+            {}
+        };
+
+        template <typename Result, typename F, typename Executor>
+        struct cancelable_task_object
+          : task_object<Result, F, Executor,
+                lcos::detail::cancelable_task_base<Result> >
+        {
+            typedef task_object<
+                    Result, F, Executor,
+                    lcos::detail::cancelable_task_base<Result>
+                > base_type;
+            typedef typename base_type::result_type result_type;
+            typedef typename base_type::init_no_addref init_no_addref;
+
+            cancelable_task_object(F const& f)
+              : base_type(f)
+            {}
+
+            cancelable_task_object(F && f)
+              : base_type(std::move(f))
+            {}
+
+            cancelable_task_object(Executor& exec, F const& f)
+              : base_type(exec, f)
+            {}
+
+            cancelable_task_object(Executor& exec, F && f)
+              : base_type(exec, std::move(f))
             {}
 
             cancelable_task_object(F const& f, init_no_addref no_addref)
@@ -173,14 +280,14 @@ namespace hpx { namespace lcos { namespace local
               : base_type(std::move(f), no_addref)
             {}
 
-            cancelable_task_object(threads::executor& sched, F const& f,
+            cancelable_task_object(Executor& exec, F const& f,
                     init_no_addref no_addref)
-              : base_type(sched, f, no_addref)
+              : base_type(exec, f, no_addref)
             {}
 
-            cancelable_task_object(threads::executor& sched, F && f,
+            cancelable_task_object(Executor& exec, F && f,
                     init_no_addref no_addref)
-              : base_type(sched, std::move(f), no_addref)
+              : base_type(exec, std::move(f), no_addref)
             {}
         };
     }
@@ -196,8 +303,12 @@ namespace hpx { namespace lcos { namespace local
 
     namespace detail
     {
-        template <typename Result, bool Cancelable>
-        struct create_task_object
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result, bool Cancelable, typename Executor = void>
+        struct create_task_object;
+
+        template <typename Result>
+        struct create_task_object<Result, false, void>
         {
             typedef
                 boost::intrusive_ptr<lcos::detail::task_base<Result> >
@@ -207,28 +318,10 @@ namespace hpx { namespace lcos { namespace local
                 init_no_addref;
 
             template <typename F>
-            static return_type call(threads::executor& sched, F && f)
-            {
-                return return_type(
-                    new task_object<Result, F>(
-                        sched, std::forward<F>(f), init_no_addref()),
-                    false);
-            }
-
-            template <typename R>
-            static return_type call(threads::executor& sched, R (*f)())
-            {
-                return return_type(
-                    new task_object<Result, Result (*)()>(
-                        sched, f, init_no_addref()),
-                    false);
-            }
-
-            template <typename F>
             static return_type call(F&& f)
             {
                 return return_type(
-                    new task_object<Result, F>(
+                    new task_object<Result, F, void>(
                         std::forward<F>(f), init_no_addref()),
                     false);
             }
@@ -237,13 +330,15 @@ namespace hpx { namespace lcos { namespace local
             static return_type call(R (*f)())
             {
                 return return_type(
-                    new task_object<Result, Result (*)()>(f, init_no_addref()),
+                    new task_object<Result, Result (*)(), void>(
+                        f, init_no_addref()),
                     false);
             }
         };
 
-        template <typename Result>
-        struct create_task_object<Result, true>
+        template <typename Result, typename Executor>
+        struct create_task_object<Result, false, Executor>
+          : create_task_object<Result, false, void>
         {
             typedef
                 boost::intrusive_ptr<lcos::detail::task_base<Result> >
@@ -253,28 +348,40 @@ namespace hpx { namespace lcos { namespace local
                 init_no_addref;
 
             template <typename F>
-            static return_type call(threads::executor& sched, F&& f)
+            static return_type call(Executor& exec, F && f)
             {
                 return return_type(
-                    new cancelable_task_object<Result, F>(
-                        sched, std::forward<F>(f), init_no_addref()),
+                    new task_object<Result, F, Executor>(exec,
+                        std::forward<F>(f), init_no_addref()),
                     false);
             }
 
             template <typename R>
-            static return_type call(threads::executor& sched, R (*f)())
+            static return_type call(Executor& exec, R (*f)())
             {
                 return return_type(
-                    new cancelable_task_object<Result, Result (*)()>(
-                        sched, f, init_no_addref()),
+                    new task_object<Result, Result (*)(), Executor>(
+                        exec, f, init_no_addref()),
                     false);
             }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result>
+        struct create_task_object<Result, true, void>
+        {
+            typedef
+                boost::intrusive_ptr<lcos::detail::task_base<Result> >
+                return_type;
+            typedef
+                typename lcos::detail::future_data_refcnt_base::init_no_addref
+                init_no_addref;
 
             template <typename F>
             static return_type call(F&& f)
             {
                 return return_type(
-                    new cancelable_task_object<Result, F>(
+                    new cancelable_task_object<Result, F, void>(
                         std::forward<F>(f), init_no_addref()),
                     false);
             }
@@ -283,8 +390,38 @@ namespace hpx { namespace lcos { namespace local
             static return_type call(R (*f)())
             {
                 return return_type(
-                    new cancelable_task_object<Result, Result (*)()>(
+                    new cancelable_task_object<Result, Result (*)(), void>(
                         f, init_no_addref()),
+                    false);
+            }
+        };
+
+        template <typename Result, typename Executor>
+        struct create_task_object<Result, true, Executor>
+          : create_task_object<Result, true, void>
+        {
+            typedef
+                boost::intrusive_ptr<lcos::detail::task_base<Result> >
+                return_type;
+            typedef
+                typename lcos::detail::future_data_refcnt_base::init_no_addref
+                init_no_addref;
+
+            template <typename F>
+            static return_type call(Executor& exec, F&& f)
+            {
+                return return_type(
+                    new cancelable_task_object<Result, F, Executor>(
+                        exec, std::forward<F>(f), init_no_addref()),
+                    false);
+            }
+
+            template <typename R>
+            static return_type call(Executor& exec, R (*f)())
+            {
+                return return_type(
+                    new cancelable_task_object<Result, Result (*)(), Executor>(
+                        exec, f, init_no_addref()),
                     false);
             }
         };
@@ -302,16 +439,18 @@ namespace hpx { namespace lcos { namespace local
           : future_obtained_(false)
         {}
 
-        template <typename F>
-        explicit futures_factory(threads::executor& sched, F&& f)
-          : task_(detail::create_task_object<Result, Cancelable>::call(
-                sched, std::forward<F>(f))),
+        template <typename Executor, typename F>
+        explicit futures_factory(Executor& exec, F&& f)
+          : task_(detail::create_task_object<Result, Cancelable, Executor>::
+                call(exec, std::forward<F>(f))),
             future_obtained_(false)
         {}
 
-        explicit futures_factory(threads::executor& sched, Result (*f)())
-          : task_(detail::create_task_object<Result, Cancelable>::call(sched, f)),
-            future_obtained_(false)
+        template <typename Executor>
+        explicit futures_factory(Executor& exec, Result (*f)())
+          : task_(detail::create_task_object<Result, Cancelable, Executor>::
+                call(exec, f))
+          , future_obtained_(false)
         {}
 
         template <typename F, typename Enable = typename
@@ -319,8 +458,8 @@ namespace hpx { namespace lcos { namespace local
                 futures_factory>::value>::type>
         explicit futures_factory(F&& f)
           : task_(detail::create_task_object<Result, Cancelable>::call(
-                std::forward<F>(f))),
-            future_obtained_(false)
+                std::forward<F>(f)))
+          , future_obtained_(false)
         {}
 
         explicit futures_factory(Result (*f)())

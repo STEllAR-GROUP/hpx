@@ -34,8 +34,6 @@ std::size_t thread_affinity_worker(std::size_t desired)
     if (current == desired)
     {
 #if defined(HPX_HAVE_HWLOC) && !defined(__APPLE__)
-        bool numa_sensitive = hpx::is_scheduler_numa_sensitive();
-
         // extract the desired affinity mask
         hpx::runtime & rt = hpx::get_runtime();
         hpx::threads::topology const& t = rt.get_topology();

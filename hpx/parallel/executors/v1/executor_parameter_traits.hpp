@@ -11,9 +11,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+#include <hpx/lcos/future.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
-#include <hpx/traits/v1/is_executor_parameters.hpp>
 #include <hpx/traits/v1/is_executor.hpp>
+#include <hpx/traits/v1/is_executor_parameters.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 

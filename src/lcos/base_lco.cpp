@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/lcos/base_lco.hpp>
-
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>

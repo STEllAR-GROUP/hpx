@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstdint>

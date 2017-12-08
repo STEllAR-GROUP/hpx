@@ -25,6 +25,7 @@
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/post_policy_dispatch.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -102,10 +103,11 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Func, typename Future, typename Continuation>
     typename std::enable_if<
-        !traits::detail::is_unique_future<
+       !traits::detail::is_unique_future<
             typename util::invoke_result<Func, Future>::type
         >::value
-    >::type invoke_continuation(Func& func, Future && future, Continuation& cont)
+    >::type
+    invoke_continuation(Func& func, Future && future, Continuation& cont)
     {
         typedef std::is_void<
             typename util::invoke_result<Func, Future>::type
@@ -120,7 +122,8 @@ namespace hpx { namespace lcos { namespace detail
         traits::detail::is_unique_future<
             typename util::invoke_result<Func, Future>::type
         >::value
-    >::type invoke_continuation(Func& func, Future && future, Continuation& cont)
+    >::type
+    invoke_continuation(Func& func, Future && future, Continuation& cont)
     {
         try {
             typedef
@@ -226,6 +229,7 @@ namespace hpx { namespace lcos { namespace detail
             f_(std::forward<Func>(f))
         {}
 
+    protected:
         void run_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -235,6 +239,7 @@ namespace hpx { namespace lcos { namespace detail
             invoke_continuation(f_, std::move(future), *this);
         }
 
+    public:
         void run(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -265,8 +270,9 @@ namespace hpx { namespace lcos { namespace detail
             run(std::move(f), priority, throws);
         }
 
+    protected:
         threads::thread_result_type
-        async_impl_v1(
+        async_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -279,23 +285,23 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         threads::thread_result_type
-        async_impl(
+        async_exec_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
         {
-            reset_id r(*this);
-
-            Future future = traits::future_access<Future>::create(std::move(f));
-
             typedef std::is_void<
                     typename util::invoke_result<F, Future>::type
                 > is_void;
-            invoke_continuation(f_, std::move(future), *this, is_void());
 
+            reset_id r(*this);
+
+            Future future = traits::future_access<Future>::create(std::move(f));
+            invoke_continuation(f_, std::move(future), *this, is_void());
             return threads::thread_result_type(threads::terminated, nullptr);
         }
 
+    public:
         void async(
             typename traits::detail::shared_state_ptr_for<
                 Future
@@ -304,107 +310,11 @@ namespace hpx { namespace lcos { namespace detail
             error_code& ec)
         {
             {
-                std::lock_guard<mutex_type> l(this->mtx_);
+                std::unique_lock<mutex_type> l(this->mtx_);
                 if (started_) {
+                    l.unlock();
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async",
-                        "this task has already been started");
-                    return;
-                }
-                started_ = true;
-            }
-
-            boost::intrusive_ptr<continuation> this_(this);
-            threads::thread_result_type (continuation::*async_impl_ptr)(
-                typename traits::detail::shared_state_ptr_for<Future>::type &&
-            ) = &continuation::async_impl_v1;
-
-            util::thread_description desc(f_, "continuation::async");
-            applier::register_thread_plain(
-                util::bind(util::one_shot(async_impl_ptr),
-                    std::move(this_), std::move(f)),
-                desc, threads::pending, true, priority);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-        void async(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            threads::executor& sched, error_code& ec)
-        {
-            {
-                std::lock_guard<mutex_type> l(this->mtx_);
-                if (started_) {
-                    HPX_THROWS_IF(ec, task_already_started,
-                        "continuation::async",
-                        "this task has already been started");
-                    return;
-                }
-                started_ = true;
-            }
-
-            boost::intrusive_ptr<continuation> this_(this);
-            threads::thread_result_type (continuation::*async_impl_ptr)(
-                typename traits::detail::shared_state_ptr_for<Future>::type &&
-            ) = &continuation::async_impl_v1;
-
-            util::thread_description desc(f_, "continuation::async");
-            sched.add(
-                util::deferred_call(async_impl_ptr, std::move(this_), std::move(f)),
-                desc);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        template <typename Executor>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void async_exec_v1(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            Executor& exec, error_code& ec)
-        {
-            {
-                std::lock_guard<mutex_type> l(this->mtx_);
-                if (started_) {
-                    HPX_THROWS_IF(ec, task_already_started,
-                        "continuation::async_exec_v1",
-                        "this task has already been started");
-                    return;
-                }
-                started_ = true;
-            }
-
-            boost::intrusive_ptr<continuation> this_(this);
-            threads::thread_result_type (continuation::*async_impl_ptr)(
-                typename traits::detail::shared_state_ptr_for<Future>::type &&
-            ) = &continuation::async_impl_v1;
-
-            parallel::executor_traits<Executor>::apply_execute(
-                exec, async_impl_ptr, std::move(this_), std::move(f));
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-#endif
-
-        template <typename Executor>
-        void async_exec(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            Executor && exec, error_code& ec)
-        {
-            {
-                std::lock_guard<mutex_type> l(this->mtx_);
-                if (started_) {
-                    HPX_THROWS_IF(ec, task_already_started,
-                        "continuation::async_exec",
                         "this task has already been started");
                     return;
                 }
@@ -416,8 +326,13 @@ namespace hpx { namespace lcos { namespace detail
                 typename traits::detail::shared_state_ptr_for<Future>::type &&
             ) = &continuation::async_impl;
 
-            parallel::execution::post(exec, async_impl_ptr, std::move(this_),
-                std::move(f));
+            hpx::util::thread_description desc(async_impl_ptr,
+                "hpx::parallel::execution::parallel_executor::post");
+
+            parallel::execution::detail::post_policy_dispatch<
+                    hpx::launch::async_policy
+                >::call(desc, hpx::launch::async, async_impl_ptr,
+                    std::move(this_), std::move(f));
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -432,15 +347,39 @@ namespace hpx { namespace lcos { namespace detail
             async(std::move(f), priority, throws);
         }
 
-        void async(
+#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
+        template <typename Executor>
+        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
+        void async_exec_v1(
             typename traits::detail::shared_state_ptr_for<
                 Future
-            >::type && f, threads::executor& sched)
+            >::type && f,
+            Executor& exec, error_code& ec)
         {
-            async(std::move(f), sched, throws);
+            {
+                std::unique_lock<mutex_type> l(this->mtx_);
+                if (started_) {
+                    l.unlock();
+                    HPX_THROWS_IF(ec, task_already_started,
+                        "continuation::async_exec_v1",
+                        "this task has already been started");
+                    return;
+                }
+                started_ = true;
+            }
+
+            boost::intrusive_ptr<continuation> this_(this);
+            threads::thread_result_type (continuation::*async_impl_ptr)(
+                typename traits::detail::shared_state_ptr_for<Future>::type &&
+            ) = &continuation::async_impl;
+
+            parallel::executor_traits<Executor>::apply_execute(exec,
+                util::one_shot(async_impl_ptr), std::move(this_), std::move(f));
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)
         void async_exec_v1(
@@ -458,9 +397,40 @@ namespace hpx { namespace lcos { namespace detail
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f,
+            Executor && exec, error_code& ec)
+        {
+            {
+                std::unique_lock<mutex_type> l(this->mtx_);
+                if (started_) {
+                    l.unlock();
+                    HPX_THROWS_IF(ec, task_already_started,
+                        "continuation::async_exec",
+                        "this task has already been started");
+                    return;
+                }
+                started_ = true;
+            }
+
+            boost::intrusive_ptr<continuation> this_(this);
+            threads::thread_result_type (continuation::*async_exec_impl_ptr)(
+                typename traits::detail::shared_state_ptr_for<Future>::type &&
+            ) = &continuation::async_exec_impl;
+
+            parallel::execution::post(std::forward<Executor>(exec),
+                async_exec_impl_ptr, std::move(this_), std::move(f));
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
+        template <typename Executor>
+        void async_exec(
+            typename traits::detail::shared_state_ptr_for<
+                Future
+            >::type && f,
             Executor && exec)
         {
-            async_exec(std::move(f), exec, throws);
+            async_exec(std::move(f), std::forward<Executor>(exec), throws);
         }
 
         // cancellation support
@@ -539,34 +509,6 @@ namespace hpx { namespace lcos { namespace detail
                 ));
         }
 
-        void attach(Future const& future, threads::executor& sched)
-        {
-            typedef
-                typename traits::detail::shared_state_ptr_for<Future>::type
-                shared_state_ptr;
-
-            // bind an on_completed handler to this future which will invoke
-            // the continuation
-            boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr &&, threads::executor&) =
-                &continuation::async;
-
-            shared_state_ptr state = traits::detail::get_shared_state(future);
-            typename shared_state_ptr::element_type* ptr = state.get();
-
-            if (ptr == nullptr)
-            {
-                HPX_THROW_EXCEPTION(no_state,
-                    "continuation::attach",
-                    "the future to attach has no valid shared state");
-            }
-
-            ptr->execute_deferred();
-            ptr->set_on_completed(
-                util::deferred_call(cb, std::move(this_), std::move(state),
-                    std::ref(sched)));
-        }
-
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         template <typename Executor>
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)
@@ -600,8 +542,11 @@ namespace hpx { namespace lcos { namespace detail
 #endif
 
         template <typename Executor>
-        void attach_exec(Future const& future, Executor && exec)
+        void attach_exec(Future const& future,
+            typename std::remove_reference<Executor>::type& exec)
         {
+            typedef typename std::remove_reference<Executor>::type
+                executor_type;
             typedef
                 typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
@@ -609,8 +554,8 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr &&, Executor &&) =
-                &continuation::async_exec<Executor>;
+            void (continuation::*cb)(shared_state_ptr &&, executor_type&) =
+                &continuation::async_exec;
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
@@ -626,6 +571,38 @@ namespace hpx { namespace lcos { namespace detail
             ptr->set_on_completed(
                 util::deferred_call(cb, std::move(this_), std::move(state),
                     std::ref(exec)));
+        }
+
+        template <typename Executor>
+        void attach_exec(Future const& future,
+            typename std::remove_reference<Executor>::type&& exec)
+        {
+            typedef typename std::remove_reference<Executor>::type
+                executor_type;
+            typedef
+                typename traits::detail::shared_state_ptr_for<Future>::type
+                shared_state_ptr;
+
+            // bind an on_completed handler to this future which will invoke
+            // the continuation
+            boost::intrusive_ptr<continuation> this_(this);
+            void (continuation::*cb)(shared_state_ptr &&, executor_type&&) =
+                &continuation::async_exec;
+
+            shared_state_ptr state = traits::detail::get_shared_state(future);
+            typename shared_state_ptr::element_type* ptr = state.get();
+
+            if (ptr == nullptr)
+            {
+                HPX_THROW_EXCEPTION(no_state,
+                    "continuation::attach_exec",
+                    "the future to attach has no valid shared state");
+            }
+
+            ptr->execute_deferred();
+            ptr->set_on_completed(
+                util::deferred_call(cb, std::move(this_), std::move(state),
+                    std::move(exec)));
         }
 
     protected:
@@ -653,23 +630,6 @@ namespace hpx { namespace lcos { namespace detail
         return p;
     }
 
-    template <typename ContResult, typename Future, typename F>
-    inline typename traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation(Future const& future, threads::executor& sched, F && f)
-    {
-        typedef typename continuation_result<ContResult>::type result_type;
-        typedef detail::continuation<Future, F, result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
-
-        // create a continuation
-        typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(std::forward<F>(f), init_no_addref()), false);
-        static_cast<shared_state*>(p.get())->attach(future, sched);
-        return p;
-    }
-
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
     template <typename ContResult, typename Future, typename Executor,
         typename F>
@@ -691,21 +651,6 @@ namespace hpx { namespace lcos { namespace detail
     }
 #endif
 
-    template <typename ContResult, typename Future, typename F>
-    inline typename traits::detail::shared_state_ptr<ContResult>::type
-    make_continuation_thread_exec(Future const& future,
-        threads::executor& sched, F && f)
-    {
-        typedef detail::continuation<Future, F, ContResult> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
-
-        // create a continuation
-        typename traits::detail::shared_state_ptr<ContResult>::type p(
-            new shared_state(std::forward<F>(f), init_no_addref()), false);
-        static_cast<shared_state*>(p.get())->attach(future, sched);
-        return p;
-    }
-
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline typename traits::detail::shared_state_ptr<ContResult>::type
@@ -717,7 +662,8 @@ namespace hpx { namespace lcos { namespace detail
         // create a continuation
         typename traits::detail::shared_state_ptr<ContResult>::type p(
             new shared_state(std::forward<F>(f), init_no_addref()), false);
-        static_cast<shared_state*>(p.get())->attach_exec(future, exec);
+        static_cast<shared_state*>(p.get())->template attach_exec<Executor>(
+            future, exec);
         return p;
     }
 

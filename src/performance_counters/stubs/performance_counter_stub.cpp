@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 

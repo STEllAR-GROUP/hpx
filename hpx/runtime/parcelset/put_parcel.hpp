@@ -9,6 +9,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -153,14 +154,9 @@ namespace hpx { namespace parcelset {
             }
         }
 
-        struct put_parcel_handler
+        struct HPX_EXPORT put_parcel_handler
         {
-            void operator()(parcel&& p) const
-            {
-                parcelset::parcelhandler& ph =
-                    hpx::get_runtime().get_parcel_handler();
-                ph.put_parcel(std::move(p));
-            }
+            void operator()(parcel&& p) const;
         };
 
         template <typename Callback>

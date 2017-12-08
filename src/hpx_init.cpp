@@ -12,6 +12,7 @@
 #include <hpx/async.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>

@@ -7,16 +7,17 @@
 #define HPX_RUNTIME_COMPONENTS_SERVER_EXECUTOR_COMPONENT_FEB_09_2017_0839PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/threads/executors.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
+
+#include <hpx/parallel/executors/execution.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -82,7 +83,7 @@ namespace hpx { namespace components
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             desc = data.description;
 #endif
-            hpx::parallel::executor_traits<executor_type>::async_execute(
+            hpx::parallel::execution::async_execute(
                 hpx::get_lva<executor_component>::call(lva)->exec_,
                 hpx::util::deferred_call(
                     hpx::util::annotated_function(

@@ -21,8 +21,18 @@ namespace hpx
     {
         namespace detail
         {
+            template <typename Result>
+            struct future_data;
+
             struct future_data_refcnt_base;
         }
+
+        namespace local { namespace detail
+        {
+            template <typename R,
+                typename SharedState = lcos::detail::future_data<R> >
+            class promise_base;
+        }}
 
         class HPX_EXPORT base_lco;
 

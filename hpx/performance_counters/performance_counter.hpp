@@ -12,7 +12,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/bind_front.hpp>
 
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 
 #include <string>

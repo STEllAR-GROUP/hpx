@@ -12,8 +12,8 @@
 #define HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F
 
 #include <hpx/config.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/error_code.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/util/function.hpp>
 
 #include <cstddef>
@@ -22,60 +22,6 @@
 
 namespace hpx { namespace performance_counters
 {
-    /// \cond NOINTERNAL
-    struct manage_counter_type
-    {
-        manage_counter_type(counter_info const& info)
-          : status_(status_invalid_data), info_(info)
-        {}
-
-        ~manage_counter_type()
-        {
-            uninstall();
-        }
-
-        counter_status install(error_code& ec = throws)
-        {
-            if (status_invalid_data != status_) {
-                HPX_THROWS_IF(ec, hpx::invalid_status,
-                    "manage_counter_type::install",
-                    "counter type " + info_.fullname_ +
-                    " has been already installed.");
-                return status_invalid_data;
-            }
-
-            return status_ = add_counter_type(info_, ec);
-        }
-
-        counter_status install(
-            create_counter_func const& create_counter,
-            discover_counters_func const& discover_counters,
-            error_code& ec = throws)
-        {
-            if (status_invalid_data != status_) {
-                HPX_THROWS_IF(ec, hpx::invalid_status,
-                    "manage_counter_type::install",
-                    "generic counter type " + info_.fullname_ +
-                    " has been already installed.");
-                return status_invalid_data;
-            }
-
-            return status_ = add_counter_type(
-                info_, create_counter, discover_counters, ec);
-        }
-
-        void uninstall(error_code& ec = throws)
-        {
-            if (status_invalid_data != status_)
-                remove_counter_type(info_, ec); // ignore errors
-        }
-
-    private:
-        counter_status status_;
-        counter_info info_;
-    };
-    /// \endcond
-
     /// \brief Install a new generic performance counter type in a way, which
     ///        will uninstall it automatically during shutdown.
     ///

@@ -16,28 +16,29 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/component_commandline_base.hpp>
+#include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/components/component_startup_shutdown_base.hpp>
-#include <hpx/runtime/components/component_commandline_base.hpp>
+#include <hpx/runtime/components/server/memory_block.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>

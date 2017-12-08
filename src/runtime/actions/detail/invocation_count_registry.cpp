@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/format.hpp>
 

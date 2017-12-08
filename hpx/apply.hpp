@@ -7,7 +7,7 @@
 #define HPX_APPLY_APR_16_20012_0943AM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -24,6 +24,7 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/parallel_executor.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -45,34 +46,11 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_invocable<F, Ts...>::value,
             bool
         >::type
-        call(F&& f, Ts&&... ts)
+        call(F && f, Ts &&... ts)
         {
-            util::thread_description desc(f, "apply_dispatch::call");
-            threads::register_thread_nullary(
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc);
-            return false;
-        }
-    };
-
-    // threads::executor
-    template <typename Executor>
-    struct apply_dispatch<Executor,
-        typename std::enable_if<
-            traits::is_threads_executor<Executor>::value
-        >::type>
-    {
-        template <typename F, typename ...Ts>
-        HPX_FORCEINLINE static
-        typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            bool
-        >::type
-        call(Executor& sched, F&& f, Ts&&... ts)
-        {
-            sched.add(
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-                "hpx::apply");
+            parallel::execution::parallel_executor exec;
+            parallel::execution::post(
+                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
         }
     };
@@ -100,23 +78,28 @@ namespace hpx { namespace detail
     };
 #endif
 
+    // The overload for hpx::apply taking an executor simply forwards to the
+    // corresponding executor customization point.
+    //
     // parallel::execution::executor
+    // threads::executor
     template <typename Executor>
     struct apply_dispatch<Executor,
         typename std::enable_if<
             traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
+            traits::is_two_way_executor<Executor>::value ||
+            traits::is_threads_executor<Executor>::value
         >::type>
     {
-        template <typename F, typename ...Ts>
+        template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
         typename std::enable_if<
             traits::detail::is_deferred_invocable<F, Ts...>::value,
             bool
         >::type
-        call(Executor& exec, F && f, Ts &&... ts)
+        call(Executor_ && exec, F && f, Ts &&... ts)
         {
-            parallel::execution::post(exec,
+            parallel::execution::post(std::forward<Executor_>(exec),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
         }
