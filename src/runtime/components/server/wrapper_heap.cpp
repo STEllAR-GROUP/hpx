@@ -287,11 +287,13 @@ namespace hpx { namespace components { namespace detail
         std::size_t const total_num_bytes =
             parameters_.capacity * parameters_.element_size;
 
-        if (first_free_ < pool_ + total_num_bytes)
+        if (first_free_ < pool_ + total_num_bytes ||
+            free_size_ < parameters_.capacity)
         {
             return false;
         }
 
+        HPX_ASSERT(free_size_ == parameters_.capacity);
         HPX_ASSERT(first_free_ == pool_ + total_num_bytes);
 
         // unbind in AGAS service
