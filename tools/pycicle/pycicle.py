@@ -2,50 +2,75 @@
 #
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-# ------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # pycicle
 # Python Continuous Integration Command Line Engine
-# Simple tool to poll PRs on github and spawn builds
-# ------------------------------------------------------
+# Simple tool to poll PRs/etc on github and spawn builds
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 from __future__ import absolute_import, division, print_function, unicode_literals
-import github, os, subprocess, time, re, string, random, socket, datetime
+import github, os, subprocess, time, re, string, random, socket, datetime, argparse
 
-#----------------------------------------------------------------------------
-# user's home dir and pycicle root
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+# Command line args
+#--------------------------------------------------------------------------
+parser = argparse.ArgumentParser()
+
+#----------------------------------------------
+# enable or disable slurm for Job launching
+#----------------------------------------------
+parser.add_argument('-s', '--slurm', dest='slurm', action='store_true', help="Use slurm for job launching (default)")
+parser.add_argument('--no-slurm', dest='slurm', action='store_false', help="Disable slurm job launching")
+parser.set_defaults(slurm=True)
+
+#----------------------------------------------
+# enable/debug mode
+#----------------------------------------------
+parser.add_argument('-d', '--debug', dest='debug', action='store_true', default=False, help="Enable debug mode")
+
+#----------------------------------------------
+# set default path for pycicle work dir
+#----------------------------------------------
 home = str(os.path.expanduser('~'))
 pycicle_dir = os.environ.get('PYCICLE_ROOT', home + '/pycicle')
-print('pycicle using root path', pycicle_dir)
+parser.add_argument('-p', '--pycicle-dir', dest='pycicle_dir', default=pycicle_dir)
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # github token used to authenticate access
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 user_token = 'generate a token and paste it here, or set env var'
 user_token = os.environ.get('PYCICLE_GITHUB_TOKEN', user_token)
+parser.add_argument('-t', '--github-token', dest='user_token', default=user_token)
 
-#----------------------------------------------------------------------------
-# Machines : get a list of machines to use for testing from PYCICLE_MACHINES
-# please use a comma separated list of machine nicknames such as
-# greina;daint;jb-laptop
+#--------------------------------------------------------------------------
+# Machines : get a list of machines to use for testing (env{PYCICLE_MACHINES})
+# use a space separated list of machine nicknames such as
+# -m greina daint jb-laptop
 # where the names corresond to the name.cmake files in the config dir
 #
 # TODO : add support for multiple machines and configs
-#----------------------------------------------------------------------------
-machines     = os.environ.get('PYCICLE_MACHINES', 'greina')
-machine_list = machines.split(',')
-machine      = machine_list[0]
-print('pycicle using machines', machine_list)
-print('current implementation supports 1 machine :', machine)
+#--------------------------------------------------------------------------
+machines = {os.environ.get('PYCICLE_MACHINES', 'greina')}
+parser.add_argument('-m', '--machines', dest='machines', nargs='+', default=machines)
 
-#----------------------------------------------------------------------------
-# Debuging - set PYCICLE_DEBUG env var to disable triggering builds
-#----------------------------------------------------------------------------
-debug_mode = os.environ.get('PYCICLE_DEBUG', '') != ''
+#----------------------------------------------
+# parse args
+#----------------------------------------------
+args = parser.parse_args()
+print('pycicle: slurm   :', 'enabled' if args.slurm else 'disabled')
+print('pycicle: debug   :',
+    'enabled (no build trigger commands will be sent)' if args.debug else 'disabled')
+print('pycicle: path    :', args.pycicle_dir)
+print('pycicle: token   :', args.user_token)
+print('pycicle: machines:', args.machines)
+#
+machine = args.machines[0]
+print('\ncurrent implementation supports only 1 machine :', machine, '\n')
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # Create a Github instance:
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 reponame    = 'HPX'
 orgname     = 'STEllAR-GROUP'
 poll_time   = 60
@@ -58,15 +83,15 @@ try:
 except:
     print('Failed to connect to github. Network down?')
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # Scrape-list : machine/build that we must check for status files
 # This will need to support lots of build/machine combinations eventually
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 scrape_list = {}
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # read one value from the CMake config for use elsewhere
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 def get_setting_for_machine(machine, setting) :
     current_path = os.path.dirname(os.path.realpath(__file__))
     f = open(current_path + '/config/' + machine + '.cmake')
@@ -76,20 +101,20 @@ def get_setting_for_machine(machine, setting) :
             return m[0]
     return ''
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # launch a command that will start one build
-#----------------------------------------------------------------------------
-def launch_build(nickname, branch_id, branch_name) :
+#--------------------------------------------------------------------------
+def launch_build(nickname, compiler, branch_id, branch_name) :
     remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
     remote_path = get_setting_for_machine(nickname, 'PYCICLE_ROOT')
     remote_http = get_setting_for_machine(nickname, 'PYCICLE_HTTP')
 
     # we are not yet using these as 'options'
-    compiler = 'xxx'
     boost = 'x.xx.x'
-
-    cmd = ['ssh', remote_ssh, 'ctest -S ',
-           remote_path          +'/repo/tools/pycicle/dashboard_slurm.cmake',
+    #
+    script = 'dashboard_slurm.cmake' if args.slurm else 'dashboard_script.cmake'
+    cmd = ['ssh', remote_ssh, 'ctest', '-S',
+           remote_path          + '/repo/tools/pycicle/' + script,
            '-DPYCICLE_ROOT='    + remote_path,
            '-DPYCICLE_HOST='    + nickname,
            '-DPYCICLE_PR='      + branch_id if branch_id != 'master' else '',
@@ -103,19 +128,31 @@ def launch_build(nickname, branch_id, branch_name) :
            '-DCTEST_BINARY_DIRECTORY=.',
            '-DCTEST_COMMAND=":"']
 
-    if debug_mode:
-        print('\n' + '-' * 20, 'Debug\n', cmd)
+    if args.debug:
+        print('\n' + '-' * 20, 'Debug\n', subprocess.list2cmdline(cmd))
         print('-' * 20 + '\n')
     else:
-        print('\n' + '-' * 20, 'Executing\n', cmd)
+        print('\n' + '-' * 20, 'Executing\n', subprocess.list2cmdline(cmd))
         p = subprocess.Popen(cmd)
         print('-' * 20 + '\n')
 
     return None
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+# launch one build from a list of options
+#--------------------------------------------------------------------------
+def choose_and_launch(machine, branch_id, branch_name) :
+    if machine=='daint':
+        if bool(random.getrandbits(1)):
+            launch_build(machine, 'gcc', branch_id, branch_name)
+        else:
+            launch_build(machine, 'clang', branch_id, branch_name)
+    else:
+        launch_build(machine, 'gcc', branch_id, branch_name)
+
+#--------------------------------------------------------------------------
 # collect test results so that we can update github PR status
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 def scrape_testing_results(nickname, branch_id, branch_name, head_commit) :
     remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
     remote_path = get_setting_for_machine(nickname, 'PYCICLE_ROOT')
@@ -152,7 +189,7 @@ def scrape_testing_results(nickname, branch_id, branch_name, head_commit) :
                '&field1=buildname/string&compare1=63&value1=' +
                branch_id + '-' + branch_name)
 
-        if debug_mode:
+        if args.debug:
             print ('Debug github PR status', URL)
         else:
             print ('Updating github PR status', URL)
@@ -189,16 +226,16 @@ def scrape_testing_results(nickname, branch_id, branch_name, head_commit) :
 
     return False
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # random string of N chars
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 def random_string(N):
     return ''.join(random.choice(string.ascii_uppercase + string.digits)
         for _ in range(N))
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # Check if a PR Needs and Update
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 def needs_update(branch_id, branch_name, branch_sha, master_sha):
     directory     = pycicle_dir + '/src/' + branch_id
     status_file   = directory + '/last_pr_sha.txt'
@@ -230,15 +267,15 @@ def needs_update(branch_id, branch_name, branch_sha, master_sha):
     #
     return update
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # main polling routine
-#----------------------------------------------------------------------------
-if debug_mode:
-    print('pycicle is in debug mode, no build trigger commands will be sent')
+#--------------------------------------------------------------------------
 #
 first_iteration = True
 github_t1       = datetime.datetime.now()
 scrape_t1       = github_t1 + datetime.timedelta(hours=-1)
+#
+random.seed(7)
 #
 while True:
     #
@@ -247,21 +284,24 @@ while True:
         github_tdiff  = github_t2 - github_t1
         github_t1     = github_t2
         print('Checking github:', 'Time since last check', github_tdiff.seconds, '(s)')
+        #
         master_branch = repo.get_branch(repo.default_branch)
+        master_sha    = master_branch.commit.sha
         #
         for pr in repo.get_pulls('open'):
             if not pr.mergeable:
+                continue
+            if args.debug and not pr.number==3042:
                 continue
             #
             branch_id   = str(pr.number)
             branch_name = pr.head.label.rsplit(':',1)[1]
             branch_sha  = pr.head.sha
-            master_sha  = master_branch.commit.sha
             #
             update = needs_update(branch_id, branch_name, branch_sha, master_sha)
             #
             if update:
-                launch_build(machine, branch_id, branch_name)
+                choose_and_launch(machine, branch_id, branch_name)
                 # get last commit on PR for setting status
                 scrape_list[branch_id] = [machine, branch_id, branch_name, pr.get_commits().reversed[0]]
 
@@ -270,7 +310,7 @@ while True:
 
         # also build the master branch if it changes
         if needs_update('master', 'master', master_sha, master_sha):
-            launch_build(machine, 'master', 'master')
+            choose_and_launch(machine, 'master', 'master')
             scrape_list['master'] = [machine, 'master', 'master', master_branch.commit]
 
     except (github.GithubException, socket.timeout) as ex:

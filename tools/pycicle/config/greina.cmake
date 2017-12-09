@@ -14,6 +14,8 @@ set(PYCICLE_ROOT "/scratch/biddisco/pycicle")
 set(PYCICLE_HTTP "TRUE")
 # Launch jobs using slurm rather than directly running them on the machine
 set(PYCICLE_SLURM "TRUE")
+#
+set(PYCICLE_BUILD_STAMP "gcc-${GCC_VER}")
 
 #######################################################################
 # These are settings you can use to define anything useful
@@ -43,6 +45,7 @@ set(BUILD_PARALLELISM "8")
 
 set(CTEST_SITE "linux(greina)-gcc-${GCC_VER}-Boost-${BOOST_VER}")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
+set(CTEST_TEST_TIMEOUT "45")
 
 #######################################################################
 # The string that is used to drive cmake config step
@@ -71,7 +74,6 @@ string(CONCAT CTEST_BUILD_OPTIONS
     " -DHPX_WITH_TESTS_UNIT=ON "
     " -DHPX_WITH_PARCELPORT_MPI=OFF "
     " -DHPX_WITH_THREAD_IDLE_RATES=ON "
-    " -DDART_TESTING_TIMEOUT=45 "
 )
 
 #######################################################################
@@ -79,7 +81,7 @@ string(CONCAT CTEST_BUILD_OPTIONS
 # note that this is intentionally multiline
 #######################################################################
 set(PYCICLE_SLURM_TEMPLATE "#!/bin/bash
-#SBATCH --job-name=hpx-${PYCICLE_PR}
+#SBATCH --job-name=hpx-${PYCICLE_PR}-${PYCICLE_BUILD_STAMP}
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --exclusive

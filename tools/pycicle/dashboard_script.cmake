@@ -22,6 +22,7 @@ set(CTEST_BUILD_CONFIGURATION "Release")
 
 #######################################################################
 # Load machine specific settings
+# This is where the main machine config file is read in and params set
 #######################################################################
 include(${CMAKE_CURRENT_LIST_DIR}/config/${PYCICLE_HOST}.cmake)
 
@@ -29,6 +30,16 @@ include(${CMAKE_CURRENT_LIST_DIR}/config/${PYCICLE_HOST}.cmake)
 # User vars that need to be set on each machine using this script
 #######################################################################
 set(GIT_REPO "https://github.com/STEllAR-GROUP/hpx.git")
+
+#######################################################################
+# a function that calls ctest_submit - only used to make
+# debugging a bit simpler by allowing us to disable submits
+#######################################################################
+function(pycicle_submit)
+#  if(NOT DEBUG_MODE)
+    ctest_submit(${ARGN})
+#  endif()
+endfunction()
 
 #######################################################################
 # All the rest below here should not need changes
@@ -40,13 +51,13 @@ set(PYCICLE_LOCAL_GIT_COPY "${PYCICLE_ROOT}/repo")
 if (PYCICLE_PR)
   set(PYCICLE_WORK_DIR ${PYCICLE_PR})
   set(CTEST_SOURCE_DIRECTORY "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}/repo")
-  set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/${PYCICLE_PR}")
+  set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/${PYCICLE_PR}-${PYCICLE_BUILD_STAMP}")
   file(MAKE_DIRECTORY "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}")
   set(CTEST_BUILD_NAME "${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 else()
   set(PYCICLE_WORK_DIR "master")
   set(CTEST_SOURCE_DIRECTORY "${PYCICLE_SRC_ROOT}/master/repo")
-  set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/master")
+  set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/master-${PYCICLE_BUILD_STAMP}")
   file(MAKE_DIRECTORY "${PYCICLE_SRC_ROOT}/master")
   set(CTEST_BUILD_NAME "${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 endif()
@@ -165,27 +176,29 @@ ctest_start(${CTEST_MODEL}
 #######################################################################
 message("Update source... using ${CTEST_SOURCE_DIRECTORY}")
 ctest_update(RETURN_VALUE NB_CHANGED_FILES)
-ctest_submit(PARTS Update)
+pycicle_submit(PARTS Update)
 message("Found ${NB_CHANGED_FILES} changed file(s)")
 
-set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}")
-set(CTEST_CONFIGURE_COMMAND "${CTEST_CONFIGURE_COMMAND} ${CTEST_BUILD_OPTIONS}")
-set(CTEST_CONFIGURE_COMMAND "${CTEST_CONFIGURE_COMMAND} \"-G${CTEST_CMAKE_GENERATOR}\"")
-set(CTEST_CONFIGURE_COMMAND "${CTEST_CONFIGURE_COMMAND} \"${CTEST_SOURCE_DIRECTORY}\"")
+string(CONCAT CTEST_CONFIGURE_COMMAND
+  " ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${CTEST_BUILD_CONFIGURATION} "
+  " ${CTEST_BUILD_OPTIONS}"
+  " ${CTEST_CONFIGURE_COMMAND} \"-G${CTEST_CMAKE_GENERATOR}\""
+  " ${CTEST_CONFIGURE_COMMAND} \"${CTEST_SOURCE_DIRECTORY}\"")
+
+message("CTEST_CONFIGURE_COMMAND is\n${CTEST_CONFIGURE_COMMAND}")
 
 message("Configure...")
 ctest_configure()
-ctest_submit(PARTS Update Configure)
+pycicle_submit(PARTS Update Configure)
 
 message("Build...")
 set(CTEST_BUILD_FLAGS "-j ${BUILD_PARALLELISM}")
 ctest_build(TARGET "tests" )
-ctest_submit(PARTS Update Configure Build)
+pycicle_submit(PARTS Update Configure Build)
 
 message("Test...")
-set(CTEST_TEST_TIMEOUT "30")
 ctest_test(RETURN_VALUE test_result_ EXCLUDE "compile")
-ctest_submit(PARTS Update Configure Build Test)
+pycicle_submit(PARTS Update Configure Build Test)
 
 if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
   ctest_coverage()

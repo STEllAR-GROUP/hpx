@@ -43,6 +43,7 @@ set(BUILD_PARALLELISM "8")
 
 set(CTEST_SITE "linux(jblaptop)-gcc-${GCC_VER}-Boost-${BOOST_VER}")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
+set(CTEST_TEST_TIMEOUT "45")
 
 #######################################################################
 # The string that is used to drive cmake config step
@@ -72,6 +73,5 @@ string(CONCAT CTEST_BUILD_OPTIONS
     " -DHPX_WITH_TESTS_UNIT=ON "
     " -DHPX_WITH_PARCELPORT_MPI=OFF "
     " -DHPX_WITH_THREAD_IDLE_RATES=ON "
-    " -DDART_TESTING_TIMEOUT=45 "
 )
 

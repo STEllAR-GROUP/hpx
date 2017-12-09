@@ -26,7 +26,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/config/${PYCICLE_HOST}.cmake)
 # Generate a slurm job script and launch it
 # we must pass all the parms we received through to the slurm script
 #######################################################################
-string(CONCAT PYCICLE_SLURM_TEMPLATE ${PYCICLE_SLURM_TEMPLATE}
+set(PYCICLE_SLURM_TEMPLATE ${PYCICLE_SLURM_TEMPLATE}
   "ctest "
   "-S ${PYCICLE_ROOT}/repo/tools/pycicle/dashboard_script.cmake "
   "-DPYCICLE_ROOT=${PYCICLE_ROOT} "
@@ -50,7 +50,7 @@ file(WRITE "${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh" ${PYCICLE_SL
 # 3 Spawn a new build
 #######################################################################
 execute_process(
-  COMMAND bash "-c" "scancel $(squeue -n hpx-${PYCICLE_PR} -h -o %A) > /dev/null 2>&1;
+  COMMAND bash "-c" "scancel $(squeue -n hpx-${PYCICLE_PR}-${PYCICLE_BUILD_STAMP} -h -o %A) > /dev/null 2>&1;
                      sbatch ${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh"
 )
 
