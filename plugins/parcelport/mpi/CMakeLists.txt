@@ -10,7 +10,6 @@ include(HPX_AddLibrary)
 # Decide whether to use the MPI based parcelport
 ################################################################################
 if(HPX_WITH_PARCELPORT_MPI)
-  find_package(MPI)
   if(NOT MPI_CXX_FOUND)
     hpx_error("MPI could not be found and HPX_WITH_PARCELPORT_MPI=On, please specify MPI_CXX_COMPILER to point to a working MPI C++ compiler for your platform")
   endif()
