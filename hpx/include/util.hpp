@@ -12,6 +12,8 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
