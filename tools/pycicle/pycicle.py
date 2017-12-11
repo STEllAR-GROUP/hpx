@@ -20,28 +20,33 @@ parser = argparse.ArgumentParser()
 #----------------------------------------------
 # enable or disable slurm for Job launching
 #----------------------------------------------
-parser.add_argument('-s', '--slurm', dest='slurm', action='store_true', help="Use slurm for job launching (default)")
-parser.add_argument('--no-slurm', dest='slurm', action='store_false', help="Disable slurm job launching")
+parser.add_argument('-s', '--slurm', dest='slurm', action='store_true',
+    help="Use slurm for job launching (default)")
+parser.add_argument('--no-slurm', dest='slurm', action='store_false',
+    help="Disable slurm job launching")
 parser.set_defaults(slurm=True)
 
 #----------------------------------------------
 # enable/debug mode
 #----------------------------------------------
-parser.add_argument('-d', '--debug', dest='debug', action='store_true', default=False, help="Enable debug mode")
+parser.add_argument('-d', '--debug', dest='debug', action='store_true',
+    default=False, help="Enable debug mode")
 
 #----------------------------------------------
 # set default path for pycicle work dir
 #----------------------------------------------
 home = str(os.path.expanduser('~'))
 pycicle_dir = os.environ.get('PYCICLE_ROOT', home + '/pycicle')
-parser.add_argument('-p', '--pycicle-dir', dest='pycicle_dir', default=pycicle_dir)
+parser.add_argument('-r', '--pycicle-dir', dest='pycicle_dir',
+    default=pycicle_dir, help='pycicle root path/directory')
 
 #--------------------------------------------------------------------------
 # github token used to authenticate access
 #--------------------------------------------------------------------------
 user_token = 'generate a token and paste it here, or set env var'
 user_token = os.environ.get('PYCICLE_GITHUB_TOKEN', user_token)
-parser.add_argument('-t', '--github-token', dest='user_token', default=user_token)
+parser.add_argument('-t', '--github-token', dest='user_token',
+    default=user_token, help='github token used to authenticate access')
 
 #--------------------------------------------------------------------------
 # Machines : get a list of machines to use for testing (env{PYCICLE_MACHINES})
@@ -52,10 +57,17 @@ parser.add_argument('-t', '--github-token', dest='user_token', default=user_toke
 # TODO : add support for multiple machines and configs
 #--------------------------------------------------------------------------
 machines = {os.environ.get('PYCICLE_MACHINES', 'greina')}
-parser.add_argument('-m', '--machines', dest='machines', nargs='+', default=machines)
+parser.add_argument('-m', '--machines', dest='machines', nargs='+',
+    default=machines, help='list of machines to use for testing')
+
+#--------------------------------------------------------------------------
+# PR - when testing, limit checks to a single PR
+#--------------------------------------------------------------------------
+parser.add_argument('-p', '--pull-request', dest='pull_request', type=int,
+    default=0, help='A single PR number for limited testing')
 
 #----------------------------------------------
-# parse args
+# print summary of parse args
 #----------------------------------------------
 args = parser.parse_args()
 print('pycicle: slurm   :', 'enabled' if args.slurm else 'disabled')
@@ -64,6 +76,7 @@ print('pycicle: debug   :',
 print('pycicle: path    :', args.pycicle_dir)
 print('pycicle: token   :', args.user_token)
 print('pycicle: machines:', args.machines)
+print('pycicle: PR      :', args.pull_request)
 #
 machine = args.machines[0]
 print('\ncurrent implementation supports only 1 machine :', machine, '\n')
@@ -112,8 +125,9 @@ def launch_build(nickname, compiler, branch_id, branch_name) :
     # we are not yet using these as 'options'
     boost = 'x.xx.x'
     #
+    cmd1 = 'ctest' if not args.debug else 'echo'
     script = 'dashboard_slurm.cmake' if args.slurm else 'dashboard_script.cmake'
-    cmd = ['ssh', remote_ssh, 'ctest', '-S',
+    cmd = ['ssh', remote_ssh, cmd1, '-S',
            remote_path          + '/repo/tools/pycicle/' + script,
            '-DPYCICLE_ROOT='    + remote_path,
            '-DPYCICLE_HOST='    + nickname,
@@ -289,9 +303,10 @@ while True:
         master_sha    = master_branch.commit.sha
         #
         for pr in repo.get_pulls('open'):
-            if not pr.mergeable:
+            if args.pull_request!=0 and pr.number!=args.pull_request:
+                print('skipping', pr.number)
                 continue
-            if args.debug and not pr.number==3042:
+            if not pr.mergeable:
                 continue
             #
             branch_id   = str(pr.number)
@@ -309,7 +324,7 @@ while True:
                 scrape_list[branch_id] = [machine, branch_id, branch_name, pr.get_commits().reversed[0]]
 
         # also build the master branch if it changes
-        if needs_update('master', 'master', master_sha, master_sha):
+        if args.pull_request==0 and needs_update('master', 'master', master_sha, master_sha):
             choose_and_launch(machine, 'master', 'master')
             scrape_list['master'] = [machine, 'master', 'master', master_branch.commit]
 
