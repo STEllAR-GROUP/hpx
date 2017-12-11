@@ -117,39 +117,6 @@ struct async_increasing_int_visitor
     }
 };
 
-template <std::size_t ArgCount>
-struct async_increasing_int_interrupted_visitor
-  : async_counter_base<async_increasing_int_interrupted_visitor<ArgCount>>
-{
-    bool operator()(async_traverse_visit_tag, std::size_t i)
-    {
-        HPX_TEST_EQ(i, this->counter());
-        ++this->counter();
-
-        // Detach the control flow at the second step
-        return i == 0;
-    }
-
-    template <typename N>
-    void operator()(async_traverse_detach_tag, std::size_t i, N&& next)
-    {
-        HPX_TEST_EQ(i, 1U);
-        HPX_TEST_EQ(this->counter(), 2U);
-
-        // Don't call next here
-        HPX_UNUSED(next);
-    }
-
-    template <typename T>
-    void operator()(async_traverse_complete_tag, T&& pack) const
-    {
-        HPX_UNUSED(pack);
-
-        // Will never be called
-        HPX_TEST(false);
-    }
-};
-
 template <std::size_t ArgCount, typename... Args>
 void test_async_traversal_base(Args&&... args)
 {
@@ -167,14 +134,6 @@ void test_async_traversal_base(Args&&... args)
         auto result = traverse_pack_async(
             async_increasing_int_visitor<ArgCount>{}, args...);
         HPX_TEST_EQ(result->counter(), ArgCount + 1U);
-    }
-
-    // Test that the first element is traversed only,
-    // if we don't call the resume continuation.
-    {
-        auto result = traverse_pack_async(
-            async_increasing_int_interrupted_visitor<ArgCount>{}, args...);
-        HPX_TEST_EQ(result->counter(), 2U);
     }
 }
 
