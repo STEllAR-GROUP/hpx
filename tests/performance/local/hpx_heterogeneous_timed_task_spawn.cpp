@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "worker_timed.hpp"
 
@@ -183,10 +184,16 @@ int hpx_main(
             payloads.push_back(payload);
         }
 
+#if defined(HPX_HAVE_CXX11_STD_SHUFFLE)
+        std::random_device random_device;
+        std::mt19937 generator(random_device());
+        std::shuffle(payloads.begin(), payloads.end(), std::move(generator));
+#else
         // Randomly shuffle the entire sequence to deal with drift.
         using hpx::util::placeholders::_1;
         std::random_shuffle(payloads.begin(), payloads.end(),
             hpx::util::bind(&shuffler, std::ref(prng), _1));
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Validate the payloads.
