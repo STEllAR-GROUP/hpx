@@ -29,7 +29,7 @@ unsigned make_unsigned_slowly()
 template <class Container>
 void test_when_each_from_list()
 {
-    unsigned const count = 10;
+    unsigned count = 10;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -88,7 +88,7 @@ void test_when_each_from_list()
 template <class Container>
 void test_when_each_from_list_iterators()
 {
-    unsigned const count = 10;
+    unsigned count = 10;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -149,7 +149,7 @@ void test_when_each_from_list_iterators()
 template <class Container>
 void test_when_each_n_from_list_iterators()
 {
-    unsigned const count = 10;
+    unsigned count = 10;
     unsigned const n = 5;
 
     unsigned call_count = 0;
@@ -217,7 +217,7 @@ void test_when_each_n_from_list_iterators()
 
 void test_when_each_one_future()
 {
-    unsigned const count = 1;
+    unsigned count = 1;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -260,7 +260,7 @@ void test_when_each_one_future()
 
 void test_when_each_two_futures()
 {
-    unsigned const count = 2;
+    unsigned count = 2;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -310,7 +310,7 @@ void test_when_each_two_futures()
 
 void test_when_each_three_futures()
 {
-    unsigned const count = 3;
+    unsigned count = 3;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -364,7 +364,7 @@ void test_when_each_three_futures()
 
 void test_when_each_four_futures()
 {
-    unsigned const count = 4;
+    unsigned count = 4;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -422,7 +422,7 @@ void test_when_each_four_futures()
 
 void test_when_each_five_futures()
 {
-    unsigned const count = 5;
+    unsigned count = 5;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -484,7 +484,7 @@ void test_when_each_five_futures()
 
 void test_when_each_late_future()
 {
-    unsigned const count = 2;
+    unsigned count = 2;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 
@@ -551,7 +551,7 @@ void test_when_each_late_future()
 
 void test_when_each_deferred_futures()
 {
-    unsigned const count = 2;
+    unsigned count = 2;
     unsigned call_count = 0;
     unsigned call_with_index_count = 0;
 

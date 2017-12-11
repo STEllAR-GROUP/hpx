@@ -427,9 +427,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(bool delete_all = false)
+        bool cleanup_terminated(bool delete_all)
         {
             bool empty = true;
+
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 empty = queues_[i]->cleanup_terminated(delete_all) && empty;
             if (!delete_all)
@@ -440,6 +441,22 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated(delete_all) && empty;
 
             empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
+
+            return empty;
+        }
+
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        {
+            bool empty = true;
+
+            empty = queues_[num_thread]->cleanup_terminated(delete_all);
+            if (!delete_all)
+                return empty;
+
+            if (num_thread < high_priority_queues_.size())
+                empty = high_priority_queues_[num_thread]->
+                    cleanup_terminated(delete_all) && empty;
+
             return empty;
         }
 
@@ -468,17 +485,18 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
-            // Select a OS thread which hasn't been disabled
-            auto mask = rp_.get_pu_mask(
-                num_thread + parent_pool_->get_thread_offset());
-            if(!threads::any(mask))
-                threads::set(mask, num_thread + parent_pool_->get_thread_offset());
-            while (true)
+            // Select an OS thread which hasn't been disabled
+            std::unique_lock<compat::mutex> l;
+            if (mode_ & threads::policies::enable_elasticity)
             {
-                if (bit_and(mask, parent_pool_->get_used_processing_units()))
-                    break;
-
-                num_thread = (num_thread + 1) % queue_size;
+                l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
+                    std::try_to_lock);
+                while (!l.owns_lock() || states_[num_thread] > state_suspended)
+                {
+                    num_thread = (num_thread + 1) % queue_size;
+                    l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
+                        std::try_to_lock);
+                }
             }
 
             // now create the thread
@@ -936,14 +954,9 @@ namespace hpx { namespace threads { namespace policies
             if (0 != added) return result;
 
             // Check if we have been disabled
+            if (!running)
             {
-                auto mask = rp_.get_pu_mask(
-                    num_thread + parent_pool_->get_thread_offset());
-
-                if (!bit_and(mask, parent_pool_->get_used_processing_units()))
-                {
-                    return added == 0 && !running;
-                }
+                return true;
             }
 
             for (std::size_t idx: victim_threads_[num_thread])

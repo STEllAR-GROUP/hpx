@@ -46,6 +46,8 @@ namespace hpx { namespace components
           : base_type(std::move(rhs))
         {}
 
+        typedef void decorates_action;
+
         /// This is the hook implementation for decorate_action which locks
         /// the component ensuring that only one action is executed at a time
         /// for this component instance.

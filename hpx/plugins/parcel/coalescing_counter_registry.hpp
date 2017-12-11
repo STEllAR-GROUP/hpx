@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>

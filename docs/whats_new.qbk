@@ -66,14 +66,81 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    3065] - Workaround for minimal_timed_async_executor_test compilation
+                 failures, attempts to copy a deferred call (in unevaluated
+                 context)
+* [pr    3064] - Fixing wrong condition in wrapper_heap
+* [pr    3059] - Fixing #2931
+* [pr    3057] - Fix stable_merge_2964 compilation problems
+* [pr    3055] - Update documentation for running tests
+* [pr    3052] - Do not bind test running to cmake test build rule
+* [pr    3047] - Fixing #3044
+* [pr    3046] - Add OS thread suspension
+* [pr    3039] - Consistently use executors to schedule work
+* [pr    3038] - Fixing local direct function execution and lambda actions
+                 perfect forwarding
+* [pr    3035] - Make parallel unit test names match build target/folder names
+* [pr    3033] - Fix setting of default build type
+* [issue 3032] - Fix partitioner arg copy found in #2982
+* [pr    3030] - Revert "implement executor then interface with && forwarding
+                 reference"
+* [pr    3029] - Run CI inspect checks before building
+* [issue 3027] - Implement all scheduling APIs in terms of executors
+* [pr    3026] - implement executor then interface with && forwarding reference
+* [pr    3025] - Fix typo unitialized to uninitialized
+* [pr    3024] - Inspect fixes
+* [pr    3023] - P0356 Simplified partial function application
+* [pr    3022] - Master fixes
+* [pr    3021] - Segfault fix
+* [pr    3020] - Disable command-line aliasing for applications that use
+                 user_main
+* [pr    3019] - Adding enable_elasticity option to pool configuration
+* [pr    3018] - Fix stack overflow detection configuration in header files
+* [pr    3017] - Speed up local action execution
+* [pr    3016] - Unify stack-overflow detection options, remove reference to
+                 libsigsegv
+* [pr    3015] - Speeding up accessing the resource partitioner and the
+                 topology info
+* [issue 3014] - HPX does not compile on POWER8 with gcc 5.4
+* [pr    3012] - Silence warning about casting away qualifiers in itt_notify.hpp
+* [pr    3011] - Fix cpuset leak in hwloc_topology_info.cpp
+* [pr    3010] - Remove useless decay_copy
+* [pr    3008] - Remove unused internal function
+* [pr    3007] - Fixing wrapper_heap alignment problems
+* [issue 3006] - hwloc memory leak
+* [pr    3004] - Silence C4251 (needs to have dll-interface) for future_data_void
+* [pr    3001] - Attempting to avoid data races in async_traversal while
+                 evaluating dataflow()
+* [pr    3000] - Adding hpx::util::optional as a first step to replace
+                 experimental::optional
+* [pr    2998] - Cleanup up and Fixing component creation and deletion
+* [pr    2995] - Push more future_data functionality to source file
+* [pr    2994] - WIP: Fix throttle test
+* [pr    2993] - Making sure --hpx:help does not throw for required (but missing)
+                 arguments
+* [pr    2992] - Adding non-blocking (on destruction) service executors
+* [issue 2991] - run_as_os_thread locks up
+* [issue 2990] - --help will not work until all required options are provided
+* [pr    2989] - Improve error messages caused by misuse of dataflow
+* [pr    2988] - Improve error messages caused by misuse of .then
+* [pr    2986] - Deduplicate non-dependent thread_info logging types
+* [pr    2985] - Adapted parallel::{all_of|any_of|none_of} for Ranges TS (see #1668)
+* [pr    2984] - Refactor one_size_heap code to simplify code
+* [pr    2983] - Fixing local_new_component
+* [pr    2982] - Clang tidy
+* [pr    2981] - Simplify allocator rebinding in pack traversal
+* [pr    2979] - Fixing integer overflows
+* [pr    2978] - Implement parallel::inplace_merge
 * [pr    2976] - Making sure client_base instance that registered the component
                  does not unregister it when being destructed
 * [pr    2975] - Change version of pulled APEX to master
 * [pr    2973] - Fix small typos
 * [pr    2972] - Adding uintstd.h header
+* [pr    2971] - Fall back to creating local components using local_new
 * [pr    2970] - Improve is_tuple_like trait
 * [pr    2969] - Fix HPX_WITH_MORE_THAN_64_THREADS default value
 * [pr    2968] - Cleaning up dataflow overload set
+* [pr    2967] - Make parallel::merge is stable. (Fix #2964.)
 * [pr    2966] - Fixing a couple of held locks during exception handling
 * [pr    2965] - Adding missing #include
 * [pr    2963] - Making sure any function object passed to dataflow is released
@@ -107,6 +174,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2933] - Making sure parallel::for_loop is executed in parallel if
                  requested
 * [pr    2932] - Classify chunk_size_iterator to input iterator tag. (Fix #2866)
+* [issue 2931] - --hpx:help triggers unusual error with clang build
 * [pr    2930] - Add #include files needed to set _POSIX_VERSION for debug check
 * [pr    2929] - Fix a couple of deprecated c++ features
 * [pr    2928] - Fixing execution parameters
@@ -138,6 +206,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2906] - Making sure generated performance counter names are correct
 * [issue 2905] - collecting idle-rate performance counters on multiple
                  localities produces an error
+* [issue 2904] - build broken for Intel 17 compilers
 * [pr    2903] - Documentation Updates-- Adding New People
 * [pr    2902] - Fixing service_executor
 * [pr    2901] - Fixing partitioned_vector creation
@@ -468,8 +537,10 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2566] - Add an inline versioning namespace before 1.0 release
 * [issue 2565] - Raise minimal cmake version requirement
 * [pr    2556] - Fixing scan partitioner
+* [pr    2546] - Broadcast async
 * [issue 2543] - make install fails due to a non-existing .so file
 * [pr    2495] - wait_or_add_new returning thread_id_type
+* [issue 2480] - Unable to register new performance counter
 * [issue 2471] - no type named 'fcontext_t' in namespace
 * [issue 2456] - Re-implement hpx::util::unwrapped
 * [issue 2455] - Add more arithmetic performance counters
@@ -484,15 +555,21 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2266] - hpx_0.9.99 make tests fail
 * [pr    2195] - Support for code completion in VIM
 * [issue 2137] - Hpx does not compile over osx
+* [issue 2092] - make tests should just build the tests
 * [issue 2026] - Build HPX with Apple's clang
+* [issue 1932] - hpx with PBS fails on multiple localities
 * [pr    1914] - Parallel heap algorithm implementations WIP
 * [issue 1598] - Disconnecting a locality results in segfault using heartbeat
                  example
 * [issue 1404] - unwrapped doesn't work with movable only types
 * [issue 1400] - hpx::util::unwrapped doesn't work with non-future types
 * [issue 1205] - TSS is broken
+* [issue 1126] - vector<future<T> > does not work gracefully with dataflow,
+                 when_all and unwrapped
 * [issue 1056] - Thread manager cleanup
 * [issue  863] - Futures should not require a default constructor
+* [issue  528] - Add support for known failures and warning count/comparisons to
+                 hpx_run_tests.py
 
 [endsect]
 

@@ -294,6 +294,12 @@ namespace hpx { namespace components
         >::release(p->component_);
     }
 
+    namespace detail
+    {
+        template <typename T>
+        class fixed_wrapper_heap;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// The managed_component template is used as a indirection layer
     /// for components allowing to gracefully handle the access to non-existing

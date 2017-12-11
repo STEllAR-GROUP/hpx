@@ -88,7 +88,7 @@ namespace hpx
         inline bool
         put_parcel_cb(naming::id_type const& id, naming::address&& addr,
             threads::thread_priority priority,
-            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+            parcelset::write_handler_type const& cb, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type
@@ -106,7 +106,7 @@ namespace hpx
         inline bool
         put_parcel_cb(naming::id_type const& id, naming::address&& addr,
             threads::thread_priority priority,
-            parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
+            parcelset::write_handler_type && cb, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type
@@ -125,7 +125,7 @@ namespace hpx
         put_parcel_cont_cb(naming::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             Continuation && cont,
-            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+            parcelset::write_handler_type const& cb, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type
@@ -145,7 +145,7 @@ namespace hpx
         put_parcel_cont_cb(naming::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             Continuation && cont,
-            parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
+            parcelset::write_handler_type && cb, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type
@@ -403,13 +403,13 @@ namespace hpx
                     action_type_(), priority
                 );
 
-            parcelset::detail::parcel_await(std::move(p),
+            parcelset::detail::parcel_await_apply(std::move(p),
                 parcelset::write_handler_type(), 0,
                 [](parcelset::parcel&& p, parcelset::write_handler_type&&)
                 {
                     hpx::get_runtime().get_parcel_handler()
                         .sync_put_parcel(std::move(p));
-                }).apply();
+                });
             return false;     // destination is remote
         }
 

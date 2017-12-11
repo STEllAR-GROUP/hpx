@@ -450,13 +450,13 @@ namespace hpx { namespace threads { namespace policies
         ///
         /// This returns 'true' if there are no more terminated threads waiting
         /// to be deleted.
-        bool cleanup_terminated_locked_helper(bool delete_all = false)
+        bool cleanup_terminated_locked(bool delete_all = false)
         {
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(cleanup_terminated_time_);
 #endif
 
-            if (terminated_items_count_ == 0 && thread_map_.empty())
+            if (terminated_items_count_ == 0)
                 return true;
 
             if (delete_all) {
@@ -506,37 +506,27 @@ namespace hpx { namespace threads { namespace policies
             return terminated_items_count_ == 0;
         }
 
-        bool cleanup_terminated_locked(bool delete_all = false)
-        {
-            return cleanup_terminated_locked_helper(delete_all) &&
-                thread_map_.empty();
-        }
-
     public:
         bool cleanup_terminated(bool delete_all = false)
         {
             if (terminated_items_count_ == 0)
-                return thread_map_count_ == 0;
+                return true;
 
             if (delete_all) {
                 // do not lock mutex while deleting all threads, do it piece-wise
-                bool thread_map_is_empty = false;
                 while (true)
                 {
                     std::lock_guard<mutex_type> lk(mtx_);
-                    if (cleanup_terminated_locked_helper(false))
+                    if (cleanup_terminated_locked(false))
                     {
-                        thread_map_is_empty =
-                            (thread_map_count_ == 0) && (new_tasks_count_ == 0);
-                        break;
+                        return true;
                     }
                 }
-                return thread_map_is_empty;
+                return false;
             }
 
             std::lock_guard<mutex_type> lk(mtx_);
-            return cleanup_terminated_locked_helper(false) &&
-                (thread_map_count_ == 0) && (new_tasks_count_ == 0);
+            return cleanup_terminated_locked(false);
         }
 
         // The maximum number of active threads this thread manager should
@@ -742,6 +732,7 @@ namespace hpx { namespace threads { namespace policies
                         thread_map_.insert(thrd);
 
                     if (HPX_UNLIKELY(!p.second)) {
+                        lk.unlock();
                         HPX_THROWS_IF(ec, hpx::out_of_memory,
                             "threadmanager::register_thread",
                             "Couldn't add new thread to the map of threads");
@@ -1060,9 +1051,20 @@ namespace hpx { namespace threads { namespace policies
                     }
                     return false;
                 }
-
-                cleanup_terminated_locked();
+                else
+                {
+                    cleanup_terminated_locked();
+                    return false;
+                }
             }
+
+            bool canexit = cleanup_terminated(true);
+            if (!running && canexit)
+            {
+                // we don't have any registered work items anymore
+                return true; // terminate scheduling loop
+            }
+
             return false;
         }
 

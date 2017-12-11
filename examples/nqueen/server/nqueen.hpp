@@ -31,19 +31,21 @@ namespace server
 //         template <class Archive>
 //         void serialize(Archive& ar, const unsigned int version)
 //         {
+//             ar & size_;
 //             ar & list_;
+//             ar & level_;
 //             ar & count_;
 //         }
 
     public:
-        board():list_(0), count_(0)
+        board() : list_(0), count_(0)
         {}
 
-        board(list_type const& list)
-            : list_(list), count_(0)
+        board(list_type const& list, std::size_t, std::size_t)
+          : list_(list), count_(0)
         {}
 
-        ~board(){}
+        ~board() = default;
 
 
         void init_board(std::size_t size)
@@ -88,7 +90,7 @@ namespace server
         std::size_t solve_board(list_type const& list, std::size_t size,
             std::size_t level, std::size_t col)
         {
-            board b(list);
+            board b(list, size, level);
 
             if (level == size)
             {

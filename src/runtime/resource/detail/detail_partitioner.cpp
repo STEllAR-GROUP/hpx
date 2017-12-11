@@ -891,7 +891,7 @@ namespace hpx { namespace resource { namespace detail
 
         // parse command line and set options
         // terminate set if program options contain --hpx:help or --hpx:version ...
-        cfg_.parse_terminate_ = cfg_.call(desc_cmdline, argc, argv);
+        cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
@@ -902,7 +902,7 @@ namespace hpx { namespace resource { namespace detail
             fill_topology_vectors();
         }
 
-        return cfg_.parse_terminate_;
+        return cfg_.parse_result_;
     }
 
     scheduler_function partitioner::get_pool_creator(

@@ -7,6 +7,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/include/parallel_execution.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <atomic>
@@ -22,7 +23,7 @@ void doit()
 int main()
 {
     {
-        hpx::threads::executors::local_priority_queue_executor exec(4);
+        hpx::parallel::execution::local_priority_queue_executor exec(4);
         for (int i = 0; i != 100; ++i)
             hpx::async(exec, &doit);
     }

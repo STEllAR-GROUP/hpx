@@ -13,7 +13,7 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
@@ -158,6 +158,9 @@ namespace hpx { namespace threads
         ///
         void stop (bool blocking = true);
 
+        // \brief Resume all suspended threads.
+        void resume();
+
         /// \brief Return whether the thread manager is still running
         //! This returns the "minimal state", i.e. the state of the
         //! least advanced thread pool
@@ -181,6 +184,8 @@ namespace hpx { namespace threads
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1), bool reset = false);
 
+        std::int64_t get_background_thread_count();
+
         // Enumerate all matching threads
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
@@ -195,7 +200,7 @@ namespace hpx { namespace threads
         //        have been terminated but which are still held in the queue
         //        of terminated threads. Some schedulers might not do anything
         //        here.
-        bool cleanup_terminated(bool delete_all = false);
+        bool cleanup_terminated(bool delete_all);
 
         /// \brief Return the number of OS threads running in this thread-manager
         ///

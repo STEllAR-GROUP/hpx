@@ -16,28 +16,29 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/component_commandline_base.hpp>
+#include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/components/component_startup_shutdown_base.hpp>
-#include <hpx/runtime/components/component_commandline_base.hpp>
+#include <hpx/runtime/components/server/memory_block.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/runtime/threads/coroutines/coroutine.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>
@@ -410,7 +411,8 @@ namespace hpx { namespace components { namespace server
         threads::threadmanager& tm = appl.get_thread_manager();
 
         for (std::size_t k = 0;
-            tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+            tm.get_thread_count() >
+                std::int64_t(1) + tm.get_background_thread_count();
             ++k)
         {
             tm.cleanup_terminated(true);
@@ -452,7 +454,8 @@ namespace hpx { namespace components { namespace server
             threads::threadmanager& tm = appl.get_thread_manager();
 
             for (std::size_t k = 0;
-                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                tm.get_thread_count() >
+                    std::int64_t(1) + tm.get_background_thread_count();
                 ++k)
             {
                 tm.cleanup_terminated(true);
@@ -516,7 +519,8 @@ namespace hpx { namespace components { namespace server
         threads::threadmanager& tm = appl.get_thread_manager();
 
         for (std::size_t k = 0;
-            tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+            tm.get_thread_count() >
+                std::int64_t(1) + tm.get_background_thread_count();
             ++k)
         {
             tm.cleanup_terminated(true);
@@ -596,7 +600,8 @@ namespace hpx { namespace components { namespace server
             threads::threadmanager& tm = appl.get_thread_manager();
 
             for (std::size_t k = 0;
-                tm.get_thread_count() > std::int64_t(1 + hpx::get_os_thread_count());
+                tm.get_thread_count() >
+                   std::int64_t(1) + tm.get_background_thread_count();
                 ++k)
             {
                 tm.cleanup_terminated(true);
@@ -677,6 +682,10 @@ namespace hpx { namespace components { namespace server
         agas_client.start_shutdown();
 
         stop_evaluating_counters();
+
+        // wake up suspended pus
+        threads::threadmanager& tm = appl.get_thread_manager();
+        tm.resume();
 
         std::vector<naming::id_type> locality_ids = find_all_localities();
         std::size_t count = dijkstra_termination_detection(locality_ids);
@@ -876,7 +885,7 @@ namespace hpx { namespace components { namespace server
 
             for (std::size_t k = 0;
                 tm.get_thread_count() >
-                    std::int64_t(1 + hpx::get_os_thread_count());
+                    std::int64_t(1) + tm.get_background_thread_count();
                 ++k)
             {
                 // let thread-manager clean up threads
@@ -903,7 +912,7 @@ namespace hpx { namespace components { namespace server
 
                 for (std::size_t k = 0;
                     tm.get_thread_count() >
-                        std::int64_t(1 + hpx::get_os_thread_count());
+                        std::int64_t(1) + tm.get_background_thread_count();
                     ++k)
                 {
                     // abort all suspended threads

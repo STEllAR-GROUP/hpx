@@ -12,6 +12,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/async.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>

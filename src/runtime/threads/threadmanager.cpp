@@ -860,6 +860,20 @@ namespace hpx { namespace threads
         return total_count;
     }
 
+    std::int64_t threadmanager::get_background_thread_count()
+    {
+        std::int64_t total_count = 0;
+        std::lock_guard<mutex_type> lk(mtx_);
+
+        for (auto& pool_iter : pools_)
+        {
+            total_count +=
+                pool_iter->get_background_thread_count();
+        }
+
+        return total_count;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Enumerate all matching threads
     bool threadmanager::enumerate_threads(
@@ -902,7 +916,7 @@ namespace hpx { namespace threads
 
         for (auto& pool_iter : pools_)
         {
-            result = result && pool_iter->cleanup_terminated(delete_all);
+            result = pool_iter->cleanup_terminated(delete_all) && result;
         }
 
         return result;
@@ -1909,6 +1923,14 @@ namespace hpx { namespace threads
             timer_pool_.clear();
         }
 #endif
+    }
+
+    void threadmanager::resume()
+    {
+        for (auto& pool_iter : pools_)
+        {
+            pool_iter->resume();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

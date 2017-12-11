@@ -76,9 +76,13 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
+          , suspend_mtxs_(num_threads)
+          , suspend_conds_(num_threads)
+          , pu_mtxs_(num_threads)
           , states_(num_threads)
           , description_(description)
           , parent_pool_(nullptr)
+          , background_thread_count_(0)
         {
             for (std::size_t i = 0; i != num_threads; ++i)
                 states_[i].store(state_initialized);
@@ -150,6 +154,32 @@ namespace hpx { namespace threads { namespace policies
 #endif
         }
 
+        void suspend(std::size_t num_thread)
+        {
+            HPX_ASSERT(num_thread < suspend_conds_.size());
+
+            states_[num_thread].store(state_sleeping);
+            std::unique_lock<compat::mutex> l(suspend_mtxs_[num_thread]);
+            suspend_conds_[num_thread].wait(l);
+            states_[num_thread].store(state_running);
+        }
+
+        void resume(std::size_t num_thread)
+        {
+            if (num_thread == std::size_t(-1))
+            {
+                for (compat::condition_variable& c : suspend_conds_)
+                {
+                    c.notify_one();
+                }
+            }
+            else
+            {
+                HPX_ASSERT(num_thread < suspend_conds_.size());
+                suspend_conds_[num_thread].notify_one();
+            }
+        }
+
         // allow to access/manipulate states
         std::atomic<hpx::state>& get_state(std::size_t num_thread)
         {
@@ -217,6 +247,12 @@ namespace hpx { namespace threads { namespace policies
         void set_scheduler_mode(scheduler_mode mode)
         {
             mode_.store(mode);
+        }
+
+        compat::mutex& get_pu_mutex(std::size_t num_thread)
+        {
+            HPX_ASSERT(num_thread < pu_mtxs_.size());
+            return pu_mtxs_[num_thread];
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -304,6 +340,21 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
 
+        std::int64_t get_background_thread_count()
+        {
+            return background_thread_count_;
+        }
+
+        void increment_background_thread_count()
+        {
+            ++background_thread_count_;
+        }
+
+        void decrement_background_thread_count()
+        {
+            --background_thread_count_;
+        }
+
         // Enumerate all matching threads
         virtual bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
@@ -311,7 +362,8 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void abort_all_suspended_threads() = 0;
 
-        virtual bool cleanup_terminated(bool delete_all = false) = 0;
+        virtual bool cleanup_terminated(bool delete_all) = 0;
+        virtual bool cleanup_terminated(std::size_t num_thread, bool delete_all) = 0;
 
         virtual void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
@@ -361,11 +413,19 @@ namespace hpx { namespace threads { namespace policies
         std::atomic<std::uint32_t> wait_count_;
 #endif
 
+        // support for suspension of pus
+        std::vector<compat::mutex> suspend_mtxs_;
+        std::vector<compat::condition_variable> suspend_conds_;
+
+        std::vector<compat::mutex> pu_mtxs_;
+
         std::vector<std::atomic<hpx::state> > states_;
         char const* description_;
 
         // the pool that owns this scheduler
         threads::detail::thread_pool_base *parent_pool_;
+
+        std::atomic<std::int64_t> background_thread_count_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

@@ -8,11 +8,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
-#include <hpx/runtime/threads/topology.hpp>
-#include <hpx/lcos/local/barrier.hpp>
-#include <hpx/util/static.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/thread_executors.hpp>
+#include <hpx/include/parallel_execution.hpp>
 
 #include <iostream>
 #include <vector>
@@ -22,7 +19,7 @@ using std::vector;
 using hpx::lcos::future;
 using std::cout;
 using std::endl;
-using hpx::threads::executors::local_queue_executor;
+using hpx::parallel::execution::local_queue_executor;
 
 
 void print_ints(int i, int j)
