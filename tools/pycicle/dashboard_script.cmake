@@ -49,17 +49,17 @@ set(PYCICLE_BUILD_ROOT     "${PYCICLE_ROOT}/build")
 set(PYCICLE_LOCAL_GIT_COPY "${PYCICLE_ROOT}/repo")
 
 if (PYCICLE_PR)
-  set(PYCICLE_WORK_DIR ${PYCICLE_PR})
-  set(CTEST_SOURCE_DIRECTORY "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}/repo")
-  set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/${PYCICLE_PR}-${PYCICLE_BUILD_STAMP}")
-  file(MAKE_DIRECTORY "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}")
-  set(CTEST_BUILD_NAME "${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
+  file(MAKE_DIRECTORY           "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}")
+  set(PYCICLE_WORK_DIR          "${PYCICLE_PR}")
+  set(CTEST_SOURCE_DIRECTORY    "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}/repo")
+  set(PYCICLE_BINARY_DIRECTORY  "${PYCICLE_BUILD_ROOT}/${PYCICLE_PR}-${PYCICLE_BUILD_STAMP}")
+  set(CTEST_BUILD_NAME          "${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 else()
-  set(PYCICLE_WORK_DIR "master")
-  set(CTEST_SOURCE_DIRECTORY "${PYCICLE_SRC_ROOT}/master/repo")
-  set(CTEST_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/master-${PYCICLE_BUILD_STAMP}")
-  file(MAKE_DIRECTORY "${PYCICLE_SRC_ROOT}/master")
-  set(CTEST_BUILD_NAME "${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
+  file(MAKE_DIRECTORY           "${PYCICLE_SRC_ROOT}/master")
+  set(PYCICLE_WORK_DIR          "master")
+  set(CTEST_SOURCE_DIRECTORY    "${PYCICLE_SRC_ROOT}/master/repo")
+  set(PYCICLE_BINARY_DIRECTORY  "${PYCICLE_BUILD_ROOT}/master-${PYCICLE_BUILD_STAMP}")
+  set(CTEST_BUILD_NAME          "${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 endif()
 
 #######################################################################
@@ -152,14 +152,35 @@ else()
 endif()
 
 #######################################################################
-# Erase any test complete status before starting new dashboard run
-#######################################################################
-file(REMOVE "${CTEST_BINARY_DIRECTORY}/pycicle-TAG.txt")
-
-#######################################################################
-# Dashboard model : @TODO
+# Dashboard model : use Experimental unless problems arise
 #######################################################################
 set(CTEST_MODEL Experimental)
+
+#######################################################################
+# INSPECT : START a fake dashboard usinf only configure to run inspect
+#######################################################################
+message("Initialize dashboard : ${CTEST_MODEL} ...")
+set(CTEST_BINARY_DIRECTORY "${PYCICLE_BINARY_DIRECTORY}/inspect")
+ctest_start(${CTEST_MODEL}
+    TRACK "Inspect"
+    "${CTEST_SOURCE_DIRECTORY}"
+    "${CTEST_BINARY_DIRECTORY}"
+)
+
+# configure step calls inspect instead of cmake
+string(CONCAT CTEST_CONFIGURE_COMMAND
+  "${PYCICLE_ROOT}/inspect/inspect ${CTEST_SOURCE_DIRECTORY}/hpx --all --text"
+)
+
+message("Running inspect...")
+ctest_configure()
+ctest_submit(PARTS Configure)
+
+#######################################################################
+# Erase any test complete status before starting new dashboard run
+#######################################################################
+set(CTEST_BINARY_DIRECTORY "${PYCICLE_BINARY_DIRECTORY}")
+file(REMOVE "${CTEST_BINARY_DIRECTORY}/pycicle-TAG.txt")
 
 #######################################################################
 # START dashboard
