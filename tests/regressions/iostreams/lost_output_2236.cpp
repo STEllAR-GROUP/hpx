@@ -117,7 +117,8 @@ namespace server {
         {
         }
         collectable(const collectable &src)
-          : weight(src.weight + 1)
+          : hpx::components::component_base<collectable>(src)
+          , weight(src.weight + 1)
           , max_weight(src.weight)
           , strong_count(1)
           , weak_count(0)
@@ -310,8 +311,8 @@ namespace server {
         }
         else
         {
+            HPX_ASSERT(weak_count > 0);
             weak_count--;
-            HPX_ASSERT(weak_count >= 0);
         }
         cd->phantom_count++;
         state();
@@ -379,8 +380,8 @@ namespace server {
     }
     void collectable::done(hpx::id_type child)
     {
+        HPX_ASSERT(cd->wc > 0);
         cd->wc--;
-        HPX_ASSERT(cd->wc >= 0);
         if (cd->wc == 0 && cd->cid == this->get_id())
         {
             phantom_wait_complete();
@@ -429,8 +430,8 @@ namespace server {
         }
         else
         {
+            HPX_ASSERT(weak_count > 0);
             weak_count--;
-            HPX_ASSERT(weak_count >= 0);
             if (weak_count == 0 && strong_count == 0)
             {
                 if (cd == nullptr || cd->phantom_count == 0)
