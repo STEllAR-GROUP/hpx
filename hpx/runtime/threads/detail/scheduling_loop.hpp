@@ -672,6 +672,7 @@ namespace hpx { namespace threads { namespace detail
                 {
                     // clean up terminated threads one more time before sleeping
                     bool can_exit =
+                        !running &&
                         scheduler.SchedulingPolicy::cleanup_terminated(
                             num_thread, true) &&
                         scheduler.SchedulingPolicy::get_thread_count(
@@ -801,6 +802,7 @@ namespace hpx { namespace threads { namespace detail
                     else
                     {
                         bool can_exit =
+                            !running &&
                             scheduler.SchedulingPolicy::cleanup_terminated(
                                 true) &&
                             scheduler.SchedulingPolicy::get_thread_count(

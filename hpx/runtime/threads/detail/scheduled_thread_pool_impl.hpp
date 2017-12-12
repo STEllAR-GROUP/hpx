@@ -440,7 +440,7 @@ namespace hpx { namespace threads { namespace detail
                 // threads exist or if some other thread has terminated
                 HPX_ASSERT(
                     !sched_->Scheduler::get_thread_count(
-                        unknown, thread_priority_default, thread_num) ||
+                        suspended, thread_priority_default, thread_num) ||
                     sched_->Scheduler::get_state(thread_num) > state_stopping);
             }
             catch (hpx::exception const& e)
