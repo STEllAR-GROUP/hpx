@@ -45,9 +45,7 @@ file(WRITE "${PYCICLE_ROOT}/build/ctest-slurm-${PYCICLE_RANDOM}.sh" ${PYCICLE_SL
 # Launch the dashboard test using slurm
 # 1 Cancel any build using the same name as this one so that multiple
 #   pushes to the same branch are handled cleanly
-# 2 Should we wipe any ctest XML files in the build tree to make it easier to
-#   get the most up-to-date one?
-# 3 Spawn a new build
+# 2 Spawn a new build
 #######################################################################
 execute_process(
   COMMAND bash "-c" "scancel $(squeue -n hpx-${PYCICLE_PR}-${PYCICLE_BUILD_STAMP} -h -o %A) > /dev/null 2>&1;

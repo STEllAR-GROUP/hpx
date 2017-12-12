@@ -66,17 +66,24 @@ parser.add_argument('-m', '--machines', dest='machines', nargs='+',
 parser.add_argument('-p', '--pull-request', dest='pull_request', type=int,
     default=0, help='A single PR number for limited testing')
 
+#--------------------------------------------------------------------------
+# only enable scraping to test github status setting
+#--------------------------------------------------------------------------
+parser.add_argument('-c', '--scrape-only', dest='scrape_only', action='store_true',
+default=False, help="Only scrape results and set github status (no building)")
+
 #----------------------------------------------
 # print summary of parse args
 #----------------------------------------------
 args = parser.parse_args()
-print('pycicle: slurm   :', 'enabled' if args.slurm else 'disabled')
-print('pycicle: debug   :',
+print('pycicle: slurm       :', 'enabled' if args.slurm else 'disabled')
+print('pycicle: debug       :',
     'enabled (no build trigger commands will be sent)' if args.debug else 'disabled')
-print('pycicle: path    :', args.pycicle_dir)
-print('pycicle: token   :', args.user_token)
-print('pycicle: machines:', args.machines)
-print('pycicle: PR      :', args.pull_request)
+print('pycicle: scrape-only :', 'enabled' if args.slurm else 'disabled')
+print('pycicle: path        :', args.pycicle_dir)
+print('pycicle: token       :', args.user_token)
+print('pycicle: machines    :', args.machines)
+print('pycicle: PR          :', args.pull_request)
 #
 machine = args.machines[0]
 print('\ncurrent implementation supports only 1 machine :', machine, '\n')
@@ -165,80 +172,106 @@ def choose_and_launch(machine, branch_id, branch_name) :
         launch_build(machine, 'gcc', branch_id, branch_name)
 
 #--------------------------------------------------------------------------
-# collect test results so that we can update github PR status
+# find all the PR build jobs submitted and from them the build dirs
+# that we can use to scrape results from
 #--------------------------------------------------------------------------
-def scrape_testing_results(nickname, branch_id, branch_name, head_commit) :
+def find_scrape_files(nickname) :
     remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
     remote_path = get_setting_for_machine(nickname, 'PYCICLE_ROOT')
 
-    cmd = ['ssh', remote_ssh, 'cat ',
-           remote_path + '/build/' + branch_id + '/pycicle-TAG.txt']
+    JobFiles   = []
+    PR_numbers = {}
+    #
+    cmd = ['ssh', remote_ssh, 'find ',
+           remote_path + '/build/', '-maxdepth 2', '-name pycicle-TAG.txt']
+    #
+    result = subprocess.check_output(cmd).splitlines()
+    for s in result: JobFiles.append(s.decode('utf-8'))
+
+    # for each build dir, return the PR number and results file
+    for f in JobFiles:
+        m = re.search(r'/build/(.+?)-.*/pycicle-TAG.txt', f)
+        if m:
+            PR_numbers[m.group(1)] = f
+
+    return PR_numbers
+
+#--------------------------------------------------------------------------
+# Utility function to remove a file from a remote filesystem
+#--------------------------------------------------------------------------
+def erase_file(remote_ssh, scrape_file):
+    # erase the pycicle scrape file if we have set status corectly
+    try:
+        cmd = ['ssh', remote_ssh, 'rm', '-f', scrape_file]
+        result = subprocess.check_output(cmd).split()
+        print ('File removed', scrape_file)
+    except Exception as ex:
+        print ('File deletion failed', ex)
+
+#--------------------------------------------------------------------------
+# collect test results so that we can update github PR status
+#--------------------------------------------------------------------------
+def scrape_testing_results(nickname, scrape_file, branch_id, branch_name, head_commit) :
+    remote_ssh  = get_setting_for_machine(nickname, 'PYCICLE_MACHINE')
+
+    cmd = ['ssh', remote_ssh, 'cat', scrape_file]
 
     Config_Errors = 0
     Build_Errors  = 0
     Test_Errors   = 0
     Errors        = []
 
+    context = re.search(r'/build/.*-(.+)/pycicle-TAG.txt', scrape_file)
+
+    if context:
+        origin = nickname + '-' + context.group(1)
+    else:
+        origin = 'unknown'
+
     try:
         result = subprocess.check_output(cmd).split()
-        print('Scrape result is', result)
         for s in result: Errors.append(s.decode('utf-8'))
         print('Errors are', Errors)
 
         Config_Errors = int(Errors[0])
         Build_Errors  = int(Errors[1])
         Test_Errors   = int(Errors[2])
-        DateStamp     = Errors[3]
-        DateURL       = DateStamp[0:4]+'-'+DateStamp[4:6]+'-'+DateStamp[6:8]
-        print('Extracted date as ', DateURL)
+        StatusValid   = True if len(Errors)>3 else False
+        if StatusValid:
+            DateStamp = Errors[3]
+            DateURL   = DateStamp[0:4]+'-'+DateStamp[4:6]+'-'+DateStamp[6:8]
+            print('Extracted date as', DateURL)
 
-        # if this file has been scraped before, then don't do it again
-        if len(Errors)>4 and Errors[4]=="PYCICLE_GITHUB_STATUS_SET":
-            print('Scrape not needed, status already set for', branch_id)
-            return True
+            URL = ('http://cdash.cscs.ch/index.php?project=HPX' +
+                   '&date=' + DateURL +
+                   '&filtercount=1' +
+                   '&field1=buildname/string&compare1=63&value1=' +
+                   branch_id + '-' + branch_name)
 
-        URL = ('http://cdash.cscs.ch/index.php?project=HPX' +
-               '&date=' + DateURL +
-               '&filtercount=1' +
-               '&field1=buildname/string&compare1=63&value1=' +
-               branch_id + '-' + branch_name)
+            if args.debug:
+                print ('Debug github PR status', URL)
+            else:
+                head_commit.create_status(
+                    'success' if Config_Errors==0 else 'failure',
+                    target_url=URL,
+                    description='errors ' + Errors[0],
+                    context='pycicle ' + origin + ' Config')
+                head_commit.create_status(
+                    'success' if Build_Errors==0 else 'failure',
+                    target_url=URL,
+                    description='errors ' + Errors[1],
+                    context='pycicle ' + origin + ' Build')
+                head_commit.create_status(
+                    'success' if Test_Errors==0 else 'failure',
+                    target_url=URL,
+                    description='errors ' + Errors[2],
+                    context='pycicle ' + origin + ' Test')
+                print ('Done setting github PR status for', origin)
 
-        if args.debug:
-            print ('Debug github PR status', URL)
-        else:
-            print ('Updating github PR status', URL)
-            head_commit.create_status(
-                'success' if Config_Errors==0 else 'failure',
-                target_url=URL,
-                description='errors ' + Errors[0],
-                context='pycicle-Config')
-            head_commit.create_status(
-                'success' if Build_Errors==0 else 'failure',
-                target_url=URL,
-                description='errors ' + Errors[1],
-                context='pycicle-Build')
-            head_commit.create_status(
-                'success' if Test_Errors==0 else 'failure',
-                target_url=URL,
-                description='errors ' + Errors[2],
-                context='pycicle-Test')
+        erase_file(remote_ssh, scrape_file)
 
-        # update the pycicle scrape file if we have set status corectly
-        try:
-            cmd = ['ssh', remote_ssh, 'echo PYCICLE_GITHUB_STATUS_SET >>' +
-                remote_path + '/build/' + branch_id + '/pycicle-TAG.txt']
-            result = subprocess.check_output(cmd).split()
-            print ('Scrape file updated', cmd)
-        except:
-            print ('Scrape file update failed', cmd)
-
-        print ('Done scraping and setting github PR status')
-        return True
-
-    except:
-        print('Scrape failed for PR', branch_id)
-
-    return False
+    except Exception as ex:
+        print('Scrape failed for PR', branch_id, ex)
 
 #--------------------------------------------------------------------------
 # random string of N chars
@@ -285,7 +318,6 @@ def needs_update(branch_id, branch_name, branch_sha, master_sha):
 # main polling routine
 #--------------------------------------------------------------------------
 #
-first_iteration = True
 github_t1       = datetime.datetime.now()
 scrape_t1       = github_t1 + datetime.timedelta(hours=-1)
 #
@@ -302,51 +334,56 @@ while True:
         master_branch = repo.get_branch(repo.default_branch)
         master_sha    = master_branch.commit.sha
         #
-        for pr in repo.get_pulls('open'):
-            if args.pull_request!=0 and pr.number!=args.pull_request:
-                print('skipping', pr.number)
-                continue
-            if not pr.mergeable:
-                continue
+        pull_requests = repo.get_pulls('open')
+        pr_list       = {}
+        for pr in pull_requests:
             #
             branch_id   = str(pr.number)
             branch_name = pr.head.label.rsplit(':',1)[1]
             branch_sha  = pr.head.sha
+            # need details, including last commit on PR for setting status
+            pr_list[branch_id] = [machine, branch_name, pr.get_commits().reversed[0]]
             #
-            update = needs_update(branch_id, branch_name, branch_sha, master_sha)
+            if args.pull_request!=0 and pr.number!=args.pull_request:
+                continue
+            if not pr.mergeable:
+                continue
             #
-            if update:
-                choose_and_launch(machine, branch_id, branch_name)
-                # get last commit on PR for setting status
-                scrape_list[branch_id] = [machine, branch_id, branch_name, pr.get_commits().reversed[0]]
+            if not args.scrape_only:
+                update = needs_update(branch_id, branch_name, branch_sha, master_sha)
+                if update:
+                    choose_and_launch(machine, branch_id, branch_name)
 
-            elif (first_iteration):
-                scrape_list[branch_id] = [machine, branch_id, branch_name, pr.get_commits().reversed[0]]
+        # also build the master branch if it has changed
+        if not args.scrape_only and args.pull_request==0:
+            if needs_update('master', 'master', master_sha, master_sha):
+                choose_and_launch(machine, 'master', 'master')
+                pr_list['master'] = [machine, 'master', master_branch.commit, ""]
 
-        # also build the master branch if it changes
-        if args.pull_request==0 and needs_update('master', 'master', master_sha, master_sha):
-            choose_and_launch(machine, 'master', 'master')
-            scrape_list['master'] = [machine, 'master', 'master', master_branch.commit]
+        scrape_t2    = datetime.datetime.now()
+        scrape_tdiff = scrape_t2 - scrape_t1
+        if (scrape_tdiff.seconds > scrape_time):
+            scrape_t1 = scrape_t2
+            print('Scraping results:', 'Time since last check', scrape_tdiff.seconds, '(s)')
+            builds_done = find_scrape_files(machine)
+            print(builds_done)
+            for branch_id in builds_done:
+                if branch_id in pr_list:
+                    # nickname, scrape_file, branch_id, branch_name, head_commit
+                    scrape_testing_results(
+                        pr_list[branch_id][0], builds_done.get(branch_id),
+                        branch_id, pr_list[branch_id][1], pr_list[branch_id][2])
+                else:
+                    # just delete the file, it is probably an old one
+                    erase_file(
+                        get_setting_for_machine(machine, 'PYCICLE_MACHINE'),
+                        builds_done.get(branch_id))
+
 
     except (github.GithubException, socket.timeout) as ex:
         # github might be down, or there may be a network issue,
         # just go to the sleep statement and try again in a minute
         print('Github/Socket exception :', ex)
-        first_iteration = True
-
-    scrape_t2    = datetime.datetime.now()
-    scrape_tdiff = scrape_t2 - scrape_t1
-    if (scrape_tdiff.seconds > scrape_time):
-        scrape_t1 = scrape_t2
-        print('Scraping results:', 'Time since last check', scrape_tdiff.seconds, '(s)')
-        # force a scrape list copy, remove keys from actual scrape_list during iteration
-        for build in list(scrape_list):
-            values = scrape_list[build]
-            print('\n' + '-' * 20, 'Scraping', values[0], values[1], values[2])
-            # if the scrape suceeds, remove the build from the scrape list
-            if scrape_testing_results(values[0], values[1], values[2], values[3]):
-                del scrape_list[build]
-            print('-' * 20)
 
     # Sleep for a while before polling github again
     time.sleep(poll_time)

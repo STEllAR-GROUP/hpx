@@ -48,18 +48,14 @@ set(PYCICLE_SRC_ROOT       "${PYCICLE_ROOT}/src")
 set(PYCICLE_BUILD_ROOT     "${PYCICLE_ROOT}/build")
 set(PYCICLE_LOCAL_GIT_COPY "${PYCICLE_ROOT}/repo")
 
-if (PYCICLE_PR)
-  file(MAKE_DIRECTORY           "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}")
-  set(PYCICLE_WORK_DIR          "${PYCICLE_PR}")
-  set(CTEST_SOURCE_DIRECTORY    "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}/repo")
-  set(PYCICLE_BINARY_DIRECTORY  "${PYCICLE_BUILD_ROOT}/${PYCICLE_PR}-${PYCICLE_BUILD_STAMP}")
-  set(CTEST_BUILD_NAME          "${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
+file(MAKE_DIRECTORY          "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}")
+set(CTEST_SOURCE_DIRECTORY   "${PYCICLE_SRC_ROOT}/${PYCICLE_PR}/repo")
+set(PYCICLE_BINARY_DIRECTORY "${PYCICLE_BUILD_ROOT}/${PYCICLE_PR}-${PYCICLE_BUILD_STAMP}")
+
+if (PYCICLE_PR STREQUAL "master")
+  set(CTEST_BUILD_NAME "${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 else()
-  file(MAKE_DIRECTORY           "${PYCICLE_SRC_ROOT}/master")
-  set(PYCICLE_WORK_DIR          "master")
-  set(CTEST_SOURCE_DIRECTORY    "${PYCICLE_SRC_ROOT}/master/repo")
-  set(PYCICLE_BINARY_DIRECTORY  "${PYCICLE_BUILD_ROOT}/master-${PYCICLE_BUILD_STAMP}")
-  set(CTEST_BUILD_NAME          "${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
+  set(CTEST_BUILD_NAME "${PYCICLE_PR}-${PYCICLE_BRANCH}-${CTEST_BUILD_CONFIGURATION}")
 endif()
 
 #######################################################################
@@ -67,11 +63,6 @@ endif()
 #######################################################################
 set(WITH_MEMCHECK FALSE)
 set(WITH_COVERAGE FALSE)
-if (WITH_MEMCHECK)
-#  find_program(CTEST_COVERAGE_COMMAND NAMES gcov)
-#  find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
-#  set(CTEST_MEMORYCHECK_SUPPRESSIONS_FILE ${CTEST_SOURCE_DIRECTORY}/tests/valgrind.supp)
-endif()
 
 #######################################################################
 # Wipe build dir when starting a new build
@@ -104,7 +95,7 @@ endif()
 #####################################################################
 # if this is a PR to be merged with master for testing
 #####################################################################
-if (PYCICLE_PR)
+if (NOT PYCICLE_PR STREQUAL "master")
   set(CTEST_SUBMISSION_TRACK "Pull Requests")
   set(PYCICLE_BRANCH "pull/${PYCICLE_PR}/head")
   set(GIT_BRANCH "PYCICLE_PR_${PYCICLE_PR}")
@@ -129,13 +120,12 @@ if (PYCICLE_PR)
                        ${CTEST_GIT_COMMAND} clean -fd;"
     WORKING_DIRECTORY "${WORK_DIR}"
     OUTPUT_VARIABLE output
-    ERROR_VARIABLE output
+    ERROR_VARIABLE  output
     RESULT_VARIABLE failed
   )
   set(CTEST_UPDATE_OPTIONS "${CTEST_SOURCE_DIRECTORY} ${GIT_BRANCH}")
 else()
   set(CTEST_SUBMISSION_TRACK "Master")
-  set(GIT_BRANCH "${PYCICLE_MASTER}")
   set(WORK_DIR "${PYCICLE_SRC_ROOT}/master")
   execute_process(
     COMMAND bash "-c" "${make_repo_copy_}
@@ -145,7 +135,7 @@ else()
                        ${CTEST_GIT_COMMAND} reset --hard;"
     WORKING_DIRECTORY "${WORK_DIR}"
     OUTPUT_VARIABLE output
-    ERROR_VARIABLE output
+    ERROR_VARIABLE  output
     RESULT_VARIABLE failed
   )
   #message("Process output copy : " ${output})
@@ -157,7 +147,7 @@ endif()
 set(CTEST_MODEL Experimental)
 
 #######################################################################
-# INSPECT : START a fake dashboard usinf only configure to run inspect
+# INSPECT : START a fake dashboard using only configure to run inspect
 #######################################################################
 message("Initialize dashboard : ${CTEST_MODEL} ...")
 set(CTEST_BINARY_DIRECTORY "${PYCICLE_BINARY_DIRECTORY}/inspect")
@@ -228,21 +218,21 @@ if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
   ctest_memcheck()
 endif (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
 
-# Create a file when this build has finished so that pycicle can
-# scrape the most recent results and use them to update the pull request status
+# Create a file when this build has finished so that pycicle can scrape the most
+# recent results and use them to update the github  pull request status
 # we will get the TAG from ctest and use it to find the correct XML files
 # with our Configure/Build/Test errors/warnings
 execute_process(
   COMMAND bash "-c"
-    "TEMP=$(head -n 1 ${PYCICLE_WORK_DIR}/Testing/TAG);
+    "TEMP=$(head -n 1 ${PYCICLE_BINARY_DIRECTORY}/Testing/TAG);
     {
-    grep '<Error>' ${PYCICLE_WORK_DIR}/Testing/$TEMP/Configure.xml | wc -l
-    grep '<Error>' ${PYCICLE_WORK_DIR}/Testing/$TEMP/Build.xml | wc -l
-    grep '<Test Status=\"failed\">' ${PYCICLE_WORK_DIR}/Testing/$TEMP/Test.xml | wc -l
+    grep '<Error>' ${PYCICLE_BINARY_DIRECTORY}/Testing/$TEMP/Configure.xml | wc -l
+    grep '<Error>' ${PYCICLE_BINARY_DIRECTORY}/Testing/$TEMP/Build.xml | wc -l
+    grep '<Test Status=\"failed\">' ${PYCICLE_BINARY_DIRECTORY}/Testing/$TEMP/Test.xml | wc -l
     echo $TEMP
     } > ${CTEST_BINARY_DIRECTORY}/pycicle-TAG.txt"
-  WORKING_DIRECTORY "${PYCICLE_BUILD_ROOT}"
+  WORKING_DIRECTORY "${PYCICLE_BINARY_DIRECTORY}"
   OUTPUT_VARIABLE output
-  ERROR_VARIABLE output
+  ERROR_VARIABLE  output
   RESULT_VARIABLE failed
 )

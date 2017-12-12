@@ -15,8 +15,6 @@ set(PYCICLE_HTTP "TRUE")
 # Launch jobs using slurm rather than directly running them on the machine
 set(PYCICLE_SLURM "TRUE")
 #
-set(PYCICLE_BUILD_STAMP "gcc-${GCC_VER}")
-
 #######################################################################
 # These are settings you can use to define anything useful
 #######################################################################
@@ -27,6 +25,8 @@ set(JEMALLOC_VER  "5.0.1")
 set(OTF2_VER      "2.0")
 set(PAPI_VER      "5.5.1")
 set(BOOST_SUFFIX  "1_65_1")
+
+set(PYCICLE_BUILD_STAMP "gcc-${GCC_VER}")
 
 set(INSTALL_ROOT     "/users/biddisco/apps")
 set(BOOST_ROOT       "${INSTALL_ROOT}/boost/${BOOST_VER}")
