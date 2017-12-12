@@ -102,8 +102,6 @@ void symbol_namespace::register_global_counter_types(
     error_code& ec
     )
 {
-    using util::placeholders::_1;
-    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
         util::bind_back(&performance_counters::agas_raw_counter_creator
       , agas::server::symbol_namespace_service_name));
