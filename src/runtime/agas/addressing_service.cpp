@@ -45,7 +45,6 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/broadcast.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -1731,51 +1730,11 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         ));
 }
 
-}}
-
-///////////////////////////////////////////////////////////////////////////////
-typedef hpx::agas::server::symbol_namespace::on_event_action
-    symbol_namespace_on_event_action;
-
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_on_event_action,
-    symbol_namespace_on_event_action)
-HPX_REGISTER_BROADCAST_ACTION_ID(symbol_namespace_on_event_action,
-    symbol_namespace_on_event_action,
-    hpx::actions::broadcast_symbol_namespace_on_event_action_id)
-
-namespace hpx { namespace agas
-{
-    namespace detail
-    {
-        std::vector<hpx::id_type> find_all_symbol_namespace_services()
-        {
-            std::vector<hpx::id_type> ids;
-            for (hpx::id_type const& id : hpx::find_all_localities())
-            {
-                ids.push_back(hpx::id_type(
-                    agas::symbol_namespace::get_service_instance(id),
-                    id_type::unmanaged));
-            }
-            return ids;
-        }
-    }
-
-/// Invoke the supplied hpx::function for every registered global name
-bool addressing_service::iterate_ids(
-    iterate_names_function_type const& f
-  , error_code& ec
-    )
-{ // {{{
-    try {
-        server::symbol_namespace::iterate_action act;
-        lcos::broadcast(act, detail::find_all_symbol_namespace_services(), f).get(ec);
-
-        return !ec;
-    }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::iterate_ids");
-        return false;
-    }
+// Return all matching entries in the symbol namespace
+hpx::future<addressing_service::iterate_names_return_type>
+    addressing_service::iterate_ids(std::string const& pattern)
+{    // {{{
+    return symbol_ns_.iterate_async(pattern);
 } // }}}
 
 // This function has to return false if the key is already in the cache (true

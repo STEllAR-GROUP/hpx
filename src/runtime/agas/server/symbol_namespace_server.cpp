@@ -29,11 +29,21 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/regex.hpp>
+
+// Reuse functionaliy from perf-counters
+namespace hpx { namespace performance_counters { namespace detail
+{
+    HPX_EXPORT std::string regex_from_pattern(std::string const& pattern,
+        error_code& ec);
+}}}
 
 namespace hpx { namespace agas
 {
@@ -366,31 +376,48 @@ naming::gid_type symbol_namespace::unbind(std::string const& key)
 } // }}}
 
 // TODO: catch exceptions
-void symbol_namespace::iterate(
-    symbol_namespace::iterate_names_function_type const& f
-    )
+symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
+    std::string const& pattern)
 { // {{{ iterate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.iterate_names_.time_
     );
     counter_data_.increment_iterate_names_count();
-    std::unique_lock<mutex_type> l(mutex_);
 
-    for (gid_table_type::iterator it = gids_.begin(); it != gids_.end(); ++it)
+    std::map<std::string, naming::gid_type> found;
+
+    if (pattern.find_first_of("*?[]") != std::string::npos)
     {
-        std::string key(it->first);
-        naming::gid_type gid = *(it->second);
+        std::string str_rx(
+            performance_counters::detail::regex_from_pattern(pattern, throws));
+        boost::regex rx(str_rx, boost::regex::perl);
 
+        std::unique_lock<mutex_type> l(mutex_);
+        for (gid_table_type::iterator it = gids_.begin(); it != gids_.end();
+             ++it)
         {
-            util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
-            f(key, gid);
+            if (!boost::regex_match(it->first, rx))
+                continue;
+            found[it->first] =
+                naming::detail::split_gid_if_needed(*(it->second)).get();
         }
-
-        // re-locate current entry
-        it = gids_.find(key);
+    }
+    else
+    {
+        std::unique_lock<mutex_type> l(mutex_);
+        for (gid_table_type::iterator it = gids_.begin(); it != gids_.end();
+             ++it)
+        {
+            if (!pattern.empty() && pattern != it->first)
+                continue;
+            found[it->first] =
+                naming::detail::split_gid_if_needed(*(it->second)).get();
+        }
     }
 
     LAGAS_(info) << "symbol_namespace::iterate";
+
+    return found;
 } // }}}
 
 bool symbol_namespace::on_event(

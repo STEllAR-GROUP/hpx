@@ -17,6 +17,7 @@
 #include <hpx/util/function.hpp>
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -30,10 +31,7 @@ struct symbol_namespace
 {
     // {{{ nested types
     typedef server::symbol_namespace server_type;
-
-    typedef hpx::util::function<
-        void(std::string const&, naming::gid_type const&)
-    > iterate_names_function_type;
+    typedef std::map<std::string, naming::id_type> iterate_names_return_type;
     // }}}
 
     static naming::gid_type get_service_instance(std::uint32_t service_locality_id);
@@ -65,8 +63,8 @@ struct symbol_namespace
     hpx::future<bool> bind_async(std::string key, naming::gid_type gid);
     bool bind(std::string key, naming::gid_type gid);
 
-    hpx::future<naming::id_type> resolve_async(std::string key);
-    naming::id_type resolve(std::string key);
+    hpx::future<naming::id_type> resolve_async(std::string key) const;
+    naming::id_type resolve(std::string key) const;
 
     hpx::future<naming::id_type> unbind_async(std::string key);
     naming::id_type unbind(std::string key);
@@ -76,6 +74,10 @@ struct symbol_namespace
       , bool call_for_past_events
       , hpx::id_type lco
         );
+
+    hpx::future<iterate_names_return_type> iterate_async(
+        std::string const& pattern) const;
+    iterate_names_return_type iterate(std::string const& pattern) const;
 
     void register_counter_types();
     void register_server_instance(std::uint32_t locality_id);

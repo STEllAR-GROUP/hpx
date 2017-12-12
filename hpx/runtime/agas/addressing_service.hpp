@@ -61,9 +61,8 @@ public:
     // {{{ types
     typedef components::component_type component_id_type;
 
-    typedef hpx::util::function<
-        void(std::string const&, naming::gid_type const&)
-    > iterate_names_function_type;
+    typedef std::map<std::string, naming::id_type>
+        iterate_names_return_type;
 
     typedef hpx::util::function<
         void(std::string const&, components::component_type)
@@ -1184,25 +1183,15 @@ public:
     ///        name.
     ///
     /// This function iterates over all registered global ids and
-    /// unconditionally invokes the supplied hpx#function for ever found entry.
+    /// returns every found entry matching the given name pattern.
     /// Any error results in an exception thrown (or reported) from this
     /// function.
     ///
-    /// \param f          [in] a \a hpx#function encapsulating an action to be
-    ///                   invoked for every currently registered global name.
-    /// \param ec         [in,out] this represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
+    /// \param pattern    [in] pattern (poosibly using wildcards) to match
+    ///                   all existing entries against
     ///
-    /// \note             As long as \a ec is not pre-initialized to
-    ///                   \a hpx#throws this function doesn't
-    ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
-    ///                   of hpx#exception.
-    bool iterate_ids(
-        iterate_names_function_type const& f
-      , error_code& ec = throws
-        );
+    hpx::future<iterate_names_return_type> iterate_ids(
+        std::string const& pattern);
 
     /// \brief Register a global name with a global address (id)
     ///

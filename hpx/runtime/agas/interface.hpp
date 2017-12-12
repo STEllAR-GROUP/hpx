@@ -23,6 +23,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -494,6 +495,11 @@ HPX_API_EXPORT std::pair<bool, components::pinned_ptr>
         util::unique_function_nonser<components::pinned_ptr()> && f);
 
 HPX_API_EXPORT void unmark_as_migrated(naming::gid_type const& gid);
+
+HPX_API_EXPORT hpx::future<std::map<std::string, hpx::id_type> >
+    find_symbols(std::string const& pattern = "*");
+HPX_API_EXPORT std::map<std::string, hpx::id_type> find_symbols(
+    hpx::launch::sync_policy, std::string const& pattern = "*");
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5
