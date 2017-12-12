@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 
 #include <cstddef>
 #include <string>

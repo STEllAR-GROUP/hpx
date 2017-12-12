@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -20,8 +20,7 @@ namespace hpx { namespace performance_counters { namespace detail
     // Extract the current number of instances for the given component type
     std::int64_t get_instance_count(components::component_type type)
     {
-        using components::stubs::runtime_support;
-        return std::int64_t(runtime_support::get_instance_count(find_here(), type));
+        return hpx::components::instance_count(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////

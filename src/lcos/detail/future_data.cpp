@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 
 #include <hpx/config.hpp>
@@ -26,6 +27,9 @@
 
 namespace hpx { namespace lcos { namespace detail
 {
+    future_data_refcnt_base::~future_data_refcnt_base() = default;
+
+    ///////////////////////////////////////////////////////////////////////////
     static bool run_on_completed_on_new_thread(
         util::unique_function_nonser<bool()> && f, error_code& ec)
     {

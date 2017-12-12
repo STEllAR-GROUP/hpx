@@ -18,7 +18,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util_fwd.hpp>
@@ -61,18 +61,7 @@ namespace hpx { namespace parcelset
             performance_counters::parcels::data_point receive_data);
 
         // make sure the parcel has been properly initialized
-        void init_parcel(parcel& p)
-        {
-            // ensure the source locality id is set (if no component id is given)
-            if (!p.source_id())
-                p.set_source_id(naming::id_type(get_locality(),
-                    naming::id_type::unmanaged));
-
-#if defined(HPX_HAVE_PARCEL_PROFILING)
-            // set the current local time for this locality
-            p.set_start_time(get_current_time());
-#endif
-        }
+        void init_parcel(parcel& p);
 
         typedef lcos::local::spinlock mutex_type;
 
@@ -206,10 +195,8 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         HPX_FORCEINLINE void put_parcel(parcel p)
         {
-            using util::placeholders::_1;
-            using util::placeholders::_2;
-            put_parcel(std::move(p), util::bind(
-                &parcelhandler::invoke_write_handler, this, _1, _2));
+            put_parcel(std::move(p), util::bind_front(
+                &parcelhandler::invoke_write_handler, this));
         }
 
         /// A parcel is submitted for transport at the source locality site to
@@ -244,10 +231,8 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         void put_parcels(std::vector<parcel> parcels)
         {
-            using util::placeholders::_1;
-            using util::placeholders::_2;
             std::vector<write_handler_type> handlers(parcels.size(),
-                util::bind(&parcelhandler::invoke_write_handler, this, _1, _2));
+                util::bind_front(&parcelhandler::invoke_write_handler, this));
 
             put_parcels(std::move(parcels), std::move(handlers));
         }

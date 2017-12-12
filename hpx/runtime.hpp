@@ -10,11 +10,14 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -218,12 +221,6 @@ namespace hpx
 
         virtual void add_shutdown_function(shutdown_function_type f) = 0;
 
-        /// Keep the factory object alive which is responsible for the given
-        /// component type. This a purely internal function allowing to work
-        /// around certain library specific problems related to dynamic
-        /// loading of external libraries.
-        virtual bool keep_factory_alive(components::component_type type) = 0;
-
         /// Access one of the internal thread pools (io_service instances)
         /// HPX is using to perform specific tasks. The three possible values
         /// for the argument \p name are "main_pool", "io_pool", "parcel_pool",
@@ -344,13 +341,6 @@ namespace hpx
         boost::scoped_ptr<components::server::memory> memory_;
         boost::scoped_ptr<components::server::runtime_support> runtime_support_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Keep the factory object alive which is responsible for the given
-    /// component type. This a purely internal function allowing to work
-    /// around certain library specific problems related to dynamic
-    /// loading of external libraries.
-    HPX_EXPORT bool keep_factory_alive(components::component_type type);
 }   // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

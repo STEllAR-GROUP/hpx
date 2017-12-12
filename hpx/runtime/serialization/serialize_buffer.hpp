@@ -12,7 +12,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -60,10 +60,9 @@ namespace hpx { namespace serialization
           , size_(size)
           , alloc_(alloc)
         {
-            using util::placeholders::_1;
             data_.reset(alloc_.allocate(size),
-                        util::bind(&serialize_buffer::deleter<allocator_type>,
-                                   _1, alloc_, size_));
+                        util::bind_back(&serialize_buffer::deleter<allocator_type>,
+                                   alloc_, size_));
         }
 
         // The default mode is 'copy' which is consistent with the constructor
@@ -75,10 +74,9 @@ namespace hpx { namespace serialization
           , alloc_(alloc)
         {
             if (mode == copy) {
-                using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size),
-                    util::bind(&serialize_buffer::deleter<allocator_type>,
-                        _1, alloc_, size_));
+                    util::bind_back(&serialize_buffer::deleter<allocator_type>,
+                        alloc_, size_));
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -88,10 +86,9 @@ namespace hpx { namespace serialization
             }
             else {
                 // take ownership
-                using util::placeholders::_1;
                 data_ = boost::shared_array<T>(data,
-                    util::bind(&serialize_buffer::deleter<allocator_type>,
-                        _1, alloc_, size_));
+                    util::bind_back(&serialize_buffer::deleter<allocator_type>,
+                        alloc_, size_));
             }
         }
 
@@ -103,10 +100,9 @@ namespace hpx { namespace serialization
           , alloc_(alloc)
         {
             // if 2 allocators are specified we assume mode 'take'
-            using util::placeholders::_1;
             data_ = boost::shared_array<T>(data,
-                util::bind(&serialize_buffer::deleter<Deallocator>,
-                    _1, dealloc, size_));
+                util::bind_back(&serialize_buffer::deleter<Deallocator>,
+                    dealloc, size_));
         }
 
         template <typename Deleter>
@@ -173,10 +169,9 @@ namespace hpx { namespace serialization
           , alloc_(alloc)
         {
             // create from const data implies 'copy' mode
-            using util::placeholders::_1;
             data_.reset(alloc_.allocate(size),
-                util::bind(&serialize_buffer::deleter<allocator_type>,
-                    _1, alloc_, size_));
+                util::bind_back(&serialize_buffer::deleter<allocator_type>,
+                    alloc_, size_));
             if (size != 0)
                 std::copy(data, data + size, data_.get());
         }
@@ -202,10 +197,9 @@ namespace hpx { namespace serialization
           , alloc_(alloc)
         {
             if (mode == copy) {
-                using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size),
-                    util::bind(&serialize_buffer::deleter<allocator_type>,
-                        _1, alloc_, size_));
+                    util::bind_back(&serialize_buffer::deleter<allocator_type>,
+                        alloc_, size_));
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -256,11 +250,10 @@ namespace hpx { namespace serialization
         template <typename Archive>
         void load(Archive& ar, const unsigned int version)
         {
-            using util::placeholders::_1;
             ar >> size_ >> alloc_; //-V128
 
             data_.reset(alloc_.allocate(size_),
-                util::bind(&serialize_buffer::deleter<allocator_type>, _1,
+                util::bind_back(&serialize_buffer::deleter<allocator_type>,
                     alloc_, size_));
 
             if (size_ != 0)

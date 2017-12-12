@@ -415,7 +415,7 @@ void test_unique()
             return a == b && b == rand_base;
         }, rand_base);
     test_unique_async(execution::par(execution::task), IteratorTag(), int(),
-        [rand_base](const int a, const int b) -> bool {
+        [](const int a, const int b) -> bool {
             return a == b;
         }, rand_base);
 

@@ -7,6 +7,7 @@
 #define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/throw_exception.hpp>
@@ -25,8 +26,7 @@ namespace hpx { namespace lcos { namespace local
 {
     namespace detail
     {
-        template <typename R,
-            typename SharedState = lcos::detail::future_data<R>>
+        template <typename R, typename SharedState>
         class promise_base
         {
             typedef SharedState shared_state_type;

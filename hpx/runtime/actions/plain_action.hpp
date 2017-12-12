@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>

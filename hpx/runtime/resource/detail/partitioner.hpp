@@ -158,9 +158,9 @@ namespace hpx { namespace resource { namespace detail
             return numa_domains_;
         }
 
-        bool terminate_after_parse()
+        int parse_result() const
         {
-            return cfg_.parse_terminate_;
+            return cfg_.parse_result_;
         }
 
         std::size_t assign_cores(std::size_t first_core);
@@ -233,6 +233,9 @@ namespace hpx { namespace resource { namespace detail
         // store policy flags determining the general behavior of the
         // resource_partitioner
         resource::partitioner_mode mode_;
+
+        // topology information
+        threads::topology& topo_;
     };
 }}}
 

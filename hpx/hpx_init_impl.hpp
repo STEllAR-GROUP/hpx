@@ -13,7 +13,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/function.hpp>
 
@@ -286,7 +286,7 @@ namespace hpx
             std::string("Usage: ") + app_name +  " [options]");
 
         util::function_nonser<int(boost::program_options::variables_map& vm)>
-            main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
+            main_f = util::bind_back(detail::init_helper, f);
         std::vector<std::string> cfg;
         util::function_nonser<void()> const empty;
 
@@ -317,7 +317,7 @@ namespace hpx
             "Usage: " + app_name +  " [options]");
 
         util::function_nonser<int(boost::program_options::variables_map& vm)>
-            main_f = util::bind(detail::init_helper, util::placeholders::_1, f);
+            main_f = util::bind_back(detail::init_helper, f);
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 

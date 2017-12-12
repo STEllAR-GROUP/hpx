@@ -45,7 +45,7 @@ HPX_REGISTER_COMPONENT(hpx::components::simple_component<foo>, foo);
 int hpx_main()
 {
     std::vector<hpx::id_type> const localities =
-        hpx::find_all_localities(foo::get_component_type());
+        hpx::find_all_localities(hpx::components::get_component_type<foo>());
 
     std::vector<hpx::future<hpx::id_type> > components;
     for (int i = 0; i != NUM_INSTANCES; ++i)

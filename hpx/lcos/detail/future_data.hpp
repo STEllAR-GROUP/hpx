@@ -38,6 +38,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -62,7 +64,7 @@ namespace detail
     void intrusive_ptr_release(future_data_refcnt_base* p);
 
     ///////////////////////////////////////////////////////////////////////
-    struct future_data_refcnt_base
+    struct HPX_EXPORT future_data_refcnt_base
     {
     private:
         typedef util::unique_function_nonser<void()> completed_callback_type;
@@ -70,7 +72,7 @@ namespace detail
     public:
         typedef void has_future_data_refcnt_base;
 
-        virtual ~future_data_refcnt_base() {}
+        virtual ~future_data_refcnt_base();
 
         virtual void set_on_completed(completed_callback_type) = 0;
 
@@ -352,7 +354,7 @@ namespace detail
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
         /// immediately.
-        void set_on_completed(completed_callback_type data_sink);
+        void set_on_completed(completed_callback_type data_sink) override;
 
         virtual void wait(error_code& ec = throws);
 
@@ -455,7 +457,7 @@ namespace detail
             return reinterpret_cast<result_type*>(&storage_);
         }
 
-        virtual util::unused_type* get_result_void(error_code& ec = throws)
+        util::unused_type* get_result_void(error_code& ec = throws) override
         {
             return base_type::get_result_void(&storage_, ec);
         }
@@ -506,7 +508,8 @@ namespace detail
                 handle_on_completed(std::move(on_completed));
         }
 
-        void set_exception(std::exception_ptr data, error_code& ec = throws)
+        void set_exception(
+            std::exception_ptr data, error_code& ec = throws) override
         {
             std::unique_lock<mutex_type> l(mtx_);
 
@@ -614,7 +617,7 @@ namespace detail
             on_completed_ = completed_callback_type();
         }
 
-        std::exception_ptr get_exception_ptr() const
+        std::exception_ptr get_exception_ptr() const override
         {
             HPX_ASSERT(state_ == exception);
             return *reinterpret_cast<std::exception_ptr const*>(&storage_);
@@ -648,7 +651,7 @@ namespace detail
 
         template <typename Target>
         future_data(Target && data, init_no_addref no_addref)
-          : future_data_base<Result>(std::move(data), no_addref)
+          : future_data_base<Result>(std::forward<Target>(data), no_addref)
         {}
 
         future_data(std::exception_ptr const& e, init_no_addref no_addref)
@@ -685,7 +688,7 @@ namespace detail
         template <typename Target>
         future_data_allocator(Target && data, init_no_addref no_addref,
                 other_allocator const& alloc)
-          : future_data<Result>(std::move(data), no_addref), alloc_(alloc)
+          : future_data<Result>(std::forward<Target>(data), no_addref), alloc_(alloc)
         {}
         future_data_allocator(std::exception_ptr const& e,
                 init_no_addref no_addref, other_allocator const& alloc)
@@ -770,22 +773,11 @@ namespace detail
 
     public:
         task_base()
-          : started_(false), sched_(nullptr)
+          : started_(false)
         {}
 
         task_base(init_no_addref no_addref)
-          : base_type(no_addref), started_(false), sched_(nullptr)
-        {}
-
-        task_base(threads::executor& sched)
-          : started_(false),
-            sched_(sched ? &sched : nullptr)
-        {}
-
-        task_base(threads::executor& sched, init_no_addref no_addref)
-          : base_type(no_addref),
-            started_(false),
-            sched_(sched ? &sched : nullptr)
+          : base_type(no_addref), started_(false)
         {}
 
         virtual void execute_deferred(error_code& ec = throws)
@@ -901,7 +893,6 @@ namespace detail
 
     protected:
         bool started_;
-        threads::executor* sched_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -933,14 +924,6 @@ namespace detail
 
         cancelable_task_base(init_no_addref no_addref)
           : task_base<Result>(no_addref), id_(threads::invalid_thread_id)
-        {}
-
-        cancelable_task_base(threads::executor& sched)
-          : task_base<Result>(sched), id_(threads::invalid_thread_id)
-        {}
-
-        cancelable_task_base(threads::executor& sched, init_no_addref no_addref)
-          : task_base<Result>(sched, no_addref), id_(threads::invalid_thread_id)
         {}
 
     private:
@@ -1049,5 +1032,7 @@ namespace hpx { namespace traits
 #endif
 #endif
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

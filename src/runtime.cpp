@@ -13,7 +13,6 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -217,11 +216,13 @@ namespace hpx
             "state_starting",     // 4
             "state_running",      // 5
             "state_suspended",    // 6
-            "state_pre_shutdown", // 7
-            "state_shutdown",     // 8
-            "state_stopping",     // 9
-            "state_terminating",  // 10
-            "state_stopped"       // 11
+            "state_pre_sleep",    // 7
+            "state_sleeping",     // 8
+            "state_pre_shutdown", // 9
+            "state_shutdown",     // 10
+            "state_stopping",     // 11
+            "state_terminating",  // 12
+            "state_stopped"       // 13
         };
     }
 
@@ -1087,20 +1088,6 @@ namespace hpx
         if (std::size_t(-1) !=
             rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
             return numa_sensitive;
-        return false;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    bool keep_factory_alive(components::component_type type)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (nullptr != rt)
-            return rt->keep_factory_alive(type);
-
-        HPX_THROW_EXCEPTION(
-            invalid_status,
-            "hpx::keep_factory_alive",
-            "the runtime system has not been initialized yet");
         return false;
     }
 

@@ -11,7 +11,7 @@
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/unwrap.hpp>
 

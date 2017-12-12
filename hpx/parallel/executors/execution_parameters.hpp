@@ -11,6 +11,7 @@
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/has_member_xxx.hpp>
@@ -366,7 +367,9 @@ namespace hpx { namespace parallel { namespace execution
             unwrapper() : T() {}
 
             // generic poor-man's forwarding constructor
-            template <typename U>
+            template <typename U, typename Enable = typename
+                std::enable_if<!std::is_same<typename hpx::util::decay<U>::type,
+                unwrapper>::value>::type>
             unwrapper(U && u) : T(std::forward<U>(u)) {}
         };
 

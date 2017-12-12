@@ -12,6 +12,7 @@
 #include <hpx/util/one_size_heap_list.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <iostream>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,27 +20,33 @@ namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    template <typename Heap, typename Mutex = lcos::local::spinlock>
+    template <typename Heap>
     class wrapper_heap_list : public util::one_size_heap_list
     {
         typedef util::one_size_heap_list base_type;
-        typedef typename Heap::value_type value_ype;
+        typedef typename Heap::value_type value_type;
 
         typedef typename std::aligned_storage<
-                sizeof(value_ype), std::alignment_of<value_ype>::value
+                sizeof(value_type), std::alignment_of<value_type>::value
             >::type storage_type;
 
         enum
         {
-            heap_step = 0xFFF,          // default initial number of elements
-            heap_size = sizeof(storage_type)  // size of one element in the heap
+            // default initial number of elements
+            heap_capacity = 0xFFF,
+            // Alignment of one element
+            heap_element_alignment = std::alignment_of<value_type>::value,
+            // size of one element in the heap
+            heap_element_size = sizeof(storage_type)
         };
 
     public:
-        wrapper_heap_list(component_type type)
-          : base_type(get_component_type_name(type), heap_step, heap_size,
-                (Heap*) nullptr)
-          , type_(type)
+        wrapper_heap_list()
+          : base_type(get_component_type_name(
+                get_component_type<typename value_type::wrapped_type>()),
+                base_type::heap_parameters{heap_capacity, heap_element_alignment,
+                heap_element_size}, (Heap*) nullptr)
+          , type_(get_component_type<typename value_type::wrapped_type>())
         {}
 
         ///

@@ -82,15 +82,6 @@ namespace hpx { namespace performance_counters { namespace server
             base_type::finalize();
         }
 
-        static components::component_type get_component_type()
-        {
-            return base_type::get_component_type();
-        }
-        static void set_component_type(components::component_type t)
-        {
-            base_type::set_component_type(t);
-        }
-
     protected:
         bool evaluate_base_counter(counter_value& value);
         bool evaluate();

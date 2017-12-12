@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/jenkins_hash.hpp>

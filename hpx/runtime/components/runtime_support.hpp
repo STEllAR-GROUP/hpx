@@ -59,18 +59,22 @@ namespace hpx { namespace components
 
         /// Asynchronously create N new default constructed components using
         /// the runtime_support
-        std::vector<naming::id_type> bulk_create_components(
-            components::component_type type, std::size_t count = 1)
+        template <typename Component, typename ...Ts>
+        std::vector<naming::id_type> bulk_create_component(
+            std::size_t count, Ts&&...vs)
         {
-            return this->base_type::bulk_create_components(gid_, type, count);
+            return this->base_type::template bulk_create_component<Component>
+                (gid_, std::forward<Ts>(vs)...);
         }
 
         /// Asynchronously create a new component using the runtime_support
+        template <typename Component, typename ...Ts>
         lcos::future<std::vector<naming::id_type> >
-        bulk_create_components_async(components::component_type type,
-            std::size_t count = 1)
+        bulk_create_components_async(
+            std::size_t count, Ts&&...vs)
         {
-            return this->base_type::bulk_create_components_async(gid_, type, count);
+            return this->base_type::template bulk_create_component<Component>
+                (gid_, std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -144,22 +148,10 @@ namespace hpx { namespace components
             this->base_type::terminate_all(gid_);
         }
 
-        void update_agas_cache_entry(naming::gid_type const& gid,
-            naming::address const& g, std::uint64_t count,
-            std::uint64_t offset)
-        {
-            this->base_type::update_agas_cache_entry(gid_, gid, g, count, offset);
-        }
-
         /// \brief Retrieve configuration information
         void get_config(util::section& ini)
         {
             this->base_type::get_config(gid_, ini);
-        }
-
-        std::int32_t  get_instance_count(components::component_type type)
-        {
-            return this->base_type::get_instance_count(gid_, type);
         }
 
         ///////////////////////////////////////////////////////////////////////

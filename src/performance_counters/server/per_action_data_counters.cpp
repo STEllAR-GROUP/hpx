@@ -10,6 +10,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/bind_front.hpp>
 
 #include <cstdint>
 #include <string>
@@ -76,9 +77,8 @@ namespace hpx { namespace performance_counters
                 if (paths.parameters_.empty()) {
                     // if no parameters (action name) is given assume that this
                     // counter should report the overall value for all actions
-                    using util::placeholders::_1;
                     auto const& f =
-                        util::bind(counter_func, paths.parameters_, _1);
+                        util::bind_front(counter_func, paths.parameters_);
                     return performance_counters::locality_raw_counter_creator(
                         info, f,ec);
                 }

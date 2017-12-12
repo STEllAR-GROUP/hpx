@@ -9,10 +9,10 @@
 #define HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -20,7 +20,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 
 #include <memory>
 
@@ -60,10 +60,10 @@ namespace hpx
                 HPX_ASSERT(was_migrated);
                 if (was_migrated)
                 {
-                    using components::stubs::runtime_support;
-                    agas::gva g (hpx::get_locality(),
-                        components::get_component_type<Component>(), 1, p);
-                    runtime_support::free_component_locally(g, id_.get_gid());
+                    components::component_type type =
+                        components::get_component_type<Component>();
+                    components::deleter(type)(id_.get_gid(),
+                        naming::address(hpx::get_locality(), type, p));
                 }
                 id_ = naming::invalid_id;       // release credits
             }
@@ -151,11 +151,9 @@ namespace hpx
     hpx::future<std::shared_ptr<Component> >
     get_ptr(naming::id_type const& id)
     {
-        using util::placeholders::_1;
         hpx::future<naming::address> f = agas::resolve(id);
-        return f.then(util::bind(
-            &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>,
-            _1, id));
+        return f.then(util::bind_back(
+            &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>, id));
     }
 
     /// \brief Returns a future referring to the pointer to the

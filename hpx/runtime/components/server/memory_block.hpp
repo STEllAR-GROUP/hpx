@@ -569,11 +569,9 @@ namespace hpx { namespace components { namespace server
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            static component_type t = component_memory_block;
-
             util::reinitializable_static<
                 heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT
-            > heap(t);
+            > heap;
             return heap.get(get_runtime_instance_number());
         }
 

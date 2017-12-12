@@ -12,6 +12,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/async.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
@@ -31,6 +32,7 @@
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -227,22 +229,22 @@ void addressing_service::launch_bootstrap(
 
     naming::id_type const locality_gid = locality_ns_->gid();
     gva locality_gva(here,
-        server::locality_namespace::get_component_type(), 1U,
+        hpx::components::component_agas_locality_namespace, 1U,
             locality_ns_->ptr());
 
     naming::id_type const primary_gid = primary_ns_.gid();
     gva primary_gva(here,
-        server::primary_namespace::get_component_type(), 1U,
+        hpx::components::component_agas_primary_namespace, 1U,
             primary_ns_.ptr());
 
     naming::id_type const component_gid = component_ns_->gid();
     gva component_gva(here,
-         server::component_namespace::get_component_type(), 1U,
+         hpx::components::component_agas_component_namespace, 1U,
             component_ns_->ptr());
 
     naming::id_type const symbol_gid = symbol_ns_.gid();
     gva symbol_gva(here,
-        server::symbol_namespace::get_component_type(), 1U,
+        hpx::components::component_agas_symbol_namespace, 1U,
             symbol_ns_.ptr());
 
     rt.get_config().parse("assigned locality",
@@ -989,7 +991,7 @@ bool addressing_service::resolve_locally_known_addresses(
         else
         {
             addr.locality_ = dest;
-            addr.type_ = server::primary_namespace::get_component_type();
+            addr.type_ = hpx::components::component_agas_primary_namespace;
             // addr.address_ will be supplied on the target locality
             return true;
         }
@@ -1006,7 +1008,7 @@ bool addressing_service::resolve_locally_known_addresses(
         else
         {
             addr.locality_ = dest;
-            addr.type_ = server::symbol_namespace::get_component_type();
+            addr.type_ = hpx::components::component_agas_symbol_namespace;
             // addr.address_ will be supplied on the target locality
         }
 
@@ -1644,10 +1646,9 @@ lcos::future<bool> addressing_service::register_name_async(
     std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
-        using util::placeholders::_1;
-        return f.then(util::bind(
+        return f.then(util::bind_back(
                 util::one_shot(&correct_credit_on_failure),
-                _1, id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
+                id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
             ));
     }
 
@@ -2218,46 +2219,43 @@ std::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 /// Install performance counter types exposing properties from the local cache.
 void addressing_service::register_counter_types()
 { // {{{
-    using util::placeholders::_1;
-    using util::placeholders::_2;
-
     // install
     util::function_nonser<std::int64_t(bool)> cache_entries(
-        util::bind(&addressing_service::get_cache_entries, this, _1));
+        util::bind_front(&addressing_service::get_cache_entries, this));
     util::function_nonser<std::int64_t(bool)> cache_hits(
-        util::bind(&addressing_service::get_cache_hits, this, _1));
+        util::bind_front(&addressing_service::get_cache_hits, this));
     util::function_nonser<std::int64_t(bool)> cache_misses(
-        util::bind(&addressing_service::get_cache_misses, this, _1));
+        util::bind_front(&addressing_service::get_cache_misses, this));
     util::function_nonser<std::int64_t(bool)> cache_evictions(
-        util::bind(&addressing_service::get_cache_evictions, this, _1));
+        util::bind_front(&addressing_service::get_cache_evictions, this));
     util::function_nonser<std::int64_t(bool)> cache_insertions(
-        util::bind(&addressing_service::get_cache_insertions, this, _1));
+        util::bind_front(&addressing_service::get_cache_insertions, this));
 
     util::function_nonser<std::int64_t(bool)> cache_get_entry_count(
-        util::bind(
-            &addressing_service::get_cache_get_entry_count, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_get_entry_count, this));
     util::function_nonser<std::int64_t(bool)> cache_insertion_count(
-        util::bind(
-            &addressing_service::get_cache_insertion_entry_count, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_insertion_entry_count, this));
     util::function_nonser<std::int64_t(bool)> cache_update_entry_count(
-        util::bind(
-            &addressing_service::get_cache_update_entry_count, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_update_entry_count, this));
     util::function_nonser<std::int64_t(bool)> cache_erase_entry_count(
-        util::bind(
-            &addressing_service::get_cache_erase_entry_count, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_erase_entry_count, this));
 
     util::function_nonser<std::int64_t(bool)> cache_get_entry_time(
-        util::bind(
-            &addressing_service::get_cache_get_entry_time, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_get_entry_time, this));
     util::function_nonser<std::int64_t(bool)> cache_insertion_time(
-        util::bind(
-            &addressing_service::get_cache_insertion_entry_time, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_insertion_entry_time, this));
     util::function_nonser<std::int64_t(bool)> cache_update_entry_time(
-        util::bind(
-            &addressing_service::get_cache_update_entry_time, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_update_entry_time, this));
     util::function_nonser<std::int64_t(bool)> cache_erase_entry_time(
-        util::bind(
-            &addressing_service::get_cache_erase_entry_time, this, _1));
+        util::bind_front(
+            &addressing_service::get_cache_erase_entry_time, this));
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {

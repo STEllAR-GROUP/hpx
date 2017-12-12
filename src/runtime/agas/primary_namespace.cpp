@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/throw_exception.hpp>
+#include <hpx/async.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
@@ -15,6 +15,7 @@
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/format.hpp>
 
@@ -27,9 +28,8 @@ using hpx::components::component_agas_primary_namespace;
 
 using hpx::agas::server::primary_namespace;
 
-HPX_REGISTER_COMPONENT(
-    hpx::components::fixed_component<primary_namespace>,
-    primary_namespace, hpx::components::factory_enabled)
+HPX_DEFINE_COMPONENT_NAME(primary_namespace,
+    hpx_primary_namespace);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     primary_namespace, component_agas_primary_namespace)
 
@@ -157,7 +157,7 @@ namespace hpx { namespace agas {
     {
         return naming::address(
             hpx::get_locality(),
-            server::primary_namespace::get_component_type(),
+            hpx::components::component_agas_primary_namespace,
             this->ptr()
         );
     }

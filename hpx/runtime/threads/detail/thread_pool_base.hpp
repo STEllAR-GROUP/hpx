@@ -80,12 +80,16 @@ namespace hpx { namespace threads { namespace detail
         virtual void stop(
             std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 
+        virtual void resume(error_code& ec = throws) = 0;
+
     public:
         std::size_t get_worker_thread_num() const;
         virtual std::size_t get_os_thread_count() const = 0;
 
         virtual compat::thread& get_os_thread_handle(
             std::size_t num_thread) = 0;
+
+        virtual std::size_t get_active_os_thread_count() const;
 
         virtual void create_thread(thread_init_data& data, thread_id_type& id,
             thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
@@ -119,7 +123,7 @@ namespace hpx { namespace threads { namespace detail
             return nullptr;
         }
 
-        mask_cref_type   get_used_processing_units() const;
+        mask_type get_used_processing_units() const;
         hwloc_bitmap_ptr get_numa_domain_bitmap() const;
 
         // performance counters
@@ -187,6 +191,8 @@ namespace hpx { namespace threads { namespace detail
         virtual std::int64_t get_thread_count(thread_state_enum state,
             thread_priority priority, std::size_t num_thread,
             bool reset) { return 0; }
+
+        virtual std::int64_t get_background_thread_count() { return 0; }
 
         std::int64_t get_thread_count_unknown(
             std::size_t num_thread, bool reset)
@@ -277,6 +283,14 @@ namespace hpx { namespace threads { namespace detail
         virtual void remove_processing_unit(std::size_t thread_num,
             error_code& ec = throws) = 0;
 
+        // Suspend the given processing unit on the scheduler.
+        virtual void suspend_processing_unit(std::size_t virt_core,
+            error_code& ec = throws) = 0;
+
+        // Resume the given processing unit on the scheduler.
+        virtual void resume_processing_unit(std::size_t virt_core,
+            error_code& ec = throws) = 0;
+
         // return the description string of the underlying scheduler
         char const* get_description() const;
 
@@ -285,13 +299,6 @@ namespace hpx { namespace threads { namespace detail
 
     protected:
         pool_id_type id_;
-
-        // Stores the mask identifying all processing units used by this
-        // thread pool.
-        typedef hpx::lcos::local::spinlock pu_mutex_type;
-        mutable pu_mutex_type used_processing_units_mtx_;
-        mask_type used_processing_units_;
-        hwloc_bitmap_ptr used_numa_domains_;
 
         // Mode of operation of the pool
         policies::scheduler_mode mode_;

@@ -126,7 +126,8 @@ namespace hpx { namespace threads { namespace policies
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
-            numa_sensitive_(init.numa_sensitive_)
+            numa_sensitive_(init.numa_sensitive_),
+            rp_(resource::get_partitioner())
         {
             victim_threads_.clear();
             victim_threads_.resize(init.num_queues_);
@@ -426,9 +427,10 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(bool delete_all = false)
+        bool cleanup_terminated(bool delete_all)
         {
             bool empty = true;
+
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 empty = queues_[i]->cleanup_terminated(delete_all) && empty;
             if (!delete_all)
@@ -439,6 +441,22 @@ namespace hpx { namespace threads { namespace policies
                     cleanup_terminated(delete_all) && empty;
 
             empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
+
+            return empty;
+        }
+
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        {
+            bool empty = true;
+
+            empty = queues_[num_thread]->cleanup_terminated(delete_all);
+            if (!delete_all)
+                return empty;
+
+            if (num_thread < high_priority_queues_.size())
+                empty = high_priority_queues_[num_thread]->
+                    cleanup_terminated(delete_all) && empty;
+
             return empty;
         }
 
@@ -467,18 +485,18 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
-            // Select a OS thread which hasn't been disabled
-            auto const& rp = resource::get_partitioner();
-            auto mask = rp.get_pu_mask(
-                num_thread + parent_pool_->get_thread_offset());
-            if(!threads::any(mask))
-                threads::set(mask, num_thread + parent_pool_->get_thread_offset());
-            while (true)
+            // Select an OS thread which hasn't been disabled
+            std::unique_lock<compat::mutex> l;
+            if (mode_ & threads::policies::enable_elasticity)
             {
-                if (bit_and(mask, parent_pool_->get_used_processing_units()))
-                    break;
-
-                num_thread = (num_thread + 1) % queue_size;
+                l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
+                    std::try_to_lock);
+                while (!l.owns_lock() || states_[num_thread] > state_suspended)
+                {
+                    num_thread = (num_thread + 1) % queue_size;
+                    l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
+                        std::try_to_lock);
+                }
             }
 
             // now create the thread
@@ -936,15 +954,9 @@ namespace hpx { namespace threads { namespace policies
             if (0 != added) return result;
 
             // Check if we have been disabled
+            if (!running)
             {
-                auto const& rp = resource::get_partitioner();
-                auto mask = rp.get_pu_mask(
-                    num_thread + parent_pool_->get_thread_offset());
-
-                if (!bit_and(mask, parent_pool_->get_used_processing_units()))
-                {
-                    return added == 0 && !running;
-                }
+                return true;
             }
 
             for (std::size_t idx: victim_threads_[num_thread])
@@ -1043,15 +1055,14 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_start_thread(num_thread);
 
             std::size_t num_threads = queues_.size();
-            auto const& rp = resource::get_partitioner();
-            auto const& topo = rp.get_topology();
+            auto const& topo = rp_.get_topology();
 
             // get numa domain masks of all queues...
             std::vector<mask_type> numa_masks(num_threads);
             std::vector<mask_type> core_masks(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
             {
-                std::size_t num_pu = rp.get_affinity_data().get_pu_num(i);
+                std::size_t num_pu = rp_.get_affinity_data().get_pu_num(i);
                 numa_masks[i] = topo.get_numa_node_affinity_mask(num_pu);
                 core_masks[i] = topo.get_core_affinity_mask(num_pu);
             }
@@ -1062,7 +1073,7 @@ namespace hpx { namespace threads { namespace policies
                 static_cast<std::ptrdiff_t>((num_threads / 2.0) + 0.5);
             victim_threads_[num_thread].reserve(num_threads);
 
-            std::size_t num_pu = rp.get_affinity_data().get_pu_num(num_thread);
+            std::size_t num_pu = rp_.get_affinity_data().get_pu_num(num_thread);
             mask_cref_type pu_mask = topo.get_thread_affinity_mask(num_pu);
             mask_cref_type numa_mask = numa_masks[num_thread];
             mask_cref_type core_mask = core_masks[num_thread];
@@ -1176,6 +1187,8 @@ namespace hpx { namespace threads { namespace policies
         std::size_t numa_sensitive_;
 
         std::vector<std::vector<std::size_t> > victim_threads_;
+
+        resource::detail::partitioner& rp_;
     };
 }}}
 

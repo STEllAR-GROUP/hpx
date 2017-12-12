@@ -4,7 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/lcos/detail/promise_lco.hpp>
-
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/atomic_count.hpp>
 
@@ -13,3 +12,8 @@ namespace hpx { namespace traits { namespace detail
     util::atomic_count unique_type(
         static_cast<long>(components::component_last));
 }}}
+
+typedef hpx::components::managed_component<
+    hpx::lcos::detail::promise_lco<void, hpx::util::unused_type>> promise_lco_void;
+
+HPX_REGISTER_COMPONENT_HEAP(promise_lco_void);

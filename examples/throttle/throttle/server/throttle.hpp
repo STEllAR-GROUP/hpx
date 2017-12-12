@@ -30,10 +30,6 @@ namespace throttle { namespace server
         throttle();
         ~throttle();
 
-        // components must contain a typedef for wrapping_type defining the
-        // component type used to encapsulate instances of this component
-        typedef throttle wrapping_type;
-
         ///////////////////////////////////////////////////////////////////////
         // parcel action code: the action to be performed on the destination
         // object (the accumulator)

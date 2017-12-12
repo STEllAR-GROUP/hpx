@@ -14,6 +14,7 @@ set(tests
     minimal_timed_sync_executor
     parallel_executor
     parallel_fork_executor
+    parallel_policy_executor
     persistent_executor_parameters
     sequenced_executor
     service_executors
@@ -73,7 +74,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER ${folder_name})
 
-  add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("parallel.executors" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.parallel.executors.${test})

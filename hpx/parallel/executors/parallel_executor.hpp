@@ -9,16 +9,18 @@
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/executors/post_policy_dispatch.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_traits.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/range.hpp>
@@ -32,6 +34,31 @@
 
 namespace hpx { namespace parallel { namespace execution
 {
+    namespace detail
+    {
+        template <typename Policy>
+        struct get_default_policy
+        {
+            static HPX_CONSTEXPR Policy call()
+            {
+                return Policy{};
+            }
+        };
+
+        template <>
+        struct get_default_policy<hpx::launch>
+        {
+            static HPX_CONSTEXPR hpx::launch::async_policy call()
+            {
+                return hpx::launch::async_policy{};
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename Shape, typename ... Ts>
+        struct bulk_function_result;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor creates groups of parallel execution agents
     /// which execute in threads implicitly created by the executor. This
@@ -40,7 +67,8 @@ namespace hpx { namespace parallel { namespace execution
     ///
     /// This executor conforms to the concepts of a TwoWayExecutor,
     /// and a BulkTwoWayExecutor
-    struct parallel_executor
+    template <typename Policy>
+    struct parallel_policy_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
@@ -51,26 +79,26 @@ namespace hpx { namespace parallel { namespace execution
         typedef static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
-        HPX_CONSTEXPR explicit parallel_executor(
-                launch l = hpx::detail::async_policy{},
+        HPX_CONSTEXPR explicit parallel_policy_executor(
+                Policy l = detail::get_default_policy<Policy>::call(),
                 std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
           : l_(l), num_spread_(spread), num_tasks_(tasks)
         {}
 
         /// \cond NOINTERNAL
-        bool operator==(parallel_executor const& rhs) const noexcept
+        bool operator==(parallel_policy_executor const& rhs) const noexcept
         {
             return l_ == rhs.l_ &&
                 num_spread_ == rhs.num_spread_ &&
                 num_tasks_ == rhs.num_tasks_;
         }
 
-        bool operator!=(parallel_executor const& rhs) const noexcept
+        bool operator!=(parallel_policy_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        parallel_executor const& context() const noexcept
+        parallel_policy_executor const& context() const noexcept
         {
             return *this;
         }
@@ -85,14 +113,19 @@ namespace hpx { namespace parallel { namespace execution
         >
         async_execute(F && f, Ts &&... ts) const
         {
-            return hpx::async(l_, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return hpx::detail::async_launch_policy_dispatch<Policy>::call(
+                l_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename ... Ts>
-        static void post(F && f, Ts &&... ts)
+        void post(F && f, Ts &&... ts)
         {
-            hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::util::thread_description desc(f,
+                "hpx::parallel::execution::parallel_executor::post");
+
+            detail::post_policy_dispatch<Policy>::call(
+                desc, l_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -119,7 +152,9 @@ namespace hpx { namespace parallel { namespace execution
             std::size_t size = hpx::util::size(shape);
             results.resize(size);
 
-            spawn(results, 0, size, num_tasks, f, hpx::util::begin(shape), ts...).get();
+            spawn(results, 0, size, num_tasks, f,
+                hpx::util::begin(shape), ts...).get();
+
             return results;
         }
         /// \endcond
@@ -140,16 +175,16 @@ namespace hpx { namespace parallel { namespace execution
                 std::vector<hpx::future<void> > tasks;
                 tasks.reserve(num_spread_);
 
-                hpx::future<void> (parallel_executor::*spawn_func)(
+                hpx::future<void> (parallel_policy_executor::*spawn_func)(
                         std::vector<hpx::future<Result> >&, std::size_t,
                         std::size_t, std::size_t, F const&, Iter, Ts const&...
-                    ) const = &parallel_executor::spawn;
+                    ) const = &parallel_policy_executor::spawn;
 
                 while (size != 0)
                 {
                     std::size_t curr_chunk_size = (std::min)(chunk_size, size);
 
-                    hpx::future<void> f = hpx::async(
+                    hpx::future<void> f = async_execute(
                         spawn_func, this, std::ref(results), base,
                         curr_chunk_size, num_tasks, std::ref(func), it,
                         std::ref(ts)...);
@@ -170,7 +205,7 @@ namespace hpx { namespace parallel { namespace execution
 
             for (std::size_t i = 0; i != size; ++i, ++it)
             {
-                results[base + i] = hpx::async(l_, func, *it, ts...);
+                results[base + i] = async_execute(func, *it, ts...);
             }
 
             return hpx::make_ready_future();
@@ -190,31 +225,41 @@ namespace hpx { namespace parallel { namespace execution
 
     private:
         /// \cond NOINTERNAL
-        launch l_;
+        Policy l_;
         std::size_t num_spread_;
         std::size_t num_tasks_;
         /// \endcond
     };
+
+    using parallel_executor = parallel_policy_executor<hpx::launch>;
 }}}
 
 namespace hpx { namespace parallel { namespace execution
 {
     /// \cond NOINTERNAL
-    template <>
-    struct is_two_way_executor<parallel::execution::parallel_executor>
-        : std::true_type
+    template <typename Policy>
+    struct is_one_way_executor<
+            parallel::execution::parallel_policy_executor<Policy> >
+      : std::true_type
     {};
 
-    template <>
-    struct is_bulk_two_way_executor<parallel::execution::parallel_executor>
-        : std::true_type
+    template <typename Policy>
+    struct is_two_way_executor<
+            parallel::execution::parallel_policy_executor<Policy> >
+      : std::true_type
+    {};
+
+    template <typename Policy>
+    struct is_bulk_two_way_executor<
+            parallel::execution::parallel_policy_executor<Policy> >
+      : std::true_type
     {};
     /// \endcond
 }}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
 
+#include <hpx/traits/v1/is_executor.hpp>
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 
 namespace hpx { namespace parallel { inline namespace v3

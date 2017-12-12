@@ -488,7 +488,7 @@ namespace hpx
         {
             if (this != &rhs)
             {
-                this->base_type::operator=(std::move(rhs));
+                this->base_type::operator=(std::move(static_cast<base_type&&>(rhs)));
 
                 size_ = rhs.size_;
                 partition_size_ = rhs.partition_size_;

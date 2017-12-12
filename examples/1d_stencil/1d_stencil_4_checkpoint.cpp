@@ -151,7 +151,7 @@ struct backup
     }
     backup(backup&& old)
       : bin(std::move(old.bin))
-      , file_name_(old.file_name_)
+      , file_name_(std::move(old.file_name_))
     {
     }
     ~backup() {}

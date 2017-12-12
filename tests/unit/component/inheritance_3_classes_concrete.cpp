@@ -189,6 +189,10 @@ int main()
         HPX_TEST_EQ(obj.test0(), "A");
     }
 
+    // Make sure AGAS kicked in...
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(!b_ctor); HPX_TEST(!b_dtor);
     HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
@@ -202,6 +206,10 @@ int main()
 
         HPX_TEST_EQ(obj.test0(), "B");
     }
+
+    // Make sure AGAS kicked in...
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
 
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
@@ -218,6 +226,10 @@ int main()
         HPX_TEST_EQ(obj.test1(), "B");
     }
 
+    // Make sure AGAS kicked in...
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
@@ -231,6 +243,10 @@ int main()
 
         HPX_TEST_EQ(obj.test0(), "C");
     }
+
+    // Make sure AGAS kicked in...
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
 
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
@@ -247,6 +263,10 @@ int main()
         HPX_TEST_EQ(obj.test1(), "C");
     }
 
+    // Make sure AGAS kicked in...
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(c_ctor); HPX_TEST(c_dtor);
@@ -262,6 +282,10 @@ int main()
         HPX_TEST_EQ(obj.test1(), "C");
         HPX_TEST_EQ(obj.test2(), "C");
     }
+
+    // Make sure AGAS kicked in...
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
 
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);

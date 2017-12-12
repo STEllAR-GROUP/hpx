@@ -67,9 +67,11 @@ void test_none_of_async(ExPolicy p, IteratorTag,Proj proj=Proj())
         hpx::future<bool> f =
             hpx::parallel::none_of(p,
                 iterator(std::begin(c)), iterator(std::end(c)),
-                [proj](std::size_t v) {
+                [](std::size_t v)
+                {
                     return v != 0;
-                },proj);
+                },
+                proj);
         f.wait();
 
         // verify values

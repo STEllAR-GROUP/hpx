@@ -9,28 +9,28 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/throw_exception.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/bind_back.hpp>
+#include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/scoped_timer.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -65,10 +65,8 @@ void primary_namespace::register_counter_types(
     error_code& ec
     )
 {
-    using util::placeholders::_1;
-    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind_back(&performance_counters::agas_raw_counter_creator
       , agas::server::primary_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -112,10 +110,8 @@ void primary_namespace::register_global_counter_types(
     error_code& ec
     )
 {
-    using util::placeholders::_1;
-    using util::placeholders::_2;
     performance_counters::create_counter_func creator(
-        util::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+        util::bind_back(&performance_counters::agas_raw_counter_creator
       , agas::server::primary_namespace_service_name));
 
     for (std::size_t i = 0;
@@ -1057,12 +1053,8 @@ void primary_namespace::free_components_sync(
 { // {{{ free_components_sync implementation
     using hpx::util::get;
 
-    std::vector<lcos::future<void> > futures;
-
     ///////////////////////////////////////////////////////////////////////////
     // Delete the objects on the free list.
-    components::server::runtime_support::free_component_action act;
-
     for (free_entry const& e : free_list)
     {
         // Bail if we're in late shutdown and non-local.
@@ -1086,23 +1078,14 @@ void primary_namespace::free_components_sync(
             upper,
             e.gid_, e.gva_, e.locality_);
 
-        // Free the object directly, if local (this avoids creating another
-        // local promise via async which would create a snowball effect of
-        // free_component calls.
+        // Destroy the component.
+        HPX_ASSERT(e.locality_ == e.gva_.prefix);
+        naming::address addr(e.locality_, e.gva_.type, e.gva_.lva());
         if (e.locality_ == locality_)
-        {
-            get_runtime_support_ptr()->free_component(e.gva_, e.gid_, 1);
-        }
+            components::deleter(e.gva_.type)(e.gid_, std::move(addr));
         else
-        {
-            naming::id_type const target_locality(e.locality_
-              , naming::id_type::unmanaged);
-            futures.push_back(hpx::async(act, target_locality, e.gva_, e.gid_, 1));
-        }
+            components::server::destroy_component(e.gid_, addr);
     }
-
-    if (!futures.empty())
-        hpx::wait_all(futures);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -1237,48 +1220,49 @@ naming::gid_type primary_namespace::statistics_counter(std::string const& name)
 
     typedef primary_namespace::counter_data cd;
 
-    using util::placeholders::_1;
     util::function_nonser<std::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {
         case primary_ns_route:
-            get_data_func = util::bind(&cd::get_route_count, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_route_count,
+                &counter_data_);
             break;
         case primary_ns_bind_gid:
-            get_data_func = util::bind(&cd::get_bind_gid_count, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_bind_gid_count,
+                &counter_data_);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = util::bind(&cd::get_resolve_gid_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_resolve_gid_count,
+                &counter_data_);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = util::bind(&cd::get_unbind_gid_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_unbind_gid_count,
+                &counter_data_);
             break;
         case primary_ns_increment_credit:
-            get_data_func = util::bind(&cd::get_increment_credit_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_increment_credit_count,
+                &counter_data_);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = util::bind(&cd::get_decrement_credit_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_decrement_credit_count,
+                &counter_data_);
             break;
         case primary_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_allocate_count,
+                &counter_data_);
             break;
         case primary_ns_begin_migration:
-            get_data_func = util::bind(&cd::get_begin_migration_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_begin_migration_count,
+                &counter_data_);
             break;
         case primary_ns_end_migration:
-            get_data_func = util::bind(&cd::get_end_migration_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_end_migration_count,
+                &counter_data_);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_count,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_overall_count,
+                &counter_data_);
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -1290,39 +1274,44 @@ naming::gid_type primary_namespace::statistics_counter(std::string const& name)
         HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case primary_ns_route:
-            get_data_func = util::bind(&cd::get_route_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_route_time,
+                &counter_data_);
             break;
         case primary_ns_bind_gid:
-            get_data_func = util::bind(&cd::get_bind_gid_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_bind_gid_time,
+                &counter_data_);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = util::bind(&cd::get_resolve_gid_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_resolve_gid_time,
+                &counter_data_);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = util::bind(&cd::get_unbind_gid_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_unbind_gid_time,
+                &counter_data_);
             break;
         case primary_ns_increment_credit:
-            get_data_func = util::bind(&cd::get_increment_credit_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_increment_credit_time,
+                &counter_data_);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = util::bind(&cd::get_decrement_credit_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_decrement_credit_time,
+                &counter_data_);
             break;
         case primary_ns_allocate:
-            get_data_func = util::bind(&cd::get_allocate_time, &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_allocate_time,
+                &counter_data_);
             break;
         case primary_ns_begin_migration:
-            get_data_func = util::bind(&cd::get_begin_migration_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_begin_migration_time,
+                &counter_data_);
             break;
         case primary_ns_end_migration:
-            get_data_func = util::bind(&cd::get_end_migration_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_end_migration_time,
+                &counter_data_);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = util::bind(&cd::get_overall_time,
-                &counter_data_, _1);
+            get_data_func = util::bind_front(&cd::get_overall_time,
+                &counter_data_);
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter

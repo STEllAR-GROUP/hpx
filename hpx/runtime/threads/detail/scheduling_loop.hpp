@@ -297,7 +297,6 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data background_init(
             [&, background_running](thread_state_ex_enum) -> thread_result_type
             {
-
                 while(*background_running)
                 {
                     if (callbacks.background_())
@@ -311,6 +310,7 @@ namespace hpx { namespace threads { namespace detail
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "background_work");
                 }
+
                 return thread_result_type(terminated, nullptr);
             },
             hpx::util::thread_description("background_work"),
@@ -325,6 +325,7 @@ namespace hpx { namespace threads { namespace detail
         scheduler.SchedulingPolicy::create_thread(background_init,
             &background_thread, suspended, true, hpx::throws, num_thread);
         HPX_ASSERT(background_thread);
+        scheduler.SchedulingPolicy::increment_background_thread_count();
         // We can now set the state to pending
         background_thread->set_state(pending);
         return background_thread;
@@ -401,6 +402,8 @@ namespace hpx { namespace threads { namespace detail
                     else if(terminated == state_val)
                     {
                         std::int64_t busy_count = 0;
+                        scheduler.SchedulingPolicy::
+                            decrement_background_thread_count();
                         scheduler.SchedulingPolicy::destroy_thread(
                             background_thread.get(), busy_count);
                         background_thread.reset();
@@ -461,8 +464,7 @@ namespace hpx { namespace threads { namespace detail
             // Get the next HPX thread from the queue
             thrd = next_thrd;
             bool running = this_state.load(
-                std::memory_order_relaxed) < state_stopping;
-
+                std::memory_order_relaxed) < state_pre_sleep;
 
             if (HPX_LIKELY(thrd ||
                     scheduler.SchedulingPolicy::get_next_thread(
@@ -542,7 +544,8 @@ namespace hpx { namespace threads { namespace detail
                             ++counters.executed_thread_phases_;
 #endif
                         }
-                        else {
+                        else
+                        {
                             // some other worker-thread got in between and started
                             // executing this HPX-thread, we just continue with
                             // the next one
@@ -660,26 +663,57 @@ namespace hpx { namespace threads { namespace detail
             }
 
             // if nothing else has to be done either wait or terminate
-            else {
+            else
+            {
                 ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-                    // clean up terminated threads one more time before exiting
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
-                    {
-                        // if this is an inner scheduler, exit immediately
-                        if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
-                        {
-                            this_state.store(state_stopped);
-                            break;
-                        }
+                    // clean up terminated threads one more time before sleeping
+                    bool can_exit =
+                        !running &&
+                        scheduler.SchedulingPolicy::cleanup_terminated(
+                            num_thread, true) &&
+                        scheduler.SchedulingPolicy::get_thread_count(
+                            suspended, thread_priority_default, num_thread) == 0;
 
-                        // otherwise, keep idling for some time
-                        if (!may_exit)
-                            idle_loop_count = 0;
-                        may_exit = true;
+                    if (can_exit)
+                    {
+                        if (this_state.load() == state_pre_sleep)
+                        {
+                            scheduler.SchedulingPolicy::suspend(num_thread);
+                        }
+                        else
+                        {
+                            if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
+                            {
+                                // If this is an inner scheduler, try to exit immediately
+                                if (background_thread.get() != nullptr)
+                                {
+                                    HPX_ASSERT(background_running);
+                                    *background_running = false;
+                                    scheduler.SchedulingPolicy::
+                                        decrement_background_thread_count();
+                                    scheduler.SchedulingPolicy::schedule_thread(
+                                        background_thread.get(), num_thread);
+                                    background_thread.reset();
+                                    background_running.reset();
+                                }
+                                else
+                                {
+                                    this_state.store(state_stopped);
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                // Otherwise, keep idling for some time
+                                if (!may_exit)
+                                    idle_loop_count = 0;
+                                may_exit = true;
+                            }
+                        }
                     }
                 }
 
@@ -698,6 +732,8 @@ namespace hpx { namespace threads { namespace detail
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
                     *background_running = false;
+                    scheduler.SchedulingPolicy::
+                        decrement_background_thread_count();
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
@@ -728,6 +764,8 @@ namespace hpx { namespace threads { namespace detail
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
                     *background_running = false;
+                    scheduler.SchedulingPolicy::
+                        decrement_background_thread_count();
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
@@ -738,7 +776,6 @@ namespace hpx { namespace threads { namespace detail
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
                 idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
-                // clean up terminated threads
                 if (idle_loop_count > params.max_idle_loop_count_)
                     idle_loop_count = 0;
 
@@ -749,11 +786,36 @@ namespace hpx { namespace threads { namespace detail
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    HPX_ASSERT(this_state.load() != state_pre_sleep);
+
+                    if (background_thread)
                     {
-                        this_state.store(state_stopped);
-                        break;
+                        HPX_ASSERT(background_running);
+                        *background_running = false;
+                        scheduler.SchedulingPolicy::
+                            decrement_background_thread_count();
+                        scheduler.SchedulingPolicy::schedule_thread(
+                            background_thread.get(), num_thread);
+                        background_thread.reset();
+                        background_running.reset();
                     }
+                    else
+                    {
+                        bool can_exit =
+                            !running &&
+                            scheduler.SchedulingPolicy::cleanup_terminated(
+                                true) &&
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                suspended, thread_priority_default,
+                                num_thread) == 0;
+
+                        if (can_exit)
+                        {
+                            this_state.store(state_stopped);
+                            break;
+                        }
+                    }
+
                     may_exit = false;
                 }
                 else

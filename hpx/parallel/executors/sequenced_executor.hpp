@@ -9,8 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -61,7 +60,8 @@ namespace hpx { namespace parallel { namespace execution
         sync_execute(F && f, Ts &&... ts)
         {
             try {
-                return hpx::util::invoke(f, std::forward<Ts>(ts)...);
+                return hpx::util::invoke(
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
             }
             catch (std::bad_alloc const& ba) {
                 throw ba;
@@ -78,8 +78,10 @@ namespace hpx { namespace parallel { namespace execution
         >
         async_execute(F && f, Ts &&... ts)
         {
-            return hpx::async(launch::deferred, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            return hpx::detail::async_launch_policy_dispatch<
+                    launch::deferred_policy
+                >::call(launch::deferred, std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -104,8 +106,7 @@ namespace hpx { namespace parallel { namespace execution
             try {
                 for (auto const& elem: shape)
                 {
-                    results.push_back(hpx::async(
-                        launch::deferred, f, elem, ts...));
+                    results.push_back(async_execute(f, elem, ts...));
                 }
             }
             catch (std::bad_alloc const& ba) {
@@ -148,29 +149,29 @@ namespace hpx { namespace parallel { namespace execution
     /// \cond NOINTERNAL
     template <>
     struct is_one_way_executor<parallel::execution::sequenced_executor>
-        : std::true_type
+      : std::true_type
     {};
 
     template <>
     struct is_bulk_one_way_executor<parallel::execution::sequenced_executor>
-        : std::true_type
+      : std::true_type
     {};
 
     template <>
     struct is_two_way_executor<parallel::execution::sequenced_executor>
-        : std::true_type
+      : std::true_type
     {};
 
     template <>
     struct is_bulk_two_way_executor<parallel::execution::sequenced_executor>
-        : std::true_type
+      : std::true_type
     {};
     /// \endcond
 }}}
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
 
+#include <hpx/traits/v1/is_executor.hpp>
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 
 namespace hpx { namespace parallel { inline namespace v3

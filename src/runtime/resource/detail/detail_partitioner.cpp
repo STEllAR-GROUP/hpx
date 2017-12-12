@@ -213,9 +213,10 @@ namespace hpx { namespace resource { namespace detail
 
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
-        : first_core_(std::size_t(-1))
-        , cores_needed_(std::size_t(-1))
-        , mode_(mode_default)
+      : first_core_(std::size_t(-1))
+      , cores_needed_(std::size_t(-1))
+      , mode_(mode_default)
+      , topo_(threads::create_topology())
     {
         // allow only one partitioner instance
         if (++instance_number_counter_ > 1)
@@ -505,7 +506,6 @@ namespace hpx { namespace resource { namespace detail
         affinity_data_.set_num_threads(new_pu_nums.size());
         affinity_data_.set_pu_nums(std::move(new_pu_nums));
         affinity_data_.set_affinity_masks(std::move(new_affinity_masks));
-        affinity_data_.init_cached_pu_nums(new_pu_nums.size());
     }
 
     // Returns true if any of the pools defined by the user is empty of resources
@@ -771,7 +771,7 @@ namespace hpx { namespace resource { namespace detail
 
     threads::topology &partitioner::get_topology() const
     {
-        return threads::create_topology();
+        return topo_;
     }
 
     util::command_line_handling &
@@ -865,7 +865,7 @@ namespace hpx { namespace resource { namespace detail
     threads::mask_cref_type partitioner::get_pu_mask(
         std::size_t global_thread_num) const
     {
-        return affinity_data_.get_pu_mask(global_thread_num);
+        return affinity_data_.get_pu_mask(topo_, global_thread_num);
     }
 
     bool partitioner::cmd_line_parsed() const
@@ -891,7 +891,7 @@ namespace hpx { namespace resource { namespace detail
 
         // parse command line and set options
         // terminate set if program options contain --hpx:help or --hpx:version ...
-        cfg_.parse_terminate_ = cfg_.call(desc_cmdline, argc, argv);
+        cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
 
         // set all parameters related to affinity data
         cores_needed_ = affinity_data_.init(cfg_);
@@ -902,7 +902,7 @@ namespace hpx { namespace resource { namespace detail
             fill_topology_vectors();
         }
 
-        return cfg_.parse_terminate_;
+        return cfg_.parse_result_;
     }
 
     scheduler_function partitioner::get_pool_creator(

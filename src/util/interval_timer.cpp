@@ -9,9 +9,10 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind_front.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -60,13 +61,13 @@ namespace hpx { namespace util { namespace detail
                 if (pre_shutdown_)
                 {
                     register_pre_shutdown_function(
-                        util::bind(&interval_timer::terminate,
+                        util::deferred_call(&interval_timer::terminate,
                             this->shared_from_this()));
                 }
                 else
                 {
                     register_shutdown_function(
-                        util::bind(&interval_timer::terminate,
+                        util::deferred_call(&interval_timer::terminate,
                             this->shared_from_this()));
                 }
             }
@@ -242,8 +243,8 @@ namespace hpx { namespace util { namespace detail
             // at shutdown.
             //util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             id = hpx::applier::register_thread_plain(
-                util::bind(&interval_timer::evaluate,
-                    this->shared_from_this(), util::placeholders::_1),
+                util::bind_front(&interval_timer::evaluate,
+                    this->shared_from_this()),
                 description_.c_str(), threads::suspended, true,
                 threads::thread_priority_boost, std::size_t(-1),
                 threads::thread_stacksize_default, ec);

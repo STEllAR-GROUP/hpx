@@ -94,6 +94,7 @@ namespace hpx { namespace util
             {}
 #endif
 
+            deferred(deferred const&) = delete;
             deferred& operator=(deferred const&) = delete;
 
             HPX_HOST_DEVICE HPX_FORCEINLINE

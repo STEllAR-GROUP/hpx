@@ -17,10 +17,10 @@ on our __stellar_hpx_github_issues__ tracker with detailed information about the
 
 [section:running_tests Running tests manually]
 
-Running the tests manually is as easy as typing ``make tests``. This will build all tests and
-run them once the tests are builtsuccessfully. After the tests have been built, you can
-invoke separate tests with the help of the ``ctest`` command. Please see the __ctest_doc__ for
-further details.
+Running the tests manually is as easy as typing ``make tests && make test``. This will build
+all tests and run them once the tests are built successfully. After the tests have been built,
+you can invoke separate tests with the help of the ``ctest`` command. You can list all available
+test targets using ``make help | grep tests``. Please see the __ctest_doc__ for further details.
 
 [endsect]
 

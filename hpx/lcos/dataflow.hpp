@@ -187,19 +187,13 @@ namespace hpx { namespace lcos { namespace detail
         void finalize(hpx::detail::async_policy policy, Futures&& futures)
         {
             // schedule the final function invocation with high priority
-            util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
             // simply schedule new thread
-            threads::register_thread_nullary(
-                util::deferred_call(&dataflow_frame::done, std::move(this_),
-                                    std::move(futures))
-              , desc
-              , threads::pending
-              , true
-              , policy.priority()
-              , std::size_t(-1)
-              , threads::thread_stacksize_current);
+            parallel::execution::parallel_policy_executor<launch::async_policy>
+                exec{policy};
+            parallel::execution::post(exec, &dataflow_frame::done,
+                std::move(this_), std::move(futures));
         }
 
         HPX_FORCEINLINE
@@ -211,24 +205,12 @@ namespace hpx { namespace lcos { namespace detail
         void finalize(hpx::detail::fork_policy policy, Futures&& futures)
         {
             // schedule the final function invocation with high priority
-            util::thread_description desc(func_, "dataflow_frame::finalize");
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
-            threads::thread_id_type tid = threads::register_thread_nullary(
-                util::deferred_call(&dataflow_frame::done, std::move(this_),
-                                    std::move(futures))
-              , desc
-              , threads::pending_do_not_schedule
-              , true
-              , policy.priority()
-              , get_worker_thread_num()
-              , threads::thread_stacksize_current);
-
-            if (tid)
-            {
-                // make sure this thread is executed last
-                hpx::this_thread::yield_to(thread::id(std::move(tid)));
-            }
+            parallel::execution::parallel_policy_executor<launch::fork_policy>
+                exec{policy};
+            parallel::execution::post(exec, &dataflow_frame::done,
+                std::move(this_), std::move(futures));
         }
 
         void finalize(launch policy, Futures&& futures)
@@ -247,14 +229,6 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-        HPX_FORCEINLINE
-        void finalize(threads::executor& sched, Futures&& futures)
-        {
-            boost::intrusive_ptr<dataflow_frame> this_(this);
-            hpx::apply(sched, &dataflow_frame::done, std::move(this_),
-                std::move(futures));
-        }
-
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
         // handle executors through their executor_traits
         template <typename Executor>
@@ -270,13 +244,19 @@ namespace hpx { namespace lcos { namespace detail
         }
 #endif
 
+        // The overload for hpx::dataflow taking an executor simply forwards
+        // to the corresponding executor customization point.
+        //
+        // parallel::execution::executor
+        // threads::executor
         template <typename Executor>
         HPX_FORCEINLINE
         typename std::enable_if<
             traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
+            traits::is_two_way_executor<Executor>::value ||
+            traits::is_threads_executor<Executor>::value
         >::type
-        finalize(Executor& exec, Futures&& futures)
+        finalize(Executor&& exec, Futures&& futures)
         {
             using execute_function_type =
                 typename std::conditional<
@@ -288,7 +268,7 @@ namespace hpx { namespace lcos { namespace detail
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
 
-            parallel::execution::post(exec,
+            parallel::execution::post(std::forward<Executor>(exec),
                 f, std::move(this_), is_void{}, std::move(futures));
         }
 
@@ -392,37 +372,16 @@ namespace hpx { namespace lcos { namespace detail
         }
     };
 
-    // threads::executor
-    template <typename Executor>
-    struct dataflow_dispatch<Executor, typename std::enable_if<
-            traits::is_threads_executor<Executor>::value
-        >::type>
-    {
-        template <typename Executor_, typename F, typename ...Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            !traits::is_action<typename std::decay<F>::type>::value,
-            lcos::future<
-                typename detail::dataflow_return<
-                    typename std::decay<F>::type,
-                    util::tuple<typename traits::acquire_future<Ts>::type...>
-                >::type>
-        >::type
-        call(Executor_& sched, F && f, Ts &&... ts)
-        {
-            return detail::create_dataflow(
-                static_cast<threads::executor&>(sched), std::forward<F>(f),
-                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
-        }
-    };
-
     // parallel executors
+    // threads::executor
     template <typename Executor>
     struct dataflow_dispatch<Executor, typename std::enable_if<
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
             traits::is_executor<Executor>::value ||
 #endif
             traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value
+            traits::is_two_way_executor<Executor>::value ||
+            traits::is_threads_executor<Executor>::value
         >::type>
     {
         template <typename Executor_, typename F, typename ...Ts>
@@ -446,13 +405,13 @@ namespace hpx { namespace lcos { namespace detail
     template <typename FD>
     struct dataflow_dispatch<FD, typename std::enable_if<
         !traits::is_launch_policy<FD>::value &&
-        !traits::is_threads_executor<FD>::value &&
         !(
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-              traits::is_executor<FD>::value ||
+            traits::is_executor<FD>::value ||
 #endif
             traits::is_one_way_executor<FD>::value ||
-            traits::is_two_way_executor<FD>::value)
+            traits::is_two_way_executor<FD>::value ||
+            traits::is_threads_executor<FD>::value)
         >::type>
     {
         template <
@@ -512,7 +471,8 @@ namespace hpx { namespace lcos { namespace detail
         call(Policy && policy, naming::id_type const& id, Ts &&... ts)
         {
             return dataflow_dispatch<typename std::decay<Policy>::type>::call(
-                std::forward<Policy>(policy), Action(), id, std::forward<Ts>(ts)...);
+                std::forward<Policy>(policy), Action(), id,
+                std::forward<Ts>(ts)...);
         }
     };
 }}}
@@ -523,11 +483,13 @@ namespace hpx
     template <typename F, typename ...Ts>
     HPX_FORCEINLINE
     auto dataflow(F && f, Ts &&... ts)
-    ->  decltype(lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...))
+    ->  decltype(
+            lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::call(
+                std::forward<F>(f), std::forward<Ts>(ts)...
+        ))
     {
-        return lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+        return lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
+            call(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 
     template <

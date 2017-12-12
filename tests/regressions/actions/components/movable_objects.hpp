@@ -43,7 +43,7 @@ namespace hpx { namespace test
         // Move assignment.
         movable_object& operator=(movable_object && other);
 
-        std::size_t get_count() const;
+        static std::size_t get_count();
         void reset_count();
 
         template <typename Archive>
@@ -70,7 +70,7 @@ namespace hpx { namespace test
         // Copy assignment.
         non_movable_object& operator=(non_movable_object const& other);
 
-        std::size_t get_count() const;
+        static std::size_t get_count();
         void reset_count();
 
         template <typename Archive>

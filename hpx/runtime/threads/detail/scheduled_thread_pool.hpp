@@ -103,6 +103,11 @@ namespace hpx { namespace threads { namespace detail
                 state, priority, num, reset);
         }
 
+        std::int64_t get_background_thread_count()
+        {
+            return sched_->Scheduler::get_background_thread_count();
+        }
+
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
             thread_state_enum state) const
@@ -117,6 +122,7 @@ namespace hpx { namespace threads { namespace detail
 
         void set_scheduler_mode(threads::policies::scheduler_mode mode)
         {
+            mode_ = mode;
             return sched_->Scheduler::set_scheduler_mode(mode);
         }
 
@@ -126,6 +132,8 @@ namespace hpx { namespace threads { namespace detail
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
         void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
+
+        void resume(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////
         compat::thread& get_os_thread_handle(std::size_t global_thread_num)
@@ -142,6 +150,22 @@ namespace hpx { namespace threads { namespace detail
         std::size_t get_os_thread_count() const
         {
             return threads_.size();
+        }
+
+        std::size_t get_active_os_thread_count() const
+        {
+            std::size_t active_os_thread_count = 0;
+            for (std::size_t thread_num = 0; thread_num < threads_.size();
+                ++thread_num)
+            {
+                if (sched_->Scheduler::get_state(thread_num).load() ==
+                    state_running)
+                {
+                    ++active_os_thread_count;
+                }
+            }
+
+            return active_os_thread_count;
         }
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
@@ -236,17 +260,31 @@ namespace hpx { namespace threads { namespace detail
 
         // Provide the given processing unit to the scheduler.
         void add_processing_unit(std::size_t virt_core,
-            std::size_t thread_num, error_code&);
+            std::size_t thread_num, error_code&  = hpx::throws);
 
         // Remove the given processing unit from the scheduler.
-        void remove_processing_unit(std::size_t virt_core, error_code&);
+        void remove_processing_unit(
+            std::size_t virt_core, error_code& = hpx::throws);
+
+        // Suspend the given processing unit on the scheduler.
+        void suspend_processing_unit(std::size_t virt_core, error_code&);
+
+        // Resume the given processing unit on the scheduler.
+        void resume_processing_unit(std::size_t virt_core, error_code&);
 
     protected:
         friend struct init_tss_helper<Scheduler>;
 
-        void add_processing_unit(std::size_t virt_core,
+        void remove_processing_unit_internal(
+            std::size_t virt_core, error_code& = hpx::throws);
+        void add_processing_unit_internal(std::size_t virt_core,
             std::size_t thread_num, std::shared_ptr<compat::barrier> startup,
             error_code& ec = hpx::throws);
+
+        void suspend_processing_unit_internal(std::size_t virt_core,
+            error_code& = hpx::throws);
+        void resume_processing_unit_internal(std::size_t virt_core,
+            error_code& = hpx::throws);
 
     private:
         std::vector<compat::thread> threads_;           // vector of OS-threads

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/execution.hpp>
+#include <hpx/parallel/executors.hpp>
 
 #endif
 

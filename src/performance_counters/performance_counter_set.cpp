@@ -6,6 +6,7 @@
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
@@ -142,7 +143,7 @@ namespace hpx { namespace performance_counters
             util::expand(n);
 
             // find matching counter types
-            discover_counter_type(n, std::move(func), discover_counters_full, ec);
+            discover_counter_type(n, func, discover_counters_full, ec);
             if (ec) return;
         }
 

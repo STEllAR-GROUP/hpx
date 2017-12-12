@@ -8,6 +8,7 @@
 #define HPX_INIT_INI_DATA_SEP_26_2008_0344PM
 
 #include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/plugin/virtual_constructor.hpp>
@@ -36,7 +37,8 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // load registry information for all statically registered modules
-    void load_component_factory_static(util::section& ini, std::string name,
+    std::vector<std::shared_ptr<components::component_registry_base>>
+    load_component_factory_static(util::section& ini, std::string name,
         hpx::util::plugin::get_plugins_list_type get_factory,
         error_code& ec = throws);
 

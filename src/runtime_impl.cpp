@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/performance_counters/counters.hpp>
+
 #include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
@@ -274,14 +276,26 @@ namespace hpx {
             get_config_entry("hpx.on_startup.wait_on_latch", ""));
         if (!connect_back_to.empty())
         {
+            lbt_ << "(5th stage) runtime_impl::run_helper: about to "
+                    "synchronize with latch: "
+                 << connect_back_to;
+
             // inform launching process that this locality is up and running
             hpx::lcos::latch l;
             l.connect_to(connect_back_to);
             l.count_down_and_wait();
+
+            lbt_ << "(5th stage) runtime_impl::run_helper: "
+                    "synchronized with latch: "
+                 << connect_back_to;
         }
 
         // Now, execute the user supplied thread function (hpx_main)
-        if (!!func) {
+        if (!!func)
+        {
+            lbt_ << "(last stage) runtime_impl::run_helper: about to "
+                    "invoke hpx_main";
+
             // Change our thread description, as we're about to call hpx_main
             threads::set_thread_description(threads::get_self_id(), "hpx_main");
 
@@ -767,12 +781,6 @@ namespace hpx {
         add_shutdown_function(shutdown_function_type f)
     {
         runtime_support_->add_shutdown_function(std::move(f));
-    }
-
-    bool runtime_impl::
-        keep_factory_alive(components::component_type type)
-    {
-        return runtime_support_->keep_factory_alive(type);
     }
 
     hpx::util::io_service_pool* runtime_impl::
