@@ -43,6 +43,7 @@ set(tests
 set(commandline_options_1437_PARAMETERS THREADS_PER_LOCALITY 2)
 set(id_type_ref_counting_1032_PARAMETERS THREADS_PER_LOCALITY 1)
 set(unhandled_exception_582_PARAMETERS THREADS_PER_LOCALITY 1)
+set(dynamic_counters_loaded_1508_FLAGS DEPENDENCIES memory_component)
 
 foreach(test ${tests})
   set(sources
