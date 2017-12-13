@@ -26,7 +26,7 @@ int main()
     //[check_test_1
     char character = 'd';
     int integer = 10;
-    float flt = 10.01;
+    float flt = 10.01f;
     bool boolean = true;
     std::string str = "I am a string of characters";
     std::vector<char> vec(str.begin(), str.end());
@@ -127,7 +127,7 @@ int main()
     //  test checkpoint(std::move(vector<char>)) constructor
     //[check_test_4
     std::ofstream test_file_7("checkpoint_test_file.txt");
-    std::vector<float> vec7{1.02, 1.03, 1.04, 1.05};
+    std::vector<float> vec7{1.02f, 1.03f, 1.04f, 1.05f};
     hpx::future<checkpoint> fut_7 = save_checkpoint(vec7);
     checkpoint archive7 = fut_7.get();
     std::copy(archive7.begin()    // Write data to ofstream
@@ -196,7 +196,7 @@ int main()
     // Test 10
     //  test checkpoint(vector<char>&) constructor
     std::ofstream test_file_10("test_file_10.txt");
-    std::vector<float> vec10{1.02, 1.03, 1.04, 1.05};
+    std::vector<float> vec10{1.02f, 1.03f, 1.04f, 1.05f};
     hpx::future<checkpoint> fut_10 = save_checkpoint(vec10);
     checkpoint archive10 = fut_10.get();
     std::copy(archive10.begin()    // Write data to ofstream
