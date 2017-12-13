@@ -23,6 +23,7 @@
 #include <hpx/util/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
+#include <hpx/util/regex_from_pattern.hpp>
 #include <hpx/util/scoped_timer.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -37,13 +38,6 @@
 #include <vector>
 
 #include <boost/regex.hpp>
-
-// Reuse functionaliy from perf-counters
-namespace hpx { namespace performance_counters { namespace detail
-{
-    HPX_EXPORT std::string regex_from_pattern(std::string const& pattern,
-        error_code& ec);
-}}}
 
 namespace hpx { namespace agas
 {
@@ -388,8 +382,7 @@ symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
 
     if (pattern.find_first_of("*?[]") != std::string::npos)
     {
-        std::string str_rx(
-            performance_counters::detail::regex_from_pattern(pattern, throws));
+        std::string str_rx(util::regex_from_pattern(pattern, throws));
         boost::regex rx(str_rx, boost::regex::perl);
 
         std::unique_lock<mutex_type> l(mutex_);
@@ -398,8 +391,13 @@ symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
         {
             if (!boost::regex_match(it->first, rx))
                 continue;
+
+            // hold on to entry while map is unlocked
+            std::shared_ptr<naming::gid_type> current_gid(it->second);
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+
             found[it->first] =
-                naming::detail::split_gid_if_needed(*(it->second)).get();
+                naming::detail::split_gid_if_needed(*current_gid).get();
         }
     }
     else
@@ -410,8 +408,13 @@ symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
         {
             if (!pattern.empty() && pattern != it->first)
                 continue;
+
+            // hold on to entry while map is unlocked
+            std::shared_ptr<naming::gid_type> current_gid(it->second);
+            util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+
             found[it->first] =
-                naming::detail::split_gid_if_needed(*(it->second)).get();
+                naming::detail::split_gid_if_needed(*current_gid).get();
         }
     }
 

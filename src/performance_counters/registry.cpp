@@ -5,20 +5,21 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/performance_counters/server/raw_counter.hpp>
-#include <hpx/performance_counters/server/raw_values_counter.hpp>
-#include <hpx/performance_counters/server/elapsed_time_counter.hpp>
-#include <hpx/performance_counters/server/statistics_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter_extended.hpp>
+#include <hpx/performance_counters/server/elapsed_time_counter.hpp>
+#include <hpx/performance_counters/server/raw_counter.hpp>
+#include <hpx/performance_counters/server/raw_values_counter.hpp>
+#include <hpx/performance_counters/server/statistics_counter.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/regex_from_pattern.hpp>
 #include <hpx/util/rolling_max.hpp>
 #include <hpx/util/rolling_min.hpp>
 
@@ -110,88 +111,6 @@ namespace hpx { namespace performance_counters
         return status_valid_data;
     }
 
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        inline std::string
-        regex_from_character_set(std::string::const_iterator& it,
-            std::string::const_iterator end, error_code& ec)
-        {
-            std::string::const_iterator start = it;
-            std::string result(1, *it);  // copy '['
-            if (*++it == '!') {
-                result.append(1, '^');   // negated character set
-            }
-            else if (*it == ']') {
-                HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
-                    "Invalid pattern (empty character set) at: " +
-                        std::string(start, end));
-                return "";
-            }
-            else {
-                result.append(1, *it);   // append this character
-            }
-
-            // copy while in character set
-            while (++it != end) {
-                result.append(1, *it);
-                if (*it == ']')
-                    break;
-            }
-
-            if (it == end || *it != ']') {
-                HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
-                    "Invalid pattern (missing closing ']') at: " +
-                        std::string(start, end));
-                return "";
-            }
-
-            return result;
-        }
-
-        std::string regex_from_pattern(std::string const& pattern, error_code& ec)
-        {
-            std::string result;
-            std::string::const_iterator end = pattern.end();
-            for (std::string::const_iterator it = pattern.begin(); it != end; ++it)
-            {
-                char c = *it;
-                switch (c) {
-                case '*':
-                    result.append(".*");
-                    break;
-
-                case '?':
-                    result.append(1, '.');
-                    break;
-
-                case '[':
-                    {
-                        std::string r = regex_from_character_set(it, end, ec);
-                        if (ec) return "";
-                        result.append(r);
-                    }
-                    break;
-
-                case '\\':
-                    if (++it == end) {
-                        HPX_THROWS_IF(ec, bad_parameter,
-                            "regex_from_pattern",
-                            "Invalid escape sequence at: " + pattern);
-                        return "";
-                    }
-                    result.append(1, *it);
-                    break;
-
-                default:
-                    result.append(1, c);
-                    break;
-                }
-            }
-            return result;
-        }
-    }
-
     /// \brief Call the supplied function for the given registered counter type.
     counter_status registry::discover_counter_type(
         std::string const& fullname,
@@ -242,7 +161,7 @@ namespace hpx { namespace performance_counters
         }
         else
         {
-            std::string str_rx(detail::regex_from_pattern(type_name, ec));
+            std::string str_rx(util::regex_from_pattern(type_name, ec));
             if (ec) return status_invalid_data;
 
             if (mode == discover_counters_full)
