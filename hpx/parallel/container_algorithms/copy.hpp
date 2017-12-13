@@ -24,10 +24,11 @@
 
 namespace hpx { namespace parallel { inline namespace v1
 {
-    /// Copies the elements in the range, defined by [first, last), to another
+    /// Copies the elements in the range \a rng to another
     /// range beginning at \a dest.
     ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    /// \note   Complexity: Performs exactly
+    ///         std::distance(begin(rng), end(rng)) assignments.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -57,14 +58,15 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a copy algorithm returns a \a hpx::future<OutIter> if the
-    ///           execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a copy algorithm returns the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
+    /// \returns  The \a copy algorithm returns a
+    ///           \a hpx::future<tagged_pair<tag::in(iterator_t<Rng>),
+    ///           tag::out(FwdIter2)> > if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy and
+    ///           returns \a tagged_pair<tag::in(iterator_t<Rng>),
+    ///           tag::out(FwdIter2)> otherwise.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter,
     HPX_CONCEPT_REQUIRES_(
@@ -84,14 +86,15 @@ namespace hpx { namespace parallel { inline namespace v1
             hpx::util::begin(rng), hpx::util::end(rng), dest);
     }
 
-    /// Copies the elements in the range, defined by [first, last), to another
+    /// Copies the elements in the range \a rng to another
     /// range beginning at \a dest. Copies only the elements for which the
     /// predicate \a f returns true. The order of the elements that are not
     /// removed is preserved.
     ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    /// \note   Complexity: Performs not more than
+    ///         std::distance(begin(rng), end(rng)) assignments,
+    ///         exactly std::distance(begin(rng), end(rng)) applications
+    ///         of the predicate \a f.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -145,14 +148,15 @@ namespace hpx { namespace parallel { inline namespace v1
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a copy_if algorithm returns a \a hpx::future<OutIter> if the
-    ///           execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a copy_if algorithm returns the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
+    /// \returns  The \a copy_if algorithm returns a
+    ///           \a hpx::future<tagged_pair<tag::in(iterator_t<Rng>),
+    ///           tag::out(FwdIter2)> > if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy and
+    ///           returns \a tagged_pair<tag::in(iterator_t<Rng>),
+    ///           tag::out(FwdIter2)> otherwise.
+    ///           The \a copy_if algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,

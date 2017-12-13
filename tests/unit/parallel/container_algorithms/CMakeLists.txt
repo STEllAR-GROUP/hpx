@@ -18,6 +18,7 @@ set(tests
     merge_range
     min_element_range
     minmax_element_range
+    move_range
     none_of_range
     partition_range
     partition_copy_range
