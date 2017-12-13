@@ -25,14 +25,16 @@ class widget
         widget(std::function<void(widget *, std::size_t)> callback,
             QWidget *parent = nullptr);
 
-        void add_label(std::size_t i, double t);
+        void threadsafe_add_label(std::size_t i, double t);
 
-        void run_finished();
+        void threadsafe_run_finished();
 
     public slots:
         void set_threads(int no);
 
         void run_clicked(bool);
+
+        void add_label(const QString& text);
 
     private:
         std::size_t no_threads;
