@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Adrian Serio
+// Copyright (c) 2018 Adrian Serio
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime/get_ptr.hpp>
 
 #include <cstddef>
 #include <fstream>
@@ -48,6 +50,9 @@ namespace util {
     /// and is consumed by a restore_checkpoint. A checkpoint may be moved into
     /// the save_checkpoint object to write the byte stream to the pre-created
     /// checkpoint object.
+    ///
+    /// Checkpoints are able to store all containers which are able to be
+    /// serialized including components.
     class checkpoint
     {
         std::vector<char> data;
@@ -83,7 +88,7 @@ namespace util {
           : data(vec)
         {
         }
-        checkpoint(std::vector<char> && vec)
+        checkpoint(std::vector<char>&& vec)
           : data(std::move(vec))
         {
         }
@@ -196,8 +201,28 @@ namespace util {
         return ist;
     }
 
-    // Function object for save_checkpoint
+    // Function objects for save_checkpoint
     namespace detail {
+        // Properly handle non clients
+        template <typename T,
+            typename U = typename std::enable_if<
+                !hpx::traits::is_client<T>::value>::type>
+        void arch_data(hpx::serialization::output_archive& ar, T&& t)
+        {
+            ar << t;
+        }
+        // Properly handle Clients to compoents
+        template <typename Client, typename Server,
+            typename U =
+                typename std::enable_if<traits::is_client<Client>::value>::type>
+        void arch_data(hpx::serialization::output_archive& ar,
+            hpx::components::client_base<Client, Server>&& c)
+        {
+            // Use shared pointer to serialize server
+            hpx::future<std::shared_ptr<Server>> f_ptr =
+                hpx::get_ptr<Server>(c.get_id());
+            ar << f_ptr.get();
+        }
         struct save_funct_obj
         {
             template <typename... Ts>
@@ -207,7 +232,7 @@ namespace util {
                 hpx::serialization::output_archive ar(c.data);
                 // Serialize data
                 int const sequencer[] = {// Trick to expand the variable pack
-                    0, (ar << ts,0)...  // Takes advantage of the comma operator
+                    0, (arch_data(ar, std::move(ts)),0)...  // Takes advantage of the comma operator
                 };
                 (void) sequencer;    // Suppress unused param. warnings
                 return std::move(c);
@@ -237,10 +262,13 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
-    /// Additionally the function can take a policy as a first object which
-    /// changes its behavior depending on the policy passed to it. Most
-    /// notably, if a sync policy is used save_checkpoint will simply return a
-    /// checkpoint object.
+    /// This funciton can also store a component either by passing a
+    /// shared_ptr to the component or by passing a component's client
+    /// instance to save_checkpoint.
+    /// Additionally the function can take a policy as
+    /// a first object which changes its behavior depending on the
+    /// policy passed to it. Most notably, if a sync policy is used
+    /// save_checkpoint will simply return a checkpoint object.
     ///
     /// \returns Save_checkpoint returns a future to a checkpoint with one
     ///          exception: if you pass hpx::launch::sync as the first
@@ -254,9 +282,8 @@ namespace util {
                     checkpoint>::value>::type>
     hpx::future<checkpoint> save_checkpoint(T&& t, Ts&&... ts)
     {
-        return hpx::dataflow(detail::save_funct_obj(),
-            std::move(checkpoint()), std::forward<T>(t),
-            std::forward<Ts>(ts)...);
+        return hpx::dataflow(detail::save_funct_obj(), std::move(checkpoint()),
+            std::forward<T>(t), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////
@@ -280,6 +307,9 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
+    /// This funciton can also store a component either by passing a
+    /// shared_ptr to the component or by passing a component's client
+    /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
     /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a
@@ -319,6 +349,9 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
+    /// This funciton can also store a component either by passing a
+    /// shared_ptr to the component or by passing a component's client
+    /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
     /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a
@@ -362,6 +395,9 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
+    /// This funciton can also store a component either by passing a
+    /// shared_ptr to the component or by passing a component's client
+    /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
     /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a
@@ -404,6 +440,9 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
+    /// This funciton can also store a component either by passing a
+    /// shared_ptr to the component or by passing a component's client
+    /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
     /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a
@@ -448,6 +487,9 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
+    /// This funciton can also store a component either by passing a
+    /// shared_ptr to the component or by passing a component's client
+    /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
     /// changes its behavior depending on the policy passed to it. Most
     /// notably, if a sync policy is used save_checkpoint will simply return a
@@ -462,16 +504,43 @@ namespace util {
     {
         hpx::future<checkpoint> f_chk =
             hpx::dataflow(sync_p, detail::save_funct_obj(), std::move(c),
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+                std::forward<T>(t), std::forward<Ts>(ts)...);
         return f_chk.get();
     }
 
+    namespace detail {
+        // Properly handle non client/server restoration
+        template <typename T,
+            typename U = typename std::enable_if<
+                !hpx::traits::is_client<T>::value>::type>
+        void restore_impl(hpx::serialization::input_archive& ar, T& t)
+        {
+            ar >> t;
+        }
+
+        // Properly handle client/server restoration
+        template <typename Client, typename Server>
+        void restore_impl(hpx::serialization::input_archive& ar,
+            hpx::components::client_base<Client, Server>& c)
+        {
+            std::shared_ptr<typename hpx::components::client_base<Client,
+                Server>::server_component_type>
+                server_ptr;
+            // Revive server
+            ar >> server_ptr;
+            c = hpx::new_<Client>(hpx::find_here(), std::move(*server_ptr));
+        }
+    }
+
     ///////////////////////////////////
-    /// Resurrect
+    /// Restore_checkpoint
     ///
-    /// Restore_checkpoint takes a checkpoint object as a first argument and the
-    /// containers which will be filled from the byte stream (in the same order
-    /// as they were placed in save_checkpoint).
+    /// Restore_checkpoint takes a checkpoint object as a first argument and
+    /// the containers which will be filled from the byte stream (in the same
+    /// order as they were placed in save_checkpoint). Restore_checkpoint can
+    /// resurrect a stored component in two ways: by passing in a instance of
+    /// a component's shared_ptr or by passing in an
+    /// instance of the component's client.
     ///
     /// \tparam T           A container to restore.
     ///
@@ -491,13 +560,13 @@ namespace util {
     template <typename T, typename... Ts>
     void restore_checkpoint(checkpoint const& c, T& t, Ts&... ts)
     {
-        // Create seriaalization archive
+        // Create serialization archive
         hpx::serialization::input_archive ar(c.data, c.size());
 
         // De-serialize data
-        ar >> t;
+        detail::restore_impl(ar, t);
         int const sequencer[] = { // Trick to exand the variable pack
-            0, (ar >> ts, 0)...};    // Takes advantage of the comma operator
+            0, (detail::restore_impl(ar, ts), 0)...};    // Takes advantage of the comma operator
         (void) sequencer;         // Suppress unused param. warnings
     }
 

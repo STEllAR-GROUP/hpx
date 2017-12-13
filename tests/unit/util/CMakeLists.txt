@@ -8,6 +8,7 @@ set(tests
     any_serialization
     bind_action
     checkpoint
+    checkpoint_component
     config_entry
     pack_traversal
     pack_traversal_async
