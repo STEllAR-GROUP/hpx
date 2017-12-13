@@ -259,26 +259,39 @@ namespace hpx { namespace parallel { inline namespace v1
             typedef hpx::util::tuple<RandIter1, RandIter2, RandIter3>
                 result_type;
 
+            typedef typename std::remove_reference<ExPolicy>::type ExPolicy_;
+            typedef typename std::remove_reference<Comp>::type Comp_;
+            typedef typename std::remove_reference<Proj1>::type Proj1_;
+            typedef typename std::remove_reference<Proj2>::type Proj2_;
+
             hpx::future<result_type> f = execution::async_execute(
                 policy.executor(),
-                [=]() mutable -> result_type
-                {
-                    try {
-                        parallel_merge_helper(
-                            policy, first1, last1, first2, last2, dest,
-                            comp, proj1, proj2, false, lower_bound_helper());
+                std::bind(
+                    [first1, last1, first2, last2, dest](
+                        ExPolicy_& policy, Comp_& comp,
+                        Proj1_& proj1, Proj2_& proj2) -> result_type
+                    {
+                        try {
+                            parallel_merge_helper(
+                                std::move(policy), first1, last1, first2, last2, dest,
+                                std::move(comp), std::move(proj1), std::move(proj2),
+                                false, lower_bound_helper());
 
-                        return hpx::util::make_tuple(last1, last2,
-                            dest + (last1 - first1) + (last2 - first2));
-                    }
-                    catch (...) {
-                        util::detail::handle_local_exceptions<ExPolicy>::call(
-                            std::current_exception());
-                    }
+                            return hpx::util::make_tuple(last1, last2,
+                                dest + (last1 - first1) + (last2 - first2));
+                        }
+                        catch (...) {
+                            util::detail::handle_local_exceptions<ExPolicy>::call(
+                                std::current_exception());
+                        }
 
-                    // Not reachable.
-                    HPX_ASSERT(false);
-                });
+                        // Not reachable.
+                        HPX_ASSERT(false);
+                    },
+                    std::forward<ExPolicy>(policy),
+                    std::forward<Comp>(comp),
+                    std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2)));
 
             return f;
         }
