@@ -12,6 +12,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/regex_from_pattern.hpp>
 
 #include <cstdint>
 #include <string>
@@ -94,9 +95,7 @@ namespace hpx { namespace parcelset { namespace detail
 
         if (p.parameters_.find_first_of("*?[]") != std::string::npos)
         {
-            std::string str_rx(
-                performance_counters::detail::regex_from_pattern(
-                    p.parameters_, ec));
+            std::string str_rx(util::regex_from_pattern(p.parameters_, ec));
             if (ec) return false;
 
             bool found_one = false;

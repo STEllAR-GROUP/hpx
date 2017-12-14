@@ -517,5 +517,18 @@ void unmark_as_migrated(naming::gid_type const& gid)
     return resolver.unmark_as_migrated(gid);
 }
 
+hpx::future<symbol_namespace::iterate_names_return_type> find_symbols(
+    std::string const& pattern)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.iterate_ids(pattern);
+}
+
+symbol_namespace::iterate_names_return_type find_symbols(
+    hpx::launch::sync_policy, std::string const& pattern)
+{
+    return find_symbols(pattern).get();
+}
+
 }}
 

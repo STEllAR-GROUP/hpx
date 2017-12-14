@@ -14,7 +14,7 @@
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
@@ -51,6 +51,7 @@
 #include <exception>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <new>
 #include <sstream>
@@ -80,37 +81,14 @@ namespace hpx { namespace detail
 {
     // forward declarations only
     void console_print(std::string const&);
-    void list_symbolic_name(std::string const&, naming::gid_type const&);
+    void list_symbolic_name(std::string const&, hpx::id_type const&);
     void list_component_type(std::string const&, components::component_type);
 }}
 
 HPX_PLAIN_ACTION_ID(hpx::detail::console_print,
     console_print_action, hpx::actions::console_print_action_id)
-HPX_PLAIN_ACTION_ID(hpx::detail::list_symbolic_name,
-    list_symbolic_name_action, hpx::actions::list_symbolic_name_action_id)
 HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
     list_component_type_action, hpx::actions::list_component_type_action_id)
-
-typedef
-    hpx::util::detail::bound_action<
-        list_symbolic_name_action
-      , hpx::util::tuple<
-            hpx::naming::id_type
-          , hpx::util::detail::placeholder<1>
-          , hpx::util::detail::placeholder<2>
-        >
-    >
-    bound_list_symbolic_name_action;
-
-HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
-    void(std::string const&, const hpx::naming::gid_type&)
-  , bound_list_symbolic_name_action
-  , list_symbolic_name_function)
-
-HPX_UTIL_REGISTER_FUNCTION(
-    void(std::string const&, const hpx::naming::gid_type&)
-  , bound_list_symbolic_name_action
-  , list_symbolic_name_function)
 
 typedef
     hpx::util::detail::bound_action<
@@ -245,12 +223,13 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void list_symbolic_name(std::string const& name, naming::gid_type const& gid)
+    void list_symbolic_name(std::string const& name, hpx::id_type const& id)
     {
         std::ostringstream strm;
 
-        strm << name << ", " << gid << ", "
-             << (naming::detail::has_credits(gid) ? "managed" : "unmanaged");
+        strm << name << ", " << id << ", "
+             << (id.get_management_type() == id_type::managed ? "managed" :
+                                                                "unmanaged");
 
         print(strm.str());
     }
@@ -260,12 +239,13 @@ namespace hpx { namespace detail
         print(std::string("List of all registered symbolic names:"));
         print(std::string("--------------------------------------"));
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        std::map<std::string, hpx::id_type> entries =
+            agas::find_symbols(hpx::launch::sync);
 
-        naming::id_type console(agas::get_console_locality());
-        naming::get_agas_client().iterate_ids(
-            hpx::util::bind<list_symbolic_name_action>(console, _1, _2));
+        for (auto const& e : entries)
+        {
+            list_symbolic_name(e.first, e.second);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
