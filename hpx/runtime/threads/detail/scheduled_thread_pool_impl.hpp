@@ -1394,20 +1394,21 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<compat::barrier> startup, error_code& ec)
     {
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
         if (threads_.size() <= virt_core)
             threads_.resize(virt_core + 1);
 
         if (threads_[virt_core].joinable())
         {
+            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
                 "the given virtual core has already been added to this "
                 "thread pool");
             return;
         }
-
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         resource::get_partitioner().assign_pu(id_.name(), virt_core);
 
@@ -1463,19 +1464,18 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
+            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::remove_processing_unit",
                 "the given virtual core has already been stopped to run on "
                 "this thread pool");
             return;
         }
-
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
-
-        compat::thread t;
 
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
@@ -1488,6 +1488,7 @@ namespace hpx { namespace threads { namespace detail
             oldstate == state_stopped);
 
         resource::get_partitioner().unassign_pu(id_.name(), virt_core);
+        compat::thread t;
         std::swap(threads_[virt_core], t);
 
         if (threads::get_self_ptr())
@@ -1507,17 +1508,18 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::suspend_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
+            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
                 "the given virtual core has already been stopped to run on "
                 "this thread pool");
             return;
         }
-
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         // inform the scheduler to suspend the virtual core
         std::atomic<hpx::state>& state =
@@ -1567,17 +1569,18 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
+            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
                 "the given virtual core has already been stopped to run on "
                 "this thread pool");
             return;
         }
-
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
