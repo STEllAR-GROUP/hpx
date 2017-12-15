@@ -10,7 +10,19 @@
 #include <hpx/traits/plugin_config_data.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
+#  if defined(__clang__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wcast-qual"
+#  elif defined (__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wcast-qual"
+#  endif
 #include <mpi.h>
+#  if defined(__clang__)
+#    pragma clang diagnostic pop
+#  elif defined (__GNUC__)
+#    pragma GCC diagnostic pop
+#  endif
 #endif
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
