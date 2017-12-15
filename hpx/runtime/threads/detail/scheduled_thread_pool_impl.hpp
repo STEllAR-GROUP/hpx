@@ -1491,7 +1491,9 @@ namespace hpx { namespace threads { namespace detail
 
         if (threads::get_self_ptr())
         {
-            while (virt_core == hpx::get_worker_thread_num())
+            std::size_t thread_num = thread_offset_ + virt_core;
+
+            while (thread_num == hpx::get_worker_thread_num())
             {
                 hpx::this_thread::suspend();
             }
@@ -1526,7 +1528,9 @@ namespace hpx { namespace threads { namespace detail
 
         if (threads::get_self_ptr())
         {
-            while (virt_core == hpx::get_worker_thread_num())
+            std::size_t thread_num = thread_offset_ + virt_core;
+
+            while (thread_num == hpx::get_worker_thread_num())
             {
                 hpx::this_thread::suspend();
             }
