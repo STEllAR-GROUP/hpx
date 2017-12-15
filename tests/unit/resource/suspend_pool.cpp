@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <atomic>
@@ -23,6 +24,15 @@
 
 int hpx_main(int argc, char* argv[])
 {
+    try
+    {
+        hpx::this_thread::get_pool()->suspend();
+        HPX_TEST_MSG(false, "Suspending is not possible on own pool");
+    }
+    catch (std::runtime_error const&)
+    {
+    }
+
     hpx::threads::detail::thread_pool_base& worker_pool =
         hpx::resource::get_thread_pool("worker");
     hpx::threads::executors::pool_executor worker_exec("worker");
