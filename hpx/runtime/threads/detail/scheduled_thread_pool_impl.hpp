@@ -1525,6 +1525,13 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
+        // check if already suspended
+        hpx::state current_state = state.load();
+        if (current_state == state_pre_sleep || current_state == state_sleeping)
+        {
+            return;
+        }
+
         hpx::state oldstate = state.exchange(state_pre_sleep);
 
         HPX_ASSERT(oldstate == state_running);
