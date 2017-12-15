@@ -643,9 +643,6 @@ namespace hpx { namespace threads { namespace detail
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
-                    //
-                    // REVIEW: Passing a specific target thread may set off
-                    // the round robin queuing.
                     scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
                 }
 
@@ -717,11 +714,6 @@ namespace hpx { namespace threads { namespace detail
                     }
                 }
 
-                // let our background threads terminate
-                if (background_running)
-                {
-                    *background_running = running;
-                }
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running))
