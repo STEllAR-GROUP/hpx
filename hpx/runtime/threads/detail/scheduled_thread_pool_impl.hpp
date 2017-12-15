@@ -334,7 +334,7 @@ namespace hpx { namespace threads { namespace detail
                 hpx::this_thread::suspend();
             }
         }
-
+        else
         {
             while (sched_->Scheduler::get_thread_count() >
                 get_background_thread_count())
