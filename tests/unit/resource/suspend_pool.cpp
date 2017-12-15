@@ -36,32 +36,68 @@ int hpx_main(int argc, char* argv[])
     hpx::threads::detail::thread_pool_base& worker_pool =
         hpx::resource::get_thread_pool("worker");
     hpx::threads::executors::pool_executor worker_exec("worker");
+    std::size_t const worker_pool_threads =
+        hpx::resource::get_num_threads("worker");
 
-    hpx::util::high_resolution_timer t;
-
-    while (t.elapsed() < 5)
     {
-        std::vector<hpx::future<void>> fs;
+        // Suspend and resume pool
+        hpx::util::high_resolution_timer t;
 
-        for (std::size_t i = 0;
-            i < hpx::resource::get_num_threads("default") * 100000; ++i)
+        while (t.elapsed() < 5)
         {
-            fs.push_back(hpx::async(worker_exec, [](){}));
+            std::vector<hpx::future<void>> fs;
+
+            for (std::size_t i = 0;
+                 i < worker_pool_threads * 10000; ++i)
+            {
+                fs.push_back(hpx::async(worker_exec, [](){}));
+            }
+
+            worker_pool.suspend();
+
+            // Can only suspend once all work is done
+            auto f = hpx::when_all(std::move(fs));
+            HPX_TEST(f.is_ready());
+
+            worker_pool.resume();
         }
+    }
 
-        worker_pool.suspend();
+    {
+        // Suspend pool with some threads already suspended
+        hpx::util::high_resolution_timer t;
 
-        // Can only suspend once all work is done
-        auto f = hpx::when_all(std::move(fs));
-        HPX_TEST(f.is_ready());
+        while (t.elapsed() < 5)
+        {
+            for (std::size_t thread_num = 0;
+                thread_num < worker_pool_threads - 1; ++thread_num)
+            {
+                worker_pool.suspend_processing_unit(thread_num);
+            }
 
-        worker_pool.resume();
+            std::vector<hpx::future<void>> fs;
+
+            for (std::size_t i = 0;
+                 i < hpx::resource::get_num_threads("default") * 10000; ++i)
+            {
+                fs.push_back(hpx::async(worker_exec, [](){}));
+            }
+
+            worker_pool.suspend();
+
+            // Can only suspend once all work is done
+            auto f = hpx::when_all(std::move(fs));
+            HPX_TEST(f.is_ready());
+
+            worker_pool.resume();
+        }
     }
 
     return hpx::finalize();
 }
 
-int main(int argc, char* argv[])
+template <typename Scheduler>
+void test_scheduler(int argc, char* argv[])
 {
     std::vector<std::string> cfg =
     {
@@ -70,8 +106,28 @@ int main(int argc, char* argv[])
 
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
-    rp.create_thread_pool("default", hpx::resource::scheduling_policy::local_priority_lifo);
-    rp.create_thread_pool("worker", hpx::resource::scheduling_policy::local_priority_lifo);
+    rp.create_thread_pool("worker",
+        [](hpx::threads::policies::callback_notifier& notifier,
+            std::size_t num_threads, std::size_t thread_offset,
+            std::size_t pool_index, std::string const& pool_name)
+        -> std::unique_ptr<hpx::threads::detail::thread_pool_base>
+        {
+            typename Scheduler::init_parameter_type init(num_threads);
+            std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
+
+            auto mode = hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::do_background_work |
+                hpx::threads::policies::reduce_thread_priority |
+                hpx::threads::policies::delay_exit |
+                hpx::threads::policies::enable_elasticity);
+
+            std::unique_ptr<hpx::threads::detail::thread_pool_base> pool(
+                new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
+                    std::move(scheduler), notifier, pool_index, pool_name, mode,
+                    thread_offset));
+
+            return pool;
+        });
 
     int const worker_pool_threads = 3;
     int worker_pool_threads_added = 0;
@@ -92,6 +148,13 @@ int main(int argc, char* argv[])
     }
 
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
+}
+
+int main(int argc, char* argv[])
+{
+    test_scheduler<hpx::threads::policies::local_queue_scheduler<>>(argc, argv);
+    test_scheduler<hpx::threads::policies::local_priority_queue_scheduler<>>(argc,
+        argv);
 
     return hpx::util::report_errors();
 }
