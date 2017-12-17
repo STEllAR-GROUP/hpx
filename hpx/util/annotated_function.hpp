@@ -14,7 +14,6 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/thread_description.hpp>
 
@@ -138,7 +137,8 @@ namespace hpx { namespace util
 
         public:
             template <typename ... Ts>
-            typename invoke_deferred_result<F, Ts...>::type
+            typename invoke_result<
+                typename util::decay_unwrap<F>::type, Ts...>::type
             operator()(Ts && ... ts)
             {
                 annotate_function func(name_);
@@ -170,10 +170,14 @@ namespace hpx { namespace util
     }
 
     template <typename F>
-    detail::annotated_function<F>
+    detail::annotated_function<typename std::decay<F>::type>
     annotated_function(F && f, char const* name = nullptr)
     {
-        return detail::annotated_function<F>(std::forward<F>(f), name);
+        typedef detail::annotated_function<
+            typename std::decay<F>::type
+        > result_type;
+
+        return result_type(std::forward<F>(f), name);
     }
 
 #else

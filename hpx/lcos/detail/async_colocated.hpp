@@ -37,10 +37,9 @@ namespace hpx { namespace detail
         typedef
             util::tuple<
                 hpx::util::detail::bound<
-                    hpx::util::functional::extract_locality(
-                        hpx::util::detail::placeholder<2ul> const&
-                      , hpx::id_type&&
-                    )
+                    hpx::util::functional::extract_locality
+                  , hpx::util::detail::placeholder<2ul>
+                  , hpx::id_type
                 >
               , Ts...
             >

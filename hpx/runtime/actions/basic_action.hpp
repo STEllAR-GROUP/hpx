@@ -112,7 +112,9 @@ namespace hpx { namespace actions
             naming::id_type target_;
             continuation_type cont_;
             naming::address::address_type lva_;
-            util::detail::deferred<F(Ts&&...)> f_;
+            util::detail::deferred<
+                typename std::decay<F>::type,
+                typename std::decay<Ts>::type...> f_;
         };
 
         ///////////////////////////////////////////////////////////////////////

@@ -71,18 +71,22 @@ namespace hpx { namespace util
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        template <typename F, typename ...Ts>
         class deferred;
 
         template <typename F, typename ...Ts>
-        class deferred<F(Ts...)>
+        class deferred
         {
         public:
             deferred() {} // needed for serialization
 
-            explicit HPX_HOST_DEVICE deferred(F&& f, Ts&&... vs)
-              : _f(std::forward<F>(f))
-              , _args(std::forward<Ts>(vs)...)
+            template <typename F_, typename ...Ts_, typename =
+                typename std::enable_if<
+                    !std::is_same<typename std::decay<F_>::type, deferred>::value
+                >::type>
+            explicit HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
+              : _f(std::forward<F_>(f))
+              , _args(std::forward<Ts_>(vs)...)
             {}
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
@@ -150,15 +154,21 @@ namespace hpx { namespace util
     }
 
     template <typename F, typename ...Ts>
-    inline detail::deferred<F(Ts&&...)>
+    detail::deferred<
+        typename std::decay<F>::type,
+        typename std::decay<Ts>::type...>
     deferred_call(F&& f, Ts&&... vs)
     {
         static_assert(
-            traits::detail::is_deferred_callable<F(Ts&&...)>::value
+            traits::detail::is_deferred_callable<F&&(Ts&&...)>::value
           , "F shall be Callable with decay_t<Ts> arguments");
 
-        return detail::deferred<F(Ts&&...)>(
-            std::forward<F>(f), std::forward<Ts>(vs)...);
+        typedef detail::deferred<
+            typename std::decay<F>::type,
+            typename std::decay<Ts>::type...
+        > result_type;
+
+        return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 
     // nullary functions do not need to be bound again
@@ -167,7 +177,7 @@ namespace hpx { namespace util
     deferred_call(F&& f)
     {
         static_assert(
-            traits::detail::is_deferred_callable<F()>::value
+            traits::detail::is_deferred_callable<F&&()>::value
           , "F shall be Callable with no arguments");
 
         return std::forward<F>(f);
@@ -179,33 +189,33 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
-    struct get_function_address<util::detail::deferred<Sig> >
+    template <typename F, typename ...Ts>
+    struct get_function_address<util::detail::deferred<F, Ts...> >
     {
         static std::size_t
-            call(util::detail::deferred<Sig> const& f) noexcept
+            call(util::detail::deferred<F, Ts...> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
-    struct get_function_annotation<util::detail::deferred<Sig> >
+    template <typename F, typename ...Ts>
+    struct get_function_annotation<util::detail::deferred<F, Ts...> >
     {
         static char const*
-            call(util::detail::deferred<Sig> const& f) noexcept
+            call(util::detail::deferred<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation();
         }
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Sig>
-    struct get_function_annotation_itt<util::detail::deferred<Sig> >
+    template <typename F, typename ...Ts>
+    struct get_function_annotation_itt<util::detail::deferred<F, Ts...> >
     {
         static util::itt::string_handle
-            call(util::detail::deferred<Sig> const& f) noexcept
+            call(util::detail::deferred<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }
@@ -218,11 +228,11 @@ namespace hpx { namespace traits
 namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive, typename T>
+    template <typename Archive, typename F, typename ...Ts>
     HPX_FORCEINLINE
     void serialize(
         Archive& ar
-      , ::hpx::util::detail::deferred<T>& d
+      , ::hpx::util::detail::deferred<F, Ts...>& d
       , unsigned int const version = 0
     )
     {
