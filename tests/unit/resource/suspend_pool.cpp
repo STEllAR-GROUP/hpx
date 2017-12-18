@@ -24,14 +24,19 @@
 
 int hpx_main(int argc, char* argv[])
 {
+    bool exception_thrown = false;
+
     try
     {
         hpx::this_thread::get_pool()->suspend();
-        HPX_TEST_MSG(false, "Suspending is not possible on own pool");
+        HPX_TEST_MSG(false, "Suspending should not be allowed on own pool");
     }
-    catch (std::runtime_error const&)
+    catch (hpx::exception const&)
     {
+        exception_thrown = true;
     }
+
+    HPX_TEST(exception_thrown);
 
     hpx::threads::detail::thread_pool_base& worker_pool =
         hpx::resource::get_thread_pool("worker");
