@@ -6,6 +6,8 @@
 #ifndef HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
 #define HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #if defined(__clang__)
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wcast-qual"
@@ -20,6 +22,8 @@
 #  pragma clang diagnostic pop
 #elif defined (__GNUC__)
 #  pragma GCC diagnostic pop
+#endif
+
 #endif
 
 #endif
