@@ -12,19 +12,7 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 // Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
 // as soon as possible.
-#  if defined(__clang__)
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wcast-qual"
-#  elif defined (__GNUC__)
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wcast-qual"
-#  endif
-#include <mpi.h>
-#  if defined(__clang__)
-#    pragma clang diagnostic pop
-#  elif defined (__GNUC__)
-#    pragma GCC diagnostic pop
-#  endif
+#include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
 #include <hpx/exception.hpp>
