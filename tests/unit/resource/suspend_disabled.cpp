@@ -19,6 +19,8 @@
 int hpx_main(int argc, char* argv[])
 {
     // Try suspending without elasticity enabled, should throw an exception
+    bool exception_thrown = false;
+
     try
     {
         hpx::threads::detail::thread_pool_base& tp =
@@ -26,11 +28,14 @@ int hpx_main(int argc, char* argv[])
 
         tp.suspend_processing_unit(0);
         HPX_TEST_MSG(false, "Suspending should not be allowed with "
-                     "elasticity disabled");
+            "elasticity disabled");
     }
-    catch (std::runtime_error const&)
+    catch (hpx::exception const&)
     {
+        exception_thrown = true;
     }
+
+    HPX_TEST(exception_thrown);
 
     return hpx::finalize();
 }
