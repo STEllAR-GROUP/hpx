@@ -338,7 +338,9 @@ namespace hpx { namespace threads { namespace detail
         {
             while (sched_->Scheduler::get_thread_count() >
                 get_background_thread_count())
-            {}
+            {
+                hpx::compat::this_thread::yield();
+            }
         }
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
@@ -1552,7 +1554,10 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            while (state.load() == state_pre_sleep) {}
+            while (state.load() == state_pre_sleep)
+            {
+                hpx::compat::this_thread::yield();
+            }
         }
     }
 
@@ -1609,6 +1614,7 @@ namespace hpx { namespace threads { namespace detail
             while (state.load() == state_sleeping)
             {
                 sched_->Scheduler::resume(virt_core);
+                hpx::compat::this_thread::yield();
             }
         }
     }
