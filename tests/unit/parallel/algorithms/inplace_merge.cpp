@@ -47,7 +47,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-#if !defined(_LIBCPP_VERSION)
+#if !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 6)
     inplace_merge_test();
     inplace_merge_exception_test();
     inplace_merge_bad_alloc_test();
