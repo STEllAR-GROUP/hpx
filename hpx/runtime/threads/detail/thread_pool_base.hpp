@@ -80,8 +80,8 @@ namespace hpx { namespace threads { namespace detail
         virtual void stop(
             std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 
-        virtual void suspend(error_code& ec = throws) {};
-        virtual void resume(error_code& ec = throws) {};
+        virtual void suspend(error_code& ec = throws) = 0;
+        virtual void resume(error_code& ec = throws) = 0;
 
     public:
         std::size_t get_worker_thread_num() const;

@@ -66,6 +66,10 @@ namespace hpx { namespace threads { namespace detail
         void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
 
         ///////////////////////////////////////////////////////////////////////
+        void suspend(error_code& ec = throws);
+        void resume(error_code& ec = throws);
+
+        ///////////////////////////////////////////////////////////////////////
         compat::thread& get_os_thread_handle(std::size_t global_thread_num);
 
         std::size_t get_os_thread_count() const;

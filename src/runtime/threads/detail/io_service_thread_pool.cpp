@@ -86,6 +86,15 @@ namespace hpx { namespace threads { namespace detail
     {
     }
 
+    void io_service_thread_pool::suspend(error_code& ec)
+    {
+        HPX_ASSERT_MSG(false, "Suspending io_service_thread_pool is not supported");
+    }
+    void io_service_thread_pool::resume(error_code& ec)
+    {
+        HPX_ASSERT_MSG(false, "Resuming io_service_thread_pool is not supported");
+    }
+
     hpx::compat::thread& io_service_thread_pool::get_os_thread_handle(
         std::size_t global_thread_num)
     {
