@@ -656,3 +656,10 @@ macro(hpx_check_for_mm_prefetch)
     SOURCE cmake/tests/mm_prefetch.cpp
     FILE ${ARGN})
 endmacro()
+
+###############################################################################
+macro(hpx_check_for_stable_inplace_merge)
+  add_hpx_config_test(HPX_WITH_STABLE_INPLACE_MERGE
+    SOURCE cmake/tests/stable_inplace_merge.cpp
+    FILE ${ARGN})
+endmacro()

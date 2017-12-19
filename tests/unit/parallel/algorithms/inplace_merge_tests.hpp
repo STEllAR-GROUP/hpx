@@ -415,6 +415,7 @@ void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
 
     // Test projection.
     {
+#if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
         sol = res = org;
@@ -436,6 +437,7 @@ void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
             sol_first, sol_last);
 
         HPX_TEST(equality);
+#endif
     }
 }
 
@@ -444,6 +446,7 @@ template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_inplace_merge_stable(ExPolicy policy, IteratorTag,
     DataType, int rand_base)
 {
+#if defined(HPX_HAVE_STABLE_INPLACE_MERGE)
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
@@ -501,6 +504,7 @@ void test_inplace_merge_stable(ExPolicy policy, IteratorTag,
 
     HPX_TEST(test_is_meaningful);
     HPX_TEST(stable);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
