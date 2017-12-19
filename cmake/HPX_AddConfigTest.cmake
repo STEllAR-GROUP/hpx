@@ -652,7 +652,7 @@ endmacro()
 
 ###############################################################################
 macro(hpx_check_for_mm_prefetch)
-  add_hpx_config_test(HPX_WITH_MM_PREFECTH
+  add_hpx_config_test(HPX_WITH_MM_PREFETCH
     SOURCE cmake/tests/mm_prefetch.cpp
     FILE ${ARGN})
 endmacro()
