@@ -11,7 +11,21 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdouble-promotion"
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wdouble-promotion"
+#endif
 #include <hpx/util/tuple.hpp>
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+
 #include <hpx/util/lightweight_test.hpp>
 
 #include <array>
