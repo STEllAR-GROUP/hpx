@@ -7,6 +7,7 @@
 #define HPX_PARALLEL_REMOVE_DEC_24_2017_0909PM
 
 #include <hpx/parallel/algorithms/remove.hpp>
+#include <hpx/parallel/container_algorithms/remove.hpp>
 
 #endif
 
