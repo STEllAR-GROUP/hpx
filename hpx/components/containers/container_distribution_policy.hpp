@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Bibek Ghimire
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2017 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,10 +12,12 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -28,6 +30,9 @@ namespace hpx
     struct container_distribution_policy
       : components::default_distribution_policy
     {
+    private:
+        typedef components::default_distribution_policy base_type;
+
     public:
         container_distribution_policy()
           : num_partitions_(std::size_t(-1))
@@ -35,7 +40,8 @@ namespace hpx
 
         container_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return container_distribution_policy(num_partitions, localities_);
+            auto localities = this->base_type::ensure_localities();
+            return container_distribution_policy(num_partitions, *localities);
         }
 
         container_distribution_policy operator()(hpx::id_type const& locality) const
@@ -79,14 +85,15 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_num_partitions() const
         {
+            auto localities = this->base_type::ensure_localities();
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
-                localities_.size() : num_partitions_;
+                localities->size() : num_partitions_;
             return (std::max)(num_parts, std::size_t(1));
         }
 
         std::vector<hpx::id_type> const& get_localities() const
         {
-            return localities_;
+            return *this->base_type::ensure_localities();
         }
 
     private:

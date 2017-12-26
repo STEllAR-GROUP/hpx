@@ -20,6 +20,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
@@ -27,6 +28,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -105,7 +107,8 @@ namespace hpx { namespace components
         {
             using components::stub_base;
 
-            for (hpx::id_type const& loc: localities_)
+            auto localities = ensure_localities();
+            for (hpx::id_type const& loc: *localities)
             {
                 if (get_num_items(1, loc) != 0)
                 {
@@ -144,12 +147,13 @@ namespace hpx { namespace components
         {
             using components::stub_base;
 
-            if (localities_.size() > 1)
+            auto localities = ensure_localities();
+            if (localities->size() > 1)
             {
                 // schedule creation of all objects across given localities
                 std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
-                objs.reserve(localities_.size());
-                for (hpx::id_type const& loc: localities_)
+                objs.reserve(localities->size());
+                for (hpx::id_type const& loc: *localities)
                 {
                     objs.push_back(stub_base<Component>::bulk_create_async(
                         loc, get_num_items(count, loc), vs...));
@@ -157,19 +161,18 @@ namespace hpx { namespace components
 
                 // consolidate all results
                 return hpx::dataflow(hpx::launch::sync,
-                    [=](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
-                        mutable -> std::vector<bulk_locality_result>
+                    [localities](
+                        std::vector<hpx::future<std::vector<hpx::id_type> > > && v
+                    ) mutable -> std::vector<bulk_locality_result>
                     {
-                        HPX_ASSERT(localities_.size() == v.size());
+                        HPX_ASSERT(localities->size() == v.size());
 
                         std::vector<bulk_locality_result> result;
                         result.reserve(v.size());
 
                         for (std::size_t i = 0; i != v.size(); ++i)
                         {
-                            result.emplace_back(
-                                    std::move(localities_[i]), v[i].get()
-                                );
+                            result.emplace_back((*localities)[i], v[i].get());
                         }
                         return result;
                     },
@@ -271,63 +274,85 @@ namespace hpx { namespace components
         ///
         std::size_t get_num_localities() const
         {
-            return (std::max)(std::size_t(1), localities_.size());
+            return (std::max)(std::size_t(1), localities_->size());
         }
 
         /// Returns the locality which is anticipated to be used for the next
         /// async operation
         hpx::id_type get_next_target() const
         {
-            return localities_.empty() ? hpx::find_here() : localities_.front();
+            return (!localities_ || localities_->empty()) ?
+                hpx::find_here() : localities_->front();
         }
 
     protected:
         /// \cond NOINTERNAL
-        std::size_t
-        get_num_items(std::size_t items, hpx::id_type const& loc) const
+        std::size_t get_num_items(
+            std::size_t items, hpx::id_type const& loc) const
         {
             // make sure the given id is known to this distribution policy
             HPX_ASSERT(
-                std::find(localities_.begin(), localities_.end(), loc) !=
-                    localities_.end() ||
-                (localities_.empty() && loc == hpx::find_here())
+               !localities_ ||
+                (localities_->empty() && loc == hpx::find_here()) ||
+                std::find(localities_->begin(), localities_->end(), loc) !=
+                    localities_->end()
             );
+
+            if (!localities_ || localities_->empty())
+            {
+                return std::size_t(1);
+            }
 
             // this distribution policy places an equal number of items onto
             // each locality
-            std::size_t locs = (std::max)(std::size_t(1), localities_.size());
+            std::size_t locs = (std::max)(std::size_t(1), localities_->size());
 
             // the overall number of items to create is smaller than the number
             // of localities
             if (items < locs)
             {
-                auto it = std::find(localities_.begin(), localities_.end(), loc);
-                std::size_t num_loc = std::distance(localities_.begin(), it);
+                auto it = std::find(localities_->begin(), localities_->end(), loc);
+                std::size_t num_loc = std::distance(localities_->begin(), it);
                 return (items < num_loc) ? 1 : 0;
             }
 
             // the last locality might get less items
-            if (localities_.size() > 1 && loc == localities_.back())
+            if (localities_->size() > 1 && loc == localities_->back())
+            {
                 return items - detail::round_to_multiple(items, locs, locs-1);
+            }
 
             // otherwise just distribute evenly
             return (items + locs - 1) / locs;
+        }
+
+        std::shared_ptr<std::vector<id_type>> ensure_localities() const
+        {
+            // use this locality, if this object was default constructed
+            auto localities = localities_;
+            if (!localities || localities->empty())
+            {
+                localities = std::make_shared<std::vector<id_type>>();
+                localities->push_back(hpx::find_here());
+            }
+            return localities;
         }
         /// \endcond
 
     protected:
         /// \cond NOINTERNAL
         default_distribution_policy(std::vector<id_type> const& localities)
-          : localities_(localities)
+          : localities_(std::make_shared<std::vector<id_type>>(localities))
         {}
 
         default_distribution_policy(std::vector<id_type> && localities)
-          : localities_(std::move(localities))
+          : localities_(std::make_shared<std::vector<id_type>>(std::move(localities)))
         {}
 
         default_distribution_policy(id_type const& locality)
+          : localities_(std::make_shared<std::vector<id_type>>())
         {
-            localities_.push_back(locality);
+            localities_->push_back(locality);
         }
 
         friend class hpx::serialization::access;
@@ -338,7 +363,8 @@ namespace hpx { namespace components
             ar & localities_;
         }
 
-        std::vector<id_type> localities_;   // localities to create things on
+        // localities to create things on
+        std::shared_ptr<std::vector<id_type>> localities_;
         /// \endcond
     };
 
