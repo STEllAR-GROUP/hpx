@@ -237,9 +237,14 @@ namespace hpx { namespace util
             tcp::endpoint ep;
             if (util::get_endpoint(address, port, ep))
             {
+#if BOOST_VERSION < 106600
                 return endpoint_iterator_type(tcp::resolver::iterator::create(
                     ep, address, port_str));
-            }
+#else
+                return endpoint_iterator_type(tcp::resolver::results_type::create(
+                    ep, address, port_str));
+#endif
+}
         }
         catch (boost::system::system_error const&) {
             errors.add(std::current_exception());
@@ -288,8 +293,13 @@ namespace hpx { namespace util
             tcp::endpoint ep;
             if (util::get_endpoint(address, port, ep))
             {
+#if BOOST_VERSION < 106600
                 return endpoint_iterator_type(
                     tcp::resolver::iterator::create(ep, address, port_str));
+#else
+                return endpoint_iterator_type(
+                    tcp::resolver::results_type::create(ep, address, port_str));
+#endif
             }
         }
         catch (boost::system::system_error const&) {
