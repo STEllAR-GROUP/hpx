@@ -62,6 +62,18 @@ namespace hpx { namespace threads { namespace policies
             return "static_priority_queue_scheduler";
         }
 
+        void suspend(std::size_t)
+        {
+            HPX_ASSERT_MSG(false, "static_priority_queue_scheduler does not"
+                " support suspending");
+        }
+
+        void resume(std::size_t)
+        {
+            HPX_ASSERT_MSG(false, "static_priority_queue_scheduler does not"
+                " support resuming");
+        }
+
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,

@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -72,6 +73,18 @@ namespace hpx { namespace threads { namespace policies
         static std::string get_scheduler_name()
         {
             return "periodic_priority_queue_scheduler";
+        }
+
+        void suspend(std::size_t)
+        {
+            HPX_ASSERT_MSG(false, "periodic_priority_queue_scheduler does not"
+                " support suspending");
+        }
+
+        void resume(std::size_t)
+        {
+            HPX_ASSERT_MSG(false, "periodic_priority_queue_scheduler does not"
+                " support resuming");
         }
 
         bool periodic_maintenance(bool running)
