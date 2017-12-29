@@ -25,7 +25,10 @@ struct test_server
     // be Serializable and CopyConstructable. Components can be
     // MoveConstructable in which case the serialized data is moved into the
     // components constructor.
-    test_server(test_server const&) {}
+    test_server(test_server const& src)
+      : hpx::components::migration_support<
+            hpx::components::simple_component_base<test_server>
+        >(src) {}
     test_server(test_server &&) {}
 
     test_server& operator=(test_server const&) { return *this; }
