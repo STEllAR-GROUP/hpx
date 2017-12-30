@@ -266,6 +266,17 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_generate.hpp>`]
      [[cpprefalgodocs generate_n]]
     ]
+    [[ [algoref remove] ]
+     [Removes the elements from a range that are equal to the given value.]
+     [`<hpx/include/parallel_remove.hpp>`]
+     [[cpprefalgodocs remove]]
+    ]
+    [[ [algoref remove_if] ]
+     [Removes the elements from a range that are equal to the given
+      predicate is `false`.]
+     [`<hpx/include/parallel_remove.hpp>`]
+     [[cpprefalgodocs remove]]
+    ]
     [[ [algoref remove_copy] ]
      [Copies the elements from a range to a new location that are not equal to
       the given value.]

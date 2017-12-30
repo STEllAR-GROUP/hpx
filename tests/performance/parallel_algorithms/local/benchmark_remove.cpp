@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/include/parallel_generate.hpp>
-#include <hpx/include/parallel_unique.hpp>
+#include <hpx/include/parallel_remove.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -32,7 +32,7 @@ struct random_fill
 {
     random_fill(std::size_t random_range)
         : gen(std::rand()),
-        dist(0, random_range - 1)
+          dist(0, random_range - 1)
     {}
 
     int operator()()
@@ -85,9 +85,10 @@ struct array_type
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename OrgIter, typename InIter>
-double run_unique_benchmark_std(int test_count,
-    OrgIter org_first, OrgIter org_last, InIter first, InIter last)
+template <typename OrgIter, typename InIter, typename ValueType>
+double run_remove_benchmark_std(int test_count,
+    OrgIter org_first, OrgIter org_last, InIter first, InIter last,
+    ValueType value)
 {
     std::uint64_t time = std::uint64_t(0);
 
@@ -98,7 +99,7 @@ double run_unique_benchmark_std(int test_count,
             org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
-        std::unique(first, last);
+        std::remove(first, last, value);
         time += hpx::util::high_resolution_clock::now() - elapsed;
     }
 
@@ -106,9 +107,11 @@ double run_unique_benchmark_std(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename OrgIter, typename FwdIter>
-double run_unique_benchmark_hpx(int test_count, ExPolicy policy,
-    OrgIter org_first, OrgIter org_last, FwdIter first, FwdIter last)
+template <typename ExPolicy, typename OrgIter, typename FwdIter,
+    typename ValueType>
+double run_remove_benchmark_hpx(int test_count, ExPolicy policy,
+    OrgIter org_first, OrgIter org_last, FwdIter first, FwdIter last,
+    ValueType value)
 {
     std::uint64_t time = std::uint64_t(0);
 
@@ -119,7 +122,7 @@ double run_unique_benchmark_hpx(int test_count, ExPolicy policy,
             org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
-        hpx::parallel::unique(policy, first, last);
+        hpx::parallel::remove(policy, first, last, value);
         time += hpx::util::high_resolution_clock::now() - elapsed;
     }
 
@@ -148,7 +151,9 @@ void run_benchmark(std::size_t vector_size, int test_count,
         random_fill(random_range));
     org_v = v;
 
-    auto dest_dist = std::distance(first, std::unique(first, last));
+    auto value = DataType(random_range / 2);
+
+    auto dest_dist = std::distance(first, std::remove(first, last, value));
 
     auto org_first = std::begin(org_v);
     auto org_last = std::end(org_v);
@@ -157,28 +162,28 @@ void run_benchmark(std::size_t vector_size, int test_count,
         << dest_dist << std::endl << std::endl;
 
     std::cout << "* Running Benchmark..." << std::endl;
-    std::cout << "--- run_unique_benchmark_std ---" << std::endl;
+    std::cout << "--- run_remove_benchmark_std ---" << std::endl;
     double time_std =
-        run_unique_benchmark_std(test_count,
-            org_first, org_last, first, last);
+        run_remove_benchmark_std(test_count,
+            org_first, org_last, first, last, value);
 
-    std::cout << "--- run_unique_benchmark_seq ---" << std::endl;
+    std::cout << "--- run_remove_benchmark_seq ---" << std::endl;
     double time_seq =
-        run_unique_benchmark_hpx(test_count, execution::seq,
-            org_first, org_last, first, last);
+        run_remove_benchmark_hpx(test_count, execution::seq,
+            org_first, org_last, first, last, value);
 
-    std::cout << "--- run_unique_benchmark_par ---" << std::endl;
+    std::cout << "--- run_remove_benchmark_par ---" << std::endl;
     double time_par =
-        run_unique_benchmark_hpx(test_count, execution::par,
-            org_first, org_last, first, last);
+        run_remove_benchmark_hpx(test_count, execution::par,
+            org_first, org_last, first, last, value);
 
-    std::cout << "--- run_unique_benchmark_par_unseq ---" << std::endl;
+    std::cout << "--- run_remove_benchmark_par_unseq ---" << std::endl;
     double time_par_unseq =
-        run_unique_benchmark_hpx(test_count, execution::par_unseq,
-            org_first, org_last, first, last);
+        run_remove_benchmark_hpx(test_count, execution::par_unseq,
+            org_first, org_last, first, last, value);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "unique (%1%) : %2%(sec)";
+    auto fmt = "remove (%1%) : %2%(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;

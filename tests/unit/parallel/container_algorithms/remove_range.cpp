@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_unique.hpp>
+#include <hpx/include/parallel_remove.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
@@ -27,6 +27,11 @@ struct user_defined_type
       : val(rand_no),
         name(name_list[std::rand() % name_list.size()])
     {}
+
+    bool operator==(int rand_no) const
+    {
+        return this->val == rand_no;
+    }
 
     bool operator==(user_defined_type const& t) const
     {
@@ -61,7 +66,7 @@ struct random_fill
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename DataType>
-void test_unique(ExPolicy policy, DataType)
+void test_remove(ExPolicy policy, DataType)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -74,8 +79,10 @@ void test_unique(ExPolicy policy, DataType)
     std::generate(std::begin(c), std::end(c), random_fill(0, 6));
     d = c;
 
-    auto result = hpx::parallel::unique(policy, c);
-    auto solution = std::unique(std::begin(d), std::end(d));
+    auto value = DataType(0);
+
+    auto result = hpx::parallel::remove(policy, c, value);
+    auto solution = std::remove(std::begin(d), std::end(d), value);
 
     bool equality = std::equal(
         std::begin(c), result,
@@ -85,7 +92,7 @@ void test_unique(ExPolicy policy, DataType)
 }
 
 template <typename ExPolicy, typename DataType>
-void test_unique_async(ExPolicy policy, DataType)
+void test_remove_async(ExPolicy policy, DataType)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -98,9 +105,11 @@ void test_unique_async(ExPolicy policy, DataType)
     std::generate(std::begin(c), std::end(c), random_fill(0, 6));
     d = c;
 
-    auto f = hpx::parallel::unique(policy, c);
+    auto value = DataType(0);
+
+    auto f = hpx::parallel::remove(policy, c, value);
     auto result = f.get();
-    auto solution = std::unique(std::begin(d), std::end(d));
+    auto solution = std::remove(std::begin(d), std::end(d), value);
 
     bool equality = std::equal(
         std::begin(c), result,
@@ -110,33 +119,33 @@ void test_unique_async(ExPolicy policy, DataType)
 }
 
 template <typename DataType>
-void test_unique()
+void test_remove()
 {
     using namespace hpx::parallel;
 
-    test_unique(execution::seq, DataType());
-    test_unique(execution::par, DataType());
-    test_unique(execution::par_unseq, DataType());
+    test_remove(execution::seq, DataType());
+    test_remove(execution::par, DataType());
+    test_remove(execution::par_unseq, DataType());
 
-    test_unique_async(execution::seq(execution::task), DataType());
-    test_unique_async(execution::par(execution::task), DataType());
+    test_remove_async(execution::seq(execution::task), DataType());
+    test_remove_async(execution::par(execution::task), DataType());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_unique(execution_policy(execution::seq), DataType());
-    test_unique(execution_policy(execution::par), DataType());
-    test_unique(execution_policy(execution::par_unseq), DataType());
+    test_remove(execution_policy(execution::seq), DataType());
+    test_remove(execution_policy(execution::par), DataType());
+    test_remove(execution_policy(execution::par_unseq), DataType());
 
-    test_unique(execution_policy(execution::seq(execution::task)),
+    test_remove(execution_policy(execution::seq(execution::task)),
         DataType());
-    test_unique(execution_policy(execution::par(execution::task)),
+    test_remove(execution_policy(execution::par(execution::task)),
         DataType());
 #endif
 }
 
-void test_unique()
+void test_remove()
 {
-    test_unique<int>();
-    test_unique<user_defined_type>();
+    test_remove<int>();
+    test_remove<user_defined_type>();
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
@@ -148,7 +157,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    test_unique();
+    test_remove();
     return hpx::finalize();
 }
 
