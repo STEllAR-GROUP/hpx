@@ -824,97 +824,111 @@ namespace hpx { namespace parallel { inline namespace v1
 
             template <typename ExPolicy, typename FwdIter,
                 typename Pred, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
+            static FwdIter
             call(ExPolicy && policy, FwdIter first, FwdIter last,
                 Pred && pred, Proj && proj)
             {
-                typedef util::detail::algorithm_result<
-                    ExPolicy, FwdIter
-                > algorithm_result;
-
                 typedef typename
                     hpx::util::decay<ExPolicy>::type::executor_parameters_type
                     parameters_type;
 
-                try {
-                    if (first == last)
-                        return algorithm_result::get(std::move(first));
+                if (first == last)
+                    return first;
 
-                    std::size_t const cores = execution::processing_units_count(
-                        policy.executor(), policy.parameters());
+                std::size_t const cores = execution::processing_units_count(
+                    policy.executor(), policy.parameters());
 
-                    // TODO: Find more better block size.
-                    const std::size_t block_size = std::size_t(20000);
-                    block_manager<FwdIter> block_manager(first, last, block_size);
+                // TODO: Find more better block size.
+                const std::size_t block_size = std::size_t(20000);
+                block_manager<FwdIter> block_manager(first, last, block_size);
 
-                    std::vector<hpx::future<block<FwdIter>>>
-                        remaining_block_futures(cores);
+                std::vector<hpx::future<block<FwdIter>>>
+                    remaining_block_futures(cores);
 
-                    // Main parallel phrase: perform sub-partitioning in each thread.
-                    for (std::size_t i = 0; i < remaining_block_futures.size(); ++i)
-                    {
-                        remaining_block_futures[i] = execution::async_execute(
-                            policy.executor(),
-                            [&block_manager, pred, proj]()
-                            {
-                                return partition_thread(block_manager, pred, proj);
-                            });
-                    }
-
-                    // Wait sub-partitioning to be all finished.
-                    hpx::wait_all(remaining_block_futures);
-
-                    // Handle exceptions in parallel phrase.
-                    std::list<std::exception_ptr> errors;
-                    // TODO: Is it okay to use thing in util::detail:: ?
-                    util::detail::handle_local_exceptions<ExPolicy>::call(
-                        remaining_block_futures, errors);
-
-                    std::vector<block<FwdIter>> remaining_blocks(
-                        remaining_block_futures.size());
-
-                    // Get remaining blocks from the result of sub-partitioning.
-                    for (std::size_t i = 0; i < remaining_block_futures.size(); ++i)
-                        remaining_blocks[i] = remaining_block_futures[i].get();
-
-                    // Remove blocks that are empty.
-                    FwdIter boundary = block_manager.boundary();
-                    remaining_blocks.erase(std::remove_if(
-                        std::begin(remaining_blocks), std::end(remaining_blocks),
-                        [](block<FwdIter> const& block) -> bool
+                // Main parallel phrase: perform sub-partitioning in each thread.
+                for (std::size_t i = 0; i < remaining_block_futures.size(); ++i)
+                {
+                    remaining_block_futures[i] = execution::async_execute(
+                        policy.executor(),
+                        [&block_manager, pred, proj]()
                         {
-                            return block.empty();
-                        }),
-                        std::end(remaining_blocks));
-
-                    // Sort remaining blocks to be listed from left to right.
-                    std::sort(std::begin(remaining_blocks),
-                        std::end(remaining_blocks));
-
-                    // Collapse remaining blocks each other.
-                    collapse_remaining_blocks(remaining_blocks, pred, proj);
-
-                    // Merge remaining blocks into one block
-                    //     which is adjacent to boundary.
-                    block<FwdIter> unpartitioned_block = merge_remaining_blocks(
-                        remaining_blocks, boundary, first);
-
-                    // Perform sequential partition to unpartitioned range.
-                    FwdIter real_boundary = sequential_partition(
-                        unpartitioned_block.first, unpartitioned_block.last,
-                        pred, proj);
-
-                    return algorithm_result::get(std::move(real_boundary));
+                            return partition_thread(block_manager, pred, proj);
+                        });
                 }
-                catch (...) {
-                    return algorithm_result::get(
-                        detail::handle_exception<ExPolicy, FwdIter>::call(
-                        std::current_exception()));
-                }
+
+                // Wait sub-partitioning to be all finished.
+                hpx::wait_all(remaining_block_futures);
+
+                // Handle exceptions in parallel phrase.
+                std::list<std::exception_ptr> errors;
+                // TODO: Is it okay to use thing in util::detail:: ?
+                util::detail::handle_local_exceptions<ExPolicy>::call(
+                    remaining_block_futures, errors);
+
+                std::vector<block<FwdIter>> remaining_blocks(
+                    remaining_block_futures.size());
+
+                // Get remaining blocks from the result of sub-partitioning.
+                for (std::size_t i = 0; i < remaining_block_futures.size(); ++i)
+                    remaining_blocks[i] = remaining_block_futures[i].get();
+
+                // Remove blocks that are empty.
+                FwdIter boundary = block_manager.boundary();
+                remaining_blocks.erase(std::remove_if(
+                    std::begin(remaining_blocks), std::end(remaining_blocks),
+                    [](block<FwdIter> const& block) -> bool
+                    {
+                        return block.empty();
+                    }),
+                    std::end(remaining_blocks));
+
+                // Sort remaining blocks to be listed from left to right.
+                std::sort(std::begin(remaining_blocks),
+                    std::end(remaining_blocks));
+
+                // Collapse remaining blocks each other.
+                collapse_remaining_blocks(remaining_blocks, pred, proj);
+
+                // Merge remaining blocks into one block
+                //     which is adjacent to boundary.
+                block<FwdIter> unpartitioned_block = merge_remaining_blocks(
+                    remaining_blocks, boundary, first);
+
+                // Perform sequential partition to unpartitioned range.
+                FwdIter real_boundary = sequential_partition(
+                    unpartitioned_block.first, unpartitioned_block.last,
+                    pred, proj);
+
+                return real_boundary;
             }
         };
+
+        template <typename ExPolicy, typename FwdIter,
+            typename Pred, typename Proj>
+        hpx::future<FwdIter>
+        parallel_partition(ExPolicy && policy,
+            FwdIter first, FwdIter last,
+            Pred && pred, Proj && proj)
+        {
+            hpx::future<FwdIter> f = execution::async_execute(
+                policy.executor(),
+                [=]() mutable -> FwdIter
+                {
+                    try {
+                        return partition_helper::call(
+                            policy, first, last, pred, proj);
+                    }
+                    catch (...) {
+                        util::detail::handle_local_exceptions<ExPolicy>::call(
+                            std::current_exception());
+                    }
+
+                    // Not reachable.
+                    HPX_ASSERT(false);
+                });
+
+            return f;
+        }
 
         template <typename FwdIter>
         struct partition
@@ -942,9 +956,23 @@ namespace hpx { namespace parallel { inline namespace v1
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
                 Pred && pred, Proj && proj)
             {
-                return partition_helper::call(
-                    std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                typedef util::detail::algorithm_result<
+                    ExPolicy, FwdIter
+                > algorithm_result;
+
+                try {
+                    return algorithm_result::get(
+                        parallel_partition(
+                            std::forward<ExPolicy>(policy),
+                            first, last,
+                            std::forward<Pred>(pred),
+                            std::forward<Proj>(proj)));
+                }
+                catch (...) {
+                    return algorithm_result::get(
+                        detail::handle_exception<ExPolicy, FwdIter>::call(
+                            std::current_exception()));
+                }
             }
         };
         /// \endcond
