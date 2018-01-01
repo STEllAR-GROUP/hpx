@@ -66,16 +66,48 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    3086] - Implement parallel::remove and parallel::remove_if
+* [pr    3085] - Addressing breaking changes in Boost V1.66
+* [pr    3084] - Ignore build warnings round 2
+* [pr    3083] - Fix typo HPX_WITH_MM_PREFECTH
+* [pr    3081] - Pre-decay template arguments early
+* [pr    3079] - Ignore build warnings
+* [pr    3078] - Don't test inplace_merge with libc++
+* [pr    3076] - Fixing 3075: Part 1
+* [pr    3074] - Fix more build warnings
+* [pr    3073] - Suspend thread cleanup
+* [pr    3072] - Change existing symbol_namespace::iterate to return all data
+                 instead of invoking a callback
+* [pr    3071] - Fixing pack_traversal_async test
+* [pr    3070] - Fix dynamic_counters_loaded_1508 test by adding dependency to
+                 memory_component
+* [pr    3069] - Fix scheduling loop exit
+* [pr    3067] - #ifdef out random_shuffle deprecated in later c++
+* [pr    3066] - Make coalescing test depend on coalescing library to ensure it
+                 gets built
 * [pr    3065] - Workaround for minimal_timed_async_executor_test compilation
                  failures, attempts to copy a deferred call (in unevaluated
                  context)
 * [pr    3064] - Fixing wrong condition in wrapper_heap
+* [pr    3062] - Fix exception handling for execution::seq
+* [pr    3061] - Adapt MSVC C++ mode handling to VS15.5
+* [pr    3060] - Fix compiler problem in MSVC release mode
 * [pr    3059] - Fixing #2931
+* [issue 3058] - minimal_timed_async_executor_test_exe fails to compile on
+                 master (d6f505c)
 * [pr    3057] - Fix stable_merge_2964 compilation problems
+* [pr    3056] - Fix some build warnings caused by unused variables/unnecessary
+                 tests
 * [pr    3055] - Update documentation for running tests
 * [pr    3052] - Do not bind test running to cmake test build rule
+* [pr    3051] - Fix HPX-Qt interaction in Qt example.
 * [pr    3047] - Fixing #3044
 * [pr    3046] - Add OS thread suspension
+* [pr    3042] - PyCicle - first attempt at a build toold for checking PR's
+* [pr    3041] - Fix a problem about asynchronous execution of parallel::merge
+                 and parallel::partition.
+* [pr    3040] - Fix a mistake about exception handling in asynchronous
+                 execution of scan_partitioner.
 * [pr    3039] - Consistently use executors to schedule work
 * [pr    3038] - Fixing local direct function execution and lambda actions
                  perfect forwarding
@@ -85,6 +117,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    3030] - Revert "implement executor then interface with && forwarding
                  reference"
 * [pr    3029] - Run CI inspect checks before building
+* [pr    3028] - Added range version of parallel::move
 * [issue 3027] - Implement all scheduling APIs in terms of executors
 * [pr    3026] - implement executor then interface with && forwarding reference
 * [pr    3025] - Fix typo unitialized to uninitialized
@@ -123,6 +156,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2990] - --help will not work until all required options are provided
 * [pr    2989] - Improve error messages caused by misuse of dataflow
 * [pr    2988] - Improve error messages caused by misuse of .then
+* [issue 2987] - stack overflow detection producing false positives
 * [pr    2986] - Deduplicate non-dependent thread_info logging types
 * [pr    2985] - Adapted parallel::{all_of|any_of|none_of} for Ranges TS (see #1668)
 * [pr    2984] - Refactor one_size_heap code to simplify code
@@ -568,6 +602,9 @@ Here is a list of the important tickets we closed for this release.
                  when_all and unwrapped
 * [issue 1056] - Thread manager cleanup
 * [issue  863] - Futures should not require a default constructor
+* [issue  856] - Allow runtimemode_connect to be used with security enabled
+* [issue  726] - Valgrind
+* [issue  701] - Add RCR performance counter component
 * [issue  528] - Add support for known failures and warning count/comparisons to
                  hpx_run_tests.py
 
