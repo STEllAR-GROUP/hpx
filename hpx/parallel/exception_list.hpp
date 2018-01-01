@@ -45,32 +45,26 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
             }
 
-            static hpx::future<Result> call(hpx::future<Result> f)
+            static Result call(hpx::future<Result> f)
             {
                 HPX_ASSERT(f.has_exception());
 
-                // Intel complains if this is not explicitly moved
-                return std::move(f);
+                return f.get();
             }
 
-            static hpx::future<Result> call(std::exception_ptr const& e)
+            HPX_NORETURN static Result call(std::exception_ptr const& e)
             {
                 try {
                     std::rethrow_exception(e);
                 }
                 catch (std::bad_alloc const&) {
-                    // rethrow bad_alloc
-                    return hpx::make_exceptional_future<Result>(
-                        std::current_exception());
+                    throw;
                 }
-                catch (hpx::exception_list const& el) {
-                    // rethrow exception_list
-                    return hpx::make_exceptional_future<Result>(el);
+                catch (hpx::exception_list const&) {
+                    throw;
                 }
                 catch (...) {
-                    // package up everything else as an exception_list
-                    return hpx::make_exceptional_future<Result>(
-                        exception_list(e));
+                    throw hpx::exception_list(std::current_exception());
                 }
             }
         };

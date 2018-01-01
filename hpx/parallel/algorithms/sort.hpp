@@ -183,8 +183,9 @@ namespace hpx { namespace parallel { inline namespace v1
         parallel_sort_async(ExPolicy && policy, RandomIt first, RandomIt last,
             Compare comp)
         {
-            hpx::future<RandomIt> result;
             try {
+                hpx::future<RandomIt> result;
+
                 std::ptrdiff_t N = last - first;
                 HPX_ASSERT(N >= 0);
 
@@ -201,19 +202,22 @@ namespace hpx { namespace parallel { inline namespace v1
                 result = execution::async_execute(policy.executor(),
                         &sort_thread<ExPolicy, RandomIt, Compare>,
                         std::ref(policy), first, last, comp);
+
+                return result;
             }
             catch (...) {
-                return detail::handle_exception<ExPolicy, RandomIt>::call(
-                    std::current_exception());
-            }
+                try {
+                    util::detail::handle_local_exceptions<ExPolicy>::call(
+                        std::current_exception());
 
-            if (result.has_exception())
-            {
-                return detail::handle_exception<ExPolicy, RandomIt>::call(
-                    std::move(result));
+                    // Not reachable.
+                    HPX_ASSERT(false);
+                }
+                catch (...) {
+                    return hpx::make_exceptional_future<RandomIt>(
+                        std::current_exception());
+                }
             }
-
-            return result;
         }
 
         ///////////////////////////////////////////////////////////////////////
