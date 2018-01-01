@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2011-2018 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  Copyright (c) 2008 Peter Dimov
@@ -13,40 +13,33 @@
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
 #include <hpx/config.hpp>
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#include <hpx/throw_exception.hpp>
-#endif
+
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 
+#include <cstddef>
+#include <cstdint>
+
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
-#  if !defined( BOOST_SP_HAS_SYNC )
-#    include <hpx/config/compiler_fence.hpp>
+#  if !defined(BOOST_SP_HAS_SYNC)
 #    include <boost/detail/interlocked.hpp>
 #  endif
 #else
 #  if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__arm__)
 #    include <boost/smart_ptr/detail/spinlock.hpp>
-#    if defined( __ia64__ ) && defined( __INTEL_COMPILER )
+#    if defined(__ia64__) && defined(__INTEL_COMPILER)
 #      include <ia64intrin.h>
 #    endif
 #  endif
 #endif
 
-#include <cstddef>
-#include <cstdint>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-    HPX_API_EXPORT extern bool spinlock_break_on_deadlock;
-    HPX_API_EXPORT extern std::size_t spinlock_deadlock_detection_limit;
-#endif
-
-    /// boost::mutex-compatible spinlock class
+    // std::mutex-compatible spinlock class
     struct spinlock
     {
     public:
@@ -58,74 +51,6 @@ namespace hpx { namespace lcos { namespace local
 #else
         std::uint64_t v_;
 #endif
-
-    public:
-        ///////////////////////////////////////////////////////////////////////
-        static void yield(std::size_t k)
-        {
-            if (k < 4) //-V112
-            {
-            }
-#if defined(BOOST_SMT_PAUSE)
-            else if(k < 16)
-            {
-                BOOST_SMT_PAUSE
-            }
-#endif
-            else if(k < 32 || k & 1) //-V112
-            {
-                if (hpx::threads::get_self_ptr())
-                {
-                    hpx::this_thread::suspend(hpx::threads::pending_boost,
-                        "hpx::lcos::local::spinlock::yield");
-                }
-                else
-                {
-#if defined(HPX_WINDOWS)
-                    Sleep(0);
-#elif defined(BOOST_HAS_PTHREADS)
-                    sched_yield();
-#else
-#endif
-                }
-            }
-            else
-            {
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-                if (spinlock_break_on_deadlock &&
-                    k > spinlock_deadlock_detection_limit)
-                {
-                    HPX_THROW_EXCEPTION(deadlock,
-                        "hpx::lcos::local::spinlock::yield",
-                        "possible deadlock detected");
-                }
-#endif
-
-                if (hpx::threads::get_self_ptr())
-                {
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "hpx::lcos::local::spinlock::yield");
-                }
-                else
-                {
-#if defined(HPX_WINDOWS)
-                    Sleep(1);
-#elif defined(BOOST_HAS_PTHREADS)
-                    // g++ -Wextra warns on {} or {0}
-                    struct timespec rqtp = { 0, 0 };
-
-                    // POSIX says that timespec has tv_sec and tv_nsec
-                    // But it doesn't guarantee order or placement
-
-                    rqtp.tv_sec = 0;
-                    rqtp.tv_nsec = 1000;
-
-                    nanosleep( &rqtp, nullptr );
-#else
-#endif
-                }
-            }
-        }
 
     public:
         spinlock(char const* const desc = "hpx::lcos::local::spinlock")
@@ -145,7 +70,8 @@ namespace hpx { namespace lcos { namespace local
 
             for (std::size_t k = 0; !acquire_lock(); ++k)
             {
-                spinlock::yield(k);
+                util::detail::yield_k(k, "hpx::lcos::local::spinlock::lock",
+                    hpx::threads::pending_boost);
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);
@@ -182,9 +108,9 @@ namespace hpx { namespace lcos { namespace local
         // returns whether the mutex has been acquired
         bool acquire_lock()
         {
-#if !defined( BOOST_SP_HAS_SYNC )
+#if !defined(BOOST_SP_HAS_SYNC)
             std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            HPX_COMPILER_FENCE
+            HPX_COMPILER_FENCE;
 #else
             std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
@@ -193,14 +119,15 @@ namespace hpx { namespace lcos { namespace local
 
         void relinquish_lock()
         {
-#if !defined( BOOST_SP_HAS_SYNC )
-            HPX_COMPILER_FENCE
+#if !defined(BOOST_SP_HAS_SYNC)
+            HPX_COMPILER_FENCE;
             *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);
 #endif
         }
     };
+
 }}}
 
 #endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113

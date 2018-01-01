@@ -11,18 +11,22 @@
 
 #if defined(__INTEL_COMPILER)
 
-#define HPX_COMPILER_FENCE __memory_barrier();
+#define HPX_COMPILER_FENCE __memory_barrier()
 
 #elif defined( _MSC_VER ) && _MSC_VER >= 1310
 
 extern "C" void _ReadWriteBarrier();
 #pragma intrinsic( _ReadWriteBarrier )
 
-#define HPX_COMPILER_FENCE _ReadWriteBarrier();
+#define HPX_COMPILER_FENCE _ReadWriteBarrier()
+
+extern "C" void _mm_pause();
+#define HPX_SMT_PAUSE _mm_pause()
 
 #elif defined(__GNUC__)
 
-#define HPX_COMPILER_FENCE __asm__ __volatile__( "" : : : "memory" );
+#define HPX_COMPILER_FENCE __asm__ __volatile__( "" : : : "memory" )
+#define HPX_SMT_PAUSE __asm__ __volatile__( "rep; nop" : : : "memory" )
 
 #else
 

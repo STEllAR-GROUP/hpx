@@ -16,6 +16,8 @@
 
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
+#include <hpx/config/compiler_fence.hpp>
+#include <hpx/config/compiler_native_tls.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
 #include <hpx/config/defines.hpp>
