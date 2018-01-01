@@ -34,11 +34,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 try {
                     throw; //-V667
                 }
-                catch(std::bad_alloc const& e) {
-                    throw e;
+                catch(std::bad_alloc const&) {
+                    throw;
                 }
-                catch (hpx::exception_list const& el) {
-                    throw el;
+                catch (hpx::exception_list const&) {
+                    throw;
                 }
                 catch (...) {
                     throw hpx::exception_list(std::current_exception());
@@ -81,11 +81,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     try {
                         throw; //-V667
                     }
-                    catch(std::bad_alloc const& e) {
-                        throw e;
+                    catch(std::bad_alloc const&) {
+                        throw;
                     }
-                    catch (hpx::exception_list const& el) {
-                        throw el;
+                    catch (hpx::exception_list const&) {
+                        throw;
                     }
                     catch (...) {
                         throw hpx::exception_list(std::current_exception());
