@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2018 Hartmut Kaiser
 //  Copyright (c) 2016 Minh-Khanh Do
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -124,12 +124,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 using hpx::util::make_zip_iterator;
 
                 auto f3 =
-                    [op, policy](
+                    [op](
                         zip_iterator part_begin, std::size_t part_size,
-                        hpx::shared_future<T> curr, hpx::shared_future<T> next
-                    )
+                        hpx::shared_future<T> curr, hpx::shared_future<T> next)
                     {
-                        HPX_UNUSED(policy);
 
                         next.get();     // rethrow exceptions
 
@@ -150,20 +148,22 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, conv, last](zip_iterator part_begin,
-                        std::size_t part_size) -> T
+                    [op, HPX_CAPTURE_FORWARD(conv, Conv), last](
+                        zip_iterator part_begin, std::size_t part_size) -> T
                     {
-                        T part_init = hpx::util::invoke(conv, get<0>(*part_begin++));
+                        T part_init = hpx::util::invoke(
+                            conv, get<0>(*part_begin++));
 
                         auto iters = part_begin.get_iterator_tuple();
                         if(get<0>(iters) != last)
+                        {
                             return sequential_exclusive_scan_n(
                                 get<0>(iters),
                                 part_size - 1,
                                 get<1>(iters),
                                 part_init, op, conv);
-                        else
-                            return part_init;
+                        }
+                        return part_init;
                     },
                     // step 2 propagates the partition results from left
                     // to right

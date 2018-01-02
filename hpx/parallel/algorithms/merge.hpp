@@ -545,7 +545,7 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename ExPolicy, typename RandIter,
             typename Comp, typename Proj>
         void
-        parallel_inplace_merge_helper(ExPolicy policy,
+        parallel_inplace_merge_helper(ExPolicy && policy,
             RandIter first, RandIter middle, RandIter last,
             Comp && comp, Proj && proj)
         {
@@ -559,7 +559,8 @@ namespace hpx { namespace parallel { inline namespace v1
             //   if data size is smaller than threshold.
             if (left_size + right_size <= threshold)
             {
-                sequential_inplace_merge(first, middle, last, comp, proj);
+                sequential_inplace_merge(first, middle, last,
+                    std::forward<Comp>(comp), std::forward<Proj>(proj));
                 return;
             }
 
@@ -568,7 +569,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 // Means that always 'pivot' < 'middle'.
                 HPX_ASSERT(left_size >= 3ul);
 
-                // Select pivot in leftside range.
+                // Select pivot in left-side range.
                 RandIter pivot = first + left_size / 2;
                 RandIter boundary = lower_bound_helper::call(
                     middle, last, hpx::util::invoke(proj, *pivot), comp, proj);
@@ -587,17 +588,15 @@ namespace hpx { namespace parallel { inline namespace v1
                     policy.executor(),
                     [&]() -> void
                     {
-                        // Process the range which is leftside of 'target'.
+                        // Process the range which is left-side of 'target'.
                         parallel_inplace_merge_helper(policy,
-                            first, pivot, target,
-                            comp, proj);
+                            first, pivot, target, comp, proj);
                     });
 
                 try {
-                    // Process the range which is rightside of 'target'.
+                    // Process the range which is right-side of 'target'.
                     parallel_inplace_merge_helper(policy,
-                        target + 1, boundary, last,
-                        comp, proj);
+                        target + 1, boundary, last, comp, proj);
                 }
                 catch (...) {
                     fut.wait();
@@ -622,7 +621,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 // Means that always 'pivot' < 'last'.
                 HPX_ASSERT(right_size >= 3ul);
 
-                // Select pivot in rightside range.
+                // Select pivot in right-side range.
                 RandIter pivot = middle + right_size / 2;
                 RandIter boundary = upper_bound_helper::call(
                     first, middle, hpx::util::invoke(proj, *pivot), comp, proj);
@@ -641,17 +640,15 @@ namespace hpx { namespace parallel { inline namespace v1
                     policy.executor(),
                     [&]() -> void
                     {
-                        // Process the range which is leftside of 'target'.
+                        // Process the range which is left-side of 'target'.
                         parallel_inplace_merge_helper(policy,
-                            first, boundary, target,
-                            comp, proj);
+                            first, boundary, target, comp, proj);
                     });
 
                 try {
-                    // Process the range which is rightside of 'target'.
+                    // Process the range which is right-side of 'target'.
                     parallel_inplace_merge_helper(policy,
-                        target + 1, pivot + 1, last,
-                        comp, proj);
+                        target + 1, pivot + 1, last, comp, proj);
                 }
                 catch (...) {
                     fut.wait();
@@ -674,20 +671,23 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         }
 
-        template <typename ExPolicy, typename RandIter,
-            typename Comp, typename Proj>
+        template <typename ExPolicy, typename RandIter, typename Comp,
+            typename Proj>
         inline hpx::future<RandIter>
-        parallel_inplace_merge(ExPolicy policy,
-            RandIter first, RandIter middle, RandIter last,
-            Comp && comp, Proj && proj)
+        parallel_inplace_merge(ExPolicy && policy,
+            RandIter first, RandIter middle, RandIter last, Comp && comp,
+            Proj && proj)
         {
-            hpx::future<RandIter> f = execution::async_execute(
+            return execution::async_execute(
                 policy.executor(),
-                [=]() mutable -> RandIter
+                [=, HPX_CAPTURE_FORWARD(comp, Comp),
+                    HPX_CAPTURE_FORWARD(proj, Proj)
+                ]() mutable -> RandIter
                 {
                     try {
                         parallel_inplace_merge_helper(
-                            policy, first, middle, last, comp, proj);
+                            policy, first, middle, last,
+                            std::move(comp), std::move(proj));
                         return last;
                     }
                     catch (...) {
@@ -698,8 +698,6 @@ namespace hpx { namespace parallel { inline namespace v1
                     // Not reachable.
                     HPX_ASSERT(false);
                 });
-
-            return f;
         }
 
         template <typename Iter>

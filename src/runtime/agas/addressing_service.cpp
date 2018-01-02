@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2017 Hartmut Kaiser
+//  Copyright (c) 2011-2018 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -2753,8 +2753,8 @@ namespace hpx
 {
     namespace detail
     {
-        std::string name_from_basename(std::string const& basename,
-            std::size_t idx)
+        std::string name_from_basename(
+            std::string const& basename, std::size_t idx)
         {
             HPX_ASSERT(!basename.empty());
 
@@ -2773,8 +2773,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<hpx::future<hpx::id_type> >
-        find_all_from_basename(std::string const& basename, std::size_t num_ids)
+    std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
+        std::string basename, std::size_t num_ids)
     {
         if (basename.empty())
         {
@@ -2793,9 +2793,8 @@ namespace hpx
         return results;
     }
 
-    std::vector<hpx::future<hpx::id_type> >
-        find_from_basename(std::string const& basename,
-            std::vector<std::size_t> const& ids)
+    std::vector<hpx::future<hpx::id_type>> find_from_basename(
+        std::string basename, std::vector<std::size_t> const& ids)
     {
         if (basename.empty())
         {
@@ -2807,14 +2806,15 @@ namespace hpx
         std::vector<hpx::future<hpx::id_type> > results;
         for (std::size_t i : ids)
         {
-            std::string name = detail::name_from_basename(basename, i); //-V106
+            std::string name =
+                detail::name_from_basename(basename, i);    //-V106
             results.push_back(agas::on_symbol_namespace_event(
                 std::move(name), true));
         }
         return results;
     }
 
-    hpx::future<hpx::id_type> find_from_basename(std::string const& basename,
+    hpx::future<hpx::id_type> find_from_basename(std::string basename,
         std::size_t sequence_nr)
     {
         if (basename.empty())
@@ -2825,13 +2825,16 @@ namespace hpx
         }
 
         if (sequence_nr == std::size_t(~0U))
-            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
+        {
+            sequence_nr =
+                std::size_t(naming::get_locality_id_from_id(find_here()));
+        }
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::on_symbol_namespace_event(std::move(name), true);
     }
 
-    hpx::future<bool> register_with_basename(std::string const& basename,
+    hpx::future<bool> register_with_basename(std::string basename,
         hpx::id_type id, std::size_t sequence_nr)
     {
         if (basename.empty())
@@ -2842,14 +2845,17 @@ namespace hpx
         }
 
         if (sequence_nr == std::size_t(~0U))
-            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
+        {
+            sequence_nr =
+                std::size_t(naming::get_locality_id_from_id(find_here()));
+        }
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::register_name(std::move(name), id);
     }
 
     hpx::future<hpx::id_type> unregister_with_basename(
-        std::string const& basename, std::size_t sequence_nr)
+        std::string basename, std::size_t sequence_nr)
     {
         if (basename.empty())
         {
@@ -2859,7 +2865,10 @@ namespace hpx
         }
 
         if (sequence_nr == std::size_t(~0U))
-            sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
+        {
+            sequence_nr =
+                std::size_t(naming::get_locality_id_from_id(find_here()));
+        }
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::unregister_name(std::move(name));

@@ -133,8 +133,10 @@ namespace hpx { namespace parallel { inline namespace v1
                             policy, it, part_count, f, proj);
                     };
                 auto f2 =
-                    [f, proj, policy](std::vector<FwdIter> && positions)
-                    ->  FwdIter
+                    [policy,
+                        HPX_CAPTURE_FORWARD(f, F),
+                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    ](std::vector<FwdIter> && positions) -> FwdIter
                     {
                         return min_element::sequential_minmax_element_ind(
                             policy, positions.begin(), positions.size(),
@@ -144,8 +146,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
                         std::forward<ExPolicy>(policy),
                         first, std::distance(first, last),
-                        std::move(f1), hpx::util::unwrapping(std::move(f2))
-                    );
+                        std::move(f1), hpx::util::unwrapping(std::move(f2)));
             }
         };
 
@@ -366,8 +367,10 @@ namespace hpx { namespace parallel { inline namespace v1
                             policy, it, part_count, f, proj);
                     };
                 auto f2 =
-                    [f, proj, policy](std::vector<FwdIter> && positions)
-                    ->  FwdIter
+                    [policy,
+                        HPX_CAPTURE_FORWARD(f, F),
+                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    ](std::vector<FwdIter> && positions) -> FwdIter
                     {
                         return max_element::sequential_minmax_element_ind(
                             policy, positions.begin(), positions.size(),
@@ -377,8 +380,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
                         std::forward<ExPolicy>(policy),
                         first, std::distance(first, last),
-                        std::move(f1), hpx::util::unwrapping(std::move(f2))
-                    );
+                        std::move(f1), hpx::util::unwrapping(std::move(f2)));
             }
         };
 
@@ -621,8 +623,10 @@ namespace hpx { namespace parallel { inline namespace v1
                             policy, it, part_count, f, proj);
                     };
                 auto f2 =
-                    [f, proj, policy](std::vector<result_type> && positions)
-                    ->  result_type
+                    [policy,
+                        HPX_CAPTURE_FORWARD(f, F),
+                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    ](std::vector<result_type> && positions) -> result_type
                     {
                         return minmax_element::sequential_minmax_element_ind(
                             policy, positions.begin(), positions.size(),
@@ -633,8 +637,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     call(
                         std::forward<ExPolicy>(policy),
                         result.first, std::distance(result.first, last),
-                        std::move(f1), hpx::util::unwrapping(std::move(f2))
-                    );
+                        std::move(f1), hpx::util::unwrapping(std::move(f2)));
             }
         };
 

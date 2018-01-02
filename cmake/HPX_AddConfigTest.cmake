@@ -575,7 +575,8 @@ endmacro()
 macro(hpx_check_for_cxx14_lambdas)
   add_hpx_config_test(HPX_WITH_CXX14_LAMBDAS
     SOURCE cmake/tests/cxx14_lambdas.cpp
-    FILE ${ARGN})
+    FILE ${ARGN}
+    CMAKECXXFEATURE cxx_lambda_init_captures)
 endmacro()
 
 ###############################################################################

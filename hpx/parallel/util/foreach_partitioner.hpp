@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -162,10 +162,12 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 return hpx::dataflow(
-                    [last, errors, scoped_param, f2](
-                            std::vector<hpx::future<Result> > && r1,
-                            std::vector<hpx::future<Result> > && r2) mutable
-                    ->  FwdIter
+                    [last, errors,
+                        HPX_CAPTURE_MOVE(scoped_param),
+                        HPX_CAPTURE_FORWARD(f2, F2)
+                    ](std::vector<hpx::future<Result> > && r1,
+                        std::vector<hpx::future<Result> > && r2
+                    ) mutable ->  FwdIter
                     {
                         HPX_UNUSED(scoped_param);
                         handle_local_exceptions<ExPolicy>::call(r1, errors);

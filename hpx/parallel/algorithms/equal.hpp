@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -111,20 +111,20 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [f, tok, policy](
+                    [f, tok](
                         zip_iterator it, std::size_t part_count
                     ) mutable -> bool
                     {
-                        HPX_UNUSED(policy);
-
                         util::loop_n<ExPolicy>(
                             it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)
                             {
-                                using hpx::util::get;
                                 reference t = *curr;
-                                if (!f(get<0>(t), get<1>(t)))
+                                if (!hpx::util::invoke(f, hpx::util::get<0>(t),
+                                        hpx::util::get<1>(t)))
+                                {
                                     tok.cancel();
+                                }
                             });
                         return !tok.was_cancelled();
                     };
@@ -299,20 +299,20 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [f, tok, policy](
+                    [f, tok](
                         zip_iterator it, std::size_t part_count
                     ) mutable -> bool
                     {
-                        HPX_UNUSED(policy);
-
                         util::loop_n<ExPolicy>(
                             it, part_count, tok,
                             [&f, &tok](zip_iterator const& curr)
                             {
                                 reference t = *curr;
-                                using hpx::util::get;
-                                if (!f(get<0>(t), get<1>(t)))
+                                if (!hpx::util::invoke(f, hpx::util::get<0>(t),
+                                        hpx::util::get<1>(t)))
+                                {
                                     tok.cancel();
+                                }
                             });
                         return !tok.was_cancelled();
                     };

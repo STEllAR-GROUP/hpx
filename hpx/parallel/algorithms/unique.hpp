@@ -110,14 +110,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     > scan_partitioner_type;
 
                 auto f1 =
-                    [pred, proj, flags, policy]
-                    (
-                       zip_iterator part_begin, std::size_t part_size
-                    )   -> std::size_t
+                    [HPX_CAPTURE_FORWARD(pred, Pred),
+                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    ](zip_iterator part_begin, std::size_t part_size)
+                    -> std::size_t
                     {
-                        HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
-
                         FwdIter base = get<0>(part_begin.get_iterator_tuple());
 
                         // MSVC complains if pred or proj is captured by ref below
@@ -144,14 +141,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::shared_ptr<FwdIter> dest_ptr =
                     std::make_shared<FwdIter>(first);
                 auto f3 =
-                    [dest_ptr, flags, policy](
+                    [dest_ptr, flags](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
                         hpx::shared_future<std::size_t> next
                     ) mutable -> void
                     {
                         HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
 
                         curr.get();     // rethrow exceptions
                         next.get();     // rethrow exceptions
@@ -196,8 +192,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 2 propagates the partition results from left
                     // to right
                     hpx::util::unwrapping(
-                        [](std::size_t, std::size_t)
-                            -> std::size_t
+                        [](std::size_t, std::size_t) -> std::size_t
                         {
                             // There is no need to propagate the partition
                             // results. But, the scan_partitioner doesn't
@@ -208,7 +203,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [dest_ptr, first, count, flags](
+                    [HPX_CAPTURE_MOVE(dest_ptr), first, count, flags](
                         std::vector<hpx::shared_future<std::size_t> > &&,
                         std::vector<hpx::future<void> > &&) mutable
                     ->  FwdIter
@@ -449,14 +444,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     > scan_partitioner_type;
 
                 auto f1 =
-                    [pred, proj, flags, policy]
-                    (
-                        zip_iterator part_begin, std::size_t part_size
-                    )   -> std::size_t
+                    [HPX_CAPTURE_FORWARD(pred, Pred),
+                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    ](zip_iterator part_begin, std::size_t part_size)
+                    -> std::size_t
                     {
-                        HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
-
                         FwdIter1 base = get<0>(part_begin.get_iterator_tuple());
                         std::size_t curr = 0;
 
@@ -481,14 +473,13 @@ namespace hpx { namespace parallel { inline namespace v1
                         return curr;
                     };
                 auto f3 =
-                    [dest, flags, policy](
+                    [dest, flags](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
                         hpx::shared_future<std::size_t> next
                     ) mutable -> void
                     {
                         HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
 
                         next.get();     // rethrow exceptions
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -1125,7 +1125,7 @@ namespace hpx { namespace lcos
         convert_future_helper(Future && f, Conv && conv) //-V659
         {
             return f.then(
-                [conv](Future && f) -> T
+                [HPX_CAPTURE_FORWARD(conv, Conv)](Future && f) -> T
                 {
                     return hpx::util::invoke(conv, f.get());
                 });
@@ -1426,7 +1426,7 @@ namespace hpx { namespace lcos
             "result type by using the supplied conversion function");
 
         return f.then(
-            [conv](hpx::shared_future<U> const& f)
+            [HPX_CAPTURE_FORWARD(conv, Conv)](hpx::shared_future<U> const& f)
             {
                 return hpx::util::invoke(conv, f.get());
             });

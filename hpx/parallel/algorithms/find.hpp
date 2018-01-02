@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -224,8 +224,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [f, tok](FwdIter it, std::size_t part_size,
-                            std::size_t base_idx) mutable -> void
+                        [HPX_CAPTURE_FORWARD(f, F), tok](
+                            FwdIter it, std::size_t part_size,
+                            std::size_t base_idx
+                        ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -398,8 +400,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [f, tok](FwdIter it, std::size_t part_size,
-                            std::size_t base_idx) mutable -> void
+                        [HPX_CAPTURE_FORWARD(f, F), tok](
+                            FwdIter it, std::size_t part_size,
+                            std::size_t base_idx
+                        ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -573,16 +577,18 @@ namespace hpx { namespace parallel { inline namespace v1
                 > tok(-1);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
-                    call_with_index(
-                        std::forward<ExPolicy>(policy), first1, count-(diff-1), 1,
-                        [=](FwdIter it, std::size_t part_size,
-                            std::size_t base_idx) mutable -> void
+                    call_with_index(std::forward<ExPolicy>(policy),
+                        first1, count - diff + 1, 1,
+                        [=, HPX_CAPTURE_FORWARD(op, Pred)](
+                            FwdIter it, std::size_t part_size,
+                            std::size_t base_idx
+                        ) mutable -> void
                         {
                             FwdIter curr = it;
 
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [=, &tok, &curr](
+                                [=, &tok, &curr, &op](
                                     reference t, std::size_t i
                                 ) -> void
                                 {
@@ -778,7 +784,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [s_first, s_last, tok, op](
+                        [s_first, s_last, tok, HPX_CAPTURE_FORWARD(op, Pred)](
                             FwdIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void
