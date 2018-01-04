@@ -24,7 +24,6 @@
 #include <hpx/util/logging/detail/ts/ts.hpp>
 
 #include <string>
-#include <boost/config.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
