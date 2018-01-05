@@ -108,8 +108,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     > scan_partitioner_type;
 
                 auto f1 =
-                    [HPX_CAPTURE_FORWARD(pred, Pred),
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    [HPX_CAPTURE_FORWARD(pred),
+                        HPX_CAPTURE_FORWARD(proj)
                     ](zip_iterator part_begin, std::size_t part_size)
                     ->  std::size_t
                     {

@@ -85,8 +85,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
                         [tok, first,
-                            HPX_CAPTURE_FORWARD(comp, Comp),
-                            HPX_CAPTURE_FORWARD(proj, Proj)
+                            HPX_CAPTURE_FORWARD(comp),
+                            HPX_CAPTURE_FORWARD(proj)
                         ](RandIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void
@@ -284,8 +284,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
                         [tok, first,
-                            HPX_CAPTURE_FORWARD(comp, Comp),
-                            HPX_CAPTURE_FORWARD(proj, Proj)
+                            HPX_CAPTURE_FORWARD(comp),
+                            HPX_CAPTURE_FORWARD(proj)
                         ](RandIter it, std::size_t part_size,
                             std::size_t base_idx) mutable
                         {

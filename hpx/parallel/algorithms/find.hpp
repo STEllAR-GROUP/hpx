@@ -224,7 +224,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [HPX_CAPTURE_FORWARD(f, F), tok](
+                        [HPX_CAPTURE_FORWARD(f), tok](
                             FwdIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void
@@ -400,7 +400,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [HPX_CAPTURE_FORWARD(f, F), tok](
+                        [HPX_CAPTURE_FORWARD(f), tok](
                             FwdIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void
@@ -579,7 +579,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(std::forward<ExPolicy>(policy),
                         first1, count - diff + 1, 1,
-                        [=, HPX_CAPTURE_FORWARD(op, Pred)](
+                        [=, HPX_CAPTURE_FORWARD(op)](
                             FwdIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void
@@ -784,7 +784,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
-                        [s_first, s_last, tok, HPX_CAPTURE_FORWARD(op, Pred)](
+                        [s_first, s_last, tok, HPX_CAPTURE_FORWARD(op)](
                             FwdIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void

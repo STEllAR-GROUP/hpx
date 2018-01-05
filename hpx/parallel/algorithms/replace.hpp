@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy), std::false_type(),
                     first, std::distance(first, last),
                     [old_value, new_value,
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                        HPX_CAPTURE_FORWARD(proj)
                     ](type& t) -> void
                     {
                         if (hpx::util::invoke(proj, t) == old_value)
@@ -229,8 +229,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy), std::false_type(),
                     first, std::distance(first, last),
                     [new_value,
-                        HPX_CAPTURE_FORWARD(f, F),
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                        HPX_CAPTURE_FORWARD(f),
+                        HPX_CAPTURE_FORWARD(proj)
                     ](type& t) -> void
                     {
                         using hpx::util::invoke;
@@ -396,7 +396,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [old_value, new_value,
-                            HPX_CAPTURE_FORWARD(proj, Proj)
+                            HPX_CAPTURE_FORWARD(proj)
                         ](reference t) -> void
                         {
                             using hpx::util::get;
@@ -584,8 +584,8 @@ namespace hpx { namespace parallel { inline namespace v1
                         hpx::util::make_zip_iterator(first, dest),
                         std::distance(first, last),
                         [new_value,
-                            HPX_CAPTURE_FORWARD(f, F),
-                            HPX_CAPTURE_FORWARD(proj, Proj)
+                            HPX_CAPTURE_FORWARD(f),
+                            HPX_CAPTURE_FORWARD(proj)
                         ](reference t) -> void
                         {
                             using hpx::util::get;

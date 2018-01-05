@@ -72,8 +72,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [HPX_CAPTURE_FORWARD(op, F), tok,
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    [HPX_CAPTURE_FORWARD(op), tok,
+                        HPX_CAPTURE_FORWARD(proj)
                     ](FwdIter part_begin, std::size_t part_count) mutable -> bool
                 {
                     util::loop_n<ExPolicy>(part_begin, part_count, tok,
@@ -247,8 +247,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [HPX_CAPTURE_FORWARD(op, F), tok,
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    [HPX_CAPTURE_FORWARD(op), tok,
+                        HPX_CAPTURE_FORWARD(proj)
                     ](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
                         util::loop_n<ExPolicy>(
@@ -423,8 +423,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [HPX_CAPTURE_FORWARD(op, F), tok,
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                    [HPX_CAPTURE_FORWARD(op), tok,
+                        HPX_CAPTURE_FORWARD(proj)
                     ](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
                         util::loop_n<ExPolicy>(

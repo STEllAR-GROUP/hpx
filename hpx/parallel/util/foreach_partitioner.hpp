@@ -164,7 +164,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::dataflow(
                     [last, errors,
                         HPX_CAPTURE_MOVE(scoped_param),
-                        HPX_CAPTURE_FORWARD(f2, F2)
+                        HPX_CAPTURE_FORWARD(f2)
                     ](std::vector<hpx::future<Result> > && r1,
                         std::vector<hpx::future<Result> > && r2
                     ) mutable ->  FwdIter

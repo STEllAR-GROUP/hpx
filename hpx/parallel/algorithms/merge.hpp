@@ -680,8 +680,8 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             return execution::async_execute(
                 policy.executor(),
-                [=, HPX_CAPTURE_FORWARD(comp, Comp),
-                    HPX_CAPTURE_FORWARD(proj, Proj)
+                [=, HPX_CAPTURE_FORWARD(comp),
+                    HPX_CAPTURE_FORWARD(proj)
                 ]() mutable -> RandIter
                 {
                     try {

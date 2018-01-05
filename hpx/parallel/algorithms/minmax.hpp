@@ -134,8 +134,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     };
                 auto f2 =
                     [policy,
-                        HPX_CAPTURE_FORWARD(f, F),
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                        HPX_CAPTURE_FORWARD(f),
+                        HPX_CAPTURE_FORWARD(proj)
                     ](std::vector<FwdIter> && positions) -> FwdIter
                     {
                         return min_element::sequential_minmax_element_ind(
@@ -368,8 +368,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     };
                 auto f2 =
                     [policy,
-                        HPX_CAPTURE_FORWARD(f, F),
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                        HPX_CAPTURE_FORWARD(f),
+                        HPX_CAPTURE_FORWARD(proj)
                     ](std::vector<FwdIter> && positions) -> FwdIter
                     {
                         return max_element::sequential_minmax_element_ind(
@@ -624,8 +624,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     };
                 auto f2 =
                     [policy,
-                        HPX_CAPTURE_FORWARD(f, F),
-                        HPX_CAPTURE_FORWARD(proj, Proj)
+                        HPX_CAPTURE_FORWARD(f),
+                        HPX_CAPTURE_FORWARD(proj)
                     ](std::vector<result_type> && positions) -> result_type
                     {
                         return minmax_element::sequential_minmax_element_ind(

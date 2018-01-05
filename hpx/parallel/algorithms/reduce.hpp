@@ -76,8 +76,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     first, std::distance(first, last),
                     std::move(f1),
                     hpx::util::unwrapping(
-                        [HPX_CAPTURE_FORWARD(init, T_),
-                            HPX_CAPTURE_FORWARD(r, Reduce)
+                        [HPX_CAPTURE_FORWARD(init),
+                            HPX_CAPTURE_FORWARD(r)
                         ](std::vector<T> && results) -> T
                         {
                             return util::accumulate_n(hpx::util::begin(results),

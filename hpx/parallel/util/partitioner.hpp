@@ -314,7 +314,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::dataflow(
                     [errors,
                         HPX_CAPTURE_MOVE(scoped_param),
-                        HPX_CAPTURE_FORWARD(f2, F2)
+                        HPX_CAPTURE_FORWARD(f2)
                     ](std::vector<hpx::future<Result> > && r) mutable -> R
                     {
                         HPX_UNUSED(scoped_param);
@@ -403,7 +403,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::dataflow(
                     [errors,
                         HPX_CAPTURE_MOVE(scoped_param),
-                        HPX_CAPTURE_FORWARD(f2, F2)
+                        HPX_CAPTURE_FORWARD(f2)
                     ](std::vector<hpx::future<Result> > && r) mutable -> R
                     {
                         // inform parameter traits
@@ -471,7 +471,7 @@ namespace hpx { namespace parallel { namespace util
                 return hpx::dataflow(
                     [errors,
                         HPX_CAPTURE_MOVE(scoped_param),
-                        HPX_CAPTURE_FORWARD(f2, F2)
+                        HPX_CAPTURE_FORWARD(f2)
                     ](std::vector<hpx::future<Result> > && r,
                         typename hpx::util::decay<Args>::type&&... args
                     ) mutable -> R

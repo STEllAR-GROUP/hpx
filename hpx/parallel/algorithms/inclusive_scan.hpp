@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, last, HPX_CAPTURE_FORWARD(conv, Conv)](
+                    [op, last, HPX_CAPTURE_FORWARD(conv)](
                         zip_iterator part_begin, std::size_t part_size) -> T
                     {
                         T part_init = hpx::util::invoke(conv, get<0>(*part_begin));

@@ -67,8 +67,8 @@ namespace hpx { namespace parallel { inline namespace v1
                     return execution::async_execute(
                         policy.executor(),
                         [first, last,
-                            HPX_CAPTURE_FORWARD(f, F),
-                            HPX_CAPTURE_FORWARD(proj, Proj)
+                            HPX_CAPTURE_FORWARD(f),
+                            HPX_CAPTURE_FORWARD(proj)
                         ]() -> RandIter
                         {
                             return std::stable_partition(
@@ -1156,11 +1156,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     > scan_partitioner_type;
 
                 auto f1 =
-                    [HPX_CAPTURE_FORWARD(pred, Pred),
-                        HPX_CAPTURE_FORWARD(proj, Proj)]
-                    (
-                       zip_iterator part_begin, std::size_t part_size
-                    )   -> output_iterator_offset
+                    [HPX_CAPTURE_FORWARD(pred), HPX_CAPTURE_FORWARD(proj)](
+                       zip_iterator part_begin, std::size_t part_size)
+                    -> output_iterator_offset
                     {
                         std::size_t true_count = 0;
 
