@@ -30,6 +30,7 @@
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>
@@ -322,21 +323,12 @@ namespace hpx { namespace threads { namespace detail
     template <typename F>
     void scheduled_thread_pool<Scheduler>::suspend_func(F&& callback, error_code& ec)
     {
-        if (threads::get_self_ptr())
+        for (std::size_t k = 0;
+             sched_->Scheduler::get_thread_count() >
+                 get_background_thread_count();
+             ++k)
         {
-            while (sched_->Scheduler::get_thread_count() >
-                get_background_thread_count())
-            {
-                hpx::this_thread::suspend();
-            }
-        }
-        else
-        {
-            while (sched_->Scheduler::get_thread_count() >
-                get_background_thread_count())
-            {
-                hpx::compat::this_thread::yield();
-            }
+            util::detail::yield_k(k, "scheduled_thread_pool::suspend_func");
         }
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
@@ -1548,9 +1540,12 @@ namespace hpx { namespace threads { namespace detail
         {
             std::size_t thread_num = thread_offset_ + virt_core;
 
-            while (thread_num == hpx::get_worker_thread_num())
+            for (std::size_t k = 0;
+                 thread_num == hpx::get_worker_thread_num();
+                 ++k)
             {
-                hpx::this_thread::suspend();
+                util::detail::yield_k(k,
+                    "scheduled_thread_pool::remove_processing_unit_internal");
             }
         }
 
@@ -1593,22 +1588,19 @@ namespace hpx { namespace threads { namespace detail
         {
             std::size_t thread_num = thread_offset_ + virt_core;
 
-            while (thread_num == hpx::get_worker_thread_num())
+            for (std::size_t k = 0;
+                 thread_num == hpx::get_worker_thread_num();
+                 ++k)
             {
-                hpx::this_thread::suspend();
-            }
-
-            while (state.load() == state_pre_sleep)
-            {
-                hpx::this_thread::suspend();
+                util::detail::yield_k(k,
+                    "scheduled_thread_pool::suspend_processing_unit_internal");
             }
         }
-        else
+
+        for (std::size_t k = 0; state.load() == state_pre_sleep; ++k)
         {
-            while (state.load() == state_pre_sleep)
-            {
-                hpx::compat::this_thread::yield();
-            }
+            util::detail::yield_k(k,
+                "scheduled_thread_pool::suspend_processing_unit_internal");
         }
     }
 
@@ -1648,25 +1640,11 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        if (threads::get_self_ptr())
+        for (std::size_t k = 0; state.load() == state_sleeping; ++k)
         {
             sched_->Scheduler::resume(virt_core);
-
-            while (state.load() == state_sleeping)
-            {
-                sched_->Scheduler::resume(virt_core);
-                hpx::this_thread::suspend();
-            }
-        }
-        else
-        {
-            sched_->Scheduler::resume(virt_core);
-
-            while (state.load() == state_sleeping)
-            {
-                sched_->Scheduler::resume(virt_core);
-                hpx::compat::this_thread::yield();
-            }
+            util::detail::yield_k(k,
+                "scheduled_thread_pool::resume_processing_unit_internal");
         }
     }
 
