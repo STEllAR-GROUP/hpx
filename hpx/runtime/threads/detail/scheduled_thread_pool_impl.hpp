@@ -6,11 +6,14 @@
 #if !defined(HPX_SCHEDULED_THREAD_POOL_IMPL_HPP)
 #define HPX_SCHEDULED_THREAD_POOL_IMPL_HPP
 
+#include <hpx/apply.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
@@ -316,16 +319,9 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::suspend(error_code& ec)
+    template <typename F>
+    void scheduled_thread_pool<Scheduler>::suspend_func(F&& callback, error_code& ec)
     {
-        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
-        {
-            HPX_THROWS_IF(ec, bad_parameter,
-                "scheduled_thread_pool<Scheduler>::suspend",
-                "cannot suspend a pool from itself");
-            return;
-        }
-
         if (threads::get_self_ptr())
         {
             while (sched_->Scheduler::get_thread_count() >
@@ -347,6 +343,61 @@ namespace hpx { namespace threads { namespace detail
         {
             suspend_processing_unit_internal(i, ec);
         }
+
+        callback();
+    }
+
+    template <typename Scheduler>
+    template <typename F>
+    void scheduled_thread_pool<Scheduler>::suspend_internal(F&& callback, error_code& ec)
+    {
+        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::suspend",
+                "cannot suspend a pool from itself");
+            return;
+        }
+
+        auto suspend_func_wrapper =
+            [this, callback{std::move(callback)}, ec]() mutable
+            {
+                this->suspend_func(callback, ec);
+            };
+
+        if (threads::get_self_ptr())
+        {
+            hpx::apply(std::move(suspend_func_wrapper));
+        }
+        else
+        {
+            compat::thread(std::move(suspend_func_wrapper)).detach();
+        }
+    }
+
+    template <typename Scheduler>
+    future<void> scheduled_thread_pool<Scheduler>::suspend(error_code& ec)
+    {
+        if (!threads::get_self_ptr())
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::suspend",
+                "cannot call suspend from outside HPX, use suspend_cb instead");
+            return make_ready_future();
+        }
+
+        lcos::local::packaged_task<void(void)> pt([](){});
+        hpx::future fut = pt.get_future();
+
+        suspend_internal(std::move(pt), ec);
+
+        return fut;
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::suspend_cb(std::function<void(void)> callback, error_code& ec)
+    {
+        suspend_internal(callback, ec);
     }
 
     template <typename Scheduler>

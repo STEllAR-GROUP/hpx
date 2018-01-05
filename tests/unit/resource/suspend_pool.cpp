@@ -5,8 +5,10 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/hpx_start.hpp>
+#include <hpx/compat/thread.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
@@ -46,7 +48,7 @@ int hpx_main(int argc, char* argv[])
         hpx::resource::get_num_threads("worker");
 
     {
-        // Suspend and resume pool
+        // Suspend and resume pool with future
         hpx::util::high_resolution_timer t;
 
         while (t.elapsed() < 5)
@@ -59,11 +61,39 @@ int hpx_main(int argc, char* argv[])
                 fs.push_back(hpx::async(worker_exec, [](){}));
             }
 
-            worker_pool.suspend();
+            worker_pool.suspend().wait();
 
-            // Can only suspend once all work is done
-            auto f = hpx::when_all(std::move(fs));
-            HPX_TEST(f.is_ready());
+            // All work should be done when pool has been suspended
+            HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
+
+            worker_pool.resume();
+        }
+    }
+
+    {
+        // Suspend and resume pool with callback
+        hpx::lcos::local::counting_semaphore sem;
+        hpx::util::high_resolution_timer t;
+
+        while (t.elapsed() < 5)
+        {
+            std::vector<hpx::future<void>> fs;
+
+            for (std::size_t i = 0;
+                 i < worker_pool_threads * 10000; ++i)
+            {
+                fs.push_back(hpx::async(worker_exec, [](){}));
+            }
+
+            worker_pool.suspend_cb([&sem]()
+                {
+                    sem.signal();
+                });
+
+            sem.wait(1);
+
+            // All work should be done when pool has been suspended
+            HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
             worker_pool.resume();
         }
@@ -89,11 +119,10 @@ int hpx_main(int argc, char* argv[])
                 fs.push_back(hpx::async(worker_exec, [](){}));
             }
 
-            worker_pool.suspend();
+            worker_pool.suspend().wait();
 
-            // Can only suspend once all work is done
-            auto f = hpx::when_all(std::move(fs));
-            HPX_TEST(f.is_ready());
+            // All work should be done when pool has been suspended
+            HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
             worker_pool.resume();
         }

@@ -11,6 +11,7 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -131,9 +132,11 @@ namespace hpx { namespace threads { namespace detail
 
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
-        void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
+        void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
 
-        void suspend(error_code& ec = throws);
+        hpx::future<void> suspend(error_code& ec = throws);
+        void suspend_cb(std::function<void(void)> callback, error_code& ec = throws);
+
         void resume(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////
@@ -275,6 +278,11 @@ namespace hpx { namespace threads { namespace detail
 
     protected:
         friend struct init_tss_helper<Scheduler>;
+
+        template <typename F>
+        void suspend_func(F&& callback, error_code& ec);
+        template <typename F>
+        void suspend_internal(F&& callback, error_code& ec);
 
         void remove_processing_unit_internal(
             std::size_t virt_core, error_code& = hpx::throws);

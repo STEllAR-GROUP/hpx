@@ -12,6 +12,7 @@
 #include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -29,6 +30,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <mutex>
@@ -80,8 +82,11 @@ namespace hpx { namespace threads { namespace detail
         virtual void stop(
             std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 
-        virtual void suspend(error_code& ec = throws) = 0;
         virtual void resume(error_code& ec = throws) = 0;
+
+        virtual hpx::future<void> suspend(error_code& ec = throws) = 0;
+        virtual void suspend_cb(
+            std::function<void(void)> callback, error_code& ec = throws) = 0;
 
     public:
         std::size_t get_worker_thread_num() const;

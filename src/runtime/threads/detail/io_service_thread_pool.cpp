@@ -86,10 +86,20 @@ namespace hpx { namespace threads { namespace detail
     {
     }
 
-    void io_service_thread_pool::suspend(error_code& ec)
+    hpx::future<void> io_service_thread_pool::suspend(error_code& ec)
     {
-        HPX_ASSERT_MSG(false, "Suspending io_service_thread_pool is not supported");
+        HPX_ASSERT_MSG(false,
+            "Suspending io_service_thread_pool is not supported");
+        return hpx::make_ready_future();
     }
+
+    void io_service_thread_pool::suspend_cb(std::function<void(void)> callback,
+         error_code& ec)
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending io_service_thread_pool is not supported");
+    }
+
     void io_service_thread_pool::resume(error_code& ec)
     {
         HPX_ASSERT_MSG(false, "Resuming io_service_thread_pool is not supported");
