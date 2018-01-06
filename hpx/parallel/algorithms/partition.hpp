@@ -60,13 +60,16 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename RandIter, typename F, typename Proj>
             hpx::future<RandIter>
             operator()(ExPolicy && policy, RandIter first, RandIter last,
-                std::size_t size, F f, Proj proj, std::size_t chunks)
+                std::size_t size, F && f, Proj && proj, std::size_t chunks)
             {
                 if (chunks < 2)
                 {
                     return execution::async_execute(
                         policy.executor(),
-                        [first, last, f, proj]() -> RandIter
+                        [first, last,
+                            HPX_CAPTURE_FORWARD(f),
+                            HPX_CAPTURE_FORWARD(proj)
+                        ]() -> RandIter
                         {
                             return std::stable_partition(
                                 first, last,
@@ -98,14 +101,18 @@ namespace hpx { namespace parallel { inline namespace v1
                             if (left.has_exception() || right.has_exception())
                             {
                                 std::list<std::exception_ptr> errors;
-                                if(left.has_exception())
+                                if (left.has_exception())
+                                {
                                     hpx::parallel::util::detail::
                                     handle_local_exceptions<ExPolicy>::call(
                                         left.get_exception_ptr(), errors);
-                                if(right.has_exception())
+                                }
+                                if (right.has_exception())
+                                {
                                     hpx::parallel::util::detail::
                                     handle_local_exceptions<ExPolicy>::call(
                                         right.get_exception_ptr(), errors);
+                                }
 
                                 if (!errors.empty())
                                 {
@@ -845,7 +852,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::vector<hpx::future<block<FwdIter>>>
                     remaining_block_futures(cores);
 
-                // Main parallel phrase: perform sub-partitioning in each thread.
+                // Main parallel phase: perform sub-partitioning in each thread.
                 for (std::size_t i = 0; i < remaining_block_futures.size(); ++i)
                 {
                     remaining_block_futures[i] = execution::async_execute(
@@ -1149,14 +1156,10 @@ namespace hpx { namespace parallel { inline namespace v1
                     > scan_partitioner_type;
 
                 auto f1 =
-                    [pred, proj, flags, policy]
-                    (
-                       zip_iterator part_begin, std::size_t part_size
-                    )   -> output_iterator_offset
+                    [HPX_CAPTURE_FORWARD(pred), HPX_CAPTURE_FORWARD(proj)](
+                       zip_iterator part_begin, std::size_t part_size)
+                    -> output_iterator_offset
                     {
-                        HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
-
                         std::size_t true_count = 0;
 
                         // MSVC complains if pred or proj is captured by ref below
@@ -1175,14 +1178,13 @@ namespace hpx { namespace parallel { inline namespace v1
                             true_count, part_size - true_count);
                     };
                 auto f3 =
-                    [dest_true, dest_false, flags, policy](
+                    [dest_true, dest_false, flags](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<output_iterator_offset> curr,
                         hpx::shared_future<output_iterator_offset> next
                     ) mutable -> void
                     {
                         HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
 
                         next.get();     // rethrow exceptions
 
@@ -1222,7 +1224,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [last, dest_true, dest_false, count, flags](
+                    [last, dest_true, dest_false, flags](
                         std::vector<
                             hpx::shared_future<output_iterator_offset>
                         > && items,
@@ -1230,7 +1232,6 @@ namespace hpx { namespace parallel { inline namespace v1
                     ->  hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>
                     {
                         HPX_UNUSED(flags);
-                        HPX_UNUSED(count);
 
                         output_iterator_offset count_pair = items.back().get();
                         std::size_t count_true = get<0>(count_pair);

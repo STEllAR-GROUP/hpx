@@ -108,14 +108,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     > scan_partitioner_type;
 
                 auto f1 =
-                    [pred, proj, flags, policy]
-                    (
-                       zip_iterator part_begin, std::size_t part_size
-                    )   -> std::size_t
+                    [HPX_CAPTURE_FORWARD(pred),
+                        HPX_CAPTURE_FORWARD(proj)
+                    ](zip_iterator part_begin, std::size_t part_size)
+                    ->  std::size_t
                     {
-                        HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
-
                         // MSVC complains if pred or proj is captured by ref below
                         util::loop_n<ExPolicy>(
                             part_begin, part_size,
@@ -136,14 +133,13 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::shared_ptr<FwdIter> dest_ptr =
                     std::make_shared<FwdIter>(first);
                 auto f3 =
-                    [dest_ptr, flags, policy](
+                    [dest_ptr, flags](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
                         hpx::shared_future<std::size_t> next
                     ) mutable -> void
                     {
                         HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
 
                         curr.get();     // rethrow exceptions
                         next.get();     // rethrow exceptions
@@ -200,11 +196,12 @@ namespace hpx { namespace parallel { inline namespace v1
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
-                    [dest_ptr, first, count, flags](
+                    [dest_ptr, flags](
                         std::vector<hpx::shared_future<std::size_t> > &&,
                         std::vector<hpx::future<void> > &&) mutable
                     ->  FwdIter
                     {
+                        HPX_UNUSED(flags);
                         return *dest_ptr;
                     });
             }
