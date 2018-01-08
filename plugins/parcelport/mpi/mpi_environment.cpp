@@ -8,7 +8,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-#include <mpi.h>
+#include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
 #include <hpx/util/runtime_configuration.hpp>

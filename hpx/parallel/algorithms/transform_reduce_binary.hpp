@@ -157,12 +157,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 difference_type count = std::distance(first1, last1);
 
                 auto f1 =
-                    [op1, op2, policy](
+                    [op1, HPX_CAPTURE_FORWARD(op2)](
                         zip_iterator part_begin, std::size_t part_size
                     ) mutable -> T
                     {
-                        HPX_UNUSED(policy);
-
                         auto iters = part_begin.get_iterator_tuple();
                         FwdIter1 it1 = hpx::util::get<0>(iters);
                         FwdIter2 it2 = hpx::util::get<1>(iters);
@@ -227,7 +225,9 @@ namespace hpx { namespace parallel { inline namespace v1
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first1, first2), count,
                     std::move(f1),
-                    [init, op1](std::vector<hpx::future<T> > && results) -> T
+                    [HPX_CAPTURE_FORWARD(init),
+                        HPX_CAPTURE_FORWARD(op1)
+                    ](std::vector<hpx::future<T> > && results) -> T
                     {
                         T ret = init;
                         for(auto && fut : results)

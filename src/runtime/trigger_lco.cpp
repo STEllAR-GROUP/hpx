@@ -8,6 +8,9 @@
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#if defined(HPX_MSVC) && !defined(HPX_DEBUG)
+#include <hpx/lcos/base_lco_with_value.hpp>
+#endif
 
 #include <exception>
 #include <utility>

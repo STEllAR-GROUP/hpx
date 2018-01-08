@@ -11,6 +11,8 @@ set(benchmarks
     benchmark_merge
     benchmark_partition
     benchmark_partition_copy
+    benchmark_remove
+    benchmark_remove_if
     benchmark_unique
     benchmark_unique_copy
    )

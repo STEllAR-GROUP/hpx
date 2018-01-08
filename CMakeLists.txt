@@ -1184,6 +1184,13 @@ endif()
 hpx_check_for_mm_prefetch(
   DEFINITIONS HPX_HAVE_MM_PREFETCH)
 
+hpx_check_for_stable_inplace_merge(
+  DEFINITIONS HPX_HAVE_STABLE_INPLACE_MERGE)
+
+if(NOT HPX_WITH_STABLE_INPLACE_MERGE)
+  hpx_warn("The standard library you are using (libc++ version < 6) does not have a stable inplace_merge implementation.")
+endif()
+
 ################################################################################
 # Check for misc system headers
 ################################################################################

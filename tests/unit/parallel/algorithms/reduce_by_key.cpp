@@ -138,7 +138,7 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
         helperkey = ho(key);
         lastkey = helperkey;
         //
-        int numkeys = static_cast<Tkey>(distrk(engk)) + 1;
+        int numkeys = static_cast<int>(distrk(engk)) + 1;
         //
         Tval sum = 0;
         for (int i = 0; i < numkeys && keysize < HPX_REDUCE_BY_KEY_TEST_SIZE; ++i) {
@@ -236,7 +236,7 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
         helperkey = ho(key);
         lastkey = helperkey;
         //
-        int numkeys = static_cast<Tkey>(distrk(engk)) + 1;
+        int numkeys = static_cast<int>(distrk(engk)) + 1;
         //
         Tval sum = 0;
         for (int i = 0; i < numkeys && keysize < HPX_REDUCE_BY_KEY_TEST_SIZE; ++i) {

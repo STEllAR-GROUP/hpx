@@ -10,7 +10,7 @@
 #include <hpx/traits/plugin_config_data.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-#include <mpi.h>
+#include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>

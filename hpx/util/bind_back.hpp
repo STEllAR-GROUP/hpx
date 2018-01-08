@@ -74,18 +74,19 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        struct bound_back;
-
         template <typename F, typename ...Ts>
-        struct bound_back<F(Ts...)>
+        struct bound_back
         {
         public:
             bound_back() {} // needed for serialization
 
-            explicit bound_back(F&& f, Ts&&... vs)
-              : _f(std::forward<F>(f))
-              , _args(std::forward<Ts>(vs)...)
+            template <typename F_, typename ...Ts_, typename =
+                typename std::enable_if<
+                    !std::is_same<typename std::decay<F_>::type, bound_back>::value
+                >::type>
+            explicit bound_back(F_&& f, Ts_&&... vs)
+              : _f(std::forward<F_>(f))
+              , _args(std::forward<Ts_>(vs)...)
             {}
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
@@ -203,10 +204,16 @@ namespace hpx { namespace util
     }
 
     template <typename F, typename ...Ts>
-    detail::bound_back<F(Ts&&...)>
+    detail::bound_back<
+        typename std::decay<F>::type,
+        typename std::decay<Ts>::type...>
     bind_back(F&& f, Ts&&... vs) {
-        return detail::bound_back<F(Ts&&...)>(
-            std::forward<F>(f), std::forward<Ts>(vs)...);
+        typedef detail::bound_back<
+            typename std::decay<F>::type,
+            typename std::decay<Ts>::type...
+        > result_type;
+
+        return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 }}
 
@@ -215,33 +222,33 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-    template <typename Sig>
-    struct get_function_address<util::detail::bound_back<Sig> >
+    template <typename F, typename ...Ts>
+    struct get_function_address<util::detail::bound_back<F, Ts...> >
     {
         static std::size_t
-            call(util::detail::bound_back<Sig> const& f) noexcept
+            call(util::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
-    struct get_function_annotation<util::detail::bound_back<Sig> >
+    template <typename F, typename ...Ts>
+    struct get_function_annotation<util::detail::bound_back<F, Ts...> >
     {
         static char const*
-            call(util::detail::bound_back<Sig> const& f) noexcept
+            call(util::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation();
         }
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Sig>
-    struct get_function_annotation_itt<util::detail::bound_back<Sig> >
+    template <typename F, typename ...Ts>
+    struct get_function_annotation_itt<util::detail::bound_back<F, Ts...> >
     {
         static util::itt::string_handle
-            call(util::detail::bound_back<Sig> const& f) noexcept
+            call(util::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }
@@ -254,10 +261,10 @@ namespace hpx { namespace traits
 namespace hpx { namespace serialization
 {
     // serialization of the bound_back object
-    template <typename Archive, typename T>
+    template <typename Archive, typename F, typename ...Ts>
     void serialize(
         Archive& ar
-      , ::hpx::util::detail::bound_back<T>& bound
+      , ::hpx::util::detail::bound_back<F, Ts...>& bound
       , unsigned int const version = 0)
     {
         bound.serialize(ar, version);

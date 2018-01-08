@@ -90,6 +90,11 @@ namespace test
 //   thread:0-1=numanode:0.pu:0-1
 //   thread:0-1=socket:0.core:all.pu:0
 
+#if defined(__GNUC__) && __GNUC__ < 5
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
     data_good data[] =
     {
         {   "thread:0=socket:0;thread:1=socket:0", 2,
@@ -971,6 +976,10 @@ namespace test
 
         { "", 0,  {data_good_thread(), data_good_thread()}, {0,0} }
     };
+
+#if defined(__GNUC__) && __GNUC__ < 5
+#  pragma GCC diagnostic pop
+#endif
 
     void good_testing(data_good const* t, char const* const options)
     {

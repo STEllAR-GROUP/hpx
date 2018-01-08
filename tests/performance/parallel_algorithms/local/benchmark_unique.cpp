@@ -153,7 +153,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
     auto org_first = std::begin(org_v);
     auto org_last = std::end(org_v);
 
-    std::cout << "*** Destination iterator distance : "
+    std::cout << "*** Distance of new range after performing the algorithm : "
         << dest_dist << std::endl << std::endl;
 
     std::cout << "* Running Benchmark..." << std::endl;
@@ -294,7 +294,7 @@ int main(int argc, char* argv[])
             boost::program_options::value<std::string>()->default_value("random"),
             "the kind of iterator tag (random/bidirectional/forward)")
         ("data_type",
-            boost::program_options::value<std::string>()->default_value("light"),
+            boost::program_options::value<std::string>()->default_value("int"),
             "the kind of data type (int/vector/array)")
         ("test_count",
             boost::program_options::value<int>()->default_value(10),

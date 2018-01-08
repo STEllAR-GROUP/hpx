@@ -125,6 +125,7 @@ namespace hpx { namespace serialization
           , buffer_(detail::create_output_container(buffer, chunks, filter,
                 typename traits::serialization_access_data<Container>::
                     preprocessing_only()))
+          , split_gids_(nullptr)
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags

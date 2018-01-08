@@ -9,6 +9,7 @@ set(tests
     shutdown_suspended_pus
     suspend_pool
     suspend_pool_external
+    suspend_disabled
     throttle
     throttle_timed
     used_pus
@@ -19,6 +20,7 @@ set(resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_external_PARAMETERS THREADS_PER_LOCALITY 4)
+set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4)
 set(throttle_PARAMETERS THREADS_PER_LOCALITY 4)
 set(throttle_timed_PARAMETERS THREADS_PER_LOCALITY 4)
 set(used_pus_PARAMETERS THREADS_PER_LOCALITY 4)

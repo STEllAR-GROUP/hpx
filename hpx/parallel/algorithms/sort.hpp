@@ -48,7 +48,8 @@ namespace hpx { namespace parallel { inline namespace v1
         ///////////////////////////////////////////////////////////////////////
         // std::is_sorted is not available on all supported platforms yet
         template <typename Iter, typename Compare>
-        inline bool is_sorted_sequential(Iter first, Iter last, Compare comp)
+        inline bool
+        is_sorted_sequential(Iter first, Iter last, Compare const& comp)
         {
             bool sorted = true;
             if (first != last)
@@ -81,7 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1
             {
                 return execution::async_execute(
                     policy.executor(),
-                    [first, last, comp]() -> RandomIt
+                    [first, last, HPX_CAPTURE_MOVE(comp)]() -> RandomIt
                     {
                         std::sort(first, last, comp);
                         return last;

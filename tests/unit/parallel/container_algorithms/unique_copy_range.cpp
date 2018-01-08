@@ -28,24 +28,10 @@ struct user_defined_type
         name(name_list[std::rand() % name_list.size()])
     {}
 
-    bool operator<(int rand_base) const
-    {
-        static std::string const base_name = "BASE";
-
-        if (this->name < base_name)
-            return true;
-        else if (this->name > base_name)
-            return false;
-        else
-            return this->val < rand_base;
-    }
-
     bool operator==(user_defined_type const& t) const
     {
         return this->name == t.name && this->val == t.val;
     }
-
-    struct user_defined_type& operator++() { return *this; };
 
     static const std::vector<std::string> name_list;
 

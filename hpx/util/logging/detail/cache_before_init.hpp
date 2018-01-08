@@ -33,26 +33,24 @@
 #include <utility>
 #include <vector>
 
-#if defined (BOOST_HAS_WINTHREADS)
+#if defined (HPX_WINDOWS)
 #include <windows.h>
 #endif
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 
 
-#if defined (BOOST_HAS_WINTHREADS)
+#if defined (HPX_WINDOWS)
 typedef DWORD thread_id_type;
-#elif defined (BOOST_HAS_PTHREADS)
-typedef pthread_t thread_id_type;
 #else
-#error Unknown threading type
+typedef pthread_t thread_id_type;
 #endif
 
 inline thread_id_type get_thread_id()
 {
-#if defined (BOOST_HAS_WINTHREADS)
+#if defined (HPX_WINDOWS)
     return ::GetCurrentThreadId();
-#elif defined (BOOST_HAS_PTHREADS)
+#else
     return pthread_self ();
 #endif
 }
@@ -66,6 +64,7 @@ struct thread_info {
 
 #if defined( HPX_LOG_BEFORE_INIT_USE_CACHE_FILTER) \
  || defined( HPX_LOG_BEFORE_INIT_USE_LOG_ALL)
+
 //////////////////////////////////////////////////////////////////
 // Messages that were logged before initializing the log - Caching them
 

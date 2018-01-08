@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,8 +49,8 @@ namespace hpx
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
-        find_all_from_basename(std::string const& base_name, std::size_t num_ids);
+    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type>>
+    find_all_from_basename(std::string base_name, std::size_t num_ids);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return all registered clients from all localities from the given base
@@ -76,10 +76,10 @@ namespace hpx
     ///
     template <typename Client>
     std::vector<Client>
-    find_all_from_basename(std::string const& base_name, std::size_t num_ids)
+    find_all_from_basename(std::string base_name, std::size_t num_ids)
     {
         return components::make_clients<Client>(
-            find_all_from_basename(base_name, num_ids));
+            find_all_from_basename(std::move(base_name), num_ids));
     }
 
     /// Return registered ids from the given base name and sequence numbers.
@@ -100,9 +100,8 @@ namespace hpx
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
-        find_from_basename(std::string const& base_name,
-            std::vector<std::size_t> const& ids);
+    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type>> find_from_basename(
+        std::string base_name, std::vector<std::size_t> const& ids);
 
     /// Return registered clients from the given base name and sequence numbers.
     ///
@@ -126,12 +125,11 @@ namespace hpx
     ///         name, even if the name was already registered.
     ///
     template <typename Client>
-    std::vector<Client>
-        find_from_basename(std::string const& base_name,
-            std::vector<std::size_t> const& ids)
+    std::vector<Client> find_from_basename(std::string base_name,
+        std::vector<std::size_t> const& ids)
     {
         return components::make_clients<Client>(
-            find_from_basename(base_name, ids));
+            find_from_basename(std::move(base_name), ids));
     }
 
     /// \brief Return registered id from the given base name and sequence number.
@@ -152,9 +150,8 @@ namespace hpx
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_API_EXPORT hpx::future<hpx::id_type>
-        find_from_basename(std::string const& base_name,
-            std::size_t sequence_nr = ~0U);
+    HPX_API_EXPORT hpx::future<hpx::id_type> find_from_basename(
+        std::string base_name, std::size_t sequence_nr = ~0U);
 
     /// \brief Return registered id from the given base name and sequence number.
     ///
@@ -207,8 +204,7 @@ namespace hpx
     ///          unique.
     ///
     HPX_API_EXPORT hpx::future<bool> register_with_basename(
-        std::string const& base_name, hpx::id_type id,
-        std::size_t sequence_nr = ~0U);
+        std::string base_name, hpx::id_type id, std::size_t sequence_nr = ~0U);
 
     /// Register the id wrapped in the given future using the given base name.
     ///
@@ -232,13 +228,16 @@ namespace hpx
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    inline hpx::future<bool> register_with_basename(std::string const& base_name,
+    inline hpx::future<bool> register_with_basename(std::string base_name,
         hpx::future<hpx::id_type> f, std::size_t sequence_nr = ~0U)
     {
         return f.then(
-            [=](hpx::future<hpx::id_type> && f) mutable
+            [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
+                hpx::future<hpx::id_type> && f
+            ) mutable -> hpx::future<bool>
             {
-                return register_with_basename(base_name, f.get(), sequence_nr);
+                return register_with_basename(
+                    std::move(base_name), f.get(), sequence_nr);
             });
     }
 
@@ -267,14 +266,17 @@ namespace hpx
     ///          unique.
     ///
     template <typename Client, typename Stub>
-    hpx::future<bool> register_with_basename(std::string const& base_name,
+    hpx::future<bool> register_with_basename(std::string base_name,
         components::client_base<Client, Stub>& client,
         std::size_t sequence_nr = ~0U)
     {
         return client.then(
-            [=](components::client_base<Client, Stub> && c)
+            [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
+                components::client_base<Client, Stub> && c
+            ) mutable -> hpx::future<bool>
             {
-                return register_with_basename(base_name, c.get_id(), sequence_nr);
+                return register_with_basename(
+                    std::move(base_name), c.get_id(), sequence_nr);
             });
     }
 
@@ -293,7 +295,7 @@ namespace hpx
     ///          operation itself.
     ///
     HPX_API_EXPORT hpx::future<hpx::id_type> unregister_with_basename(
-        std::string const& base_name, std::size_t sequence_nr = ~0U);
+        std::string base_name, std::size_t sequence_nr = ~0U);
 
     /// Unregister the given base name.
     ///
@@ -313,10 +315,10 @@ namespace hpx
     ///
     template <typename Client>
     Client unregister_with_basename(
-        std::string const& base_name, std::size_t sequence_nr = ~0U)
+        std::string base_name, std::size_t sequence_nr = ~0U)
     {
         return components::make_client<Client>(
-            unregister_with_basename(base_name, sequence_nr));
+            unregister_with_basename(std::move(base_name), sequence_nr));
     }
 }
 

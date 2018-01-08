@@ -83,6 +83,8 @@ set(tests
     partition_copy
     reduce_
     reduce_by_key
+    remove
+    remove_if
     remove_copy
     remove_copy_if
     replace

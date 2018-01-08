@@ -118,13 +118,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 using hpx::util::make_zip_iterator;
 
                 auto f3 =
-                    [op, policy](
+                    [op](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<T> curr, hpx::shared_future<T> next
                     ) -> void
                     {
-                        HPX_UNUSED(policy);
-
                         next.get();     // rethrow exceptions
 
                         T val = curr.get();

@@ -272,6 +272,10 @@ parallel::reduction_bit_xor           "reduction_bit_xor" "hpx\.parallel\.v2\.re
 parallel::reduction_min               "reduction_min" "hpx\.parallel\.v2\.reduction_min"
 parallel::reduction_max               "reduction_max" "hpx\.parallel\.v2\.reduction_max"
 
+# hpx/parallel/algorithms/remove.hpp
+parallel::remove                      "remove" "hpx\.parallel\.v1\.remove_id.*"
+parallel::remove_if                   "remove_if" "hpx\.parallel\.v1\.remove_if_id.*"
+
 # hpx/parallel/algorithms/remove_copy.hpp
 parallel::remove_copy                  "remove_copy" "hpx\.parallel\.v1\.remove_copy$"
 parallel::remove_copy_if               "remove_copy_if" "hpx\.parallel\.v1\.remove_copy_if.*"
