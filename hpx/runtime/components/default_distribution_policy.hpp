@@ -365,7 +365,7 @@ namespace hpx { namespace components
 
     /// A predefined instance of the default \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static default_distribution_policy const default_layout;
+    static default_distribution_policy const default_layout{};
 }}
 
 /// \cond NOINTERNAL
