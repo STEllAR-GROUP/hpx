@@ -134,10 +134,11 @@ namespace hpx { namespace threads { namespace detail
         void stop_locked(Lock& l, bool blocking = true);
         void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
 
-        hpx::future<void> suspend(error_code& ec = throws);
+        hpx::future<void> suspend();
         void suspend_cb(std::function<void(void)> callback, error_code& ec = throws);
 
-        void resume(error_code& ec = throws);
+        hpx::future<void> resume();
+        void resume_cb(std::function<void(void)> callback, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////
         compat::thread& get_os_thread_handle(std::size_t global_thread_num)
@@ -271,18 +272,20 @@ namespace hpx { namespace threads { namespace detail
             std::size_t virt_core, error_code& = hpx::throws);
 
         // Suspend the given processing unit on the scheduler.
-        void suspend_processing_unit(std::size_t virt_core, error_code&);
+        hpx::future<void> suspend_processing_unit(std::size_t virt_core);
+        void suspend_processing_unit_cb(std::function<void(void)> callback,
+            std::size_t virt_core, error_code& = hpx::throws);
 
         // Resume the given processing unit on the scheduler.
-        void resume_processing_unit(std::size_t virt_core, error_code&);
+        hpx::future<void> resume_processing_unit(std::size_t virt_core);
+        void resume_processing_unit_cb(std::function<void(void)> callback,
+            std::size_t virt_core, error_code& = hpx::throws);
 
     protected:
         friend struct init_tss_helper<Scheduler>;
 
-        template <typename F>
-        void suspend_func(F&& callback, error_code& ec);
-        template <typename F>
-        void suspend_internal(F&& callback, error_code& ec);
+        void resume_internal(error_code& ec);
+        void suspend_internal(error_code& ec);
 
         void remove_processing_unit_internal(
             std::size_t virt_core, error_code& = hpx::throws);

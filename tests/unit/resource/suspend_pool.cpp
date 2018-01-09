@@ -31,7 +31,8 @@ int hpx_main(int argc, char* argv[])
 
     try
     {
-        hpx::this_thread::get_pool()->suspend();
+        // Use .get() to throw exception
+        hpx::this_thread::get_pool()->suspend().get();
         HPX_TEST_MSG(false, "Suspending should not be allowed on own pool");
     }
     catch (hpx::exception const&)
@@ -61,12 +62,12 @@ int hpx_main(int argc, char* argv[])
                 fs.push_back(hpx::async(worker_exec, [](){}));
             }
 
-            worker_pool.suspend().wait();
+            worker_pool.suspend().get();
 
             // All work should be done when pool has been suspended
             HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
-            worker_pool.resume();
+            worker_pool.resume().get();
         }
     }
 
@@ -95,7 +96,12 @@ int hpx_main(int argc, char* argv[])
             // All work should be done when pool has been suspended
             HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
-            worker_pool.resume();
+            worker_pool.resume_cb([&sem]()
+                {
+                    sem.signal();
+                });
+
+            sem.wait(1);
         }
     }
 
@@ -119,12 +125,12 @@ int hpx_main(int argc, char* argv[])
                 fs.push_back(hpx::async(worker_exec, [](){}));
             }
 
-            worker_pool.suspend().wait();
+            worker_pool.suspend().get();
 
             // All work should be done when pool has been suspended
             HPX_TEST(hpx::when_all(std::move(fs)).is_ready());
 
-            worker_pool.resume();
+            worker_pool.resume().get();
         }
     }
 
