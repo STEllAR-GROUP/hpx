@@ -58,7 +58,7 @@ int hpx_main(int argc, char* argv[])
             {
                 if (thread_num != hpx::resource::get_num_threads("default") - 1)
                 {
-                    tp.suspend_processing_unit(thread_num);
+                    tp.suspend_processing_unit(thread_num).get();
                 }
 
                 ++thread_num;
@@ -71,7 +71,7 @@ int hpx_main(int argc, char* argv[])
             }
             else
             {
-                tp.resume_processing_unit(thread_num - 1);
+                tp.resume_processing_unit(thread_num - 1).get();
 
                 --thread_num;
 
@@ -88,7 +88,7 @@ int hpx_main(int argc, char* argv[])
         for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
             ++thread_num_resume)
         {
-            tp.resume_processing_unit(thread_num_resume);
+            tp.resume_processing_unit(thread_num_resume).get();
         }
     }
 

@@ -57,7 +57,6 @@ int main(int argc, char* argv[])
         default_pool.suspend_cb([&suspended]()
             {
                 suspended = true;
-                std::cout << "suspended\n";
             });
 
         while (!suspended)
@@ -65,7 +64,16 @@ int main(int argc, char* argv[])
             hpx::compat::this_thread::yield();
         }
 
-        default_pool.resume();
+        bool resumed = false;
+        default_pool.resume_cb([&resumed]()
+            {
+                resumed = true;
+            });
+
+        while (!resumed)
+        {
+            hpx::compat::this_thread::yield();
+        }
     }
 
     hpx::apply(default_exec, []() { hpx::finalize(); });

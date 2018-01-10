@@ -35,14 +35,14 @@ int hpx_main(int argc, char* argv[])
         // Check number of used resources
         for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
         {
-            tp.suspend_processing_unit(thread_num);
+            tp.suspend_processing_unit(thread_num).get();
             HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
                 tp.get_active_os_thread_count());
         }
 
         for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
         {
-            tp.resume_processing_unit(thread_num);
+            tp.resume_processing_unit(thread_num).get();
             HPX_TEST_EQ(std::size_t(thread_num + 2),
                 tp.get_active_os_thread_count());
         }
@@ -51,8 +51,8 @@ int hpx_main(int argc, char* argv[])
     {
         // Check suspending pu on which current thread is running
         std::size_t worker_thread_num = hpx::get_worker_thread_num();
-        tp.suspend_processing_unit(worker_thread_num);
-        tp.resume_processing_unit(worker_thread_num);
+        tp.suspend_processing_unit(worker_thread_num).get();
+        tp.resume_processing_unit(worker_thread_num).get();
     }
 
     {
@@ -73,7 +73,7 @@ int hpx_main(int argc, char* argv[])
             {
                 if (thread_num != thread_num_suspend)
                 {
-                    tp.suspend_processing_unit(thread_num_suspend);
+                    tp.suspend_processing_unit(thread_num_suspend).get();
                 }
             }
 
@@ -85,7 +85,7 @@ int hpx_main(int argc, char* argv[])
             {
                 if (thread_num != thread_num_resume)
                 {
-                    tp.resume_processing_unit(thread_num_resume);
+                    tp.resume_processing_unit(thread_num_resume).get();
                 }
             }
         }
@@ -110,7 +110,7 @@ int hpx_main(int argc, char* argv[])
             {
                 if (thread_num != hpx::resource::get_num_threads("default") - 1)
                 {
-                    tp.suspend_processing_unit(thread_num);
+                    tp.suspend_processing_unit(thread_num).get();
                 }
 
                 ++thread_num;
@@ -123,7 +123,7 @@ int hpx_main(int argc, char* argv[])
             }
             else
             {
-                tp.resume_processing_unit(thread_num - 1);
+                tp.resume_processing_unit(thread_num - 1).get();
 
                 --thread_num;
 
@@ -140,7 +140,25 @@ int hpx_main(int argc, char* argv[])
         for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
             ++thread_num_resume)
         {
-            tp.resume_processing_unit(thread_num_resume);
+            tp.resume_processing_unit(thread_num_resume).get();
+        }
+    }
+
+    {
+        // Check suspending and resuming the same thread without waiting for
+        // each to finish.
+        for (std::size_t thread_num = 0;
+             thread_num < hpx::resource::get_num_threads("default");
+             ++thread_num)
+        {
+            std::vector<hpx::future<void>> fs;
+
+            fs.push_back(tp.suspend_processing_unit(thread_num));
+            fs.push_back(tp.suspend_processing_unit(thread_num));
+            fs.push_back(tp.resume_processing_unit(thread_num));
+            fs.push_back(tp.resume_processing_unit(thread_num));
+
+            hpx::wait_all(fs);
         }
     }
 
