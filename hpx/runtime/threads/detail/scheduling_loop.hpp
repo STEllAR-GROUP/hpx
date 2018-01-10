@@ -667,21 +667,29 @@ namespace hpx { namespace threads { namespace detail
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-                    // clean up terminated threads one more time before sleeping
+                    // Clean up terminated threads before trying to exit
                     bool can_exit =
                         !running &&
                         scheduler.SchedulingPolicy::cleanup_terminated(
                             num_thread, true) &&
-                        scheduler.SchedulingPolicy::get_thread_count(
-                            suspended, thread_priority_default, num_thread) == 0;
+                        scheduler.SchedulingPolicy::get_queue_length(
+                            num_thread) == 0;
 
-                    if (can_exit)
+                    if (this_state.load() == state_pre_sleep)
                     {
-                        if (this_state.load() == state_pre_sleep)
+                        if (can_exit)
                         {
                             scheduler.SchedulingPolicy::suspend(num_thread);
                         }
-                        else
+                    }
+                    else
+                    {
+                        can_exit = can_exit &&
+                            scheduler.SchedulingPolicy::get_thread_count(
+                                suspended, thread_priority_default,
+                                num_thread) == 0;
+
+                        if (can_exit)
                         {
                             if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                             {
@@ -799,6 +807,8 @@ namespace hpx { namespace threads { namespace detail
                                 true) &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 suspended, thread_priority_default,
+                                num_thread) == 0 &&
+                            scheduler.SchedulingPolicy::get_queue_length(
                                 num_thread) == 0;
 
                         if (can_exit)
