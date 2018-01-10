@@ -8,6 +8,8 @@
 
 #include <hpx/config/defines.hpp>
 
+#include <ciso646>
+
 #if defined(__has_feature)
 #  if __has_feature(cxx_thread_local)
 #    define HPX_NATIVE_TLS thread_local
