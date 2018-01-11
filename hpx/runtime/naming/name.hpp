@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -19,6 +19,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 
@@ -296,7 +297,7 @@ namespace hpx { namespace naming
 
             for (std::size_t k = 0; !acquire_lock(); ++k)
             {
-                lcos::local::spinlock::yield(k);
+                util::detail::yield_k(k, "hpx::naming::gid_type::lock");
             }
 
             util::register_lock(this);

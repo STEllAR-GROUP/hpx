@@ -30,6 +30,7 @@
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
@@ -219,7 +220,9 @@ namespace hpx { namespace parcelset
                     else
                     {
                         ++k;
-                        hpx::lcos::local::spinlock::yield(k);
+                        util::detail::yield_k(k,
+                            "hpx::parcelset::policies::mpi::parcelport::"
+                                "io_service_work");
                     }
                 }
             }

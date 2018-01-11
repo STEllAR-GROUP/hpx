@@ -93,9 +93,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 }}}
 
-namespace hpx { namespace lcos { namespace local
-{
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+namespace hpx { namespace util { namespace detail
+{
     ///////////////////////////////////////////////////////////////////////////
     // We globally control whether to do minimal deadlock detection in
     // spin-locks using this global bool variable. It will be set once by the
@@ -103,8 +103,8 @@ namespace hpx { namespace lcos { namespace local
     bool spinlock_break_on_deadlock = false;
     std::size_t spinlock_deadlock_detection_limit =
         HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
-#endif
 }}}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -525,9 +525,9 @@ namespace hpx { namespace util
             enable_minimal_deadlock_detection();
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        lcos::local::spinlock_break_on_deadlock =
+        util::detail::spinlock_break_on_deadlock =
             enable_spinlock_deadlock_detection();
-        lcos::local::spinlock_deadlock_detection_limit =
+        util::detail::spinlock_deadlock_detection_limit =
             get_spinlock_deadlock_detection_limit();
 #endif
     }
@@ -586,9 +586,9 @@ namespace hpx { namespace util
             enable_minimal_deadlock_detection();
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        lcos::local::spinlock_break_on_deadlock =
+        util::detail::spinlock_break_on_deadlock =
             enable_spinlock_deadlock_detection();
-        lcos::local::spinlock_deadlock_detection_limit =
+        util::detail::spinlock_deadlock_detection_limit =
             get_spinlock_deadlock_detection_limit();
 #endif
     }

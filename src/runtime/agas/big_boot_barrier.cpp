@@ -34,6 +34,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/reinitializable_static.hpp>
@@ -844,6 +845,18 @@ void big_boot_barrier::trigger()
             }
             delete p;
         }
+    }
+}
+
+void big_boot_barrier::add_thunk(util::unique_function_nonser<void()>* f)
+{
+    std::size_t k = 0;
+    while (!thunks.push(f))
+    {
+        // Wait until successfully pushed ...
+        hpx::util::detail::yield_k(
+            k, "hpx::agas::big_boot_barrier::add_thunk");
+        ++k;
     }
 }
 
