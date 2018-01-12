@@ -213,6 +213,10 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // convert event name to code and check availability
         {
             std::lock_guard<papi_counter_base::mutex_type> lk(this->get_global_mtx());
+            // papi_call might throw, leading to potential "lock held while
+            // suspending thread" errors. At this point, it is safe to ignore
+            // the lock.
+            hpx::util::ignore_all_while_checking il;
 
             papi_call(PAPI_event_name_to_code(
                 const_cast<char *>(cpe.countername_.c_str()),
