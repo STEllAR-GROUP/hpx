@@ -1628,16 +1628,6 @@ namespace hpx { namespace threads { namespace detail
 
         HPX_ASSERT(oldstate == state_running);
 
-        if (threads::get_self_ptr())
-        {
-            std::size_t thread_num = thread_offset_ + virt_core;
-
-            util::detail::yield_while([thread_num]()
-                {
-                    return thread_num == hpx::get_worker_thread_num();
-                }, "scheduled_thread_pool::suspend_processing_unit_internal");
-        }
-
         util::detail::yield_while([&state]()
             {
                 return state.load() == state_pre_sleep;
