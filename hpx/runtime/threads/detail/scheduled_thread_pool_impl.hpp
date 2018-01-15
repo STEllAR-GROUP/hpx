@@ -369,13 +369,11 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::suspend_internal(error_code& ec)
     {
-        for (std::size_t k = 0;
-             sched_->Scheduler::get_thread_count() >
-                 get_background_thread_count();
-             ++k)
-        {
-            util::detail::yield_k(k, "scheduled_thread_pool::suspend_resume");
-        }
+        util::detail::yield_while([this]()
+            {
+                return this->sched_->Scheduler::get_thread_count() >
+                    this->get_background_thread_count();
+            }, "scheduled_thread_pool::suspend_internal");
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
@@ -1575,13 +1573,10 @@ namespace hpx { namespace threads { namespace detail
         {
             std::size_t thread_num = thread_offset_ + virt_core;
 
-            for (std::size_t k = 0;
-                 thread_num == hpx::get_worker_thread_num();
-                 ++k)
-            {
-                util::detail::yield_k(k,
-                    "scheduled_thread_pool::remove_processing_unit_internal");
-            }
+            util::detail::yield_while([thread_num]()
+                {
+                    return thread_num == hpx::get_worker_thread_num();
+                }, "scheduled_thread_pool::remove_processing_unit_internal");
         }
 
         t.join();
@@ -1595,12 +1590,18 @@ namespace hpx { namespace threads { namespace detail
         // deadlocks when multiple HPX threads try to resume or suspend pus.
         std::unique_lock<compat::mutex>
             l(sched_->Scheduler::get_pu_mutex(virt_core), std::try_to_lock);
-        for (std::size_t k = 0; !l.owns_lock(); k++)
-        {
-            util::detail::yield_k(k,
-                "scheduled_thread_pool::suspend_processing_unit_internal");
-            l.try_lock();
-        }
+        util::detail::yield_while([&l]()
+            {
+                if (l.owns_lock())
+                {
+                    return false;
+                }
+                else
+                {
+                    l.try_lock();
+                    return true;
+                }
+            }, "scheduled_thread_pool::suspend_processing_unit_internal");
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
@@ -1631,20 +1632,16 @@ namespace hpx { namespace threads { namespace detail
         {
             std::size_t thread_num = thread_offset_ + virt_core;
 
-            for (std::size_t k = 0;
-                 thread_num == hpx::get_worker_thread_num();
-                 ++k)
-            {
-                util::detail::yield_k(k,
-                    "scheduled_thread_pool::suspend_processing_unit_internal");
-            }
+            util::detail::yield_while([thread_num]()
+                {
+                    return thread_num == hpx::get_worker_thread_num();
+                }, "scheduled_thread_pool::suspend_processing_unit_internal");
         }
 
-        for (std::size_t k = 0; state.load() == state_pre_sleep; ++k)
-        {
-            util::detail::yield_k(k,
-                "scheduled_thread_pool::suspend_processing_unit_internal");
-        }
+        util::detail::yield_while([&state]()
+            {
+                return state.load() == state_pre_sleep;
+            }, "scheduled_thread_pool::suspend_processing_unit_internal");
     }
 
     template <typename Scheduler>
@@ -1711,12 +1708,18 @@ namespace hpx { namespace threads { namespace detail
         // deadlocks when multiple HPX threads try to resume or suspend pus.
         std::unique_lock<compat::mutex>
             l(sched_->Scheduler::get_pu_mutex(virt_core), std::try_to_lock);
-        for (std::size_t k = 0; !l.owns_lock(); k++)
-        {
-            util::detail::yield_k(k,
-                "scheduled_thread_pool::resume_processing_unit_internal");
-            l.try_lock();
-        }
+        util::detail::yield_while([&l]()
+            {
+                if (l.owns_lock())
+                {
+                    return false;
+                }
+                else
+                {
+                    l.try_lock();
+                    return true;
+                }
+            }, "scheduled_thread_pool::resume_processing_unit_internal");
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
@@ -1731,12 +1734,11 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        for (std::size_t k = 0; state.load() == state_sleeping; ++k)
-        {
-            sched_->Scheduler::resume(virt_core);
-            util::detail::yield_k(k,
-                "scheduled_thread_pool::resume_processing_unit_internal");
-        }
+        util::detail::yield_while([this, &state, virt_core]()
+            {
+                this->sched_->Scheduler::resume(virt_core);
+                return state.load() == state_sleeping;
+            }, "scheduled_thread_pool::resume_processing_unit_internal");
     }
 
     template <typename Scheduler>

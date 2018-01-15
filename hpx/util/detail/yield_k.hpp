@@ -77,6 +77,26 @@ namespace hpx { namespace util { namespace detail
         }
     }
 
+    template <typename Predicate>
+    inline void yield_while(Predicate && predicate, const char *thread_name,
+        hpx::threads::thread_state_enum p = hpx::threads::pending_boost,
+        bool allow_timed_suspension = true)
+    {
+        if (allow_timed_suspension)
+        {
+            for (std::size_t k = 0; predicate(); ++k)
+            {
+                yield_k(k, thread_name, p);
+            }
+        }
+        else
+        {
+            for (std::size_t k = 0; predicate(); ++k)
+            {
+                yield_k(k % 32, thread_name, p);
+            }
+        }
+    }
 }}}
 
 #endif
