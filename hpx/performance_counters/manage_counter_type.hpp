@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace hpx { namespace performance_counters
 {
@@ -65,6 +66,55 @@ namespace hpx { namespace performance_counters
     ///       corresponding performance counter will be created.
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
         hpx::util::function_nonser<std::int64_t(bool)> const& counter_value,
+        std::string const& helptext = "", std::string const& uom = "",
+        error_code& ec = throws);
+
+    /// Install a new generic performance counter type returning an
+    /// array of values in a way, that will uninstall it automatically during
+    /// shutdown.
+    ///
+    /// The function \a install_counter_type will register a new generic
+    /// counter type that returns an array of values based on the provided
+    /// function. The counter
+    /// type will be automatically unregistered during system shutdown. Any
+    /// consumer querying any instance of this this counter type will cause the
+    /// provided function to be called and the returned array value to be
+    /// exposed as the counter value.
+    ///
+    /// The counter type is registered such that there can be one counter
+    /// instance per locality. The expected naming scheme for the counter
+    /// instances is: \c '/objectname{locality#<*>/total}/countername' where
+    /// '<*>' is a zero based integer identifying the locality the counter
+    /// is created on.
+    ///
+    /// \param name   [in] The global virtual name of the counter type. This
+    ///               name is expected to have the format /objectname/countername.
+    /// \param counter_value [in] The function to call whenever the counter
+    ///               value (array of values) is requested by a consumer.
+    /// \param helptext [in, optional] A longer descriptive text shown to the
+    ///               user to explain the nature of the counters created from
+    ///               this type.
+    /// \param uom    [in] The unit of measure for the new performance counter
+    ///               type.
+    /// \param ec     [in,out] this represents the error status on exit,
+    ///               if this is pre-initialized to \a hpx#throws
+    ///               the function will throw on error instead.
+    ///
+    /// \note As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///       function doesn't throw but returns the result code using the
+    ///       parameter \a ec. Otherwise it throws an instance of hpx::exception.
+    ///
+    /// \returns      If successful, this function returns \a status_valid_data,
+    ///               otherwise it will either throw an exception or return an
+    ///               error_code from the enum \a counter_status (also, see
+    ///               note related to parameter \a ec).
+    ///
+    /// \note The counter type registry is a locality based service. You will
+    ///       have to register each counter type on every locality where a
+    ///       corresponding performance counter will be created.
+    HPX_EXPORT counter_status install_counter_type(std::string const& name,
+        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const&
+            counter_value,
         std::string const& helptext = "", std::string const& uom = "",
         error_code& ec = throws);
 

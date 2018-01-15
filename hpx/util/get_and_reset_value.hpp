@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <vector>
 
 namespace hpx { namespace util
 {
@@ -34,6 +35,16 @@ namespace hpx { namespace util
         T result = value.load();
         if (reset)
             value.store(0);
+        return result;
+    }
+
+    inline std::vector<std::int64_t> get_and_reset_value(
+        std::vector<std::int64_t>& value, bool reset)
+    {
+        std::vector<std::int64_t> result = value;
+        if (reset)
+            value.clear();
+
         return result;
     }
 }}
