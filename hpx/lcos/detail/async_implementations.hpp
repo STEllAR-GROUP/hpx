@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -158,13 +158,9 @@ namespace hpx { namespace detail
     bool can_invoke_locally()
     {
         return !traits::action_decorate_function<Action>::value &&
-            this_thread::get_priority() ==
-                static_cast<threads::thread_priority>(
-                    traits::action_priority<Action>::value) &&
-            this_thread::get_stack_size() ==
-                threads::get_stack_size(
-                    static_cast<threads::thread_stacksize>(
-                        traits::action_stacksize<Action>::value));
+            this_thread::get_stack_size() >= threads::get_stack_size(
+                static_cast<threads::thread_stacksize>(
+                    traits::action_stacksize<Action>::value));
     }
 
     template <typename Action>
