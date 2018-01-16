@@ -51,9 +51,12 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT_OWNS_LOCK(lock);
             util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
-
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
+            //The following ensures that the inner lock will be unlocked
+            //before the outer to avoid deadlock (fixes issue #3608)
+            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+                l, std::adopt_lock);
 
             cond_.wait(l, ec);
 
@@ -85,6 +88,10 @@ namespace hpx { namespace lcos { namespace local
             util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
+            //The following ensures that the inner lock will be unlocked
+            //before the outer to avoid deadlock (fixes issue #3608)
+            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+                l, std::adopt_lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, abs_time, ec);
@@ -163,6 +170,10 @@ namespace hpx { namespace lcos { namespace local
             util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<Lock> unlock(lock);
+            //The following ensures that the inner lock will be unlocked
+            //before the outer to avoid deadlock (fixes issue #3608)
+            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+                l, std::adopt_lock);
 
             cond_.wait(l, ec);
 
@@ -194,6 +205,10 @@ namespace hpx { namespace lcos { namespace local
             util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_);
             util::unlock_guard<Lock> unlock(lock);
+            //The following ensures that the inner lock will be unlocked
+            //before the outer to avoid deadlock (fixes issue #3608)
+            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+                l, std::adopt_lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, abs_time, ec);
