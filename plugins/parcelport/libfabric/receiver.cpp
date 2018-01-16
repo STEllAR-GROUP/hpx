@@ -171,8 +171,9 @@ namespace libfabric
 
         hpx::util::detail::yield_while([this, desc]()
             {
-                // post a receive using 'this' as the context, so that this receiver object
-                // can be used to handle the incoming receive/request
+                // post a receive using 'this' as the context, so that this
+                // receiver object can be used to handle the incoming
+                // receive/request
                 int ret = fi_recv(this->endpoint_,
                     this->header_region_->get_address(),
                     this->header_region_->get_size(), desc, 0, this);
