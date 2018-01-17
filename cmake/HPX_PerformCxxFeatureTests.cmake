@@ -164,6 +164,9 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx14_std_integer_sequence(
       DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
 
+    hpx_check_for_cxx14_std_decay_t(
+      DEFINITIONS HPX_HAVE_CXX14_STD_DECAY_T)
+
     hpx_check_for_cxx14_std_is_final(
       DEFINITIONS HPX_HAVE_CXX14_STD_IS_FINAL)
 

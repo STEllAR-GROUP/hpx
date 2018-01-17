@@ -6,6 +6,8 @@
 #if !defined(HPX_UTIL_OPTIONAL_HPP)
 #define HPX_UTIL_OPTIONAL_HPP
 
+#include <hpx/config.hpp>
+
 #include <exception>
 #include <string>
 #include <stdexcept>
@@ -483,9 +485,9 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    constexpr optional<std::decay_t<T>> make_optional(T && v)
+    constexpr optional<HPX_DECAY_T(T)> make_optional(T && v)
     {
-        return optional<std::decay_t<T>>(std::forward<T>(v));
+        return optional<HPX_DECAY_T(T)>(std::forward<T>(v));
     }
 
     template <typename T, typename ... Ts>
