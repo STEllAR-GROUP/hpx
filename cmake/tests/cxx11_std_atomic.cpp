@@ -6,9 +6,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <atomic>
+#include <cstdint>
 
 struct P {
-    long x; long y;
+    uint64_t x; uint64_t y;
 };
 
 int main()
