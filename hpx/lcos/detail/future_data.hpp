@@ -223,7 +223,7 @@ namespace detail
             if (recurse_asynchronously)
             {
                 error_code ec;
-                threads::thread_id_type id = threads::register_thread_nullary(
+                threads::register_thread_nullary(
                     compose_cb_impl(std::move(f1_), std::move(f2_)),
                     "compose_cb",
                     threads::pending, true, threads::thread_priority_boost,

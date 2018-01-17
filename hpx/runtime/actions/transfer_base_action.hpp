@@ -16,6 +16,8 @@
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -176,7 +178,7 @@ namespace hpx { namespace actions
           : arguments_(std::forward<Ts>(vs)...),
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_(transfer_base_action::get_locality_id()),
-            parent_id_(reinterpret_cast<std::uint64_t>(threads::get_parent_id())),
+            parent_id_(threads::get_parent_id()),
             parent_phase_(threads::get_parent_phase()),
 #endif
             priority_(
@@ -194,7 +196,7 @@ namespace hpx { namespace actions
           : arguments_(std::forward<Ts>(vs)...),
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_(transfer_base_action::get_locality_id()),
-            parent_id_(reinterpret_cast<std::uint64_t>(threads::get_parent_id())),
+            parent_id_(threads::get_parent_id()),
             parent_phase_(threads::get_parent_phase()),
 #endif
             priority_(
@@ -266,9 +268,9 @@ namespace hpx { namespace actions
         }
 
         /// Return the thread id of the parent thread
-        threads::thread_id_repr_type get_parent_thread_id() const
+        threads::thread_id_type get_parent_thread_id() const
         {
-            return threads::invalid_thread_id_repr;
+            return threads::invalid_thread_id;
         }
 
         /// Return the phase of the parent thread
@@ -284,9 +286,9 @@ namespace hpx { namespace actions
         }
 
         /// Return the thread id of the parent thread
-        threads::thread_id_repr_type get_parent_thread_id() const
+        threads::thread_id_type get_parent_thread_id() const
         {
-            return reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
+            return parent_id_;
         }
 
         /// Return the phase of the parent thread
@@ -368,7 +370,8 @@ namespace hpx { namespace actions
 
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_ = data.parent_locality_;
-            parent_id_ = data.parent_id_;
+            parent_id_ = threads::thread_id_type(
+                reinterpret_cast<threads::thread_data*>(data.parent_id_));
             parent_phase_ = data.parent_phase_;
 #endif
             priority_ = data.priority_;
@@ -385,7 +388,7 @@ namespace hpx { namespace actions
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             std::uint32_t parent_locality_ = naming::invalid_locality_id;
-            std::uint64_t parent_id_ = std::uint64_t(-1);
+            threads::thread_id_type parent_id_;
             std::uint64_t parent_phase_ = 0;
 #endif
             detail::action_serialization_data data(parent_locality_,
@@ -405,7 +408,7 @@ namespace hpx { namespace actions
 
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         std::uint32_t parent_locality_;
-        std::uint64_t parent_id_;
+        threads::thread_id_type parent_id_;
         std::uint64_t parent_phase_;
 #endif
         threads::thread_priority priority_;

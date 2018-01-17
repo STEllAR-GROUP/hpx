@@ -51,6 +51,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     thread::thread() noexcept
+      : id_(hpx::threads::invalid_thread_id)
     {}
 
     thread::thread(thread&& rhs) noexcept

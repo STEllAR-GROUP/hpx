@@ -70,13 +70,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         if (!queue_.empty())
         {
-            threads::thread_id_repr_type id = queue_.front().id_;
+            threads::thread_id_type id = queue_.front().id_;
 
             // remove item from queue before error handling
-            queue_.front().id_ = threads::invalid_thread_id_repr;
+            queue_.front().id_ = threads::invalid_thread_id;
             queue_.pop_front();
 
-            if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+            if (HPX_UNLIKELY(id == threads::invalid_thread_id))
             {
                 lock.unlock();
 
@@ -89,8 +89,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             bool not_empty = !queue_.empty();
             lock.unlock();
 
-            threads::set_thread_state(threads::thread_id_type(
-                    reinterpret_cast<threads::thread_data*>(id)),
+            threads::set_thread_state(id,
                 threads::pending, threads::wait_signaled, priority, ec);
 
             return not_empty;
@@ -119,13 +118,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 qe.q_ = &queue;
 
             do {
-                threads::thread_id_repr_type id = queue.front().id_;
+                threads::thread_id_type id = queue.front().id_;
 
                 // remove item from queue before error handling
-                queue.front().id_ = threads::invalid_thread_id_repr;
+                queue.front().id_ = threads::invalid_thread_id;
                 queue.pop_front();
 
-                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                if (HPX_UNLIKELY(id == threads::invalid_thread_id))
                 {
                     prepend_entries(lock, queue);
                     lock.unlock();
@@ -139,8 +138,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 error_code local_ec;
                 {
                     util::ignore_while_checking<std::unique_lock<mutex_type> > il(&lock);
-                    threads::set_thread_state(threads::thread_id_type(
-                            reinterpret_cast<threads::thread_data*>(id)),
+                    threads::set_thread_state(id,
                         threads::pending, threads::wait_signaled, priority, local_ec);
                 }
 
@@ -183,7 +181,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
-        queue_entry f(threads::get_self_id().get(), &queue_);
+        queue_entry f(threads::get_self_id(), &queue_);
         queue_.push_back(f);
 
         reset_queue_entry r(f, queue_);
@@ -195,7 +193,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             if (ec) return threads::wait_unknown;
         }
 
-        return (f.id_ != threads::invalid_thread_id_repr) ?
+        return (f.id_ != threads::invalid_thread_id) ?
             threads::wait_timeout : reason;
     }
 
@@ -208,7 +206,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
-        queue_entry f(threads::get_self_id().get(), &queue_);
+        queue_entry f(threads::get_self_id(), &queue_);
         queue_.push_back(f);
 
         reset_queue_entry r(f, queue_);
@@ -220,7 +218,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             if (ec) return threads::wait_unknown;
         }
 
-        return (f.id_ != threads::invalid_thread_id_repr) ?
+        return (f.id_ != threads::invalid_thread_id) ?
             threads::wait_timeout : reason;
     }
 
@@ -240,12 +238,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             while (!queue.empty())
             {
-                threads::thread_id_repr_type id = queue.front().id_;
+                threads::thread_id_type id = queue.front().id_;
 
-                queue.front().id_ = threads::invalid_thread_id_repr;
+                queue.front().id_ = threads::invalid_thread_id;
                 queue.pop_front();
 
-                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                if (HPX_UNLIKELY(id == threads::invalid_thread_id))
                 {
                     LERR_(fatal)
                         << "condition_variable::abort_all:"
@@ -253,24 +251,20 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     continue;
                 }
 
-                // we know that the id is actually the pointer to the thread
-                threads::thread_id_type tid(
-                    reinterpret_cast<threads::thread_data*>(id));
-
                 LERR_(fatal)
                         << "condition_variable::abort_all:"
                         << " pending thread: "
                         << get_thread_state_name(
-                                threads::get_thread_state(tid))
-                        << "(" << tid << "): "
-                        << threads::get_thread_description(tid);
+                                threads::get_thread_state(id))
+                        << "(" << id << "): "
+                        << threads::get_thread_description(id);
 
                 // unlock while notifying thread as this can suspend
                 util::unlock_guard<std::unique_lock<Mutex> > unlock(lock);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
-                threads::set_thread_state(tid,
+                threads::set_thread_state(id,
                     threads::pending, threads::wait_abort,
                     threads::thread_priority_default, ec);
                 if (ec)
@@ -279,9 +273,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         << "condition_variable::abort_all:"
                         << " could not abort thread: "
                         << get_thread_state_name(
-                                threads::get_thread_state(tid))
-                        << "(" << tid << "): "
-                        << threads::get_thread_description(tid);
+                                threads::get_thread_state(id))
+                        << "(" << id << "): "
+                        << threads::get_thread_description(id);
                 }
             }
         }

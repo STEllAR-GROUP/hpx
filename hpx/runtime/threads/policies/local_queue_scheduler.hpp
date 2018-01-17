@@ -460,6 +460,8 @@ namespace hpx { namespace threads { namespace policies
             if (std::size_t(-1) == num_thread)
                 num_thread = curr_queue_++ % queues_.size();
 
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+
             HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread(thrd);
         }
@@ -471,6 +473,8 @@ namespace hpx { namespace threads { namespace policies
             if (std::size_t(-1) == num_thread)
                 num_thread = curr_queue_++ % queues_.size();
 
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+
             HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread(thrd, true);
         }
@@ -478,6 +482,8 @@ namespace hpx { namespace threads { namespace policies
         /// Destroy the passed thread as it has been terminated
         bool destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
         {
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+
             for (std::size_t i = 0; i != queues_.size(); ++i)
             {
                 if (queues_[i]->destroy_thread(thrd, busy_count))
