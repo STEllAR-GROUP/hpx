@@ -31,10 +31,9 @@ namespace hpx { namespace util
     template <typename T>
     inline T get_and_reset_value(std::atomic<T>& value, bool reset)
     {
-        T result = value.load();
         if (reset)
-            value.store(0);
-        return result;
+            return value.exchange(0, std::memory_order_acq_rel);
+        return value.load(std::memory_order_relaxed);
     }
 }}
 
