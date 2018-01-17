@@ -86,6 +86,65 @@ namespace hpx { namespace threads { namespace detail
     {
     }
 
+    hpx::future<void> io_service_thread_pool::resume()
+    {
+        HPX_ASSERT_MSG(false,
+            "Resuming io_service_thread_pool is not supported");
+        return hpx::make_ready_future();
+    }
+
+    void io_service_thread_pool::resume_cb(std::function<void(void)> callback,
+        error_code& ec)
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending io_service_thread_pool is not supported");
+    }
+
+    hpx::future<void> io_service_thread_pool::suspend()
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending io_service_thread_pool is not supported");
+        return hpx::make_ready_future();
+    }
+
+    void io_service_thread_pool::suspend_cb(std::function<void(void)> callback,
+        error_code& ec)
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending io_service_thread_pool is not supported");
+    }
+
+    hpx::future<void> io_service_thread_pool::suspend_processing_unit(
+        std::size_t virt_core)
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending threads on io_service_thread_pool is not supported");
+    }
+
+    void io_service_thread_pool::suspend_processing_unit_cb(
+        std::function<void(void)> callback, std::size_t virt_core,
+        error_code& ec)
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending threads on io_service_thread_pool is not supported");
+    }
+
+    hpx::future<void> io_service_thread_pool::resume_processing_unit(
+        std::size_t virt_core)
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending threads on io_service_thread_pool is not supported");
+    }
+
+    void io_service_thread_pool::resume_processing_unit_cb(
+        std::function<void(void)> callback, std::size_t virt_core,
+        error_code& ec)
+    {
+        HPX_ASSERT_MSG(false,
+            "Suspending threads on io_service_thread_pool is not supported");
+    }
+
+
     hpx::compat::thread& io_service_thread_pool::get_os_thread_handle(
         std::size_t global_thread_num)
     {
