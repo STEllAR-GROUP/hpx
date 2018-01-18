@@ -306,36 +306,35 @@ namespace libfabric
         // count reads
         ++rma_reads_;
 
-        hpx::util::detail::yield_while([this, get_region]()
+        ssize_t ret = 0;
+        for (std::size_t k = 0; true; ++k)
+        {
+            LOG_EXCLUSIVE(
+                // write a pattern and dump out data for debugging purposes
+                uint32_t *buffer =
+                    reinterpret_cast<uint32_t*>(get_region->get_address());
+                std::fill(buffer, buffer + get_region->get_size()/4, 0xDEADC0DE);
+                LOG_TRACE_MSG(
+                    CRC32_MEM(get_region->get_address(), c.size_,
+                        "(RDMA GET region (pre-fi_read))"));
+            );
+
+            ret = fi_read(endpoint_,
+                get_region->get_address(),
+                get_region->get_message_length(),
+                get_region->get_desc(),
+                src_addr_,
+                (uint64_t)(remoteAddr), rkey, this);
+            if (ret == -FI_EAGAIN)
             {
-                LOG_EXCLUSIVE(
-                    // write a pattern and dump out data for debugging purposes
-                    uint32_t *buffer =
-                        reinterpret_cast<uint32_t*>(get_region->get_address());
-                    std::fill(buffer, buffer + get_region->get_size()/4,
-                       0xDEADC0DE);
-                    LOG_TRACE_MSG(
-                        CRC32_MEM(get_region->get_address(), c.size_,
-                                  "(RDMA GET region (pre-fi_read))"));
-                    );
-
-                ssize_t ret = fi_read(endpoint_, get_region->get_address(),
-                    get_region->get_message_length(), get_region->get_desc(),
-                    src_addr_, (uint64_t)(remoteAddr), rkey, this);
-
-                if (ret == -FI_EAGAIN)
-                {
-                    LOG_ERROR_MSG("receiver " << hexpointer(this)
-                        << "reposting fi_read...\n");
-                    return true;
-                }
-                else if (ret)
-                {
-                    throw fabric_error(ret, "fi_read");
-                }
-
-                return false;
-            }, "libfabric::receiver::async_read");
+                LOG_ERROR_MSG("receiver " << hexpointer(this)
+                    << "reposting fi_read...\n");
+                hpx::util::detail::yield_k(k, "libfabric::receiver::async_read");
+                continue;
+            }
+            if (ret) throw fabric_error(ret, "fi_read");
+            break;
+        }
     }
 
     // --------------------------------------------------------------------
@@ -485,28 +484,25 @@ namespace libfabric
 
         ++sent_ack_;
 
-        hpx::util::detail::yield_while([this]()
+        int ret = 0;
+        for (std::size_t k = 0; true; ++k)
+        {
+            // when we received the incoming message, the tag was already set
+            // with the sender context so that we can signal it directly
+            // that we have completed RMA and the sender my now cleanup.
+            std::uint64_t tag = header_->tag();
+            ret = fi_inject(endpoint_, &tag, sizeof(std::uint64_t), src_addr_);
+            if (ret == -FI_EAGAIN)
             {
-                // when we received the incoming message, the tag was already set
-                // with the sender context so that we can signal it directly
-                // that we have completed RMA and the sender my now cleanup.
-                std::uint64_t tag = this->header_->tag();
-                int ret = fi_inject(this->endpoint_, &tag,
-                    sizeof(std::uint64_t), this->src_addr_);
-
-                if (ret == -FI_EAGAIN)
-                {
-                    LOG_ERROR_MSG("receiver " << hexpointer(this)
-                        << "reposting fi_inject...\n");
-                    return true;
-                }
-                else if (ret)
-                {
-                    throw fabric_error(ret, "fi_inject ack notification error");
-                }
-
-                return false;
-            }, "libfabric::receiver::send_rdma_complete_ack");
+                LOG_ERROR_MSG("receiver " << hexpointer(this)
+                    << "reposting fi_inject...\n");
+                hpx::util::detail::yield_k(k,
+                    "libfabric::receiver::send_rdma_complete_ack");
+                continue;
+            }
+            if (ret) throw fabric_error(ret, "fi_inject ack notification error");
+            break;
+        }
     }
 
     // --------------------------------------------------------------------

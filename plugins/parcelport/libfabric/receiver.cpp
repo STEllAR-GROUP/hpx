@@ -169,28 +169,31 @@ namespace libfabric
             << *header_region_
             << "context " << hexpointer(this));
 
-        hpx::util::detail::yield_while([this, desc]()
+        int ret = 0;
+        for (std::size_t k = 0; true; ++k)
+        {
+            // post a receive using 'this' as the context, so that this receiver object
+            // can be used to handle the incoming receive/request
+            ret = fi_recv(
+                endpoint_,
+                header_region_->get_address(),
+                header_region_->get_size(),
+                desc, 0, this);
+
+            if (ret == -FI_EAGAIN)
             {
-                // post a receive using 'this' as the context, so that this
-                // receiver object can be used to handle the incoming
-                // receive/request
-                int ret = fi_recv(this->endpoint_,
-                    this->header_region_->get_address(),
-                    this->header_region_->get_size(), desc, 0, this);
-
-                if (ret == -FI_EAGAIN)
-                {
-                    LOG_ERROR_MSG("reposting fi_recv\n");
-                    return true;
-                }
-                else if (ret != 0)
-                {
-                    throw fabric_error(ret, "pp_post_rx");
-                }
-
-                return false;
-            }, "libfabric::receiver::post_recv");
-
+                LOG_ERROR_MSG("reposting fi_recv\n");
+                hpx::util::detail::yield_k(k,
+                    "libfabric::receiver::post_recv");
+                continue;
+            }
+            if (ret!=0)
+            {
+                // TODO: proper error message
+                throw fabric_error(ret, "pp_post_rx");
+            }
+            break;
+        }
         FUNC_END_DEBUG_MSG;
     }
 }}}}

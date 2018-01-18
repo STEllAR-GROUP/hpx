@@ -643,6 +643,9 @@ namespace hpx { namespace threads { namespace detail
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
+                    //
+                    // REVIEW: Passing a specific target thread may set off
+                    // the round robin queuing.
                     scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
                 }
 
@@ -667,29 +670,21 @@ namespace hpx { namespace threads { namespace detail
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-                    // Clean up terminated threads before trying to exit
+                    // clean up terminated threads one more time before sleeping
                     bool can_exit =
                         !running &&
                         scheduler.SchedulingPolicy::cleanup_terminated(
                             num_thread, true) &&
-                        scheduler.SchedulingPolicy::get_queue_length(
-                            num_thread) == 0;
+                        scheduler.SchedulingPolicy::get_thread_count(
+                            suspended, thread_priority_default, num_thread) == 0;
 
-                    if (this_state.load() == state_pre_sleep)
+                    if (can_exit)
                     {
-                        if (can_exit)
+                        if (this_state.load() == state_pre_sleep)
                         {
                             scheduler.SchedulingPolicy::suspend(num_thread);
                         }
-                    }
-                    else
-                    {
-                        can_exit = can_exit &&
-                            scheduler.SchedulingPolicy::get_thread_count(
-                                suspended, thread_priority_default,
-                                num_thread) == 0;
-
-                        if (can_exit)
+                        else
                         {
                             if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                             {
@@ -722,6 +717,11 @@ namespace hpx { namespace threads { namespace detail
                     }
                 }
 
+                // let our background threads terminate
+                if (background_running)
+                {
+                    *background_running = running;
+                }
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running))
@@ -807,8 +807,6 @@ namespace hpx { namespace threads { namespace detail
                                 true) &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 suspended, thread_priority_default,
-                                num_thread) == 0 &&
-                            scheduler.SchedulingPolicy::get_queue_length(
                                 num_thread) == 0;
 
                         if (can_exit)

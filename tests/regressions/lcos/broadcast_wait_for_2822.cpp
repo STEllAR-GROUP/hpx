@@ -39,8 +39,18 @@ int hpx_main()
 
         auto f =
             hpx::lcos::broadcast<vector_bcast_action>(localities, bcast_array);
-        HPX_TEST(f.wait_for(std::chrono::milliseconds(1000)) ==
-            hpx::lcos::future_status::ready);
+        hpx::lcos::future_status status = hpx::lcos::future_status::timeout;
+
+        // This test should usually test against future_status == ready. However,
+        // under some circumstances, the operation might still take a little
+        // longer...
+        while (status != hpx::lcos::future_status::ready)
+        {
+            status = f.wait_for(std::chrono::milliseconds(1000));
+            HPX_TEST( status ==
+                hpx::lcos::future_status::ready ||
+                status == hpx::lcos::future_status::timeout);
+        }
 
         HPX_TEST_EQ(buffer.size(), N);
         HPX_TEST_EQ(buffer.size(), bcast_array.size());

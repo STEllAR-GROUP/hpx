@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -65,26 +64,6 @@ namespace hpx { namespace threads { namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
-
-        ///////////////////////////////////////////////////////////////////////
-        hpx::future<void> resume();
-        void resume_cb(std::function<void(void)> callback,
-            error_code& ec = throws);
-
-        hpx::future<void> suspend();
-        void suspend_cb(std::function<void(void)> callback,
-            error_code& ec = throws);
-
-        ///////////////////////////////////////////////////////////////////////
-        hpx::future<void> suspend_processing_unit(std::size_t virt_core);
-        void suspend_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
-            error_code& ec = throws);
-
-        hpx::future<void> resume_processing_unit(std::size_t virt_core);
-        void resume_processing_unit_cb(
-            std::function<void(void)> callback, std::size_t virt_core,
-            error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         compat::thread& get_os_thread_handle(std::size_t global_thread_num);

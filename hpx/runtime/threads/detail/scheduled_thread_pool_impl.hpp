@@ -6,8 +6,6 @@
 #if !defined(HPX_SCHEDULED_THREAD_POOL_IMPL_HPP)
 #define HPX_SCHEDULED_THREAD_POOL_IMPL_HPP
 
-#include <hpx/apply.hpp>
-#include <hpx/async.hpp>
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
@@ -30,7 +28,6 @@
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>
@@ -181,7 +178,7 @@ namespace hpx { namespace threads { namespace detail
         if (!threads_.empty())
         {
             // wake up if suspended
-            resume_internal(throws);
+            resume();
 
             // set state to stopping
             sched_->Scheduler::set_all_states(state_stopping);
@@ -320,116 +317,16 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::resume_internal(error_code& ec)
+    void scheduled_thread_pool<Scheduler>::resume(error_code& ec)
     {
-        for (std::size_t i = 0; i != threads_.size(); ++i)
+        if (!(mode_ & threads::policies::enable_elasticity))
         {
-            resume_processing_unit_internal(i, ec);
-        }
-    }
-
-    template <typename Scheduler>
-    future<void> scheduled_thread_pool<Scheduler>::resume()
-    {
-        if (!threads::get_self_ptr())
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "scheduled_thread_pool<Scheduler>::resume",
-                "cannot call resume from outside HPX, use resume_cb instead");
-            return hpx::make_ready_future();
-        }
-
-        return hpx::async(
-            hpx::util::bind(&scheduled_thread_pool::resume_internal, this,
-                std::move(throws)));
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::resume_cb(
-        std::function<void(void)> callback, error_code& ec)
-    {
-        std::function<void(void)> resume_internal_wrapper =
-            [this, HPX_CAPTURE_MOVE(callback)]()
-            {
-                this->resume_internal(throws);
-                callback();
-            };
-
-        if (threads::get_self_ptr())
-        {
-            hpx::apply(std::move(resume_internal_wrapper));
-        }
-        else
-        {
-            compat::thread(std::move(resume_internal_wrapper)).detach();
-        }
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::suspend_internal(error_code& ec)
-    {
-        util::detail::yield_while([this]()
-            {
-                return this->sched_->Scheduler::get_thread_count() >
-                    this->get_background_thread_count();
-            }, "scheduled_thread_pool::suspend_internal");
-
-        for (std::size_t i = 0; i != threads_.size(); ++i)
-        {
-            suspend_processing_unit_internal(i, ec);
-        }
-    }
-
-    template <typename Scheduler>
-    future<void> scheduled_thread_pool<Scheduler>::suspend()
-    {
-        if (!threads::get_self_ptr())
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "scheduled_thread_pool<Scheduler>::suspend",
-                "cannot call suspend from outside HPX, use suspend_cb instead");
-            return make_ready_future();
-        }
-        else if (threads::get_self_ptr() &&
-            hpx::this_thread::get_pool() == this)
-        {
-            return hpx::make_exceptional_future<void>(
-                HPX_GET_EXCEPTION(bad_parameter,
-                    "scheduled_thread_pool<Scheduler>::suspend",
-                    "cannot suspend a pool from itself"));
-        }
-
-        return hpx::async(
-            hpx::util::bind(&scheduled_thread_pool::suspend_internal, this,
-                std::move(throws)));
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::suspend_cb(
-        std::function<void(void)> callback, error_code& ec)
-    {
-        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
-        {
-            HPX_THROWS_IF(ec, bad_parameter,
-                "scheduled_thread_pool<Scheduler>::suspend",
-                "cannot suspend a pool from itself");
             return;
         }
 
-        std::function<void(void)> suspend_internal_wrapper =
-            [this, HPX_CAPTURE_MOVE(callback)]()
-            {
-                this->suspend_internal(throws);
-                callback();
-            };
-
-        if (threads::get_self_ptr())
+        for (std::size_t i = 0; i != threads_.size(); ++i)
         {
-            hpx::apply(std::move(suspend_internal_wrapper));
-        }
-        else
-        {
-            compat::thread(std::move(suspend_internal_wrapper)).detach();
+            resume_processing_unit_internal(i, ec);
         }
     }
 
@@ -543,9 +440,8 @@ namespace hpx { namespace threads { namespace detail
                 // the OS thread is allowed to exit only if no more HPX
                 // threads exist or if some other thread has terminated
                 HPX_ASSERT(
-                    (sched_->Scheduler::get_thread_count(
-                        suspended, thread_priority_default, thread_num) == 0 &&
-                     sched_->Scheduler::get_queue_length(thread_num) == 0) ||
+                    !sched_->Scheduler::get_thread_count(
+                        suspended, thread_priority_default, thread_num) ||
                     sched_->Scheduler::get_state(thread_num) > state_stopping);
             }
             catch (hpx::exception const& e)
@@ -1471,21 +1367,20 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<compat::barrier> startup, error_code& ec)
     {
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
-
         if (threads_.size() <= virt_core)
             threads_.resize(virt_core + 1);
 
         if (threads_[virt_core].joinable())
         {
-            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
                 "the given virtual core has already been added to this "
                 "thread pool");
             return;
         }
+
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         resource::get_partitioner().assign_pu(id_.name(), virt_core);
 
@@ -1541,18 +1436,19 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
-
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
-            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::remove_processing_unit",
                 "the given virtual core has already been stopped to run on "
                 "this thread pool");
             return;
         }
+
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
+        compat::thread t;
 
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
@@ -1565,17 +1461,14 @@ namespace hpx { namespace threads { namespace detail
             oldstate == state_stopped);
 
         resource::get_partitioner().unassign_pu(id_.name(), virt_core);
-        compat::thread t;
         std::swap(threads_[virt_core], t);
 
         if (threads::get_self_ptr())
         {
-            std::size_t thread_num = thread_offset_ + virt_core;
-
-            util::detail::yield_while([thread_num]()
-                {
-                    return thread_num == hpx::get_worker_thread_num();
-                }, "scheduled_thread_pool::remove_processing_unit_internal");
+            while (virt_core == hpx::get_worker_thread_num())
+            {
+                hpx::this_thread::suspend();
+            }
         }
 
         t.join();
@@ -1585,26 +1478,8 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::suspend_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
-        // Yield to other HPX threads if lock is not available to avoid
-        // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core), std::try_to_lock);
-        util::detail::yield_while([&l]()
-            {
-                if (l.owns_lock())
-                {
-                    return false;
-                }
-                else
-                {
-                    l.try_lock();
-                    return true;
-                }
-            }, "scheduled_thread_pool::suspend_processing_unit_internal");
-
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
-            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
                 "the given virtual core has already been stopped to run on "
@@ -1612,56 +1487,38 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
         // inform the scheduler to suspend the virtual core
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
-
-        // check if already suspended
-        hpx::state current_state = state.load();
-        if (current_state == state_pre_sleep || current_state == state_sleeping)
-        {
-            return;
-        }
 
         hpx::state oldstate = state.exchange(state_pre_sleep);
 
         HPX_ASSERT(oldstate == state_running);
 
-        util::detail::yield_while([&state]()
+        if (threads::get_self_ptr())
+        {
+            while (virt_core == hpx::get_worker_thread_num())
             {
-                return state.load() == state_pre_sleep;
-            }, "scheduled_thread_pool::suspend_processing_unit_internal");
+                hpx::this_thread::suspend();
+            }
+
+            while (state.load() == state_pre_sleep)
+            {
+                hpx::this_thread::suspend();
+            }
+        }
+        else
+        {
+            while (state.load() == state_pre_sleep) {}
+        }
     }
 
     template <typename Scheduler>
-    hpx::future<void> scheduled_thread_pool<Scheduler>::suspend_processing_unit(
-        std::size_t virt_core)
-    {
-        if (!threads::get_self_ptr())
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
-                "cannot call suspend_processing_unit from outside HPX, use"
-                "suspend_processing_unit_cb instead");
-        }
-        else if (!(mode_ & threads::policies::enable_elasticity))
-        {
-            return hpx::make_exceptional_future<void>(
-                HPX_GET_EXCEPTION(invalid_status,
-                    "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
-                    "this thread pool does not support suspending "
-                    "processing units"));
-        }
-
-        return hpx::async(
-            hpx::util::bind(
-                &scheduled_thread_pool::suspend_processing_unit_internal, this,
-                virt_core, std::move(throws)));
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::suspend_processing_unit_cb(
-        std::function<void(void)> callback, std::size_t virt_core, error_code& ec)
+    void scheduled_thread_pool<Scheduler>::suspend_processing_unit(
+        std::size_t virt_core, error_code& ec)
     {
         if (!(mode_ & threads::policies::enable_elasticity))
         {
@@ -1672,47 +1529,15 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
-        std::function<void(void)> suspend_internal_wrapper =
-            [this, virt_core, HPX_CAPTURE_MOVE(callback)]()
-            {
-                this->suspend_processing_unit_internal(virt_core, throws);
-                callback();
-            };
-
-        if (threads::get_self_ptr())
-        {
-            hpx::apply(std::move(suspend_internal_wrapper));
-        }
-        else
-        {
-            compat::thread(std::move(suspend_internal_wrapper)).detach();
-        }
+        suspend_processing_unit_internal(virt_core, ec);
     }
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
-        // Yield to other HPX threads if lock is not available to avoid
-        // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core), std::try_to_lock);
-        util::detail::yield_while([&l]()
-            {
-                if (l.owns_lock())
-                {
-                    return false;
-                }
-                else
-                {
-                    l.try_lock();
-                    return true;
-                }
-            }, "scheduled_thread_pool::resume_processing_unit_internal");
-
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
-            l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
                 "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
                 "the given virtual core has already been stopped to run on "
@@ -1720,45 +1545,36 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
+        std::unique_lock<compat::mutex>
+            l(sched_->Scheduler::get_pu_mutex(virt_core));
+
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        util::detail::yield_while([this, &state, virt_core]()
+        if (threads::get_self_ptr())
+        {
+            sched_->Scheduler::resume(virt_core);
+
+            while (state.load() == state_sleeping)
             {
-                this->sched_->Scheduler::resume(virt_core);
-                return state.load() == state_sleeping;
-            }, "scheduled_thread_pool::resume_processing_unit_internal");
+                sched_->Scheduler::resume(virt_core);
+                hpx::this_thread::suspend();
+            }
+        }
+        else
+        {
+            sched_->Scheduler::resume(virt_core);
+
+            while (state.load() == state_sleeping)
+            {
+                sched_->Scheduler::resume(virt_core);
+            }
+        }
     }
 
     template <typename Scheduler>
-    hpx::future<void> scheduled_thread_pool<Scheduler>::resume_processing_unit(
-        std::size_t virt_core)
-    {
-        if (!threads::get_self_ptr())
-        {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "scheduled_thread_pool<Scheduler>::resume_processing_unit",
-                "cannot call resume_processing_unit from outside HPX, use"
-                "resume_processing_unit_cb instead");
-        }
-        else if (!(mode_ & threads::policies::enable_elasticity))
-        {
-            return hpx::make_exceptional_future<void>(
-                HPX_GET_EXCEPTION(invalid_status,
-                    "scheduled_thread_pool<Scheduler>::resume_processing_unit",
-                    "this thread pool does not support suspending "
-                    "processing units"));
-        }
-
-        return hpx::async(
-            hpx::util::bind(
-                &scheduled_thread_pool::resume_processing_unit_internal, this,
-                virt_core, std::move(throws)));
-    }
-
-    template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::resume_processing_unit_cb(
-        std::function<void(void)> callback, std::size_t virt_core, error_code& ec)
+    void scheduled_thread_pool<Scheduler>::resume_processing_unit(
+        std::size_t virt_core, error_code& ec)
     {
         if (!(mode_ & threads::policies::enable_elasticity))
         {
@@ -1769,20 +1585,6 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
-        std::function<void(void)> resume_internal_wrapper =
-            [this, virt_core, HPX_CAPTURE_MOVE(callback)]()
-            {
-                this->resume_processing_unit_internal(virt_core, throws);
-                callback();
-            };
-
-        if (threads::get_self_ptr())
-        {
-            hpx::apply(std::move(resume_internal_wrapper));
-        }
-        else
-        {
-            compat::thread(std::move(resume_internal_wrapper)).detach();
-        }
+        resume_processing_unit_internal(virt_core, ec);
     }
 }}}
