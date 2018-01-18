@@ -136,6 +136,7 @@ namespace libfabric
                 << "addr " << hexpointer(cb.data_.cpos_));
         }
 
+        int ret = 0;
         if (header_->message_piggy_back())
         {
             LOG_DEBUG_MSG("Sender " << hexpointer(this)
@@ -150,23 +151,18 @@ namespace libfabric
                 "Message region (send piggyback)"));
 
             // send 2 regions as one message, goes into one receive
-            hpx::util::detail::yield_while([this]()
-                {
-                    int ret = fi_sendv(this->endpoint_, this->region_list_,
-                        this->desc_, 2, this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("reposting fi_sendv...\n");
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_sendv");
-                    }
-
-                    return false;
-                }, "sender::async_write")
+            for (std::size_t k = 0; true; ++k)
+            {
+                ret = fi_sendv(endpoint_, region_list_, desc_, 2, dst_addr_, this);
+                if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("reposting fi_sendv...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
+            }
         }
         else
         {
@@ -187,25 +183,18 @@ namespace libfabric
                 "Message region (send for rdma fetch)"));
 
             // send just the header region - a single message
-            hpx::util::detail::yield_while([this]()
-                {
-                    int ret = fi_send(this->endpoint_,
-                        this->region_list_[0].iov_base,
-                        this->region_list_[0].iov_len,
-                        this->desc_[0], this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("reposting fi_send...\n");
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_sendv");
-                    }
-
-                    return false;
-                }, "sender::async_write");
+            for (std::size_t k = 0; true; ++k) {
+                ret = fi_send(endpoint_, region_list_[0].iov_base,
+                    region_list_[0].iov_len, desc_[0], dst_addr_, this);
+                if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("reposting fi_send...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
+            }
         }
 
         FUNC_END_DEBUG_MSG;
@@ -274,26 +263,22 @@ namespace libfabric
     {
         LOG_ERROR_MSG("resending message after error " << hexpointer(this));
 
+        int ret = 0;
         if (header_->message_piggy_back())
         {
             // send 2 regions as one message, goes into one receive
-            hpx::util::detail::yield_while([this]()
-                {
-                    int ret = fi_sendv(this->endpoint_, this->region_list_,
-                        this->desc_, 2, this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("reposting fi_sendv...\n");
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_sendv");
-                    }
-
-                    return false;
-                }, "libfabric::sender::handle_error");
+            for (std::size_t k = 0; true; ++k)
+            {
+                ret = fi_sendv(endpoint_, region_list_, desc_, 2, dst_addr_, this);
+                if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("reposting fi_sendv...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
+            }
         }
         else
         {
@@ -301,25 +286,18 @@ namespace libfabric
                 message_region_->get_remote_key(), message_region_->get_address());
 
             // send just the header region - a single message
-            hpx::util::detail::yield_while([this]()
-                {
-                    int ret = fi_send(this->endpoint_,
-                        this->region_list_[0].iov_base,
-                        this->region_list_[0].iov_len,
-                        this->desc_[0], this->dst_addr_, this);
-
-                    if (ret == -FI_EAGAIN)
-                    {
-                        LOG_ERROR_MSG("reposting fi_send...\n");
-                        return true;
-                    }
-                    else if (ret)
-                    {
-                        throw fabric_error(ret, "fi_sendv");
-                    }
-
-                    return false;
-                }, "libfabric::sender::handle_error");
+            for (std::size_t k = 0; true; ++k) {
+                ret = fi_send(endpoint_, region_list_[0].iov_base,
+                    region_list_[0].iov_len, desc_[0], dst_addr_, this);
+                if (ret == -FI_EAGAIN) {
+                    LOG_ERROR_MSG("reposting fi_send...\n");
+                    hpx::util::detail::yield_k(k,
+                        "libfabric::sender::async_write");
+                    continue;
+                }
+                if (ret) throw fabric_error(ret, "fi_sendv");
+                break;
+            }
         }
     }
 
