@@ -149,7 +149,7 @@ namespace hpx
 
     inline bool operator== (thread::id const& x, thread::id const& y) noexcept
     {
-        return x.id_.get() == y.id_.get();
+        return x.id_ == y.id_;
     }
 
     inline bool operator!= (thread::id const& x, thread::id const& y) noexcept
@@ -159,22 +159,22 @@ namespace hpx
 
     inline bool operator< (thread::id const& x, thread::id const& y) noexcept
     {
-        return x.id_.get() < y.id_.get();
+        return x.id_ < y.id_;
     }
 
     inline bool operator> (thread::id const& x, thread::id const& y) noexcept
     {
-        return x.id_.get() > y.id_.get();
+        return y < x;
     }
 
     inline bool operator<= (thread::id const& x, thread::id const& y) noexcept
     {
-        return !(x.id_.get() > y.id_.get());
+        return !(x > y);
     }
 
     inline bool operator>= (thread::id const& x, thread::id const& y) noexcept
     {
-        return !(x.id_.get() < y.id_.get());
+        return !(x < y);
     }
 
     template <typename Char, typename Traits>
