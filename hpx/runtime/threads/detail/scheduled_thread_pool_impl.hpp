@@ -14,7 +14,6 @@
 #include <hpx/exception.hpp>
 #include <hpx/exception_info.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
