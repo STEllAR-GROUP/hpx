@@ -20,7 +20,6 @@
 #include <hpx/config/compiler_native_tls.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
-#include <hpx/config/decay_t.hpp>
 #include <hpx/config/defines.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/config/export_definitions.hpp>

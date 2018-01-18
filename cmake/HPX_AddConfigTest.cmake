@@ -631,14 +631,6 @@ macro(hpx_check_for_cxx14_return_type_deduction)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx14_std_decay_t)
-  add_hpx_config_test(HPX_WITH_CXX14_STD_DECAY_T
-    SOURCE cmake/tests/cxx14_std_decay_t.cpp
-    FILE ${ARGN}
-    CMAKECXXFEATURE cxx_std::decay_t)
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
     SOURCE cmake/tests/libfun_std_experimental_optional.cpp
