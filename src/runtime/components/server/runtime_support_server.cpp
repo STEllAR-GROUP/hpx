@@ -845,8 +845,7 @@ namespace hpx { namespace components { namespace server
 
     // let thread manager clean up HPX threads
     template <typename Lock>
-    inline void
-    cleanup_threads(threads::threadmanager& tm, Lock& l)
+    inline void cleanup_threads(threads::threadmanager& tm, Lock& l)
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();

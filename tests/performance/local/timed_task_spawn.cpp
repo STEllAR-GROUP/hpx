@@ -197,18 +197,14 @@ void wait_for_tasks(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::threads::thread_result_type invoke_worker_timed_no_suspension(
-    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
-    )
+hpx::threads::thread_result_type invoke_worker_timed_no_suspension()
 {
     worker_timed(delay * 1000);
     return hpx::threads::thread_result_type(hpx::threads::terminated,
         hpx::threads::invalid_thread_id);
 }
 
-hpx::threads::thread_result_type invoke_worker_timed_suspension(
-    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
-    )
+hpx::threads::thread_result_type invoke_worker_timed_suspension()
 {
     worker_timed(delay * 1000);
 

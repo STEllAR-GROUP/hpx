@@ -48,10 +48,7 @@ namespace hpx { namespace threads
     typedef std::pair<thread_state_enum, thread_id_type> thread_result_type;
     typedef thread_state_ex_enum thread_arg_type;
 
-    typedef thread_result_type thread_function_sig(thread_arg_type);
-    typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
-
-    HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
+    typedef util::unique_function_nonser<thread_result_type()> thread_function_type;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////

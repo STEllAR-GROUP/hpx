@@ -295,7 +295,7 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type background_thread;
         background_running.reset(new bool(true));
         thread_init_data background_init(
-            [&, background_running](thread_state_ex_enum) -> thread_result_type
+            [&, background_running]() -> thread_result_type
             {
                 while(*background_running)
                 {

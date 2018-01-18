@@ -80,12 +80,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::srand(seed);
 
     {
-        std::size_t count = std::rand();
+        std::size_t count = std::rand() % 512;
         test_bulk_allocator<int>(count);
     }
 
     {
-        std::size_t count = std::rand();
+        std::size_t count = std::rand() % 512;
         test_bulk_allocator<test>(count);
         HPX_TEST_EQ(construction_count.load(), count);
         HPX_TEST_EQ(destruction_count.load(), count);
