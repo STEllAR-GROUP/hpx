@@ -483,9 +483,9 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    constexpr optional<std::decay_t<T>> make_optional(T && v)
+    constexpr optional<typename std::decay<T>::type> make_optional(T && v)
     {
-        return optional<std::decay_t<T>>(std::forward<T>(v));
+        return optional<typename std::decay<T>::type>(std::forward<T>(v));
     }
 
     template <typename T, typename ... Ts>
