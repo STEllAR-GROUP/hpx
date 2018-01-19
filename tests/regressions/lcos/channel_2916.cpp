@@ -56,8 +56,11 @@ int hpx_main()
         result.get();
     }
 
+    // There might be at least one thread less waiting than are currently
+    // pending as the first thread exiting the loop did not request an item
+    // off the channel anymore.
     std::size_t remaining_count = free_resources.close(true);
-    HPX_TEST_EQ(remaining_count, count.load());
+    HPX_TEST(remaining_count <= count.load());
 
     return hpx::finalize();
 }
