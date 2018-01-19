@@ -1236,7 +1236,8 @@ namespace hpx { namespace threads
         return true;
     }
 
-    util::thread_specific_ptr<hpx_hwloc_bitmap_wrapper, topology::tls_tag> topology::bitmap_storage_;
+    util::thread_specific_ptr<hpx_hwloc_bitmap_wrapper, topology::tls_tag>
+        topology::bitmap_storage_;
 
     threads::mask_type topology::get_area_membind_nodeset(
         const void *addr, std::size_t len) const
@@ -1264,7 +1265,7 @@ namespace hpx { namespace threads
 
     int topology::get_numa_domain(const void *addr) const
     {
-#if HWLOC_API_VERSION >= 0x00010b03
+#if HWLOC_API_VERSION >= 0x00010b00
         hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
         if (nullptr == nodeset)
         {
