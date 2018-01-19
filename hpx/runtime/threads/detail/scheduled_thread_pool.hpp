@@ -284,7 +284,7 @@ namespace hpx { namespace threads { namespace detail
     protected:
         friend struct init_tss_helper<Scheduler>;
 
-        void resume_internal(error_code& ec);
+        void resume_internal(bool blocking, error_code& ec);
         void suspend_internal(error_code& ec);
 
         void remove_processing_unit_internal(

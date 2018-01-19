@@ -181,7 +181,7 @@ namespace hpx { namespace threads { namespace detail
         if (!threads_.empty())
         {
             // wake up if suspended
-            resume_internal(throws);
+            resume_internal(blocking, throws);
 
             // set state to stopping
             sched_->Scheduler::set_all_states(state_stopping);
@@ -320,11 +320,27 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::resume_internal(error_code& ec)
+    void scheduled_thread_pool<Scheduler>::resume_internal(bool blocking,
+        error_code& ec)
     {
-        for (std::size_t i = 0; i != threads_.size(); ++i)
+        if (blocking)
         {
-            resume_processing_unit_internal(i, ec);
+            for (std::size_t virt_core = 0; virt_core != threads_.size();
+                ++virt_core)
+            {
+                if (threads_[virt_core].joinable())
+                {
+                    resume_processing_unit_internal(virt_core, ec);
+                }
+            }
+        }
+        else
+        {
+            for (std::size_t virt_core = 0; virt_core != threads_.size();
+                ++virt_core)
+            {
+                this->sched_->Scheduler::resume(virt_core);
+            }
         }
     }
 
@@ -340,7 +356,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         return hpx::async(
-            hpx::util::bind(&scheduled_thread_pool::resume_internal, this,
+            hpx::util::bind(&scheduled_thread_pool::resume_internal, this, true,
                 std::move(throws)));
     }
 
@@ -351,7 +367,7 @@ namespace hpx { namespace threads { namespace detail
         std::function<void(void)> resume_internal_wrapper =
             [this, HPX_CAPTURE_MOVE(callback)]()
             {
-                this->resume_internal(throws);
+                this->resume_internal(true, throws);
                 callback();
             };
 
