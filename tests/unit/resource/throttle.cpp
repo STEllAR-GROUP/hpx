@@ -49,7 +49,10 @@ int hpx_main(int argc, char* argv[])
     }
 
     {
-        // Check suspending pu on which current thread is running
+        // Check suspending pu on which current thread is running.
+
+        // NOTE: This only works as long as there is another OS thread which has
+        // no work and is able to steal.
         std::size_t worker_thread_num = hpx::get_worker_thread_num();
         tp.suspend_processing_unit(worker_thread_num).get();
         tp.resume_processing_unit(worker_thread_num).get();
@@ -88,6 +91,46 @@ int hpx_main(int argc, char* argv[])
                     tp.resume_processing_unit(thread_num_resume).get();
                 }
             }
+        }
+    }
+
+    {
+        // Check suspending and resuming the same thread without waiting for
+        // each to finish.
+        for (std::size_t thread_num = 0;
+             thread_num < hpx::resource::get_num_threads("default");
+             ++thread_num)
+        {
+            std::vector<hpx::future<void>> fs;
+
+            fs.push_back(tp.suspend_processing_unit(thread_num));
+            fs.push_back(tp.resume_processing_unit(thread_num));
+
+            hpx::wait_all(fs);
+
+            // Suspend is not guaranteed to run before resume, so make sure
+            // processing unit is running
+            tp.resume_processing_unit(thread_num).get();
+
+            fs.clear();
+
+            // Launching 4 (i.e. same as number of threads) tasks may deadlock
+            // as no thread is available to steal from the current thread.
+            fs.push_back(tp.suspend_processing_unit(thread_num));
+            fs.push_back(tp.suspend_processing_unit(thread_num));
+            fs.push_back(tp.suspend_processing_unit(thread_num));
+
+            hpx::wait_all(fs);
+
+            fs.clear();
+
+            // Launching 4 (i.e. same as number of threads) tasks may deadlock
+            // as no thread is available to steal from the current thread.
+            fs.push_back(tp.resume_processing_unit(thread_num));
+            fs.push_back(tp.resume_processing_unit(thread_num));
+            fs.push_back(tp.resume_processing_unit(thread_num));
+
+            hpx::wait_all(fs);
         }
     }
 
@@ -141,24 +184,6 @@ int hpx_main(int argc, char* argv[])
             ++thread_num_resume)
         {
             tp.resume_processing_unit(thread_num_resume).get();
-        }
-    }
-
-    {
-        // Check suspending and resuming the same thread without waiting for
-        // each to finish.
-        for (std::size_t thread_num = 0;
-             thread_num < hpx::resource::get_num_threads("default");
-             ++thread_num)
-        {
-            std::vector<hpx::future<void>> fs;
-
-            fs.push_back(tp.suspend_processing_unit(thread_num));
-            fs.push_back(tp.suspend_processing_unit(thread_num));
-            fs.push_back(tp.resume_processing_unit(thread_num));
-            fs.push_back(tp.resume_processing_unit(thread_num));
-
-            hpx::wait_all(fs);
         }
     }
 
