@@ -388,7 +388,8 @@ namespace hpx { namespace threads { namespace detail
             {
                 return this->sched_->Scheduler::get_thread_count() >
                     this->get_background_thread_count();
-            }, "scheduled_thread_pool::suspend_internal");
+            }, "scheduled_thread_pool::suspend_internal",
+            hpx::threads::pending);
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
@@ -1591,7 +1592,8 @@ namespace hpx { namespace threads { namespace detail
             util::detail::yield_while([thread_num]()
                 {
                     return thread_num == hpx::get_worker_thread_num();
-                }, "scheduled_thread_pool::remove_processing_unit_internal");
+                }, "scheduled_thread_pool::remove_processing_unit_internal",
+                hpx::threads::pending);
         }
 
         t.join();
@@ -1616,7 +1618,8 @@ namespace hpx { namespace threads { namespace detail
                     l.try_lock();
                     return true;
                 }
-            }, "scheduled_thread_pool::suspend_processing_unit_internal");
+            }, "scheduled_thread_pool::suspend_processing_unit_internal",
+            hpx::threads::pending);
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
@@ -1646,7 +1649,8 @@ namespace hpx { namespace threads { namespace detail
         util::detail::yield_while([&state]()
             {
                 return state.load() == state_pre_sleep;
-            }, "scheduled_thread_pool::suspend_processing_unit_internal");
+            }, "scheduled_thread_pool::suspend_processing_unit_internal",
+            hpx::threads::pending);
     }
 
     template <typename Scheduler>
@@ -1724,7 +1728,8 @@ namespace hpx { namespace threads { namespace detail
                     l.try_lock();
                     return true;
                 }
-            }, "scheduled_thread_pool::resume_processing_unit_internal");
+            }, "scheduled_thread_pool::resume_processing_unit_internal",
+            hpx::threads::pending);
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
@@ -1743,7 +1748,8 @@ namespace hpx { namespace threads { namespace detail
             {
                 this->sched_->Scheduler::resume(virt_core);
                 return state.load() == state_sleeping;
-            }, "scheduled_thread_pool::resume_processing_unit_internal");
+            }, "scheduled_thread_pool::resume_processing_unit_internal",
+            hpx::threads::pending);
     }
 
     template <typename Scheduler>
