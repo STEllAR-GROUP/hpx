@@ -48,12 +48,10 @@ namespace hpx { namespace parallel { inline namespace v1
         OutIter sequential_exclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op, Conv && conv = Conv())
         {
-            T temp = init;
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init  = hpx::util::invoke(op, init, hpx::util::invoke(conv, *first));
-                *dest = temp;
-                temp  = init;
+                *dest = init;
+                init = hpx::util::invoke(op, init, hpx::util::invoke(conv, *first));
             }
             return dest;
         }
@@ -63,12 +61,10 @@ namespace hpx { namespace parallel { inline namespace v1
         T sequential_exclusive_scan_n(InIter first, std::size_t count,
             OutIter dest, T init, Op && op, Conv && conv = Conv())
         {
-            T temp = init;
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
+                *dest = init;
                 init  = hpx::util::invoke(op, init, hpx::util::invoke(conv, *first));
-                *dest = temp;
-                temp  = init;
             }
             return init;
         }
@@ -128,7 +124,6 @@ namespace hpx { namespace parallel { inline namespace v1
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<T> curr, hpx::shared_future<T> next)
                     {
-
                         next.get();     // rethrow exceptions
 
                         T val = curr.get();
