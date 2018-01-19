@@ -1730,7 +1730,7 @@ namespace hpx { namespace threads { namespace detail
         {
             l.unlock();
             HPX_THROWS_IF(ec, bad_parameter,
-                "scheduled_thread_pool<Scheduler>::suspend_processing_unit",
+                "scheduled_thread_pool<Scheduler>::resume_processing_unit",
                 "the given virtual core has already been stopped to run on "
                 "this thread pool");
             return;
