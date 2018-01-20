@@ -297,6 +297,17 @@ namespace hpx { namespace threads { namespace detail
         thread_init_data background_init(
             [&, background_running](thread_state_ex_enum) -> thread_result_type
             {
+#if defined(HPX_HAVE_APEX)
+                // get the APEX data pointer, in case we are resuming the
+                // thread and have to restore any leaf timers from
+                // direct actions, etc.
+
+                // the address of tmp_data is getting stored
+                // by APEX during this call
+                util::apex_wrapper apex_profiler(
+                    get_description(),
+                    get_apex_data());
+#endif
                 while(*background_running)
                 {
                     if (callbacks.background_())
@@ -310,6 +321,10 @@ namespace hpx { namespace threads { namespace detail
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "background_work");
                 }
+
+#if defined(HPX_HAVE_APEX)
+                apex_profiler.stop();
+#endif
 
                 return thread_result_type(terminated, nullptr);
             },
@@ -354,30 +369,8 @@ namespace hpx { namespace threads { namespace detail
                     if (HPX_LIKELY(thrd_stat.is_valid() &&
                             thrd_stat.get_previous() == pending))
                     {
-#if defined(HPX_HAVE_APEX)
-                        // get the APEX data pointer, in case we are resuming the
-                        // thread and have to restore any leaf timers from
-                        // direct actions, etc.
-
-                        // the address of tmp_data is getting stored
-                        // by APEX during this call
-                        util::apex_wrapper apex_profiler(
-                            background_thread->get_description(),
-                            background_thread->get_apex_data());
-
                         thrd_stat = (*background_thread)();
 
-                        if (thrd_stat.get_previous() == terminated)
-                        {
-                            apex_profiler.stop();
-                        }
-                        else
-                        {
-                            apex_profiler.yield();
-                        }
-#else
-                        thrd_stat = (*background_thread)();
-#endif
                         thread_data *next = thrd_stat.get_next_thread();
                         if (next != nullptr && next != background_thread.get())
                         {
