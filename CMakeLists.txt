@@ -883,22 +883,6 @@ hpx_option(HPX_WITH_VIM_YCM BOOL
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
-# HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
-hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
-    "Enable backwards compatibility for apply_colocated, async_colocated and friends"
-    OFF ADVANCED)
-if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
-endif()
-
-# HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY: introduced in V0.9.11
-hpx_option(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY BOOL
-    "Enable backwards compatibility for component::get_gid() functions"
-    OFF ADVANCED)
-if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-endif()
-
 # HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.99
 hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
     "Enable backwards compatibility for hpx::lcos::local::dataflow() functions"
@@ -957,7 +941,7 @@ endif()
 # HPX_WITH_EXECUTOR_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_EXECUTOR_COMPATIBILITY BOOL
     "Enable old (pre-concurrency TS) executor API (default: ON)"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_EXECUTOR_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 endif()
@@ -965,7 +949,7 @@ endif()
 # HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
     "Enable old execution policy names in API (default: ON)"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
 endif()
@@ -973,7 +957,7 @@ endif()
 # HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
     "Enable old overloads for transform_reduce and inner_product (default: ON)"
-    ON ADVANCED)
+    OFF ADVANCED)
 if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
 endif()
