@@ -411,12 +411,12 @@ void test_executor_task_block(Executor& exec)
 int hpx_main()
 {
     {
-        hpx::parallel::sequential_executor exec;
+        hpx::parallel::execution::sequenced_executor exec;
         test_executor_task_block(exec);
     }
 
     {
-        hpx::parallel::parallel_executor exec;
+        hpx::parallel::execution::parallel_executor exec;
         test_executor_task_block(exec);
 
         define_task_block_exceptions_test3(exec);

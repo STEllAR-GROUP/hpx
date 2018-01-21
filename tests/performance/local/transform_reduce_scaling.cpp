@@ -34,15 +34,14 @@ void measure_transform_reduce(std::size_t size)
     // invoke transform_reduce
     double result =
         hpx::parallel::transform_reduce(hpx::parallel::execution::par,
-        std::begin(data_representation),
-        std::end(data_representation),
-        0.0,
-        [](Point r)
-        {
-            return r.x * r.y;
-        },
-        std::plus<double>()
-    );
+            std::begin(data_representation),
+            std::end(data_representation),
+            0.0,
+            std::plus<double>(),
+            [](Point r)
+            {
+                return r.x * r.y;
+            });
     HPX_UNUSED(result);
 }
 

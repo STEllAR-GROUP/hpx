@@ -31,8 +31,10 @@ namespace hpx { namespace parallel { inline namespace v2
     // Asynchronous version
     template <typename ExPolicy, typename F, typename ... Args,
         typename = typename std::enable_if<
-            hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
-        >
+            hpx::parallel::execution::is_async_execution_policy<
+                ExPolicy
+            >::value
+        >::type>
     std::vector<hpx::future<void>>
     define_spmd_block(ExPolicy && policy,
         std::size_t num_images, F && f, Args && ... args)
@@ -45,8 +47,10 @@ namespace hpx { namespace parallel { inline namespace v2
     // Synchronous version
     template <typename ExPolicy, typename F, typename ... Args,
         typename = typename std::enable_if<
-            !hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
-        >
+           !hpx::parallel::execution::is_async_execution_policy<
+                ExPolicy
+            >::value
+        >::type>
     void define_spmd_block(ExPolicy && policy,
         std::size_t num_images, F && f, Args && ... args)
     {

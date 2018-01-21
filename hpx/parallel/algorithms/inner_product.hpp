@@ -71,8 +71,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///       of \a transform_reduce.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     inner_product(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
@@ -166,8 +167,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T,
         typename Op1, typename Op2>
+    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
     inline typename std::enable_if<
-        is_execution_policy<ExPolicy>::value,
+        execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     inner_product(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
