@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -67,6 +67,8 @@ namespace hpx { namespace performance_counters { namespace stubs
             naming::id_type const& targetid);
         static lcos::future<void> reset(launch::async_policy,
             naming::id_type const& targetid);
+        static lcos::future<void> reinit(launch::async_policy,
+            naming::id_type const& targetid, bool reset);
 
         static bool start(launch::sync_policy, naming::id_type const& targetid,
             error_code& ec = throws);
@@ -74,6 +76,8 @@ namespace hpx { namespace performance_counters { namespace stubs
             error_code& ec = throws);
         static void reset(launch::sync_policy, naming::id_type const& targetid,
             error_code& ec = throws);
+        static void reinit(launch::sync_policy, naming::id_type const& targetid,
+            bool reset, error_code& ec = throws);
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)

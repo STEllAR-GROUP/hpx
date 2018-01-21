@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,26 +26,27 @@ namespace hpx { namespace performance_counters { namespace server
     protected:
         /// the following functions are not implemented by default, they will
         /// just throw
-        virtual void reset_counter_value()
+        virtual void reset_counter_value() override
         {
             HPX_THROW_EXCEPTION(invalid_status, "reset_counter_value",
                 "reset_counter_value is not implemented for this counter");
         }
 
-        virtual void set_counter_value(counter_value const& /*value*/)
+        virtual void set_counter_value(counter_value const& /*value*/) override
         {
             HPX_THROW_EXCEPTION(invalid_status, "set_counter_value",
                 "set_counter_value is not implemented for this counter");
         }
 
-        virtual counter_value get_counter_value(bool reset)
+        virtual counter_value get_counter_value(bool reset) override
         {
             HPX_THROW_EXCEPTION(invalid_status, "get_counter_value",
                 "get_counter_value is not implemented for this counter");
             return counter_value();
         }
 
-        virtual counter_values_array get_counter_values_array(bool reset)
+        virtual counter_values_array get_counter_values_array(
+            bool reset) override
         {
             HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
                 "get_counter_values_array is not implemented for this "
@@ -53,17 +54,21 @@ namespace hpx { namespace performance_counters { namespace server
             return counter_values_array();
         }
 
-        virtual bool start()
+        virtual bool start() override
         {
             return false;    // nothing to do
         }
 
-        virtual bool stop()
+        virtual bool stop() override
         {
             return false;    // nothing to do
         }
 
-        virtual counter_info get_counter_info() const
+        virtual void reinit(bool reset) override
+        {
+        }
+
+        virtual counter_info get_counter_info() const override
         {
             return info_;
         }
@@ -137,6 +142,11 @@ namespace hpx { namespace performance_counters { namespace server
             return this->stop();
         }
 
+        void reinit_nonvirt(bool reset)
+        {
+            reinit(reset);
+        }
+
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
         /// serialization, etc.
@@ -172,6 +182,10 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a stop_action
         HPX_DEFINE_COMPONENT_ACTION(
             base_performance_counter, stop_nonvirt, stop_action);
+
+        /// The \a reinit_action
+        HPX_DEFINE_COMPONENT_ACTION(
+            base_performance_counter, reinit_nonvirt, reinit_action);
 
     protected:
         hpx::performance_counters::counter_info info_;
