@@ -124,7 +124,15 @@ namespace hpx { namespace performance_counters
         // and upper boundaries, and the size of the histogram buckets. All
         // remaining values in the returned array represent the number of
         // measurements for each of the buckets in the histogram.
-        counter_histogram
+        counter_histogram,
+
+        /// \a counter_raw_values exposes an array of measured values
+        /// instead of a single value as many of the other counter types.
+        /// Counters of this type expose a \a counter_value_array instead of a
+        /// \a counter_value. Those will also not implement the
+        /// \a get_counter_value() functionality. The results are exposed
+        /// through a separate \a get_counter_values_array() function.
+        counter_raw_values
     };
 
     ///////////////////////////////////////////////////////////////////////////

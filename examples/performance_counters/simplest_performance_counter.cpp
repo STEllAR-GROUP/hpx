@@ -18,6 +18,7 @@ std::atomic<std::int64_t> counter(0);
 
 std::int64_t some_performance_data(bool reset)
 {
+    ++counter;
     return hpx::util::get_and_reset_value(counter, reset);
 }
 

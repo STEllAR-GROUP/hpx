@@ -33,10 +33,13 @@ namespace hpx { namespace performance_counters { namespace server
             hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f)
       : base_type_holder(info), f_(std::move(f)), reset_(false)
     {
-        if (info.type_ != counter_histogram) {
+        if (info.type_ != counter_histogram &&
+            info.type_ != counter_raw_values)
+        {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "raw_values_counter::raw_values_counter",
-                "unexpected counter type specified for raw_values_counter");
+                "unexpected counter type specified for raw_values_counter "
+                    "should be counter_histogram or counter_raw_values");
         }
     }
 
