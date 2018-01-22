@@ -6,7 +6,8 @@
 set(tests
     all_counters
     counter_raw_values
-    path_elements)
+    path_elements
+    reinit_counters)
 
 foreach(test ${tests})
   set(sources
