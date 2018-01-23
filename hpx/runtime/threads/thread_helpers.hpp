@@ -513,7 +513,7 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(state, nullptr, description, ec);
+        return suspend(state, threads::invalid_thread_id, description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -563,7 +563,7 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(abs_time, nullptr, description, ec);
+        return suspend(abs_time, threads::invalid_thread_id, description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -589,7 +589,8 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(rel_time.from_now(), nullptr, description, ec);
+        return suspend(rel_time.from_now(), threads::invalid_thread_id,
+            description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -641,7 +642,8 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(std::chrono::milliseconds(ms), nullptr, description, ec);
+        return suspend(std::chrono::milliseconds(ms), threads::invalid_thread_id,
+            description, ec);
     }
 
     /// Returns a reference to the executor which was used to create the current
@@ -804,7 +806,8 @@ namespace hpx { namespace applier
                 // held.
                 util::force_error_on_lock();
 
-                return threads::thread_result_type(threads::terminated, nullptr);
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
             }
         };
 
@@ -823,7 +826,8 @@ namespace hpx { namespace applier
                 // held.
                 util::force_error_on_lock();
 
-                return threads::thread_result_type(threads::terminated, nullptr);
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
             }
         };
     }

@@ -136,7 +136,7 @@ namespace hpx
         friend class thread;
 
     public:
-        id() noexcept {}
+        id() noexcept : id_(threads::invalid_thread_id) {}
         explicit id(threads::thread_id_type const& i) noexcept
           : id_(i)
         {}

@@ -37,6 +37,7 @@
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <cstddef>
@@ -54,7 +55,7 @@ namespace hpx { namespace threads { namespace coroutines
 
         typedef detail::coroutine_impl impl_type;
         typedef impl_type::pointer impl_ptr;
-        typedef impl_type::thread_id_repr_type thread_id_repr_type;
+        typedef impl_type::thread_id_type thread_id_type;
 
         typedef impl_type::result_type result_type;
         typedef impl_type::arg_type arg_type;
@@ -64,7 +65,7 @@ namespace hpx { namespace threads { namespace coroutines
         coroutine() : m_pimpl(nullptr) {}
 
         coroutine(functor_type&& f,
-                thread_id_repr_type id = nullptr,
+                thread_id_type id,
                 std::ptrdiff_t stack_size = detail::default_stack_size)
           : m_pimpl(impl_type::create(
                 std::move(f), id, stack_size))
@@ -95,7 +96,7 @@ namespace hpx { namespace threads { namespace coroutines
             lhs.swap(rhs);
         }
 
-        thread_id_repr_type get_thread_id() const
+        thread_id_type get_thread_id() const
         {
             return m_pimpl->get_thread_id();
         }
@@ -124,7 +125,7 @@ namespace hpx { namespace threads { namespace coroutines
         }
 #endif
 
-        void rebind(functor_type&& f, thread_id_repr_type id = nullptr)
+        void rebind(functor_type&& f, thread_id_type id)
         {
             HPX_ASSERT(exited());
             impl_type::rebind(m_pimpl.get(), std::move(f), id);

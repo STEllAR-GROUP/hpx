@@ -127,7 +127,7 @@ namespace hpx { namespace util { namespace detail
                 error_code ec(lightweight);       // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
                     threads::wait_abort, threads::thread_priority_boost, ec);
-                id_ = nullptr;
+                id_.reset();
             }
             return true;
         }
@@ -196,7 +196,7 @@ namespace hpx { namespace util { namespace detail
                 return threads::thread_result_type(threads::terminated, nullptr);
             }
 
-            id_ = nullptr;
+            id_.reset();
             is_started_ = false;
 
             bool result = false;
