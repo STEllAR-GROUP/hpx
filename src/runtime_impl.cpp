@@ -27,6 +27,7 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/set_thread_name.hpp>
@@ -355,6 +356,14 @@ namespace hpx {
         threads::thread_id_type id = threads:: invalid_thread_id;
         thread_manager_->register_thread(data, id);
         this->runtime::starting();
+
+        // Wait until done with pre-main
+        util::detail::yield_while(
+            [this]()
+            {
+                return state_.load() != state_running;
+            }, "runtime_impl::start");
+
         // }}}
 
         // block if required
@@ -524,6 +533,60 @@ namespace hpx {
 
         std::lock_guard<compat::mutex> l(mtx);
         cond.notify_all();                  // we're done now
+    }
+
+    int runtime_impl::suspend()
+    {
+        LRT_(info) << "runtime_impl: about to suspend runtime";
+
+        if (state_.load() == state_sleeping)
+        {
+            return 0;
+        }
+
+        if (state_.load() != state_running) {
+            std::cout << state_.load() << "\n";
+            HPX_THROW_EXCEPTION(invalid_status,
+                "runtime_impl::suspend",
+                "Can only suspend runtime from running state");
+            return -1;
+        }
+
+        util::detail::yield_while(
+            [this]()
+            {
+                return thread_manager_->get_thread_count() >
+                    thread_manager_->get_background_thread_count();
+            }, "runtime_impl::suspend");
+
+        thread_manager_->suspend();
+
+        set_state(state_sleeping);
+
+        return 0;
+    }
+
+    int runtime_impl::resume()
+    {
+        LRT_(info) << "runtime_impl: about to resume runtime";
+
+        if (state_.load() == state_running)
+        {
+            return 0;
+        }
+
+        if (state_.load() != state_sleeping) {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "runtime_impl::resume",
+                "Can only resume runtime from suspended state");
+            return -1;
+        }
+
+        thread_manager_->resume();
+
+        set_state(state_running);
+
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

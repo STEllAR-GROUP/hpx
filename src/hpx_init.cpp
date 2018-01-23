@@ -800,6 +800,46 @@ namespace hpx
         return result;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    int suspend(error_code& ec)
+    {
+        if (threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
+                "this function cannot be called from an HPX thread");
+            return -1;
+        }
+
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
+                "the runtime system is not active (did you already "
+                "call hpx::stop?)");
+            return -1;
+        }
+
+        return rt->suspend();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    int resume(error_code& ec)
+    {
+        if (threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
+                "this function cannot be called from an HPX thread");
+            return -1;
+        }
+
+        runtime* rt = get_runtime_ptr();
+        if (nullptr == rt) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
+                "the runtime system is not active (did you already "
+                "call hpx::stop?)");
+            return -1;
+        }
+
+        return rt->resume();
+    }
+
     namespace detail
     {
         HPX_EXPORT int init_helper(

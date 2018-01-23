@@ -188,6 +188,9 @@ namespace hpx
 
         virtual void stop(bool blocking = true) = 0;
 
+        virtual int suspend() = 0;
+        virtual int resume() = 0;
+
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
         virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
 
