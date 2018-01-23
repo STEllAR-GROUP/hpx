@@ -104,7 +104,8 @@ namespace hpx { namespace actions
                     << " with continuation(" << cont_.get_id() << ")";
 
                 actions::trigger(std::move(cont_), f_);
-                return threads::thread_result_type(threads::terminated, nullptr);
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
             }
 
         private:
@@ -271,7 +272,8 @@ namespace hpx { namespace actions
                 // OS-thread. This will throw if there are still any locks
                 // held.
                 util::force_error_on_lock();
-                return threads::thread_result_type(threads::terminated, nullptr);
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
             }
 
             // This holds the target alive, if necessary.

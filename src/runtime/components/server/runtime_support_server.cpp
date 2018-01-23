@@ -855,7 +855,8 @@ namespace hpx { namespace components { namespace server
         // give the scheduler some time to work on remaining tasks
         {
             util::unlock_guard<Lock> ul(l);
-            self->yield(threads::thread_result_type(threads::pending, nullptr));
+            self->yield(threads::thread_result_type(threads::pending,
+                threads::invalid_thread_id));
         }
 
         // get rid of all terminated threads

@@ -568,7 +568,8 @@ namespace hpx { namespace this_thread
                 nextid->get_scheduler_base()->schedule_thread(
                     nextid.get(), std::size_t(-1));
                 statex = self.yield(
-                    threads::thread_result_type(threads::suspended, nullptr));
+                    threads::thread_result_type(threads::suspended,
+                        threads::invalid_thread_id));
             }
             else
             {

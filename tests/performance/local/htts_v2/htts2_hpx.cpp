@@ -66,7 +66,8 @@ struct hpx_driver : htts2::driver
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
         //++count_;
-        return hpx::threads::thread_result_type(hpx::threads::terminated, nullptr);
+        return hpx::threads::thread_result_type(hpx::threads::terminated,
+            hpx::threads::invalid_thread_id);
     }
 
     void stage_tasks(std::uint64_t target_osthread)

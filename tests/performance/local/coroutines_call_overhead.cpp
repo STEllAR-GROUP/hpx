@@ -143,7 +143,8 @@ struct kernel
     {
         worker_timed(payload * 1000);
 
-        return hpx::threads::thread_result_type(hpx::threads::pending, nullptr);
+        return hpx::threads::thread_result_type(hpx::threads::pending,
+            hpx::threads::invalid_thread_id);
     }
 
     bool operator!() const { return true; }
