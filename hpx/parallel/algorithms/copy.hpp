@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -423,14 +423,11 @@ namespace hpx { namespace parallel { inline namespace v1
                     > scan_partitioner_type;
 
                 auto f1 =
-                    [pred, proj, flags, policy]
-                    (
-                       zip_iterator part_begin, std::size_t part_size
-                    )   -> std::size_t
+                    [HPX_CAPTURE_FORWARD(pred),
+                        HPX_CAPTURE_FORWARD(proj)
+                    ](zip_iterator part_begin, std::size_t part_size)
+                    ->  std::size_t
                     {
-                        HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
-
                         std::size_t curr = 0;
 
                         // MSVC complains if proj is captured by ref below
@@ -438,8 +435,8 @@ namespace hpx { namespace parallel { inline namespace v1
                             part_begin, part_size,
                             [&pred, proj, &curr](zip_iterator it) mutable
                             {
-                                using hpx::util::invoke;
-                                bool f = invoke(pred, invoke(proj, get<0>(*it)));
+                                bool f = hpx::util::invoke(pred,
+                                    hpx::util::invoke(proj, get<0>(*it)));
 
                                 if ((get<1>(*it) = f))
                                     ++curr;
@@ -448,14 +445,13 @@ namespace hpx { namespace parallel { inline namespace v1
                         return curr;
                     };
                 auto f3 =
-                    [dest, flags, policy](
+                    [dest, flags](
                         zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
                         hpx::shared_future<std::size_t> next
                     ) mutable
                     {
                         HPX_UNUSED(flags);
-                        HPX_UNUSED(policy);
 
                         next.get();     // rethrow exceptions
 
@@ -464,7 +460,7 @@ namespace hpx { namespace parallel { inline namespace v1
                             part_begin, part_size,
                             [&dest](zip_iterator it) mutable
                             {
-                                if(get<1>(*it))
+                                if (get<1>(*it))
                                     *dest++ = get<0>(*it);
                             });
                     };

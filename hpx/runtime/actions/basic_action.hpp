@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -971,6 +971,11 @@ namespace hpx { namespace serialization
         {                                                                     \
             enum { value = priority };                                        \
         };                                                                    \
+        /* make sure the action is not executed directly */                   \
+        template <>                                                           \
+        struct has_decorates_action< action>                                  \
+          : std::true_type                                                    \
+        {};                                                                   \
     }}                                                                        \
 /**/
 

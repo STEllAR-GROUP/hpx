@@ -165,7 +165,7 @@ double perform_2n_iterations()
 
     for (std::uint64_t i = 0; i < contexts; ++i)
     {
-        coroutine_type* c = new coroutine_type(k);
+        coroutine_type* c = new coroutine_type(k, hpx::threads::invalid_thread_id);
         coroutines.push_back(c);
     }
 

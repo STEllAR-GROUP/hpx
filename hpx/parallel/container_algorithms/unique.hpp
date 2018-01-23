@@ -86,9 +86,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
     ///           returns \a FwdIter otherwise.
-    ///           The \a unique algorithm returns the pair of
-    ///           the source iterator to \a last, and
-    ///           the destination iterator to the end of the \a dest range.
+    ///           The \a unique algorithm returns the iterator to the new end
+    ///           of the range.
     ///
     template <typename ExPolicy, typename Rng,
         typename Pred = detail::equal_to,

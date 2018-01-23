@@ -124,7 +124,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             }
             catch(...) {
                 // this does not return
-                return detail::handle_exception<ExPolicy, local_result_type>::call();
+                return detail::handle_exception<ExPolicy,
+                    local_result_type>::call();
             }
 #endif
         }
@@ -163,6 +164,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 return call_execute(std::forward<ExPolicy>(policy),
                     is_void(), std::forward<Args>(args)...);
             }
+            catch (std::bad_alloc const& ba) {
+                throw ba;
+            }
             catch (...) {
                 return detail::handle_exception<ExPolicy, local_result_type>::
                     call();
@@ -186,6 +190,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 return parallel::util::detail::algorithm_result<
                         ExPolicy, local_result_type
                     >::get(std::move(result));
+            }
+            catch (std::bad_alloc const& ba) {
+                throw ba;
             }
             catch (...) {
                 return detail::handle_exception<ExPolicy, local_result_type>::

@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace local
             static thread_id_type call()
             {
                 return hpx::threads::get_self_ptr() ?
-                    (thread_id_type)hpx::threads::get_self_id().get() :
+                    reinterpret_cast<thread_id_type>(hpx::threads::get_self_id().get()) :
                     thread_id_from_mutex<void>::call();
             };
         };
@@ -126,8 +126,8 @@ namespace hpx { namespace lcos { namespace local
             ///         called outside of a HPX-thread.
 //             bool timed_lock(::boost::system_time const& wait_until);
 //             {
-//                 threads::thread_id_repr_type const current_thread_id =
-//                     threads::get_self_id().get();
+//                 threads::thread_id_type const current_thread_id =
+//                     threads::get_self_id();
 //
 //                 return try_recursive_lock(current_thread_id) ||
 //                        try_timed_lock(current_thread_id, wait_until);
@@ -197,7 +197,7 @@ namespace hpx { namespace lcos { namespace local
                 return false;
             }
 
-//             bool try_timed_lock(threads::thread_id_repr_type current_thread_id,
+//             bool try_timed_lock(threads::thread_id_type current_thread_id,
 //                 ::boost::system_time const& target)
 //             {
 //                 if (mtx.timed_lock(target))

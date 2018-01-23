@@ -65,7 +65,7 @@ namespace detail
         typename Map::const_iterator end = tm.end();
         for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
         {
-            threads::thread_data const* thrd = (*it).get();
+            threads::thread_data const* thrd = it->get();
             threads::thread_state_enum state = thrd->get_state().state();
             threads::thread_state_enum marked_state = thrd->get_marked_state();
 
@@ -89,7 +89,7 @@ namespace detail
                     LTM_(error) << "queue(" << num_thread << "): " //-V128
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)
-                                    << std::setfill('0') << (*it).get()
+                                    << std::setfill('0') << (*it)
                                 << "." << std::hex << std::setw(2)
                                     << std::setfill('0') << thrd->get_thread_phase()
                                 << "/" << std::hex << std::setw(8)
@@ -107,7 +107,7 @@ namespace detail
                                 << "queue(" << num_thread << "): "
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)
-                                    << std::setfill('0') << (*it).get()
+                                    << std::setfill('0') << (*it)
                                 << "." << std::hex << std::setw(2)
                                     << std::setfill('0') << thrd->get_thread_phase()
                                 << "/" << std::hex << std::setw(8)

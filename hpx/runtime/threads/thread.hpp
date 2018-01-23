@@ -136,7 +136,7 @@ namespace hpx
         friend class thread;
 
     public:
-        id() noexcept {}
+        id() noexcept : id_(threads::invalid_thread_id) {}
         explicit id(threads::thread_id_type const& i) noexcept
           : id_(i)
         {}
@@ -149,7 +149,7 @@ namespace hpx
 
     inline bool operator== (thread::id const& x, thread::id const& y) noexcept
     {
-        return x.id_.get() == y.id_.get();
+        return x.id_ == y.id_;
     }
 
     inline bool operator!= (thread::id const& x, thread::id const& y) noexcept
@@ -159,22 +159,22 @@ namespace hpx
 
     inline bool operator< (thread::id const& x, thread::id const& y) noexcept
     {
-        return x.id_.get() < y.id_.get();
+        return x.id_ < y.id_;
     }
 
     inline bool operator> (thread::id const& x, thread::id const& y) noexcept
     {
-        return x.id_.get() > y.id_.get();
+        return y < x;
     }
 
     inline bool operator<= (thread::id const& x, thread::id const& y) noexcept
     {
-        return !(x.id_.get() > y.id_.get());
+        return !(x > y);
     }
 
     inline bool operator>= (thread::id const& x, thread::id const& y) noexcept
     {
-        return !(x.id_.get() < y.id_.get());
+        return !(x < y);
     }
 
     template <typename Char, typename Traits>

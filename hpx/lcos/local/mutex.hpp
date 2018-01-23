@@ -48,7 +48,7 @@ namespace hpx { namespace lcos { namespace local
 
     protected:
         mutable mutex_type mtx_;
-        threads::thread_id_repr_type owner_id_;
+        threads::thread_id_type owner_id_;
         detail::condition_variable cond_;
     };
 

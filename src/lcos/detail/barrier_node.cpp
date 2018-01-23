@@ -135,7 +135,7 @@ namespace hpx { namespace lcos { namespace detail {
         if (rank_ == 0)
         {
             return future.then(hpx::launch::sync,
-                [this_](hpx::future<void>&& f)
+                [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f)
                 {
                     // Trigger possible errors...
                     f.get();
@@ -157,7 +157,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         return future.then(hpx::launch::sync,
-            [this_](hpx::future<void>&& f)
+            [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f)
             {
                 // Trigger possible errors...
                 f.get();

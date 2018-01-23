@@ -46,6 +46,7 @@
 #include <hpx/runtime/threads/coroutines/detail/swap_context.hpp> //for swap hints
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/coroutines/exception.hpp>
+#include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <atomic>
@@ -92,10 +93,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     {
     public:
         typedef void deleter_type(context_base const*);
-        typedef void* thread_id_repr_type;
+        typedef hpx::threads::thread_id_type thread_id_type;
 
         template <typename Derived>
-        context_base(Derived& derived, std::ptrdiff_t stack_size, thread_id_repr_type id)
+        context_base(Derived& derived, std::ptrdiff_t stack_size, thread_id_type id)
           : default_context_impl(derived, stack_size),
             m_caller(),
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
@@ -183,7 +184,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_APEX)
             m_apex_data = 0ull;
 #endif
-            m_thread_id = nullptr;
+            m_thread_id.reset();
         }
 
 #if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
@@ -238,7 +239,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 #endif
 
-        thread_id_repr_type get_thread_id() const
+        thread_id_type get_thread_id() const
         {
             return m_thread_id;
         }
@@ -445,7 +446,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 if (!exited())
                     exit();
                 HPX_ASSERT(exited());
-                m_thread_id = nullptr;
+                m_thread_id.reset();
             }
             catch (...) {
                 /**/;
@@ -560,7 +561,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             ctx_exited_abnormally // process exited uncleanly.
         };
 
-        void rebind_base(thread_id_repr_type id)
+        void rebind_base(thread_id_type id)
         {
 #if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
             HPX_ASSERT(exited() && 0 == m_wait_counter && !pending());
@@ -660,7 +661,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         // This is used to generate a meaningful exception trace.
         std::exception_ptr m_type_info;
-        thread_id_repr_type m_thread_id;
+        thread_id_type m_thread_id;
 
         std::size_t continuation_recursion_count_;
     };

@@ -65,12 +65,10 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [tok, pred, last, policy](
+                    [tok, last, HPX_CAPTURE_FORWARD(pred)](
                         FwdIter part_begin, std::size_t part_size
                     ) mutable -> bool
                     {
-                        HPX_UNUSED(policy);
-
                         FwdIter trail = part_begin++;
                         util::loop_n<ExPolicy>(
                             part_begin, part_size - 1,
@@ -228,8 +226,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                 call_with_index(
                     std::forward<ExPolicy>(policy), first, count, 1,
-                    [tok, pred, last](FwdIter part_begin, std::size_t part_size,
-                        std::size_t base_idx) mutable -> void
+                    [tok, last, HPX_CAPTURE_FORWARD(pred)](
+                        FwdIter part_begin, std::size_t part_size,
+                        std::size_t base_idx
+                    ) mutable -> void
                     {
                         FwdIter trail = part_begin++;
                         util::loop_idx_n(++base_idx, part_begin,

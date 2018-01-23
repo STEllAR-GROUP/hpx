@@ -488,12 +488,14 @@ namespace hpx { namespace performance_counters
         }
 
         // make sure the counter type requested is supported
-        if (counter_histogram != (*it).second.info_.type_ ||
-            counter_histogram != info.type_)
+        if (!((counter_histogram == (*it).second.info_.type_ &&
+               counter_histogram == info.type_) ||
+              (counter_raw_values == (*it).second.info_.type_ &&
+               counter_raw_values == info.type_)))
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
                 "invalid counter type requested (only counter_histogram "
-                "is supported)");
+                "or counter_raw_values is supported)");
             return status_counter_type_unknown;
         }
 

@@ -105,16 +105,21 @@ namespace hpx { namespace parallel { inline namespace v1
                     call_with_index(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first1, first2), count1, 1,
-                        [f, tok](zip_iterator it, std::size_t part_count,
-                            std::size_t base_idx) mutable -> void
+                        [tok, HPX_CAPTURE_FORWARD(f)](
+                            zip_iterator it, std::size_t part_count,
+                            std::size_t base_idx
+                        ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_count, tok,
                                 [&f, &tok](reference t, std::size_t i)
                                 {
-                                    using hpx::util::get;
-                                    if (!f(get<0>(t), get<1>(t)))
+                                    if (!hpx::util::invoke(f,
+                                            hpx::util::get<0>(t),
+                                            hpx::util::get<1>(t)))
+                                    {
                                         tok.cancel(i);
+                                    }
                                 });
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable
@@ -299,16 +304,21 @@ namespace hpx { namespace parallel { inline namespace v1
                     call_with_index(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first1, first2), count, 1,
-                        [f, tok](zip_iterator it, std::size_t part_count,
-                            std::size_t base_idx) mutable -> void
+                        [tok, HPX_CAPTURE_FORWARD(f)](
+                            zip_iterator it, std::size_t part_count,
+                            std::size_t base_idx
+                        ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_count, tok,
                                 [&f, &tok](reference t, std::size_t i)
                                 {
-                                    using hpx::util::get;
-                                    if (!f(get<0>(t), get<1>(t)))
+                                    if (!hpx::util::invoke(f,
+                                            hpx::util::get<0>(t),
+                                            hpx::util::get<1>(t)))
+                                    {
                                         tok.cancel(i);
+                                    }
                                 });
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable ->

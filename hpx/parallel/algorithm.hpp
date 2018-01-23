@@ -33,6 +33,7 @@
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/algorithms/move.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
+#include <hpx/parallel/algorithms/remove.hpp>
 #include <hpx/parallel/algorithms/remove_copy.hpp>
 #include <hpx/parallel/algorithms/replace.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>

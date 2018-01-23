@@ -21,10 +21,9 @@
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/logging.hpp>
-//#include <boost/thread/detail/config.hpp>
-#include <boost/config.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace tag {
 
@@ -84,18 +83,16 @@ See @ref hpx::util::logging::tag "how to use tags".
 */
 struct thread_id {
     thread_id() {
-#if defined (BOOST_HAS_WINTHREADS)
+#if defined (HPX_WINDOWS)
         val = ::GetCurrentThreadId();
-#elif defined (BOOST_HAS_PTHREADS)
-        val = pthread_self ();
 #else
-#error Unknown type of threads
+        val = pthread_self ();
 #endif
     }
 
-#if defined (BOOST_HAS_WINTHREADS)
+#if defined (HPX_WINDOWS)
     DWORD val;
-#elif defined (BOOST_HAS_PTHREADS)
+#else
     pthread_t val;
 #endif
 };

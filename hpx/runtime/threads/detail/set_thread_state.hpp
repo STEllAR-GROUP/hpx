@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace detail
                 << "set_active_state: thread is still active, however "
                       "it was non-active since the original set_state "
                       "request was issued, aborting state change, thread("
-                << thrd.get() << "), description("
+                << thrd << "), description("
                 << thrd->get_description() << "), new state("
                 << get_thread_state_name(newstate) << ")";
             return thread_result_type(terminated, nullptr);
@@ -117,7 +117,7 @@ namespace hpx { namespace threads { namespace detail
                 LTM_(warning)
                     << "set_thread_state: old thread state is the same as new "
                        "thread state, aborting state change, thread("
-                    << thrd.get() << "), description("
+                    << thrd << "), description("
                     << thrd->get_description() << "), new state("
                     << get_thread_state_name(new_state) << ")";
 
@@ -135,7 +135,7 @@ namespace hpx { namespace threads { namespace detail
                     // schedule a new thread to set the state
                     LTM_(warning)
                         << "set_thread_state: thread is currently active, scheduling "
-                            "new thread, thread(" << thrd.get() << "), description("
+                            "new thread, thread(" << thrd << "), description("
                         << thrd->get_description() << "), new state("
                         << get_thread_state_name(new_state) << ")";
 
@@ -157,7 +157,7 @@ namespace hpx { namespace threads { namespace detail
                 {
                     LTM_(warning)
                         << "set_thread_state: thread is terminated, aborting state "
-                            "change, thread(" << thrd.get() << "), description("
+                            "change, thread(" << thrd << "), description("
                         << thrd->get_description() << "), new state("
                         << get_thread_state_name(new_state) << ")";
 
@@ -177,7 +177,7 @@ namespace hpx { namespace threads { namespace detail
                     std::ostringstream strm;
                     strm << "set_thread_state: invalid new state, can't demote a "
                             "pending thread, "
-                         << "thread(" << thrd.get() << "), description("
+                         << "thread(" << thrd << "), description("
                          << thrd->get_description() << "), new state("
                          << get_thread_state_name(new_state) << ")";
 
@@ -203,7 +203,7 @@ namespace hpx { namespace threads { namespace detail
             // at some point will ignore this thread by simply skipping it
             // (if it's not pending anymore).
 
-            LTM_(info) << "set_thread_state: thread(" << thrd.get() << "), "
+            LTM_(info) << "set_thread_state: thread(" << thrd << "), "
                           "description(" << thrd->get_description() << "), "
                           "new state(" << get_thread_state_name(new_state) << "), "
                           "old state(" << get_thread_state_name(previous_state_val)
@@ -216,7 +216,7 @@ namespace hpx { namespace threads { namespace detail
             // state has changed since we fetched it from the thread, retry
             LTM_(error)
                 << "set_thread_state: state has been changed since it was fetched, "
-                   "retrying, thread(" << thrd.get() << "), "
+                   "retrying, thread(" << thrd << "), "
                    "description(" << thrd->get_description() << "), "
                    "new state(" << get_thread_state_name(new_state) << "), "
                    "old state(" << get_thread_state_name(previous_state_val)
@@ -352,7 +352,7 @@ namespace hpx { namespace threads { namespace detail
             HPX_THROWS_IF(ec, null_thread_id,
                 "threads::detail::set_thread_state",
                 "null thread id encountered");
-            return nullptr;
+            return invalid_thread_id;
         }
 
         // this creates a new thread which creates the timer and handles the

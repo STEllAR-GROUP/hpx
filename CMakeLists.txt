@@ -883,22 +883,6 @@ hpx_option(HPX_WITH_VIM_YCM BOOL
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
-# HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
-hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
-    "Enable backwards compatibility for apply_colocated, async_colocated and friends"
-    OFF ADVANCED)
-if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
-endif()
-
-# HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY: introduced in V0.9.11
-hpx_option(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY BOOL
-    "Enable backwards compatibility for component::get_gid() functions"
-    OFF ADVANCED)
-if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-endif()
-
 # HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.99
 hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
     "Enable backwards compatibility for hpx::lcos::local::dataflow() functions"
@@ -1183,6 +1167,13 @@ endif()
 
 hpx_check_for_mm_prefetch(
   DEFINITIONS HPX_HAVE_MM_PREFETCH)
+
+hpx_check_for_stable_inplace_merge(
+  DEFINITIONS HPX_HAVE_STABLE_INPLACE_MERGE)
+
+if(NOT HPX_WITH_STABLE_INPLACE_MERGE)
+  hpx_warn("The standard library you are using (libc++ version < 6) does not have a stable inplace_merge implementation.")
+endif()
 
 ################################################################################
 # Check for misc system headers

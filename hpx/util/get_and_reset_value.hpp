@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <vector>
 
 namespace hpx { namespace util
 {
@@ -31,9 +32,18 @@ namespace hpx { namespace util
     template <typename T>
     inline T get_and_reset_value(std::atomic<T>& value, bool reset)
     {
-        T result = value.load();
         if (reset)
-            value.store(0);
+            return value.exchange(0, std::memory_order_acq_rel);
+        return value.load(std::memory_order_relaxed);
+    }
+
+    inline std::vector<std::int64_t> get_and_reset_value(
+        std::vector<std::int64_t>& value, bool reset)
+    {
+        std::vector<std::int64_t> result = value;
+        if (reset)
+            value.clear();
+
         return result;
     }
 }}
