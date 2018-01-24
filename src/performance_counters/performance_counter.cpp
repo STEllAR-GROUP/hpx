@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -128,6 +128,16 @@ namespace hpx { namespace performance_counters
     void performance_counter::reset(launch::sync_policy, error_code& ec)
     {
         stubs::performance_counter::reset(launch::sync, get_id(), ec);
+    }
+
+    future<void> performance_counter::reinit(bool reset)
+    {
+        return stubs::performance_counter::reinit(launch::async, get_id(), reset);
+    }
+    void performance_counter::reinit(
+        launch::sync_policy, bool reset, error_code& ec)
+    {
+        stubs::performance_counter::reinit(launch::sync, get_id(), reset, ec);
     }
 
     ///

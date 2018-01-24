@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -289,6 +289,7 @@ namespace hpx
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);
         void reset_active_counters(error_code& ec = throws);
+        void reinit_active_counters(bool reset = true, error_code& ec = throws);
         void evaluate_active_counters(bool reset = false,
             char const* description = nullptr, error_code& ec = throws);
 

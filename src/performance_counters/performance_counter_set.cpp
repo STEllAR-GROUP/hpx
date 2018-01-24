@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -214,7 +214,7 @@ namespace hpx { namespace performance_counters
             return std::all_of(v.begin(), v.end(), [](bool val) { return val; });
         }
         catch (hpx::exception const& e) {
-            HPX_RETHROWS_IF(ec, e, "performance_counter_set::start");
+            HPX_RETHROWS_IF(ec, e, "performance_counter_set::stop");
             return false;
         }
     }
@@ -247,7 +247,41 @@ namespace hpx { namespace performance_counters
             hpx::util::unwrap(reset());
         }
         catch (hpx::exception const& e) {
-            HPX_RETHROWS_IF(ec, e, "performance_counter_set::start");
+            HPX_RETHROWS_IF(ec, e, "performance_counter_set::reset");
+        }
+    }
+
+    std::vector<hpx::future<void> > performance_counter_set::reinit(bool reset)
+    {
+        std::vector<hpx::id_type> ids;
+
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            ids = ids_;
+        }
+
+        std::vector<hpx::future<void> > v;
+        v.reserve(ids.size());
+
+        // re-initialize all performance counters
+        for (std::size_t i = 0; i != ids.size(); ++i)
+        {
+            using performance_counters::stubs::performance_counter;
+            v.push_back(
+                performance_counter::reinit(launch::async, ids[i], reset));
+        }
+
+        return v;
+    }
+
+    void performance_counter_set::reinit(
+        launch::sync_policy, bool reset, error_code& ec)
+    {
+        try {
+            hpx::util::unwrap(reinit(reset));
+        }
+        catch (hpx::exception const& e) {
+            HPX_RETHROWS_IF(ec, e, "performance_counter_set::reinit");
         }
     }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -175,6 +175,25 @@ namespace hpx
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
     HPX_API_EXPORT void reset_active_counters(error_code& ec = throws);
+
+    /// \brief Re-initialize all active performance counters.
+    ///
+    /// \param reset [in] Reset the current values before re-initializing
+    ///           counters (default: true)
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     The active counters are those which have been specified on
+    ///           the command line while executing the application (see command
+    ///           line option \--hpx:print-counter)
+    HPX_API_EXPORT void reinit_active_counters(
+        bool reset = true, error_code& ec = throws);
 
     /// \brief Stop all active performance counters.
     ///
