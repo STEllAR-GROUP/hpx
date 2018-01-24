@@ -281,7 +281,8 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this);
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
         }
 
         threads::thread_result_type
@@ -298,7 +299,8 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this, is_void());
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(threads::terminated,
+                threads::invalid_thread_id);
         }
 
     public:

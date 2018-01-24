@@ -870,7 +870,8 @@ namespace detail
         static threads::thread_result_type run_impl(future_base_type this_)
         {
             this_->do_run();
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(
+                threads::terminated, threads::invalid_thread_id);
         }
 
     public:
@@ -946,7 +947,8 @@ namespace detail
         {
             reset_id r(*this_);
             this_->do_run();
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(
+                threads::terminated, threads::invalid_thread_id);
         }
 
     public:

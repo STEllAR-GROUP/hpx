@@ -94,25 +94,25 @@ namespace threads {
             return lhs.thrd_ != rhs.thrd_;
         }
 
-        friend constexpr bool operator<(
+        friend HPX_CXX14_CONSTEXPR bool operator<(
             thread_id_type const& lhs, thread_id_type const& rhs)
         {
             return std::less<void const*>{}(lhs.thrd_, rhs.thrd_);
         }
 
-        friend constexpr bool operator>(
+        friend HPX_CXX14_CONSTEXPR bool operator>(
             thread_id_type const& lhs, thread_id_type const& rhs)
         {
             return std::less<void const*>{}(rhs.thrd_, lhs.thrd_);
         }
 
-        friend constexpr bool operator<=(
+        friend HPX_CXX14_CONSTEXPR bool operator<=(
             thread_id_type const& lhs, thread_id_type const& rhs)
         {
             return !(rhs > lhs);
         }
 
-        friend constexpr bool operator>=(
+        friend HPX_CXX14_CONSTEXPR bool operator>=(
             thread_id_type const& lhs, thread_id_type const& rhs)
         {
             return !(rhs < lhs);

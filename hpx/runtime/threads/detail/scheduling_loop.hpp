@@ -311,7 +311,7 @@ namespace hpx { namespace threads { namespace detail
                         "background_work");
                 }
 
-                return thread_result_type(terminated, nullptr);
+                return thread_result_type(terminated, invalid_thread_id);
             },
             hpx::util::thread_description("background_work"),
             0,
