@@ -357,13 +357,6 @@ namespace hpx {
         thread_manager_->register_thread(data, id);
         this->runtime::starting();
 
-        // Wait until done with pre-main
-        util::detail::yield_while(
-            [this]()
-            {
-                return state_.load() != state_running;
-            }, "runtime_impl::start");
-
         // }}}
 
         // block if required
