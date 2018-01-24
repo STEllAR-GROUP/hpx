@@ -553,8 +553,8 @@ namespace hpx {
             return 0;
         }
 
-        if (state_.load() != state_running) {
-            std::cout << state_.load() << "\n";
+        if (state_.load() != state_running)
+        {
             HPX_THROW_EXCEPTION(invalid_status,
                 "runtime_impl::suspend",
                 "Can only suspend runtime from running state");
@@ -602,7 +602,8 @@ namespace hpx {
             return 0;
         }
 
-        if (state_.load() != state_sleeping) {
+        if (state_.load() != state_sleeping)
+        {
             HPX_THROW_EXCEPTION(invalid_status,
                 "runtime_impl::resume",
                 "Can only resume runtime from suspended state");
