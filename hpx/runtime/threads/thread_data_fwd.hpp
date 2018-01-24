@@ -12,11 +12,10 @@
 #include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/unique_function.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -46,20 +45,13 @@ namespace hpx { namespace threads
     typedef coroutines::detail::coroutine_self thread_self;
     typedef coroutines::detail::coroutine_impl thread_self_impl_type;
 
-    typedef void * thread_id_repr_type;
-    typedef boost::intrusive_ptr<thread_data> thread_id_type;
-
     typedef std::pair<thread_state_enum, thread_id_type> thread_result_type;
     typedef thread_state_ex_enum thread_arg_type;
 
     typedef thread_result_type thread_function_sig(thread_arg_type);
     typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
 
-    HPX_API_EXPORT void intrusive_ptr_add_ref(thread_data* p);
-    HPX_API_EXPORT void intrusive_ptr_release(thread_data* p);
-
-    HPX_CONSTEXPR_OR_CONST thread_id_repr_type invalid_thread_id_repr = nullptr;
-    thread_id_type const invalid_thread_id = thread_id_type();
+    HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////
@@ -90,7 +82,7 @@ namespace hpx { namespace threads
     /// \note This function will return a meaningful value only if the
     ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
     ///       being defined.
-    HPX_API_EXPORT thread_id_repr_type get_parent_id();
+    HPX_API_EXPORT thread_id_type get_parent_id();
 
     /// The function \a get_parent_phase returns the HPX phase of the
     /// current thread's parent (or zero if the current thread is not a

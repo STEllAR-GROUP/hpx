@@ -131,7 +131,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // execute the actual thread function
         func();
 
-        return threads::thread_result_type(threads::terminated, nullptr);
+        return threads::thread_result_type(threads::terminated,
+            threads::invalid_thread_id);
     }
 
     // Return the requested policy element

@@ -96,7 +96,7 @@ namespace hpx { namespace threads
 
         typedef boost::lockfree::caching_freelist<thread_data> pool_type;
 
-        static boost::intrusive_ptr<thread_data> create(
+        static thread_data* create(
             thread_init_data& init_data, pool_type& pool,
             thread_state_enum newstate)
         {
@@ -333,9 +333,9 @@ namespace hpx { namespace threads
         }
 
         /// Return the thread id of the parent thread
-        thread_id_repr_type get_parent_thread_id() const
+        thread_id_type get_parent_thread_id() const
         {
-            return threads::invalid_thread_id_repr;
+            return threads::invalid_thread_id;
         }
 
         /// Return the phase of the parent thread
@@ -351,7 +351,7 @@ namespace hpx { namespace threads
         }
 
         /// Return the thread id of the parent thread
-        thread_id_repr_type get_parent_thread_id() const
+        thread_id_type get_parent_thread_id() const
         {
             return parent_thread_id_;
         }
@@ -516,16 +516,14 @@ namespace hpx { namespace threads
         ///                 thread's scheduling status.
         coroutine_type::result_type operator()()
         {
-            HPX_ASSERT(this == coroutine_.get_thread_id());
+            HPX_ASSERT(this == coroutine_.get_thread_id().get());
             return coroutine_(set_state_ex(wait_signaled));
         }
 
         thread_id_type get_thread_id() const
         {
-            HPX_ASSERT(this == coroutine_.get_thread_id());
-            return thread_id_type(
-                    reinterpret_cast<thread_data*>(coroutine_.get_thread_id())
-                );
+            HPX_ASSERT(this == coroutine_.get_thread_id().get());
+            return coroutine_.get_thread_id();
         }
 
         std::size_t get_thread_phase() const
@@ -563,7 +561,7 @@ namespace hpx { namespace threads
 
             rebind_base(init_data, newstate);
 
-            coroutine_.rebind(std::move(init_data.func), this_());
+            coroutine_.rebind(std::move(init_data.func), thread_id_type(this));
 
             HPX_ASSERT(init_data.stacksize != 0);
             HPX_ASSERT(coroutine_.is_ready());
@@ -571,9 +569,6 @@ namespace hpx { namespace threads
 
         /// This function will be called when the thread is about to be deleted
         //virtual void reset() {}
-
-        friend HPX_EXPORT void intrusive_ptr_add_ref(thread_data* p);
-        friend HPX_EXPORT void intrusive_ptr_release(thread_data* p);
 
         /// Construct a new \a thread
         thread_data(thread_init_data& init_data,
@@ -602,10 +597,9 @@ namespace hpx { namespace threads
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
             scheduler_base_(init_data.scheduler_base),
-            count_(0),
             stacksize_(init_data.stacksize),
             coroutine_(std::move(init_data.func),
-                this_(), init_data.stacksize),
+                thread_id_type(this_()), init_data.stacksize),
             pool_(pool)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
@@ -614,11 +608,11 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
-            if (nullptr == parent_thread_id_) {
+            if (parent_thread_id_) {
                 thread_self* self = get_self_ptr();
                 if (self)
                 {
-                    parent_thread_id_ = threads::get_self_id().get();
+                    parent_thread_id_ = threads::get_self_id();
                     parent_thread_phase_ = self->get_thread_phase();
                 }
             }
@@ -673,7 +667,7 @@ namespace hpx { namespace threads
                 thread_self* self = get_self_ptr();
                 if (self)
                 {
-                    parent_thread_id_ = threads::get_self_id().get();
+                    parent_thread_id_ = threads::get_self_id();
                     parent_thread_phase_ = self->get_thread_phase();
                 }
             }
@@ -697,7 +691,7 @@ namespace hpx { namespace threads
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         std::uint32_t parent_locality_id_;
-        thread_id_repr_type parent_thread_id_;
+        thread_id_type parent_thread_id_;
         std::size_t parent_thread_phase_;
 #endif
 
@@ -726,9 +720,6 @@ namespace hpx { namespace threads
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
-
-        // reference count
-        util::atomic_count count_;
 
         std::ptrdiff_t stacksize_;
 

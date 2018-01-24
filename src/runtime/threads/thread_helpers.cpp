@@ -493,9 +493,19 @@ namespace hpx { namespace this_thread
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
-
-            // suspend the HPX-thread
-            statex = self.yield(threads::thread_result_type(state, nextid));
+            // We might need to dispatch 'nextid' to it's correct scheduler
+            // only if our current scheduler is the same, we should yield the id
+            if (nextid && nextid->get_scheduler_base() != id->get_scheduler_base())
+            {
+                nextid->get_scheduler_base()->schedule_thread(
+                    nextid.get(), std::size_t(-1));
+                statex = self.yield(threads::thread_result_type(state,
+                    threads::invalid_thread_id));
+            }
+            else
+            {
+                statex = self.yield(threads::thread_result_type(state, nextid));
+            }
         }
 
         // handle interruption, if needed
@@ -551,9 +561,21 @@ namespace hpx { namespace this_thread
                 threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
-            // suspend the HPX-thread
-            statex = self.yield(
-                threads::thread_result_type(threads::suspended, nextid));
+            // We might need to dispatch 'nextid' to it's correct scheduler
+            // only if our current scheduler is the same, we should yield the id
+            if (nextid && nextid->get_scheduler_base() != id->get_scheduler_base())
+            {
+                nextid->get_scheduler_base()->schedule_thread(
+                    nextid.get(), std::size_t(-1));
+                statex = self.yield(
+                    threads::thread_result_type(threads::suspended,
+                        threads::invalid_thread_id));
+            }
+            else
+            {
+                statex = self.yield(
+                    threads::thread_result_type(threads::suspended, nextid));
+            }
 
             if (statex != threads::wait_timeout)
             {

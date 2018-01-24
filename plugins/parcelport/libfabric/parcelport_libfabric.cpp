@@ -364,12 +364,13 @@ namespace libfabric
     // --------------------------------------------------------------------
     bool parcelport::can_send_immediate()
     {
-        // hpx::util::detail::yield_while([this]()
-        //     {
-        //         this->background_work(0);
-        //         return this->senders_.empty();
-        //     }, "libfabric::can_send_immediate");
-
+//          std::size_t k = 0;
+//          while (senders_.empty())
+//          {
+// //              background_work(0);
+//              hpx::util::detail::yield_k(k, "libfabric::can_send_immediate");
+//              ++k;
+//          }
         return true;
     }
 

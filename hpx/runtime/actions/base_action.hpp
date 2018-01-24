@@ -81,7 +81,7 @@ namespace hpx { namespace actions
         virtual std::uint32_t get_parent_locality_id() const = 0;
 
         /// Return the thread id of the parent thread
-        virtual threads::thread_id_repr_type get_parent_thread_id() const = 0;
+        virtual threads::thread_id_type get_parent_thread_id() const = 0;
 
         /// Return the thread phase of the parent thread
         virtual std::uint64_t get_parent_thread_phase() const = 0;

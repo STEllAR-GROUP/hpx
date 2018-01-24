@@ -26,6 +26,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/optional.hpp>
 #include <hpx/util/range.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unwrap.hpp>
@@ -37,12 +38,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
-#include <experimental/optional>
-#else
-#include <boost/optional.hpp>
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace execution
@@ -319,28 +314,13 @@ namespace hpx { namespace parallel { namespace execution
                     auto && args =
                         hpx::util::forward_as_tuple(std::forward<Ts>(ts)...);
 
-#if defined(HPX_HAVE_CXX1Y_EXPERIMENTAL_OPTIONAL)
-                    std::experimental::optional<result_type> out;
+                    hpx::util::optional<result_type> out;
                     auto && wrapper =
                         [&]() mutable
                         {
                             out.emplace(hpx::util::invoke_fused(
                                 std::forward<F>(f), std::move(args)));
                         };
-#else
-                    boost::optional<result_type> out;
-                    auto && wrapper =
-                        [&]() mutable
-                        {
-#if BOOST_VERSION < 105600
-                            out = boost::in_place(hpx::util::invoke_fused(
-                                std::forward<F>(f), std::move(args)));
-#else
-                            out.emplace(hpx::util::invoke_fused(
-                                std::forward<F>(f), std::move(args)));
-#endif
-                        };
-#endif
 
                     // use async execution, wait for result, propagate exceptions
                     async_execute_dispatch(0, std::forward<TwoWayExecutor>(exec),

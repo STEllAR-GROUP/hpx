@@ -33,6 +33,7 @@
 #include <hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
@@ -71,7 +72,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         typedef coroutine_impl impl_type;
         typedef impl_type* impl_ptr; // Note, no reference counting here.
-        typedef impl_type::thread_id_repr_type thread_id_repr_type;
+        typedef impl_type::thread_id_type thread_id_type;
 
         typedef impl_type::result_type result_type;
         typedef impl_type::arg_type arg_type;
@@ -140,7 +141,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return m_pimpl->pending() != 0;
         }
 
-        thread_id_repr_type get_thread_id() const
+        thread_id_type get_thread_id() const
         {
             HPX_ASSERT(m_pimpl);
             return m_pimpl->get_thread_id();

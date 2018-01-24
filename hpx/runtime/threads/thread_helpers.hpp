@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c)      2018 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -18,12 +19,15 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -509,7 +513,7 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(state, nullptr, description, ec);
+        return suspend(state, threads::invalid_thread_id, description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -559,7 +563,7 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(abs_time, nullptr, description, ec);
+        return suspend(abs_time, threads::invalid_thread_id, description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -585,7 +589,8 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(rel_time.from_now(), nullptr, description, ec);
+        return suspend(rel_time.from_now(), threads::invalid_thread_id,
+            description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -637,7 +642,8 @@ namespace hpx { namespace this_thread
             util::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(std::chrono::milliseconds(ms), nullptr, description, ec);
+        return suspend(std::chrono::milliseconds(ms), threads::invalid_thread_id,
+            description, ec);
     }
 
     /// Returns a reference to the executor which was used to create the current
@@ -758,6 +764,19 @@ namespace hpx { namespace applier
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create a new \a thread using the given data.
+    ///
+    /// \note This function is completely equivalent to the first overload
+    ///       of threads#register_thread_plain above, except that part of the
+    ///       parameters are passed as members of the threads#thread_init_data
+    ///       object.
+    ///
+    HPX_API_EXPORT threads::thread_id_type register_thread_plain(
+        threads::thread_init_data& data,
+        threads::thread_state_enum initial_state = threads::pending,
+        bool run_now = true, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the work to
     ///        be executed.
     ///
@@ -770,15 +789,67 @@ namespace hpx { namespace applier
     /// \note All other arguments are equivalent to those of the function
     ///       \a threads#register_thread_plain
     ///
-    HPX_API_EXPORT threads::thread_id_type register_thread(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
+    namespace detail
+    {
+        template <typename F>
+        struct thread_function
+        {
+            F f;
+
+            inline threads::thread_result_type operator()(threads::thread_arg_type)
+            {
+                // execute the actual thread function
+                f(threads::wait_signaled);
+
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
+            }
+        };
+
+        template <typename F>
+        struct thread_function_nullary
+        {
+            F f;
+
+            inline threads::thread_result_type operator()(threads::thread_arg_type)
+            {
+                // execute the actual thread function
+                f();
+
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
+            }
+        };
+    }
+
+    template <typename F>
+    threads::thread_id_type register_thread(
+        F && func,
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        threads::thread_function_type thread_func(
+            detail::thread_function<typename std::decay<F>::type>{
+                std::forward<F>(func)});
+        return register_thread_plain(std::move(thread_func),
+            description, initial_state, run_now, priority, os_thread, stacksize,
+            ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the work to
@@ -792,28 +863,24 @@ namespace hpx { namespace applier
     /// \note All other arguments are equivalent to those of the function
     ///       \a threads#register_thread_plain
     ///
-    HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
-        util::unique_function_nonser<void()> && func,
+    template <typename F>
+    threads::thread_id_type register_thread_nullary(
+        F && func,
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new \a thread using the given data.
-    ///
-    /// \note This function is completely equivalent to the first overload
-    ///       of threads#register_thread_plain above, except that part of the
-    ///       parameters are passed as members of the threads#thread_init_data
-    ///       object.
-    ///
-    HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true, error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        threads::thread_function_type thread_func(
+            detail::thread_function_nullary<typename std::decay<F>::type>{
+                std::forward<F>(func)});
+        return register_thread_plain(std::move(thread_func),
+            description, initial_state, run_now, priority, os_thread, stacksize,
+            ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
@@ -877,6 +944,20 @@ namespace hpx { namespace applier
     /// \brief Create a new work item using the given function as the
     ///        work to be executed.
     ///
+    /// \note This function is completely equivalent to the first overload
+    ///       of threads#register_work_plain above, except that part of the
+    ///       parameters are passed as members of the threads#thread_init_data
+    ///       object.
+    ///
+    HPX_API_EXPORT void register_work_plain(
+        threads::thread_init_data& data,
+        threads::thread_state_enum initial_state = threads::pending,
+        error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create a new work item using the given function as the
+    ///        work to be executed.
+    ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   HPX-thread interface, i.e. it takes one argument (a
@@ -886,14 +967,23 @@ namespace hpx { namespace applier
     /// \note All other arguments are equivalent to those of the function
     ///       \a threads#register_work_plain
     ///
-    HPX_API_EXPORT void register_work(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
+    template <typename F>
+    void register_work(
+        F && func,
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        threads::thread_function_type thread_func(
+            detail::thread_function<typename std::decay<F>::type>{
+                std::forward<F>(func)});
+        return register_work_plain(std::move(thread_func),
+            description, 0, initial_state, priority, os_thread, stacksize,
+            ec);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
@@ -907,28 +997,23 @@ namespace hpx { namespace applier
     /// \note All other arguments are equivalent to those of the function
     ///       \a threads#register_work_plain
     ///
-    HPX_API_EXPORT void register_work_nullary(
-        util::unique_function_nonser<void()> && func,
+    template <typename F>
+    void register_work_nullary(
+        F && func,
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new work item using the given function as the
-    ///        work to be executed.
-    ///
-    /// \note This function is completely equivalent to the first overload
-    ///       of threads#register_work_plain above, except that part of the
-    ///       parameters are passed as members of the threads#thread_init_data
-    ///       object.
-    ///
-    HPX_API_EXPORT void register_work_plain(
-        threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        error_code& ec = throws);
+        error_code& ec = throws)
+    {
+        threads::thread_function_type thread_func(
+            detail::thread_function_nullary<typename std::decay<F>::type>{
+                std::forward<F>(func)});
+        return register_work_plain(std::move(thread_func),
+            description, 0, initial_state, priority, os_thread, stacksize,
+            ec);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

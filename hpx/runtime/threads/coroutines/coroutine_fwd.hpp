@@ -34,11 +34,6 @@
 
 namespace hpx { namespace threads
 {
-    class HPX_EXPORT thread_data;
-
-    HPX_EXPORT void intrusive_ptr_add_ref(thread_data* p);
-    HPX_EXPORT void intrusive_ptr_release(thread_data* p);
-
     namespace coroutines
     {
         namespace detail

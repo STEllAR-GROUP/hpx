@@ -11,7 +11,6 @@
 #include <hpx/compat/mutex.hpp>
 #include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -132,13 +131,9 @@ namespace hpx { namespace threads { namespace detail
 
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
-        void stop(std::unique_lock<compat::mutex>& l, bool blocking = true);
+        void stop (std::unique_lock<compat::mutex>& l, bool blocking = true);
 
-        hpx::future<void> suspend();
-        void suspend_cb(std::function<void(void)> callback, error_code& ec = throws);
-
-        hpx::future<void> resume();
-        void resume_cb(std::function<void(void)> callback, error_code& ec = throws);
+        void resume(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////
         compat::thread& get_os_thread_handle(std::size_t global_thread_num)
@@ -272,20 +267,13 @@ namespace hpx { namespace threads { namespace detail
             std::size_t virt_core, error_code& = hpx::throws);
 
         // Suspend the given processing unit on the scheduler.
-        hpx::future<void> suspend_processing_unit(std::size_t virt_core);
-        void suspend_processing_unit_cb(std::function<void(void)> callback,
-            std::size_t virt_core, error_code& = hpx::throws);
+        void suspend_processing_unit(std::size_t virt_core, error_code&);
 
         // Resume the given processing unit on the scheduler.
-        hpx::future<void> resume_processing_unit(std::size_t virt_core);
-        void resume_processing_unit_cb(std::function<void(void)> callback,
-            std::size_t virt_core, error_code& = hpx::throws);
+        void resume_processing_unit(std::size_t virt_core, error_code&);
 
     protected:
         friend struct init_tss_helper<Scheduler>;
-
-        void resume_internal(error_code& ec);
-        void suspend_internal(error_code& ec);
 
         void remove_processing_unit_internal(
             std::size_t virt_core, error_code& = hpx::throws);

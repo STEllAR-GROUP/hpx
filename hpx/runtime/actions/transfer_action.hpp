@@ -168,8 +168,7 @@ namespace hpx { namespace actions
 
         threads::thread_init_data data;
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-        data.parent_id =
-            reinterpret_cast<threads::thread_id_repr_type>(this->parent_id_);
+        data.parent_id = this->parent_id_;
         data.parent_locality_id = this->parent_locality_;
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(

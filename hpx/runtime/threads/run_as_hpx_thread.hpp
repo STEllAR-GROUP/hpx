@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/optional.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -22,12 +23,6 @@
 #include <thread>
 #include <type_traits>
 #include <utility>
-
-#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
-#include <experimental/optional>
-#else
-#include <boost/optional.hpp>
-#endif
 
 namespace hpx { namespace threads
 {
@@ -48,11 +43,7 @@ namespace hpx { namespace threads
             // Using the optional for storing the returned result value
             // allows to support non-default-constructible and move-only
             // types.
-#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
-            std::experimental::optional<result_type> result;
-#else
-            boost::optional<result_type> result;
-#endif
+            hpx::util::optional<result_type> result;
 
             // This lambda function will be scheduled to run as an HPX
             // thread
@@ -62,15 +53,7 @@ namespace hpx { namespace threads
                 {
                     // Execute the given function, forward all parameters,
                     // store result.
-
-#if defined(HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
                     result.emplace(util::invoke_fused(f, std::move(args)));
-#elif BOOST_VERSION < 105600
-                    result = boost::in_place(
-                                util::invoke_fused(f, std::move(args)));
-#else
-                    result.emplace(util::invoke_fused(f, std::move(args)));
-#endif
 
                     // Now signal to the waiting thread that we're done.
                     {

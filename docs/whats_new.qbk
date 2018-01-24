@@ -16,6 +16,21 @@
 Here are some of the main highlights and changes for this release (in no
 particular order):
 
+* We have changed the way __hpx__ manages the processing units on a node. We do
+  not longer implicitly bind all available cores to a single thread pool. The
+  user has now full control over what processing units are bound to what thread
+  pool, each with a separate scheduler. It is now also possible to create your
+  own scheduler implementation and control what processing units this scheduler
+  should use. We added the `hpx::resource::partitioner` that manages all available
+  processing units and assigns resources to the used thread pools. Thread pools
+  can be now be suspended/resumed independently. This functionality helps in
+  running __hpx__ concurrently to code that is directly relying on __openmp__
+  and/or __mpi__.
+* We have continued to implement various parallel algorithms. __hpx__ now almost
+  completely implements all of the parallel algorithms as specified by the
+  __cpp17__. We have also continued to implement these alogorithms for the
+  distributed use case (for segmented data structures, such as
+  `hpx::partitioned_vector`).
 * Added a compatibility layer for `std::thread`, `std::mutex`, and
   `std::condition_variable` allowing for the code to use those facilities where
   available and to fall back to the corresponding Boost facilities otherwise.
@@ -46,11 +61,23 @@ particular order):
   order to enable the old behavior use the the compatibility option
   `-DHPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT=On` on the __cmake__ command
   line.
+* We have added the functionalities allowing for LCOs being implemented using
+  (simple) components. Before LCOs had to always be implemented using managed
+  components.
+* User defined components don't have to be default-constructible anymore.
+  Return types from actions don't have to be default-constructible anymore
+  either. Our serialization layer now in general supports
+  non-default-constructible types.
+* We have added a new launch policy `hpx::launch::lazy` that allows to defer
+  the decision on what launch policy to use to the point of execution. This
+  policy is initializaed with a function (object) that -- when invoked -- is
+  expected to produce the desired launch policy.
 
 [heading Breaking Changes]
 
 * We have dropped support for the gcc compiler version V4.8. The
-  minimal gcc version we now test on is gcc V4.9.
+  minimal gcc version we now test on is gcc V4.9. The minimally required
+  version of __cmake__ is now V3.3.2.
 * We have dropped support for the Visual Studio 2013 compiler version. The
   minimal Visual Studio version we now test on is Visual Studio 2015.5.
 * We have dropped support for the Boost V1.51-V1.54. The minimal version of
@@ -61,16 +88,65 @@ particular order):
   The functional usage of `hpx::util::unwrapped` should be
   changed to the new `hpx::util::unwrapping` function whereas
   the immediate usage should be replaced to `hpx::util::unwrap`.
+* The performance counter names referring to properties as exposed by
+  the threading subsystem have changes as those now additionally have to
+  specify the thread-pool. See the corresponding documentation for more
+  details.
+* The overloads of `hpx::async` that invoke and action do not perform
+  implicit unwrapping of the returned future anymore in case the invoked
+  function does return a future in the first place. In this case
+  `hpx::async` now returns a `hpx::future<future<T>>` making its behavior
+  conforming to its local counterpart.
+* We have replaced the used of `boost::exception_ptr` in our APIs with the
+ equivalent `std::exception_ptr`. Please change your codes accordingly.
+ No compatibility settings are provided.
+* We have removed the compatibility settings for
+  `HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY` and
+  `HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY` as their life-cycle has reached
+  its end.
+
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    3117] - Replace uses of boost/experimental::optional with
+                 util::optional
+* [pr    3114] - Avoid using util::function for thread function wrappers
+* [pr    3113] - cmake V3.10.2 has changed the variable names used for MPI
+* [pr    3112] - Minor fixes to exclusive_scan algorithm
+* [pr    3111] - Revert "fix detection of cxx11_std_atomic"
+* [pr    3109] - Fixing thread scheduling when yielding a thread id
+* [pr    3108] - Revert "Suspend thread pool"
+* [pr    3107] - Remove UB from thread::id relational operators
+* [pr    3106] - Add cmake test for std::decay_t to fix cuda build
+* [pr    3105] - Fixing refcount for async traversal frame
+* [pr    3104] - Local execution of direct actions is now actually performed
+                 directly
+* [pr    3101] - Revert "Adapting stack overhead limit for gcc 4.9"
+* [pr    3100] - Fix #3068 (condition_variable deadlock)
+* [pr    3099] - Fixing lock held during suspension in papi counter component
+* [pr    3098] - Unbreak broadcast_wait_for_2822 test
+* [pr    3097] - Adapting stack overhead limit for gcc 4.9
+* [pr    3096] - fix detection of cxx11_std_atomic
+* [pr    3095] - Add ciso646 header to get _LIBCPP_VERSION for testing
+                 inplace merge
+* [pr    3094] - Relax atomic operations on performance counter values
+* [pr    3093] - Short-circuit all_of/any_of/none_of instantiations
+* [pr    3092] - Take advantage of C++14 lambda capture initialization syntax,
+                 where possible
+* [pr    3091] - Remove more references to Boost from logging code
+* [pr    3090] - Unify use of yield/yield_k
+* [pr    3089] - Fix a strange thing in parallel::detail::handle_exception.
+                 (Fix #2834.)
+* [issue 3088] - A strange thing in parallel::sort.
+* [pr    3087] - Fixing assertion in default_distribution_policy
 * [pr    3086] - Implement parallel::remove and parallel::remove_if
 * [pr    3085] - Addressing breaking changes in Boost V1.66
 * [pr    3084] - Ignore build warnings round 2
 * [pr    3083] - Fix typo HPX_WITH_MM_PREFECTH
 * [pr    3081] - Pre-decay template arguments early
+* [pr    3080] - Suspend thread pool
 * [pr    3079] - Ignore build warnings
 * [pr    3078] - Don't test inplace_merge with libc++
 * [pr    3076] - Fixing 3075: Part 1
@@ -82,6 +158,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    3070] - Fix dynamic_counters_loaded_1508 test by adding dependency to
                  memory_component
 * [pr    3069] - Fix scheduling loop exit
+* [issue 3068] - hpx::lcos::condition_variable could be suspect to deadlocks
 * [pr    3067] - #ifdef out random_shuffle deprecated in later c++
 * [pr    3066] - Make coalescing test depend on coalescing library to ensure it
                  gets built
@@ -99,6 +176,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    3056] - Fix some build warnings caused by unused variables/unnecessary
                  tests
 * [pr    3055] - Update documentation for running tests
+* [issue 3054] - Assertion failure when using bulk hpx::new_ in asynchronous mode
 * [pr    3052] - Do not bind test running to cmake test build rule
 * [pr    3051] - Fix HPX-Qt interaction in Qt example.
 * [pr    3047] - Fixing #3044
@@ -114,6 +192,8 @@ Here is a list of the important tickets we closed for this release.
 * [pr    3035] - Make parallel unit test names match build target/folder names
 * [pr    3033] - Fix setting of default build type
 * [issue 3032] - Fix partitioner arg copy found in #2982
+* [issue 3031] - Errors linking libhpx.so due to missing references (master
+                 branch, commit 6679a8882)
 * [pr    3030] - Revert "implement executor then interface with && forwarding
                  reference"
 * [pr    3029] - Run CI inspect checks before building
@@ -177,6 +257,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2967] - Make parallel::merge is stable. (Fix #2964.)
 * [pr    2966] - Fixing a couple of held locks during exception handling
 * [pr    2965] - Adding missing #include
+* [issue 2964] - parallel merge is not stable
 * [pr    2963] - Making sure any function object passed to dataflow is released
                  after being invoked
 * [pr    2962] - Partially reverting #2891
@@ -185,6 +266,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 2958] - HPX_PLAIN_ACTION breaks due to missing include
 * [pr    2957] - Fixing errors generated by mixing different attribute syntaxes
 * [issue 2956] - Mixing attribute syntaxes leads to compiler errors
+* [issue 2955] - Fix OS-Thread throttling
 * [pr    2953] - Making sure any hpx.os_threads=N supplied through a
                  --hpx::config file is taken into account
 * [pr    2952] - Removing wrong call to cleanup_terminated_locked
@@ -316,6 +398,7 @@ Here is a list of the important tickets we closed for this release.
                  members
 * [issue 2835] - `constexpr` functions with `void` return type break compilation
                  with CUDA 8.0
+* [issue 2834] - One suspicion in parallel::detail::handle_exception
 * [pr    2833] - Implement parallel::merge
 * [pr    2832] - Fix a strange thing in
                  parallel::util::detail::handle_local_exceptions. (Fix #2818)
@@ -532,7 +615,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2626] - Generate `cmake_variables.qbk` and `cmake_toolchains.qbk` outside
                  of the source tree
 * [pr    2625] - Supporting -std=c++17 flag
-* [pr    2624] - Fixing a smalll cmake typo
+* [pr    2624] - Fixing a small cmake typo
 * [pr    2622] - Update CMake minimum required version to 3.0.2 (closes #2621)
 * [issue 2621] - Compiling hpx master fails with /usr/bin/ld: final link failed:
                  Bad value

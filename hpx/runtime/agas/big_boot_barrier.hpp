@@ -127,16 +127,7 @@ public:
     // no-op on non-bootstrap localities
     void trigger();
 
-    void add_thunk(util::unique_function_nonser<void()>* f)
-    {
-        std::size_t k = 0;
-        while(!thunks.push(f))
-        {
-            // Wait until succesfully pushed ...
-            hpx::lcos::local::spinlock::yield(k);
-            ++k;
-        }
-    }
+    void add_thunk(util::unique_function_nonser<void()>* f);
 
     void add_locality_endpoints(std::uint32_t locality_id,
         parcelset::endpoints_type const& endpoints);

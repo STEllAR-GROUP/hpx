@@ -601,12 +601,13 @@ namespace hpx { namespace performance_counters
             "counter_average_timer",
             "counter_elapsed_time",
             "counter_histogram",
+            "counter_raw_values",
         };
     }
 
     char const* get_counter_type_name(counter_type type)
     {
-        if (type < counter_text || type > counter_histogram)
+        if (type < counter_text || type > counter_raw_values)
             return "unknown";
         return strings::counter_type_names[type];
     }

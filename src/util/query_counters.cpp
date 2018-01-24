@@ -267,8 +267,12 @@ namespace hpx { namespace util
                 // now print array value counters
                 for (std::size_t i = 0; i != infos.size(); ++i)
                 {
-                    if (infos[i].type_ != performance_counters::counter_histogram)
+                    if (infos[i].type_ != performance_counters::counter_histogram &&
+                        infos[i].type_ != performance_counters::counter_raw_values)
+                    {
                         continue;
+                    }
+
                     if (!first)
                         output << ",";
                     first = false;
@@ -294,8 +298,12 @@ namespace hpx { namespace util
                 // now print array value counters
                 for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
                 {
-                    if (infos[i].type_ != performance_counters::counter_histogram)
+                    if (infos[i].type_ != performance_counters::counter_histogram &&
+                        infos[i].type_ != performance_counters::counter_raw_values)
+                    {
                         continue;
+                    }
+
                     if (!first)
                         output << ",";
                     first = false;
@@ -411,8 +419,12 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ == performance_counters::counter_histogram)
+            if (infos[i].type_ == performance_counters::counter_histogram ||
+                infos[i].type_ == performance_counters::counter_raw_values)
+            {
                 continue;
+            }
+
             indicies.push_back(i);
         }
 
@@ -461,8 +473,12 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ != performance_counters::counter_histogram)
+            if (infos[i].type_ != performance_counters::counter_histogram &&
+                infos[i].type_ != performance_counters::counter_raw_values)
+            {
                 continue;
+            }
+
             indicies.push_back(i);
         }
 

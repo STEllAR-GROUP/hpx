@@ -40,11 +40,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            queue_entry(threads::thread_id_repr_type const& id, void* q)
+            queue_entry(threads::thread_id_type const& id, void* q)
               : id_(id), q_(q)
             {}
 
-            threads::thread_id_repr_type id_;
+            threads::thread_id_type id_;
             void* q_;
             hook_type slist_hook_;
         };
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             ~reset_queue_entry()
             {
-                if (e_.id_ != threads::invalid_thread_id_repr)
+                if (e_.id_ != threads::invalid_thread_id)
                 {
                     queue_type* q = static_cast<queue_type*>(e_.q_);
                     q->erase(last_);     // remove entry from queue

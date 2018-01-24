@@ -269,8 +269,11 @@ namespace hpx { namespace performance_counters
         // reset all performance counters
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            if (infos_[i].type_ == counter_histogram)
+            if (infos_[i].type_ == counter_histogram ||
+                infos_[i].type_ == counter_raw_values)
+            {
                 continue;
+            }
 
             using performance_counters::stubs::performance_counter;
             v.push_back(performance_counter::get_value(
@@ -311,8 +314,11 @@ namespace hpx { namespace performance_counters
         // reset all performance counters
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            if (infos_[i].type_ != counter_histogram)
+            if (infos_[i].type_ != counter_histogram &&
+                infos_[i].type_ != counter_raw_values)
+            {
                 continue;
+            }
 
             using performance_counters::stubs::performance_counter;
             v.push_back(performance_counter::get_values_array(

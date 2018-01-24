@@ -127,7 +127,7 @@ namespace hpx { namespace util { namespace detail
                 error_code ec(lightweight);       // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
                     threads::wait_abort, threads::thread_priority_boost, ec);
-                id_ = nullptr;
+                id_.reset();
             }
             return true;
         }
@@ -187,16 +187,18 @@ namespace hpx { namespace util { namespace detail
                 statex == threads::wait_abort || 0 == microsecs_)
             {
                 // object has been finalized, exit
-                return threads::thread_result_type(threads::terminated, nullptr);
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
             }
 
             if (id_ != nullptr && id_ != threads::get_self_id())
             {
                 // obsolete timer thread
-                return threads::thread_result_type(threads::terminated, nullptr);
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
             }
 
-            id_ = nullptr;
+            id_.reset();
             is_started_ = false;
 
             bool result = false;
@@ -222,7 +224,8 @@ namespace hpx { namespace util { namespace detail
         }
 
         // do not re-schedule this thread
-        return threads::thread_result_type(threads::terminated, nullptr);
+        return threads::thread_result_type(threads::terminated,
+            threads::invalid_thread_id);
     }
 
     // schedule a high priority task after a given time interval
