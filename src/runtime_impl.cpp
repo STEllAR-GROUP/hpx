@@ -561,6 +561,15 @@ namespace hpx {
 
         thread_manager_->suspend();
 
+        // Ignore parcel pools because suspension can only be done with one
+        // locality
+#ifdef HPX_HAVE_TIMER_POOL
+        timer_pool_.wait();
+#endif
+#ifdef HPX_HAVE_IO_POOL
+        io_pool_.wait();
+#endif
+
         set_state(state_sleeping);
 
         return 0;
