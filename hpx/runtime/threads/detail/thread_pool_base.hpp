@@ -12,6 +12,7 @@
 #include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -29,6 +30,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <mutex>
@@ -80,7 +82,13 @@ namespace hpx { namespace threads { namespace detail
         virtual void stop(
             std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
 
-        virtual void resume(error_code& ec = throws) = 0;
+        virtual hpx::future<void> resume() = 0;
+        virtual void resume_cb(
+            std::function<void(void)> callback, error_code& ec = throws) = 0;
+
+        virtual hpx::future<void> suspend() = 0;
+        virtual void suspend_cb(
+            std::function<void(void)> callback, error_code& ec = throws) = 0;
 
     public:
         std::size_t get_worker_thread_num() const;
@@ -284,12 +292,16 @@ namespace hpx { namespace threads { namespace detail
             error_code& ec = throws) = 0;
 
         // Suspend the given processing unit on the scheduler.
-        virtual void suspend_processing_unit(std::size_t virt_core,
+        virtual hpx::future<void> suspend_processing_unit(std::size_t virt_core) = 0;
+        virtual void suspend_processing_unit_cb(
+            std::function<void(void)> callback, std::size_t virt_core,
             error_code& ec = throws) = 0;
 
         // Resume the given processing unit on the scheduler.
-        virtual void resume_processing_unit(std::size_t virt_core,
-            error_code& ec = throws) = 0;
+        virtual hpx::future<void> resume_processing_unit(std::size_t virt_core) = 0;
+        virtual void resume_processing_unit_cb(
+            std::function<void(void)> callback, std::size_t virt_core,
+                error_code& ec = throws) = 0;
 
         // return the description string of the underlying scheduler
         char const* get_description() const;

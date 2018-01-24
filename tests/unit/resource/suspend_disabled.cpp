@@ -26,7 +26,8 @@ int hpx_main(int argc, char* argv[])
         hpx::threads::detail::thread_pool_base& tp =
             hpx::resource::get_thread_pool("default");
 
-        tp.suspend_processing_unit(0);
+        // Use .get() to throw exception
+        tp.suspend_processing_unit(0).get();
         HPX_TEST_MSG(false, "Suspending should not be allowed with "
             "elasticity disabled");
     }

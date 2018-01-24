@@ -7,6 +7,8 @@ set(tests
     named_pool_executor
     resource_partitioner
     shutdown_suspended_pus
+    suspend_pool
+    suspend_pool_external
     suspend_disabled
     suspend_pool
     suspend_pool_external
@@ -19,6 +21,8 @@ set(tests
 set(named_pool_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(resource_partitioner_PARAMETERS THREADS_PER_LOCALITY 4)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
+set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4)
+set(suspend_pool_external_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_external_PARAMETERS THREADS_PER_LOCALITY 4)
