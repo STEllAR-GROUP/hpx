@@ -41,7 +41,9 @@ namespace hpx { namespace util
                 on_stop_thread();
             }
         ),
-        pool_name_(pool_name), pool_name_postfix_(name_postfix)
+        pool_name_(pool_name), pool_name_postfix_(name_postfix),
+        waiting_(false), wait_barrier_(pool_size + 1),
+        continue_barrier_(pool_size + 1)
     {
         LPROGRESS_ << pool_name;
 
@@ -75,7 +77,9 @@ namespace hpx { namespace util
                 on_stop_thread();
             }
         ),
-        pool_name_(pool_name), pool_name_postfix_(name_postfix)
+        pool_name_(pool_name), pool_name_postfix_(name_postfix),
+        waiting_(false), wait_barrier_(1),
+        continue_barrier_(1)
     {
         LPROGRESS_ << pool_name;
     }
@@ -86,7 +90,9 @@ namespace hpx { namespace util
             char const* pool_name, char const* name_postfix)
       : next_io_service_(0), stopped_(false), pool_size_(0),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
-        pool_name_(pool_name), pool_name_postfix_(name_postfix)
+        pool_name_(pool_name), pool_name_postfix_(name_postfix),
+        waiting_(false), wait_barrier_(1),
+        continue_barrier_(1)
     {
         LPROGRESS_ << pool_name;
     }
@@ -109,7 +115,20 @@ namespace hpx { namespace util
             on_start_thread_(index, pool_name_postfix_);
 
         // use this thread for the given io service
-        io_services_[index]->run();   // run io service
+        while (true)
+        {
+            io_services_[index]->run();   // run io service
+
+            if (waiting_)
+            {
+                wait_barrier_.wait();
+                continue_barrier_.wait();
+            }
+            else
+            {
+                break;
+            }
+        }
 
         if (on_stop_thread_)
             on_stop_thread_(index, pool_name_postfix_);
@@ -231,6 +250,32 @@ namespace hpx { namespace util
                 io_services_[i]->stop();
 
             stopped_ = true;
+        }
+    }
+
+    void io_service_pool::wait()
+    {
+        std::lock_guard<compat::mutex> l(mtx_);
+        wait_locked();
+    }
+
+    void io_service_pool::wait_locked()
+    {
+        if (!stopped_) {
+            // Clear work so that the run functions return when all work is done
+            waiting_ = true;
+            work_.clear();
+            wait_barrier_.wait();
+
+            // Add back the work guard and restart the services
+            waiting_ = false;
+            for (std::size_t i = 0; i < pool_size_; ++i)
+            {
+                work_.emplace_back(initialize_work(*io_services_[i]));
+                io_services_[i]->reset();
+            }
+
+            continue_barrier_.wait();
         }
     }
 
