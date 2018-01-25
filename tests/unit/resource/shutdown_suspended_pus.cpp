@@ -33,7 +33,7 @@ int hpx_main(int argc, char* argv[])
     // Remove all but one pu
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
     {
-        tp.suspend_processing_unit(thread_num);
+        tp.suspend_processing_unit(thread_num).get();
     }
 
     // Schedule some dummy work

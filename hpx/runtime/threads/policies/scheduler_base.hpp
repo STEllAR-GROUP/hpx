@@ -161,7 +161,15 @@ namespace hpx { namespace threads { namespace policies
             states_[num_thread].store(state_sleeping);
             std::unique_lock<compat::mutex> l(suspend_mtxs_[num_thread]);
             suspend_conds_[num_thread].wait(l);
-            states_[num_thread].store(state_running);
+
+            // Only set running if still in state_sleeping. Can be set with
+            // non-blocking/locking functions to stopping or terminating, in
+            // which case the state is left untouched.
+            hpx::state expected = state_sleeping;
+            states_[num_thread].compare_exchange_strong(expected, state_running);
+
+            HPX_ASSERT(expected == state_sleeping ||
+                expected == state_stopping || expected == state_terminating);
         }
 
         void resume(std::size_t num_thread)
