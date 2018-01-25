@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -330,7 +330,7 @@ namespace hpx
         return *thread_support_;
     }
 
-///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     void runtime::register_query_counters(
         std::shared_ptr<util::query_counters> const& active_counters)
     {
@@ -353,6 +353,12 @@ namespace hpx
     {
         if (active_counters_.get())
             active_counters_->reset_counters(ec);
+    }
+
+    void runtime::reinit_active_counters(bool reset, error_code& ec)
+    {
+        if (active_counters_.get())
+            active_counters_->reinit_counters(reset, ec);
     }
 
     void runtime::evaluate_active_counters(bool reset,
@@ -1283,6 +1289,18 @@ namespace hpx
         }
         else {
             HPX_THROWS_IF(ec, invalid_status, "reset_active_counters",
+                "the runtime system is not available at this time");
+        }
+    }
+
+    void reinit_active_counters(bool reset, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt) {
+            rt->reinit_active_counters(reset, ec);
+        }
+        else {
+            HPX_THROWS_IF(ec, invalid_status, "reinit_active_counters",
                 "the runtime system is not available at this time");
         }
     }

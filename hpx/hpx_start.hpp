@@ -18,6 +18,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -549,6 +550,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -586,6 +588,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -623,6 +626,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -658,6 +662,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -728,6 +733,19 @@ namespace hpx
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+/// \cond NOINTERNAL
+    inline bool start(std::nullptr_t f,
+        std::string const& app_name, int argc, char** argv,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline bool start(std::nullptr_t f, int argc, char** argv,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline bool start(std::nullptr_t f,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+/// \endcond
 }
 
 #ifndef DOXYGEN

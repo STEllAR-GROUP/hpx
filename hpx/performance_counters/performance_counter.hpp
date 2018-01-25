@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -109,6 +109,10 @@ namespace hpx { namespace performance_counters
 
         future<void> reset();
         void reset(launch::sync_policy, error_code& ec = throws);
+
+        future<void> reinit(bool reset = true);
+        void reinit(
+            launch::sync_policy, bool reset = true, error_code& ec = throws);
 
 #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
         HPX_DEPRECATED(HPX_DEPRECATED_MSG)
