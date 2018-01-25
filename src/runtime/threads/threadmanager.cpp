@@ -1930,6 +1930,7 @@ namespace hpx { namespace threads
     {
         for (auto& pool_iter : pools_)
         {
+            // TODO: Use condition variable.
             bool suspended = false;
             pool_iter->suspend_cb([&suspended](){ suspended = true; });
             hpx::util::detail::yield_while(
@@ -1942,6 +1943,7 @@ namespace hpx { namespace threads
     {
         for (auto& pool_iter : pools_)
         {
+            // TODO: Use condition variable.
             bool resumed = false;
             pool_iter->resume_cb([&resumed](){ resumed = true; });
             hpx::util::detail::yield_while([&resumed]() { return !resumed; },
