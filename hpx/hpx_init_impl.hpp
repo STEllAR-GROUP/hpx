@@ -1,3 +1,4 @@
+//  Copyright (c)      2018 Mikael Simberg
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //

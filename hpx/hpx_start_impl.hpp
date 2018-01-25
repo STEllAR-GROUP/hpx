@@ -1,3 +1,4 @@
+//  Copyright (c)      2018 Mikael Simberg
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
