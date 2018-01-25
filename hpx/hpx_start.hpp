@@ -550,6 +550,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -587,6 +588,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -624,6 +626,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -659,6 +662,7 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
