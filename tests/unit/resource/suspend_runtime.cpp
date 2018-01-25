@@ -5,32 +5,18 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/compat/thread.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <atomic>
 #include <cstddef>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-int hpx_main(int, char**)
-{
-    return 0;
-}
 
 int main(int argc, char* argv[])
 {
@@ -39,8 +25,15 @@ int main(int argc, char* argv[])
         "hpx.os_threads=4"
     };
 
+    hpx::start(nullptr, argc, argv, cfg);
 
-    hpx::start(argc, argv);
+    // Wait for runtime to start
+    hpx::runtime* rt = hpx::get_runtime_ptr();
+    hpx::util::detail::yield_while([rt]()
+        {
+            return rt->get_state() < hpx::state_running;
+        }, "");
+
     hpx::suspend();
 
     for (std::size_t i = 0; i < 100; ++i)
