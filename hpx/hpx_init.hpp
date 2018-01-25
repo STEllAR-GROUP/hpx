@@ -20,6 +20,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -705,6 +706,18 @@ namespace hpx
     inline int init(util::function_nonser<int(int, char**)> const& f,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+/// \cond NOINTERNAL
+    inline int init(std::nullptr_t f, std::string const& app_name, int argc,
+        char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline int init(std::nullptr_t f, int argc, char** argv,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline int init(std::nullptr_t f, int argc, char** argv,
+        std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+/// \endcond
 }
 
 #ifndef DOXYGEN
