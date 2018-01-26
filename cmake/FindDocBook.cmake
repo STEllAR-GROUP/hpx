@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-find_path(DOCBOOK_DTD
+find_path(DOCBOOK_DTD_DIR
   docbookx.dtd
   PATHS ${CMAKE_SYSTEM_PREFIX_PATH} ${DOCBOOK_ROOT} ENV DOCBOOK_ROOT
   PATH_SUFFIXES
@@ -12,7 +12,7 @@ find_path(DOCBOOK_DTD
     docbook-dtd
     share/sgml/docbook/xml-dtd-4.2)
 
-find_path(DOCBOOK_XSL
+find_path(DOCBOOK_XSL_DIR
   NAMES html/html.xsl xhtml-1_1/html.xsl
   PATHS ${CMAKE_SYSTEM_PREFIX_PATH} ${DOCBOOK_ROOT} ENV DOCBOOK_ROOT
   PATH_SUFFIXES
@@ -20,8 +20,8 @@ find_path(DOCBOOK_XSL
       docbook-xsl
       share/sgml/docbook/xsl-stylesheets)
 
-if(DOCBOOK_DTD AND DOCBOOK_XSL)
+if(DOCBOOK_DTD_DIR AND DOCBOOK_XSL_DIR)
   set(DOCBOOK_FOUND TRUE)
 endif()
 
-mark_as_advanced(DOCBOOK_DTD DOCBOOK_XSL)
+mark_as_advanced(DOCBOOK_DTD_DIR DOCBOOK_XSL_DIR)
