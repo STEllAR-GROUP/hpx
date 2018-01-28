@@ -151,7 +151,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::set<std::thread::id> thread_set;
 
     // test a parallel algorithm on custom pool with high priority
-    hpx::parallel::static_chunk_size fixed(1);
+    hpx::parallel::execution::static_chunk_size fixed(1);
     hpx::parallel::for_loop_strided(
         hpx::parallel::execution::par.with(fixed).on(high_priority_executor), 0,
         loop_count, 1, [&](std::size_t i) {

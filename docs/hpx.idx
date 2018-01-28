@@ -114,7 +114,7 @@ parallel::is_executor                      "is_executor"                   "hpx\
 
 parallel::execution::sequenced_execution_tag          "sequenced_execution_tag"       "hpx\.parallel\.execution\.sequenced_execution_tag.*"
 parallel::execution::parallel_execution_tag           "parallel_execution_tag"        "hpx\.parallel\.execution\.parallel_execution_tag.*"
-parallel::execution::vector_execution_tag             "vector_execution_tag"          "hpx\.parallel\.execution\.vector_execution_tag.*"
+parallel::execution::unsequenced_execution_tag        "unsequenced_execution_tag"     "hpx\.parallel\.execution\.unsequenced_execution_tag.*"
 
 # hpx/parallel/executors/sequential_executor.hpp
 parallel::execution::sequenced_executor              "sequenced_executor"           "hpx\.parallel\.execution\.sequenced_executor.*"

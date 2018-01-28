@@ -170,15 +170,17 @@ namespace hpx { namespace lcos { namespace local
     // Asynchronous version
     template <typename ExPolicy, typename F, typename ... Args,
         typename = typename std::enable_if<
-            hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
-        >
+            hpx::parallel::execution::is_async_execution_policy<
+                ExPolicy
+            >::value
+        >::type>
     std::vector<hpx::future<void>>
-    define_spmd_block(ExPolicy && policy,
-        std::size_t num_images, F && f, Args && ... args)
+    define_spmd_block(ExPolicy && policy, std::size_t num_images, F && f,
+        Args && ... args)
     {
         static_assert(
-            parallel::execution::is_execution_policy<ExPolicy>::value,
-            "parallel::execution::is_execution_policy<ExPolicy>::value");
+            parallel::execution::is_async_execution_policy<ExPolicy>::value,
+            "parallel::execution::is_async_execution_policy<ExPolicy>::value");
 
         using ftype = typename std::decay<F>::type;
         using first_type =
@@ -202,26 +204,24 @@ namespace hpx { namespace lcos { namespace local
         std::shared_ptr<mutex_type> mtx
             = std::make_shared<mutex_type>();
 
-        return
-            hpx::parallel::executor_traits<
-                    typename std::decay<executor_type>::type
-                >::bulk_async_execute(
-                    policy.executor(),
-                    detail::spmd_block_helper<F>{
-                        barrier,barriers,mtx,std::forward<F>(f),num_images
-                    },
-                    boost::irange(std::size_t(0), num_images),
-                        std::forward<Args>(args)...);
+        return hpx::parallel::execution::bulk_async_execute(
+            policy.executor(),
+            detail::spmd_block_helper<F>{
+                barrier,barriers,mtx,std::forward<F>(f), num_images
+            },
+            boost::irange(std::size_t(0), num_images),
+                std::forward<Args>(args)...);
     }
 
     // Synchronous version
     template <typename ExPolicy, typename F, typename ... Args,
         typename = typename std::enable_if<
-            !hpx::parallel::v1::is_async_execution_policy<ExPolicy>::value>::type
-        >
-    void
-    define_spmd_block(ExPolicy && policy,
-        std::size_t num_images, F && f, Args && ... args)
+           !hpx::parallel::execution::is_async_execution_policy<
+                ExPolicy
+            >::value
+        >::type>
+    void define_spmd_block(ExPolicy && policy, std::size_t num_images,
+        F && f, Args && ... args)
     {
         static_assert(
             parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -249,15 +249,13 @@ namespace hpx { namespace lcos { namespace local
         std::shared_ptr<mutex_type> mtx
             = std::make_shared<mutex_type>();
 
-        hpx::parallel::executor_traits<
-                typename std::decay<executor_type>::type
-            >::bulk_execute(
-                policy.executor(),
-                detail::spmd_block_helper<F>{
-                    barrier,barriers,mtx,std::forward<F>(f),num_images
-                },
-                boost::irange(std::size_t(0), num_images),
-                    std::forward<Args>(args)...);
+        hpx::parallel::execution::bulk_sync_execute(
+            policy.executor(),
+            detail::spmd_block_helper<F>{
+                barrier,barriers,mtx,std::forward<F>(f), num_images
+            },
+            boost::irange(std::size_t(0), num_images),
+                std::forward<Args>(args)...);
     }
 
     template <typename F, typename ... Args>

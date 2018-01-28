@@ -59,8 +59,6 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
     std::atomic<std::size_t> count_invocations(0);
     std::size_t const num_tasks = 100;
 
-    typedef hpx::parallel::executor_information_traits<Executor> infotraits;
-
     std::size_t num_execs = processing_units / num_pus;
 
     {
@@ -77,7 +75,9 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
 
         for(Executor& exec : execs)
         {
-            HPX_TEST_EQ(infotraits::processing_units_count(exec, test::dummy),
+            HPX_TEST_EQ(
+                hpx::parallel::execution::processing_units_count(
+                    exec, test::dummy),
                 num_pus);
         }
 
@@ -97,7 +97,9 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
         // test again
         for(Executor& exec : execs)
         {
-            HPX_TEST_EQ(infotraits::processing_units_count(exec, test::dummy),
+            HPX_TEST_EQ(
+                hpx::parallel::execution::processing_units_count(
+                    exec, test::dummy),
                 num_pus);
         }
     }
@@ -107,7 +109,7 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
 
 void test_executors(std::size_t num_pus)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::parallel::execution;
     std::size_t processing_units = hpx::get_os_thread_count();
 
     processing_units = (processing_units / num_pus) * num_pus;
@@ -131,8 +133,6 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
     std::atomic<std::size_t> count_invocations(0);
     std::size_t const num_tasks = 100;
 
-    typedef hpx::parallel::executor_information_traits<Executor> infotraits;
-
     // create one executor which can give back processing units
     Executor shrink_exec(processing_units);
 
@@ -140,7 +140,8 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
     hpx::this_thread::yield();
 
     HPX_TEST_EQ(
-        infotraits::processing_units_count(shrink_exec, test::dummy),
+        hpx::parallel::execution::processing_units_count(
+            shrink_exec, test::dummy),
         processing_units);
 
     std::size_t num_execs = (processing_units-1) / num_pus;
@@ -157,13 +158,16 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
 
         for(Executor& exec : execs)
         {
-            HPX_TEST_EQ(infotraits::processing_units_count(exec, test::dummy),
+            HPX_TEST_EQ(
+                hpx::parallel::execution::processing_units_count(
+                    exec, test::dummy),
                 num_pus);
         }
 
         // the main executor should run on a reduced amount of cores
         HPX_TEST_EQ(
-            infotraits::processing_units_count(shrink_exec, test::dummy),
+            hpx::parallel::execution::processing_units_count(
+                shrink_exec, test::dummy),
             processing_units - num_execs * num_pus);
 
         // schedule a couple of tasks on each of the executors
@@ -182,13 +186,16 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
         // test again
         for(Executor& exec : execs)
         {
-            HPX_TEST_EQ(infotraits::processing_units_count(exec, test::dummy),
+            HPX_TEST_EQ(
+                hpx::parallel::execution::processing_units_count(
+                    exec, test::dummy),
                 num_pus);
         }
 
         // the main executor should run on a reduced amount of cores
         HPX_TEST_EQ(
-            infotraits::processing_units_count(shrink_exec, test::dummy),
+            hpx::parallel::execution::processing_units_count(
+                shrink_exec, test::dummy),
             processing_units - num_execs * num_pus);
     }
 
@@ -197,7 +204,7 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
 
 void test_executors_shrink(std::size_t num_pus)
 {
-    using namespace hpx::parallel;
+    using namespace hpx::parallel::execution;
     std::size_t processing_units = hpx::get_os_thread_count();
 
     processing_units = (processing_units / num_pus) * num_pus;

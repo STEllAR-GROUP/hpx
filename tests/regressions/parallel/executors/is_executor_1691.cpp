@@ -13,15 +13,25 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-struct my_executor : hpx::parallel::parallel_executor {};
+struct my_executor : hpx::parallel::execution::parallel_executor {};
 
-namespace hpx { namespace parallel { inline namespace v3 { namespace detail
+namespace hpx { namespace parallel { namespace execution
 {
     template <>
-    struct is_executor<my_executor>
+    struct is_one_way_executor<my_executor>
       : std::true_type
     {};
-}}}}
+
+    template <>
+    struct is_two_way_executor<my_executor>
+      : std::true_type
+    {};
+
+    template <>
+    struct is_bulk_two_way_executor<my_executor>
+      : std::true_type
+    {};
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
@@ -33,8 +43,7 @@ int hpx_main(int argc, char* argv[])
 
     std::vector<int> v(100);
 
-    for_each(par.on(exec),
-        v.begin(), v.end(), [](int x){ });
+    for_each(par.on(exec), v.begin(), v.end(), [](int x) {});
 
     return hpx::finalize();
 }

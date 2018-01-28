@@ -185,7 +185,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 "Requires at least output iterator.");
 
             typedef std::integral_constant<bool,
-                    is_sequenced_execution_policy<ExPolicy>::value ||
+                    execution::is_sequenced_execution_policy<ExPolicy>::value ||
                    !hpx::traits::is_forward_iterator<FwdIter1>::value ||
                    !hpx::traits::is_forward_iterator<FwdIter2>::value
                 > is_seq;
@@ -197,7 +197,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 (hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
 
-            typedef is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 #endif
             return detail::transform_inclusive_scan<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -374,7 +374,7 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T, typename Op, typename Conv,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter1>::value &&
         hpx::traits::is_iterator<FwdIter2>::value &&
         hpx::traits::is_invocable<Conv,
@@ -533,7 +533,7 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Conv, typename Op,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter1>::value &&
         hpx::traits::is_iterator<FwdIter2>::value &&
         hpx::traits::is_invocable<Conv,
