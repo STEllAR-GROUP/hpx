@@ -58,7 +58,8 @@ namespace hpx
     /// the users `main()` function. It will set up the HPX runtime environment
     /// and schedule the function given by \p f as a HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
-    /// with the runtime system's execution.
+    /// with the runtime system's execution. This overload will not call
+    /// `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -123,7 +124,8 @@ namespace hpx
     /// users `main()` function. It will set up the HPX runtime environment and
     /// schedule the function given by \p f as a HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
-    /// with the runtime system's execution.
+    /// with the runtime system's execution. This overload will not call
+    /// `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -555,7 +557,9 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
-    /// `hpx::stop` to synchronize with the runtime system's execution.
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -593,7 +597,9 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
-    /// `hpx::stop` to synchronize with the runtime system's execution.
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -633,7 +639,9 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
-    /// `hpx::stop` to synchronize with the runtime system's execution.
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -671,7 +679,9 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
-    /// `hpx::stop` to synchronize with the runtime system's execution.
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -709,6 +719,9 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main

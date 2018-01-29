@@ -63,7 +63,9 @@ namespace hpx
     /// This is the main entry point for any HPX application. This function
     /// (or one of its overloads below) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
-    /// function given by \p f as a HPX thread.
+    /// function given by \p f as a HPX thread. This overload will not call
+    /// `hpx_main`.
+    ///
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -127,7 +129,8 @@ namespace hpx
     /// This is the main entry point for any HPX application. This function
     /// (or one of its overloads below) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
-    /// function given by \p f as a HPX thread.
+    /// function given by \p f as a HPX thread. This overload will not call
+    /// `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -540,7 +543,9 @@ namespace hpx
     ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// console mode or worker mode depending on the command line settings). It
+    /// will schedule the function given by \p f as a HPX thread. This overload
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -577,7 +582,9 @@ namespace hpx
     ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// console mode or worker mode depending on the command line settings). It
+    /// will schedule the function given by \p f as a HPX thread. This overload
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -612,7 +619,9 @@ namespace hpx
     ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// console mode or worker mode depending on the command line settings). It
+    /// will schedule the function given by \p f as a HPX thread. This overload
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -649,7 +658,9 @@ namespace hpx
     ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// console mode or worker mode depending on the command line settings). It
+    /// will schedule the function given by \p f as a HPX thread. This overload
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -684,7 +695,9 @@ namespace hpx
     ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
+    /// console mode or worker mode depending on the command line settings). It
+    /// will schedule the function given by \p f as a HPX thread. This overload
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
