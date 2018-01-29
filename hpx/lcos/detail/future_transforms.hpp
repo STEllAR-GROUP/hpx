@@ -30,7 +30,7 @@ namespace lcos {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         bool async_visit_future(T&& current)
         {
-            auto state =
+            auto const& state =
                 traits::detail::get_shared_state(std::forward<T>(current));
 
             if ((state.get() == nullptr) || state->is_ready())
@@ -51,7 +51,7 @@ namespace lcos {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         void async_detach_future(T&& current, N&& next)
         {
-            auto state =
+            auto const& state =
                 traits::detail::get_shared_state(std::forward<T>(current));
 
             // Attach a continuation to this future which will
