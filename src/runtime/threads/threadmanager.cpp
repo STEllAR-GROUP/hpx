@@ -1943,12 +1943,21 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                // TODO: Use condition variable.
-                bool suspended = false;
-                pool_iter->suspend_cb([&suspended](){ suspended = true; });
-                hpx::util::detail::yield_while(
-                    [&suspended]() { return !suspended; },
-                    "threadmanager::suspend");
+                compat::mutex mtx;
+                compat::condition_variable cond;
+                std::unique_lock<compat::mutex> lk(mtx);
+
+                pool_iter->suspend_cb(
+                    [&mtx, &cond]()
+                    {
+                        {
+                            std::lock_guard<compat::mutex> lk(mtx);
+                        }
+
+                        cond.notify_all();
+                    });
+
+                cond.wait(lk);
             }
         }
     }
@@ -1970,12 +1979,21 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                // TODO: Use condition variable.
-                bool resumed = false;
-                pool_iter->resume_cb([&resumed](){ resumed = true; });
-                hpx::util::detail::yield_while(
-                    [&resumed]() { return !resumed; },
-                    "threadmanager::resume");
+                compat::mutex mtx;
+                compat::condition_variable cond;
+                std::unique_lock<compat::mutex> lk(mtx);
+
+                pool_iter->resume_cb(
+                    [&mtx, &cond]()
+                    {
+                        {
+                            std::lock_guard<compat::mutex> lk(mtx);
+                        }
+
+                        cond.notify_all();
+                    });
+
+                cond.wait(lk);
             }
         }
     }
