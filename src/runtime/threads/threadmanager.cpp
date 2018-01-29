@@ -1928,26 +1928,55 @@ namespace hpx { namespace threads
 
     void threadmanager::suspend()
     {
-        for (auto& pool_iter : pools_)
+        if (threads::get_self_ptr())
         {
-            // TODO: Use condition variable.
-            bool suspended = false;
-            pool_iter->suspend_cb([&suspended](){ suspended = true; });
-            hpx::util::detail::yield_while(
-                [&suspended]() { return !suspended; },
-                "threadmanager::suspend");
+            std::vector<hpx::future<void>> fs;
+
+            for (auto& pool_iter : pools_)
+            {
+                fs.push_back(pool_iter->suspend());
+            }
+
+            hpx::wait_all(fs);
+        }
+        else
+        {
+            for (auto& pool_iter : pools_)
+            {
+                // TODO: Use condition variable.
+                bool suspended = false;
+                pool_iter->suspend_cb([&suspended](){ suspended = true; });
+                hpx::util::detail::yield_while(
+                    [&suspended]() { return !suspended; },
+                    "threadmanager::suspend");
+            }
         }
     }
 
     void threadmanager::resume()
     {
-        for (auto& pool_iter : pools_)
+        if (threads::get_self_ptr())
         {
-            // TODO: Use condition variable.
-            bool resumed = false;
-            pool_iter->resume_cb([&resumed](){ resumed = true; });
-            hpx::util::detail::yield_while([&resumed]() { return !resumed; },
-                "threadmanager::resume");
+            std::vector<hpx::future<void>> fs;
+
+            for (auto& pool_iter : pools_)
+            {
+                fs.push_back(pool_iter->resume());
+            }
+
+            hpx::wait_all(fs);
+        }
+        else
+        {
+            for (auto& pool_iter : pools_)
+            {
+                // TODO: Use condition variable.
+                bool resumed = false;
+                pool_iter->resume_cb([&resumed](){ resumed = true; });
+                hpx::util::detail::yield_while(
+                    [&resumed]() { return !resumed; },
+                    "threadmanager::resume");
+            }
         }
     }
 
