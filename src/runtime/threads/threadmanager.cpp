@@ -1951,9 +1951,14 @@ namespace hpx { namespace threads
                     [&mtx, &cond]()
                     {
                         {
+                            // Lock the mutex to ensure that wait is called
+                            // before notify_all (wait unlocks the mutex
+                            // internally).
                             std::lock_guard<compat::mutex> lk(mtx);
                         }
 
+                        // Don't lock here anymore so that cond doesn't have to
+                        // wait to lock the mutex again when returning.
                         cond.notify_all();
                     });
 
@@ -1987,9 +1992,14 @@ namespace hpx { namespace threads
                     [&mtx, &cond]()
                     {
                         {
+                            // Lock the mutex to ensure that wait is called
+                            // before notify_all (wait unlocks the mutex
+                            // internally).
                             std::lock_guard<compat::mutex> lk(mtx);
                         }
 
+                        // Don't lock here anymore so that wait doesn't have to
+                        // wait to lock the mutex again when returning.
                         cond.notify_all();
                     });
 
