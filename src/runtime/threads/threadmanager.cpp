@@ -46,6 +46,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
