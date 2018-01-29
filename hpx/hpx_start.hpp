@@ -62,7 +62,9 @@ namespace hpx
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param desc_cmdline [in] This parameter may hold the description of
     ///                     additional command line arguments understood by the
     ///                     application. These options will be prepended to
@@ -125,7 +127,9 @@ namespace hpx
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param desc_cmdline [in] This parameter may hold the description of
     ///                     additional command line arguments understood by the
     ///                     application. These options will be prepended to
@@ -593,7 +597,9 @@ namespace hpx
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param app_name     [in] The name of the application.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
@@ -631,7 +637,9 @@ namespace hpx
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
     ///                     passed by the operating system (to `main()`).
@@ -667,7 +675,9 @@ namespace hpx
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
     ///                     passed by the operating system (to `main()`).
@@ -702,7 +712,9 @@ namespace hpx
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
     ///                     passed by the operating system (to `main()`).
