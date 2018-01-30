@@ -8,7 +8,10 @@
 
 #include <hpx/config/defines.hpp>
 
+// don't #include ciso646 for MSVC as it contains '#define and &&' and similar
+#if !defined(_MSC_VER)
 #include <ciso646>
+#endif
 
 #if defined(__has_feature)
 #  if __has_feature(cxx_thread_local)
