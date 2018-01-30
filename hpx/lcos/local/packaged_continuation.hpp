@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -281,7 +281,8 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this);
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
         }
 
         threads::thread_result_type
@@ -298,7 +299,8 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this, is_void());
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(threads::terminated,
+                threads::invalid_thread_id);
         }
 
     public:
@@ -497,8 +499,10 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             ptr->execute_deferred();
+
             ptr->set_on_completed(util::deferred_call(
-                    [this_](shared_state_ptr && f, launch policy)
+                    [HPX_CAPTURE_MOVE(this_)](
+                        shared_state_ptr && f, launch policy)
                     {
                         if (hpx::detail::has_async_policy(policy))
                             this_->async(std::move(f), policy.priority());

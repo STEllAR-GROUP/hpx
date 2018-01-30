@@ -331,7 +331,7 @@ namespace hpx { namespace serialization
         case hpx::util::boost_system_error:
             e = hpx::detail::construct_exception(
                     boost::system::system_error(err_value,
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
+#if BOOST_VERSION < 106600 && !defined(BOOST_SYSTEM_NO_DEPRECATED)
                         boost::system::get_system_category()
 #else
                         boost::system::system_category()

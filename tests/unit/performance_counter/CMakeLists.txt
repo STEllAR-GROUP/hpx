@@ -1,11 +1,13 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2018 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
     all_counters
-    path_elements)
+    counter_raw_values
+    path_elements
+    reinit_counters)
 
 foreach(test ${tests})
   set(sources

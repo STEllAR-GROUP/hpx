@@ -40,7 +40,6 @@ void test_when_each_from_list()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -52,7 +51,6 @@ void test_when_each_from_list()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -101,7 +99,6 @@ void test_when_each_from_list_iterators()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -113,7 +110,6 @@ void test_when_each_from_list_iterators()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -166,7 +162,6 @@ void test_when_each_n_from_list_iterators()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
 
@@ -178,7 +173,6 @@ void test_when_each_n_from_list_iterators()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < n);
         };
 
@@ -234,7 +228,6 @@ void test_when_each_one_future()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -246,7 +239,6 @@ void test_when_each_one_future()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -279,7 +271,6 @@ void test_when_each_two_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -291,7 +282,6 @@ void test_when_each_two_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -331,7 +321,6 @@ void test_when_each_three_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -343,7 +332,6 @@ void test_when_each_three_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -387,7 +375,6 @@ void test_when_each_four_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -399,7 +386,6 @@ void test_when_each_four_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -447,7 +433,6 @@ void test_when_each_five_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -459,7 +444,6 @@ void test_when_each_five_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -511,7 +495,6 @@ void test_when_each_late_future()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -523,7 +506,6 @@ void test_when_each_late_future()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -580,7 +562,6 @@ void test_when_each_deferred_futures()
 
             unsigned id = fut.get();
 
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 
@@ -592,7 +573,6 @@ void test_when_each_deferred_futures()
             unsigned id = fut.get();
 
             HPX_TEST_EQ(idx, id);
-            HPX_TEST(id >= 0);
             HPX_TEST(id < count);
         };
 

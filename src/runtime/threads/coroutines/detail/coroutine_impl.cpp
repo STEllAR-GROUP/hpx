@@ -217,10 +217,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     }
 
     coroutine_impl* coroutine_impl::allocate(
-        thread_id_repr_type id, std::ptrdiff_t stacksize)
+        thread_id_type id, std::ptrdiff_t stacksize)
     {
         // start looking at the matching heap
-        std::size_t const heap_num = std::size_t(id) / 32; //-V112
+        std::size_t const heap_num = std::size_t(id.get()) / 32; //-V112
         std::size_t const heap_count = get_heap_count(stacksize);
 
         // look through all heaps to find an available coroutine object
@@ -237,7 +237,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
     void coroutine_impl::deallocate(coroutine_impl* p)
     {
-        std::size_t const heap_num = std::size_t(p->get_thread_id()) / 32; //-V112
+        std::size_t const heap_num = std::size_t(p->get_thread_id().get()) / 32; //-V112
         std::ptrdiff_t const stacksize = p->get_stacksize();
 
         get_heap(heap_num, stacksize).deallocate(p);

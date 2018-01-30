@@ -33,11 +33,16 @@ void run(widget * w, std::size_t num_threads)
     for(std::size_t i = 0; i < num_threads; ++i)
     {
         runner_action a;
-        futures[i] = hpx::async(a, hpx::find_here(), high_resolution_timer::now());
+        futures[i] = hpx::async(a,
+                                hpx::find_here(),
+                                high_resolution_timer::now());
     }
 
-    hpx::lcos::wait(futures, [w](std::size_t i, double t){ w->add_label(i, t); });
-    w->run_finished();
+    hpx::lcos::wait(
+                futures,
+                [w](std::size_t i, double t){ w->threadsafe_add_label(i, t); }
+    );
+    w->threadsafe_run_finished();
 }
 
 void qt_main(int argc, char ** argv)

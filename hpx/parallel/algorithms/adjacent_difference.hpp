@@ -78,22 +78,17 @@ namespace hpx { namespace parallel { inline namespace v1
                 }
 
                 auto f1 =
-                    [op, policy](
-                        zip_iterator part_begin, std::size_t part_size
-                    ) mutable
-                    {
-                        HPX_UNUSED(policy);
-
-                        // VS2015RC bails out when op is captured by ref
-                        using hpx::util::get;
-                        util::loop_n<ExPolicy>(
-                            part_begin, part_size,
-                            [op](zip_iterator it)
-                            {
-                                get<2>(*it) = hpx::util::invoke(
-                                    op, get<0>(*it), get<1>(*it));
-                            });
-                    };
+                    [HPX_CAPTURE_FORWARD(op)](
+                        zip_iterator part_begin, std::size_t part_size) mutable
+                {
+                    // VS2015RC bails out when op is captured by ref
+                    using hpx::util::get;
+                    util::loop_n<ExPolicy>(
+                        part_begin, part_size, [op](zip_iterator it) {
+                            get<2>(*it) =
+                                hpx::util::invoke(op, get<0>(*it), get<1>(*it));
+                        });
+                };
 
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, Iter, void>::call(

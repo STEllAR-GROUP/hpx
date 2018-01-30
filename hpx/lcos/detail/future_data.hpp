@@ -223,7 +223,7 @@ namespace detail
             if (recurse_asynchronously)
             {
                 error_code ec;
-                threads::thread_id_type id = threads::register_thread_nullary(
+                threads::register_thread_nullary(
                     compose_cb_impl(std::move(f1_), std::move(f2_)),
                     "compose_cb",
                     threads::pending, true, threads::thread_priority_boost,
@@ -870,7 +870,8 @@ namespace detail
         static threads::thread_result_type run_impl(future_base_type this_)
         {
             this_->do_run();
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(
+                threads::terminated, threads::invalid_thread_id);
         }
 
     public:
@@ -946,7 +947,8 @@ namespace detail
         {
             reset_id r(*this_);
             this_->do_run();
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(
+                threads::terminated, threads::invalid_thread_id);
         }
 
     public:

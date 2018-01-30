@@ -89,12 +89,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [pred, tok, policy](
-                        Iter part_begin, std::size_t part_count
-                    ) mutable -> bool
+                    [tok, HPX_CAPTURE_FORWARD(pred)](
+                        Iter part_begin, std::size_t part_count) mutable -> bool
                     {
-                        HPX_UNUSED(policy);
-
                         bool fst_bool = hpx::util::invoke(pred, *part_begin);
                         if (part_count == 1)
                             return fst_bool;

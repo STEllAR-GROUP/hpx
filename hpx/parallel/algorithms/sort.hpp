@@ -1,6 +1,7 @@
 //  Copyright (c) 2015 John Biddiscombe
 //  Copyright (c) 2015-2017 Hartmut Kaiser
 //  Copyright (c) 2015 Francisco Jose Tapia
+//  Copyright (c) 2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,7 +25,6 @@
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -48,7 +48,8 @@ namespace hpx { namespace parallel { inline namespace v1
         ///////////////////////////////////////////////////////////////////////
         // std::is_sorted is not available on all supported platforms yet
         template <typename Iter, typename Compare>
-        inline bool is_sorted_sequential(Iter first, Iter last, Compare comp)
+        inline bool
+        is_sorted_sequential(Iter first, Iter last, Compare const& comp)
         {
             bool sorted = true;
             if (first != last)
@@ -81,7 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1
             {
                 return execution::async_execute(
                     policy.executor(),
-                    [first, last, comp]() -> RandomIt
+                    [first, last, HPX_CAPTURE_MOVE(comp)]() -> RandomIt
                     {
                         std::sort(first, last, comp);
                         return last;
@@ -183,37 +184,22 @@ namespace hpx { namespace parallel { inline namespace v1
         parallel_sort_async(ExPolicy && policy, RandomIt first, RandomIt last,
             Compare comp)
         {
-            hpx::future<RandomIt> result;
-            try {
-                std::ptrdiff_t N = last - first;
-                HPX_ASSERT(N >= 0);
+            std::ptrdiff_t N = last - first;
+            HPX_ASSERT(N >= 0);
 
-                if (std::size_t(N) < sort_limit_per_task)
-                {
-                    std::sort(first, last, comp);
-                    return hpx::make_ready_future(last);
-                }
-
-                // check if already sorted
-                if (detail::is_sorted_sequential(first, last, comp))
-                    return hpx::make_ready_future(last);
-
-                result = execution::async_execute(policy.executor(),
-                        &sort_thread<ExPolicy, RandomIt, Compare>,
-                        std::ref(policy), first, last, comp);
-            }
-            catch (...) {
-                return detail::handle_exception<ExPolicy, RandomIt>::call(
-                    std::current_exception());
-            }
-
-            if (result.has_exception())
+            if (std::size_t(N) < sort_limit_per_task)
             {
-                return detail::handle_exception<ExPolicy, RandomIt>::call(
-                    std::move(result));
+                std::sort(first, last, comp);
+                return hpx::make_ready_future(last);
             }
 
-            return result;
+            // check if already sorted
+            if (detail::is_sorted_sequential(first, last, comp))
+                return hpx::make_ready_future(last);
+
+            return execution::async_execute(policy.executor(),
+                    &sort_thread<ExPolicy, RandomIt, Compare>,
+                    std::ref(policy), first, last, comp);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -245,15 +231,26 @@ namespace hpx { namespace parallel { inline namespace v1
             parallel(ExPolicy && policy, RandomIt first, RandomIt last,
                 Compare && comp, Proj && proj)
             {
-                // call the sort routine and return the right type,
-                // depending on execution policy
-                return util::detail::algorithm_result<ExPolicy, RandomIt>::get(
-                    parallel_sort_async(std::forward<ExPolicy>(policy),
-                        first, last,
-                        util::compare_projected<Compare, Proj>(
-                            std::forward<Compare>(comp),
-                            std::forward<Proj>(proj)
-                        )));
+                typedef util::detail::algorithm_result<
+                    ExPolicy, RandomIt
+                > algorithm_result;
+
+                try {
+                    // call the sort routine and return the right type,
+                    // depending on execution policy
+                    return algorithm_result::get(
+                        parallel_sort_async(std::forward<ExPolicy>(policy),
+                            first, last,
+                            util::compare_projected<Compare, Proj>(
+                                std::forward<Compare>(comp),
+                                std::forward<Proj>(proj)
+                            )));
+                }
+                catch (...) {
+                    return algorithm_result::get(
+                        detail::handle_exception<ExPolicy, RandomIt>::call(
+                            std::current_exception()));
+                }
             }
         };
         /// \endcond

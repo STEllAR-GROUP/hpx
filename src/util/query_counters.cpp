@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -267,8 +267,12 @@ namespace hpx { namespace util
                 // now print array value counters
                 for (std::size_t i = 0; i != infos.size(); ++i)
                 {
-                    if (infos[i].type_ != performance_counters::counter_histogram)
+                    if (infos[i].type_ != performance_counters::counter_histogram &&
+                        infos[i].type_ != performance_counters::counter_raw_values)
+                    {
                         continue;
+                    }
+
                     if (!first)
                         output << ",";
                     first = false;
@@ -294,8 +298,12 @@ namespace hpx { namespace util
                 // now print array value counters
                 for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
                 {
-                    if (infos[i].type_ != performance_counters::counter_histogram)
+                    if (infos[i].type_ != performance_counters::counter_histogram &&
+                        infos[i].type_ != performance_counters::counter_raw_values)
+                    {
                         continue;
+                    }
+
                     if (!first)
                         output << ",";
                     first = false;
@@ -399,6 +407,21 @@ namespace hpx { namespace util
         counters_.reset(launch::sync, ec);
     }
 
+    void query_counters::reinit_counters(bool reset, error_code& ec)
+    {
+        if (counters_.size() == 0)
+        {
+            // start has not been called yet
+            HPX_THROWS_IF(ec, invalid_status,
+                "query_counters::reinit_counters",
+                "The counters to be evaluated have not been initialized yet");
+            return;
+        }
+
+        // Reset the performance counters.
+        counters_.reinit(launch::sync, reset, ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     bool query_counters::print_raw_counters(bool destination_is_cout,
         bool no_output, bool reset, char const* description,
@@ -411,8 +434,12 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ == performance_counters::counter_histogram)
+            if (infos[i].type_ == performance_counters::counter_histogram ||
+                infos[i].type_ == performance_counters::counter_raw_values)
+            {
                 continue;
+            }
+
             indicies.push_back(i);
         }
 
@@ -461,8 +488,12 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ != performance_counters::counter_histogram)
+            if (infos[i].type_ != performance_counters::counter_histogram &&
+                infos[i].type_ != performance_counters::counter_raw_values)
+            {
                 continue;
+            }
+
             indicies.push_back(i);
         }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,12 +16,15 @@
 
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
+#include <hpx/config/compiler_fence.hpp>
+#include <hpx/config/compiler_native_tls.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
 #include <hpx/config/defines.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
+#include <hpx/config/lambda_capture.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/version.hpp>
 

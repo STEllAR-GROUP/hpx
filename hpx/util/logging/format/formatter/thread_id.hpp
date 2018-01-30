@@ -21,6 +21,7 @@
 # pragma once
 #endif
 
+#include <hpx/config.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // is_generic
@@ -43,12 +44,10 @@ hpx::util::logging::op_equal::always_equal {
     template<class msg_type> void operator()(msg_type & msg) const {
         std::basic_ostringstream<char_type> out;
         out
-    #if defined (BOOST_HAS_WINTHREADS)
+    #if defined (HPX_WINDOWS)
             << ::GetCurrentThreadId()
-    #elif defined (BOOST_HAS_PTHREADS)
+    #else
             << pthread_self ()
-    #elif defined (BOOST_HAS_MPTASKS)
-            << MPCurrentTaskID()
     #endif
             ;
 

@@ -34,25 +34,6 @@ namespace hpx { namespace threads
     };
 #endif
 
-    void intrusive_ptr_add_ref(thread_data* p)
-    {
-        ++p->count_;
-    }
-    void intrusive_ptr_release(thread_data* p)
-    {
-        if (0 == --p->count_)
-        {
-            thread_data::pool_type* pool = p->get_pool();
-            if (pool == nullptr)
-                delete p;
-            else
-            {
-                p->~thread_data();
-                pool->deallocate(p);
-            }
-        }
-    }
-
     void thread_data::run_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
@@ -170,9 +151,7 @@ namespace hpx { namespace threads
         if (nullptr == self)
             return threads::invalid_thread_id;
 
-        return thread_id_type(
-                reinterpret_cast<thread_data*>(self->get_thread_id())
-            );
+        return self->get_thread_id();
     }
 
     std::size_t get_self_stacksize()
@@ -182,9 +161,9 @@ namespace hpx { namespace threads
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
-    thread_id_repr_type get_parent_id()
+    thread_id_type get_parent_id()
     {
-        return threads::invalid_thread_id_repr;
+        return threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()
@@ -197,12 +176,12 @@ namespace hpx { namespace threads
         return naming::invalid_locality_id;
     }
 #else
-    thread_id_repr_type get_parent_id()
+    thread_id_type get_parent_id()
     {
         thread_self* self = get_self_ptr();
         if (nullptr == self)
-            return threads::invalid_thread_id_repr;
-        return get_self_id()->get_parent_thread_id();
+            return threads::invalid_thread_id;
+        return self->get_thread_id()->get_parent_thread_id();
     }
 
     std::size_t get_parent_phase()
@@ -210,7 +189,7 @@ namespace hpx { namespace threads
         thread_self* self = get_self_ptr();
         if (nullptr == self)
             return 0;
-        return get_self_id()->get_parent_thread_phase();
+        return self->get_thread_id()->get_parent_thread_phase();
     }
 
     std::uint32_t get_parent_locality_id()
@@ -218,7 +197,7 @@ namespace hpx { namespace threads
         thread_self* self = get_self_ptr();
         if (nullptr == self)
             return naming::invalid_locality_id;
-        return get_self_id()->get_parent_locality_id();
+        return self->get_thread_id()->get_parent_locality_id();
     }
 #endif
 
@@ -230,7 +209,7 @@ namespace hpx { namespace threads
         thread_self* self = get_self_ptr();
         if (nullptr == self)
             return 0;
-        return get_self_id()->get_component_id();
+        return self->get_thread_id()->get_component_id();
 #endif
     }
 

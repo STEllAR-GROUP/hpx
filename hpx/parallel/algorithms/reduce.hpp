@@ -63,17 +63,22 @@ namespace hpx { namespace parallel { inline namespace v1
                         std::forward<T_>(init));
                 }
 
-                return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy),
-                    first, std::distance(first, last),
+                auto f1 =
                     [r](FwdIter part_begin, std::size_t part_size) -> T
                     {
                         T val = *part_begin;
                         return util::accumulate_n(++part_begin, --part_size,
                             std::move(val), r);
-                    },
+                    };
+
+                return util::partitioner<ExPolicy, T>::call(
+                    std::forward<ExPolicy>(policy),
+                    first, std::distance(first, last),
+                    std::move(f1),
                     hpx::util::unwrapping(
-                        [init, r](std::vector<T> && results) -> T
+                        [HPX_CAPTURE_FORWARD(init),
+                            HPX_CAPTURE_FORWARD(r)
+                        ](std::vector<T> && results) -> T
                         {
                             return util::accumulate_n(hpx::util::begin(results),
                                 hpx::util::size(results), init, r);

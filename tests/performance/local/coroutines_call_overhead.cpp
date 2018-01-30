@@ -143,7 +143,8 @@ struct kernel
     {
         worker_timed(payload * 1000);
 
-        return hpx::threads::thread_result_type(hpx::threads::pending, nullptr);
+        return hpx::threads::thread_result_type(hpx::threads::pending,
+            hpx::threads::invalid_thread_id);
     }
 
     bool operator!() const { return true; }
@@ -165,7 +166,7 @@ double perform_2n_iterations()
 
     for (std::uint64_t i = 0; i < contexts; ++i)
     {
-        coroutine_type* c = new coroutine_type(k);
+        coroutine_type* c = new coroutine_type(k, hpx::threads::invalid_thread_id);
         coroutines.push_back(c);
     }
 

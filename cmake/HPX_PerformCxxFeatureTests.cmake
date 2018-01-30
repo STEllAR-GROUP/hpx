@@ -180,12 +180,6 @@ macro(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX14_DEPRECATED_ATTRIBUTE)
 
     hpx_check_for_cxx14_return_type_deduction()
-
-    # check for experimental facilities
-
-    # check for Library Fundamentals TS v2's experimental/optional
-    hpx_check_for_libfun_std_experimental_optional(
-      DEFINITIONS HPX_HAVE_LIBFUN_STD_EXPERIMENTAL_OPTIONAL)
   endif()
 
   if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17)

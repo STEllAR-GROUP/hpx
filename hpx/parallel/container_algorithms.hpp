@@ -16,6 +16,7 @@
 #include <hpx/parallel/container_algorithms/merge.hpp>
 #include <hpx/parallel/container_algorithms/minmax.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>
+#include <hpx/parallel/container_algorithms/remove.hpp>
 #include <hpx/parallel/container_algorithms/remove_copy.hpp>
 #include <hpx/parallel/container_algorithms/replace.hpp>
 #include <hpx/parallel/container_algorithms/reverse.hpp>

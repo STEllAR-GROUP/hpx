@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2015 Daniel Bourgeois
 //  Copyright (c)      2017 Taeguk Kwon
 //
@@ -341,26 +341,20 @@ namespace hpx { namespace parallel { namespace util
             {
                 hpx::future<R> f = execution::async_execute(
                     policy.executor(),
-                    [=]() mutable -> R
+                    [first, count,
+                        HPX_CAPTURE_FORWARD(policy),
+                        HPX_CAPTURE_FORWARD(init),
+                        HPX_CAPTURE_FORWARD(f1),
+                        HPX_CAPTURE_FORWARD(f2),
+                        HPX_CAPTURE_FORWARD(f3),
+                        HPX_CAPTURE_FORWARD(f4)
+                    ]() mutable -> R
                     {
                         return static_scan_partitioner_helper<
                                 R, Result1, Result2, ScanPartTag
                             >::call(policy, first, count, init,
                                 f1, f2, f3, f4);
                     });
-
-                if (f.has_exception())
-                {
-                    try {
-                        std::rethrow_exception(f.get_exception_ptr());
-                    }
-                    catch (std::bad_alloc const& ba) {
-                        throw ba;
-                    }
-                    catch (...) {
-                        return hpx::make_exceptional_future<R>(std::current_exception());
-                    }
-                }
 
                 return f;
             }

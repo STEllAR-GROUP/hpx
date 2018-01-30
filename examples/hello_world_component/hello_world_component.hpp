@@ -36,7 +36,11 @@ namespace examples
         typedef hpx::components::client_base<hello_world, server::hello_world>
             base_type;
 
-        hello_world(hpx::future<hpx::id_type> f)
+        hello_world(hpx::future<hpx::naming::id_type> && f)
+          : base_type(std::move(f))
+        {}
+
+        hello_world(hpx::naming::id_type && f)
           : base_type(std::move(f))
         {}
 

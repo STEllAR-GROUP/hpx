@@ -1,15 +1,15 @@
 //  Copyright (c) 2017 Denis Blank
+//  Copyright Andrey Semashev 2007 - 2013.
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/util/atomic_count.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/unused.hpp>
-
-#include <boost/smart_ptr/intrusive_ref_counter.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -36,13 +36,87 @@ struct not_accepted_tag
 {
 };
 
+struct thread_safe_counter
+{
+    typedef hpx::util::atomic_count type;
+
+    static unsigned int load(hpx::util::atomic_count const& counter) noexcept
+    {
+        return static_cast<unsigned int>(static_cast<long>(counter));
+    }
+
+    static void increment(hpx::util::atomic_count& counter) noexcept
+    {
+        ++counter;
+    }
+
+    static unsigned int decrement(hpx::util::atomic_count& counter) noexcept
+    {
+        return static_cast<unsigned int>(--counter);
+    }
+};
+
+template <typename Derived, typename CounterPolicy = thread_safe_counter>
+class intrusive_ref_counter;
+
+template <typename Derived, typename CounterPolicy>
+void intrusive_ptr_add_ref(
+    intrusive_ref_counter<Derived, CounterPolicy> const* p) noexcept;
+
+template <typename Derived, typename CounterPolicy>
+void intrusive_ptr_release(
+    intrusive_ref_counter<Derived, CounterPolicy> const* p) noexcept;
+
+template <typename Derived, typename CounterPolicy>
+class intrusive_ref_counter
+{
+private:
+    typedef typename CounterPolicy::type counter_type;
+
+    mutable counter_type ref_counter;
+
+public:
+    intrusive_ref_counter() noexcept : ref_counter(1) {}
+
+    unsigned int use_count() const noexcept
+    {
+        return CounterPolicy::load(ref_counter);
+    }
+
+protected:
+    ~intrusive_ref_counter() = default;
+
+    friend void intrusive_ptr_add_ref<Derived, CounterPolicy>(
+        intrusive_ref_counter<Derived, CounterPolicy> const* p)
+        noexcept;
+
+    friend void intrusive_ptr_release<Derived, CounterPolicy>(
+        intrusive_ref_counter<Derived, CounterPolicy> const* p)
+        noexcept;
+};
+
+template <typename Derived, typename CounterPolicy>
+inline void intrusive_ptr_add_ref(
+    intrusive_ref_counter<Derived, CounterPolicy> const* p) noexcept
+{
+    CounterPolicy::increment(p->ref_counter);
+}
+
+template <typename Derived, typename CounterPolicy>
+inline void intrusive_ptr_release(
+    intrusive_ref_counter<Derived, CounterPolicy> const* p) noexcept
+{
+    if (CounterPolicy::decrement(p->ref_counter) == 0)
+        delete static_cast<Derived const*>(p);
+}
+
 template <typename Child>
-class async_counter_base : public boost::intrusive_ref_counter<Child>
+class async_counter_base : public intrusive_ref_counter<Child>
 {
     std::size_t counter_ = 0;
 
 public:
-    explicit async_counter_base() = default;
+    async_counter_base() = default;
 
     virtual ~async_counter_base() {}
 
@@ -61,6 +135,8 @@ template <std::size_t ArgCount>
 struct async_increasing_int_sync_visitor
   : async_counter_base<async_increasing_int_sync_visitor<ArgCount>>
 {
+    explicit async_increasing_int_sync_visitor(int dummy) {}
+
     bool operator()(async_traverse_visit_tag, std::size_t i)
     {
         HPX_TEST_EQ(i, this->counter());
@@ -92,6 +168,8 @@ template <std::size_t ArgCount>
 struct async_increasing_int_visitor
   : async_counter_base<async_increasing_int_visitor<ArgCount>>
 {
+    explicit async_increasing_int_visitor(int dummy) {}
+
     bool operator()(async_traverse_visit_tag, std::size_t i) const
     {
         HPX_TEST_EQ(i, this->counter());
@@ -117,39 +195,6 @@ struct async_increasing_int_visitor
     }
 };
 
-template <std::size_t ArgCount>
-struct async_increasing_int_interrupted_visitor
-  : async_counter_base<async_increasing_int_interrupted_visitor<ArgCount>>
-{
-    bool operator()(async_traverse_visit_tag, std::size_t i)
-    {
-        HPX_TEST_EQ(i, this->counter());
-        ++this->counter();
-
-        // Detach the control flow at the second step
-        return i == 0;
-    }
-
-    template <typename N>
-    void operator()(async_traverse_detach_tag, std::size_t i, N&& next)
-    {
-        HPX_TEST_EQ(i, 1U);
-        HPX_TEST_EQ(this->counter(), 2U);
-
-        // Don't call next here
-        HPX_UNUSED(next);
-    }
-
-    template <typename T>
-    void operator()(async_traverse_complete_tag, T&& pack) const
-    {
-        HPX_UNUSED(pack);
-
-        // Will never be called
-        HPX_TEST(false);
-    }
-};
-
 template <std::size_t ArgCount, typename... Args>
 void test_async_traversal_base(Args&&... args)
 {
@@ -157,7 +202,9 @@ void test_async_traversal_base(Args&&... args)
     // when we detach the control flow on every visit.
     {
         auto result = traverse_pack_async(
-            async_increasing_int_sync_visitor<ArgCount>{}, args...);
+            hpx::util::async_traverse_in_place_tag<
+                async_increasing_int_sync_visitor<ArgCount>>{},
+            42, args...);
         HPX_TEST_EQ(result->counter(), ArgCount + 1U);
     }
 
@@ -165,16 +212,10 @@ void test_async_traversal_base(Args&&... args)
     // when we detach the control flow on every visit.
     {
         auto result = traverse_pack_async(
-            async_increasing_int_visitor<ArgCount>{}, args...);
+            hpx::util::async_traverse_in_place_tag<
+                async_increasing_int_visitor<ArgCount>>{},
+            42, args...);
         HPX_TEST_EQ(result->counter(), ArgCount + 1U);
-    }
-
-    // Test that the first element is traversed only,
-    // if we don't call the resume continuation.
-    {
-        auto result = traverse_pack_async(
-            async_increasing_int_interrupted_visitor<ArgCount>{}, args...);
-        HPX_TEST_EQ(result->counter(), 2U);
     }
 }
 
@@ -289,6 +330,8 @@ template <std::size_t ArgCount>
 struct async_unique_sync_visitor
   : async_counter_base<async_unique_sync_visitor<ArgCount>>
 {
+    explicit async_unique_sync_visitor(int dummy) {}
+
     bool operator()(async_traverse_visit_tag, std::unique_ptr<std::size_t>& i)
     {
         HPX_TEST_EQ(*i, this->counter());
@@ -321,6 +364,8 @@ struct async_unique_sync_visitor
 template <std::size_t ArgCount>
 struct async_unique_visitor : async_counter_base<async_unique_visitor<ArgCount>>
 {
+    explicit async_unique_visitor(int dummy) {}
+
     bool operator()(async_traverse_visit_tag,
         std::unique_ptr<std::size_t>& i) const
     {
@@ -357,19 +402,25 @@ static void test_async_move_only_traversal()
 
     {
         auto result = traverse_pack_async(
-            async_unique_sync_visitor<4>{}, of(0), of(1), of(2), of(3));
+            hpx::util::async_traverse_in_place_tag<
+                async_unique_sync_visitor<4>>{},
+            42, of(0), of(1), of(2), of(3));
         HPX_TEST_EQ(result->counter(), 5U);
     }
 
     {
         auto result = traverse_pack_async(
-            async_unique_visitor<4>{}, of(0), of(1), of(2), of(3));
+            hpx::util::async_traverse_in_place_tag<
+                async_unique_visitor<4>>{},
+            42, of(0), of(1), of(2), of(3));
         HPX_TEST_EQ(result->counter(), 5U);
     }
 }
 
 struct invalidate_visitor : async_counter_base<invalidate_visitor>
 {
+    explicit invalidate_visitor(int dummy) {}
+
     bool operator()(async_traverse_visit_tag, std::shared_ptr<int>& i) const
     {
         HPX_TEST_EQ(*i, 22);
@@ -402,7 +453,9 @@ static void test_async_complete_invalidation()
 {
     auto value = std::make_shared<int>(22);
 
-    auto frame = traverse_pack_async(invalidate_visitor{}, value);
+    auto frame = traverse_pack_async(
+        hpx::util::async_traverse_in_place_tag<invalidate_visitor>{},
+        42, value);
 
     HPX_TEST_EQ(value.use_count(), 1U);
 }

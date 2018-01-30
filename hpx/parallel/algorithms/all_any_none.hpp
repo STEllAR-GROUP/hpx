@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -72,22 +72,22 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [op, tok, policy, proj](
-                        FwdIter part_begin, std::size_t part_count
-                    ) mutable -> bool
-                    {
-                        HPX_UNUSED(policy);
-
-                        util::loop_n<ExPolicy>(
-                            part_begin, part_count, tok,
-                            [&op, &tok, &proj](FwdIter const& curr)
+                    [HPX_CAPTURE_FORWARD(op), tok,
+                        HPX_CAPTURE_FORWARD(proj)
+                    ](FwdIter part_begin, std::size_t part_count) mutable -> bool
+                {
+                    util::loop_n<ExPolicy>(part_begin, part_count, tok,
+                        [&op, &tok, &proj](FwdIter const& curr)
+                        {
+                            if (hpx::util::invoke(op,
+                                    hpx::util::invoke(proj, *curr)))
                             {
-                                if (op(proj(*curr)))
-                                    tok.cancel();
-                            });
+                                tok.cancel();
+                            }
+                        });
 
-                        return !tok.was_cancelled();
-                    };
+                    return !tok.was_cancelled();
+                };
 
                 return util::partitioner<ExPolicy, bool>::call(
                     std::forward<ExPolicy>(policy),
@@ -247,18 +247,19 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [op, tok, policy, proj](
-                        FwdIter part_begin, std::size_t part_count
-                    ) mutable -> bool
+                    [HPX_CAPTURE_FORWARD(op), tok,
+                        HPX_CAPTURE_FORWARD(proj)
+                    ](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
-                        HPX_UNUSED(policy);
-
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
                             [&op, &tok, &proj](FwdIter const& curr)
                             {
-                                if (op(proj(*curr)))
+                                if (hpx::util::invoke(op,
+                                        hpx::util::invoke(proj, *curr)))
+                                {
                                     tok.cancel();
+                                }
                             });
 
                         return tok.was_cancelled();
@@ -422,18 +423,19 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 auto f1 =
-                    [op, tok, policy, proj](
-                        FwdIter part_begin, std::size_t part_count
-                    ) mutable -> bool
+                    [HPX_CAPTURE_FORWARD(op), tok,
+                        HPX_CAPTURE_FORWARD(proj)
+                    ](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
-                        HPX_UNUSED(policy);
-
                         util::loop_n<ExPolicy>(
                             part_begin, part_count, tok,
                             [&op, &tok, &proj](FwdIter const& curr)
                             {
-                                if (!op(proj(*curr)))
+                                if (!hpx::util::invoke(op,
+                                        hpx::util::invoke(proj, *curr)))
+                                {
                                     tok.cancel();
+                                }
                             });
 
                         return !tok.was_cancelled();

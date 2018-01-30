@@ -3,11 +3,12 @@
 /*  Distributed under the Boost Software License, Version 1.0. (See accompanying */
 /*  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)        */
 
+#include <hpx/plugins/parcelport/mpi/mpi.hpp>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include <mpi.h>
 
 int main(int argc,char** argv)
 {

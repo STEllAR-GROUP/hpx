@@ -84,20 +84,25 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, bool, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
-                        [tok, first, comp, proj](RandIter it,
-                            std::size_t part_size, std::size_t base_idx
+                        [tok, first,
+                            HPX_CAPTURE_FORWARD(comp),
+                            HPX_CAPTURE_FORWARD(proj)
+                        ](RandIter it, std::size_t part_size,
+                            std::size_t base_idx
                         ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, first, &comp, proj](
+                                [&tok, first, &comp, &proj](
                                     type const& v, std::size_t i
                                 ) -> void
                                 {
                                     if (hpx::util::invoke(comp,
                                         hpx::util::invoke(proj, *(first + i / 2)),
                                         hpx::util::invoke(proj, v)))
+                                    {
                                         tok.cancel(0);
+                                    }
                                 });
                         },
                         [tok](std::vector<hpx::future<void> > &&) mutable
@@ -278,8 +283,11 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, RandIter, void>::
                     call_with_index(
                         std::forward<ExPolicy>(policy), second, count, 1,
-                        [tok, first, comp, proj](RandIter it,
-                            std::size_t part_size, std::size_t base_idx) mutable
+                        [tok, first,
+                            HPX_CAPTURE_FORWARD(comp),
+                            HPX_CAPTURE_FORWARD(proj)
+                        ](RandIter it, std::size_t part_size,
+                            std::size_t base_idx) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
@@ -290,7 +298,9 @@ namespace hpx { namespace parallel { inline namespace v1
                                     if (hpx::util::invoke(comp,
                                         hpx::util::invoke(proj, *(first + i / 2)),
                                         hpx::util::invoke(proj, v)))
+                                    {
                                         tok.cancel(i);
+                                    }
                                 });
                         },
                         [tok, second](std::vector<hpx::future<void> > &&) mutable

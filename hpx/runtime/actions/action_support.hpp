@@ -42,19 +42,19 @@ namespace hpx { namespace actions { namespace detail
     {
         action_serialization_data()
           : parent_locality_(naming::invalid_locality_id)
-          , parent_id_(static_cast<std::uint64_t>(-1))
+          , parent_id_(static_cast<std::uint64_t>(0))
           , parent_phase_(0)
           , priority_(static_cast<threads::thread_priority>(0))
           , stacksize_(static_cast<threads::thread_stacksize>(0))
         {}
 
         action_serialization_data(std::uint32_t parent_locality,
-                std::uint64_t parent_id,
+                threads::thread_id_type parent_id,
                 std::uint64_t parent_phase,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize)
           : parent_locality_(parent_locality)
-          , parent_id_(parent_id)
+          , parent_id_(reinterpret_cast<std::uint64_t>(parent_id.get()))
           , parent_phase_(parent_phase)
           , priority_(priority)
           , stacksize_(stacksize)

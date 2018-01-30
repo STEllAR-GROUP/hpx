@@ -207,6 +207,18 @@ namespace hpx { namespace threads { namespace policies
             return "hierarchy_scheduler";
         }
 
+        void suspend(std::size_t)
+        {
+            HPX_ASSERT_MSG(false, "hierarchy_scheduler does not support"
+                " suspending");
+        }
+
+        void resume(std::size_t)
+        {
+            HPX_ASSERT_MSG(false, "hierarchy_scheduler does not support"
+                " resuming");
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
         std::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const

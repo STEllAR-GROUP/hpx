@@ -8,6 +8,7 @@
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/regex_from_pattern.hpp>
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
@@ -256,9 +257,7 @@ namespace hpx { namespace plugins { namespace parcel
 
         if (parameters.find_first_of("*?[]") != std::string::npos)
         {
-            std::string str_rx(
-                performance_counters::detail::regex_from_pattern(
-                    parameters, ec));
+            std::string str_rx(util::regex_from_pattern(parameters, ec));
             if (ec) return false;
 
             bool found_one = false;

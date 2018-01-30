@@ -252,7 +252,8 @@ namespace hpx {
         if (result) {
             lbt_ << "runtime_impl::run_helper: bootstrap "
                     "aborted, bailing out";
-            return threads::thread_result_type(threads::terminated, nullptr);
+            return threads::thread_result_type(threads::terminated,
+                threads::invalid_thread_id);
         }
 
         lbt_ << "(4th stage) runtime_impl::run_helper: bootstrap complete";
@@ -302,7 +303,8 @@ namespace hpx {
             // Call hpx_main
             result = func();
         }
-        return threads::thread_result_type(threads::terminated, nullptr);
+        return threads::thread_result_type(threads::terminated,
+            threads::invalid_thread_id);
     }
 
     int runtime_impl::start(

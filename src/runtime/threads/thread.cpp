@@ -51,6 +51,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     thread::thread() noexcept
+      : id_(hpx::threads::invalid_thread_id)
     {}
 
     thread::thread(thread&& rhs) noexcept
@@ -136,7 +137,8 @@ namespace hpx
         // run all callbacks attached to the exit event for this thread
         run_thread_exit_callbacks();
 
-        return threads::thread_result_type(threads::terminated, nullptr);
+        return threads::thread_result_type(threads::terminated,
+            threads::invalid_thread_id);
     }
 
     thread::id thread::get_id() const noexcept
