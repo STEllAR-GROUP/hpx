@@ -5,8 +5,6 @@
 
 #include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
 
-#if defined(HPX_HAVE_HWLOC)
-
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
@@ -1052,5 +1050,3 @@ namespace hpx { namespace threads
         }
     }
 }}
-
-#endif

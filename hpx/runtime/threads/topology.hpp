@@ -21,13 +21,11 @@
 #include <iosfwd>
 #include <utility>
 
-#if defined(HPX_HAVE_HWLOC)
 #include <hpx/error_code.hpp>
 
 #include <cstddef>
 #include <string>
 #include <vector>
-#endif
 
 namespace hpx { namespace threads
 {
@@ -225,7 +223,6 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT topology const& get_topology();
 
-#if defined(HPX_HAVE_HWLOC)
     HPX_API_EXPORT void parse_affinity_options(std::string const& spec,
         std::vector<mask_type>& affinities,
         std::size_t used_cores,
@@ -249,7 +246,6 @@ namespace hpx { namespace threads
             std::size_t max_cores,
             std::vector<std::size_t>& num_pus,
             error_code& ec = throws);
-#endif
 
     /// \endcond
 }}

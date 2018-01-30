@@ -28,15 +28,6 @@
 #include <sys/resource.h>
 #endif
 
-#if !defined(HPX_HAVE_HWLOC)
-
-namespace hpx { namespace threads
-{
-    mask_type noop_topology::empty_mask =
-        mask_type(noop_topology::hardware_concurrency());
-}}
-
-#else
 #include <hwloc.h>
 #include <hpx/exception.hpp>
 
@@ -48,7 +39,6 @@ namespace hpx { namespace threads { namespace detail
         return top.get_number_of_pus();
     }
 }}}
-#endif
 
 namespace hpx { namespace threads
 {
@@ -116,10 +106,8 @@ namespace hpx { namespace threads
         hw_concurrency()
 #if defined(__ANDROID__) && defined(ANDROID)
           : num_of_cores_(::android_getCpuCount())
-#elif defined(HPX_HAVE_HWLOC)
-          : num_of_cores_(detail::hwloc_hardware_concurrency())
 #else
-          : num_of_cores_(compat::thread::hardware_concurrency())
+          : num_of_cores_(detail::hwloc_hardware_concurrency())
 #endif
         {
             if (num_of_cores_ == 0)

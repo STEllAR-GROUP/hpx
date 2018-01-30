@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_HWLOC)
 #include <hpx/exception_fwd.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -95,6 +94,5 @@ namespace hpx { namespace threads { namespace detail
     HPX_API_EXPORT void parse_mappings(std::string const& spec,
         mappings_type& mappings, error_code& ec = throws);
 }}}
-#endif
 
 #endif // HPX_RUNTIME_THREADS_POLICIES_PARSE_AFFINITY_OPTIONS_HPP

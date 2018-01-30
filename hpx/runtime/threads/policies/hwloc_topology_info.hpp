@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
 
 #include <hpx/compat/thread.hpp>
@@ -346,7 +345,5 @@ namespace hpx { namespace threads
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif
 
 #endif /*HPX_RUNTIME_THREADS_POLICIES_HWLOC_TOPOLOGY_HPP*/

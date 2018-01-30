@@ -113,7 +113,6 @@ namespace hpx {
         void ensure_hwloc_compatibility(
             boost::program_options::variables_map const& vm)
         {
-#if defined(HPX_HAVE_HWLOC)
             // pu control is available for HWLOC only
             if (vm.count("hpx:pu-offset"))
             {
@@ -130,8 +129,6 @@ namespace hpx {
                     "--hpx:queuing=periodic-priority, or "
                     "--hpx:queuing=local-priority only.");
             }
-#endif
-#if defined(HPX_HAVE_HWLOC)
             // affinity control is available for HWLOC only
             if (vm.count("hpx:affinity"))
             {
@@ -157,7 +154,6 @@ namespace hpx {
                     "--hpx:queuing=periodic-priority, or "
                     "--hpx:queuing=local-priority only.");
             }
-#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -185,7 +181,6 @@ namespace hpx {
         std::string get_affinity_domain(util::command_line_handling const& cfg)
         {
             std::string affinity_domain("pu");
-#if defined(HPX_HAVE_HWLOC)
             if (cfg.affinity_domain_ != "pu")
             {
                 affinity_domain = cfg.affinity_domain_;
@@ -200,14 +195,12 @@ namespace hpx {
                         "or machine.");
                 }
             }
-#endif
             return affinity_domain;
         }
 
         std::size_t get_affinity_description(
             util::command_line_handling const& cfg, std::string& affinity_desc)
         {
-#if defined(HPX_HAVE_HWLOC)
             if (cfg.affinity_bind_.empty())
                 return cfg.numa_sensitive_;
 
@@ -222,7 +215,6 @@ namespace hpx {
             }
 
             affinity_desc = cfg.affinity_bind_;
-#endif
             return cfg.numa_sensitive_;
         }
     }    // namespace detail

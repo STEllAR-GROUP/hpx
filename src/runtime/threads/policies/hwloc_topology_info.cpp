@@ -7,8 +7,6 @@
 
 #include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 
-#if defined(HPX_HAVE_HWLOC)
-
 #include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/throw_exception.hpp>
@@ -1318,4 +1316,3 @@ namespace hpx { namespace threads
     }
 }}
 
-#endif

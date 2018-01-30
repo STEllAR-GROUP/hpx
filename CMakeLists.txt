@@ -181,11 +181,6 @@ hpx_option(HPX_WITH_MALLOC
   ${DEFAULT_MALLOC}
   STRINGS "system;tcmalloc;jemalloc;tbbmalloc;custom")
 
-hpx_option(HPX_WITH_HWLOC
-  BOOL
-  "Use Hwloc for hardware topology information and thread pinning. If disabled, performance might be reduced."
-  ON ADVANCED)
-
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
   "Build HPX with logging enabled (default: ON)."
@@ -1498,15 +1493,12 @@ include(HPX_SetupAllocator)
 # convey selected allocator type to the build configuration
 hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
 
-if(HPX_WITH_HWLOC)
-  find_package(Hwloc)
-  if(NOT HWLOC_FOUND)
-    hpx_error("Hwloc could not be found and HPX_WITH_HWLOC=ON, please specify HWLOC_ROOT to point to the correct location or set HPX_WITH_HWLOC to OFF")
-  endif()
-  hpx_libraries(${HWLOC_LIBRARIES})
-  include_directories(${HWLOC_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_HWLOC)
+find_package(Hwloc)
+if(NOT HWLOC_FOUND)
+  hpx_error("Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
 endif()
+hpx_libraries(${HWLOC_LIBRARIES})
+include_directories(${HWLOC_INCLUDE_DIR})
 
 ################################################################################
 # Enable integration with Intel Amplifier
