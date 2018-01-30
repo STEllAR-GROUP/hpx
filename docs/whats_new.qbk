@@ -28,7 +28,7 @@ particular order):
   and/or __mpi__.
 * We have continued to implement various parallel algorithms. __hpx__ now almost
   completely implements all of the parallel algorithms as specified by the
-  __cpp17__. We have also continued to implement these alogorithms for the
+  __cpp17__. We have also continued to implement these algorithms for the
   distributed use case (for segmented data structures, such as
   `hpx::partitioned_vector`).
 * Added a compatibility layer for `std::thread`, `std::mutex`, and
@@ -92,12 +92,12 @@ particular order):
   the threading subsystem have changes as those now additionally have to
   specify the thread-pool. See the corresponding documentation for more
   details.
-* The overloads of `hpx::async` that invoke and action do not perform
+* The overloads of `hpx::async` that invoke an action do not perform
   implicit unwrapping of the returned future anymore in case the invoked
   function does return a future in the first place. In this case
   `hpx::async` now returns a `hpx::future<future<T>>` making its behavior
   conforming to its local counterpart.
-* We have replaced the used of `boost::exception_ptr` in our APIs with the
+* We have replaced the use of `boost::exception_ptr` in our APIs with the
  equivalent `std::exception_ptr`. Please change your codes accordingly.
  No compatibility settings are provided.
 * We have removed the compatibility settings for
