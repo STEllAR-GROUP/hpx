@@ -434,9 +434,9 @@ namespace hpx { namespace threads { namespace detail
         util::itt::id threadid(thread_domain, &scheduler);
         util::itt::string_handle task_id("task_id");
         util::itt::string_handle task_phase("task_phase");
+        // util::itt::frame_context fctx(thread_domain);
 #endif
 
-//         util::itt::frame_context fctx(thread_domain);
 
         std::int64_t& idle_loop_count = counters.idle_loop_count_;
         std::int64_t& busy_loop_count = counters.busy_loop_count_;
