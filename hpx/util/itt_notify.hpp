@@ -642,13 +642,14 @@ namespace hpx { namespace util { namespace itt
         HPX_NON_COPYABLE(domain);
 
         domain(char const*) {}
+        domain() {}
     };
 
-    struct thread_domain
+    struct thread_domain : domain
     {
         HPX_NON_COPYABLE(thread_domain);
 
-        thread_domain() {};
+        thread_domain() : domain() {};
     };
 
     struct id
