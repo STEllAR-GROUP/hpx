@@ -264,10 +264,7 @@ namespace hpx { namespace util { namespace itt
     }
 
     domain::domain()
-      : domain_(nullptr)
-    {}
-
-    domain::~domain() {}
+      : domain_(nullptr) {}
 
     struct thread_domain_tag;
     hpx::util::thread_specific_ptr<___itt_domain, thread_domain_tag>
@@ -288,8 +285,6 @@ namespace hpx { namespace util { namespace itt
             domain_->flags = 1;
         }
     }
-
-    thread_domain::~thread_domain() {}
 
     task::task(domain const& domain, util::thread_description const& name)
       : domain_(domain), id_(0), sh_()

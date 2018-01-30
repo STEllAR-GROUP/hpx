@@ -225,7 +225,6 @@ namespace hpx { namespace util { namespace itt
 
         HPX_EXPORT domain(char const*);
         HPX_EXPORT domain();
-        HPX_EXPORT virtual ~domain();
 
         ___itt_domain* domain_;
     };
@@ -235,7 +234,6 @@ namespace hpx { namespace util { namespace itt
         HPX_NON_COPYABLE(thread_domain);
 
         HPX_EXPORT thread_domain();
-        HPX_EXPORT ~thread_domain();
     };
 
     struct id
@@ -644,7 +642,6 @@ namespace hpx { namespace util { namespace itt
         HPX_NON_COPYABLE(domain);
 
         domain(char const*) {}
-        ~domain() {}
     };
 
     struct thread_domain
@@ -652,7 +649,6 @@ namespace hpx { namespace util { namespace itt
         HPX_NON_COPYABLE(thread_domain);
 
         thread_domain() {};
-        ~thread_domain() {};
     };
 
     struct id
