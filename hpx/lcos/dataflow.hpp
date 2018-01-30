@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace detail
 #if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
         static auto error(F f, Args args)
         {
-            hpx::util::invoke_fused(std::move(f), std::move(args));
+            return hpx::util::invoke_fused(std::move(f), std::move(args));
         }
 #else
         static auto error(F f, Args args)
