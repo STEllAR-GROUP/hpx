@@ -107,8 +107,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_cref_type get_machine_affinity_mask(
-            error_code& ec = throws) const;
+        mask_cref_type get_machine_affinity_mask(error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the service threads in the
@@ -119,8 +118,8 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_type get_service_affinity_mask(
-            mask_cref_type used_processing_units, error_code& ec = throws) const;
+        mask_type get_service_affinity_mask(mask_cref_type used_processing_units,
+            error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
@@ -190,13 +189,12 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_type get_thread_affinity_mask_from_lva(
-            naming::address_type, error_code& ec = throws) const;
+        mask_type get_thread_affinity_mask_from_lva(naming::address_type,
+            error_code& ec = throws) const;
 
         /// \brief Prints the \param m to os in a human readable form
-        void print_affinity_mask(std::ostream& os,
-            std::size_t num_thread, mask_cref_type m,
-            const std::string &pool_name) const;
+        void print_affinity_mask(std::ostream& os, std::size_t num_thread,
+            mask_cref_type m, const std::string &pool_name) const;
 
         /// \brief Reduce thread priority of the current thread.
         ///
@@ -229,6 +227,7 @@ namespace hpx { namespace threads
         /// \brief Return number of processing units in given core
         std::size_t get_number_of_core_pus(std::size_t core) const;
 
+        /// \brief Return number of cores units in given socket
         std::size_t get_number_of_socket_cores(std::size_t socket) const;
 
         std::size_t get_core_number(std::size_t num_thread,
@@ -237,7 +236,6 @@ namespace hpx { namespace threads
             return core_numbers_[num_thread % num_of_pus_];
         }
 
-        // TODO
         std::size_t get_pu_number(std::size_t num_core, std::size_t num_pu,
             error_code& ec = throws) const;
 
@@ -318,16 +316,10 @@ namespace hpx { namespace threads
             return init_node_number(num_thread, HWLOC_OBJ_CORE);
         }
 
-        void extract_node_mask(
-            hwloc_obj_t parent
-          , mask_type& mask
-            ) const;
+        void extract_node_mask(hwloc_obj_t parent, mask_type& mask) const;
 
-        std::size_t extract_node_count(
-            hwloc_obj_t parent
-          , hwloc_obj_type_t type
-          , std::size_t count
-            ) const;
+        std::size_t extract_node_count(hwloc_obj_t parent, hwloc_obj_type_t type,
+            std::size_t count) const;
 
         mask_type init_machine_affinity_mask() const;
         mask_type init_socket_affinity_mask(std::size_t num_thread) const
@@ -335,11 +327,13 @@ namespace hpx { namespace threads
             return init_socket_affinity_mask_from_socket(
                 get_socket_number(num_thread));
         }
+
         mask_type init_numa_node_affinity_mask(std::size_t num_thread) const
         {
             return init_numa_node_affinity_mask_from_numa_node(
                 get_numa_node_number(num_thread));
         }
+
         mask_type init_core_affinity_mask(std::size_t num_thread) const
         {
             mask_type default_mask = numa_node_affinity_masks_[num_thread];
@@ -427,8 +421,6 @@ namespace hpx { namespace threads
             std::size_t max_cores,
             std::vector<std::size_t>& num_pus,
             error_code& ec = throws);
-
-    /// \endcond
 }}
 
 #endif /*HPX_RUNTIME_THREADS_TOPOLOGY_HPP*/
