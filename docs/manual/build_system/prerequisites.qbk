@@ -38,9 +38,9 @@ The installation of Boost is described in detail in Boost's own
 __boost_getting_started__ document. However, if you've never used the Boost
 libraries (or even if you have), here's a quick primer: __boost_installation__.
 
-In addition, we urge every user to have a recent version of hwloc installed on
-the target system in order to have proper support for thread pinning and NUMA
-awareness.
+In addition, we require a recent version of hwloc in order to support thread
+pinning and NUMA awareness. See __hwloc_installation__ for instructions on
+building __hwloc__.
 
 __hpx__ is written in 99.99% Standard C++ (the remaining 0.01% is platform specific
 assembly code). As such __hpx__ is compilable with
@@ -64,8 +64,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
 
     [[[*Required Libraries]]]
     [[__boost_libraries__        ][1.57.0 or newer    ][1.55.0          ]]
-    [[__hwloc__                  ][1.10                ][1.2 (Xeon Phi: 1.6)]
-        [Used for OS-thread pinning and NUMA awareness. This library is optional on Mac OSX.]]
+    [[__hwloc__                  ][1.10                ][1.2 (Xeon Phi: 1.6)]]
 ]
 
 [important When compiling __hpx__ using clang/libc++ on OSX platform it is advised not
@@ -190,6 +189,29 @@ detail in the sections __unix_installation__ and __windows_installation__.
     might also want to pass the correct toolset to the `b2` command depending on
     which version of the IDE you want to use. In addition, passing `address-model=64`
     is highly recommended.]
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hwloc_installation Installing Hwloc]
+
+We suggest you download the most recent release of hwloc from here:
+__hwloc_downloads__. Unpack the downloaded archive into a directory of your
+choosing. We will refer to this directory as `$HWLOC`.
+
+To build hwloc run:
+
+    cd $HWLOC
+    ./configure --prefix=<where to install hwloc>
+    make -j<N> install
+
+where: `<where to install hwloc>` is the directory the built binaries will be
+installed to, and `<N>` is the number of cores to use to build hwloc.
+
+After the above sequence of commands has been executed you will need to specify
+the directory where Hwloc was installed as `HWLOC_ROOT` (`<where to install
+hwloc>`) while executing cmake for __hpx__ as explained in detail in the
+sections __unix_installation__ and __windows_installation__.
 
 [endsect]
 
