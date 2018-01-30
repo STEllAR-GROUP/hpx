@@ -1,3 +1,4 @@
+//  Copyright (c)      2018 Mikael Simberg
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +19,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -56,11 +58,14 @@ namespace hpx
     /// the users `main()` function. It will set up the HPX runtime environment
     /// and schedule the function given by \p f as a HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
-    /// with the runtime system's execution.
+    /// with the runtime system's execution. This overload will not call
+    /// `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param desc_cmdline [in] This parameter may hold the description of
     ///                     additional command line arguments understood by the
     ///                     application. These options will be prepended to
@@ -119,11 +124,14 @@ namespace hpx
     /// users `main()` function. It will set up the HPX runtime environment and
     /// schedule the function given by \p f as a HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
-    /// with the runtime system's execution.
+    /// with the runtime system's execution. This overload will not call
+    /// `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param desc_cmdline [in] This parameter may hold the description of
     ///                     additional command line arguments understood by the
     ///                     application. These options will be prepended to
@@ -549,6 +557,9 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
@@ -586,10 +597,15 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param app_name     [in] The name of the application.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
@@ -623,10 +639,15 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
     ///                     passed by the operating system (to `main()`).
@@ -658,10 +679,15 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
     ///                     passed by the operating system (to `main()`).
@@ -693,10 +719,15 @@ namespace hpx
     /// to set up the runtime for an HPX application (the runtime system will
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution. This
+    /// overload will schedule the function given by \p f as a HPX thread. It
+    /// will not call `hpx_main`.
     ///
     /// \param f            [in] The function to be scheduled as an HPX
     ///                     thread. Usually this function represents the main
-    ///                     entry point of any HPX application.
+    ///                     entry point of any HPX application. If \p f is
+    ///                     `nullptr` the HPX runtime environment will be started
+    ///                     without invoking \p f.
     /// \param argc         [in] The number of command line arguments passed
     ///                     in \p argv. This is usually the unchanged value as
     ///                     passed by the operating system (to `main()`).
@@ -728,6 +759,19 @@ namespace hpx
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+/// \cond NOINTERNAL
+    inline bool start(std::nullptr_t f,
+        std::string const& app_name, int argc, char** argv,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline bool start(std::nullptr_t f, int argc, char** argv,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+
+    inline bool start(std::nullptr_t f,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode = hpx::runtime_mode_default);
+/// \endcond
 }
 
 #ifndef DOXYGEN

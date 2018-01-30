@@ -1,3 +1,4 @@
+//  Copyright (c)      2018 Mikael Simberg
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,6 +20,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>
@@ -313,6 +315,49 @@ namespace hpx
 
         util::function_nonser<int(boost::program_options::variables_map& vm)>
             main_f = util::bind_back(detail::init_helper, f);
+
+        HPX_ASSERT(argc != 0 && argv != nullptr);
+
+        return start(main_f, desc_commandline, argc, argv, cfg,
+            startup_function_type(), shutdown_function_type(), mode);
+    }
+
+    inline bool start(std::nullptr_t f, std::string const& app_name, int argc,
+        char** argv, hpx::runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            "Usage: " + app_name +  " [options]");
+
+        util::function_nonser<int(boost::program_options::variables_map& vm)>
+            main_f;
+        std::vector<std::string> cfg;
+
+        HPX_ASSERT(argc != 0 && argv != nullptr);
+
+        return start(main_f, desc_commandline, argc, argv, cfg,
+            startup_function_type(), shutdown_function_type(), mode);
+    }
+
+    inline bool start(std::nullptr_t f, int argc, char** argv,
+        hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        return start(f, app_name, argc, argv, mode);
+    }
+
+    inline bool start(std::nullptr_t f, int argc, char** argv,
+        std::vector<std::string> const& cfg, hpx::runtime_mode mode)
+    {
+        std::string app_name(HPX_APPLICATION_STRING);
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            "Usage: " + app_name +  " [options]");
+
+        util::function_nonser<int(boost::program_options::variables_map& vm)>
+            main_f;
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
