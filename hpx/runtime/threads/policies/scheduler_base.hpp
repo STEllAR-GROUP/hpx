@@ -387,7 +387,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal) = 0;
 
-        virtual bool destroy_thread(threads::thread_data* thrd,
+        virtual void destroy_thread(threads::thread_data* thrd,
             std::int64_t& busy_count) = 0;
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
