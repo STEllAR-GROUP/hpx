@@ -430,13 +430,13 @@ namespace hpx { namespace threads { namespace detail
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         util::itt::stack_context ctx;        // helper for itt support
-        util::itt::domain domain;
-        util::itt::id threadid(domain, &scheduler);
+        util::itt::thread_domain thread_domain;
+        util::itt::id threadid(thread_domain, &scheduler);
         util::itt::string_handle task_id("task_id");
         util::itt::string_handle task_phase("task_phase");
 #endif
 
-//         util::itt::frame_context fctx(domain);
+//         util::itt::frame_context fctx(thread_domain);
 
         std::int64_t& idle_loop_count = counters.idle_loop_count_;
         std::int64_t& busy_loop_count = counters.busy_loop_count_;
@@ -508,7 +508,7 @@ namespace hpx { namespace threads { namespace detail
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
 //                                 util::itt::undo_frame_context undoframe(fctx);
-                                util::itt::task task(domain, thrd->get_description());
+                                util::itt::task task(thread_domain, thrd->get_description());
                                 task.add_metadata(task_id, thrd);
                                 task.add_metadata(task_phase, thrd->get_thread_phase());
 #endif

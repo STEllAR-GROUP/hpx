@@ -52,21 +52,19 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name)
-          : domain_(),
-            task_(domain_,
+          : task_(thread_domain_,
                 hpx::util::itt::string_handle(name))
         {}
         template <typename F>
         explicit annotate_function(F && f)
-          : domain_(),
-            task_(domain_,
+          : task_(thread_domain_,
                 hpx::traits::get_function_annotation_itt<
                     typename std::decay<F>::type
                 >::call(f))
         {}
 
     private:
-        hpx::util::itt::domain domain_;
+        hpx::util::itt::thread_domain thread_domain_;
         hpx::util::itt::task task_;
     };
 #elif defined(HPX_HAVE_APEX)
