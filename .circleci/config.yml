@@ -29,23 +29,7 @@ core_dependency: &core_dependency
 
 headers_test_dependency: &headers_test_dependency
     requires:
-      - tests.unit.build
-      - tests.unit.diagnostics
-      - tests.unit.actions
-      - tests.unit.agas
-      - tests.unit.component
-      - tests.unit.computeapi
-      - tests.unit.lcos
-      - tests.unit.parallel
-      - tests.unit.parcelset
-      - tests.unit.performance_counter
-      - tests.unit.serialization
-      - tests.unit.threads
-      - tests.unit.traits
-      - tests.unit.util
-      - tests.regressions
-      - tests.performance
-      - examples
+      - configure
     <<: *gh_pages_filter
 
 version: 2
