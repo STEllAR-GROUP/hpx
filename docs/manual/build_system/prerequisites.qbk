@@ -195,6 +195,11 @@ detail in the sections __unix_installation__ and __windows_installation__.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hwloc_installation Installing Hwloc]
 
+[note These instructions are for everything except Windows. On Windows there is
+      no need to build hwloc. Instead download the latest release, extract the
+      files, and set `HWLOC_ROOT` during cmake configuration to the directory
+      in which you extracted the files. ]
+
 We suggest you download the most recent release of hwloc from here:
 __hwloc_downloads__. Unpack the downloaded archive into a directory of your
 choosing. We will refer to this directory as `$HWLOC`.
