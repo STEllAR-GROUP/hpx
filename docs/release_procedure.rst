@@ -149,6 +149,8 @@ the lines as they are completed to avoid confusion.
 
 #.  Create a release on github
 
+    *   Refer to 'What's New' section in the documentation you uploaded in the
+        notes for the Github release (see previous releases for a hint).
     *   A DOI number using Zenodo is automatically assigned once the release is
         created as such on github.
     *   Verify on Zenodo (https://zenodo.org/) that release was uploaded.
