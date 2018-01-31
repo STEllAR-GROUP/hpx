@@ -1946,24 +1946,25 @@ namespace hpx { namespace threads
             {
                 compat::mutex mtx;
                 compat::condition_variable cond;
-                std::unique_lock<compat::mutex> lk(mtx);
+                bool suspended = false;
 
                 pool_iter->suspend_cb(
-                    [&mtx, &cond]()
+                    [&mtx, &cond, &suspended]()
                     {
                         {
-                            // Lock the mutex to ensure that wait is called
-                            // before notify_all (wait unlocks the mutex
-                            // internally).
                             std::lock_guard<compat::mutex> lk(mtx);
+                            suspended = true;
                         }
 
-                        // Don't lock here anymore so that cond doesn't have to
-                        // wait to lock the mutex again when returning.
+                        // No need to lock mutex when notifying
                         cond.notify_all();
                     });
 
-                cond.wait(lk);
+                {
+                    std::unique_lock<compat::mutex> lk(mtx);
+                    while (!suspended)
+                        cond.wait(lk);
+                }
             }
         }
     }
@@ -1987,24 +1988,25 @@ namespace hpx { namespace threads
             {
                 compat::mutex mtx;
                 compat::condition_variable cond;
-                std::unique_lock<compat::mutex> lk(mtx);
+                bool resumed = false;
 
                 pool_iter->resume_cb(
-                    [&mtx, &cond]()
+                    [&mtx, &cond, &resumed]()
                     {
                         {
-                            // Lock the mutex to ensure that wait is called
-                            // before notify_all (wait unlocks the mutex
-                            // internally).
                             std::lock_guard<compat::mutex> lk(mtx);
+                            resumed = true;
                         }
 
-                        // Don't lock here anymore so that wait doesn't have to
-                        // wait to lock the mutex again when returning.
+                        // No need to lock mutex when notifying
                         cond.notify_all();
                     });
 
-                cond.wait(lk);
+                {
+                    std::unique_lock<compat::mutex> lk(mtx);
+                    while (!resumed)
+                        cond.wait(lk);
+                }
             }
         }
     }
