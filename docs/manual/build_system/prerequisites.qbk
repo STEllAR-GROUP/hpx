@@ -218,6 +218,8 @@ the directory where Hwloc was installed as `HWLOC_ROOT` (`<where to install
 hwloc>`) while executing cmake for __hpx__ as explained in detail in the
 sections __unix_installation__ and __windows_installation__.
 
+Please see __hwloc_doc__ for more information about Hwloc.
+
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]
