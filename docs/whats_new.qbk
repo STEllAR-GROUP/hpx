@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2017 Hartmut Kaiser
+    Copyright (C) 2007-2018 Hartmut Kaiser
     Copyright (c) 2016 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -110,12 +110,26 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    3132] - Update CXX14 constexpr feature test
+* [pr    3128] - Make docbook dtd and xsl path names consistent
+* [pr    3127] - Add hpx::start nullptr overloads
+* [pr    3125] - Replacing nullptr with hpx::threads::invalid_thread_id
+* [pr    3123] - Add new constructor
+* [pr    3122] - Fixing #3121
+* [issue 3121] - HPX_SMT_PAUSE is broken on non-x86 platforms when __GNUC__
+                 is defined
+* [pr    3120] - Don't use boost::intrusive_ptr for thread_id_type
+* [pr    3119] - Disable default executor compatibility with V1 executors
+* [pr    3118] - Adding performance_counter::reinit to allow for dynamically
+                 changing counter sets
 * [pr    3117] - Replace uses of boost/experimental::optional with
                  util::optional
+* [pr    3115] - Fixing race condition in channel test
 * [pr    3114] - Avoid using util::function for thread function wrappers
 * [pr    3113] - cmake V3.10.2 has changed the variable names used for MPI
 * [pr    3112] - Minor fixes to exclusive_scan algorithm
 * [pr    3111] - Revert "fix detection of cxx11_std_atomic"
+* [pr    3110] - Suspend thread pool
 * [pr    3109] - Fixing thread scheduling when yielding a thread id
 * [pr    3108] - Revert "Suspend thread pool"
 * [pr    3107] - Remove UB from thread::id relational operators
@@ -123,6 +137,10 @@ Here is a list of the important tickets we closed for this release.
 * [pr    3105] - Fixing refcount for async traversal frame
 * [pr    3104] - Local execution of direct actions is now actually performed
                  directly
+* [pr    3103] - Adding support for generic counter_raw_values performance
+                 counter type
+* [issue 3102] - Introduce generic performance counter type returning an array
+                 of values
 * [pr    3101] - Revert "Adapting stack overhead limit for gcc 4.9"
 * [pr    3100] - Fix #3068 (condition_variable deadlock)
 * [pr    3099] - Fixing lock held during suspension in papi counter component
@@ -666,6 +684,8 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2447] - Implementing new executor API (P0443)
 * [issue 2439] - Implement executor proposal
 * [issue 2408] - Stackoverflow detection for linux, e.g. based on libsigsegv
+* [pr    2377] - Add a customization point for put_parcel so we can override
+                 actions
 * [issue 2368] - HPX_ASSERT problem
 * [issue 2324] - Change default number of threads used to the maximum of the
                  system
