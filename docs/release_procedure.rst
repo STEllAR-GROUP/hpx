@@ -51,15 +51,21 @@ the lines as they are completed to avoid confusion.
     create a tag from the old release branch before deleting the old release
     branch in the next step.
 
+#.  Unprotect the release branch in the github repository settings so that it
+    can be deleted and recreated.
+
 #.  Delete the old release branch, and create a new one by branching a stable
     point from master.
 
-    *   ``git push origin --delete [branch name]``
-    *   ``git branch -D [branch name]``
-    *   ``git branch [new branch name]``
-    *   ``git push origin [new branch name]``
-    *   ``git branch --set-upstream-to=origin/[branch name] [branch name]``
+    *   ``git push origin --delete release``
+    *   ``git branch -D release``
+    *   ``git checkout [stable point in master]``
+    *   ``git branch release``
+    *   ``git push origin release``
+    *   ``git branch --set-upstream-to=origin/release release``
 
+#.  Protect the release branch again to disable deleting and force pushes.
+    
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
     and later with an empty string for the actual release).
