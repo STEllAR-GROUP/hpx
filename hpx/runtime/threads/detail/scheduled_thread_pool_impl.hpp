@@ -391,6 +391,12 @@ namespace hpx { namespace threads { namespace detail
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
+            hpx::state expected = state_running;
+            sched_->Scheduler::get_state(i).compare_exchange_strong(expected, state_pre_sleep);
+        }
+
+        for (std::size_t i = 0; i != threads_.size(); ++i)
+        {
             suspend_processing_unit_internal(i, ec);
         }
     }
@@ -1629,20 +1635,21 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
-        // inform the scheduler to suspend the virtual core
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
         // check if already suspended
         hpx::state current_state = state.load();
-        if (current_state == state_pre_sleep || current_state == state_sleeping)
+        if (current_state == state_sleeping)
         {
             return;
         }
 
-        hpx::state oldstate = state.exchange(state_pre_sleep);
+        // inform the scheduler to suspend the virtual core
+        hpx::state expected = state_running;
+        state.compare_exchange_strong(expected, state_pre_sleep);
 
-        HPX_ASSERT(oldstate == state_running);
+        HPX_ASSERT(expected == state_running || expected == state_pre_sleep);
 
         util::detail::yield_while([&state]()
             {
