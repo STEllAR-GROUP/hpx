@@ -8,9 +8,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
