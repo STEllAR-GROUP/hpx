@@ -65,7 +65,7 @@ the lines as they are completed to avoid confusion.
     *   ``git branch --set-upstream-to=origin/release release``
 
 #.  Protect the release branch again to disable deleting and force pushes.
-    
+
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
     and later with an empty string for the actual release).
@@ -121,6 +121,10 @@ the lines as they are completed to avoid confusion.
     *   ``CMakeLists.txt``
     *   Grep for old version number
 
+#.  Create a new 'What's New' section for the docs of the next anticipated release.
+    Move the old (now current) 'What's New' section to the section for the previous
+    releases.
+
 #.  Create new logos for documentation. Update the logo used on line 234
     (add '_draft') and change the size accordingly in ``docs/cmakelist.txt``
     lines 330/331.
@@ -132,6 +136,8 @@ the lines as they are completed to avoid confusion.
 
 #.  Push changes to new branch numbered after the next release (not the current
     one).
+
+#.  Add the release date to the caption of the current 'What's New' section in the docs
 
 #.  Tag the release.
 
