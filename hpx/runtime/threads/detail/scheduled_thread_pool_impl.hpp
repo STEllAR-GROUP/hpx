@@ -323,6 +323,12 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_internal(bool blocking,
         error_code& ec)
     {
+        for (std::size_t virt_core = 0; virt_core != threads_.size();
+             ++virt_core)
+        {
+            this->sched_->Scheduler::resume(virt_core);
+        }
+
         if (blocking)
         {
             for (std::size_t virt_core = 0; virt_core != threads_.size();
@@ -332,14 +338,6 @@ namespace hpx { namespace threads { namespace detail
                 {
                     resume_processing_unit_internal(virt_core, ec);
                 }
-            }
-        }
-        else
-        {
-            for (std::size_t virt_core = 0; virt_core != threads_.size();
-                ++virt_core)
-            {
-                this->sched_->Scheduler::resume(virt_core);
             }
         }
     }
