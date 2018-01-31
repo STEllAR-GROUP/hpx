@@ -91,7 +91,7 @@
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
 [def __hwloc_downloads__        [@http://www.open-mpi.org/software/hwloc/v1.11 Hwloc Downloads]]
-[def __hwloc_doc__              [@http://www.open-mpi.org/projects/hwloc/doc/v1.11.9 Hwloc Documentation]]
+[def __hwloc_doc__              [@http://www.open-mpi.org/projects/hwloc/doc/ Hwloc Documentation]]
 [def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
 [def __macports__               [@http://www.macports.org/ MacPorts]]
