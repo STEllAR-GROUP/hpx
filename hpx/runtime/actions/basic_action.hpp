@@ -97,7 +97,7 @@ namespace hpx { namespace actions
             {}
 
             HPX_FORCEINLINE threads::thread_result_type
-            operator()(threads::thread_state_ex_enum)
+            operator()()
             {
                 LTM_(debug)
                     << "Executing " << Action::get_action_name(lva_)

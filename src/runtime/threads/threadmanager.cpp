@@ -1478,13 +1478,6 @@ namespace hpx { namespace threads
                     &coroutine_type::impl_type::get_stack_unbind_count),
                 util::function_nonser<std::uint64_t(bool)>(), "", 0},
 #endif
-            // /threads{locality#%d/total}/count/objects
-            // /threads{locality#%d/allocator%d}/count/objects
-            {"count/objects",
-                &coroutine_type::impl_type::get_allocation_count_all,
-                util::bind_front(&coroutine_type::impl_type::get_allocation_count,
-                    static_cast<std::size_t>(paths.instanceindex_)),
-                "allocator", HPX_COROUTINE_NUM_ALL_HEAPS},
         };
         std::size_t const data_size = sizeof(data)/sizeof(data[0]);
 

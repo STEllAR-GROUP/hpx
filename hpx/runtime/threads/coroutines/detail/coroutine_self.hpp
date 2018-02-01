@@ -75,30 +75,27 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         typedef impl_type::thread_id_type thread_id_type;
 
         typedef impl_type::result_type result_type;
-        typedef impl_type::arg_type arg_type;
 
-        typedef util::function_nonser<arg_type(result_type)>
+        typedef util::function_nonser<void(result_type)>
             yield_decorator_type;
 
-        arg_type yield(result_type arg = result_type())
+        void yield(result_type arg)
         {
-            return !yield_decorator_.empty() ?
+            !yield_decorator_.empty() ?
                 yield_decorator_(std::move(arg)) :
                 yield_impl(std::move(arg));
         }
 
-        arg_type yield_impl(result_type arg)
+        void yield_impl(result_type arg)
         {
             HPX_ASSERT(m_pimpl);
 
-            this->m_pimpl->bind_result(&arg);
+            this->m_pimpl->bind_result(arg);
 
             {
                 reset_self_on_exit on_exit(this);
                 this->m_pimpl->yield();
             }
-
-            return *m_pimpl->args();
         }
 
         template <typename F>
@@ -127,18 +124,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             yield_decorator_type tmp;
             std::swap(tmp, yield_decorator_);
             return tmp;
-        }
-
-        HPX_NORETURN void exit()
-        {
-            m_pimpl->exit_self();
-            std::terminate(); // FIXME: replace with hpx::terminate();
-        }
-
-        bool pending() const
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->pending() != 0;
         }
 
         thread_id_type get_thread_id() const

@@ -139,7 +139,7 @@ void print_results(
 ///////////////////////////////////////////////////////////////////////////////
 struct kernel
 {
-    hpx::threads::thread_result_type operator()(thread_state_ex_enum) const
+    hpx::threads::thread_result_type operator()() const
     {
         worker_timed(payload * 1000);
 
@@ -177,14 +177,14 @@ double perform_2n_iterations()
     // Warmup
     for (std::uint64_t i = 0; i < iterations; ++i)
     {
-        (*coroutines[indices[i]])(wait_signaled);
+        (*coroutines[indices[i]])();
     }
 
     hpx::util::high_resolution_timer t;
 
     for (std::uint64_t i = 0; i < iterations; ++i)
     {
-        (*coroutines[indices[i]])(wait_signaled);
+        (*coroutines[indices[i]])();
     }
 
     double elapsed = t.elapsed();

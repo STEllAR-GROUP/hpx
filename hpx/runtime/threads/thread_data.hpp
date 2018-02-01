@@ -241,7 +241,7 @@ namespace hpx { namespace threads
                 thread_state(new_state, state_ex, tag));
         }
 
-    private:
+    public:
         /// The set_state function changes the extended state of this
         /// thread instance.
         ///
@@ -269,7 +269,6 @@ namespace hpx { namespace threads
             }
         }
 
-    public:
         /// Return the id of the component this thread is running in
         naming::address_type get_component_id() const
         {
@@ -517,7 +516,7 @@ namespace hpx { namespace threads
         coroutine_type::result_type operator()()
         {
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
-            return coroutine_(set_state_ex(wait_signaled));
+            return coroutine_();
         }
 
         thread_id_type get_thread_id() const

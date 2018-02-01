@@ -34,10 +34,6 @@
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/reinitializable_static.hpp>
-
-#include <boost/exception/exception.hpp>
-#include <boost/lockfree/stack.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -73,173 +69,41 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     }
 #endif
 
-    void coroutine_impl::operator()()
+    void coroutine_impl::operator()() noexcept
     {
         typedef super_type::context_exit_status context_exit_status;
         context_exit_status status = super_type::ctx_exited_return;
 
-        // loop as long this coroutine has been rebound
-        do
+        // yield value once the thread function has finished executing
+        static result_type result_last(
+            thread_state_enum::terminated, invalid_thread_id);
+
+        std::exception_ptr tinfo;
+        try
         {
-            std::exception_ptr tinfo;
-            try
             {
-                this->check_exit_state();
+                coroutine_self* old_self = coroutine_self::get_self();
+                coroutine_self self(this, old_self);
+                reset_self_on_exit on_exit(&self, old_self);
 
-                HPX_ASSERT(this->count() > 0);
+                result_last = m_fun();
+                HPX_ASSERT(result_last.first == thread_state_enum::terminated);
 
-                {
-                    coroutine_self* old_self = coroutine_self::get_self();
-                    coroutine_self self(this, old_self);
-                    reset_self_on_exit on_exit(&self, old_self);
-
-                    this->m_result_last = m_fun(*this->args());
-
-                    // if this thread returned 'terminated' we need to reset
-                    // the functor and the bound arguments
-                    if (this->m_result_last.first == terminated)
-                        this->reset();
-                }
-
-                // return value to other side of the fence
-                this->bind_result(&this->m_result_last);
-            }
-            catch (exit_exception const&) {
-                status = super_type::ctx_exited_exit;
-                tinfo = std::current_exception();
-                this->reset();            // reset functor
-            }
-            catch (boost::exception const&) {
-                status = super_type::ctx_exited_abnormally;
-                tinfo = std::current_exception();
-                this->reset();
-            }
-            catch (std::exception const&) {
-                status = super_type::ctx_exited_abnormally;
-                tinfo = std::current_exception();
-                this->reset();
-            }
-            catch (...) {
-                status = super_type::ctx_exited_abnormally;
-                tinfo = std::current_exception();
                 this->reset();
             }
 
-            this->do_return(status, std::move(tinfo));
+            // return value to other side of the fence
+            this->bind_result(result_last);
+        }
+        catch (...) {
+            status = super_type::ctx_exited_abnormally;
+            tinfo = std::current_exception();
+            this->reset();
+        }
 
-        } while (this->m_state == super_type::ctx_running);
+        this->do_return(status, std::move(tinfo));
 
         // should not get here, never
         HPX_ASSERT(this->m_state == super_type::ctx_running);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // the memory for the threads is managed by a lockfree caching_freelist
-    struct coroutine_heap
-    {
-        coroutine_heap()
-          : heap_(128)
-        {}
-
-        ~coroutine_heap()
-        {
-            while (coroutine_impl* next = get_locked())
-                delete next;
-        }
-
-        coroutine_impl* allocate()
-        {
-            return get_locked();
-        }
-
-        void deallocate(coroutine_impl* p)
-        {
-            //p->reset();          // reset bound function
-            heap_.push(p);
-        }
-
-    private:
-        coroutine_impl* get_locked()
-        {
-            coroutine_impl* result = nullptr;
-            heap_.pop(result);
-            return result;
-        }
-
-        boost::lockfree::stack<coroutine_impl*> heap_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct heap_tag_small {};
-    struct heap_tag_medium {};
-    struct heap_tag_large {};
-    struct heap_tag_huge {};
-
-    template <std::size_t NumHeaps, typename Tag>
-    static coroutine_heap& get_heap(std::size_t i)
-    {
-        // ensure thread-safe initialization
-        util::reinitializable_static<coroutine_heap, Tag, NumHeaps> heap;
-        return heap.get(i);
-    }
-
-    static coroutine_heap& get_heap(std::size_t i, std::ptrdiff_t stacksize)
-    {
-        // FIXME: This should check the sizes in runtime_configuration, not the
-        // default macro sizes
-        if (stacksize > HPX_MEDIUM_STACK_SIZE)
-        {
-            if (stacksize > HPX_LARGE_STACK_SIZE)
-                return get_heap<HPX_COROUTINE_NUM_HEAPS / 4,
-                heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS / 4)); //-V112
-
-            return get_heap<HPX_COROUTINE_NUM_HEAPS / 4,
-                heap_tag_large>(i % (HPX_COROUTINE_NUM_HEAPS / 4)); //-V112
-        }
-
-        if (stacksize > HPX_SMALL_STACK_SIZE)
-            return get_heap<HPX_COROUTINE_NUM_HEAPS / 2,
-            heap_tag_medium>(i % (HPX_COROUTINE_NUM_HEAPS / 2));
-
-        return get_heap<HPX_COROUTINE_NUM_HEAPS,
-            heap_tag_small>(i % HPX_COROUTINE_NUM_HEAPS);
-    }
-
-    static std::size_t get_heap_count(ptrdiff_t stacksize)
-    {
-        if (stacksize > HPX_MEDIUM_STACK_SIZE)
-            return HPX_COROUTINE_NUM_HEAPS / 4; //-V112
-
-        if (stacksize > HPX_SMALL_STACK_SIZE)
-            return HPX_COROUTINE_NUM_HEAPS / 2;
-
-        return HPX_COROUTINE_NUM_HEAPS;
-    }
-
-    coroutine_impl* coroutine_impl::allocate(
-        thread_id_type id, std::ptrdiff_t stacksize)
-    {
-        // start looking at the matching heap
-        std::size_t const heap_num = std::size_t(id.get()) / 32; //-V112
-        std::size_t const heap_count = get_heap_count(stacksize);
-
-        // look through all heaps to find an available coroutine object
-        coroutine_impl* p = get_heap(heap_num, stacksize).allocate();
-        if (!p)
-        {
-            for (std::size_t i = 1; i != heap_count && !p; ++i)
-            {
-                p = get_heap(heap_num + i, stacksize).allocate();
-            }
-        }
-        return p;
-    }
-
-    void coroutine_impl::deallocate(coroutine_impl* p)
-    {
-        std::size_t const heap_num = std::size_t(p->get_thread_id().get()) / 32; //-V112
-        std::ptrdiff_t const stacksize = p->get_stacksize();
-
-        get_heap(heap_num, stacksize).deallocate(p);
     }
 }}}}

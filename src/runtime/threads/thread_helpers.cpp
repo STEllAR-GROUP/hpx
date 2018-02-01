@@ -474,7 +474,7 @@ namespace hpx { namespace this_thread
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = threads::get_self_id();
+        threads::thread_id_type id = self.get_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id, ec);
@@ -499,13 +499,14 @@ namespace hpx { namespace this_thread
             {
                 nextid->get_scheduler_base()->schedule_thread(
                     nextid.get(), std::size_t(-1));
-                statex = self.yield(threads::thread_result_type(state,
+                self.yield(threads::thread_result_type(state,
                     threads::invalid_thread_id));
             }
             else
             {
-                statex = self.yield(threads::thread_result_type(state, nextid));
+                self.yield(threads::thread_result_type(state, nextid));
             }
+            statex = id->get_state().state_ex();
         }
 
         // handle interruption, if needed
@@ -536,7 +537,7 @@ namespace hpx { namespace this_thread
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = threads::get_self_id();
+        threads::thread_id_type id = self.get_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id, ec);
@@ -567,15 +568,15 @@ namespace hpx { namespace this_thread
             {
                 nextid->get_scheduler_base()->schedule_thread(
                     nextid.get(), std::size_t(-1));
-                statex = self.yield(
-                    threads::thread_result_type(threads::suspended,
-                        threads::invalid_thread_id));
+                self.yield(threads::thread_result_type(threads::suspended,
+                    threads::invalid_thread_id));
             }
             else
             {
-                statex = self.yield(
+                self.yield(
                     threads::thread_result_type(threads::suspended, nextid));
             }
+            statex = id->get_state().state_ex();
 
             if (statex != threads::wait_timeout)
             {

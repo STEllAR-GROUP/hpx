@@ -11,8 +11,8 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_front.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -55,17 +55,15 @@ namespace hpx { namespace components
         static threads::thread_function_type
         decorate_action(naming::address::address_type lva, F && f)
         {
-            return util::bind(
-                util::one_shot(&locking_hook::thread_function),
+            return util::deferred_call(&locking_hook::thread_function,
                 get_lva<this_component_type>::call(lva),
-                util::placeholders::_1,
                 traits::action_decorate_function<base_type>::call(
                     lva, std::forward<F>(f)));
         }
 
     protected:
         typedef util::function_nonser<
-            threads::thread_arg_type(threads::thread_result_type)
+            void(threads::thread_result_type)
         > yield_decorator_type;
 
         struct decorate_wrapper
@@ -87,7 +85,7 @@ namespace hpx { namespace components
         // Execute the wrapped action. This locks the mutex ensuring a thread
         // safe action invocation.
         threads::thread_result_type thread_function(
-            threads::thread_arg_type state, threads::thread_function_type f)
+            threads::thread_function_type f)
         {
             threads::thread_result_type result(threads::unknown,
                 threads::invalid_thread_id);
@@ -109,7 +107,7 @@ namespace hpx { namespace components
                 decorate_wrapper yield_decorator(
                     util::bind_front(&locking_hook::yield_function, this));
 
-                result = f(state);
+                result = f();
 
                 (void)yield_decorator;       // silence gcc warnings
             }
@@ -133,24 +131,21 @@ namespace hpx { namespace components
 
         // The yield decorator unlocks the mutex and calls the system yield
         // which gives up control back to the thread manager.
-        threads::thread_arg_type yield_function(threads::thread_result_type state)
+        void yield_function(threads::thread_result_type state)
         {
             // We un-decorate the yield function as the lock handling may
             // suspend, which causes an infinite recursion otherwise.
             undecorate_wrapper yield_decorator;
-            threads::thread_arg_type result = threads::wait_unknown;
 
             {
                 util::unlock_guard<mutex_type> ul(mtx_);
-                result = threads::get_self().yield_impl(state);
+                threads::get_self().yield_impl(state);
             }
 
             // Re-enable ignoring the lock on the mutex above (this
             // information is lost in the lock tracking tables once a mutex is
             // unlocked).
             util::ignore_lock(&mtx_);
-
-            return result;
         }
 
     private:
