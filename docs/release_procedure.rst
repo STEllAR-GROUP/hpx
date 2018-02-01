@@ -71,8 +71,8 @@ the lines as they are completed to avoid confusion.
     and later with an empty string for the actual release).
 
 #.  Change logo for release documentation by removing '_draft' suffix
-    in ``docs/cmakelist.txt`` on line 234. Update logo size accordingly on
-    lines 330/331.
+    in ``docs/cmakelist.txt`` in the `set(image...` call. Update logo size
+    accordingly in the call to `hpx_quickbook_to_html`.
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.
