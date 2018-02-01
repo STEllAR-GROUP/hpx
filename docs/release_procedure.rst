@@ -70,9 +70,9 @@ the lines as they are completed to avoid confusion.
     ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
     and later with an empty string for the actual release).
 
-#.  Change logo for release documentation by removing '_draft' suffix
-    in ``docs/cmakelist.txt`` in the `set(image...` call. Update logo size
-    accordingly in the call to `hpx_quickbook_to_html`.
+#.  Change logo for release documentation by removing ``_draft`` suffix
+    in ``docs/cmakelist.txt`` in the ``set(image...`` call. Update logo size
+    accordingly in the call to ``hpx_quickbook_to_html``.
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.
