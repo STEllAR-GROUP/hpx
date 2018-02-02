@@ -107,7 +107,7 @@ namespace hpx { namespace parallel { namespace util
                         finalitems.reserve(size + 1);
 
                         hpx::shared_future<Result1> curr = workitems[1];
-                        finalitems.push_back(dataflow(policy.executor(),
+                        finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, first_, count_ - count, workitems[0], curr));
 
                         workitems[1] = dataflow(hpx::launch::sync,
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { namespace util
                         auto curr = execution::async_execute(
                             policy.executor(), f1, it, size).share();
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, it, size, prev, curr));
 
                         workitems.push_back(dataflow(hpx::launch::sync,
@@ -250,7 +250,7 @@ namespace hpx { namespace parallel { namespace util
                     {
                         HPX_ASSERT(count_ > count);
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, first_, count_ - count,
                             workitems[0], workitems[1]));
                     }
@@ -260,7 +260,7 @@ namespace hpx { namespace parallel { namespace util
                         FwdIter it = hpx::util::get<0>(elem);
                         std::size_t size = hpx::util::get<1>(elem);
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, it, size, workitems[0], workitems[1]));
                     }
 
@@ -279,7 +279,7 @@ namespace hpx { namespace parallel { namespace util
                         // Wait the completion of f3 on previous partition.
                         finalitems.back().wait();
 
-                        finalitems.push_back(dataflow(policy.executor(),
+                        finalitems.push_back(dataflow(hpx::launch::sync,
                             f3, it, size,
                             workitems[widx], workitems[widx + 1]));
                     }
