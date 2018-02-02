@@ -407,7 +407,8 @@ namespace hpx { namespace threads { namespace detail
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
             hpx::state expected = state_running;
-            sched_->Scheduler::get_state(i).compare_exchange_strong(expected, state_pre_sleep);
+            sched_->Scheduler::get_state(i).compare_exchange_strong(expected,
+                 state_pre_sleep);
         }
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
