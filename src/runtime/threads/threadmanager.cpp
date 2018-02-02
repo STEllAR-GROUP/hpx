@@ -1947,27 +1947,7 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                compat::mutex mtx;
-                compat::condition_variable cond;
-                bool suspended = false;
-
-                pool_iter->suspend_cb(
-                    [&mtx, &cond, &suspended]()
-                    {
-                        {
-                            std::lock_guard<compat::mutex> lk(mtx);
-                            suspended = true;
-                        }
-
-                        // No need to lock mutex when notifying
-                        cond.notify_all();
-                    });
-
-                {
-                    std::unique_lock<compat::mutex> lk(mtx);
-                    while (!suspended)
-                        cond.wait(lk);
-                }
+                pool_iter->suspend_direct();
             }
         }
     }
@@ -1989,27 +1969,7 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                compat::mutex mtx;
-                compat::condition_variable cond;
-                bool resumed = false;
-
-                pool_iter->resume_cb(
-                    [&mtx, &cond, &resumed]()
-                    {
-                        {
-                            std::lock_guard<compat::mutex> lk(mtx);
-                            resumed = true;
-                        }
-
-                        // No need to lock mutex when notifying
-                        cond.notify_all();
-                    });
-
-                {
-                    std::unique_lock<compat::mutex> lk(mtx);
-                    while (!resumed)
-                        cond.wait(lk);
-                }
+                pool_iter->resume_direct();
             }
         }
     }
