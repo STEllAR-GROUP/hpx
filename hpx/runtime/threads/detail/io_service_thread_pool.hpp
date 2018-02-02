@@ -70,10 +70,12 @@ namespace hpx { namespace threads { namespace detail
         hpx::future<void> resume();
         void resume_cb(std::function<void(void)> callback,
             error_code& ec = throws);
+        void resume_direct(error_code& ec = throws);
 
         hpx::future<void> suspend();
         void suspend_cb(std::function<void(void)> callback,
             error_code& ec = throws);
+        void suspend_direct(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<void> suspend_processing_unit(std::size_t virt_core);

@@ -85,12 +85,12 @@ namespace hpx { namespace threads { namespace detail
         virtual hpx::future<void> resume() = 0;
         virtual void resume_cb(
             std::function<void(void)> callback, error_code& ec = throws) = 0;
-        virtual void resume_direct(error_code& ec = throws) {};
+        virtual void resume_direct(error_code& ec = throws) = 0;
 
         virtual hpx::future<void> suspend() = 0;
         virtual void suspend_cb(
             std::function<void(void)> callback, error_code& ec = throws) = 0;
-        virtual void suspend_direct(error_code& ec = throws) {};
+        virtual void suspend_direct(error_code& ec = throws) = 0;
 
     public:
         std::size_t get_worker_thread_num() const;
