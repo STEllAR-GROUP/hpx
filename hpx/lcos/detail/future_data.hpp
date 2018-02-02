@@ -28,6 +28,7 @@
 #include <hpx/util/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
+#include <boost/container/small_vector.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -66,10 +67,11 @@ namespace detail
     ///////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT future_data_refcnt_base
     {
-    private:
-        typedef util::unique_function_nonser<void()> completed_callback_type;
-
     public:
+        typedef util::unique_function_nonser<void()> completed_callback_type;
+        typedef boost::container::small_vector<completed_callback_type, 3>
+            completed_callback_vector_type;
+
         typedef void has_future_data_refcnt_base;
 
         virtual ~future_data_refcnt_base();
@@ -179,91 +181,6 @@ namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct handle_continuation_recursion_count
-    {
-        handle_continuation_recursion_count()
-          : count_(threads::get_continuation_recursion_count())
-        {
-            ++count_;
-        }
-        ~handle_continuation_recursion_count()
-        {
-            --count_;
-        }
-
-        std::size_t& count_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F1, typename F2>
-    struct compose_cb_impl
-    {
-        template <typename A1, typename A2>
-        compose_cb_impl(A1 && f1, A2 && f2)
-          : f1_(std::forward<A1>(f1))
-          , f2_(std::forward<A2>(f2))
-        {}
-
-        compose_cb_impl(compose_cb_impl&& other)
-          : f1_(std::move(other.f1_))
-          , f2_(std::move(other.f2_))
-        {}
-
-        void operator()()
-        {
-            bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
-#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-            recurse_asynchronously =
-                !this_thread::has_sufficient_stack_space();
-#else
-            handle_continuation_recursion_count cnt;
-            recurse_asynchronously = recurse_asynchronously ||
-                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
-#endif
-            if (recurse_asynchronously)
-            {
-                error_code ec;
-                threads::register_thread_nullary(
-                    compose_cb_impl(std::move(f1_), std::move(f2_)),
-                    "compose_cb",
-                    threads::pending, true, threads::thread_priority_boost,
-                    std::size_t(-1), threads::thread_stacksize_current, ec);
-                return;
-            }
-
-            {
-                hpx::util::annotate_function annotate(f1_);
-                (void)annotate;
-                f1_();
-            }
-            {
-                hpx::util::annotate_function annotate(f2_);
-                (void)annotate;
-                f2_();
-            }
-        }
-
-        F1 f1_;
-        F2 f2_;
-    };
-
-    template <typename F1, typename F2>
-    static HPX_FORCEINLINE util::unique_function_nonser<void()>
-    compose_cb(F1 && f1, F2 && f2)
-    {
-        if (!f1)
-            return std::forward<F2>(f2);
-        else if (!f2)
-            return std::forward<F1>(f1);
-
-        // otherwise create a combined callback
-        typedef compose_cb_impl<
-            typename util::decay<F1>::type, typename util::decay<F2>::type
-        > result_type;
-        return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     struct future_data_base;
 
@@ -279,9 +196,10 @@ namespace detail
           : future_data_refcnt_base(no_addref), state_(empty)
         {}
 
+        using future_data_refcnt_base::completed_callback_type;
+        using future_data_refcnt_base::completed_callback_vector_type;
         typedef lcos::local::spinlock mutex_type;
         typedef util::unused_type result_type;
-        typedef util::unique_function_nonser<void()> completed_callback_type;
         typedef future_data_refcnt_base::init_no_addref init_no_addref;
 
         virtual ~future_data_base();
@@ -344,12 +262,12 @@ namespace detail
         // continuation support
 
         // deferred execution of a given continuation
-        bool run_on_completed(completed_callback_type && on_completed,
+        bool run_on_completed(completed_callback_vector_type && on_completed,
             std::exception_ptr& ptr);
 
         // make sure continuation invocation does not recurse deeper than
         // allowed
-        void handle_on_completed(completed_callback_type && on_completed);
+        void handle_on_completed(completed_callback_vector_type && on_completed);
 
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
@@ -379,7 +297,7 @@ namespace detail
     protected:
         mutable mutex_type mtx_;
         state state_;                               // current state
-        completed_callback_type on_completed_;
+        completed_callback_vector_type on_completed_;
         local::detail::condition_variable cond_;    // threads waiting in read
     };
 
@@ -390,10 +308,12 @@ namespace detail
         HPX_NON_COPYABLE(future_data_base);
 
         typedef typename future_data_result<Result>::type result_type;
-        typedef util::unique_function_nonser<void()> completed_callback_type;
         typedef future_data_base<traits::detail::future_data_void> base_type;
         typedef lcos::local::spinlock mutex_type;
         typedef typename base_type::init_no_addref init_no_addref;
+        typedef typename base_type::completed_callback_type completed_callback_type;
+        typedef typename base_type::completed_callback_vector_type
+            completed_callback_vector_type;
 
         future_data_base() = default;
 
@@ -477,7 +397,8 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed = std::move(on_completed_);
+            completed_callback_vector_type on_completed;
+            on_completed.swap(on_completed_);
 
             // set the data
             result_type* value_ptr =
@@ -504,7 +425,7 @@ namespace detail
             //       it unlocked when returning.
 
             // invoke the callback (continuation) function
-            if (on_completed)
+            if (!on_completed.empty())
                 handle_on_completed(std::move(on_completed));
         }
 
@@ -522,7 +443,8 @@ namespace detail
                 return;
             }
 
-            completed_callback_type on_completed = std::move(on_completed_);
+            completed_callback_vector_type on_completed;
+            on_completed.swap(on_completed_);
 
             // set the data
             std::exception_ptr* exception_ptr =
@@ -548,7 +470,7 @@ namespace detail
             //       it unlocked when returning.
 
             // invoke the callback (continuation) function
-            if (on_completed)
+            if (!on_completed.empty())
                 handle_on_completed(std::move(on_completed));
         }
 
@@ -614,7 +536,8 @@ namespace detail
             }
 
             state_ = empty;
-            on_completed_ = completed_callback_type();
+            on_completed_.clear();
+            on_completed_.shrink_to_fit();
         }
 
         std::exception_ptr get_exception_ptr() const override
@@ -1008,31 +931,6 @@ namespace hpx { namespace traits
             typedef lcos::detail::future_data_allocator<R, Allocator> type;
         };
     }
-
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F1, typename F2>
-    struct get_function_annotation<lcos::detail::compose_cb_impl<F1, F2> >
-    {
-        static char const*
-            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
-        {
-            return get_function_annotation<F1>::call(f.f1_);
-        }
-    };
-
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F1, typename F2>
-    struct get_function_annotation_itt<lcos::detail::compose_cb_impl<F1, F2> >
-    {
-        static util::itt::string_handle
-            call(lcos::detail::compose_cb_impl<F1, F2> const& f) noexcept
-        {
-            return get_function_annotation_itt<F1>::call(f.f1_);
-        }
-    };
-#endif
-#endif
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
