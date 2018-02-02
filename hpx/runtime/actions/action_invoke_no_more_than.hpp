@@ -15,7 +15,7 @@
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/static.hpp>
 
 #include <memory>
@@ -83,6 +83,7 @@ namespace hpx { namespace actions { namespace detail
         // If the action returns something which is not a future, we inject
         // a semaphore into the call graph.
         static threads::thread_result_type thread_function(
+            threads::thread_state_ex_enum state,
             threads::thread_function_type f)
         {
             typedef typename construct_semaphore_type::semaphore_type
@@ -90,15 +91,16 @@ namespace hpx { namespace actions { namespace detail
 
             signal_on_exit<semaphore_type> on_exit(
                 construct_semaphore_type::get_sem());
-            return f();
+            return f(state);
         }
 
         template <typename F>
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, std::false_type)
         {
-            return util::deferred_call(
-                &action_decorate_function::thread_function,
+            return util::bind(
+                util::one_shot(&action_decorate_function::thread_function),
+                util::placeholders::_1,
                 traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
             );
@@ -107,18 +109,20 @@ namespace hpx { namespace actions { namespace detail
         // If the action returns a future we wait on the semaphore as well,
         // however it will be signaled once the future gets ready only.
         static threads::thread_result_type thread_function_future(
+            threads::thread_state_ex_enum state,
             threads::thread_function_type f)
         {
             construct_semaphore_type::get_sem().wait();
-            return f();
+            return f(state);
         }
 
         template <typename F>
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, std::true_type)
         {
-            return util::deferred_call(
-                &action_decorate_function::thread_function_future,
+            return util::bind(
+                util::one_shot(&action_decorate_function::thread_function_future),
+                util::placeholders::_1,
                 traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
             );

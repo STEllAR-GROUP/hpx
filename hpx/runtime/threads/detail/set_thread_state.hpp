@@ -321,9 +321,8 @@ namespace hpx { namespace threads { namespace detail
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
         // the timer fired and the wake_timer_thread above has been executed
-        get_self().yield(thread_result_type(suspended, invalid_thread_id));
         thread_state_ex_enum statex =
-            self_id->set_state_ex(thread_state_ex_enum::wait_signaled);
+            get_self().yield(thread_result_type(suspended, invalid_thread_id));
 
         if (wait_timeout != statex) //-V601
         {

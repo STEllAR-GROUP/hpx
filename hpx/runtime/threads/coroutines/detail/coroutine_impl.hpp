@@ -63,13 +63,15 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         typedef context_base::thread_id_type thread_id_type;
 
         typedef std::pair<thread_state_enum, thread_id_type> result_type;
+        typedef thread_state_ex_enum arg_type;
 
-        typedef util::unique_function_nonser<result_type()> functor_type;
+        typedef util::unique_function_nonser<result_type(arg_type)> functor_type;
 
         coroutine_impl(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size)
           : context_base(*this, stack_size, id)
-          , m_result(terminated, invalid_thread_id)
+          , m_result(unknown, invalid_thread_id)
+          , m_arg(nullptr)
           , m_fun(std::move(f))
         {}
 
@@ -88,6 +90,16 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         result_type result() const
         {
             return m_result;
+        }
+        arg_type * args()
+        {
+            HPX_ASSERT(m_arg);
+            return m_arg;
+        };
+
+        void bind_args(arg_type* arg)
+        {
+            m_arg = arg;
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
@@ -114,6 +126,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
     private:
         result_type m_result;
+        arg_type* m_arg;
 
         functor_type m_fun;
     };

@@ -796,7 +796,27 @@ namespace hpx { namespace applier
         {
             F f;
 
-            inline threads::thread_result_type operator()()
+            inline threads::thread_result_type operator()(threads::thread_arg_type)
+            {
+                // execute the actual thread function
+                f(threads::wait_signaled);
+
+                // Verify that there are no more registered locks for this
+                // OS-thread. This will throw if there are still any locks
+                // held.
+                util::force_error_on_lock();
+
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
+            }
+        };
+
+        template <typename F>
+        struct thread_function_nullary
+        {
+            F f;
+
+            inline threads::thread_result_type operator()(threads::thread_arg_type)
             {
                 // execute the actual thread function
                 f();
@@ -855,7 +875,7 @@ namespace hpx { namespace applier
         error_code& ec = throws)
     {
         threads::thread_function_type thread_func(
-            detail::thread_function<typename std::decay<F>::type>{
+            detail::thread_function_nullary<typename std::decay<F>::type>{
                 std::forward<F>(func)});
         return register_thread_plain(std::move(thread_func),
             description, initial_state, run_now, priority, os_thread, stacksize,
@@ -988,7 +1008,7 @@ namespace hpx { namespace applier
         error_code& ec = throws)
     {
         threads::thread_function_type thread_func(
-            detail::thread_function<typename std::decay<F>::type>{
+            detail::thread_function_nullary<typename std::decay<F>::type>{
                 std::forward<F>(func)});
         return register_work_plain(std::move(thread_func),
             description, 0, initial_state, priority, os_thread, stacksize,

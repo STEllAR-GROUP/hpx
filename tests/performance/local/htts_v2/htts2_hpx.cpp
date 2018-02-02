@@ -60,7 +60,9 @@ struct hpx_driver : htts2::driver
         return hpx::finalize();
     }
 
-    hpx::threads::thread_result_type payload_thread_function()
+    hpx::threads::thread_result_type payload_thread_function(
+        hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
+        )
     {
         htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
         //++count_;
@@ -92,7 +94,7 @@ struct hpx_driver : htts2::driver
             using hpx::util::placeholders::_1;
             hpx::threads::register_thread_plain(
                 hpx::util::bind(&hpx_driver::payload_thread_function,
-                    std::ref(*this))
+                    std::ref(*this), _1)
               , nullptr // No HPX-thread name.
               , hpx::threads::pending
               , false // Do not run immediately.
