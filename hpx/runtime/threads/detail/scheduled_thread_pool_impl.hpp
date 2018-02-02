@@ -349,7 +349,8 @@ namespace hpx { namespace threads { namespace detail
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::resume",
-                "cannot call resume from outside HPX, use resume_cb instead");
+                "cannot call resume from outside HPX, use resume_cb or"
+                "resume_direct instead");
             return hpx::make_ready_future();
         }
 
@@ -422,7 +423,8 @@ namespace hpx { namespace threads { namespace detail
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::suspend",
-                "cannot call suspend from outside HPX, use suspend_cb instead");
+                "cannot call suspend from outside HPX, use suspend_cb or"
+                "suspend_direct instead");
             return make_ready_future();
         }
         else if (threads::get_self_ptr() &&

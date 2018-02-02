@@ -97,7 +97,7 @@ namespace hpx { namespace threads { namespace detail
         error_code& ec)
     {
         HPX_ASSERT_MSG(false,
-            "Suspending io_service_thread_pool is not supported");
+            "Resuming io_service_thread_pool is not supported");
     }
 
     void io_service_thread_pool::resume_direct(error_code& ec)
@@ -153,7 +153,7 @@ namespace hpx { namespace threads { namespace detail
         error_code& ec)
     {
         HPX_ASSERT_MSG(false,
-            "Suspending threads on io_service_thread_pool is not supported");
+            "Resuming threads on io_service_thread_pool is not supported");
     }
 
 
