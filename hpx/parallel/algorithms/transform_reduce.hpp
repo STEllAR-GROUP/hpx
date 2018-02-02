@@ -288,7 +288,7 @@ namespace hpx { namespace parallel { inline namespace v1
     template <typename ExPolicy, typename FwdIter, typename T, typename Reduce,
         typename Convert,
     HPX_CONCEPT_REQUIRES_(
-        is_execution_policy<ExPolicy>::value &&
+        execution::is_execution_policy<ExPolicy>::value &&
         hpx::traits::is_iterator<FwdIter>::value &&
         hpx::traits::is_invocable<Convert,
                 typename std::iterator_traits<FwdIter>::value_type

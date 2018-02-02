@@ -46,6 +46,49 @@ namespace hpx { namespace parallel { namespace execution
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface processing_units_count()
+        template <typename Parameters_>
+        struct processing_units_count_parameter_helper
+        {
+            template <typename Parameters, typename Executor>
+            static std::size_t call(hpx::traits::detail::wrap_int,
+                Parameters && params, Executor && exec)
+            {
+                return hpx::get_os_thread_count();
+            }
+
+            template <typename Parameters, typename Executor>
+            static auto call(int, Parameters && params, Executor && exec)
+            ->  decltype(params.processing_units_count(
+                    std::forward<Executor>(exec)))
+            {
+                return params.processing_units_count(
+                    std::forward<Executor>(exec));
+            }
+
+            template <typename Executor>
+            static std::size_t call(Parameters_& params, Executor && exec)
+            {
+                return call(0, params, std::forward<Executor>(exec));
+            }
+
+            template <typename Parameters, typename Executor>
+            static std::size_t call(Parameters params, Executor && exec)
+            {
+                return call(static_cast<Parameters_&>(params),
+                    std::forward<Executor>(exec));
+            }
+        };
+
+        template <typename Parameters, typename Executor>
+        std::size_t call_processing_units_parameter_count(Parameters && params,
+            Executor && exec)
+        {
+            return processing_units_count_parameter_helper<
+                    typename hpx::util::decay_unwrap<Parameters>::type
+                >::call(std::forward<Parameters>(params),
+                    std::forward<Executor>(exec));
+        }
+
         template <typename Executor>
         struct processing_units_count_fn_helper<Executor,
             typename std::enable_if<
@@ -58,13 +101,11 @@ namespace hpx { namespace parallel { namespace execution
             HPX_FORCEINLINE static auto
             call(hpx::traits::detail::wrap_int, AnyExecutor && exec,
                     Parameters& params)
-            -> decltype(parallel::v3::detail::
-                    call_processing_units_parameter_count(params,
-                        std::forward<AnyExecutor>(exec)))
+            ->  decltype(call_processing_units_parameter_count(params,
+                    std::forward<AnyExecutor>(exec)))
             {
-                return parallel::v3::detail::
-                    call_processing_units_parameter_count(params,
-                        std::forward<AnyExecutor>(exec));
+                return call_processing_units_parameter_count(
+                    params, std::forward<AnyExecutor>(exec));
             }
 
             template <typename AnyExecutor, typename Parameters>

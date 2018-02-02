@@ -7,10 +7,12 @@
 // pool and executor
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/resource_partitioner.hpp>
+
+#include <hpx/async.hpp>
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
@@ -48,11 +50,11 @@ int hpx_main(int argc, char* argv[])
     // the test to fail
     hpx::threads::scheduled_executor exec_0_hp =
         hpx::threads::executors::pool_executor("default",
-        hpx::threads::thread_priority_high);
+            hpx::threads::thread_priority_high);
 
     hpx::threads::scheduled_executor exec_0 =
         hpx::threads::executors::pool_executor("default",
-        hpx::threads::thread_priority_default);
+            hpx::threads::thread_priority_default);
 
     std::vector<hpx::future<void>> lotsa_futures;
 

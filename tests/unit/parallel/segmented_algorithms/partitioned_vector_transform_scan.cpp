@@ -40,7 +40,7 @@ void test_transform_inclusive_scan(ExPolicy && policy,
     hpx::partitioned_vector<T> & xvalues, hpx::partitioned_vector<T> & out)
 {
     hpx::parallel::transform_inclusive_scan(policy, xvalues.begin(),
-        xvalues.end(), out.begin(), conv(), T(0), op());
+        xvalues.end(), out.begin(), op(), conv(), T(0));
 }
 
 template <typename ExPolicy, typename T>
@@ -50,7 +50,7 @@ test_transform_inclusive_scan_async(ExPolicy && policy,
 {
     hpx::parallel::transform_inclusive_scan(policy,
         xvalues.begin(), xvalues.end(), out.begin(),
-        conv(), T(0), op()).get();
+        op(), conv(), T(0)).get();
 }
 
 template <typename ExPolicy, typename T>
@@ -58,7 +58,7 @@ void test_transform_exclusive_scan(ExPolicy && policy,
     hpx::partitioned_vector<T> & xvalues, hpx::partitioned_vector<T> & out)
 {
     hpx::parallel::transform_exclusive_scan(policy, xvalues.begin(),
-        xvalues.end(), out.begin(), conv(), T(0), op());
+        xvalues.end(), out.begin(), T(0), op(), conv());
 }
 
 template <typename ExPolicy, typename T>
@@ -68,7 +68,7 @@ test_transform_exclusive_scan_async(ExPolicy && policy,
 {
     hpx::parallel::transform_exclusive_scan(policy,
         xvalues.begin(), xvalues.end(), out.begin(),
-        conv(), T(0), op()).get();
+        T(0), op(), conv()).get();
 }
 
 template <typename T>

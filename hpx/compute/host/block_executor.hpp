@@ -137,16 +137,16 @@ namespace hpx { namespace compute { namespace host
 
         template <typename F, typename Shape, typename ... Ts>
         std::vector<hpx::future<
-            typename hpx::parallel::v3::detail::bulk_async_execute_result<
+            typename parallel::execution::detail::bulk_function_result<
                 F, Shape, Ts...
-            >::type>
-        >
+            >::type
+        > >
         bulk_async_execute(F && f, Shape const& shape, Ts &&... ts)
         {
             std::vector<hpx::future<
-                typename hpx::parallel::v3::detail::bulk_async_execute_result<
-                        F, Shape, Ts...
-                    >::type
+                typename parallel::execution::detail::bulk_function_result<
+                    F, Shape, Ts...
+                >::type
             > > results;
             std::size_t cnt = util::size(shape);
             std::size_t part_size = cnt / executors_.size();
@@ -181,13 +181,13 @@ namespace hpx { namespace compute { namespace host
             }
         }
 
-        template <typename F, typename Shape, typename ... Ts>
-        typename hpx::parallel::v3::detail::bulk_execute_result<
+        template <typename F, typename Shape, typename... Ts>
+        typename parallel::execution::detail::bulk_execute_result<
             F, Shape, Ts...
         >::type
-        bulk_sync_execute(F && f, Shape const& shape, Ts &&... ts)
+        bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts)
         {
-            typename hpx::parallel::v3::detail::bulk_execute_result<
+            typename parallel::execution::detail::bulk_execute_result<
                     F, Shape, Ts...
                 >::type results;
             std::size_t cnt = util::size(shape);

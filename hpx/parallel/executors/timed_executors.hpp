@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <>
-        struct async_execute_at_helper<sequential_execution_tag>
+        struct async_execute_at_helper<sequenced_execution_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             static auto
@@ -294,7 +294,7 @@ namespace hpx { namespace parallel { namespace execution
         };
 
         template <>
-        struct post_at_helper<sequential_execution_tag>
+        struct post_at_helper<sequenced_execution_tag>
         {
             template <typename Executor, typename F, typename ... Ts>
             static void

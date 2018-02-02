@@ -220,7 +220,7 @@ namespace hpx { namespace threads
 
     void reset_continuation_recursion_count()
     {
-        delete continuation_recursion_count.get();
+        continuation_recursion_count.reset(nullptr);
     }
 
     ///////////////////////////////////////////////////////////////////////////

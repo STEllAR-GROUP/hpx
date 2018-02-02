@@ -35,12 +35,12 @@ those are configured correctly.
       the xsltproc tool). Consult the documentation for your platform on how
       to make this package available on your machine.]
     ]
-    [[`DOCBOOK_DTD_ROOT:PATH`]
+    [[`DOCBOOK_DTD_DIR:PATH`]
      [Specifies where to look for the installation of the docbook-xml-4.2
       package. This usually needs to refer to the directory containing the
       file `docbook.cat`, which is part of this package.]
     ]
-    [[`DOCBOOK_XSL_ROOT:PATH`]
+    [[`DOCBOOK_XSL_DIR:PATH`]
      [Specifies where to look for the installation of the docbook-xsl
       package. This usually needs to refer to the directory containing the
       file `catalog.xml`, which is part of this package.]

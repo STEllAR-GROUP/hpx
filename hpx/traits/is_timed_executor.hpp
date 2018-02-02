@@ -15,8 +15,6 @@
 namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct timed_executor_tag : executor_tag {};
-
     namespace detail
     {
         /// \cond NOINTERNAL

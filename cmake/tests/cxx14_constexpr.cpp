@@ -8,14 +8,28 @@
 
 constexpr void decrement(int& value) { --value; }
 
+struct S
+{
+    constexpr S() : ptr(nullptr) {}
+    constexpr void reset() { ptr = nullptr; }
+    constexpr void reset() const { }
+    void * ptr;
+};
+
 constexpr int zero()
 {
     int ret = 1;
     decrement(ret);
+
+    S s;
+    s.reset();
+
     return ret;
 }
 
 int main()
 {
     constexpr int i = zero();
+    S s;
+    s.reset();
 }

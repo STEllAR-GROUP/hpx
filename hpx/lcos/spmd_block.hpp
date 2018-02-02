@@ -10,7 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/broadcast.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/execution.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -289,15 +289,13 @@ namespace hpx { namespace lcos
                 std::size_t offset = hpx::get_locality_id();
                 offset *= images_per_locality;
 
-                hpx::parallel::executor_traits<
-                    executor_type
-                    >::bulk_execute(
-                        exec,
-                        detail::spmd_block_helper<F>{
-                            name,images_per_locality, num_images},
-                        boost::irange(
-                            offset, offset + images_per_locality),
-                        args...);
+                hpx::parallel::execution::bulk_sync_execute(
+                    exec,
+                    detail::spmd_block_helper<F>{
+                        name,images_per_locality, num_images},
+                    boost::irange(
+                        offset, offset + images_per_locality),
+                    args...);
             }
         };
     }
