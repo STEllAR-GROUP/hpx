@@ -356,9 +356,9 @@ void test_is_heap(bool test_for_is_heap = true)
 {
     using namespace hpx::parallel;
 
-    test_is_heap(execution::seq, IteratorTag(), test_for_is_heap);
-    test_is_heap(execution::par, IteratorTag(), test_for_is_heap);
-    test_is_heap(execution::par_unseq, IteratorTag(), test_for_is_heap);
+    test_is_heap(execution::seq, IteratorTag(), int(), test_for_is_heap);
+    test_is_heap(execution::par, IteratorTag(), int(), test_for_is_heap);
+    test_is_heap(execution::par_unseq, IteratorTag(), int(), test_for_is_heap);
 
     test_is_heap(execution::seq, IteratorTag(), user_defined_type(),
         test_for_is_heap);
