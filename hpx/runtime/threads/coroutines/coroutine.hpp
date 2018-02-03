@@ -57,8 +57,9 @@ namespace hpx { namespace threads { namespace coroutines
         typedef impl_type::thread_id_type thread_id_type;
 
         typedef impl_type::result_type result_type;
+        typedef impl_type::arg_type arg_type;
 
-        typedef util::unique_function_nonser<result_type()> functor_type;
+        typedef util::unique_function_nonser<result_type(arg_type)> functor_type;
 
         coroutine(functor_type&& f,
                 thread_id_type id,
@@ -107,9 +108,11 @@ namespace hpx { namespace threads { namespace coroutines
             impl_.rebind(std::move(f), id);
         }
 
-        HPX_FORCEINLINE result_type operator()()
+        HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())
         {
             HPX_ASSERT(impl_.is_ready());
+
+            impl_.bind_args(&arg);
 
             impl_.invoke();
 

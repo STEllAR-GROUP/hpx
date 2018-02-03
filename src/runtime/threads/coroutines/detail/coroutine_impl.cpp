@@ -75,33 +75,37 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         context_exit_status status = super_type::ctx_exited_return;
 
         // yield value once the thread function has finished executing
-        static result_type result_last(
+        result_type result_last(
             thread_state_enum::terminated, invalid_thread_id);
 
-        std::exception_ptr tinfo;
-        try
+        // loop as long this coroutine has been rebound
+        do
         {
+            std::exception_ptr tinfo;
+            try
             {
-                coroutine_self* old_self = coroutine_self::get_self();
-                coroutine_self self(this, old_self);
-                reset_self_on_exit on_exit(&self, old_self);
+                {
+                    coroutine_self* old_self = coroutine_self::get_self();
+                    coroutine_self self(this, old_self);
+                    reset_self_on_exit on_exit(&self, old_self);
 
-                result_last = m_fun();
-                HPX_ASSERT(result_last.first == thread_state_enum::terminated);
+                    result_last = m_fun(*this->args());
+                    HPX_ASSERT(result_last.first == thread_state_enum::terminated);
 
+                    this->reset();
+                }
+
+                // return value to other side of the fence
+                this->bind_result(result_last);
+            }
+            catch (...) {
+                status = super_type::ctx_exited_abnormally;
+                tinfo = std::current_exception();
                 this->reset();
             }
 
-            // return value to other side of the fence
-            this->bind_result(result_last);
-        }
-        catch (...) {
-            status = super_type::ctx_exited_abnormally;
-            tinfo = std::current_exception();
-            this->reset();
-        }
-
-        this->do_return(status, std::move(tinfo));
+            this->do_return(status, std::move(tinfo));
+        } while (this->m_state == super_type::ctx_running);
 
         // should not get here, never
         HPX_ASSERT(this->m_state == super_type::ctx_running);

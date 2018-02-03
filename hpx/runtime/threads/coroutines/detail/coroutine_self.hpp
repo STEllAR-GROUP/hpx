@@ -75,18 +75,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         typedef impl_type::thread_id_type thread_id_type;
 
         typedef impl_type::result_type result_type;
+        typedef impl_type::arg_type arg_type;
 
-        typedef util::function_nonser<void(result_type)>
+        typedef util::function_nonser<arg_type(result_type)>
             yield_decorator_type;
 
-        void yield(result_type arg)
+        arg_type yield(result_type arg = result_type())
         {
-            !yield_decorator_.empty() ?
+            return !yield_decorator_.empty() ?
                 yield_decorator_(std::move(arg)) :
                 yield_impl(std::move(arg));
         }
 
-        void yield_impl(result_type arg)
+        arg_type yield_impl(result_type arg)
         {
             HPX_ASSERT(m_pimpl);
 
@@ -96,6 +97,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 reset_self_on_exit on_exit(this);
                 this->m_pimpl->yield();
             }
+
+            return *m_pimpl->args();
         }
 
         template <typename F>

@@ -499,14 +499,13 @@ namespace hpx { namespace this_thread
             {
                 nextid->get_scheduler_base()->schedule_thread(
                     nextid.get(), std::size_t(-1));
-                self.yield(threads::thread_result_type(state,
+                statex = self.yield(threads::thread_result_type(state,
                     threads::invalid_thread_id));
             }
             else
             {
-                self.yield(threads::thread_result_type(state, nextid));
+                statex = self.yield(threads::thread_result_type(state, nextid));
             }
-            statex = id->get_state().state_ex();
         }
 
         // handle interruption, if needed
@@ -568,15 +567,15 @@ namespace hpx { namespace this_thread
             {
                 nextid->get_scheduler_base()->schedule_thread(
                     nextid.get(), std::size_t(-1));
-                self.yield(threads::thread_result_type(threads::suspended,
-                    threads::invalid_thread_id));
+                statex = self.yield(
+                    threads::thread_result_type(threads::suspended,
+                        threads::invalid_thread_id));
             }
             else
             {
-                self.yield(
+                statex = self.yield(
                     threads::thread_result_type(threads::suspended, nextid));
             }
-            statex = id->get_state().state_ex();
 
             if (statex != threads::wait_timeout)
             {
