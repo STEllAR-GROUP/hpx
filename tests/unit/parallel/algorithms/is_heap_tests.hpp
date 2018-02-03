@@ -67,8 +67,8 @@ struct user_defined_type
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag, typename DataType = int>
-void test_is_heap(ExPolicy policy, IteratorTag, DataType = DataType(),
+template <typename ExPolicy, typename IteratorTag, typename DataType>
+void test_is_heap(ExPolicy policy, IteratorTag, DataType,
     bool test_for_is_heap = true)
 {
     static_assert(
@@ -137,8 +137,8 @@ void test_is_heap_with_pred(ExPolicy policy, IteratorTag, DataType, Pred pred,
     }
 }
 
-template <typename ExPolicy, typename IteratorTag, typename DataType = int>
-void test_is_heap_async(ExPolicy policy, IteratorTag, DataType = DataType(),
+template <typename ExPolicy, typename IteratorTag, typename DataType>
+void test_is_heap_async(ExPolicy policy, IteratorTag, DataType,
     bool test_for_is_heap = true)
 {
     static_assert(
@@ -374,9 +374,9 @@ void test_is_heap(bool test_for_is_heap = true)
     test_is_heap_with_pred(execution::par_unseq, IteratorTag(), int(),
         std::greater_equal<int>(), test_for_is_heap);
 
-    test_is_heap_async(execution::seq(execution::task), IteratorTag(),
+    test_is_heap_async(execution::seq(execution::task), IteratorTag(), int(),
         test_for_is_heap);
-    test_is_heap_async(execution::par(execution::task), IteratorTag(),
+    test_is_heap_async(execution::par(execution::task), IteratorTag(), int(),
         test_for_is_heap);
 
     test_is_heap_async(execution::seq(execution::task), IteratorTag(),
