@@ -135,6 +135,14 @@ namespace hpx
         void stopped(bool blocking, compat::condition_variable& cond,
             compat::mutex& mtx);
 
+        /// \brief Suspend the runtime system
+        ///
+        int suspend();
+
+        /// \brief Resume the runtime system
+        ///
+        int resume();
+
         /// \brief Report a non-recoverable error to the runtime system
         ///
         /// \param num_thread [in] The number of the operating system thread

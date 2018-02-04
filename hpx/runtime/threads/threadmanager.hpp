@@ -158,7 +158,10 @@ namespace hpx { namespace threads
         ///
         void stop (bool blocking = true);
 
-        // \brief Resume all suspended threads.
+        // \brief Suspend all thread pools.
+        void suspend();
+
+        // \brief Resume all thread pools.
         void resume();
 
         /// \brief Return whether the thread manager is still running

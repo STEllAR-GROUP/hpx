@@ -84,6 +84,9 @@ namespace hpx { namespace util
         /// \brief Clear all internal data structures
         void clear();
 
+        /// \brief Wait for all work to be done
+        void wait();
+
         bool stopped();
 
         /// \brief Get an io_service to use.
@@ -117,6 +120,7 @@ namespace hpx { namespace util
         void stop_locked();
         void join_locked();
         void clear_locked();
+        void wait_locked();
 
     private:
         typedef std::unique_ptr<boost::asio::io_service> io_service_ptr;
@@ -163,6 +167,13 @@ namespace hpx { namespace util
 
         char const* pool_name_;
         char const* pool_name_postfix_;
+
+        /// Set to true if waiting for work to finish
+        bool waiting_;
+
+        // Barriers for waiting for work to finish on all worker threads
+        compat::barrier wait_barrier_;
+        compat::barrier continue_barrier_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

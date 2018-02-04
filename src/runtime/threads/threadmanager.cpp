@@ -8,9 +8,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -30,6 +33,7 @@
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
@@ -45,6 +49,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
@@ -1918,11 +1923,87 @@ namespace hpx { namespace threads
 #endif
     }
 
+    void threadmanager::suspend()
+    {
+        if (threads::get_self_ptr())
+        {
+            std::vector<hpx::future<void>> fs;
+
+            for (auto& pool_iter : pools_)
+            {
+                fs.push_back(pool_iter->suspend());
+            }
+
+            hpx::wait_all(fs);
+        }
+        else
+        {
+            for (auto& pool_iter : pools_)
+            {
+                compat::mutex mtx;
+                compat::condition_variable cond;
+                bool suspended = false;
+
+                pool_iter->suspend_cb(
+                    [&mtx, &cond, &suspended]()
+                    {
+                        {
+                            std::lock_guard<compat::mutex> lk(mtx);
+                            suspended = true;
+                        }
+
+                        // No need to lock mutex when notifying
+                        cond.notify_all();
+                    });
+
+                {
+                    std::unique_lock<compat::mutex> lk(mtx);
+                    while (!suspended)
+                        cond.wait(lk);
+                }
+            }
+        }
+    }
+
     void threadmanager::resume()
     {
-        for (auto& pool_iter : pools_)
+        if (threads::get_self_ptr())
         {
-            pool_iter->resume();
+            std::vector<hpx::future<void>> fs;
+
+            for (auto& pool_iter : pools_)
+            {
+                fs.push_back(pool_iter->resume());
+            }
+
+            hpx::wait_all(fs);
+        }
+        else
+        {
+            for (auto& pool_iter : pools_)
+            {
+                compat::mutex mtx;
+                compat::condition_variable cond;
+                bool resumed = false;
+
+                pool_iter->resume_cb(
+                    [&mtx, &cond, &resumed]()
+                    {
+                        {
+                            std::lock_guard<compat::mutex> lk(mtx);
+                            resumed = true;
+                        }
+
+                        // No need to lock mutex when notifying
+                        cond.notify_all();
+                    });
+
+                {
+                    std::unique_lock<compat::mutex> lk(mtx);
+                    while (!resumed)
+                        cond.wait(lk);
+                }
+            }
         }
     }
 
