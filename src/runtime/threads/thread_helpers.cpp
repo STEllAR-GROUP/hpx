@@ -474,7 +474,7 @@ namespace hpx { namespace this_thread
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = threads::get_self_id();
+        threads::thread_id_type id = self.get_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id, ec);
@@ -536,7 +536,7 @@ namespace hpx { namespace this_thread
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = threads::get_self_id();
+        threads::thread_id_type id = self.get_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id, ec);

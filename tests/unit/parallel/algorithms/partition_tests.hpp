@@ -187,7 +187,7 @@ void test_partition_exception(ExPolicy policy, IteratorTag)
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::size_t const size = 300007;
+    std::size_t const size = 30007;
     std::vector<int> c(size);
     std::iota(std::begin(c), std::end(c), std::rand());
 
@@ -217,7 +217,7 @@ void test_partition_exception_async(ExPolicy policy, IteratorTag)
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::size_t const size = 300007;
+    std::size_t const size = 30007;
     std::vector<int> c(size);
     std::iota(std::begin(c), std::end(c), std::rand());
 
@@ -255,7 +255,7 @@ void test_partition_bad_alloc(ExPolicy policy, IteratorTag)
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::size_t const size = 300007;
+    std::size_t const size = 30007;
     std::vector<int> c(size);
     std::iota(std::begin(c), std::end(c), std::rand());
 
@@ -284,7 +284,7 @@ void test_partition_bad_alloc_async(ExPolicy policy, IteratorTag)
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::size_t const size = 300007;
+    std::size_t const size = 30007;
     std::vector<int> c(size);
     std::iota(std::begin(c), std::end(c), std::rand());
 
@@ -314,7 +314,7 @@ template <typename ExPolicy, typename IteratorTag, typename DataType, typename P
 void test_partition(ExPolicy policy, IteratorTag, DataType, Pred pred,
     int rand_base)
 {
-    const std::size_t size = 300007u;
+    const std::size_t size = 30007;
     const int half_range = size / 10;
 
     test_partition(policy, IteratorTag(), DataType(), pred,
@@ -325,7 +325,7 @@ template <typename ExPolicy, typename IteratorTag, typename DataType, typename P
 void test_partition_async(ExPolicy policy, IteratorTag, DataType, Pred pred,
     int rand_base)
 {
-    const std::size_t size = 300007u;
+    const std::size_t size = 30007;
     const int half_range = size / 10;
 
     test_partition_async(policy, IteratorTag(), DataType(), pred,

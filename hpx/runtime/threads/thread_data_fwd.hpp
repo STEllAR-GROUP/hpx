@@ -50,8 +50,6 @@ namespace hpx { namespace threads
 
     typedef thread_result_type thread_function_sig(thread_arg_type);
     typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
-
-    HPX_CONSTEXPR_OR_CONST thread_id_type invalid_thread_id;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////

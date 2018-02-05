@@ -49,12 +49,6 @@ namespace hpx { namespace threads { namespace coroutines
     // on an already exited coroutine is undefined behavior.
     class coroutine_exited : public exception_base {};
 
-    // This exception is thrown on a coroutine invocation
-    // if a coroutine enter the wait state without
-    // returning a result. Note that calling invoke()
-    // on a waiting coroutine is undefined behavior.
-    class waiting : public exception_base {};
-
     class unknown_exception_tag {};
 
     // This exception is thrown on a coroutine invocation

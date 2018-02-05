@@ -16,7 +16,7 @@
 #include <vector>
 //
 #if defined(HPX_DEBUG)
-#define HPX_SORT_BY_KEY_TEST_SIZE (1 << 16)
+#define HPX_SORT_BY_KEY_TEST_SIZE (1 << 8)
 #else
 #define HPX_SORT_BY_KEY_TEST_SIZE (1 << 18)
 #endif

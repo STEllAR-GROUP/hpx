@@ -20,6 +20,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <cstddef>
 #include <exception>
 #include <functional>
 #include <mutex>
@@ -28,6 +29,22 @@
 namespace hpx { namespace lcos { namespace detail
 {
     future_data_refcnt_base::~future_data_refcnt_base() = default;
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct handle_continuation_recursion_count
+    {
+        handle_continuation_recursion_count()
+          : count_(threads::get_continuation_recursion_count())
+        {
+            ++count_;
+        }
+        ~handle_continuation_recursion_count()
+        {
+            --count_;
+        }
+
+        std::size_t& count_;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     static bool run_on_completed_on_new_thread(
@@ -115,12 +132,15 @@ namespace hpx { namespace lcos { namespace detail
 
     // deferred execution of a given continuation
     bool future_data_base<traits::detail::future_data_void>::
-        run_on_completed(completed_callback_type && on_completed,
+        run_on_completed(completed_callback_vector_type && on_completed,
         std::exception_ptr& ptr)
     {
         try {
-            hpx::util::annotate_function annotate(on_completed);
-            on_completed();
+            for (auto& func: on_completed)
+            {
+                hpx::util::annotate_function annotate(func);
+                func();
+            }
         }
         catch (...) {
             ptr = std::current_exception();
@@ -132,7 +152,7 @@ namespace hpx { namespace lcos { namespace detail
     // make sure continuation invocation does not recurse deeper than
     // allowed
     void future_data_base<traits::detail::future_data_void>::
-        handle_on_completed(completed_callback_type && on_completed)
+        handle_on_completed(completed_callback_vector_type && on_completed)
     {
         // We need to run the completion on a new thread if we are on a
         // non HPX thread.
@@ -194,19 +214,17 @@ namespace hpx { namespace lcos { namespace detail
 
         if (is_ready_locked(l)) {
 
-            HPX_ASSERT(!on_completed_);
+            HPX_ASSERT(on_completed_.empty());
 
             // invoke the callback (continuation) function right away
             l.unlock();
 
-            handle_on_completed(std::move(data_sink));
+            completed_callback_vector_type on_completed;
+            on_completed.push_back(std::move(data_sink));
+            handle_on_completed(std::move(on_completed));
         }
         else {
-            // store a combined callback wrapping the old and the new one
-            // make sure continuations are evaluated in the order they are
-            // attached
-            on_completed_ = compose_cb(
-                std::move(on_completed_), std::move(data_sink));
+            on_completed_.push_back(std::move(data_sink));
         }
     }
 
