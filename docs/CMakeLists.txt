@@ -47,6 +47,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/error.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/error_code.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception.hpp"

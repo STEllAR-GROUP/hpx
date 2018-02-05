@@ -588,6 +588,10 @@ init                                  "" "hpx\.init_id.*"
 # hpx/hpx_start.hpp
 start                                 "" "hpx\.start_id.*"
 
+# hpx/hpx_suspend.hpp
+resume                                "" "hpx\.suspend.*"
+suspend                               "" "hpx\.resume.*"
+
 # hpx/performance_counters/manage_counter_type.hpp
 install_counter_type                  "" "hpx\.performance_counters\.install_counter_type.*"
 
