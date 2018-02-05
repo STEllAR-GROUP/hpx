@@ -69,8 +69,13 @@ namespace detail
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
+#if BOOST_VERSION < 105800
+        typedef std::vector<completed_callback_type>
+            completed_callback_vector_type;
+#else
         typedef boost::container::small_vector<completed_callback_type, 3>
             completed_callback_vector_type;
+#endif
 
         typedef void has_future_data_refcnt_base;
 
@@ -397,8 +402,8 @@ namespace detail
                 return;
             }
 
-            completed_callback_vector_type on_completed;
-            on_completed.swap(on_completed_);
+            auto on_completed = std::move(on_completed_);
+            on_completed_ = completed_callback_vector_type();
 
             // set the data
             result_type* value_ptr =
@@ -443,8 +448,8 @@ namespace detail
                 return;
             }
 
-            completed_callback_vector_type on_completed;
-            on_completed.swap(on_completed_);
+            auto on_completed = std::move(on_completed_);
+            on_completed_ = completed_callback_vector_type();
 
             // set the data
             std::exception_ptr* exception_ptr =
@@ -536,8 +541,7 @@ namespace detail
             }
 
             state_ = empty;
-            on_completed_.clear();
-            on_completed_.shrink_to_fit();
+            on_completed_ = completed_callback_vector_type();
         }
 
         std::exception_ptr get_exception_ptr() const override
