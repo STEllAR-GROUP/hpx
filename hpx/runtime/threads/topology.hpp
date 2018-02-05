@@ -72,6 +72,8 @@ namespace hpx { namespace threads
         membind_mixed      = HWLOC_MEMBIND_MIXED
     };
 
+#include <hpx/config/warnings_prefix.hpp>
+
     struct topology
     {
         topology();
@@ -384,6 +386,8 @@ namespace hpx { namespace threads
         std::vector<mask_type> core_affinity_masks_;
         std::vector<mask_type> thread_affinity_masks_;
     };
+
+#include <hpx/config/warnings_suffix.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     struct topology_tag {};
