@@ -8,6 +8,7 @@
 #ifndef HPX_CONFIG_THREADS_STACK_HPP
 #define HPX_CONFIG_THREADS_STACK_HPP
 
+#include <hpx/config/debug.hpp>
 #include <hpx/config/defines.hpp>
 #include <hpx/config/compiler_specific.hpp>
 

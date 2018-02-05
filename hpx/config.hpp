@@ -20,6 +20,7 @@
 #include <hpx/config/compiler_native_tls.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
+#include <hpx/config/debug.hpp>
 #include <hpx/config/defines.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/config/export_definitions.hpp>
@@ -43,23 +44,6 @@
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
 #define _WINSOCKAPI_
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Make sure DEBUG macro is defined consistently across platforms
-#if defined(_DEBUG) && !defined(DEBUG)
-#  define DEBUG
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if defined(DEBUG) && !defined(HPX_DEBUG)
-#  define HPX_DEBUG
-#endif
-
-#if defined(HPX_DEBUG)
-#  define HPX_BUILD_TYPE debug
-#else
-#  define HPX_BUILD_TYPE release
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
