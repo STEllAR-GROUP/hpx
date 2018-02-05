@@ -28,7 +28,12 @@
 #include <hpx/util/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
+
+#if BOOST_VERSION < 105800
+#include <vector>
+#else
 #include <boost/container/small_vector.hpp>
+#endif
 
 #include <chrono>
 #include <cstddef>
