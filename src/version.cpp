@@ -26,13 +26,11 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 
+#include <hwloc.h>
+
 #include <cstdint>
 #include <sstream>
 #include <string>
-
-#if defined(HPX_HAVE_HWLOC)
-#include <hwloc.h>
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -201,7 +199,6 @@ namespace hpx
             BOOST_VERSION % 100);
     }
 
-#if defined(HPX_HAVE_HWLOC)
     std::string hwloc_version()
     {
         // HWLOC_API_VERSION: 0x00010700
@@ -210,7 +207,6 @@ namespace hpx
             HWLOC_API_VERSION / 0x100 % 0x100,
             HWLOC_API_VERSION % 0x100);
     }
-#endif
 
 #if defined(HPX_HAVE_MALLOC)
     std::string malloc_version()
@@ -240,9 +236,7 @@ namespace hpx
             "Versions:\n"
             "  HPX: %s\n"
             "  Boost: %s\n"
-#if defined(HPX_HAVE_HWLOC)
             "  Hwloc: %s\n"
-#endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             "  MPI: %s\n"
 #endif
@@ -255,9 +249,7 @@ namespace hpx
             "  Standard Library: %s\n",
             build_string(),
             boost_version(),
-#if defined(HPX_HAVE_HWLOC)
             hwloc_version(),
-#endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             mpi_version(),
 #endif

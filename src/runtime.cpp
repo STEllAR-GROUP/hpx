@@ -21,7 +21,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>

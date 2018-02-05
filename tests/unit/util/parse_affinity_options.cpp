@@ -24,7 +24,6 @@
 //#define VERIFY_AFFINITY_MASKS
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_HWLOC)
 namespace hpx { namespace threads { namespace detail
 {
     std::ostream& operator<<(std::ostream& os, spec_type const& data)
@@ -1102,17 +1101,14 @@ namespace test
         }
     }
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-#if defined(HPX_HAVE_HWLOC)
     {
         test::good();
         test::bad();
     }
-#endif
 
     return hpx::finalize();
 }

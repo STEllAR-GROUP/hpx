@@ -9,7 +9,6 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -1067,7 +1066,6 @@ namespace hpx { namespace util
 #endif
     }
 
-#if defined(HPX_HAVE_HWLOC)
     ///////////////////////////////////////////////////////////////////////////
     void handle_print_bind(boost::program_options::variables_map const& vm_,
         std::size_t num_threads)
@@ -1130,7 +1128,6 @@ namespace hpx { namespace util
             std::cout << strm.str();
         }
     }
-#endif
 
     void handle_list_parcelports()
     {

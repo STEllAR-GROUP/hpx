@@ -44,12 +44,11 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
       libraries).]
     ]
     [[`HWLOC_ROOT:PATH`]
-     [Specifies where to look for the __hwloc__ library. While it is not
-      necessary to compile __hpx__ with HWLOC, we strongly suggest you do so.
-      HWLOC provides platform independent support for extracting information
-      about the used hardware architecture (number of cores, number of NUMA
-      domains, hyperthreading, etc.). __hpx__ utilizes this information if
-      available.]
+     [Specifies where to look for the __hwloc__ library. Set this if CMake is
+      not able to locate a suitable version of __hwloc__. __hwloc__ provides
+      platform independent support for extracting information about the used
+      hardware architecture (number of cores, number of NUMA domains,
+      hyperthreading, etc.). __hpx__ utilizes this information if available.]
     ]
     [[`PAPI_ROOT:PATH`]
      [Specifies where to look for the __papi__ library. The PAPI library is

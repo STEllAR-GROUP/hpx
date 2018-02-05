@@ -8,7 +8,7 @@
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/format.hpp>
@@ -32,7 +32,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     std::size_t get_pu_offset(util::command_line_handling const& cfg)
     {
         std::size_t pu_offset = std::size_t(-1);
-#if defined(HPX_HAVE_HWLOC)
+
         if (cfg.pu_offset_ != std::size_t(-1))
         {
             pu_offset = cfg.pu_offset_;
@@ -44,14 +44,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                     "available processing units.");
             }
         }
-#endif
+
         return pu_offset;
     }
 
     std::size_t get_pu_step(util::command_line_handling const& cfg)
     {
         std::size_t pu_step = 1;
-#if defined(HPX_HAVE_HWLOC)
+
         if (cfg.pu_step_ != 1)
         {
             pu_step = cfg.pu_step_;
@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                     "number of available processing units.");
             }
         }
-#endif
+
         return pu_step;
     }
 
@@ -132,7 +132,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         auto const& topo = threads::create_topology();
 
-#if defined(HPX_HAVE_HWLOC)
         std::string affinity_desc;
         hpx::detail::get_affinity_description(cfg_, affinity_desc);
         if (affinity_desc == "none")
@@ -172,7 +171,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                 pu_offset_ += topo.get_number_of_core_pus(num_core);
             }
         }
-#endif
 
         // correct used_cores from config data if appropriate
         if (used_cores_ == 0)

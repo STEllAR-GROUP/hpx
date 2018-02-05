@@ -9,11 +9,11 @@
 #define HPX_THREADMANAGER_MAY_20_2008_840AM
 
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 
 #endif
 

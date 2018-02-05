@@ -308,10 +308,6 @@ In addition to the syntax described below one can use `--hpx:bind=none` to
 disable all binding of any threads to a particular core. This is mostly
 supported for debugging purposes.
 
-[note This command line option is only available if __hpx__ was built with
-      support for HWLOC (__hwloc__) enabled. Please see __cmake_options__ for more
-      details on how to enable support for HWLOC in __hpx__.]
-
 The specified affinities refer to specific regions within a machine hardware
 topology. In order to understand the hardware topology of a particular machine
 it may be useful to run the lstopo tool which is part of __hwloc__ to see the
