@@ -217,6 +217,32 @@ public:
     {
     }
 
+    hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type) const
+    {
+        return hwloc_bitmap_ptr();
+    }
+
+    void* allocate_membind(std::size_t len, hwloc_bitmap_ptr,
+        hpx_hwloc_membind_policy, int) const
+    {
+        return allocate(len);
+    }
+
+    mask_type get_area_membind_nodeset(const void*, std::size_t, void*) const
+    {
+        return mask_type(0);
+    }
+
+    bool set_area_membind_nodeset(const void*, std::size_t, void*) const
+    {
+        return true;
+    }
+
+    int get_numa_domain(const void*, void*) const
+    {
+        return 0;
+    }
+
     struct noop_topology_tag {};
 
     void write_to_log() const {}

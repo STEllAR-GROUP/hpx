@@ -717,7 +717,7 @@ namespace hpx { namespace threads
 
             case resource::throttle:
             {
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 hpx::detail::ensure_high_priority_compatibility(cfg_.vm_);
