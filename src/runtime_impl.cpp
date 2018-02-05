@@ -27,11 +27,11 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -556,7 +556,7 @@ namespace hpx {
             return -1;
         }
 
-        util::detail::yield_while(
+        util::yield_while(
             [this]()
             {
                 return thread_manager_->get_thread_count() >

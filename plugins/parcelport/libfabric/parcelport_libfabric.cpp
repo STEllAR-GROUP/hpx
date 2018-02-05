@@ -364,7 +364,7 @@ namespace libfabric
     // --------------------------------------------------------------------
     bool parcelport::can_send_immediate()
     {
-        // hpx::util::detail::yield_while([this]()
+        // hpx::util::yield_while([this]()
         //     {
         //         this->background_work(0);
         //         return this->senders_.empty();

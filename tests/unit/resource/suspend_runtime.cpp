@@ -10,8 +10,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <cstddef>
 #include <string>
@@ -29,10 +29,8 @@ int main(int argc, char* argv[])
 
     // Wait for runtime to start
     hpx::runtime* rt = hpx::get_runtime_ptr();
-    hpx::util::detail::yield_while([rt]()
-        {
-            return rt->get_state() < hpx::state_running;
-        }, "");
+    hpx::util::yield_while([rt]()
+        { return rt->get_state() < hpx::state_running; });
 
     hpx::suspend();
 
