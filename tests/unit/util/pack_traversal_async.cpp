@@ -19,10 +19,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 #include <array>
-#endif
 
 using hpx::util::async_traverse_complete_tag;
 using hpx::util::async_traverse_detach_tag;
@@ -252,7 +249,6 @@ struct common_container_factory
     }
 };
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
 template <typename T>
 struct array_container_factory
 {
@@ -262,7 +258,6 @@ struct array_container_factory
         return Array{{std::forward<Args>(args)...}};
     }
 };
-#endif
 
 static void test_async_container_traversal()
 {
@@ -281,12 +276,10 @@ static void test_async_container_traversal()
         test_async_container_traversal_impl(factory);
     }
 
-#if defined(HPX_HAVE_CXX11_STD_ARRAY)
     {
         array_container_factory<std::size_t> factory;
         test_async_container_traversal_impl(factory);
     }
-#endif
 }
 
 static void test_async_tuple_like_traversal()
