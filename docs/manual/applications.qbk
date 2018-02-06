@@ -224,8 +224,10 @@ hpx/hpx_suspend.hpp `hpx/hpx_suspend.hpp`].
         return ``[funcref hpx::stop `hpx::stop`]``();
     }
 
-[note `hpx::suspend` does not wait for `hpx::finalize` to be called. Only call
-      `hpx::finalize` when you wish to fully stop the __hpx__ runtime.]
+[note [funcref hpx::suspend `hpx::suspend`] does not wait for [funcref
+      hpx::finalize `hpx::finalize]` to be called. Only call [funcref
+      hpx::finalize `hpx::finalize]` when you wish to fully stop the __hpx__
+      runtime.]
 
 __hpx__ also supports suspending individual thread pools and threads. For
 details on how to do that see the documentation for [classref
