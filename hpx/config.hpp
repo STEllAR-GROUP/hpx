@@ -402,9 +402,9 @@
 #  endif
 #endif
 
-#if !defined(HPX_HAVE_VERIFY_LOCKS_GLOBALY)
+#if !defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
 #  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS_GLOBALY
+#    define HPX_HAVE_VERIFY_LOCKS_GLOBALLY
 #  endif
 #endif
 
