@@ -12,7 +12,6 @@
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
-#include <hpx/parallel/executors/thread_pool_attached_executors.hpp>
 #include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/deferred_call.hpp>
