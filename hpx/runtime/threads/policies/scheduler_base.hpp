@@ -12,9 +12,9 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util_fwd.hpp>
@@ -92,13 +92,13 @@ namespace hpx { namespace threads { namespace policies
         {
         }
 
-        threads::detail::thread_pool_base *get_parent_pool()
+        threads::thread_pool_base *get_parent_pool()
         {
             HPX_ASSERT(parent_pool_ != nullptr);
             return parent_pool_;
         }
 
-        void set_parent_pool(threads::detail::thread_pool_base *p)
+        void set_parent_pool(threads::thread_pool_base *p)
         {
             HPX_ASSERT(parent_pool_ == nullptr);
             parent_pool_ = p;
@@ -431,7 +431,7 @@ namespace hpx { namespace threads { namespace policies
         char const* description_;
 
         // the pool that owns this scheduler
-        threads::detail::thread_pool_base *parent_pool_;
+        threads::thread_pool_base *parent_pool_;
 
         std::atomic<std::int64_t> background_thread_count_;
 

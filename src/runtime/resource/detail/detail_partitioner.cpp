@@ -8,8 +8,8 @@
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/static.hpp>

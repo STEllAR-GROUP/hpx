@@ -42,7 +42,7 @@ int hpx_main(int argc, char* argv[])
 
     HPX_TEST(exception_thrown);
 
-    hpx::threads::detail::thread_pool_base& worker_pool =
+    hpx::threads::thread_pool_base& worker_pool =
         hpx::resource::get_thread_pool("worker");
     hpx::threads::executors::pool_executor worker_exec("worker");
     std::size_t const worker_pool_threads =
@@ -151,7 +151,7 @@ void test_scheduler(int argc, char* argv[])
         [](hpx::threads::policies::callback_notifier& notifier,
             std::size_t num_threads, std::size_t thread_offset,
             std::size_t pool_index, std::string const& pool_name)
-        -> std::unique_ptr<hpx::threads::detail::thread_pool_base>
+        -> std::unique_ptr<hpx::threads::thread_pool_base>
         {
             typename Scheduler::init_parameter_type init(num_threads);
             std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
@@ -162,7 +162,7 @@ void test_scheduler(int argc, char* argv[])
                 hpx::threads::policies::delay_exit |
                 hpx::threads::policies::enable_elasticity);
 
-            std::unique_ptr<hpx::threads::detail::thread_pool_base> pool(
+            std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
                     std::move(scheduler), notifier, pool_index, pool_name, mode,
                     thread_offset));

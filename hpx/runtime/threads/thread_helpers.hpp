@@ -454,7 +454,7 @@ namespace hpx { namespace threads
     ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
-    HPX_EXPORT threads::detail::thread_pool_base*
+    HPX_EXPORT threads::thread_pool_base*
         get_pool(thread_id_type const& id, error_code& ec = throws);
 
     /// \cond NOINTERNAL
@@ -673,8 +673,7 @@ namespace hpx { namespace this_thread
     ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
-    HPX_EXPORT threads::detail::thread_pool_base*
-        get_pool(error_code& ec = throws);
+    HPX_EXPORT threads::thread_pool_base* get_pool(error_code& ec = throws);
 
     /// \cond NOINTERNAL
     // returns the remaining available stack space

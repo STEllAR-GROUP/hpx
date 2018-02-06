@@ -54,13 +54,13 @@ namespace hpx { namespace resource
         return get_partitioner().get_pool_name(pool_index);
     }
 
-    threads::detail::thread_pool_base& get_thread_pool(
+    threads::thread_pool_base& get_thread_pool(
         std::string const& pool_name)
     {
         return get_runtime().get_thread_manager().get_pool(pool_name);
     }
 
-    threads::detail::thread_pool_base& get_thread_pool(std::size_t pool_index)
+    threads::thread_pool_base& get_thread_pool(std::size_t pool_index)
     {
         return get_thread_pool(get_pool_name(pool_index));
     }
