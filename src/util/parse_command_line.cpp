@@ -497,6 +497,9 @@ namespace hpx { namespace util
                 ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the timing log channel and send all "
                   "timing logs to the target destination")
+                ("hpx:debug-app-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the application log channel and send all "
+                  "application logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)

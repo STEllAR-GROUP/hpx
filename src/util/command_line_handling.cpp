@@ -882,11 +882,23 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.console.timing.level=1";
             ini_config += "hpx.logging.timing.level=1";
         }
+
+        if (vm.count("hpx:debug-app-log")) {
+            ini_config += "hpx.logging.console.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.console.application.level=5";
+            ini_config += "hpx.logging.application.level=5";
+        }
 #else
         if (vm.count("hpx:debug-hpx-log") ||
             vm.count("hpx:debug-agas-log") ||
             vm.count("hpx:debug-parcel-log") ||
-            vm.count("hpx:debug-timing-log"))
+            vm.count("hpx:debug-timing-log") ||
+            vm.count("hpx:debug-app-log"))
         {
             throw hpx::detail::command_line_error(
                 "Command line option error: can't enable logging while it "
