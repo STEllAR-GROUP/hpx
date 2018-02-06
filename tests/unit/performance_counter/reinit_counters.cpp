@@ -30,7 +30,7 @@ public:
       : hpx::performance_counters::base_performance_counter<test_counter>(info)
       , base_counter_(0)
     {
-        value_count_ = std::rand();
+        value_count_ = std::rand() % 100;
     }
 
     hpx::performance_counters::counter_values_array get_counter_values_array(
