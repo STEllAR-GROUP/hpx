@@ -42,9 +42,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             thread_priority priority, thread_stacksize stacksize)
       : first_thread_(first_thread),
         num_threads_(num_threads),
-        os_thread_(0),
-        priority_(priority),
-        stacksize_(stacksize)
+        os_thread_(0)
     {
 //         if (first_thread + num_threads > hpx::get_os_thread_count())
 //         {

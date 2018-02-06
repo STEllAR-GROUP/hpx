@@ -81,8 +81,6 @@ namespace hpx { namespace threads { namespace executors
             std::size_t first_thread_;
             std::size_t num_threads_;
             std::atomic<std::size_t> os_thread_;
-            thread_priority priority_;
-            thread_stacksize stacksize_;
         };
     }
 

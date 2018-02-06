@@ -22,16 +22,12 @@
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     default_executor::default_executor()
-      : stacksize_(thread_stacksize_default),
-        priority_(thread_priority_default),
-        schedulehint_(thread_schedule_hint_none)
+      : scheduled_executor_base()
     {}
 
     default_executor::default_executor(thread_priority priority,
         thread_stacksize stacksize, thread_schedule_hint schedulehint)
-      : stacksize_(stacksize),
-        priority_(priority),
-        schedulehint_(schedulehint)
+      : scheduled_executor_base(priority, stacksize, schedulehint)
     {}
 
     // Schedule the specified function for execution in this executor.
