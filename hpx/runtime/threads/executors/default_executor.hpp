@@ -78,11 +78,6 @@ namespace hpx { namespace threads { namespace executors
             // Return the requested policy element
             std::size_t get_policy_element(
                 threads::detail::executor_parameter p, error_code& ec) const;
-
-        private:
-            thread_stacksize stacksize_;
-            thread_priority priority_;
-            thread_schedule_hint schedulehint_;
         };
     }
 

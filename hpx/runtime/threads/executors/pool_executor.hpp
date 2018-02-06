@@ -85,10 +85,6 @@ namespace hpx { namespace threads { namespace executors
             // the scheduler used by this executor
             pool_type& pool_;
 
-            // task properties
-            thread_stacksize stacksize_;
-            thread_priority priority_;
-
             // protect scheduler initialization
             typedef compat::mutex mutex_type;
             mutable mutex_type mtx_;
