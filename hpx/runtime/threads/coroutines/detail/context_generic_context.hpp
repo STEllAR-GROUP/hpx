@@ -187,6 +187,7 @@ namespace hpx { namespace threads { namespace coroutines
         }
 #endif
 
+        template <typename CoroutineImpl>
         class fcontext_context_impl
         {
         public:
@@ -195,27 +196,13 @@ namespace hpx { namespace threads { namespace coroutines
         public:
             typedef fcontext_context_impl context_impl_base;
 
-            fcontext_context_impl()
-#if BOOST_VERSION < 106100
-              : cb_(0)
-#else
-              : cb_(std::make_pair(nullptr, nullptr))
-#endif
-              , funp_(0)
-              , ctx_(0)
-              , alloc_()
-              , stack_size_(0)
-              , stack_pointer_(0)
-            {}
-
             // Create a context that on restore invokes Functor on
             // a new stack. The stack size can be optionally specified.
-            template <typename Functor>
-            fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
+            explicit fcontext_context_impl(std::ptrdiff_t stack_size)
 #if BOOST_VERSION < 106100
-              : cb_(reinterpret_cast<intptr_t>(&cb))
+              : cb_(reinterpret_cast<intptr_t>(this))
 #else
-              : cb_(std::make_pair(reinterpret_cast<void*>(&cb), nullptr))
+              : cb_(std::make_pair(reinterpret_cast<void*>(this), nullptr))
 #endif
               , funp_(&trampoline<Functor>)
               , ctx_(0)
@@ -224,8 +211,14 @@ namespace hpx { namespace threads { namespace coroutines
                     (stack_size == -1) ?
                     alloc_.minimum_stacksize() : std::size_t(stack_size)
                 )
-              , stack_pointer_(alloc_.allocate(stack_size_))
+              , stack_pointer_(nullptr)
+            {}
+
+            void init()
             {
+                if (stack_pointer_ != nullptr) return;
+
+                stack_pointer_ = alloc_.allocate(stack_size_);
 #if BOOST_VERSION < 106100
                 ctx_ =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
@@ -314,8 +307,6 @@ namespace hpx { namespace threads { namespace coroutines
             std::size_t stack_size_;
             void * stack_pointer_;
         };
-
-        typedef fcontext_context_impl context_impl;
     }}
 }}}
 
