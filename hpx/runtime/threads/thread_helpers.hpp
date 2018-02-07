@@ -23,6 +23,7 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -104,10 +105,22 @@ namespace hpx { namespace threads
     ///                   of hpx#exception.
     HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type const& id,
         util::steady_time_point const& abs_time,
+        std::atomic<bool>* started,
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
         error_code& ec = throws);
+
+    inline thread_id_type set_thread_state(thread_id_type const& id,
+        util::steady_time_point const& abs_time,
+        thread_state_enum state = pending,
+        thread_state_ex_enum stateex = wait_timeout,
+        thread_priority priority = thread_priority_normal,
+        error_code& ec = throws)
+    {
+        return set_thread_state(id, abs_time, nullptr, state, stateex,
+            priority, throws);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
