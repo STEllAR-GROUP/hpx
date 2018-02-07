@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/assert.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
@@ -579,6 +580,9 @@ namespace hpx { namespace this_thread
 
             if (statex != threads::wait_timeout)
             {
+                HPX_ASSERT(
+                    statex == threads::wait_abort ||
+                    statex == threads::wait_signaled);
                 error_code ec1(lightweight);    // do not throw
                 threads::set_thread_state(timer_id,
                     threads::pending, threads::wait_abort,
