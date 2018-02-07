@@ -80,7 +80,6 @@ namespace hpx { namespace threads
 
         virtual void stop(
             std::unique_lock<compat::mutex>& l, bool blocking = true) = 0;
-        /// \endcond
 
         virtual void print_pool(std::ostream&) = 0;
 
@@ -88,6 +87,7 @@ namespace hpx { namespace threads
         {
             return id_;
         }
+        /// \endcond
 
         /// Resumes the thread pool. When the all OS threads on the thread pool
         /// have been resumed the returned future will be ready.
@@ -100,7 +100,6 @@ namespace hpx { namespace threads
         /// be called when all OS threads on the thread pool have been resumed.
         ///
         /// \param callback [in] called when the thread pool has been resumed.
-        ///
         /// \param ec       [in,out] this represents the error status on exit, if this
         ///                 is pre-initialized to \a hpx#throws the function will throw
         ///                 on error instead.
@@ -327,8 +326,6 @@ namespace hpx { namespace threads
         ///////////////////////////////////////////////////////////////////////
         // detail::manage_executor implementation
 
-        /// \endcond
-
         /// \brief Return the requested policy element.
         virtual std::size_t get_policy_element(detail::executor_parameter p,
             error_code& ec = throws) const = 0;
@@ -337,7 +334,6 @@ namespace hpx { namespace threads
         virtual void get_statistics(executor_statistics& stats,
             error_code& ec = throws) const = 0;
 
-        /// \cond NOINTERNAL
         // \brief Provide the given processing unit to the scheduler.
         virtual void add_processing_unit(std::size_t virt_core,
             std::size_t thread_num, error_code& ec = throws) = 0;
@@ -345,6 +341,10 @@ namespace hpx { namespace threads
         // \brief Remove the given processing unit from the scheduler.
         virtual void remove_processing_unit(std::size_t thread_num,
             error_code& ec = throws) = 0;
+
+        // \brief Return the description string of the underlying scheduler.
+        char const* get_description() const;
+
         /// \endcond
 
         /// Suspends the given processing unit. When the processing unit has
@@ -395,15 +395,13 @@ namespace hpx { namespace threads
             std::function<void(void)> callback, std::size_t virt_core,
                 error_code& ec = throws) = 0;
 
-        /// \cond NOINTERNAL
-        // return the description string of the underlying scheduler
-        char const* get_description() const;
-
     protected:
+        /// \cond NOINTERNAL
         void init_pool_time_scale();
         /// \endcond
 
     protected:
+        /// \cond NOINTERNAL
         pool_id_type id_;
 
         // Mode of operation of the pool
@@ -421,6 +419,7 @@ namespace hpx { namespace threads
 
         // callback functions to invoke at start, stop, and error
         threads::policies::callback_notifier& notifier_;
+        /// \endcond
     };
 }}
 
