@@ -102,11 +102,20 @@ namespace hpx { namespace threads { namespace executors
                 const_cast<Executor&>(executor_),
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            p.apply(
-                launch::async,
-                executor_.get_priority(),
-                executor_.get_stacksize(),
-                threads::thread_schedule_hint(domain+32768));
+            if (executor_.get_priority() == hpx::threads::thread_priority_high) {
+                p.apply(
+                    hpx::launch::sync,
+                    executor_.get_priority(),
+                    executor_.get_stacksize(),
+                    threads::thread_schedule_hint(domain+32768));
+            }
+            else {
+                p.apply(
+                    hpx::launch::async,
+                    executor_.get_priority(),
+                    executor_.get_stacksize(),
+                    threads::thread_schedule_hint(domain+32768));
+            }
 
             return p.get_future();
         }
@@ -146,11 +155,20 @@ namespace hpx { namespace threads { namespace executors
                                     std::forward<Ts>(ts)...)
             );
 
-            p.apply(
-                launch::async,
-                executor_.get_priority(),
-                executor_.get_stacksize(),
-                threads::thread_schedule_hint(domain+32768));
+            if (executor_.get_priority() == hpx::threads::thread_priority_high) {
+                p.apply(
+                    hpx::launch::sync,
+                    executor_.get_priority(),
+                    executor_.get_stacksize(),
+                    threads::thread_schedule_hint(domain+32768));
+            }
+            else {
+                p.apply(
+                    hpx::launch::async,
+                    executor_.get_priority(),
+                    executor_.get_stacksize(),
+                    threads::thread_schedule_hint(domain+32768));
+            }
 
             return p.get_future();
         }
@@ -229,7 +247,7 @@ namespace hpx { namespace threads { namespace executors
             // hold onto the function until all futures have become ready
             // by using a dataflow operation, then call the scheduling hint
             // before passing the task onwards to the real executor
-            return dataflow(
+            return dataflow(launch::sync,
                 util::unwrapping(
                     pre_execution_async_domain_schedule<pool_executor,
                         pool_numa_hint<H,Tag>> {
@@ -391,6 +409,9 @@ namespace hpx { namespace threads { namespace executors
                 predecessor
             );
 
+            // invoke the hint function with the unwrapped tuple futures
+            int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
+
 #ifdef GUIDED_EXECUTOR_DEBUG
             std::cout << "dataflow      : Predecessor : "
                       << debug::print_type<util::tuple<InnerFutures...>>()
@@ -400,11 +421,9 @@ namespace hpx { namespace threads { namespace executors
                       << "\n"
                       << "dataflow-frame: Result      : "
                       << debug::print_type<Result>() << "\n";
-#endif
 
-            // invoke the hint function with the unwrapped tuple futures
-            int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
-//            std::cout << "dataflow returning " << domain << "\n";
+            std::cout << "dataflow hint returning " << domain << "\n";
+#endif
 
             // forward the task execution on to the real internal executor
             lcos::local::futures_factory<result_type()> p(
@@ -417,12 +436,20 @@ namespace hpx { namespace threads { namespace executors
                 )
             );
 
-            p.apply(
-                launch::async,
-                threads::thread_priority_default,
-                threads::thread_stacksize_default,
-                threads::thread_schedule_hint(domain+32768));
-
+            if (pool_executor_.get_priority() == hpx::threads::thread_priority_high) {
+                p.apply(
+                    hpx::launch::sync,
+                    pool_executor_.get_priority(),
+                    pool_executor_.get_stacksize(),
+                    threads::thread_schedule_hint(domain+32768));
+            }
+            else {
+                p.apply(
+                    hpx::launch::async,
+                    pool_executor_.get_priority(),
+                    pool_executor_.get_stacksize(),
+                    threads::thread_schedule_hint(domain+32768));
+            }
             return p.get_future();
         }
 
@@ -509,7 +536,7 @@ namespace hpx { namespace threads { namespace executors
                         std::forward<Future>(predecessor), pool_exec_,
                         std::move(func));
 
-                return hpx::traits::future_access<hpx::lcos::future<result_type> >::
+                return hpx::traits::future_access<hpx::lcos::future<result_type>>::
                     create(std::move(p));
             }
         }
