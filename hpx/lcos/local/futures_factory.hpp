@@ -111,15 +111,14 @@ namespace hpx { namespace lcos { namespace local
                         threads::thread_priority_boost, get_worker_thread_num(),
                         stacksize, ec);
                 }
-                else {
-                    threads::register_thread_nullary(
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_, "task_object::apply"),
-                        threads::pending, false, priority, std::size_t(-1),
-                        stacksize, ec);
-                    return threads::invalid_thread_id;
-                }
+
+                threads::register_thread_nullary(
+                    util::deferred_call(
+                        &base_type::run_impl, std::move(this_)),
+                    util::thread_description(f_, "task_object::apply"),
+                    threads::pending, false, priority, std::size_t(-1),
+                    stacksize, ec);
+                return threads::invalid_thread_id;
             }
         };
 

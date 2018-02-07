@@ -26,9 +26,9 @@ namespace hpx { namespace threads { namespace policies
             void(std::size_t, std::exception_ptr const&)> on_error_type;
 
     public:
-        callback_notifier(on_startstop_type start = on_startstop_type(),
-            on_startstop_type stop = on_startstop_type(),
-            on_error_type on_err = on_error_type())
+        callback_notifier(on_startstop_type const& start = on_startstop_type(),
+            on_startstop_type const& stop = on_startstop_type(),
+            on_error_type const& on_err = on_error_type())
           : on_start_thread_(start), on_stop_thread_(stop), on_error_(on_err)
         {}
 

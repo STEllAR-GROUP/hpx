@@ -86,8 +86,8 @@ namespace hpx { namespace actions { namespace detail
     {
         if (has_continuation)
             return new transfer_continuation_action<Action>();
-        else
-            return new transfer_action<Action>();
+
+        return new transfer_action<Action>();
     }
 
     template <typename Action>

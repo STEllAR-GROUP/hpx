@@ -363,11 +363,9 @@ namespace hpx { namespace detail
                         return sync_local_invoke<action_type, result_type>::call(
                             id, std::move(addr), std::forward<Ts>(vs)...);
                     }
-                    else
-                    {
-                        f = hpx::async(action_invoker<action_type>(),
-                                addr.address_, addr.type_, std::forward<Ts>(vs)...);
-                    }
+
+                    f = hpx::async(action_invoker<action_type>(),
+                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
 
                     return keep_alive(std::move(f), id, std::move(r.second));
                 }
@@ -379,11 +377,9 @@ namespace hpx { namespace detail
                     return sync_local_invoke<action_type, result_type>::call(
                         id, std::move(addr), std::forward<Ts>(vs)...);
                 }
-                else
-                {
-                    f = hpx::async(action_invoker<action_type>(),
-                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
-                }
+
+                f = hpx::async(action_invoker<action_type>(),
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
 
                 return keep_alive(std::move(f), id);
             }

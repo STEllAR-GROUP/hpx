@@ -298,13 +298,11 @@ namespace hpx { namespace actions
                         typename Derived::thread_function()),
                         lva, comptype, std::forward<Ts>(vs)...));
             }
-            else
-            {
-                return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(
-                        typename Derived::thread_function(target)),
-                        lva, comptype, std::forward<Ts>(vs)...));
-            }
+
+            return traits::action_decorate_function<Derived>::call(lva,
+                util::bind(util::one_shot(
+                    typename Derived::thread_function(target)),
+                    lva, comptype, std::forward<Ts>(vs)...));
         }
 
         // This static construct_thread_function allows to construct
@@ -328,12 +326,10 @@ namespace hpx { namespace actions
                     thread_function(std::move(cont), lva, invoker(),
                         lva, comptype, std::forward<Ts>(vs)...));
             }
-            else
-            {
-                return traits::action_decorate_function<Derived>::call(lva,
-                    thread_function(target, std::move(cont), lva, invoker(),
-                        lva, comptype, std::forward<Ts>(vs)...));
-            }
+
+            return traits::action_decorate_function<Derived>::call(lva,
+                thread_function(target, std::move(cont), lva, invoker(),
+                    lva, comptype, std::forward<Ts>(vs)...));
         }
 
         // direct execution
