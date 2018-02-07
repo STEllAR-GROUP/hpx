@@ -28,7 +28,14 @@
 #include <hpx/util/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
+
+// NOTE: small_vector was introduced in 1.58 but seems to be buggy in that
+// version, so use only from 1.59 onwards.
+#if BOOST_VERSION < 105900
+#include <vector>
+#else
 #include <boost/container/small_vector.hpp>
+#endif
 
 #include <chrono>
 #include <cstddef>
@@ -69,8 +76,13 @@ namespace detail
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
+#if BOOST_VERSION < 105900
+        typedef std::vector<completed_callback_type>
+            completed_callback_vector_type;
+#else
         typedef boost::container::small_vector<completed_callback_type, 3>
             completed_callback_vector_type;
+#endif
 
         typedef void has_future_data_refcnt_base;
 
@@ -397,8 +409,8 @@ namespace detail
                 return;
             }
 
-            completed_callback_vector_type on_completed;
-            on_completed.swap(on_completed_);
+            auto on_completed = std::move(on_completed_);
+            on_completed_ = completed_callback_vector_type();
 
             // set the data
             result_type* value_ptr =
@@ -443,8 +455,8 @@ namespace detail
                 return;
             }
 
-            completed_callback_vector_type on_completed;
-            on_completed.swap(on_completed_);
+            auto on_completed = std::move(on_completed_);
+            on_completed_ = completed_callback_vector_type();
 
             // set the data
             std::exception_ptr* exception_ptr =
@@ -536,8 +548,7 @@ namespace detail
             }
 
             state_ = empty;
-            on_completed_.clear();
-            on_completed_.shrink_to_fit();
+            on_completed_ = completed_callback_vector_type();
         }
 
         std::exception_ptr get_exception_ptr() const override

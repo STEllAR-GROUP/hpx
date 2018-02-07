@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER) && defined(HPX_HAVE_HWLOC)
+#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>

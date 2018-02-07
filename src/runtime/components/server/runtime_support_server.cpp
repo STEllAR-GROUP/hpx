@@ -1061,13 +1061,12 @@ namespace hpx { namespace components { namespace server
                     util::allow_unregistered | util::report_missing_config_file,
                     get_runtime_mode_from_name(runtime_mode));
 
-#if defined(HPX_HAVE_HWLOC)
                 if (vm.count("hpx:print-bind")) {
                     std::size_t num_threads = boost::lexical_cast<std::size_t>(
                         ini.get_entry("hpx.os_threads", 1));
                     util::handle_print_bind(vm, num_threads);
                 }
-#endif
+
                 if (vm.count("hpx:list-parcel-ports"))
                     util::handle_list_parcelports();
 

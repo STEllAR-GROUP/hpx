@@ -30,7 +30,6 @@
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>

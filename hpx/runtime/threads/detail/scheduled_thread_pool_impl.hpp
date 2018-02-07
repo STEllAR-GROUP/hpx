@@ -28,14 +28,13 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <boost/system/system_error.hpp>
-
-#include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -1669,18 +1668,12 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        // check if already suspended
-        hpx::state current_state = state.load();
-        if (current_state == state_sleeping)
-        {
-            return;
-        }
-
-        // inform the scheduler to suspend the virtual core
+        // Inform the scheduler to suspend the virtual core only if running
         hpx::state expected = state_running;
         state.compare_exchange_strong(expected, state_pre_sleep);
 
-        HPX_ASSERT(expected == state_running || expected == state_pre_sleep);
+        HPX_ASSERT(expected == state_running || expected == state_pre_sleep ||
+            expected == state_sleeping);
 
         util::detail::yield_while([&state]()
             {

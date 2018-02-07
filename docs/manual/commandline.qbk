@@ -125,6 +125,9 @@ described in the table below:
     [[`--hpx:debug-timing-log [arg]`] [enable all messages on the timing log
                                        channel and send all timing logs to the
                                        target destination (default: cout)]]
+    [[`--hpx:debug-app-log [arg]`] [enable all messages on the application log
+                                    channel and send all application logs to the
+                                    target destination (default: cout)]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
     [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
                                     `startup` or `exception` (default: startup)]]
@@ -307,10 +310,6 @@ below.
 In addition to the syntax described below one can use `--hpx:bind=none` to
 disable all binding of any threads to a particular core. This is mostly
 supported for debugging purposes.
-
-[note This command line option is only available if __hpx__ was built with
-      support for HWLOC (__hwloc__) enabled. Please see __cmake_options__ for more
-      details on how to enable support for HWLOC in __hpx__.]
 
 The specified affinities refer to specific regions within a machine hardware
 topology. In order to understand the hardware topology of a particular machine

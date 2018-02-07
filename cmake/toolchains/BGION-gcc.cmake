@@ -64,7 +64,6 @@ set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL "")
 #
 set(BOOST_ROOT "/gpfs/bbp.cscs.ch/home/biddisco/apps/gcc-4.8.2/boost_1_56_0")
 set(HWLOC_ROOT "/gpfs/bbp.cscs.ch/home/biddisco/apps/gcc-4.8.2/hwloc-1.8.1")
-set(HPX_WITH_HWLOC ON CACHE BOOL "Use hwloc")
 
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Default build")
 

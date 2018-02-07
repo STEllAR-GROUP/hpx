@@ -9,7 +9,6 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -883,11 +882,23 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.console.timing.level=1";
             ini_config += "hpx.logging.timing.level=1";
         }
+
+        if (vm.count("hpx:debug-app-log")) {
+            ini_config += "hpx.logging.console.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.console.application.level=5";
+            ini_config += "hpx.logging.application.level=5";
+        }
 #else
         if (vm.count("hpx:debug-hpx-log") ||
             vm.count("hpx:debug-agas-log") ||
             vm.count("hpx:debug-parcel-log") ||
-            vm.count("hpx:debug-timing-log"))
+            vm.count("hpx:debug-timing-log") ||
+            vm.count("hpx:debug-app-log"))
         {
             throw hpx::detail::command_line_error(
                 "Command line option error: can't enable logging while it "
@@ -1067,7 +1078,6 @@ namespace hpx { namespace util
 #endif
     }
 
-#if defined(HPX_HAVE_HWLOC)
     ///////////////////////////////////////////////////////////////////////////
     void handle_print_bind(boost::program_options::variables_map const& vm_,
         std::size_t num_threads)
@@ -1130,7 +1140,6 @@ namespace hpx { namespace util
             std::cout << strm.str();
         }
     }
-#endif
 
     void handle_list_parcelports()
     {

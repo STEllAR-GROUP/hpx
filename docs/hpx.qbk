@@ -90,7 +90,8 @@
 [def __boost_atomic__           [@http://www.boost.org/doc/libs/release/doc/html/atomic.html Boost.Atomic]]
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
-[def __hwloc_downloads__        [@http://www.open-mpi.org/software/hwloc/v1.7/ hwloc]]
+[def __hwloc_downloads__        [@http://www.open-mpi.org/software/hwloc/v1.11 Hwloc Downloads]]
+[def __hwloc_doc__              [@http://www.open-mpi.org/projects/hwloc/doc/ Hwloc Documentation]]
 [def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
 [def __macports__               [@http://www.macports.org/ MacPorts]]
@@ -185,6 +186,7 @@
 
 [/ Section link shortcuts]
 [def __boost_installation__     [link hpx.manual.build_system.prerequisites.boost_installation Installing Boost Libraries]]
+[def __hwloc_installation__     [link hpx.manual.build_system.prerequisites.hwloc_installation Installing Hwloc]]
 [def __prerequisites__          [link hpx.manual.build_system.prerequisites Build Prerequisites]]
 [def __unix_installation__      [link hpx.manual.build_system.building_hpx.build_recipes.unix_installation How to Install __hpx__ on Unix Variants]]
 [def __macos_installation__     [link hpx.manual.build_system.building_hpx.build_recipes.macos_installation How to Install __hpx__ on Mac OS]]

@@ -7,7 +7,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/config/asio.hpp>
 
-#include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/runtime_configuration.hpp>

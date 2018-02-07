@@ -22,7 +22,7 @@
 #include <set>
 #include <vector>
 
-#if defined(HPX_HAVE_HWLOC) && !defined(__APPLE__)
+#if !defined(__APPLE__)
 #  include <hwloc.h>
 #endif
 
@@ -33,7 +33,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
     std::size_t current = hpx::get_worker_thread_num();
     if (current == desired)
     {
-#if defined(HPX_HAVE_HWLOC) && !defined(__APPLE__)
+#if !defined(__APPLE__)
         // extract the desired affinity mask
         hpx::runtime & rt = hpx::get_runtime();
         hpx::threads::topology const& t = rt.get_topology();
