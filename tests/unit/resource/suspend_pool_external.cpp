@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     hpx::start(argc, argv, std::move(cfg));
 
     hpx::threads::executors::pool_executor default_exec("default");
-    hpx::threads::detail::thread_pool_base& default_pool =
+    hpx::threads::thread_pool_base& default_pool =
         hpx::resource::get_thread_pool("default");
     std::size_t const default_pool_threads =
         hpx::resource::get_num_threads("default");

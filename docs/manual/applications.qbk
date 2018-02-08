@@ -187,4 +187,50 @@ available, such as for instance to provide your own entry point function instead
 of [funcref hpx_main `hpx_main`]. Please refer to the function documentation for
 more details (see: [headerref hpx/hpx_start.hpp `hpx/hpx_start.hpp`]).
 
+[heading:flexible Suspending and resuming the __hpx__ runtime]
+
+In some applications it is required to combine __hpx__ with other runtimes. To
+support this use case __hpx__ provides two functions: [funcref hpx::suspend
+`hpx::suspend`] and [funcref hpx::resume `hpx::resume`]. [funcref hpx::resume
+`hpx::suspend`] is a blocking call which will wait for all scheduled tasks to
+finish executing and then put the thread pool OS threads to sleep. [funcref
+hpx::resume `hpx::resume`] simply wakes up the sleeping threads so that they are
+ready to accept new work. [funcref hpx::suspend `hpx::suspend`] and [funcref
+hpx::resume `hpx::resume`] can be found in the header [headerref
+hpx/hpx_suspend.hpp `hpx/hpx_suspend.hpp`].
+
+    #include <``[headerref hpx/hpx_start.hpp `hpx/hpx_start.hpp`]``>
+    #include <``[headerref hpx/hpx_suspend.hpp `hpx/hpx_suspend.hpp`]``>
+
+    int main(int argc, char* argv[])
+    {
+        // Initialize HPX, don't run hpx_main
+        ``[funcref hpx::start `hpx::start`]``(nullptr, argc, argv);
+
+        // Schedule a function on the HPX runtime
+        ``[funcref hpx::async `hpx::async`]``(&my_function, ...);
+
+        // Wait for all tasks to finish, and suspend the HPX runtime
+        ``[funcref hpx::suspend `hpx::suspend`]``();
+
+        // Execute non-HPX code here
+
+        // Resume the HPX runtime
+        ``[funcref hpx::resume `hpx::resume`]``();
+
+        // Schedule more work on the HPX runtime
+
+        // Wait for hpx::finalize being called.
+        return ``[funcref hpx::stop `hpx::stop`]``();
+    }
+
+[note [funcref hpx::suspend `hpx::suspend`] does not wait for [funcref
+      hpx::finalize `hpx::finalize`] to be called. Only call [funcref
+      hpx::finalize `hpx::finalize`] when you wish to fully stop the __hpx__
+      runtime.]
+
+__hpx__ also supports suspending individual thread pools and threads. For
+details on how to do that see the documentation for [classref
+hpx::threads::thread_pool_base `thread_pool_base`].
+
 [endsect]

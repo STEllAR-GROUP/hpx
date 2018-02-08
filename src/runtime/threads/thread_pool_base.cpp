@@ -13,8 +13,8 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
@@ -29,7 +29,7 @@
 #include <mutex>
 #include <string>
 
-namespace hpx { namespace threads { namespace detail
+namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(
@@ -91,7 +91,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     std::size_t thread_pool_base::get_worker_thread_num() const
     {
-        return thread_num_tss_.get_worker_thread_num();
+        return detail::thread_num_tss_.get_worker_thread_num();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -128,5 +128,5 @@ namespace hpx { namespace threads { namespace detail
     {
         thread_offset_ = threads_offset;
     }
-}}}
+}}
 
