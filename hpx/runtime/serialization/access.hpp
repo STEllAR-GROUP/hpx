@@ -8,19 +8,17 @@
 #define HPX_SERIALIZATION_ACCESS_HPP
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/traits/has_member_xxx.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace serialization
 {
     namespace detail
     {
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(serialize);
-
         template <class T> HPX_FORCEINLINE
         void serialize_force_adl(output_archive& ar, const T& t, unsigned)
         {
@@ -36,6 +34,26 @@ namespace hpx { namespace serialization
 
     class access
     {
+        template <class T>
+        class has_serialize
+        {
+            template <class T1> static std::false_type test(...);
+
+            // the following expression sfinae trick
+            // appears to work on clang-3.4, gcc-4.9,
+            // icc-16, msvc-2017 (at least)
+            // note that this detection would have been much easier
+            // to implement if there hadn't been an issue with gcc:
+            // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82478
+            template <class T1, class = decltype(
+                    std::declval<typename std::remove_const<T1>::type &>().
+                        serialize(std::declval<output_archive &>(), 0u))>
+            static std::true_type test(int);
+
+        public:
+            static constexpr bool value = decltype(test<T>(0))::value;
+        };
+
         template <class T>
         class serialize_dispatcher
         {
@@ -73,7 +91,7 @@ namespace hpx { namespace serialization
             struct empty
             {
                 template <class Archive>
-                static void call(Archive& ar, T& t, unsigned)
+                static void call(Archive&, T&, unsigned)
                 {
                 }
             };
@@ -95,7 +113,7 @@ namespace hpx { namespace serialization
                 hpx::traits::is_intrusive_polymorphic<T>::value,
                 intrusive_polymorphic,
                 typename std::conditional<
-                    detail::has_serialize<T>::value,
+                    has_serialize<T>::value,
                     intrusive_usual,
                     typename std::conditional<
                         std::is_empty<T>::value,
