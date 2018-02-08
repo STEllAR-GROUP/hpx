@@ -16,9 +16,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/yield_while.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/logging.hpp>
@@ -246,8 +244,7 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type const& thrd, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
         thread_id_type const& timer_id,
-        std::shared_ptr<std::atomic<bool> > const& triggered,
-        thread_state_ex_enum my_statex)
+        std::shared_ptr<std::atomic<bool> > const& triggered)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -262,14 +259,17 @@ namespace hpx { namespace threads { namespace detail
             return thread_result_type(terminated, invalid_thread_id);
         }
 
-        HPX_ASSERT(my_statex == wait_abort || my_statex == wait_timeout);
-
-        if (!triggered->load())
+        bool oldvalue = false;
+        if (triggered->compare_exchange_strong(oldvalue, true)) //-V601
         {
-            error_code ec(lightweight);    // do not throw
-            detail::set_thread_state(timer_id, pending, my_statex,
-                thread_priority_boost, std::size_t(-1), ec);
+            // timer has not been canceled yet, trigger the requested set_state
+            detail::set_thread_state(thrd, newstate, newstate_ex, priority);
         }
+
+        // then re-activate the thread holding the deadline_timer
+        error_code ec(lightweight);    // do not throw
+        detail::set_thread_state(timer_id, pending, wait_timeout,
+            thread_priority_boost, std::size_t(-1), ec);
 
         return thread_result_type(terminated, invalid_thread_id);
     }
@@ -280,8 +280,7 @@ namespace hpx { namespace threads { namespace detail
     thread_result_type at_timer(SchedulingPolicy& scheduler,
         util::steady_clock::time_point& abs_time,
         thread_id_type const& thrd, thread_state_enum newstate,
-        thread_state_ex_enum newstate_ex, thread_priority priority,
-        std::atomic<bool>& started)
+        thread_state_ex_enum newstate_ex, thread_priority priority)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -299,7 +298,7 @@ namespace hpx { namespace threads { namespace detail
             std::make_shared<std::atomic<bool> >(false));
 
         thread_init_data data(
-            util::bind_front(&wake_timer_thread,
+            util::bind(&wake_timer_thread,
                 thrd, newstate, newstate_ex, priority,
                 self_id, triggered),
             "wake_timer", 0, priority);
@@ -315,22 +314,9 @@ namespace hpx { namespace threads { namespace detail
             get_thread_pool("timer-pool")->get_io_service(), abs_time);
 
         // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait(
-            [wake_id, priority](const boost::system::error_code& ec)
-            {
-                if (ec.value() == boost::system::errc::operation_canceled)
-                {
-                    detail::set_thread_state(wake_id, pending, wait_abort,
-                        priority, std::size_t(-1), throws);
-                }
-                else
-                {
-                    detail::set_thread_state(wake_id, pending, wait_timeout,
-                        priority, std::size_t(-1), throws);
-                }
-            });
-
-        started.store(true);
+        t.async_wait(util::bind(&detail::set_thread_state,
+            wake_id, pending, wait_timeout, priority,
+            std::size_t(-1), std::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
@@ -338,17 +324,17 @@ namespace hpx { namespace threads { namespace detail
         thread_state_ex_enum statex =
             get_self().yield(thread_result_type(suspended, invalid_thread_id));
 
-        HPX_ASSERT(statex == wait_abort || statex == wait_timeout);
-
         if (wait_timeout != statex) //-V601
         {
             triggered->store(true);
+
             // wake_timer_thread has not been executed yet, cancel timer
             t.cancel();
-        }
-        else
-        {
-            detail::set_thread_state(thrd, newstate, newstate_ex, priority);
+
+            // cancel wake_timer_thread
+            error_code ec(lightweight);    // do not throw
+            detail::set_thread_state(wake_id, pending, wait_abort,
+                priority, std::size_t(-1), ec);
         }
 
         return thread_result_type(terminated, invalid_thread_id);
@@ -371,17 +357,14 @@ namespace hpx { namespace threads { namespace detail
 
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        std::atomic<bool> started(false);
         thread_init_data data(
             util::bind(&at_timer<SchedulingPolicy>,
                 std::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
-                priority, std::ref(started)),
+                priority),
             "at_timer (expire at)", 0, priority, thread_num);
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, pending, true, ec); //-V601
-        hpx::util::yield_while(
-            [&started]() { return !started.load(); }, "set_thread_state_timed");
         return newid;
     }
 
