@@ -3,6 +3,7 @@ list(APPEND CTEST_CUSTOM_ERROR_MATCH
 
 list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   # CMake Configure step
+  "CMake Warning:.*"
   "Imported targets not available for .*"
 )
 
