@@ -11,7 +11,7 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
 #include <hpx/util/assert.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/util/yield_while.hpp>
 //
 #include <cstddef>
 #include <cstdint>
@@ -306,7 +306,7 @@ namespace libfabric
         // count reads
         ++rma_reads_;
 
-        hpx::util::detail::yield_while([this, get_region]()
+        hpx::util::yield_while([this, get_region]()
             {
                 LOG_EXCLUSIVE(
                     // write a pattern and dump out data for debugging purposes
@@ -485,7 +485,7 @@ namespace libfabric
 
         ++sent_ack_;
 
-        hpx::util::detail::yield_while([this]()
+        hpx::util::yield_while([this]()
             {
                 // when we received the incoming message, the tag was already set
                 // with the sender context so that we can signal it directly

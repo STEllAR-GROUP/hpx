@@ -51,7 +51,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
@@ -410,7 +410,7 @@ namespace hpx { namespace components { namespace server
         // it hands over the token to machine nr.i.
         threads::threadmanager& tm = appl.get_thread_manager();
 
-        util::detail::yield_while([&tm]()
+        util::yield_while([&tm]()
             {
                 tm.cleanup_terminated(true);
                 return tm.get_thread_count() >
@@ -449,7 +449,7 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
 
-            util::detail::yield_while([&tm]()
+            util::yield_while([&tm]()
                 {
                     tm.cleanup_terminated(true);
                     return tm.get_thread_count() >
@@ -510,7 +510,7 @@ namespace hpx { namespace components { namespace server
         applier::applier& appl = hpx::applier::get_applier();
         threads::threadmanager& tm = appl.get_thread_manager();
 
-        util::detail::yield_while([&tm]()
+        util::yield_while([&tm]()
             {
                 tm.cleanup_terminated(true);
                 return tm.get_thread_count() >
@@ -587,7 +587,7 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
 
-            util::detail::yield_while([&tm]()
+            util::yield_while([&tm]()
                 {
                     tm.cleanup_terminated(true);
                     return tm.get_thread_count() >
@@ -867,7 +867,7 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            util::detail::yield_while(
+            util::yield_while(
                 [&tm, &l, timeout, &t, start_time, &timed_out]()
                 {
                     cleanup_threads(tm, l);
@@ -889,7 +889,7 @@ namespace hpx { namespace components { namespace server
                 // now we have to wait for all threads to be aborted
                 start_time = t.elapsed();
 
-                util::detail::yield_while([&tm, &l, timeout, &t, start_time]()
+                util::yield_while([&tm, &l, timeout, &t, start_time]()
                     {
                         tm.abort_all_suspended_threads();
                         cleanup_threads(tm, l);
