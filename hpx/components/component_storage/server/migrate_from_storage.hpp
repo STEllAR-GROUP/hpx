@@ -146,29 +146,20 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(naming::invalid_id);
         }
 
-        return agas::begin_migration(to_resurrect)
-            .then(
-                [to_resurrect, target_locality](
-                    future<std::pair<naming::id_type, naming::address> > && f)
-                ->  future<naming::id_type>
-                {
-                    // rethrow errors
-                    std::pair<naming::id_type, naming::address> r = f.get();
+        auto r = agas::begin_migration(to_resurrect);
 
-                    // retrieve the data from the given storage
-                    typedef typename server::component_storage::migrate_from_here_action
-                        action_type;
-                    return async<action_type>(r.first, to_resurrect.get_gid())
-                        .then(util::bind_back(
-                            &detail::migrate_from_storage_here<Component>,
-                            to_resurrect, r.second, target_locality));
-                })
-            .then(
-                [to_resurrect](future<naming::id_type> && f) -> naming::id_type
-                {
-                    agas::end_migration(to_resurrect).get();
-                    return f.get();
-                });
+        // retrieve the data from the given storage
+        typedef typename server::component_storage::migrate_from_here_action
+            action_type;
+        return async<action_type>(r.first, to_resurrect.get_gid())
+            .then(util::bind_back(
+                &detail::migrate_from_storage_here<Component>,
+                to_resurrect, r.second, target_locality)).then(
+                    [to_resurrect](future<naming::id_type> && f) -> naming::id_type
+                    {
+                        agas::end_migration(to_resurrect);
+                        return f.get();
+                    });
     }
 
     template <typename Component>

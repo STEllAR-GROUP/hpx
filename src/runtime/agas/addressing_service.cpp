@@ -2668,17 +2668,16 @@ void addressing_service::unmark_as_migrated(
     }
 }
 
-hpx::future<std::pair<naming::id_type, naming::address> >
-addressing_service::begin_migration_async(naming::id_type const& id)
+std::pair<naming::id_type, naming::address>
+addressing_service::begin_migration(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
 
     if (!id)
     {
-        return hpx::make_exceptional_future<result_type>(
-            HPX_GET_EXCEPTION(bad_parameter,
-                "addressing_service::begin_migration_async",
-                "invalid reference id"));
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::begin_migration_async",
+            "invalid reference id");
     }
 
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
@@ -2686,16 +2685,15 @@ addressing_service::begin_migration_async(naming::id_type const& id)
     return primary_ns_.begin_migration(gid);
 }
 
-hpx::future<bool> addressing_service::end_migration_async(
+bool addressing_service::end_migration(
     naming::id_type const& id
     )
 {
     if (!id)
     {
-        return hpx::make_exceptional_future<bool>(
-            HPX_GET_EXCEPTION(bad_parameter,
-                "addressing_service::end_migration_async",
-                "invalid reference id"));
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::end_migration_async",
+            "invalid reference id");
     }
 
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
