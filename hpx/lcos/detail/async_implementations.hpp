@@ -157,10 +157,13 @@ namespace hpx { namespace detail
     template <typename Action>
     bool can_invoke_locally()
     {
-        return !traits::action_decorate_function<Action>::value &&
-            this_thread::get_stack_size() >= threads::get_stack_size(
+        std::ptrdiff_t requested_stack_size =
+            threads::get_stack_size(
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
+        return !traits::action_decorate_function<Action>::value &&
+            this_thread::get_stack_size() >= requested_stack_size &&
+            this_thread::has_sufficient_stack_space(requested_stack_size);
     }
 
     template <typename Action>
