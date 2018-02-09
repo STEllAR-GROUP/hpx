@@ -241,7 +241,8 @@ namespace hpx {
 
     threads::thread_result_type
     runtime_impl::run_helper(
-        util::function_nonser<runtime::hpx_main_function_type> func, int& result)
+        util::function_nonser<runtime::hpx_main_function_type> const& func,
+        int& result)
     {
         lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 

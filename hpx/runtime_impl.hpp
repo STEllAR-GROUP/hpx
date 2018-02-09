@@ -51,7 +51,7 @@ namespace hpx
 
         //
         threads::thread_result_type run_helper(
-            util::function_nonser<runtime::hpx_main_function_type> func,
+            util::function_nonser<runtime::hpx_main_function_type> const& func,
             int& result);
 
         void wait_helper(compat::mutex& mtx, compat::condition_variable& cond,
