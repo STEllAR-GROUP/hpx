@@ -23,6 +23,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstddef>
 #include <utility>
 
 namespace hpx { namespace detail
