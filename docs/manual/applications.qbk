@@ -191,7 +191,7 @@ more details (see: [headerref hpx/hpx_start.hpp `hpx/hpx_start.hpp`]).
 
 In some applications it is required to combine __hpx__ with other runtimes. To
 support this use case __hpx__ provides two functions: [funcref hpx::suspend
-`hpx::suspend`] and [funcref hpx::resume `hpx::resume`]. [funcref hpx::resume
+`hpx::suspend`] and [funcref hpx::resume `hpx::resume`]. [funcref hpx::suspend
 `hpx::suspend`] is a blocking call which will wait for all scheduled tasks to
 finish executing and then put the thread pool OS threads to sleep. [funcref
 hpx::resume `hpx::resume`] simply wakes up the sleeping threads so that they are
