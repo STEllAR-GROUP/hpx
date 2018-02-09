@@ -262,7 +262,7 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
-    /// This funciton can also store a component either by passing a
+    /// This function can also store a component either by passing a
     /// shared_ptr to the component or by passing a component's client
     /// instance to save_checkpoint.
     /// Additionally the function can take a policy as
@@ -307,7 +307,7 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
-    /// This funciton can also store a component either by passing a
+    /// This function can also store a component either by passing a
     /// shared_ptr to the component or by passing a component's client
     /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
@@ -349,7 +349,7 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
-    /// This funciton can also store a component either by passing a
+    /// This function can also store a component either by passing a
     /// shared_ptr to the component or by passing a component's client
     /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
@@ -395,7 +395,7 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
-    /// This funciton can also store a component either by passing a
+    /// This function can also store a component either by passing a
     /// shared_ptr to the component or by passing a component's client
     /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
@@ -440,7 +440,7 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
-    /// This funciton can also store a component either by passing a
+    /// This function can also store a component either by passing a
     /// shared_ptr to the component or by passing a component's client
     /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
@@ -487,7 +487,7 @@ namespace util {
     ///
     /// Save_checkpoint takes any number of objects which a user may wish
     /// to store and returns a future to a checkpoint object.
-    /// This funciton can also store a component either by passing a
+    /// This function can also store a component either by passing a
     /// shared_ptr to the component or by passing a component's client
     /// instance to save_checkpoint.
     /// Additionally the function can take a policy as a first object which
