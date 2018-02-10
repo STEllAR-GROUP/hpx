@@ -85,9 +85,9 @@ namespace hpx { namespace actions { namespace detail
     base_action* register_action<Action>::create(bool has_continuation)
     {
         if (has_continuation)
-            return new transfer_continuation_action<Action>();
+            return new transfer_continuation_action<Action>{};
 
-        return new transfer_action<Action>();
+        return new transfer_action<Action>{};
     }
 
     template <typename Action>

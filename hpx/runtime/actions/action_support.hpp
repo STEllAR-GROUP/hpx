@@ -20,7 +20,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/traits/action_remote_result.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/tuple.hpp>
@@ -36,47 +35,6 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 /// \cond NOINTERNAL
-namespace hpx { namespace actions { namespace detail
-{
-    struct action_serialization_data
-    {
-        action_serialization_data()
-          : parent_locality_(naming::invalid_locality_id)
-          , parent_id_(static_cast<std::uint64_t>(0))
-          , parent_phase_(0)
-          , priority_(static_cast<threads::thread_priority>(0))
-          , stacksize_(static_cast<threads::thread_stacksize>(0))
-        {}
-
-        action_serialization_data(std::uint32_t parent_locality,
-                threads::thread_id_type parent_id,
-                std::uint64_t parent_phase,
-                threads::thread_priority priority,
-                threads::thread_stacksize stacksize)
-          : parent_locality_(parent_locality)
-          , parent_id_(reinterpret_cast<std::uint64_t>(parent_id.get()))
-          , parent_phase_(parent_phase)
-          , priority_(priority)
-          , stacksize_(stacksize)
-        {}
-
-        std::uint32_t parent_locality_;
-        std::uint64_t parent_id_;
-        std::uint64_t parent_phase_;
-        threads::thread_priority priority_;
-        threads::thread_stacksize stacksize_;
-
-        template <class Archive>
-        void serialize(Archive& ar, unsigned)
-        {
-            ar & parent_id_ & parent_phase_ & parent_locality_
-               & priority_ & stacksize_;
-        }
-    };
-}}}
-
-HPX_IS_BITWISE_SERIALIZABLE(hpx::actions::detail::action_serialization_data)
-
 namespace hpx { namespace traits
 {
     namespace detail
@@ -90,7 +48,6 @@ namespace hpx { namespace traits
         };
     }
 }}
-
 /// \endcond
 
 ///////////////////////////////////////////////////////////////////////////////
