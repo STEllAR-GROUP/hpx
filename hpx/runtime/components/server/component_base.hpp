@@ -68,7 +68,7 @@ namespace hpx { namespace components
 
             /// \brief finalize() will be called just before the instance gets
             ///        destructed
-            HPX_CONSTEXPR static void finalize()
+            HPX_CXX14_CONSTEXPR static void finalize()
             {
             }
 
@@ -77,10 +77,10 @@ namespace hpx { namespace components
                 naming::gid_type const& gid) const;
 
             // Pinning functionality
-            HPX_CONSTEXPR static void pin()
+            HPX_CXX14_CONSTEXPR static void pin()
             {
             }
-            HPX_CONSTEXPR static void unpin()
+            HPX_CXX14_CONSTEXPR static void unpin()
             {
             }
             HPX_CONSTEXPR static std::uint32_t pin_count()
@@ -89,10 +89,10 @@ namespace hpx { namespace components
             }
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-            HPX_CONSTEXPR static void mark_as_migrated()
+            HPX_CXX14_CONSTEXPR static void mark_as_migrated()
             {
             }
-            HPX_CONSTEXPR static void on_migrated()
+            HPX_CXX14_CONSTEXPR static void on_migrated()
             {
             }
 #else

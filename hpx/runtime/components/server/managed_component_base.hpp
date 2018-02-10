@@ -45,7 +45,8 @@ namespace hpx { namespace components
         struct init<traits::construct_with_back_ptr>
         {
             template <typename Component, typename Managed>
-            HPX_CONSTEXPR static void call(Component* component, Managed* this_)
+            HPX_CXX14_CONSTEXPR static void call(Component* component,
+                Managed* this_)
             {
             }
 
@@ -99,7 +100,7 @@ namespace hpx { namespace components
         struct destroy_backptr<traits::managed_object_controls_lifetime>
         {
             template <typename BackPtr>
-            HPX_CONSTEXPR static void call(BackPtr*)
+            HPX_CXX14_CONSTEXPR static void call(BackPtr*)
             {
                 // The managed_component's lifetime is controlled by the
                 // component implementation. Do nothing.
@@ -116,7 +117,7 @@ namespace hpx { namespace components
         struct manage_lifetime<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
-            HPX_CONSTEXPR static void call(Component*)
+            HPX_CXX14_CONSTEXPR static void call(Component*)
             {
                 // The managed_component's lifetime is controlled by the
                 // component implementation. Do nothing.
@@ -148,12 +149,12 @@ namespace hpx { namespace components
             }
 
             template <typename Component>
-            HPX_CONSTEXPR static void addref(Component*)
+            HPX_CXX14_CONSTEXPR static void addref(Component*)
             {
             }
 
             template <typename Component>
-            HPX_CONSTEXPR static void release(Component*)
+            HPX_CXX14_CONSTEXPR static void release(Component*)
             {
             }
         };
@@ -167,18 +168,18 @@ namespace hpx { namespace components
         {
             /// \brief finalize() will be called just before the instance gets
             ///        destructed
-            HPX_CONSTEXPR static void finalize() {}
+            HPX_CXX14_CONSTEXPR static void finalize() {}
 
             // Pinning functionality
-            HPX_CONSTEXPR static void pin() {}
-            HPX_CONSTEXPR static void unpin() {}
+            HPX_CXX14_CONSTEXPR static void pin() {}
+            HPX_CXX14_CONSTEXPR static void unpin() {}
             HPX_CONSTEXPR static std::uint32_t pin_count() { return 0; }
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-            HPX_CONSTEXPR static void mark_as_migrated()
+            HPX_CXX14_CONSTEXPR static void mark_as_migrated()
             {
             }
-            HPX_CONSTEXPR static void on_migrated()
+            HPX_CXX14_CONSTEXPR static void on_migrated()
             {
             }
 #else
@@ -382,7 +383,7 @@ namespace hpx { namespace components
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
         ///
-        HPX_CONSTEXPR static void finalize() {}
+        HPX_CXX14_CONSTEXPR static void finalize() {}
 
         /// \brief Return a pointer to the wrapped instance
         /// \note  Caller must check validity of returned pointer
