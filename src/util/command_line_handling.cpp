@@ -41,6 +41,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util
@@ -67,13 +68,14 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline void encode (std::string &str, char s, char const *r)
+        inline void encode(
+            std::string& str, char s, char const* r, std::size_t inc = 1ull)
         {
             std::string::size_type pos = 0;
             while ((pos = str.find_first_of(s, pos)) != std::string::npos)
             {
                 str.replace (pos, 1, r);
-                ++pos;
+                pos += inc;
             }
         }
 
@@ -81,6 +83,12 @@ namespace hpx { namespace util
         {
             encode(str, '\n', "\\n");
             return str;
+        }
+
+        inline std::string encode_and_enquote(std::string str)
+        {
+            encode(str, '\"', "\\\"", 2);
+            return detail::enquote(std::move(str));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -986,7 +994,7 @@ namespace hpx { namespace util
         {
             // quote only if it contains whitespace
             std::string arg(argv[i]); //-V108
-            cmd_line += detail::enquote(arg);
+            cmd_line += detail::encode_and_enquote(arg);
 
             if ((i + 1) != argc)
                 cmd_line += " ";
@@ -1010,15 +1018,17 @@ namespace hpx { namespace util
 
             iterator_type  end = unregistered_options.end();
             for (iterator_type  it = unregistered_options.begin(); it != end; ++it)
-                unregistered_options_cmd_line += " " + detail::enquote(*it);
+                unregistered_options_cmd_line +=
+                    " " + detail::encode_and_enquote(*it);
 
             ini_config_ += "hpx.unknown_cmd_line!=" +
-                detail::enquote(cmd_name) + unregistered_options_cmd_line;
+                detail::encode_and_enquote(cmd_name) +
+                unregistered_options_cmd_line;
         }
 
         ini_config_ += "hpx.program_name!=" + cmd_name;
         ini_config_ += "hpx.reconstructed_cmd_line!=" +
-            detail::enquote(cmd_name) + " " +
+            detail::encode_and_enquote(cmd_name) + " " +
             util::reconstruct_command_line(vm_) + " " +
             unregistered_options_cmd_line;
     }
