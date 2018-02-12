@@ -44,11 +44,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
     /// \param value        The value to search for.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// The comparisons in the parallel \a count algorithm invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -108,13 +110,11 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
-    ///
+    //
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
     /// \param f            Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last).This is an
@@ -129,6 +129,10 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     it. The type \a Type must be such that an object of
     ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
     ///
     /// \note The assignments in the parallel \a count_if algorithm invoked with
     ///       an execution policy object of type \a sequenced_policy
