@@ -45,7 +45,7 @@ namespace hpx
 
         using scheduler_function =
             util::function_nonser<
-                std::unique_ptr<hpx::threads::detail::thread_pool_base>(
+                std::unique_ptr<hpx::threads::thread_pool_base>(
                     hpx::threads::policies::callback_notifier&,
                     std::size_t, std::size_t, std::size_t, std::string const&
                 )>;

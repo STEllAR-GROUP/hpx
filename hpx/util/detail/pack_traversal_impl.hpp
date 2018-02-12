@@ -52,7 +52,7 @@ namespace util {
                 explicit HPX_CONSTEXPR spread_box() noexcept
                 {
                 }
-                explicit HPX_CONSTEXPR spread_box(tuple<>) noexcept
+                explicit HPX_CONSTEXPR spread_box(tuple<> const&) noexcept
                 {
                 }
 
@@ -282,7 +282,7 @@ namespace util {
             {
                 return std::move(val);
             }
-            inline void voidify_empty_tuple(tuple<>) noexcept
+            inline void voidify_empty_tuple(tuple<> const&) noexcept
             {
             }
 

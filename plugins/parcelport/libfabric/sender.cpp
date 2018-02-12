@@ -12,9 +12,9 @@
 //
 #include <hpx/util/assert.hpp>
 #include <hpx/util/atomic_count.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/unique_function.hpp>
+#include <hpx/util/yield_while.hpp>
 //
 #include <rdma/fi_endpoint.h>
 //
@@ -150,7 +150,7 @@ namespace libfabric
                 "Message region (send piggyback)"));
 
             // send 2 regions as one message, goes into one receive
-            hpx::util::detail::yield_while([this]()
+            hpx::util::yield_while([this]()
                 {
                     int ret = fi_sendv(this->endpoint_, this->region_list_,
                         this->desc_, 2, this->dst_addr_, this);
@@ -187,7 +187,7 @@ namespace libfabric
                 "Message region (send for rdma fetch)"));
 
             // send just the header region - a single message
-            hpx::util::detail::yield_while([this]()
+            hpx::util::yield_while([this]()
                 {
                     int ret = fi_send(this->endpoint_,
                         this->region_list_[0].iov_base,
@@ -277,7 +277,7 @@ namespace libfabric
         if (header_->message_piggy_back())
         {
             // send 2 regions as one message, goes into one receive
-            hpx::util::detail::yield_while([this]()
+            hpx::util::yield_while([this]()
                 {
                     int ret = fi_sendv(this->endpoint_, this->region_list_,
                         this->desc_, 2, this->dst_addr_, this);
@@ -301,7 +301,7 @@ namespace libfabric
                 message_region_->get_remote_key(), message_region_->get_address());
 
             // send just the header region - a single message
-            hpx::util::detail::yield_while([this]()
+            hpx::util::yield_while([this]()
                 {
                     int ret = fi_send(this->endpoint_,
                         this->region_list_[0].iov_base,

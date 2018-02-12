@@ -174,12 +174,12 @@ namespace hpx { namespace components
 
     // Returns the (unique) name for a given component
     template <typename Component, typename Enable = void>
-    const char* get_component_name();
+    HPX_CONSTEXPR char const* get_component_name();
 
     // Returns the (unique) name of the base component. If there is none,
     // nullptr is returned
     template <typename Component, typename Enable = void>
-    const char* get_component_base_name();
+    HPX_CONSTEXPR const char* get_component_base_name();
 
     template <typename Component>
     inline void set_component_type(component_type type)
@@ -253,13 +253,13 @@ namespace hpx { namespace components
 
 #define HPX_DEFINE_COMPONENT_NAME_2(Component, name)                          \
 namespace hpx { namespace components {                                        \
-    template <> HPX_ALWAYS_EXPORT                                             \
-    const char* get_component_name< Component, void>()                        \
+    template <> HPX_CONSTEXPR                                                 \
+    char const* get_component_name< Component, void>()                        \
     {                                                                         \
         return HPX_PP_STRINGIZE(name);                                        \
     }                                                                         \
-    template <> HPX_ALWAYS_EXPORT                                             \
-    const char* get_component_base_name< Component, void>()                   \
+    template <> HPX_CONSTEXPR                                                 \
+    char const* get_component_base_name< Component, void>()                   \
     {                                                                         \
         return nullptr;                                                       \
     }                                                                         \
@@ -268,13 +268,13 @@ namespace hpx { namespace components {                                        \
 
 #define HPX_DEFINE_COMPONENT_NAME_3(Component, name, base_name)               \
 namespace hpx { namespace components {                                        \
-    template <> HPX_ALWAYS_EXPORT                                             \
-    const char* get_component_name< Component, void>()                        \
+    template <> HPX_CONSTEXPR                                                 \
+    char const* get_component_name< Component, void>()                        \
     {                                                                         \
         return HPX_PP_STRINGIZE(name);                                        \
     }                                                                         \
-    template <> HPX_ALWAYS_EXPORT                                             \
-    const char* get_component_base_name< Component, void>()                   \
+    template <> HPX_CONSTEXPR                                                 \
+    char const* get_component_base_name< Component, void>()                   \
     {                                                                         \
         return base_name;                                                     \
     }                                                                         \

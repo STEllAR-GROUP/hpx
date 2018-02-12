@@ -29,7 +29,9 @@
 
 #include <boost/intrusive_ptr.hpp>
 
-#if BOOST_VERSION < 105800
+// NOTE: small_vector was introduced in 1.58 but seems to be buggy in that
+// version, so use only from 1.59 onwards.
+#if BOOST_VERSION < 105900
 #include <vector>
 #else
 #include <boost/container/small_vector.hpp>
@@ -74,7 +76,7 @@ namespace detail
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
-#if BOOST_VERSION < 105800
+#if BOOST_VERSION < 105900
         typedef std::vector<completed_callback_type>
             completed_callback_vector_type;
 #else

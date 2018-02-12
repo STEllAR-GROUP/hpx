@@ -306,7 +306,7 @@ namespace hpx { namespace util
             }
 
             template <typename Archive>
-            void serialize(Archive& ar, unsigned int const version)
+            void serialize(Archive& ar, unsigned int const)
             {
                 int const _sequencer[] = {
                     ((ar & this->get<Is>()), 0)...

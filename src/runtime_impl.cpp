@@ -27,11 +27,11 @@
 #include <hpx/util/apex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -241,7 +241,8 @@ namespace hpx {
 
     threads::thread_result_type
     runtime_impl::run_helper(
-        util::function_nonser<runtime::hpx_main_function_type> func, int& result)
+        util::function_nonser<runtime::hpx_main_function_type> const& func,
+        int& result)
     {
         lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
@@ -556,7 +557,7 @@ namespace hpx {
             return -1;
         }
 
-        util::detail::yield_while(
+        util::yield_while(
             [this]()
             {
                 return thread_manager_->get_thread_count() >

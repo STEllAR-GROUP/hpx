@@ -10,9 +10,9 @@
 #include <hpx/compat/barrier.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
@@ -70,10 +70,12 @@ namespace hpx { namespace threads { namespace detail
         hpx::future<void> resume();
         void resume_cb(std::function<void(void)> callback,
             error_code& ec = throws);
+        void resume_direct(error_code& ec = throws);
 
         hpx::future<void> suspend();
         void suspend_cb(std::function<void(void)> callback,
             error_code& ec = throws);
+        void suspend_direct(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<void> suspend_processing_unit(std::size_t virt_core);

@@ -41,7 +41,7 @@ namespace hpx { namespace lcos
 
         /// Extension: Create a client side representation for the existing
         /// \a server#latch instance with the given global id \a id.
-        latch(naming::id_type id)
+        latch(naming::id_type const& id)
           : base_type(id)
         {}
 

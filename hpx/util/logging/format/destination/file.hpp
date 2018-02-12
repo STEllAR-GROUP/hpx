@@ -76,7 +76,7 @@ namespace detail {
     }
 
     struct file_info {
-        file_info(const std::string& name_, file_settings settings_)
+        file_info(const std::string& name_, file_settings const& settings_)
             : name(name_),
 //               out( new std::basic_ofstream<char_type>
 //                   ( name_.c_str(), open_flags(settings_) )),

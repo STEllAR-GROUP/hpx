@@ -16,7 +16,7 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
 #include <hpx/util/assert.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/util/yield_while.hpp>
 //
 #include <utility>
 #include <cstddef>
@@ -169,7 +169,7 @@ namespace libfabric
             << *header_region_
             << "context " << hexpointer(this));
 
-        hpx::util::detail::yield_while([this, desc]()
+        hpx::util::yield_while([this, desc]()
             {
                 // post a receive using 'this' as the context, so that this
                 // receiver object can be used to handle the incoming

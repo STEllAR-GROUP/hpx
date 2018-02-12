@@ -24,7 +24,7 @@ int hpx_main(int argc, char* argv[])
     HPX_TEST_EQ(std::string("default"), hpx::resource::get_pool_name(0));
 
     {
-        hpx::threads::detail::thread_pool_base& pool =
+        hpx::threads::thread_pool_base& pool =
             hpx::resource::get_thread_pool(0);
         HPX_TEST_EQ(std::size_t(0), pool.get_pool_index());
         HPX_TEST_EQ(std::string("default"), pool.get_pool_name());
@@ -32,7 +32,7 @@ int hpx_main(int argc, char* argv[])
     }
 
     {
-        hpx::threads::detail::thread_pool_base& pool =
+        hpx::threads::thread_pool_base& pool =
             hpx::resource::get_thread_pool("default");
         HPX_TEST_EQ(std::size_t(0), pool.get_pool_index());
         HPX_TEST_EQ(std::string("default"), pool.get_pool_name());
