@@ -112,12 +112,12 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename InIter, typename T,
                 typename Proj>
             static difference_type
-            sequential(ExPolicy && policy, InIter first, InIter last, 
+            sequential(ExPolicy && policy, InIter first, InIter last,
                        T const& value, Proj && proj)
             {
                 auto f1 =
                     count_iteration<ExPolicy, detail::compare_to<T>, Proj>(
-                        detail::compare_to<T>(value), 
+                        detail::compare_to<T>(value),
                         std::forward<Proj>(proj));
 
                 typename std::iterator_traits<InIter>::difference_type ret = 0;
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename FwdIter, typename T, 
+        template <typename ExPolicy, typename FwdIter, typename T,
             typename Proj>
         inline typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
@@ -193,7 +193,7 @@ namespace hpx { namespace parallel { inline namespace v1
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename T, 
+        template <typename ExPolicy, typename FwdIter, typename T,
             typename Proj>
         typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
@@ -293,13 +293,13 @@ namespace hpx { namespace parallel { inline namespace v1
               : count_if::algorithm("count_if")
             {}
 
-            template <typename ExPolicy, typename InIter, typename Pred, 
+            template <typename ExPolicy, typename InIter, typename Pred,
                 typename Proj>
             static difference_type
             sequential(ExPolicy && policy, InIter first, InIter last, Pred && op,
                 Proj && proj)
             {
-                auto f1 = count_iteration<ExPolicy, Pred, Proj>(op, 
+                auto f1 = count_iteration<ExPolicy, Pred, Proj>(op,
                     std::forward<Proj>(proj));
 
                 typename std::iterator_traits<InIter>::difference_type ret = 0;
@@ -326,7 +326,7 @@ namespace hpx { namespace parallel { inline namespace v1
                         >::get(0);
                 }
 
-                auto f1 = count_iteration<ExPolicy, Pred, Proj>(op, 
+                auto f1 = count_iteration<ExPolicy, Pred, Proj>(op,
                     std::forward<Proj>(proj));
 
                 return util::partitioner<ExPolicy, difference_type>::call(
@@ -343,7 +343,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
 
-        template <typename ExPolicy, typename FwdIter, typename F, 
+        template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
         typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
@@ -369,12 +369,12 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return detail::count_if<difference_type>().call(
                 std::forward<ExPolicy>(policy), is_seq(),
-                first, last, std::forward<F>(f), 
+                first, last, std::forward<F>(f),
                 std::forward<Proj>(proj));
         }
 
         // forward declare the segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename F, 
+        template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
         typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<FwdIter>::difference_type
@@ -446,11 +446,11 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F, 
+    template <typename ExPolicy, typename FwdIter, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value && 
+        hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj, FwdIter>::value &&
         traits::is_indirect_callable<
             ExPolicy, F, traits::projected<Proj, FwdIter>

@@ -19,11 +19,11 @@
 
 #include "test_utils.hpp"
 
-struct user_defined_struct 
+struct user_defined_struct
 {
     user_defined_struct() = default;
     user_defined_struct(int val) : val(val)
-    {} 
+    {}
 
     ~user_defined_struct() = default;
 
@@ -62,9 +62,9 @@ void test_count(ExPolicy policy, IteratorTag, DataType)
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
     const auto search_val = DataType(10);
-    
+
     auto result = hpx::parallel::count(policy, c, search_val);
-    auto expected = std::count(std::begin(c), std::end(c), search_val); 
+    auto expected = std::count(std::begin(c), std::end(c), search_val);
 
     HPX_TEST_EQ(expected, result);
 }
@@ -79,12 +79,12 @@ void test_count_async(ExPolicy policy, IteratorTag, DataType)
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
-    const auto search_val = DataType(10); 
-    
+    const auto search_val = DataType(10);
+
     auto f = hpx::parallel::count(policy, c, search_val);
     auto result = f.get();
 
-    auto expected = std::count(std::begin(c), std::end(c), search_val); 
+    auto expected = std::count(std::begin(c), std::end(c), search_val);
 
     HPX_TEST_EQ(expected, result);
 }
@@ -102,13 +102,16 @@ void test_count()
     test_count(par, IteratorTag(), DataType());
     test_count(par_unseq, IteratorTag(), DataType());
 
-    test_count_async(execution::seq(execution::task), IteratorTag(), DataType());
-    test_count_async(execution::par(execution::task), IteratorTag(), DataType());
+    test_count_async(execution::seq(execution::task),
+                     IteratorTag(), DataType());
+    test_count_async(execution::par(execution::task),
+                     IteratorTag(), DataType());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_count(execution_policy(execution::seq), IteratorTag(), DataType());
     test_count(execution_policy(execution::par), IteratorTag(), DataType());
-    test_count(execution_policy(execution::par_unseq), IteratorTag(), DataType());
+    test_count(execution_policy(execution::par_unseq),
+               IteratorTag(), DataType());
 
     test_unique(execution_policy(execution::seq(execution::task)), DataType());
     test_unique(execution_policy(execution::par(execution::task)), DataType());
