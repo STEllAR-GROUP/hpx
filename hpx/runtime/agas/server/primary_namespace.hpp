@@ -140,7 +140,7 @@ struct HPX_EXPORT primary_namespace
     refcnt_table_type refcnts_;
     typedef std::map<
             naming::gid_type,
-            hpx::util::tuple<bool, std::size_t, lcos::local::condition_variable_any>
+            hpx::util::tuple<bool, std::size_t, lcos::local::detail::condition_variable>
         > migration_table_type;
 
     std::string instance_name_;
@@ -366,7 +366,6 @@ struct HPX_EXPORT primary_namespace
   public:
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, bind_gid);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, begin_migration);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, colocate);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, end_migration);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit);
@@ -402,13 +401,6 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bind_gid_action,
     primary_namespace_bind_gid_action)
-
-HPX_ACTION_USES_MEDIUM_STACK(
-    hpx::agas::server::primary_namespace::begin_migration_action)
-
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::agas::server::primary_namespace::begin_migration_action,
-    primary_namespace_begin_migration_action)
 
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::agas::server::primary_namespace::end_migration_action)

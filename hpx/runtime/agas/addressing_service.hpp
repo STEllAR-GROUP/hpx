@@ -1377,9 +1377,9 @@ public:
     /// start/stop migration of an object
     ///
     /// \returns Current locality and address of the object to migrate
-    hpx::future<std::pair<naming::id_type, naming::address> >
-        begin_migration_async(naming::id_type const& id);
-    hpx::future<bool> end_migration_async(naming::id_type const& id);
+    std::pair<naming::id_type, naming::address>
+        begin_migration(naming::id_type const& id);
+    bool end_migration(naming::id_type const& id);
 
     /// Maintain list of migrated objects
     std::pair<bool, components::pinned_ptr>
