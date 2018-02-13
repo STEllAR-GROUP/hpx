@@ -38,6 +38,9 @@ template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<hpx::compat::mutex,
         hpx::threads::policies::lockfree_abp_fifo>>;
+template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
+    hpx::threads::policies::local_priority_queue_scheduler<hpx::compat::mutex,
+        hpx::threads::policies::lockfree_abp_lifo>>;
 #endif
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
