@@ -274,7 +274,7 @@ int main(int argc, char* argv[])
 
             std::unique_ptr<high_priority_sched> scheduler(
                 new high_priority_sched(
-                    num_threads, 1, "shared-priority-scheduler"));
+                    num_threads, {4,4,64}, "shared-priority-scheduler"));
 
             auto mode = scheduler_mode(scheduler_mode::do_background_work |
                 scheduler_mode::delay_exit);
@@ -305,8 +305,8 @@ int main(int argc, char* argv[])
                 std::cout << "User defined scheduler creation callback "
                           << std::endl;
                 std::unique_ptr<high_priority_sched> scheduler(
-                    new high_priority_sched(num_threads, 1, 
-                        "shared-priority-scheduler"));
+                    new high_priority_sched(
+                        num_threads, {4,4,64}, "shared-priority-scheduler"));
 
                 auto mode = scheduler_mode(scheduler_mode::delay_exit);
 

@@ -39,12 +39,17 @@
 #include <numeric>
 
 #define HPX_MAX_NUMA_PER_NODE 4
+//#define SHARED_PRIORITY_SCHEDULER_DEBUG 1
+#define SHARED_PRIORITY_SCHEDULER_MINIMAL_DEBUG 1
+
+// for debug reasons, we might want to pretend a single socket machine has 2 numa domains
+//#define DEBUG_FORCE_2_NUMA_DOMAINS
 
 // @TODO :
 // min_tasks_to_steal_pending
 // min_tasks_to_steal_staged
 
-#if !defined(HPX_MSVC)
+#if !defined(HPX_MSVC) && defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
 static std::chrono::high_resolution_clock::time_point log_t_start =
     std::chrono::high_resolution_clock::now();
 
@@ -57,13 +62,6 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
     else                                                                       \
         dummy << "pool (unset) " << x << std::endl;                            \
     std::cout << dummy.str().c_str();
-
-#ifdef LOG_CUSTOM_MSG
-#undef LOG_CUSTOM_MSG
-#endif
-#ifdef LOG_CUSTOM_MSG2
-#undef LOG_CUSTOM_MSG2
-#endif
 
 #define LOG_CUSTOM_MSG(x)                                                      \
     std::stringstream dummy;                                                   \
@@ -90,56 +88,57 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
     hexpointer(thrd ? thrd : 0)
 #endif
 
-#undef LOG_CUSTOM_MSG
-#undef LOG_CUSTOM_MSG2
-#define LOG_CUSTOM_MSG(x)
-#define LOG_CUSTOM_MSG2(x)
 #else
 #define LOG_CUSTOM_MSG(x)
 #define LOG_CUSTOM_MSG2(x)
 #endif
 
-//#define EXTRA_DEBUG
-
 #if defined(HPX_MSVC)
-#undef EXTRA_DEBUG
+#undef SHARED_PRIORITY_SCHEDULER_DEBUG
+#undef LOG_CUSTOM_MSG
+#undef LOG_CUSTOM_MSG2
+#define LOG_CUSTOM_MSG(x)
+#define LOG_CUSTOM_MSG2(x)
 #endif
 
 //
 namespace hpx { namespace debug {
+#ifdef SHARED_PRIORITY_SCHEDULER_MINIMAL_DEBUG
     template<typename T>
     void output(const std::string &name, const std::vector<T> &v) {
-#ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {" << decnumber(v.size()) << "} : ";
         std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
         std::cout << "\n";
-#endif
     }
 
     template<typename T, std::size_t N>
     void output(const std::string &name, const std::array<T, N> &v) {
-#ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {" << decnumber(v.size()) << "} : ";
         std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
         std::cout << "\n";
-#endif
     }
 
     template<typename Iter>
     void output(const std::string &name, Iter begin, Iter end) {
-#ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {"
                   << decnumber(std::distance(begin,end)) << "} : ";
         std::copy(begin, end,
             std::ostream_iterator<typename std::iterator_traits<Iter>::
             value_type>(std::cout, ", "));
         std::cout << std::endl;
-#endif
     }
-#if defined(EXTRA_DEBUG)
-# define debug_msg(a) std::cout << a
 #else
-# define debug_msg(a)
+    template<typename T>
+    void output(const std::string &name, const std::vector<T> &v) {
+    }
+
+    template<typename T, std::size_t N>
+    void output(const std::string &name, const std::array<T, N> &v) {
+    }
+
+    template<typename Iter>
+    void output(const std::string &name, Iter begin, Iter end) {
+    }
 #endif
 }}
 
@@ -207,6 +206,8 @@ namespace hpx {
 namespace threads {
 namespace policies {
 
+    typedef std::tuple<std::size_t, std::size_t, std::size_t> core_ratios;
+
     // ----------------------------------------------------------------
     // helper class to hold a seto of queues
     // ----------------------------------------------------------------
@@ -260,7 +261,7 @@ namespace policies {
         }
 
         // ----------------------------------------------------------------
-        std::size_t get_queue_length() const
+        inline std::size_t get_queue_length() const
         {
             std::size_t len = 0;
             for (auto &q : queues_) len += q->get_queue_length();
@@ -268,7 +269,7 @@ namespace policies {
         }
 
         // ----------------------------------------------------------------
-        std::size_t get_thread_count(thread_state_enum state = unknown) const
+        inline std::size_t get_thread_count(thread_state_enum state = unknown) const
         {
             std::size_t len = 0;
             for (auto &q : queues_) len += q->get_thread_count(state);
@@ -285,7 +286,7 @@ namespace policies {
         }
 
         // ----------------------------------------------------------------
-        std::size_t size() const {
+        inline std::size_t size() const {
             return num_queues;
         }
 
@@ -330,21 +331,22 @@ namespace policies {
                 TerminatedQueuing>
                 thread_queue_type;
 
-            shared_priority_scheduler(std::size_t num_worker_queues,
-                std::size_t num_high_priority_queues_,
+            shared_priority_scheduler(
+                std::size_t num_worker_threads,
+                core_ratios cores_per_queue,
                 char const* description,
                 int max_tasks = max_thread_count)
-              : scheduler_base(num_worker_queues, description)
+              : scheduler_base(num_worker_threads, description)
+              , cores_per_queue_(cores_per_queue)
               , max_queue_thread_count_(max_tasks)
-              , num_workers_(num_worker_queues)
+              , num_workers_(num_worker_threads)
               , num_domains_(1)
-              , hp_numa_(num_high_priority_queues_)
               , initialized_(false)
             {
-                LOG_CUSTOM_MSG("Constructing scheduler with num queues "
-                    << decnumber(num_worker_queues));
+                LOG_CUSTOM_MSG("Constructing scheduler with num threads "
+                    << decnumber(num_worker_threads));
                 //
-                HPX_ASSERT(num_worker_queues != 0);
+                HPX_ASSERT(num_worker_threads != 0);
             }
 
             virtual ~shared_priority_scheduler()
@@ -808,7 +810,7 @@ bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
                     LOG_CUSTOM_MSG("create_thread NORMAL " << domain_num);
                 }
 
-                LOG_CUSTOM_MSG("create_thread " << " queue "
+                LOG_CUSTOM_MSG("create_thread "
                                << "queue " << decnumber(pool_queue_num)
                                << "domain " << decnumber(domain_num)
                                << "qindex " << decnumber(q_index));
@@ -920,7 +922,7 @@ bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
                 if (result)
                 {
                     HPX_ASSERT(thrd->get_scheduler_base() == this);
-                    LOG_CUSTOM_MSG("got next thread " << " queue "
+                    LOG_CUSTOM_MSG("got next thread "
                                    << "queue " << decnumber(pool_queue_num)
                                    << "domain " << decnumber(domain_num));
                 }
@@ -951,34 +953,34 @@ bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
                 std::size_t domain_num;
                 //
-                LOG_CUSTOM_MSG("schedule_thread " << " queue "
-                                                  << decnumber(pool_queue_num));
-                //
                 if (pool_queue_num == std::size_t(-1) || pool_queue_num == 32767)
                 {
                     std::size_t t = threads::detail::thread_num_tss_
                                         .get_worker_thread_num();
                     pool_queue_num = this->global_to_local_thread_index(t);
                     domain_num     = d_lookup_[pool_queue_num];
-                    std::cout << "Scheduled without preference " <<std::endl;
+                    LOG_CUSTOM_MSG("schedule_thread HINT_NONE"
+                                   << " queue " << decnumber(pool_queue_num));
                 }
                 else if (pool_queue_num>=32768) {
                     domain_num     = pool_queue_num - 32768;
                     std::size_t t = threads::detail::thread_num_tss_
                                         .get_worker_thread_num();
                     pool_queue_num = this->global_to_local_thread_index(t);
-                    std::cout << "Scheduled with domain " << domain_num << std::endl;
+                    LOG_CUSTOM_MSG("schedule_thread HINT domain " << domain_num
+                                   << " queue " << decnumber(pool_queue_num));
                 }
                 else if (pool_queue_num>num_workers_) {
                     throw std::runtime_error("Bad thread number in schedule thread");
                 }
                 else {
                     domain_num = d_lookup_[pool_queue_num];
-                    std::cout << "Scheduled with default queue " << pool_queue_num << std::endl;
+                    LOG_CUSTOM_MSG("schedule_thread fallback domain " << domain_num
+                                   << " queue " << decnumber(pool_queue_num));
                 }
                 std::size_t q_index = q_lookup_[pool_queue_num];
 
-                LOG_CUSTOM_MSG2("thread scheduled on "
+                LOG_CUSTOM_MSG2("thread scheduled "
                                << "queue " << decnumber(pool_queue_num)
                                << "domain " << decnumber(domain_num)
                                << "qindex " << decnumber(q_index));
@@ -1069,7 +1071,29 @@ bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
                 thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
             }
 
-            //---------------------------------------------------------------------
+#ifdef _OLD_STYLE_FUNCTION
+            bool destroy_thread(threads::thread_data* thrd,
+                         std::int64_t& busy_count)
+            {
+                LOG_CUSTOM_MSG("destroy thread " << THREAD_DESC(thrd)
+                                                 << " busy_count "
+                                                 << decnumber(busy_count));
+
+                HPX_ASSERT(thrd->get_scheduler_base() == this);
+
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    if (hp_queues_[d].destroy_thread(thrd,busy_count)) return true;
+                    if (np_queues_[d].destroy_thread(thrd,busy_count)) return true;
+                    if (lp_queues_[d].destroy_thread(thrd,busy_count)) return true;
+                }
+
+                // the thread has to belong to one of the queues, always
+                HPX_ASSERT(false);
+                return false;
+            }
+#endif
+
+            ///////////////////////////////////////////////////////////////////////
             // This returns the current length of the queues (work items and new
             // items)
             //---------------------------------------------------------------------
@@ -1267,7 +1291,9 @@ bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
                         std::size_t global_id = local_to_global_thread_index(local_id);
                         std::size_t pu_num = rp.get_pu_num(global_id);
                         std::size_t domain = topo.get_numa_node_number(pu_num);
-                        //domain = std::rand() % 2;
+#ifdef DEBUG_FORCE_2_NUMA_DOMAINS
+                        domain = std::rand() % 2;
+#endif
                         d_lookup_[local_id] = domain;
                         num_domains_ = std::max(num_domains_, domain+1);
                     }
@@ -1284,17 +1310,30 @@ bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
 
                     // create queue sets for each numa domain
                     for (std::size_t i=0; i<num_domains_; ++i) {
-                        // high priority - do not use more than q count
+                        // high priority
+                        int queues = std::max(q_counts_[i]/std::get<0>(cores_per_queue_),
+                                              std::size_t(1));
                         hp_queues_[i].init(
-                            q_counts_[i],
-                            std::max(std::min(hp_numa_, q_counts_[i]), std::size_t(1)),
-                            max_queue_thread_count_);
+                            q_counts_[i], queues, max_queue_thread_count_);
+                        LOG_CUSTOM_MSG2("Created HP queue for numa " << i
+                                        << " cores " << q_counts_[i]
+                                        << " queues " << queues);
                         // normal priority
+                        queues = std::max(q_counts_[i]/std::get<1>(cores_per_queue_),
+                                          std::size_t(1));
                         np_queues_[i].init(
-                            q_counts_[i], q_counts_[i], max_queue_thread_count_);
+                            q_counts_[i], queues, max_queue_thread_count_);
+                        LOG_CUSTOM_MSG2("Created NP queue for numa " << i
+                                        << " cores " << q_counts_[i]
+                                        << " queues " << queues);
                         // low oriority
+                        queues = std::max(q_counts_[i]/std::get<2>(cores_per_queue_),
+                                          std::size_t(1));
                         lp_queues_[i].init(
-                            q_counts_[i], 1, max_queue_thread_count_);
+                            q_counts_[i], queues, max_queue_thread_count_);
+                        LOG_CUSTOM_MSG2("Created LP queue for numa " << i
+                                        << " cores " << q_counts_[i]
+                                        << " queues " << queues);
                     }
                 }
             }
@@ -1353,13 +1392,16 @@ bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
             std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> d_lookup_;
             // lookup sub domain queue index from local worker index
             std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> q_lookup_;
-            //
+            // number of cores per queue for HP, NP, LP queues
+            core_ratios cores_per_queue_;
+            // max storage size of any queue
             std::size_t max_queue_thread_count_;
+            // number of worker threads assigned to this pool
             std::size_t num_workers_;
+            // number of numa domains that the threads are occupying
             std::size_t num_domains_;
-            std::size_t hp_numa_;
+            // used to make sure the scheduler is only initialized once on a thread
             bool        initialized_;
-            //
             hpx::lcos::local::spinlock init_mutex;
         };
     }
