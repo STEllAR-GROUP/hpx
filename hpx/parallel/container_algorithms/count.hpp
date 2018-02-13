@@ -1,11 +1,11 @@
-//  Copyright (c) 2018 Christopher Ogle 
+//  Copyright (c) 2018 Christopher Ogle
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/count.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2017_2057PM)
+#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2018_2057PM)
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2018_2057PM
 
 #include <hpx/config.hpp>
@@ -23,7 +23,7 @@
 namespace hpx { namespace parallel { inline namespace v1
 {
     ///////////////////////////////////////////////////////////////////////////
-    // count 
+    // count
 
     /// Returns the number of elements in the range [first, last) satisfying
     /// a specific criteria. This version counts the elements that are equal to
@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename Rng, typename T, 
+    template <typename ExPolicy, typename Rng, typename T,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
@@ -153,7 +153,7 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename Rng, typename F, 
+    template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
     HPX_CONCEPT_REQUIRES_(
         execution::is_execution_policy<ExPolicy>::value &&
@@ -170,7 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1
     count_if(ExPolicy && policy, Rng && rng, F && f,
         Proj && proj = Proj())
     {
-        return count_if(policy, hpx::util::begin(rng), hpx::util::end(rng), 
+        return count_if(policy, hpx::util::begin(rng), hpx::util::end(rng),
             std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}
