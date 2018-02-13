@@ -30,9 +30,9 @@
 #include "shared_priority_scheduler.hpp"
 #include "system_characteristics.hpp"
 
-static bool use_pools = true;
+static bool use_pools     = false;
 static bool use_scheduler = false;
-static int pool_threads = 1;
+static int  pool_threads  = 0;
 
 #define CUSTOM_POOL_NAME "Custom"
 
@@ -49,7 +49,8 @@ using namespace hpx::threads::policies;
 void async_guided(std::size_t n, bool printout, const std::string &message)
 {
     if (printout) {
-        std::cout << "[async_guided] " << message << " " << n << "\n";
+        std::cout << "[async_guided] <std::size_t, bool, const std::string> "
+                  << message << " n=" << n << "\n";
     }
     for (std::size_t i(0); i < n; ++i)
     {
@@ -69,46 +70,58 @@ int a_function(Args...args) {
     return 2;
 }
 */
-std::string a_function(hpx::future<double> &&df) {
+std::string a_function(hpx::future<double> &&df)
+{
     std::cout << "A_function double is " << df.get() << std::endl;
     return "The number 2";
 }
 
 namespace hpx { namespace threads { namespace executors
 {
-    // ------------------------------------------------------------------------
-    // specialize the hint template for our function type
-    template <typename R, typename...Args>
-    struct HPX_EXPORT pool_numa_hint<R(*)(Args...)>
-    {
-        int operator ()(Args ...args) const {
-            std::cout << "Function type numa hint invoked " << std::endl;
-            return 56;
-        }
-    };
+
+    struct guided_test_tag {};
 
     // ------------------------------------------------------------------------
-    // specialize the hint template for lambda args
     template <>
-    struct HPX_EXPORT pool_numa_hint<int, double, const std::string &>
+    struct HPX_EXPORT pool_numa_hint<guided_test_tag>
     {
-        int operator ()(int, double, const std::string &) const {
-            std::cout << "Lambda arg type numa hint invoked " << std::endl;
+        // ------------------------------------------------------------------------
+        // specialize the hint operator for params
+        int operator()(std::size_t i, bool b, const std::string& msg) const
+        {
+            std::cout << "<std::size_t, bool, const std::string> hint "
+                      << "invoked with : "
+                      << i << " " << b << " " << msg << std::endl;
+            return 1;
+        }
+
+        // ------------------------------------------------------------------------
+        // specialize the hint operator for params
+        int operator()(int i, double d, const std::string& msg) const
+        {
+            std::cout << "<int, double, const std::string> hint "
+                      << "invoked with : "
+                      << i << " " << d << " " << msg << std::endl;
             return 42;
         }
-    };
 
-    // ------------------------------------------------------------------------
-    // specialize the hint template for .then continuation
-    template <>
-    struct HPX_EXPORT pool_numa_hint<double>
-    {
-        int operator ()(double) const {
-            std::cout << "Lambda continuation numa hint invoked " << std::endl;
+        // ------------------------------------------------------------------------
+        // specialize the hint operator for params
+        int operator()(double x) const
+        {
+            std::cout << "double hint invoked with " << x << std::endl;
             return 27;
         }
-    };
 
+        // ------------------------------------------------------------------------
+        // specialize the hint operator for an arbitrary function/args type
+        template <typename...Args>
+        int operator ()(Args ...args) const {
+            std::cout << "Variadic hint invoked " << std::endl;
+            return 56;
+        }
+
+    };
 }}}
 
 using namespace hpx::threads::executors;
@@ -128,28 +141,49 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t num_threads = hpx::get_num_worker_threads();
     std::cout << "HPX using threads = " << num_threads << std::endl;
 
+
+    // ------------------------------------------------------------------------
+    // test 1
+    // ------------------------------------------------------------------------
     std::cout << std::endl << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
     std::cout << "Testing async guided exec " << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
     // we must specialize the numa callback hint for the function type we are invoking
-    using hint_type1 = pool_numa_hint<decltype(&async_guided)>;
+    using hint_type1 = pool_numa_hint<guided_test_tag>;
     // create an executor using that hint type
     hpx::threads::executors::guided_pool_executor<hint_type1> guided_exec(CUSTOM_POOL_NAME);
     // invoke an async function using our numa hint executor
-    hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided, 5, true, "Guided function");
+    hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided,
+        std::size_t(5), true, std::string("Guided function"));
     gf1.get();
 
+    // ------------------------------------------------------------------------
+    // test 2
+    // ------------------------------------------------------------------------
     std::cout << std::endl << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
     std::cout << "Testing async guided exec lambda" << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
     // specialize the numa hint callback for a lambda type invocation
     // the args of the async lambda must match the args of the hint type
-    using hint_type2 = pool_numa_hint<int, double, const std::string &>;
+    using hint_type2 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
     hpx::threads::executors::guided_pool_executor<hint_type2> guided_lambda_exec(CUSTOM_POOL_NAME);
+    // invoke a lambda asynchronously and use the numa executor
+    hpx::future<double> gf2 = hpx::async(guided_lambda_exec,
+        [](int a, double x, const std::string &msg) mutable -> double {
+            std::cout << "inside <int, double, string> async lambda "
+                      << msg << std::endl;
+            // return a double as an example
+            return 3.1415;
+        },
+        5, 2.718, "Guided function 2");
+    gf2.get();
 
+    // ------------------------------------------------------------------------
+    // static checks for laughs
+    // ------------------------------------------------------------------------
     using namespace hpx::traits;
     static_assert(
         has_sync_execute_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::false_type(),
@@ -164,30 +198,23 @@ int hpx_main(boost::program_options::variables_map& vm)
         has_post_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::false_type(),
         "has_post_member<executor>::value");
 
-
-    // invoke the lambda asynchronously and use the numa executor
-    hpx::future<double> gf2 = hpx::async(guided_lambda_exec,
-        [](int a, double x, const std::string &msg) mutable -> double {
-            std::cout << "inside async lambda " << msg << std::endl;
-            // return a double as an example
-            return 3.1415;
-        },
-        5, 2.718, "Guided function 2");
-    gf2.get();
-
+    // ------------------------------------------------------------------------
+    // test 3
+    // ------------------------------------------------------------------------
     std::cout << std::endl << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
-    std::cout << "Testing async guided exec continuation" << std::endl;
+    std::cout << "Testing async guided exec continuation"         << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
     // specialize the numa hint callback for another lambda type invocation
     // the args of the async lambda must match the args of the hint type
-    using hint_type3 = pool_numa_hint<double>;
+    using hint_type3 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
     hpx::threads::executors::guided_pool_executor<hint_type3> guided_cont_exec(CUSTOM_POOL_NAME);
     // invoke the lambda asynchronously and use the numa executor
-    auto new_future = hpx::async([]() -> double { return 2*3.1415;} ).then(
-        guided_cont_exec, a_function);
-/*
+    auto new_future = hpx::async([]() -> double { return 2 * 3.1415; })
+                          .then(guided_cont_exec, a_function);
+
+    /*
     [](double df)
     {
         double d = df; // .get();
@@ -195,7 +222,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         return d*2;
     }));
 */
-    new_future.get();
+    //    new_future.get();
 
     return hpx::finalize();
 }
@@ -210,7 +237,7 @@ int main(int argc, char* argv[])
         ( "use-pools,u", "Enable advanced HPX thread pools and executors")
         ( "use-scheduler,s", "Enable custom priority scheduler")
         ( "pool-threads,m",
-          boost::program_options::value<int>()->default_value(1),
+          boost::program_options::value<int>()->default_value(0),
           "Number of threads to assign to custom pool")
     ;
 
@@ -247,17 +274,17 @@ int main(int argc, char* argv[])
         [](hpx::threads::policies::callback_notifier& notifier,
             std::size_t num_threads, std::size_t thread_offset,
             std::size_t pool_index, std::string const& pool_name)
-        -> std::unique_ptr<hpx::threads::detail::thread_pool_base>
+        -> std::unique_ptr<hpx::threads::thread_pool_base>
         {
             std::cout << "User defined scheduler creation callback "
                       << std::endl;
             std::unique_ptr<high_priority_sched> scheduler(
-                new high_priority_sched(num_threads, 1, false, false,
-                    "shared-priority-scheduler"));
+                new high_priority_sched(num_threads,
+                    {6, 6, 64}, "shared-priority-scheduler"));
 
             auto mode = scheduler_mode(scheduler_mode::delay_exit);
 
-            std::unique_ptr<hpx::threads::detail::thread_pool_base> pool(
+            std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<
                         high_priority_sched
                     >(std::move(scheduler), notifier,

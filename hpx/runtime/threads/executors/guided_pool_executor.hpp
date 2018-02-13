@@ -9,7 +9,7 @@
 #include <hpx/async.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/lcos/dataflow.hpp>
@@ -27,6 +27,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 //#define GUIDED_EXECUTOR_DEBUG 1
+//#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
 
 // --------------------------------------------------------------------
 // pool_numa_hint
@@ -90,7 +91,12 @@ namespace hpx { namespace threads { namespace executors
         auto operator()(F && f, Ts &&... ts) const
         {
             // call the numa hint function
+#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
+            int domain = -1;
+#else
             int domain = numa_function_(ts...);
+#endif
+
 #ifdef GUIDED_EXECUTOR_DEBUG
             std::cout << "pre_execution_async_domain_schedule : domain " << domain << std::endl;
 #endif
@@ -135,11 +141,15 @@ namespace hpx { namespace threads { namespace executors
         template <typename F, typename Future, typename ... Ts>
         auto operator()(F && f, Future && predecessor, Ts &&... ts) const
         {
+            // call the numa hint function
+#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
+            int domain = -1;
+#else
             // get the argument for the numa hint function from the predecessor future
             const auto & predecessor_value = future_extract_value()(predecessor);
-
-            // call the numa hint function
             int domain = numa_function_(predecessor_value, ts...);
+#endif
+
 #ifdef GUIDED_EXECUTOR_DEBUG
             std::cout << "pre_execution_then_domain_schedule : domain " << domain << std::endl;
 #endif
@@ -212,8 +222,8 @@ namespace hpx { namespace threads { namespace executors
     // the args should be the same as those that would be called
     // for an async function or continuation. This makes it possible to
     // guide a lambda rather than a full function.
-    template <typename H, typename Tag>
-    struct HPX_EXPORT guided_pool_executor<pool_numa_hint<H,Tag>>
+    template <typename Tag>
+    struct HPX_EXPORT guided_pool_executor<pool_numa_hint<Tag>>
         : guided_pool_executor_base
     {
     public:
@@ -239,7 +249,7 @@ namespace hpx { namespace threads { namespace executors
                       << "async_execute : Result      : "
                       << debug::print_type<result_type>() << "\n"
                       << "async_execute : Numa Hint   : "
-                      << debug::print_type<pool_numa_hint<H,Tag>>() << "\n"
+                      << debug::print_type<pool_numa_hint<Tag>>() << "\n"
                       << "async_execute : Hint   : "
                       << debug::print_type<H>() << "\n";
 #endif
@@ -250,7 +260,7 @@ namespace hpx { namespace threads { namespace executors
             return dataflow(launch::sync,
                 util::unwrapping(
                     pre_execution_async_domain_schedule<pool_executor,
-                        pool_numa_hint<H,Tag>> {
+                        pool_numa_hint<Tag>> {
                             pool_executor_, hint_
                         }
                 ),
@@ -303,7 +313,7 @@ namespace hpx { namespace threads { namespace executors
                 [f{std::move(f)}, this](Future && predecessor, Ts &&... ts)
                 {
                     pre_execution_then_domain_schedule<
-                        pool_executor, pool_numa_hint<H,Tag>>
+                        pool_executor, pool_numa_hint<Tag>>
                             pre_exec { pool_executor_, hint_ };
 
                     return pre_exec(
@@ -338,13 +348,13 @@ namespace hpx { namespace threads { namespace executors
             // get the tuple of futures from the predecessor future <tuple of futures>
             const auto & predecessor_value = future_extract_value()(predecessor);
 
+#ifdef GUIDED_EXECUTOR_DEBUG
             // create a tuple of the unwrapped future values
             auto unwrapped_futures_tuple = util::map_pack(
                 future_extract_value{},
                 predecessor_value
             );
 
-#ifdef GUIDED_EXECUTOR_DEBUG
             typedef typename util::detail::invoke_deferred_result<
                 F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type
                     result_type;
@@ -367,7 +377,7 @@ namespace hpx { namespace threads { namespace executors
                 (OuterFuture<util::tuple<InnerFutures...>> && predecessor, Ts &&... ts)
                 {
                     pre_execution_then_domain_schedule<pool_executor,
-                        pool_numa_hint<H,Tag>>
+                        pool_numa_hint<Tag>>
                         pre_exec { pool_executor_, hint_ };
 
                     return pre_exec(
@@ -404,13 +414,17 @@ namespace hpx { namespace threads { namespace executors
                 F, DataFlowFrame, Result, util::tuple<InnerFutures... >>::type
                     result_type;
 
+            // invoke the hint function with the unwrapped tuple futures
+#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
+            int domain = -1;
+#else
             auto unwrapped_futures_tuple = util::map_pack(
                 future_extract_value{},
                 predecessor
             );
 
-            // invoke the hint function with the unwrapped tuple futures
             int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
+#endif
 
 #ifdef GUIDED_EXECUTOR_DEBUG
             std::cout << "dataflow      : Predecessor : "
@@ -454,7 +468,7 @@ namespace hpx { namespace threads { namespace executors
         }
 
     private:
-        pool_numa_hint<H,Tag> hint_;
+        pool_numa_hint<Tag> hint_;
     };
 
     // --------------------------------------------------------------------
