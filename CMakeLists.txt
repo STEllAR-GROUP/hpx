@@ -185,6 +185,14 @@ hpx_option(HPX_WITH_MALLOC
 hpx_option(HPX_WITH_LOGGING BOOL
   "Build HPX with logging enabled (default: ON)."
   ON ADVANCED)
+
+hpx_option(HPX_WITH_FAULT_TOLERANCE BOOL
+  "Build HPX to tolerate failures of nodes, i.e. ignore errors in active communication channels (default: OFF)"
+  OFF ADVANCED)
+if(HPX_WITH_FAULT_TOLERANCE)
+  hpx_add_config_define(HPX_HAVE_FAULT_TOLERANCE)
+endif()
+
 if(HPX_WITH_LOGGING)
   hpx_add_config_define(HPX_HAVE_LOGGING)
 endif()

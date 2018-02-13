@@ -22,6 +22,8 @@
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/protect.hpp>
 
+#include <boost/asio/error.hpp>
+
 #include <exception>
 #include <utility>
 
@@ -77,6 +79,10 @@ namespace lcos {
             // any error in the parcel layer will be stored in the future object
             if (ec)
             {
+                if (hpx::tolerate_node_faults()) {
+                    if (ec == boost::asio::error::connection_reset)
+                        return;
+                }
                 std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
                     "packaged_action::parcel_write_handler",
                     parcelset::dump_parcel(p));

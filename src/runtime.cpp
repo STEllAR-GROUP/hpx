@@ -1132,6 +1132,15 @@ namespace hpx
         return true;        // assume stopped
     }
 
+    bool HPX_EXPORT tolerate_node_faults()
+    {
+#ifdef HPX_HAVE_FAULT_TOLERANCE
+        return true;
+#else
+        return false;
+#endif
+    }
+
     bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();

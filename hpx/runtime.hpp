@@ -345,6 +345,12 @@ namespace hpx
         boost::scoped_ptr<components::server::memory> memory_;
         boost::scoped_ptr<components::server::runtime_support> runtime_support_;
     };
+    ///////////////////////////////////////////////////////////////////////////
+    /// Keep the factory object alive which is responsible for the given
+    /// component type. This a purely internal function allowing to work
+    /// around certain library specific problems related to dynamic
+    /// loading of external libraries.
+    HPX_EXPORT bool tolerate_node_faults();
 }   // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
