@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -127,7 +127,7 @@ namespace hpx { namespace parallel { namespace util
             >::type
             call(InIter first, InIter last, OutIter dest, F && f)
             {
-                return util::transform_loop(parallel::v1::seq,
+                return util::transform_loop(parallel::execution::seq,
                     first, last, dest, std::forward<F>(f));
             }
         };
