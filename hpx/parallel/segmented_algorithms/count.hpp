@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { inline namespace v1
             ExPolicy, typename std::iterator_traits<SegIter>::difference_type
         >::type
         segmented_count(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, T const& value, 
+            SegIter first, SegIter last, T const& value,
             Proj && proj, std::true_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     overall_result = dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, 
+                        algo, policy, std::true_type(), beg, end,
                         value, proj);
                 }
             }
@@ -75,7 +75,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, 
+                        algo, policy, std::true_type(), beg, end,
                         value, proj);
                 }
 
@@ -87,7 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     if (beg != end)
                     {
                         overall_result += dispatch(traits::get_id(sit),
-                            algo, policy, std::true_type(), beg, end, 
+                            algo, policy, std::true_type(), beg, end,
                             value, proj);
                     }
                 }
@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit),
-                        algo, policy, std::true_type(), beg, end, 
+                        algo, policy, std::true_type(), beg, end,
                         value, proj);
                 }
             }
@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { inline namespace v1
             ExPolicy, typename std::iterator_traits<SegIter>::difference_type
         >::type
         segmented_count(Algo && algo, ExPolicy const& policy,
-            SegIter first, SegIter last, T const& value, 
+            SegIter first, SegIter last, T const& value,
             Proj && proj, std::false_type)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
@@ -286,7 +286,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         overall_result += dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(),
-                            beg, end, std::forward<F>(f), 
+                            beg, end, std::forward<F>(f),
                             std::forward<Proj>(proj));
                     }
                 }
@@ -298,7 +298,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result += dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(),
-                        beg, end, std::forward<F>(f), 
+                        beg, end, std::forward<F>(f),
                         std::forward<Proj>(proj));
                 }
             }
@@ -342,7 +342,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
                         algo, policy, forced_seq(),
-                        beg, end, std::forward<F>(f), 
+                        beg, end, std::forward<F>(f),
                         std::forward<Proj>(proj)));
                 }
             }
@@ -367,7 +367,7 @@ namespace hpx { namespace parallel { inline namespace v1
                     {
                         segments.push_back(dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(),
-                            beg, end, std::forward<F>(f), 
+                            beg, end, std::forward<F>(f),
                             std::forward<Proj>(proj)));
                     }
                 }
@@ -426,7 +426,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
             return segmented_count_if(
                 count_if<difference_type>(), std::forward<ExPolicy>(policy),
-                first, last, std::forward<F>(f), std::forward<Proj>(proj), 
+                first, last, std::forward<F>(f), std::forward<Proj>(proj),
                 is_seq());
         }
 
