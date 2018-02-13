@@ -3350,8 +3350,8 @@ approximately 70 tickets (bugs, feature requests, etc.).
   thread.
 * Added two new experimental thread schedulers: hierarchy_scheduler and
   periodic_priority_scheduler. These can be activated by using the command line
-  options [hpx_cmdline [^--hpx:queueing=hierarchy]] or
-  [hpx_cmdline [^--hpx:queueing=periodic]].
+  options [hpx_cmdline [^--hpx:queuing=hierarchy]] or
+  [hpx_cmdline [^--hpx:queuing=periodic]].
 
 [heading Example Applications]
 

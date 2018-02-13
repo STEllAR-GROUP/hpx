@@ -38,9 +38,9 @@ same NUMA domain first, only after that work is stolen from other NUMA domains.
 
 This scheduler is enabled at build time by default and will be available always.
 
-This scheduler can be used with two underlying queueing policies (FIFO:
+This scheduler can be used with two underlying queuing policies (FIFO:
 first-in-first-out, and LIFO: last-in-first-out). The default is FIFO. In order
-to use the LIFO policiy use the command line option
+to use the LIFO policy use the command line option
 [hpx_cmdline `--hpx:queuing=local-priority-lifo`].
 
 [heading Static Priority Scheduling Policy]

@@ -198,7 +198,7 @@ namespace hpx { namespace util
             return num_localities;
         }
 
-        std::string handle_queueing(util::manage_config& cfgmap,
+        std::string handle_queuing(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm, std::string default_)
         {
             // command line options is used preferred
@@ -748,7 +748,7 @@ namespace hpx { namespace util
 #endif
 
         // handle setting related to schedulers
-        queuing_ = detail::handle_queueing(cfgmap, vm, "local-priority-fifo");
+        queuing_ = detail::handle_queuing(cfgmap, vm, "local-priority-fifo");
         ini_config += "hpx.scheduler=" + queuing_;
 
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
