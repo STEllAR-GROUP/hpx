@@ -11,8 +11,6 @@
 #include <hpx/config.hpp>
 
 #include <hpx/util/lockfree/deque.hpp>
-#include <boost/lockfree/queue.hpp>
-#include <boost/lockfree/stack.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -23,17 +21,17 @@ namespace hpx { namespace threads { namespace policies
 struct lockfree_fifo;
 struct lockfree_lifo;
 
-///////////////////////////////////////////////////////////////////////////////
-template <typename T, typename Queuing>
-struct basic_lockfree_queue_backend
+// FIFO
+template <typename T>
+struct lockfree_fifo_backend
 {
-    typedef Queuing container_type;
+    typedef boost::lockfree::deque<T> container_type;
     typedef T value_type;
     typedef T& reference;
     typedef T const& const_reference;
     typedef std::uint64_t size_type;
 
-    basic_lockfree_queue_backend(
+    lockfree_fifo_backend(
         size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
@@ -42,12 +40,12 @@ struct basic_lockfree_queue_backend
 
     bool push(const_reference val, bool /*other_end*/ = false)
     {
-        return queue_.push(val);
+        return queue_.push_left(val);
     }
 
-    bool pop(reference val, bool /*steal*/ = true)
+    bool pop(reference val, bool steal = true)
     {
-        return queue_.pop(val);
+        return queue_.pop_right(val);
     }
 
     bool empty()
@@ -64,10 +62,46 @@ struct lockfree_fifo
     template <typename T>
     struct apply
     {
-        typedef basic_lockfree_queue_backend<
-            T, boost::lockfree::queue<T>
-        > type;
+        typedef lockfree_fifo_backend<T> type;
     };
+};
+
+// LIFO
+template <typename T>
+struct lockfree_lifo_backend
+{
+    typedef boost::lockfree::deque<T> container_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef T const& const_reference;
+    typedef std::uint64_t size_type;
+
+    lockfree_lifo_backend(
+        size_type initial_size = 0
+      , size_type num_thread = size_type(-1)
+        )
+      : queue_(std::size_t(initial_size))
+    {}
+
+    bool push(const_reference val, bool other_end = false)
+    {
+        if (other_end)
+            return queue_.push_right(val);
+        return queue_.push_left(val);
+    }
+
+    bool pop(reference val, bool steal = true)
+    {
+        return queue_.pop_left(val);
+    }
+
+    bool empty()
+    {
+        return queue_.empty();
+    }
+
+  private:
+    container_type queue_;
 };
 
 struct lockfree_lifo
@@ -75,9 +109,7 @@ struct lockfree_lifo
     template <typename T>
     struct apply
     {
-        typedef basic_lockfree_queue_backend<
-            T, boost::lockfree::stack<T>
-        > type;
+        typedef lockfree_lifo_backend<T> type;
     };
 };
 
