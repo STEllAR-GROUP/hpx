@@ -159,6 +159,10 @@ namespace hpx { namespace threads
         mask.set(idx);
     }
 
+    inline void unset(mask_type& mask, std::size_t idx)
+    {
+	mask.set(idx,0);
+    }
     inline std::size_t mask_size(mask_cref_type mask)
     {
         return mask.size();
