@@ -134,7 +134,7 @@ int main()
     data_client B(std::move(old_id));
 
     HPX_TEST(A.get_data().get() == B.get_data().get());
-    
+
     // Test 2
     // Try to checkpoint and restore a component with a client
     //[comp_test_1
