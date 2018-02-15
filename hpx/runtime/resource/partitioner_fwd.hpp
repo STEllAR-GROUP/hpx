@@ -61,10 +61,11 @@ namespace hpx
             local_priority_lifo = 2,
             static_ = 3,
             static_priority = 4,
-            abp_priority = 5,
-            hierarchy = 6,
-            periodic_priority = 7,
-            throttle = 8
+            abp_priority_fifo = 5,
+            abp_priority_lifo = 6,
+            hierarchy = 7,
+            periodic_priority = 8,
+            throttle = 9
         };
     }
 }
