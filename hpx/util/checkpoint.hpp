@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <fstream>
 #include <iosfwd>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -205,23 +206,28 @@ namespace util {
     namespace detail {
         // Properly handle non clients
         template <typename T,
-            typename U = typename std::enable_if<
-                !hpx::traits::is_client<T>::value>::type>
-        void arch_data(hpx::serialization::output_archive& ar, T&& t)
+            typename U = typename std::enable_if<!hpx::traits::is_client<
+                typename std::decay<T>::type>::value>::type>
+        T&& prep(T&& t)
         {
-            ar << t;
+            return std::forward<T>(t);
         }
         // Properly handle Clients to compoents
-        template <typename Client, typename Server,
-            typename U =
-                typename std::enable_if<traits::is_client<Client>::value>::type>
-        void arch_data(hpx::serialization::output_archive& ar,
-            hpx::components::client_base<Client, Server>&& c)
+        template <typename T,
+            typename U = typename std::enable_if<hpx::traits::is_client<
+                typename std::decay<T>::type>::value>::type>
+        hpx::future<std::shared_ptr<
+            typename std::decay<T>::type::server_component_type>>
+        prep(T&& c)
         {
             // Use shared pointer to serialize server
-            hpx::future<std::shared_ptr<Server>> f_ptr =
-                hpx::get_ptr<Server>(c.get_id());
-            ar << f_ptr.get();
+            using server_type =
+                typename std::decay<T>::type::server_component_type;
+            return c.then(
+                [](typename std::decay<T>::type && c)
+                {
+                    return hpx::get_ptr<server_type>(c.get_id());
+                });
         }
         struct save_funct_obj
         {
@@ -231,8 +237,9 @@ namespace util {
                 // Create serialization archive from checkpoint data member
                 hpx::serialization::output_archive ar(c.data);
                 // Serialize data
-                int const sequencer[] = {// Trick to expand the variable pack
-                    0, (arch_data(ar, std::move(ts)),0)...  // Takes advantage of the comma operator
+                int const sequencer[] = {
+                    // Trick to expand the variable pack
+                    0, (ar << ts, 0)...    // Takes advantage of the comma oper.
                 };
                 (void) sequencer;    // Suppress unused param. warnings
                 return std::move(c);
@@ -275,15 +282,18 @@ namespace util {
     ///          argument. In this case save_checkpoint will simply return
     ///          a checkpoint.
 
-    template <typename T, typename... Ts,
+    template <typename T,
+        typename... Ts,
         typename U =
             typename std::enable_if<!hpx::traits::is_launch_policy<T>::value &&
                 !std::is_same<typename std::decay<T>::type,
                     checkpoint>::value>::type>
     hpx::future<checkpoint> save_checkpoint(T&& t, Ts&&... ts)
     {
-        return hpx::dataflow(detail::save_funct_obj(), std::move(checkpoint()),
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+        return hpx::dataflow(detail::save_funct_obj(),
+            std::move(checkpoint()),
+            detail::prep(std::forward<T>(t)),
+            detail::prep(std::forward<Ts>(ts))...);
     }
 
     ///////////////////////////////////
@@ -323,8 +333,10 @@ namespace util {
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(checkpoint&& c, T&& t, Ts&&... ts)
     {
-        return hpx::dataflow(detail::save_funct_obj(), std::move(c),
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+        return hpx::dataflow(detail::save_funct_obj(),
+            std::move(c),
+            detail::prep(std::forward<T>(t)),
+            detail::prep(std::forward<Ts>(ts))...);
     }
 
     ///////////////////////////////////
@@ -365,9 +377,11 @@ namespace util {
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(hpx::launch p, T&& t, Ts&&... ts)
     {
-        return hpx::dataflow(p, detail::save_funct_obj(),
-            std::move(checkpoint()), std::forward<T>(t),
-            std::forward<Ts>(ts)...);
+        return hpx::dataflow(p,
+            detail::save_funct_obj(),
+            std::move(checkpoint()),
+            detail::prep(std::forward<T>(t)),
+            detail::prep(std::forward<Ts>(ts))...);
     }
 
     ///////////////////////////////////
@@ -412,8 +426,11 @@ namespace util {
     hpx::future<checkpoint> save_checkpoint(
         hpx::launch p, checkpoint&& c, T&& t, Ts&&... ts)
     {
-        return hpx::dataflow(p, detail::save_funct_obj(), std::move(c),
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+        return hpx::dataflow(p,
+            detail::save_funct_obj(),
+            std::move(c),
+            detail::prep(std::forward<T>(t)),
+            detail::prep(std::forward<Ts>(ts))...);
     }
 
     ///////////////////////////////////
@@ -459,8 +476,10 @@ namespace util {
         hpx::launch::sync_policy sync_p, T&& t, Ts&&... ts)
     {
         hpx::future<checkpoint> f_chk = hpx::dataflow(sync_p,
-            detail::save_funct_obj(), std::move(checkpoint()),
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+            detail::save_funct_obj(),
+            std::move(checkpoint()),
+            detail::prep(std::forward<T>(t)),
+            detail::prep(std::forward<Ts>(ts))...);
         return f_chk.get();
     }
 
@@ -503,8 +522,11 @@ namespace util {
         hpx::launch::sync_policy sync_p, checkpoint&& c, T&& t, Ts&&... ts)
     {
         hpx::future<checkpoint> f_chk =
-            hpx::dataflow(sync_p, detail::save_funct_obj(), std::move(c),
-                std::forward<T>(t), std::forward<Ts>(ts)...);
+            hpx::dataflow(sync_p,
+                detail::save_funct_obj(),
+                std::move(c),
+                detail::prep(std::forward<T>(t)),
+                detail::prep(std::forward<Ts>(ts))...);
         return f_chk.get();
     }
 
@@ -523,12 +545,13 @@ namespace util {
         void restore_impl(hpx::serialization::input_archive& ar,
             hpx::components::client_base<Client, Server>& c)
         {
-            std::shared_ptr<typename hpx::components::client_base<Client,
-                Server>::server_component_type>
-                server_ptr;
+            hpx::future<std::shared_ptr<typename hpx::components::
+                    client_base<Client, Server>::server_component_type>>
+                f_server_ptr;
             // Revive server
-            ar >> server_ptr;
-            c = hpx::new_<Client>(hpx::find_here(), std::move(*server_ptr));
+            ar >> f_server_ptr;
+            c = hpx::new_<Client>(
+                hpx::find_here(), std::move(*(f_server_ptr.get())));
         }
     }
 
@@ -566,7 +589,8 @@ namespace util {
         // De-serialize data
         detail::restore_impl(ar, t);
         int const sequencer[] = { // Trick to exand the variable pack
-            0, (detail::restore_impl(ar, ts), 0)...};    // Takes advantage of the comma operator
+                                  // Takes advantage of the comma operator
+            0, (detail::restore_impl(ar, ts), 0)...};
         (void) sequencer;         // Suppress unused param. warnings
     }
 

@@ -15,6 +15,8 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <fstream>
+#include <iostream>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -132,20 +134,8 @@ int main()
     data_client B(std::move(old_id));
 
     HPX_TEST(A.get_data().get() == B.get_data().get());
-
+    
     // Test 2
-    // try to checkpoint a component using a client
-    std::vector<int> vec2{5, 4, 3, 2, 1};
-    data_client C(hpx::find_here(), std::move(vec2));
-    hpx::future<checkpoint> f2 = save_checkpoint(C);
-
-    // Restore Server
-    std::shared_ptr<data_server> c_server_id;
-    restore_checkpoint(f2.get(), c_server_id);
-
-    HPX_TEST(C.get_data().get() == c_server_id->get_data());
-
-    // Test 3
     // Try to checkpoint and restore a component with a client
     //[comp_test_1
     std::vector<int> vec3{10, 10, 10, 10, 10};
