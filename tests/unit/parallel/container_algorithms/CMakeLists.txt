@@ -8,6 +8,8 @@ set(tests
     any_of_range
     copy_range
     copyif_range
+    count_range
+    countif_range
     foreach_range
     foreach_range_projection
     generate_range
