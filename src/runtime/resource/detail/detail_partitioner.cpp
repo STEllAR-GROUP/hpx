@@ -144,8 +144,11 @@ namespace hpx { namespace resource { namespace detail
         case resource::static_priority:
             sched = "static_priority";
             break;
-        case resource::abp_priority:
-            sched = "abp_priority";
+        case resource::abp_priority_fifo:
+            sched = "abp_priority_fifo";
+            break;
+        case resource::abp_priority_lifo:
+            sched = "abp_priority_lifo";
             break;
         case resource::hierarchy:
             sched = "hierarchy";
@@ -428,9 +431,13 @@ namespace hpx { namespace resource { namespace detail
         {
             default_scheduler = scheduling_policy::static_priority;
         }
-        else if (0 == std::string("abp-priority").find(cfg_.queuing_))
+        else if (0 == std::string("abp-priority-fifo").find(cfg_.queuing_))
         {
-            default_scheduler = scheduling_policy::abp_priority;
+            default_scheduler = scheduling_policy::abp_priority_fifo;
+        }
+        else if (0 == std::string("abp-priority-lifo").find(cfg_.queuing_))
+        {
+            default_scheduler = scheduling_policy::abp_priority_lifo;
         }
         else if (0 == std::string("hierarchy").find(cfg_.queuing_))
         {

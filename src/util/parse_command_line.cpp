@@ -446,7 +446,7 @@ namespace hpx { namespace util
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are "
                   "'local', 'local-priority-fifo','local-priority-lifo', "
-                  "'abp-priority', "
+                  "'abp-priority-fifo', 'abp-priority-lifo', "
                   "'hierarchy', 'static', 'static-priority', and "
                   "'periodic-priority' (default: 'local-priority'; "
                   "all option values can be abbreviated)")

@@ -630,7 +630,7 @@ by __cpp11_n4406__ (Parallel Algorithms Need Executors).
 Executors are modular components for requisitioning execution agents. During
 parallel algorithm execution, execution policies generate execution agents by
 requesting their creation from an associated executor. Rather than focusing on
-asynchronous task queueing, our complementary treatment of executors casts
+asynchronous task queuing, our complementary treatment of executors casts
 them as modular components for invoking functions over the points of an index
 space. We believe that executors may be conceived of as allocators for
 execution agents and our interface's design reflects this analogy. The process

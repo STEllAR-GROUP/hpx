@@ -16,6 +16,11 @@
 #include <iosfwd>
 #include <string>
 
+namespace hpx { namespace iostreams {
+    template <typename Char, typename Sink>
+    struct ostream;
+}}
+
 namespace hpx { namespace util
 {
     template <typename ...Args>
@@ -27,6 +32,18 @@ namespace hpx { namespace util
         (void)_sequencer;
 
         return boost::str(fmt);
+    }
+
+    template <typename Char, typename Sink, typename ...Args>
+    hpx::iostreams::ostream<Char, Sink>& format_to(
+        hpx::iostreams::ostream<Char, Sink>& os,
+        std::string const& format_str, Args const&... args)
+    {
+        boost::format fmt(format_str);
+        int const _sequencer[] = { ((fmt % args), 0)... };
+        (void)_sequencer;
+
+        return os << fmt;
     }
 
     template <typename ...Args>
