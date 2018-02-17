@@ -436,6 +436,13 @@ namespace hpx { namespace threads
             std::function<void(void)> callback, std::size_t virt_core,
                 error_code& ec = throws) = 0;
 
+        /// \cond NOINTERNAL
+        policies::scheduler_mode get_scheduler_mode() const
+        {
+            return mode_;
+        }
+        /// \endcond
+
     protected:
         /// \cond NOINTERNAL
         void init_pool_time_scale();
