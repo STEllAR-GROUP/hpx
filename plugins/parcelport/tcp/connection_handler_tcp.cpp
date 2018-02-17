@@ -207,6 +207,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             strm << error.message() << " (while trying to connect to: "
                   << l << ")";
 
+            if (tolerate_node_faults())
+                return sender_connection;
+
             HPX_THROWS_IF(ec, network_error,
                 "tcp::connection_handler::get_connection",
                 strm.str());
