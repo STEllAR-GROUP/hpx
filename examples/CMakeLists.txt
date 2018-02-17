@@ -8,7 +8,6 @@
 set(subdirs
     1d_stencil
     accumulators
-    allgather
     async_io
     balancing
     cancelable_action
