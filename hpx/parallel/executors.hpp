@@ -22,6 +22,7 @@
 #include <hpx/parallel/executors/default_executor.hpp>
 #include <hpx/parallel/executors/distribution_policy_executor.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
+#include <hpx/parallel/executors/pool_executor.hpp>
 #include <hpx/parallel/executors/sequenced_executor.hpp>
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/parallel/executors/this_thread_executors.hpp>

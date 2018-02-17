@@ -352,6 +352,30 @@ namespace hpx { namespace util
 #endif
             }
 
+            // make sure minimal requested number of threads is observed
+            std::size_t min_os_threads = cfgmap.get_value<std::size_t>(
+                "hpx.force_min_os_threads", threads);
+
+            if (min_os_threads == 0)
+            {
+                throw hpx::detail::command_line_error(
+                    "Number of hpx.force_min_os_threads must be greater than "
+                    "0");
+            }
+
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+            if (min_os_threads > HPX_HAVE_MAX_CPU_COUNT)
+            {
+                throw hpx::detail::command_line_error("Requested more than "
+                    HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)
+                    " hpx.force_min_os_threads "
+                    "to use for this application, use the option "
+                    "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+            }
+#endif
+
+            threads = (std::max)(threads, min_os_threads);
+
             if (!initial && env.found_batch_environment() &&
                 using_nodelist && (threads > batch_threads))
             {

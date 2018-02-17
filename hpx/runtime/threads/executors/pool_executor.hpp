@@ -95,12 +95,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT pool_executor : public scheduled_executor
     {
-        pool_executor(const std::string& pool_name);
+        pool_executor() = default;
 
-        pool_executor(const std::string& pool_name,
+        pool_executor(std::string const& pool_name);
+
+        pool_executor(std::string const& pool_name,
                 thread_stacksize stacksize);
 
-        pool_executor(const std::string& pool_name,
+        pool_executor(std::string const& pool_name,
                 thread_priority priority,
                 thread_stacksize stacksize = thread_stacksize_default);
     };

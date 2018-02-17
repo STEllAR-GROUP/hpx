@@ -141,6 +141,22 @@ namespace hpx { namespace resource
         {}
 
 #if !defined(HPX_EXPORTS)
+        partitioner(util::function_nonser<int(int, char**)> const& f,
+            int argc, char** argv,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            hpx::runtime_mode mode = hpx::runtime_mode_default)
+          : partitioner_(
+                detail::create_partitioner(f, argc, argv, rpmode, mode))
+        {}
+
+        partitioner(util::function_nonser<int(int, char**)> const& f,
+            int argc, char** argv, std::vector<std::string> const& cfg,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            hpx::runtime_mode mode = hpx::runtime_mode_default)
+          : partitioner_(
+                detail::create_partitioner(f, argc, argv, cfg, rpmode, mode))
+        {}
+
         partitioner(int argc, char** argv,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
