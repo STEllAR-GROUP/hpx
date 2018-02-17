@@ -6,6 +6,7 @@
 set(tests
     lockfree_fifo
     resource_manager
+    schedule_last
     set_thread_state
     stack_check
     thread

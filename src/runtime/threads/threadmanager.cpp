@@ -585,7 +585,7 @@ namespace hpx { namespace threads
                 break;
             }
 
-            case resource::abp_priority:
+            case resource::abp_priority_fifo:
             {
 #if defined(HPX_HAVE_ABP_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
@@ -619,7 +619,48 @@ namespace hpx { namespace threads
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
-                    "Command line option --hpx:queuing=abp-priority "
+                    "Command line option --hpx:queuing=abp-priority-fifo "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
+#endif
+                break;
+            }
+
+            case resource::abp_priority_lifo:
+            {
+#if defined(HPX_HAVE_ABP_SCHEDULER)
+                // set parameters for scheduler and pool instantiation and
+                // perform compatibility checks
+                hpx::detail::ensure_hierarchy_arity_compatibility(cfg_.vm_);
+                hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
+                std::size_t num_high_priority_queues =
+                    hpx::detail::get_num_high_priority_queues(
+                        cfg_, rp.get_num_threads(name));
+
+                // instantiate the scheduler
+                typedef hpx::threads::policies::local_priority_queue_scheduler<
+                    compat::mutex, hpx::threads::policies::lockfree_lifo>
+                    local_sched_type;
+                local_sched_type::init_parameter_type init(num_threads_in_pool,
+                    num_high_priority_queues, 1000, cfg_.numa_sensitive_,
+                    "core-abp_fifo_priority_queue_scheduler");
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(init));
+
+                // instantiate the pool
+                std::unique_ptr<thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<
+                            local_sched_type
+                        >(std::move(sched),
+                        notifier_, i, name.c_str(),
+                        policies::scheduler_mode(policies::do_background_work |
+                            policies::reduce_thread_priority |
+                            policies::delay_exit),
+                        thread_offset));
+                pools_.push_back(std::move(pool));
+#else
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:queuing=abp-priority-lifo "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
 #endif
