@@ -42,8 +42,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    // check if HPX should ignore exceptions
-    // through node failures such as a connection reset 
+    // \brief Returns if HPX continues past connection signals
+    // caused by crashed nodes
     HPX_EXPORT bool tolerate_node_faults();
     namespace util
     {
