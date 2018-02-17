@@ -221,9 +221,19 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
-        HPX_EXPORT domain(char const* name);
+        HPX_NON_COPYABLE(domain);
+
+        HPX_EXPORT domain(char const*);
+        HPX_EXPORT domain();
 
         ___itt_domain* domain_;
+    };
+
+    struct thread_domain : domain
+    {
+        HPX_NON_COPYABLE(thread_domain);
+
+        HPX_EXPORT thread_domain();
     };
 
     struct id
@@ -355,11 +365,7 @@ namespace hpx { namespace util { namespace itt
     {
         HPX_EXPORT task(domain const&, util::thread_description const&);
         HPX_EXPORT task(domain const&, string_handle const&);
-
-        ~task()
-        {
-            HPX_ITT_TASK_END(domain_.domain_);
-        }
+        HPX_EXPORT ~task();
 
         void add_metadata(string_handle const& name, std::uint64_t val)
         {
@@ -633,8 +639,17 @@ namespace hpx { namespace util { namespace itt
     //////////////////////////////////////////////////////////////////////////
     struct domain
     {
+        HPX_NON_COPYABLE(domain);
+
         domain(char const*) {}
-        ~domain() {}
+        domain() {}
+    };
+
+    struct thread_domain : domain
+    {
+        HPX_NON_COPYABLE(thread_domain);
+
+        thread_domain() : domain() {};
     };
 
     struct id

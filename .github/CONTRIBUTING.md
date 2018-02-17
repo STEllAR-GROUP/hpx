@@ -96,7 +96,7 @@ The short version of the guidelines:
 * Use expressive identifiers.
 * Exceptions for error handling instead of C-style error codes.
 
-A more elaborate description of our coding guidelines can be found 
+A more elaborate description of our coding guidelines can be found
 [here](https://github.com/STEllAR-GROUP/hpx/wiki/HPX-Source-Code-Structure-and-Coding-Standards).
 
 There is a `.editorconfig` file in the HPX root directory which can be used
@@ -106,10 +106,10 @@ editor.
 
 There is a `.clang-format` file in the HPX root directory which you can use to
 manually format the code you contribute. This configuration file can be used
-with [clang-format](https://clang.llvm.org/docs/ClangFormat.html), a tool created 
+with [clang-format](https://clang.llvm.org/docs/ClangFormat.html), a tool created
 by the [Clang](https://clang.llvm.org/) project.
 
-Please follow the follwoing guidelines for using it:
+Please follow the following guidelines for using it:
 
 * You should use this file for creating an initial formatting for new files.
 * Please separate edits which are pure formatting into isolated commits
@@ -128,7 +128,7 @@ A few additional ones:
 
 Community is an important part of all we do.
 
-* You can help us answer questions our users have by being around on IRC 
+* You can help us answer questions our users have by being around on IRC
   (#ste||ar on irc.freenode.net) or by chiming in on the
   [users mailing list](email:hpx-users@stellar.cct.lsu.edu)
 * You can help write blog posts (for [stellar.cct.lsu.edu](stellar.cct.lsu.edu))
