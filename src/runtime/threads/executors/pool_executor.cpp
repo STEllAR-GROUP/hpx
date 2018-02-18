@@ -18,26 +18,25 @@ namespace hpx { namespace threads { namespace executors
 {
     namespace detail
     {
-        pool_executor::pool_executor(
-                std::string const& pool_name)
-            : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
-            , stacksize_(thread_stacksize_default)
-            , priority_(thread_priority_default)
+        pool_executor::pool_executor(std::string const& pool_name)
+          : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+          , stacksize_(thread_stacksize_default)
+          , priority_(thread_priority_default)
         {}
 
-        pool_executor::pool_executor(const std::string& pool_name,
-                thread_stacksize stacksize)
-            : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
-            , stacksize_(stacksize)
-            , priority_(thread_priority_default)
+        pool_executor::pool_executor(std::string const& pool_name,
+            thread_stacksize stacksize)
+          : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+          , stacksize_(stacksize)
+          , priority_(thread_priority_default)
         {}
 
-        pool_executor::pool_executor(const std::string& pool_name,
-                thread_priority priority, thread_stacksize stacksize)
-            : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
-            , stacksize_(stacksize)
-            , priority_(priority)
-            {}
+        pool_executor::pool_executor(std::string const& pool_name,
+            thread_priority priority, thread_stacksize stacksize)
+          : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+          , stacksize_(stacksize)
+          , priority_(priority)
+        {}
 
         threads::thread_result_type
         pool_executor::thread_function_nullary(closure_type func)
@@ -164,21 +163,21 @@ namespace hpx { namespace threads { namespace executors
 
 namespace hpx { namespace threads { namespace executors
 {
-    pool_executor::pool_executor(
-        const std::string& pool_name)
-      : scheduled_executor(new detail::pool_executor(pool_name))
-    {}
+    pool_executor::pool_executor(std::string const& pool_name)
+        : scheduled_executor(new detail::pool_executor(pool_name))
+    {
+    }
 
-    pool_executor::pool_executor(const std::string& pool_name,
+    pool_executor::pool_executor(std::string const& pool_name,
             thread_stacksize stacksize)
-        : scheduled_executor(new detail::pool_executor(pool_name, stacksize))
-    {}
+      : scheduled_executor(new detail::pool_executor(pool_name, stacksize))
+    {
+    }
 
-    pool_executor::pool_executor(const std::string& pool_name,
+    pool_executor::pool_executor(std::string const& pool_name,
             thread_priority priority, thread_stacksize stacksize)
-        : scheduled_executor(
-              new detail::pool_executor(pool_name, priority, stacksize))
-    {}
-
-
+      : scheduled_executor(
+            new detail::pool_executor(pool_name, priority, stacksize))
+    {
+    }
 }}}

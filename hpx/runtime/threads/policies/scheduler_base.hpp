@@ -154,7 +154,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
         }
 
-        void suspend(std::size_t num_thread)
+        virtual void suspend(std::size_t num_thread)
         {
             HPX_ASSERT(num_thread < suspend_conds_.size());
 
@@ -172,7 +172,7 @@ namespace hpx { namespace threads { namespace policies
                 expected == state_stopping || expected == state_terminating);
         }
 
-        void resume(std::size_t num_thread)
+        virtual void resume(std::size_t num_thread)
         {
             if (num_thread == std::size_t(-1))
             {

@@ -325,7 +325,10 @@ namespace hpx { namespace threads { namespace detail
         for (std::size_t virt_core = 0; virt_core != threads_.size();
              ++virt_core)
         {
-            this->sched_->Scheduler::resume(virt_core);
+            if (mode_ & policies::enable_suspension)
+            {
+                this->sched_->Scheduler::resume(virt_core);
+            }
         }
 
         if (blocking)
@@ -353,6 +356,14 @@ namespace hpx { namespace threads { namespace detail
             return hpx::make_ready_future();
         }
 
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume",
+                "this scheduler does not support suspension");
+            return hpx::make_ready_future();
+        }
+
         return hpx::async(
             hpx::util::bind(&scheduled_thread_pool::resume_internal, this, true,
                 std::move(throws)));
@@ -362,6 +373,14 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_cb(
         std::function<void(void)> callback, error_code& ec)
     {
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume_cb",
+                "this scheduler does not support suspension");
+            return;
+        }
+
         std::function<void(void)> resume_internal_wrapper =
             [this, HPX_CAPTURE_MOVE(callback)]()
             {
@@ -385,8 +404,16 @@ namespace hpx { namespace threads { namespace detail
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                "scheduled_thread_pool<Scheduler>::suspend",
+                "scheduled_thread_pool<Scheduler>::resume_direct",
                 "cannot suspend a pool from itself");
+            return;
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume_direct",
+                "this scheduler does not support suspension");
             return;
         }
 
@@ -425,7 +452,7 @@ namespace hpx { namespace threads { namespace detail
                 "scheduled_thread_pool<Scheduler>::suspend",
                 "cannot call suspend from outside HPX, use suspend_cb or"
                 "suspend_direct instead");
-            return make_ready_future();
+            return hpx::make_ready_future();
         }
         else if (threads::get_self_ptr() &&
             hpx::this_thread::get_pool() == this)
@@ -434,6 +461,14 @@ namespace hpx { namespace threads { namespace detail
                 HPX_GET_EXCEPTION(bad_parameter,
                     "scheduled_thread_pool<Scheduler>::suspend",
                     "cannot suspend a pool from itself"));
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend",
+                "this scheduler does not support suspension");
+            return hpx::make_ready_future();
         }
 
         return hpx::async(
@@ -448,8 +483,16 @@ namespace hpx { namespace threads { namespace detail
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                "scheduled_thread_pool<Scheduler>::suspend",
+                "scheduled_thread_pool<Scheduler>::suspend_cb",
                 "cannot suspend a pool from itself");
+            return;
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend_cb",
+                "this scheduler does not support suspension");
             return;
         }
 
@@ -476,8 +519,16 @@ namespace hpx { namespace threads { namespace detail
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                          "scheduled_thread_pool<Scheduler>::suspend",
-                          "cannot suspend a pool from itself");
+                "scheduled_thread_pool<Scheduler>::suspend_direct",
+                "cannot suspend a pool from itself");
+            return;
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend_direct",
+                "this scheduler does not support suspension");
             return;
         }
 
@@ -1775,7 +1826,10 @@ namespace hpx { namespace threads { namespace detail
 
         util::yield_while([this, &state, virt_core]()
             {
-                this->sched_->Scheduler::resume(virt_core);
+                if (mode_ & policies::enable_suspension)
+                {
+                    this->sched_->Scheduler::resume(virt_core);
+                }
                 return state.load() == state_sleeping;
             }, "scheduled_thread_pool::resume_processing_unit_internal",
             hpx::threads::pending);
