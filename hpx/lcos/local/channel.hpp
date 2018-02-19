@@ -19,7 +19,7 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/iterator_facade.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace local
                 std::exception_ptr e;
 
                 {
-                    util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     e = HPX_GET_EXCEPTION(
                             hpx::future_cancelled, hpx::lightweight,
                             "hpx::lcos::local::close",
@@ -478,7 +478,7 @@ namespace hpx { namespace lcos { namespace local
                 // canceled at this point
                 std::exception_ptr e;
                 {
-                    util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     e = std::exception_ptr(
                         HPX_GET_EXCEPTION(hpx::future_cancelled,
                             "hpx::lcos::local::close",

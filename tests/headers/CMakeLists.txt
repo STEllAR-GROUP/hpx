@@ -22,6 +22,11 @@ set(exclude_from_headers
   "parallel/executors/timed_execution_fwd.hpp"
 )
 
+if(NOT HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY)
+  set(exclude_from_all_headers ${exclude_from_all_headers} "util/scoped_unlock.hpp")
+  set(exclude_from_headers ${exclude_from_headers} "util/scoped_unlock.hpp")
+endif()
+
 # If we compile with the MPI parcelport enabled, we need to additionally
 # add the MPI include path here, because for the main library, it's only
 # added for the plugin.
