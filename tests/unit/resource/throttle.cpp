@@ -231,9 +231,7 @@ void test_scheduler(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // NOTE: Static schedulers do not support suspending the own worker thread
-    // because they do not steal work. Periodic priority scheduler not tested
-    // because it does not take into account scheduler states when scheduling
-    // work.
+    // because they do not steal work.
 
     test_scheduler<hpx::threads::policies::local_queue_scheduler<>>(argc, argv);
     test_scheduler<hpx::threads::policies::local_priority_queue_scheduler<>>(argc,
