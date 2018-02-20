@@ -79,7 +79,7 @@ void print_results(
 
     hpx::util::format_to(std::cout,
         "%-21s %-21s %-21s %10.12s, %10.12s\n",
-        cores_str, tasks_str, delay_str
+        cores_str, tasks_str, delay_str,
         walltime, walltime / tasks);
 }
 
