@@ -605,7 +605,7 @@ hpx_option(HPX_WITH_ITTNOTIFY BOOL
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, static. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
