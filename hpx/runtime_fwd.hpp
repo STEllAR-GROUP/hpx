@@ -92,6 +92,14 @@ namespace hpx
     ///         return false otherwise.
     HPX_API_EXPORT bool is_starting();
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test if HPX runs in fault-tolerant mode
+    ///
+    /// This function returns whether the runtime system is running
+    /// in fault-tolerant mode
+    HPX_API_EXPORT bool tolerate_node_faults();
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently running.
     ///

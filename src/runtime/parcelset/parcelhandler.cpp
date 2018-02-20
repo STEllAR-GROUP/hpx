@@ -709,6 +709,10 @@ namespace hpx { namespace parcelset
                     return;
                 }
             }
+            else if (hpx::tolerate_node_faults()) {
+                if (ec == boost::asio::error::connection_reset)
+                    return;
+            }
 
             // all unhandled exceptions terminate the whole application
             std::exception_ptr exception =

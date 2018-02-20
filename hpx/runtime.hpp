@@ -42,6 +42,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    // \brief Returns if HPX continues past connection signals
+    // caused by crashed nodes
+    HPX_EXPORT bool tolerate_node_faults();
     namespace util
     {
         class thread_mapper;
