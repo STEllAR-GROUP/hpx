@@ -86,10 +86,8 @@ described in the table below:
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
                                  'local/l', 'local-priority-fifo/lo', 'local-priority-lifo',
-                                 'abp-priority-fifo/a', 'abp-priority-lifo', 'hierarchy/h', and
-                                 'periodic/pe' (default: local-priority-fifo/lo)]]
-    [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
-                                 `--hpx:queuing=hierarchy` only (default: 2)]]
+                                 'abp-priority-fifo/a' and 'abp-priority-lifo'
+                                 (default: local-priority-fifo/lo)]]
     [[`--hpx:high-priority-threads arg`] [the number of operating system threads
                                  maintaining a high priority queue (default:
                                  number of OS threads), valid for `--hpx:queuing=local`,
