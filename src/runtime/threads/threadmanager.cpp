@@ -102,52 +102,6 @@ namespace hpx {
             ensure_numa_sensitivity_compatibility(vm);
         }
 
-        void ensure_hwloc_compatibility(
-            boost::program_options::variables_map const& vm)
-        {
-            // pu control is available for HWLOC only
-            if (vm.count("hpx:pu-offset"))
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:pu-offset, valid for --hpx:queuing=priority or "
-                    "--hpx:queuing=local-priority only.");
-            }
-            if (vm.count("hpx:pu-step"))
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:pu-step, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-            // affinity control is available for HWLOC only
-            if (vm.count("hpx:affinity"))
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:affinity, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-            if (vm.count("hpx:bind"))
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:bind, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-            if (vm.count("hpx:print-bind"))
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:print-bind, valid for --hpx:queuing=abp-priority, "
-                    "--hpx:queuing=periodic-priority, or "
-                    "--hpx:queuing=local-priority only.");
-            }
-        }
-
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_num_high_priority_queues(
             util::command_line_handling const& cfg, std::size_t num_threads)
@@ -575,7 +529,6 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_ABP_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
-                hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
                 std::size_t num_high_priority_queues =
                     hpx::detail::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
@@ -616,7 +569,6 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_ABP_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
-                hpx::detail::ensure_hwloc_compatibility(cfg_.vm_);
                 std::size_t num_high_priority_queues =
                     hpx::detail::get_num_high_priority_queues(
                         cfg_, rp.get_num_threads(name));
