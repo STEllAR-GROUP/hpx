@@ -9,16 +9,16 @@
 
 [section:schedulers __hpx__ Thread Scheduling Policies]
 
-The HPX runtime has six thread scheduling policies: local-priority, local,
-abp-priority and static-priority. These policies can be specified from the
-command line using the command line option [hpx_cmdline `--hpx:queuing`]. In
-order to use a particular scheduling policy, the runtime system must be built
-with the appropriate scheduler flag turned on (e.g. `cmake
+The HPX runtime has five thread scheduling policies: local-priority,
+static-priority, local, static and abp-priority. These policies can be specified
+from the command line using the command line option [hpx_cmdline
+`--hpx:queuing`]. In order to use a particular scheduling policy, the runtime
+system must be built with the appropriate scheduler flag turned on (e.g. `cmake
 -DHPX_THREAD_SCHEDULERS=local`, see __cmake_options__ for more information).
 
 [heading Priority Local Scheduling Policy (default policy)]
 
-* default or invoke using: [hpx_cmdline `--hpx:queuing=local-priority-fifo`] (or `-qlo`)
+* default or invoke using: [hpx_cmdline `--hpx:queuing=local-priority-fifo`]
 
 The priority local scheduling policy maintains one queue per operating system
 (OS) thread. The OS thread pulls its work from this queue. By default the number
