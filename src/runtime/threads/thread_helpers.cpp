@@ -46,7 +46,7 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         return  detail::set_thread_state(id, state, stateex,
-            priority, std::size_t(-1), ec);
+            priority, thread_schedule_hint_none, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
