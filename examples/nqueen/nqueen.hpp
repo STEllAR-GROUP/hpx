@@ -34,7 +34,12 @@ namespace nqueen
 
         void init_board(std::size_t size)
         {
-            hpx::apply<server::board::init_action>(this->get_id(), size);
+            return init_board_async(size).get();
+        }
+
+        hpx::lcos::future<void> init_board_async(std::size_t size)
+        {
+            return hpx::async<server::board::init_action>(this->get_id(), size);
         }
 
         //-------------------------------------------------------
