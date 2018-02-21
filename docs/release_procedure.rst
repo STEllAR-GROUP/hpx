@@ -164,6 +164,11 @@ the lines as they are completed to avoid confusion.
 
 #.  Merge new branch containing next version numbers to master, resolve conflicts
     if necessary.
+    
+#.  Update Vcpkg (https://github.com/Microsoft/vcpkg) to pull from latest release.
+
+    *  Update version number in CONTROL
+    *  Update tag and SHA512 to that of the new release
 
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu,
     stellar@cct.lsu.edu, allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
