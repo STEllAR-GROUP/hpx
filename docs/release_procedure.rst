@@ -125,9 +125,9 @@ the lines as they are completed to avoid confusion.
     Move the old (now current) 'What's New' section to the section for the previous
     releases.
 
-#.  Create new logos for documentation. Update the logo used on line 234
-    (add '_draft') and change the size accordingly in ``docs/cmakelist.txt``
-    lines 330/331.
+#.  Create new logos for documentation. Change logo by adding ``_draft`` suffix
+    in ``docs/cmakelist.txt`` in the ``set(image...`` call. Update logo size
+    accordingly in the call to ``hpx_quickbook_to_html``.
 
 #.  Update ``$HPX_SOURCE/README.rst``
 
