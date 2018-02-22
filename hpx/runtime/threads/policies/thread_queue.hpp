@@ -64,9 +64,9 @@ namespace hpx { namespace threads { namespace policies
     {
         inline int get_min_tasks_to_steal_pending()
         {
-            static int min_tasks_to_steal_pending =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.min_tasks_to_steal_pending", "0"));
+            static int min_tasks_to_steal_pending = 0;
+//                boost::lexical_cast<int>(hpx::get_config_entry(
+//                    "hpx.thread_queue.min_tasks_to_steal_pending", "0"));
             return min_tasks_to_steal_pending;
         }
 
@@ -80,25 +80,25 @@ namespace hpx { namespace threads { namespace policies
 
         inline int get_min_add_new_count()
         {
-            static int min_add_new_count =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.min_add_new_count", "10"));
+            static int min_add_new_count = 0;
+//                boost::lexical_cast<int>(hpx::get_config_entry(
+//                    "hpx.thread_queue.min_add_new_count", "10"));
             return min_add_new_count;
         }
 
         inline int get_max_add_new_count()
         {
-            static int max_add_new_count =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.max_add_new_count", "10"));
+            static int max_add_new_count = 50;
+//                boost::lexical_cast<int>(hpx::get_config_entry(
+//                    "hpx.thread_queue.max_add_new_count", "10"));
             return max_add_new_count;
         }
 
         inline int get_max_delete_count()
         {
-            static int max_delete_count =
-                boost::lexical_cast<int>(hpx::get_config_entry(
-                    "hpx.thread_queue.max_delete_count", "1000"));
+            static int max_delete_count = 50;
+//                boost::lexical_cast<int>(hpx::get_config_entry(
+//                    "hpx.thread_queue.max_delete_count", "1000"));
             return max_delete_count;
         }
 
@@ -755,10 +755,10 @@ namespace hpx { namespace threads { namespace policies
             std::int64_t work_items_count =
                 work_items_count_.load(std::memory_order_relaxed);
 
-            if (allow_stealing && min_tasks_to_steal_pending > work_items_count)
-            {
-                return false;
-            }
+//            if (allow_stealing && min_tasks_to_steal_pending > work_items_count)
+//            {
+//                return false;
+//            }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             thread_description* tdesc;
