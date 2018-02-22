@@ -64,14 +64,15 @@ namespace hpx
             util::attach_debugger();
         }
 
-        std::cerr
+        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        {
+            std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::util::trace() << "\n"
+                << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
-            << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
-            << full_build_string();           // add full build information
-
-        std::abort();
+                << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
+                << full_build_string();           // add full build information
+        }
     }
 
     HPX_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
@@ -121,15 +122,16 @@ namespace hpx
             util::attach_debugger();
         }
 
-        char* reason = strsignal(signum);
-        std::cerr
+        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        {
+            char* reason = strsignal(signum);
+            std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::util::trace() << "\n"
+                << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
-            << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
-            << full_build_string();           // add full build information
-
-        std::abort();
+                << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
+                << full_build_string();           // add full build information
+        }
     }
 }
 
