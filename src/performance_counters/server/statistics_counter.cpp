@@ -20,7 +20,6 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/median.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/max.hpp>
 #include <boost/accumulators/statistics/min.hpp>
@@ -36,6 +35,7 @@
 #  pragma warning(push)
 #  pragma warning(disable: 4244)
 #endif
+#include <boost/accumulators/statistics/median.hpp>
 #if defined(HPX_MSVC)
 #  pragma warning(pop)
 #endif
