@@ -499,8 +499,8 @@ namespace hpx { namespace threads { namespace executors
             , pool_exec_(pool_name, priority, stacksize)
         {}
 
-
         // --------------------------------------------------------------------
+        // async
         // --------------------------------------------------------------------
         template <typename F, typename ... Ts>
         future<typename util::detail::invoke_deferred_result<F, Ts...>::type>
@@ -516,12 +516,18 @@ namespace hpx { namespace threads { namespace executors
                     pool_exec_,
                     util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...)
                 );
-                p.apply();
+                p.apply(
+                    hpx::launch::async,
+                    pool_exec_.get_priority(),
+                    pool_exec_.get_stacksize(),
+                    threads::thread_schedule_hint_none
+                );
                 return p.get_future();
             }
         }
 
         // --------------------------------------------------------------------
+        // Continuation
         // --------------------------------------------------------------------
         template <typename F,
                   typename Future,
