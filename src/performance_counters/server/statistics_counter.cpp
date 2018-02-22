@@ -36,7 +36,6 @@
 #  pragma warning(push)
 #  pragma warning(disable: 4244)
 #endif
-#include <boost/accumulators/statistics/median.hpp>
 #if defined(HPX_MSVC)
 #  pragma warning(pop)
 #endif
