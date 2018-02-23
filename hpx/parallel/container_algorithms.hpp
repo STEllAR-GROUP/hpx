@@ -10,6 +10,7 @@
 #include <hpx/parallel/algorithm.hpp>
 
 #include <hpx/parallel/container_algorithms/copy.hpp>
+#include <hpx/parallel/container_algorithms/fill.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/container_algorithms/generate.hpp>
 #include <hpx/parallel/container_algorithms/is_heap.hpp>
