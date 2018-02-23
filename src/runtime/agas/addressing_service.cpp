@@ -31,6 +31,8 @@
 #include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/format.hpp>
@@ -45,6 +47,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/when_all.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -2850,6 +2853,19 @@ namespace hpx
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::register_name(std::move(name), id);
+    }
+
+    hpx::future<bool> register_with_basename(std::string base_name,
+        hpx::future<hpx::id_type> f, std::size_t sequence_nr)
+    {
+        return f.then(
+            [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
+                hpx::future<hpx::id_type> && f
+            ) mutable -> hpx::future<bool>
+            {
+                return register_with_basename(
+                    std::move(base_name), f.get(), sequence_nr);
+            });
     }
 
     hpx::future<hpx::id_type> unregister_with_basename(

@@ -143,7 +143,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_localities.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_colocation_id.hpp"

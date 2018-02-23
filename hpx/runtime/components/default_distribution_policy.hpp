@@ -9,13 +9,14 @@
 #define HPX_COMPONENTS_DISTRIBUTION_POLICY_APR_07_2015_1246PM
 
 #include <hpx/config.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>

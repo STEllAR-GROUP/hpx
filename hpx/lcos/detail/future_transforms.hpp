@@ -6,6 +6,7 @@
 #ifndef HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP
 #define HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP
 
+#include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>

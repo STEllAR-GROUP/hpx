@@ -50,7 +50,7 @@ namespace hpx { namespace threads { namespace policies
         typedef std::true_type has_periodic_maintenance;
 
         void start_periodic_maintenance(
-            std::atomic<hpx::state>& global_state)
+            std::atomic<hpx::state>& global_state) override
         {
             threads::detail::start_periodic_maintenance(*this, global_state,
                 has_periodic_maintenance());

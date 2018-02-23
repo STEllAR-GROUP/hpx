@@ -135,6 +135,7 @@ namespace hpx { namespace lcos
 #define HPX_LCOS_BROADCAST_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>

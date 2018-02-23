@@ -127,11 +127,26 @@ namespace hpx { namespace traits
             return lcos::future<R>(shared_state);
         }
 
-        template <typename SharedState>
+        template <typename T = void>
         static lcos::future<R>
-        create(boost::intrusive_ptr<SharedState> && shared_state)
+        create(typename detail::shared_state_ptr_for<
+            lcos::future<lcos::future<R>>>::type const& shared_state)
+        {
+            return lcos::future<lcos::future<R>>(shared_state);
+        }
+
+        template <typename SharedState>
+        static lcos::future<R> create(
+            boost::intrusive_ptr<SharedState>&& shared_state)
         {
             return lcos::future<R>(std::move(shared_state));
+        }
+
+        template <typename T = void>
+        static lcos::future<R> create(typename detail::shared_state_ptr_for<
+            lcos::future<lcos::future<R>>>::type&& shared_state)
+        {
+            return lcos::future<lcos::future<R>>(std::move(shared_state));
         }
 
         template <typename SharedState>
@@ -169,11 +184,28 @@ namespace hpx { namespace traits
             return lcos::shared_future<R>(shared_state);
         }
 
+        template <typename T = void>
+        static lcos::shared_future<R> create(
+            typename detail::shared_state_ptr_for<
+                lcos::shared_future<lcos::future<R>>>::type const& shared_state)
+        {
+            return lcos::shared_future<lcos::future<R>>(shared_state);
+        }
+
         template <typename SharedState>
         static lcos::shared_future<R>
         create(boost::intrusive_ptr<SharedState> && shared_state)
         {
             return lcos::shared_future<R>(std::move(shared_state));
+        }
+
+        template <typename T = void>
+        static lcos::shared_future<R> create(
+            typename detail::shared_state_ptr_for<
+                lcos::shared_future<lcos::future<R>>>::type&& shared_state)
+        {
+            return lcos::shared_future<lcos::future<R>>(
+                std::move(shared_state));
         }
 
         template <typename SharedState>

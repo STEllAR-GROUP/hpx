@@ -200,7 +200,7 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        bool numa_sensitive() const { return numa_sensitive_; }
+        bool numa_sensitive() const override { return numa_sensitive_; }
 
         static std::string get_scheduler_name()
         {
@@ -221,7 +221,8 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
-        std::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
+        std::int64_t get_queue_length(
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             HPX_ASSERT(tree.size());
             // Return queue length of one specific queue.
@@ -255,7 +256,8 @@ namespace hpx { namespace threads { namespace policies
         // Queries the current thread count of the queues.
         std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
-            std::size_t num_thread = std::size_t(-1), bool reset = false) const
+            std::size_t num_thread = std::size_t(-1),
+            bool reset = false) const override
         {
             HPX_ASSERT(tree.size());
             // Return thread count of one specific queue.
@@ -289,7 +291,7 @@ namespace hpx { namespace threads { namespace policies
         // Enumerate matching threads from all queues
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const
+            thread_state_enum state = unknown) const override
         {
             bool result = true;
             for(size_type i = 0; i < tree.size(); ++i)
@@ -406,7 +408,8 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        std::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_misses(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
@@ -433,7 +436,8 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        std::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        std::int64_t get_num_pending_accesses(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
@@ -460,7 +464,8 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        std::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_pending(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -487,7 +492,8 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_pending(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -514,7 +520,8 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_from_staged(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -541,7 +548,8 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        std::int64_t get_num_stolen_to_staged(
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
@@ -570,7 +578,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        void abort_all_suspended_threads()
+        void abort_all_suspended_threads() override
         {
             HPX_ASSERT(tree.size());
             for(size_type i = 0; i != tree.size(); ++i)
@@ -584,7 +592,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool cleanup_terminated(bool delete_all)
+        bool cleanup_terminated(bool delete_all) override
         {
             HPX_ASSERT(tree.size());
             bool empty = true;
@@ -599,7 +607,7 @@ namespace hpx { namespace threads { namespace policies
             return empty;
         }
 
-        bool cleanup_terminated(std::size_t num_thread, bool delete_all)
+        bool cleanup_terminated(std::size_t num_thread, bool delete_all) override
         {
             return cleanup_terminated(delete_all);
         }
@@ -610,7 +618,7 @@ namespace hpx { namespace threads { namespace policies
         // TODO: add recycling
         void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread)
+            std::size_t num_thread) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(tree.back().size());
@@ -668,7 +676,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree[0].size());
@@ -693,7 +701,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
-            thread_priority /*priority*/ = thread_priority_normal)
+            thread_priority /*priority*/ = thread_priority_normal) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(tree.back().size());
@@ -702,7 +710,7 @@ namespace hpx { namespace threads { namespace policies
 
         void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
-            thread_priority priority = thread_priority_normal)
+            thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(tree.back().size());
@@ -710,7 +718,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
+        void destroy_thread(
+            threads::thread_data* thrd, std::int64_t& busy_count) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
             thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
@@ -768,7 +777,7 @@ namespace hpx { namespace threads { namespace policies
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count)
+            std::int64_t& idle_loop_count) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree.at(0).size());
@@ -785,19 +794,19 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t num_thread)
+        void on_start_thread(std::size_t num_thread) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree.at(0).size());
             tree.at(0).at(num_thread)->on_start_thread(num_thread);
         }
-        void on_stop_thread(std::size_t num_thread)
+        void on_stop_thread(std::size_t num_thread) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree.at(0).size());
             tree.at(0).at(num_thread)->on_stop_thread(num_thread);
         }
-        void on_error(std::size_t num_thread, std::exception_ptr const& e)
+        void on_error(std::size_t num_thread, std::exception_ptr const& e) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree.at(0).size());
