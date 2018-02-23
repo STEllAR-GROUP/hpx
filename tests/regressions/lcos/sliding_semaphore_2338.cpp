@@ -10,6 +10,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <vector>
 
@@ -36,7 +37,7 @@ int main()
     std::size_t window_size  = 1;
     std::size_t skip         = 50;
 
-    std::size_t signal_count(0);
+    std::atomic<std::size_t> signal_count(0);
 
     hpx::lcos::local::sliding_semaphore sem(window_size, 0);
     message_double_action msg;
@@ -50,8 +51,8 @@ int main()
             // so that N are always in flight
             [&,parcel_count](hpx::future<double> &&f) -> void
             {
-                sem.signal(parcel_count);
                 ++signal_count;
+                sem.signal(parcel_count);
             }
         );
 
