@@ -430,7 +430,7 @@ namespace hpx
 
             // rolling_averaging counter
             { "/statistics/rolling_average", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the rolling average value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/rolling_averaging",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -454,7 +454,7 @@ namespace hpx
 
             // median counter
             { "/statistics/median", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the median value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/median",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -465,7 +465,7 @@ namespace hpx
 
             // max counter
             { "/statistics/max", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the maximum value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -476,7 +476,7 @@ namespace hpx
 
             // min counter
             { "/statistics/min", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the minimum value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
