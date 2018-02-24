@@ -56,15 +56,11 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename Rng, typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<
-            typename hpx::traits::range_traits<Rng>::iterator_type
-            >::difference_type
-        >::type
-    >::type
+    template <typename ExPolicy, typename Rng, typename T,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_range<Rng>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type
     fill(ExPolicy && policy, Rng && rng, T value)
     {
         return fill(std::forward<ExPolicy>(policy),
@@ -113,14 +109,14 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename Rng, typename Size, typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<
-            ExPolicy, typename std::iterator_traits<
-            typename hpx::traits::range_traits<Rng>::iterator_type
-            >::difference_type
-        >::type
+    template <typename ExPolicy, typename Rng,
+        typename Size, typename T,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_range<Rng>::value)>
+    typename util::detail::algorithm_result<
+        ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type
     >::type
     fill_n(ExPolicy && policy, Rng & rng, Size count, T value)
     {
