@@ -114,6 +114,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/all_any_none.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/count.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/is_heap.hpp"

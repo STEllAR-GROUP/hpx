@@ -15,8 +15,8 @@
 
 #include <hpx/parallel/algorithms/fill.hpp>
 
-#include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1
 {
