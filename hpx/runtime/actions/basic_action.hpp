@@ -195,6 +195,7 @@ namespace hpx { namespace actions
                     std::is_void<R>::value, util::unused_type, R
                 >::type
                 result_type;
+
             template <typename ...Ts>
             HPX_FORCEINLINE result_type operator()(
                 naming::address::address_type lva,
@@ -205,6 +206,7 @@ namespace hpx { namespace actions
                     std::forward<Ts>(vs)...);
             }
 
+        private:
             template <typename ...Ts>
             HPX_FORCEINLINE result_type invoke(std::true_type,
                 naming::address::address_type lva,
@@ -291,7 +293,8 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            if (target && target.get_management_type() == naming::id_type::unmanaged)
+            if (target &&
+                target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
                     util::bind(util::one_shot(
@@ -320,7 +323,8 @@ namespace hpx { namespace actions
                 naming::address::component_type&, Ts&&...
             > thread_function;
 
-            if (target && target.get_management_type() == naming::id_type::unmanaged)
+            if (target &&
+                target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
                     thread_function(std::move(cont), lva, invoker(),
@@ -384,7 +388,7 @@ namespace hpx { namespace actions
             Ts&&... vs) const
         {
             return sync_invoke::call(
-                launch::sync, id, throws, std::forward<Ts>(vs)...);
+                policy, id, throws, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
@@ -418,8 +422,8 @@ namespace hpx { namespace actions
         operator()(DistPolicy const& dist_policy, error_code& ec,
             Ts&&... vs) const
         {
-            return (*this)(launch::sync, dist_policy, ec,
-                std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, dist_policy, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename DistPolicy, typename ...Ts>
@@ -431,8 +435,8 @@ namespace hpx { namespace actions
         operator()(launch policy,
             DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return (*this)(launch::sync, dist_policy, throws,
-                std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                policy, dist_policy, throws, std::forward<Ts>(vs)...);
         }
 
         template <typename DistPolicy, typename ...Ts>
@@ -443,8 +447,8 @@ namespace hpx { namespace actions
         >::type
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const
         {
-            return (*this)(launch::sync, dist_policy, throws,
-                std::forward<Ts>(vs)...);
+            return sync_invoke::call(
+                launch::sync, dist_policy, throws, std::forward<Ts>(vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
