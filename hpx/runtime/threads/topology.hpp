@@ -18,6 +18,8 @@
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
+
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>
 
@@ -67,9 +69,13 @@ namespace hpx { namespace threads
         membind_firsttouch = HWLOC_MEMBIND_FIRSTTOUCH,
         membind_bind       = HWLOC_MEMBIND_BIND,
         membind_interleave = HWLOC_MEMBIND_INTERLEAVE,
+#if HWLOC_API_VERSION < 0x00020000
         membind_replicate  = HWLOC_MEMBIND_REPLICATE,
+#endif
         membind_nexttouch  = HWLOC_MEMBIND_NEXTTOUCH,
-        membind_mixed      = HWLOC_MEMBIND_MIXED
+        membind_mixed      = HWLOC_MEMBIND_MIXED,
+        // special HPX addition
+        membind_user       = HWLOC_MEMBIND_MIXED + 256
     };
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -262,12 +268,12 @@ namespace hpx { namespace threads
             hpx_hwloc_membind_policy policy, int flags) const;
 
         threads::mask_type get_area_membind_nodeset(
-            const void *addr, std::size_t len, void *nodeset) const;
+            const void *addr, std::size_t len) const;
 
         bool set_area_membind_nodeset(
             const void *addr, std::size_t len, void *nodeset) const;
 
-        int get_numa_domain(const void *addr, void *nodeset) const;
+        int get_numa_domain(const void *addr) const;
 
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const;
@@ -385,6 +391,10 @@ namespace hpx { namespace threads
         std::vector<mask_type> numa_node_affinity_masks_;
         std::vector<mask_type> core_affinity_masks_;
         std::vector<mask_type> thread_affinity_masks_;
+
+        struct tls_tag {};
+        static util::thread_specific_ptr<hpx_hwloc_bitmap_wrapper, tls_tag>
+            bitmap_storage_;
     };
 
 #include <hpx/config/warnings_suffix.hpp>
