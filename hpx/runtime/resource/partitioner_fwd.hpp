@@ -34,6 +34,7 @@ namespace hpx
         // May be used anywhere in code and returns a reference to the single,
         // global resource partitioner.
         HPX_EXPORT detail::partitioner& get_partitioner();
+        HPX_EXPORT bool is_partitioner_valid();
 
         // resource_partitioner mode
         enum partitioner_mode

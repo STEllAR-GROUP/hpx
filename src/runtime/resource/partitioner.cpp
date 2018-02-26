@@ -154,6 +154,16 @@ namespace hpx { namespace resource
     {
         std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
 
+        if (!rp)
+        {
+            // if the resource partitioner is not accessed for the first time
+            // if the command-line parsing has not yet been done
+            throw std::invalid_argument(
+                "hpx::resource::get_partitioner() can be called only after "
+                "the resource partitioner has been initialized and before it "
+                "has been deleted");
+        }
+
         if (!rp->cmd_line_parsed())
         {
             if (get_runtime_ptr() != nullptr)
@@ -175,6 +185,11 @@ namespace hpx { namespace resource
         }
 
         return *rp;
+    }
+
+    bool is_partitioner_valid()
+    {
+        return bool(detail::get_partitioner());
     }
 
     namespace detail
