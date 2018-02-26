@@ -42,6 +42,15 @@ namespace hpx { namespace util
         }
     };
 
+    namespace _optional_swap
+    {
+        using std::swap;
+
+        template <typename T>
+        void check_swap() noexcept(noexcept(
+            swap(std::declval<T&>(), std::declval<T&>())));
+    }
+
     template <typename T>
     class optional
     {
@@ -249,9 +258,9 @@ namespace hpx { namespace util
             empty_ = false;
         }
 
-        void swap(optional& other)
-            noexcept(std::is_nothrow_move_constructible<T>::value &&
-                noexcept(swap(std::declval<T&>(), std::declval<T&>())))
+        void swap(optional& other) noexcept(
+            std::is_nothrow_move_constructible<T>::value &&
+            noexcept(_optional_swap::check_swap<T>()))
         {
             // do nothing if both are empty
             if (empty_ && other.empty_)
@@ -261,6 +270,7 @@ namespace hpx { namespace util
             // swap content if both are non-empty
             if (!empty_ && !other.empty_)
             {
+                using std::swap;
                 swap(**this, *other);
                 return;
             }
