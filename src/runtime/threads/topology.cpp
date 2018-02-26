@@ -1265,7 +1265,7 @@ namespace hpx { namespace threads
 
     int topology::get_numa_domain(const void *addr) const
     {
-#if HWLOC_API_VERSION >= 0x00010b03
+#if HWLOC_API_VERSION >= 0x00010b00
         hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
         if (nullptr == nodeset)
         {
