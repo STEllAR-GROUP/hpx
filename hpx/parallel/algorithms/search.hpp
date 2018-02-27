@@ -16,6 +16,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <hpx/parallel/util/loop.hpp>
@@ -42,27 +43,36 @@ namespace hpx {namespace parallel { inline namespace v1
                 : search::algorithm("search")
             {}
 
-            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            template <typename ExPolicy, typename FwdIter2, typename Pred,
+                typename Proj1, typename Proj2>
             static FwdIter
             sequential(ExPolicy, FwdIter first, FwdIter last,
-                FwdIter2 s_first, FwdIter2 s_last, Pred && op)
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op,
+                Proj1 && proj1, Proj2 && proj2)
             {
-                return std::search(first, last, s_first, s_last, op);
+                return std::search(first, last, s_first, s_last,
+                    util::compare_projected<Pred, Proj1, Proj2>(op,
+                        proj1, proj2));
             }
 
-            template <typename ExPolicy, typename FwdIter2, typename Pred>
+            template <typename ExPolicy, typename FwdIter2, typename Pred,
+                typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                FwdIter2 s_first, FwdIter2 s_last, Pred && op)
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op,
+                Proj1 && proj1, Proj2 && proj2)
             {
-                typedef typename std::iterator_traits<FwdIter>::reference
-                    reference;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
-                    difference_type;
-                typedef typename std::iterator_traits<FwdIter2>::difference_type
-                    s_difference_type;
+                using reference =
+                    typename std::iterator_traits<FwdIter>::reference;
+
+                using difference_type =
+                    typename std::iterator_traits<FwdIter>::difference_type;
+
+                using s_difference_type =
+                    typename std::iterator_traits<FwdIter2>::difference_type;
+
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
@@ -191,13 +201,20 @@ namespace hpx {namespace parallel { inline namespace v1
     ///           returned. If no subsequence is found, \a last is returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Pred = detail::equal_to>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    >::type
+        typename Pred = detail::equal_to,
+        typename Proj1 = util::projection_identity,
+        typename Proj2 = util::projection_identity,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_iterator<FwdIter>::value &&
+        traits::is_projected<Proj1, FwdIter>::value &&
+        hpx::traits::is_iterator<FwdIter2>::value &&
+        traits::is_projected<Proj2, FwdIter2>::value
+    )>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
-        FwdIter2 s_first, FwdIter2 s_last, Pred && op = Pred())
+        FwdIter2 s_first, FwdIter2 s_last, Pred && op = Pred(),
+        Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
         static_assert(
             (hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -210,7 +227,8 @@ namespace hpx {namespace parallel { inline namespace v1
 
         return detail::search<FwdIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first, last, s_first, s_last, std::forward<Pred>(op));
+            first, last, s_first, s_last, std::forward<Pred>(op),
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
