@@ -645,6 +645,16 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
+            // arithmetics count counter
+            { "/arithmetics/count", performance_counters::counter_aggregating,
+              "returns the count value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/count@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
         };
         performance_counters::install_counter_types(
             arithmetic_counter_types,
