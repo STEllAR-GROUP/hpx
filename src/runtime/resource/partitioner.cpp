@@ -140,7 +140,8 @@ namespace hpx { namespace resource
 
         void delete_partitioner()
         {
-            std::lock_guard<compat::mutex> l(partitioner_mtx());
+            // don't lock the mutex as otherwise will be still locked while
+            // being destroyed (leading to problems on some platforms)
             std::unique_ptr<detail::partitioner>& part = partitioner_ref();
             if (part)
                 part.reset();
