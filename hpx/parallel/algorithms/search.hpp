@@ -88,17 +88,27 @@ namespace hpx {namespace parallel { inline namespace v1
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
                     std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
-                    [=](FwdIter it, std::size_t part_size,
+                    [=,
+                        HPX_CAPTURE_FORWARD(op),
+                        HPX_CAPTURE_FORWARD(proj1),
+                        HPX_CAPTURE_FORWARD(proj2)
+                    ](FwdIter it, std::size_t part_size,
                         std::size_t base_idx) mutable -> void
                     {
                         FwdIter curr = it;
 
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
-                            [=, &tok, &curr](reference v, std::size_t i) -> void
+                            [=, &tok, &curr,
+                                HPX_CAPTURE_FORWARD(op),
+                                HPX_CAPTURE_FORWARD(proj1),
+                                HPX_CAPTURE_FORWARD(proj2)
+                            ](reference v, std::size_t i) -> void
                             {
                                 ++curr;
-                                if (op(v, *s_first))
+                                if (hpx::util::invoke(op,
+                                    hpx::util::invoke(proj1, v),
+                                    hpx::util::invoke(proj2, *s_first)))
                                 {
                                     difference_type local_count = 1;
                                     FwdIter2 needle = s_first;
@@ -108,7 +118,8 @@ namespace hpx {namespace parallel { inline namespace v1
                                         local_count != diff && len != count;
                                         ++local_count, ++len, ++mid)
                                     {
-                                        if(*mid != *++needle)
+                                        if(hpx::util::invoke(proj1, *mid) !=
+                                           hpx::util::invoke(proj2, *++needle))
                                             break;
                                     }
 
@@ -143,11 +154,11 @@ namespace hpx {namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter      The type of the source iterators used for the
+    /// \tparam FwdIter     The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam FwdIter2     The type of the source iterators used for the
+    /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -156,6 +167,12 @@ namespace hpx {namespace parallel { inline namespace v1
     ///                     overload of \a adjacent_find requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
+    /// \tparam Proj1       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of type dereferenced \a FwdIter.
+    /// \tparam Proj2       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of type dereferenced \a FwdIter2.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -179,6 +196,14 @@ namespace hpx {namespace parallel { inline namespace v1
     ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
+    /// param proj1         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of type
+    ///                     dereferenced \a FwdIter1 as a projection operation
+    ///                     before the actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of type
+    ///                     dereferenced \a FwdIter2 as a projection operation
+    ///                     before the actual predicate \a is invoked.
     ///
     /// The comparison operations in the parallel \a search algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -215,6 +240,11 @@ namespace hpx {namespace parallel { inline namespace v1
                 std::declval<typename std::iterator_traits<FwdIter2>::value_type>())),
             decltype(hpx::util::invoke(std::declval<Proj1>(),
                 std::declval<typename std::iterator_traits<FwdIter>::value_type>()))
+        >::value &&
+        traits::is_indirect_callable<
+            ExPolicy, Pred,
+            traits::projected<Proj1, FwdIter>,
+            traits::projected<Proj2, FwdIter2>
         >::value
     )>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
@@ -339,11 +369,11 @@ namespace hpx {namespace parallel { inline namespace v1
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter      The type of the source iterators used for the
+    /// \tparam FwdIter     The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam FwdIter2     The type of the source iterators used for the
+    /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
