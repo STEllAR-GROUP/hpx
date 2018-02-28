@@ -209,7 +209,13 @@ namespace hpx {namespace parallel { inline namespace v1
         hpx::traits::is_iterator<FwdIter>::value &&
         traits::is_projected<Proj1, FwdIter>::value &&
         hpx::traits::is_iterator<FwdIter2>::value &&
-        traits::is_projected<Proj2, FwdIter2>::value
+        traits::is_projected<Proj2, FwdIter2>::value &&
+        std::is_convertible<
+            decltype(hpx::util::invoke(std::declval<Proj2>(),
+                std::declval<typename std::iterator_traits<FwdIter2>::value_type>())),
+            decltype(hpx::util::invoke(std::declval<Proj1>(),
+                std::declval<typename std::iterator_traits<FwdIter>::value_type>()))
+        >::value
     )>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
