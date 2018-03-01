@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { namespace util
         {
             return hpx::util::invoke(comp_,
                 hpx::util::invoke(proj1_, std::forward<T1>(t1)),
-                hpx::util::invoke(proj1_, std::forward<T2>(t2)));
+                hpx::util::invoke(proj2_, std::forward<T2>(t2)));
         }
 
         Compare comp_;

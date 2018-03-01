@@ -36,6 +36,7 @@ set(tests
     reverse_copy_range
     rotate_range
     rotate_copy_range
+    search_range
     sort_range
     transform_range
     transform_range_binary

@@ -122,7 +122,8 @@ namespace hpx { namespace parallel { inline namespace v1
         ExPolicy,
         typename hpx::traits::range_iterator<Rng1>::type
     >::type
-    search(ExPolicy && policy, Rng1 rng1, Rng2 rng2, Pred && op = Pred(),
+    search(ExPolicy && policy, Rng1 && rng1,
+        Rng2 && rng2, Pred && op = Pred(),
         Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
         return search(std::forward<ExPolicy>(policy),
