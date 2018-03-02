@@ -236,12 +236,6 @@ namespace hpx {namespace parallel { inline namespace v1
         traits::is_projected<Proj1, FwdIter>::value &&
         hpx::traits::is_iterator<FwdIter2>::value &&
         traits::is_projected<Proj2, FwdIter2>::value &&
-        std::is_convertible<
-            decltype(hpx::util::invoke(std::declval<Proj2>(),
-                std::declval<typename std::iterator_traits<FwdIter2>::value_type>())),
-            decltype(hpx::util::invoke(std::declval<Proj1>(),
-                std::declval<typename std::iterator_traits<FwdIter>::value_type>()))
-        >::value &&
         traits::is_indirect_callable<
             ExPolicy, Pred,
             traits::projected<Proj1, FwdIter>,
@@ -457,12 +451,6 @@ namespace hpx {namespace parallel { inline namespace v1
         traits::is_projected<Proj1, FwdIter>::value &&
         hpx::traits::is_iterator<FwdIter2>::value &&
         traits::is_projected<Proj2, FwdIter2>::value &&
-        std::is_convertible<
-            decltype(hpx::util::invoke(std::declval<Proj2>(),
-                std::declval<typename std::iterator_traits<FwdIter2>::value_type>())),
-            decltype(hpx::util::invoke(std::declval<Proj1>(),
-                std::declval<typename std::iterator_traits<FwdIter>::value_type>()))
-        >::value &&
         traits::is_indirect_callable<
             ExPolicy, Pred,
             traits::projected<Proj1, FwdIter>,
