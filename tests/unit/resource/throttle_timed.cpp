@@ -9,6 +9,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
