@@ -118,8 +118,9 @@ namespace hpx {namespace parallel { inline namespace v1
                                         local_count != diff && len != count;
                                         ++local_count, ++len, ++mid)
                                     {
-                                        if(hpx::util::invoke(proj1, *mid) !=
-                                           hpx::util::invoke(proj2, *++needle))
+                                        if(!hpx::util::invoke(op,
+                                           hpx::util::invoke(proj1, *mid),
+                                           hpx::util::invoke(proj2, *++needle)))
                                             break;
                                     }
 
@@ -352,8 +353,9 @@ namespace hpx {namespace parallel { inline namespace v1
                                         len != difference_type(count);
                                         ++local_count, ++len, ++mid)
                                     {
-                                        if(hpx::util::invoke(proj1, *mid) !=
-                                           hpx::util::invoke(proj2, *++needle))
+                                        if(!hpx::util::invoke(op,
+                                           hpx::util::invoke(proj1, *mid),
+                                           hpx::util::invoke(proj2, *++needle)))
                                            break;
                                     }
 
