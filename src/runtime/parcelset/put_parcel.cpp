@@ -9,13 +9,29 @@
 
 #include <utility>
 
-namespace hpx { namespace parcelset { namespace detail
+namespace hpx { namespace parcelset
 {
-    void put_parcel_handler::operator()(parcel&& p) const
+    namespace detail
+    {
+        void put_parcel_handler::operator()(parcel&& p) const
+        {
+            parcelset::parcelhandler& ph =
+                hpx::get_runtime().get_parcel_handler();
+            ph.put_parcel(std::move(p));
+        }
+    }
+
+    void put_parcel(parcel&& p, write_handler_type&& f)
     {
         parcelset::parcelhandler& ph =
             hpx::get_runtime().get_parcel_handler();
-        ph.put_parcel(std::move(p));
+        ph.put_parcel(std::move(p), std::move(f));
     }
-}}}
 
+    void sync_put_parcel(parcel&& p)
+    {
+        parcelset::parcelhandler& ph =
+            hpx::get_runtime().get_parcel_handler();
+        ph.sync_put_parcel(std::move(p));
+    }
+}}

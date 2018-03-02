@@ -170,9 +170,7 @@ namespace hpx { namespace parcelset {
 
             void operator()(parcel&& p)
             {
-                parcelset::parcelhandler& ph =
-                    hpx::get_runtime().get_parcel_handler();
-                ph.put_parcel(std::move(p), std::move(cb_));
+                hpx::parcelset::put_parcel(std::move(p), std::move(cb_));
             }
 
             typename hpx::util::decay<Callback>::type cb_;

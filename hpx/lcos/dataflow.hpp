@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,13 +6,16 @@
 // hpxinspect:nodeprecatedinclude:boost/ref.hpp
 // hpxinspect:nodeprecatedname:boost::reference_wrapper
 
+#include <hpx/config.hpp>
+
+// Intentionally #include future.hpp outside of the guards as it may #include
+// dataflow.hpp itself
+#include <hpx/lcos/future.hpp>
+
 #ifndef HPX_LCOS_DATAFLOW_HPP
 #define HPX_LCOS_DATAFLOW_HPP
 
-#include <hpx/config.hpp>
-#include <hpx/apply.hpp>
 #include <hpx/lcos/detail/future_transforms.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
@@ -36,6 +39,7 @@
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
 #endif
 #include <hpx/parallel/executors/execution.hpp>
+#include <hpx/parallel/executors/parallel_executor.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/ref.hpp>

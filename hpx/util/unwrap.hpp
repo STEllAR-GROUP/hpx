@@ -68,6 +68,24 @@ namespace util {
         return detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...);
     }
 
+    namespace functional
+    {
+        /// A helper function object for functionally invoking
+        /// `hpx::util::unwrap`. For more information please refer to its
+        /// documentation.
+        struct unwrap
+        {
+            /// \cond NOINTERNAL
+            template <typename... Args>
+            auto operator()(Args&&... args)
+                -> decltype(util::unwrap(std::forward<Args>(args)...))
+            {
+                return util::unwrap(std::forward<Args>(args)...);
+            }
+            /// \endcond
+        };
+    }
+
     /// An alterntive version of hpx::util::unwrap(), which unwraps the given
     /// arguments to a certain depth of hpx::lcos::future like objects.
     ///
@@ -84,6 +102,25 @@ namespace util {
         return detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...);
     }
 
+    namespace functional
+    {
+        /// A helper function object for functionally invoking
+        /// `hpx::util::unwrap_n`. For more information please refer to its
+        /// documentation.
+        template <std::size_t Depth>
+        struct unwrap_n
+        {
+            /// \cond NOINTERNAL
+            template <typename... Args>
+            auto operator()(Args&&... args)
+                -> decltype(util::unwrap_n<Depth>(std::forward<Args>(args)...))
+            {
+                return util::unwrap_n<Depth>(std::forward<Args>(args)...);
+            }
+            /// \endcond
+        };
+    }
+
     /// An alterntive version of hpx::util::unwrap(), which unwraps the given
     /// arguments recursively so that all contained hpx::lcos::future like
     /// objects are replaced by their actual value.
@@ -95,6 +132,24 @@ namespace util {
         -> decltype(detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...))
     {
         return detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...);
+    }
+
+    namespace functional
+    {
+        /// A helper function object for functionally invoking
+        /// `hpx::util::unwrap_all`. For more information please refer to its
+        /// documentation.
+        struct unwrap_all
+        {
+            /// \cond NOINTERNAL
+            template <typename... Args>
+            auto operator()(Args&&... args)
+                -> decltype(util::unwrap_all(std::forward<Args>(args)...))
+            {
+                return util::unwrap_all(std::forward<Args>(args)...);
+            }
+            /// \endcond
+        };
     }
 
     /// Returns a callable object which unwraps its arguments upon

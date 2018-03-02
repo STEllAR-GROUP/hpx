@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_POOL_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/executors/thread_execution.hpp>
 #include <hpx/parallel/executors/thread_execution_information.hpp>

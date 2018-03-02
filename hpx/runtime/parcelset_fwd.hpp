@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,6 +46,14 @@ namespace hpx {
         typedef util::function_nonser<
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
+
+        ///////////////////////////////////////////////////////////////////////
+        /// Hand a parcel to the underlying parcel layer for delivery.
+        HPX_API_EXPORT void put_parcel(parcel&& p, write_handler_type&& f);
+
+        /// Hand a parcel to the underlying parcel layer for delivery.
+        /// Wait for the operation to finish before returning to the user.
+        HPX_API_EXPORT void sync_put_parcel(parcelset::parcel&& p);
     }
 }
 
