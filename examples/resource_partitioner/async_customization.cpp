@@ -1,9 +1,14 @@
-#include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
+#include <hpx/runtime/resource/partitioner.hpp>
+//#include <hpx/runtime/threads/cpu_mask.hpp>
+//#include <hpx/include/parallel_executors.hpp>
 #include <hpx/async.hpp>
+
+// we should not need these
+#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/util/invoke.hpp>
@@ -14,6 +19,8 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/demangle_helper.hpp>
+//
+#include "shared_priority_scheduler.hpp"
 
 // --------------------------------------------------------------------
 // custom executor async/then/when/dataflow specialization example
@@ -275,97 +282,6 @@ private:
 };
 
 // --------------------------------------------------------------------
-// guided_guided_pool_executor_shim
-// an executor compatible with scheduled executor API
-// --------------------------------------------------------------------
-template <typename H>
-struct HPX_EXPORT guided_pool_executor_shim {
-public:
-    guided_pool_executor_shim(bool guided, const std::string& pool_name)
-        : guided_(guided)
-        , guided_exec_()
-        , pool_exec_(pool_name)
-    {}
-
-    guided_pool_executor_shim(bool guided, const std::string& pool_name,
-        threads::thread_stacksize stacksize)
-        : guided_(guided)
-        , guided_exec_()
-        , pool_exec_(pool_name, stacksize)
-    {}
-
-    guided_pool_executor_shim(bool guided, const std::string& pool_name,
-        threads::thread_priority priority,
-        threads::thread_stacksize stacksize = threads::thread_stacksize_default)
-        : guided_(guided)
-        , guided_exec_()
-        , pool_exec_(pool_name, priority, stacksize)
-    {}
-
-
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
-    template <typename F, typename ... Ts>
-    future<typename util::detail::invoke_deferred_result<F, Ts...>::type>
-    async_execute(F && f, Ts &&... ts)
-    {
-        if (guided_) return guided_exec_.async_execute(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
-        else {
-            typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
-                result_type;
-
-            lcos::local::futures_factory<result_type()> p(
-                pool_exec_,
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...)
-            );
-            p.apply();
-            return p.get_future();
-        }
-    }
-
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
-    template <typename F,
-              typename Future,
-              typename ... Ts,
-              typename = typename std::enable_if_t<traits::is_future<Future>::value>
-              >
-    auto
-    then_execute(F && f, Future && predecessor, Ts &&... ts)
-    ->  future<typename util::detail::invoke_deferred_result<
-        F, Future, Ts...>::type>
-    {
-        if (guided_) return guided_exec_.then_execute(
-            std::forward<F>(f), std::forward<Future>(predecessor),
-            std::forward<Ts>(ts)...);
-        else {
-            typedef typename hpx::util::detail::invoke_deferred_result<
-                    F, Future, Ts...
-                >::type result_type;
-
-            auto func = hpx::util::bind(
-                hpx::util::one_shot(std::forward<F>(f)),
-                hpx::util::placeholders::_1, std::forward<Ts>(ts)...);
-
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                hpx::lcos::detail::make_continuation_exec<result_type>(
-                    std::forward<Future>(predecessor), pool_exec_,
-                    std::move(func));
-
-            return hpx::traits::future_access<hpx::lcos::future<result_type> >::
-                create(std::move(p));
-        }
-    }
-
-    // --------------------------------------------------------------------
-
-    bool                              guided_;
-    test_async_executor               guided_exec_;
-    threads::executors::pool_executor pool_exec_;
-};
-
-// --------------------------------------------------------------------
 // set traits for executor to say it is an async executor
 // --------------------------------------------------------------------
 namespace hpx { namespace parallel { namespace execution
@@ -374,13 +290,6 @@ namespace hpx { namespace parallel { namespace execution
     struct is_two_way_executor<test_async_executor>
       : std::true_type
     {};
-
-    template <typename Hint>
-    struct is_two_way_executor<
-            guided_pool_executor_shim<Hint> >
-      : std::true_type
-    {};
-
 }}}
 
 // --------------------------------------------------------------------
@@ -508,7 +417,7 @@ struct dummy_tag {};
 
 namespace hpx { namespace threads { namespace executors
 {
-    template <typename dummy_tag>
+    template <>
     struct HPX_EXPORT pool_numa_hint<dummy_tag>
     {
       int operator()(const int, const double, const char *) {
@@ -523,16 +432,76 @@ namespace hpx { namespace threads { namespace executors
           std::cout << "Hint 3 \n";
           return 0;
       }
+      int operator()(const util::tuple<future<int>, future<double>> &) {
+          return 0;
+      }
+      int operator()(const util::tuple<future<long unsigned int>, shared_future<float>> &) {
+          return 0;
+      }
     };
 }}}
 
-int main()
+int hpx_main()
 {
     test_async_executor exec;
     int val = test(exec);
 
-    guided_pool_executor_shim<dummy_tag> exec2(true, "default");
+    typedef hpx::threads::executors::pool_numa_hint<dummy_tag> dummy_hint;
+    hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec2(true, "default");
     val = test(exec2);
 
     return val;
+}
+
+int main(int argc, char** argv)
+{
+    int pool_threads = 1;
+
+    // Create the resource partitioner
+    hpx::resource::partitioner rp(argc, argv);
+
+    // declare the high priority scheduler type we'll use
+    using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<>;
+    using namespace hpx::threads::policies;
+    // setup the default pool with our custom priority scheduler
+    rp.create_thread_pool(
+        "custom",
+        [](hpx::threads::policies::callback_notifier& notifier, std::size_t num_threads,
+          std::size_t thread_offset, std::size_t pool_index,
+          std::string const& pool_name) -> std::unique_ptr<hpx::threads::thread_pool_base>
+          {
+            std::cout << "User defined scheduler creation callback " << std::endl;
+            std::unique_ptr<high_priority_sched> scheduler(new high_priority_sched(
+                num_threads, {6, 6, 64}, "shared-priority-scheduler"));
+
+            scheduler_mode mode = scheduler_mode(
+                scheduler_mode::do_background_work |
+                scheduler_mode::delay_exit);
+
+            std::unique_ptr<hpx::threads::thread_pool_base> pool(
+              new hpx::threads::detail::scheduled_thread_pool<high_priority_sched>(
+                  std::move(scheduler), notifier, pool_index, pool_name, mode, thread_offset));
+            return pool;
+            });
+
+    std::cout << "[main] "
+              << "thread_pools created \n";
+
+    // add N cores to mpi pool
+    int count = 0;
+    for (const hpx::resource::numa_domain& d : rp.numa_domains()) {
+      for (const hpx::resource::core& c : d.cores()) {
+        for (const hpx::resource::pu& p : c.pus()) {
+          if (count < pool_threads) {
+            std::cout << "Added pu " << count++ << " to mpi pool\n";
+            rp.add_resource(p, "custom");
+          }
+        }
+      }
+    }
+
+    // rp.add_resource(rp.numa_domains()[0].cores()[1], "mpi");
+    std::cout << "[main] "
+              << "resources added to thread_pools \n";
+    return hpx::init(argc, argv);
 }
