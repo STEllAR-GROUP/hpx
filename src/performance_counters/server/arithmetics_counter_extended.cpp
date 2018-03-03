@@ -104,7 +104,7 @@ namespace hpx { namespace performance_counters { namespace server
                 return (boost::accumulators::max)(accum);
             }
         };
-        
+
         template <>
         struct statistic_get_value<boost::accumulators::tag::count>
         {
@@ -249,7 +249,7 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     max_arithmetics_counter_type, max_arithmetics_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(max_arithmetics_counter_type::wrapped_type)
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/count
 typedef hpx::components::component<
@@ -260,7 +260,7 @@ typedef hpx::components::component<
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     count_arithmetics_counter_type, count_arithmetics_counter,
     "base_performance_counter", hpx::components::factory_enabled)
-HPX_DEFINE_GET_COMPONENT_TYPE(count_arithmetics_counter_type::wrapped_type)    
+HPX_DEFINE_GET_COMPONENT_TYPE(count_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail
