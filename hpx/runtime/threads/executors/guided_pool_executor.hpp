@@ -345,10 +345,10 @@ namespace hpx { namespace threads { namespace executors
         ->  future<typename util::detail::invoke_deferred_result<
             F, OuterFuture<util::tuple<InnerFutures... >>, Ts...>::type>
         {
+#ifdef GUIDED_EXECUTOR_DEBUG
             // get the tuple of futures from the predecessor future <tuple of futures>
             const auto & predecessor_value = future_extract_value()(predecessor);
 
-#ifdef GUIDED_EXECUTOR_DEBUG
             // create a tuple of the unwrapped future values
             auto unwrapped_futures_tuple = util::map_pack(
                 future_extract_value{},
