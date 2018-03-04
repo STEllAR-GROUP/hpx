@@ -20,11 +20,14 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
+auto seed = std::random_device{}();
+std::mt19937 _rand(seed);
+
 struct random_fill
 {
     random_fill() = default;
     random_fill(int rand_base, int range)
-      : gen(std::rand()),
+      : gen(_rand()),
         dist(rand_base - range / 2, rand_base + range / 2)
     {}
 
@@ -185,7 +188,8 @@ int hpx_main(int argc, char **argv)
     HPX_TEST(equality);
 
     // Do moduler operation for avoiding overflow in ramdom_fill. (#2954)
-    int rand_base = std::rand() % 10000;
+    std::uniform_int_distribution<> dis(0,9999);
+    int rand_base = dis(_rand);
 
     using namespace hpx::parallel;
 

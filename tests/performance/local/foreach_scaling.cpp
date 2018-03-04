@@ -25,6 +25,7 @@ int delay = 1000;
 int test_count = 100;
 int chunk_size = 0;
 int num_overlapping_loops = 0;
+std::mt19937 gen(std::random_device{}());
 
 ///////////////////////////////////////////////////////////////////////////////
 void measure_sequential_foreach(std::size_t size)
@@ -32,7 +33,7 @@ void measure_sequential_foreach(std::size_t size)
     std::vector<std::size_t> data_representation(size);
     std::iota(std::begin(data_representation),
         std::end(data_representation),
-        std::rand());
+        gen());
 
     // invoke sequential for_each
     hpx::parallel::for_each(hpx::parallel::execution::seq,
@@ -48,7 +49,7 @@ void measure_parallel_foreach(std::size_t size)
     std::vector<std::size_t> data_representation(size);
     std::iota(std::begin(data_representation),
         std::end(data_representation),
-        std::rand());
+        gen());
 
     // create executor parameters object
     hpx::parallel::execution::static_chunk_size cs(chunk_size);
@@ -68,7 +69,7 @@ hpx::future<void> measure_task_foreach(std::size_t size)
         std::make_shared<std::vector<std::size_t> >(size));
     std::iota(std::begin(*data_representation),
         std::end(*data_representation),
-        std::rand());
+        gen());
 
     // create executor parameters object
     hpx::parallel::execution::static_chunk_size cs(chunk_size);

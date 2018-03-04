@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <random>
 #include <string>
 #include <utility>
 
@@ -87,6 +88,8 @@ namespace hpx { namespace util
     /// by Bob Jenkins here: http://burtleburtle.net/bob/hash
     class jenkins_hash
     {
+    	unsigned int _seed = (unsigned int) std::random_device{}();
+        std::mt19937 gen{_seed};
     public:
         /// this is the type representing the result of this hash
         typedef std::uint32_t size_type;
@@ -99,7 +102,7 @@ namespace hpx { namespace util
         jenkins_hash() : seed_(0) {}
 
         explicit jenkins_hash(size_type size)
-            : seed_(std::rand() % size)
+            : seed_(std::uniform_int_distribution<>(0, size-1)(gen))
         {}
 
         explicit jenkins_hash(size_type seedval, seedenum)

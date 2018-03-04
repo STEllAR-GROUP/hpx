@@ -34,7 +34,7 @@ const int random_fill_range = (std::min)(100000, RAND_MAX);
 struct random_fill
 {
     random_fill()
-        : gen(std::rand()),
+        : gen(std::random_device{}()),
         dist(0, random_fill_range)
     {}
 
@@ -184,11 +184,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (vm.count("seed"))
         seed = vm["seed"].as<std::uint32_t>();
 
-    std::srand(static_cast<unsigned int>(seed));
+    std::mt19937 gen(static_cast<unsigned int>(seed));
+    std::uniform_int_distribution<> dis(0,random_fill_range-1);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    int base_num = std::rand() % random_fill_range;
+    int base_num = dis(gen);
     if (vm.count("base_num"))
         base_num = vm["base_num"].as<int>();
     int test_count = vm["test_count"].as<int>();

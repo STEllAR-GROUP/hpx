@@ -20,7 +20,7 @@ HPX_REGISTER_PARTITIONED_VECTOR(int);
 struct random_fill
 {
     random_fill()
-      : gen(std::rand()),
+      : gen(std::random_device{}()),
         dist(0, RAND_MAX)
     {}
 

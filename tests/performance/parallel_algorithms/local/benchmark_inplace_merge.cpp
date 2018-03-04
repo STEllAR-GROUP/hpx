@@ -28,10 +28,14 @@
 #include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = (unsigned int)std::random_device{}();
+std::mt19937 _rand(seed);
+///////////////////////////////////////////////////////////////////////////////
+
 struct random_fill
 {
     random_fill(std::size_t random_range)
-        : gen(std::rand()),
+        : gen(_rand()),
         dist(0, random_range - 1)
     {}
 
@@ -160,11 +164,8 @@ std::string correct_iterator_tag_str(std::string iterator_tag)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
-
-    std::srand(seed);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();

@@ -10,23 +10,25 @@
 
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    auto seed = std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dis(2, 101);
 
     // create data vector on host
     int const N = 100;
     std::vector<int> h_A(N);
     std::vector<int> h_B(N);
-    std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
+    std::iota(h_A.begin(), h_A.end(), dis(gen));
 
     hpx::compute::cuda::target target;
 
