@@ -116,7 +116,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    seed = std::random_device{}();
+    unsigned int seed = std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
