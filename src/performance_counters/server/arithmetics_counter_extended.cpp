@@ -22,6 +22,7 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/max.hpp>
 #include <boost/accumulators/statistics/min.hpp>
+#include <boost/accumulators/statistics/count.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -103,6 +104,16 @@ namespace hpx { namespace performance_counters { namespace server
                 return (boost::accumulators::max)(accum);
             }
         };
+
+        template <>
+        struct statistic_get_value<boost::accumulators::tag::count>
+        {
+            template <typename Accumulator>
+            static double call(Accumulator const& accum)
+            {
+                return boost::accumulators::count(accum);
+            }
+        };
     }
 
     template <typename Statistic>
@@ -175,6 +186,9 @@ hpx::performance_counters::server::arithmetics_counter_extended<
 template class HPX_EXPORT
 hpx::performance_counters::server::arithmetics_counter_extended<
     boost::accumulators::tag::max>;
+template class HPX_EXPORT
+hpx::performance_counters::server::arithmetics_counter_extended<
+    boost::accumulators::tag::count>;
 
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/mean
@@ -235,6 +249,18 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     max_arithmetics_counter_type, max_arithmetics_counter,
     "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(max_arithmetics_counter_type::wrapped_type)
+
+///////////////////////////////////////////////////////////////////////////////
+// /arithmetic/count
+typedef hpx::components::component<
+    hpx::performance_counters::server::arithmetics_counter_extended<
+        boost::accumulators::tag::count>
+> count_arithmetics_counter_type;
+
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+    count_arithmetics_counter_type, count_arithmetics_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(count_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail

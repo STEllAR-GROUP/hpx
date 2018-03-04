@@ -1659,6 +1659,15 @@ system and application performance.
          this counter is accessed. Any wildcards in the counter names will
          be expanded.]
     ]
+    [   [`/arithmetics/count`]
+        [None]
+        [Returns the count value of all values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         full performance counter names which are queried whenever
+         this counter is accessed. Any wildcards in the counter names will
+         be expanded.]
+    ]
 ]
 
 [note The /arithmetics counters can consume an arbitrary number of other counters.
