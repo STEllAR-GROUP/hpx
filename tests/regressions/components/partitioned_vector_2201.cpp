@@ -15,12 +15,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(int);
+unsigned int seed = std::random_device{}();
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
     random_fill()
-      : gen(std::random_device{}()),
+      : gen(seed),
         dist(0, RAND_MAX)
     {}
 

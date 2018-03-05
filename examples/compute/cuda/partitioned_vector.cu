@@ -35,12 +35,11 @@ struct pfo
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
 
     hpx::compute::cuda::target_distribution_policy policy =
         hpx::compute::cuda::target_layout(hpx::compute::cuda::get_local_targets());

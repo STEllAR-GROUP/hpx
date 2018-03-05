@@ -431,12 +431,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t sizeMult   = vm["sizemult"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
     //
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = std::random_device{}();
      if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+
     //
     sizeMult = (std::min)(sizeMult, std::size_t(100));
     sizeMult = (std::max)(sizeMult, std::size_t(1));

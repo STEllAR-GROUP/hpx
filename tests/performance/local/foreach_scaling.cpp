@@ -25,7 +25,8 @@ int delay = 1000;
 int test_count = 100;
 int chunk_size = 0;
 int num_overlapping_loops = 0;
-std::mt19937 gen(std::random_device{}());
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
 
 ///////////////////////////////////////////////////////////////////////////////
 void measure_sequential_foreach(std::size_t size)

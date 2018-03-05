@@ -29,12 +29,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 const int random_fill_range = (std::min)(100000, RAND_MAX);
+unsigned int seed = std::random_device{}();
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
     random_fill()
-        : gen(std::random_device{}()),
+        : gen(seed),
         dist(0, random_fill_range)
     {}
 
@@ -180,7 +181,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     // If simply using current time as seed, random numbers are closer
     //     when time is closer.
-    std::uint32_t seed = hash(std::uint32_t(std::time(nullptr)));
     if (vm.count("seed"))
         seed = vm["seed"].as<std::uint32_t>();
 
