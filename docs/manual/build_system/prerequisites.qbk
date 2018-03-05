@@ -161,6 +161,12 @@ listed below.
       (`bjam`). Note however, that this is absolutely necessary when using
       gcc V5.2 and above.]
 
+[important On Windows, depending on the installed versions of Visual Studio, you
+    might also want to pass the correct toolset to the `b2` command depending on
+    which version of the IDE you want to use. In addition, passing `address-model=64`
+    is highly recommended. It might be also necessary to add command line argument
+    --build-type=complete to the `b2` command on the Windows platform.]
+
 The easiest way to create a working Boost installation is to compile Boost from
 sources yourself. This is particularly important as many high performance
 resources, even if they have Boost installed, usually only provide you with an
@@ -169,11 +175,12 @@ Boost libraries from here: __boost_downloads__. Unpack the downloaded archive
 into a directory of your choosing. We will refer to this directory a `$BOOST`.
 
 Building and installing the Boost binaries is simple, regardless what platform
-you are on:
+you are on the basic instructions are as follows (with possible additional
+platform-dependent command line arguments):
 
     cd $BOOST
     bootstrap --prefix=<where to install boost>
-    ./b2 -j<N> --build-type=complete
+    ./b2 -j<N>
     ./b2 install
 
 where: `<where to install boost>` is the directory the built binaries will be
@@ -184,11 +191,6 @@ After the above sequence of commands has been executed (this may take a while!)
 you will need to specify the directory where Boost was installed as `BOOST_ROOT`
 (`<where to install boost>`) while executing cmake for __hpx__ as explained in
 detail in the sections __unix_installation__ and __windows_installation__.
-
-[important On Windows, depending on the installed versions of Visual Studio, you
-    might also want to pass the correct toolset to the `b2` command depending on
-    which version of the IDE you want to use. In addition, passing `address-model=64`
-    is highly recommended.]
 
 [endsect]
 
