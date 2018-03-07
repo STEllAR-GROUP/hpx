@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_SEARCH_OCT_25_130PM
 
 #include <hpx/parallel/algorithms/search.hpp>
+#include <hpx/parallel/container_algorithms/search.hpp>
 
 #endif
 
