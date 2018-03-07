@@ -111,7 +111,7 @@ namespace hpx { namespace performance_counters { namespace server
             template <typename Accumulator>
             static double call(Accumulator const& accum)
             {
-                return boost::accumulators::count(accum);
+                return static_cast<double>(boost::accumulators::count(accum));
             }
         };
     }
