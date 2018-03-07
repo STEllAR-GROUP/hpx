@@ -789,6 +789,10 @@ namespace hpx
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
+        if (!resource::is_partitioner_valid())
+        {
+            return dflt;
+        }
         return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
@@ -799,6 +803,10 @@ namespace hpx
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
+        if (!resource::is_partitioner_valid())
+        {
+            return std::to_string(dflt);
+        }
         return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
@@ -808,22 +816,28 @@ namespace hpx
     {
         if (get_runtime_ptr() != nullptr)
         {
-            return get_runtime_ptr()->get_config().add_entry(key, value);
+            get_runtime_ptr()->get_config().add_entry(key, value);
         }
-        return resource::get_partitioner()
-            .get_command_line_switches().rtcfg_.add_entry(key, value);
+        if (resource::is_partitioner_valid())
+        {
+            resource::get_partitioner()
+                .get_command_line_switches().rtcfg_.add_entry(key, value);
+        }
     }
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
         if (get_runtime_ptr() != nullptr)
         {
-            return get_runtime_ptr()->get_config().add_entry(
+            get_runtime_ptr()->get_config().add_entry(
                 key, std::to_string(value));
         }
-        return resource::get_partitioner()
-            .get_command_line_switches().rtcfg_.
-                add_entry(key, std::to_string(value));
+        if (resource::is_partitioner_valid())
+        {
+            resource::get_partitioner()
+                .get_command_line_switches().rtcfg_.
+                    add_entry(key, std::to_string(value));
+        }
     }
 
     void set_config_entry_callback(std::string const& key,
@@ -832,12 +846,15 @@ namespace hpx
     {
         if (get_runtime_ptr() != nullptr)
         {
-            return get_runtime_ptr()->get_config().add_notification_callback(
+            get_runtime_ptr()->get_config().add_notification_callback(
                 key, callback);
         }
-        return resource::get_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.add_notification_callback(key, callback);
+        if (resource::is_partitioner_valid())
+        {
+            return resource::get_partitioner()
+                .get_command_line_switches()
+                .rtcfg_.add_notification_callback(key, callback);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
