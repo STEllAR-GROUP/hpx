@@ -697,20 +697,21 @@ return cleanup_terminated(delete_all);
         // create a new thread and schedule it if the initial state
         // is equal to pending
         void create_thread(thread_init_data& data, thread_id_type* thrd,
-            thread_state_enum initial_state, error_code& ec,
-                thread_schedule_hint schedulehint,
-                thread_schedule_hint)
+            thread_state_enum initial_state, error_code& ec) override
         {
             // safety check that task was created by this thread/scheduler
             HPX_ASSERT(data.scheduler_base == this);
             //
-            std::size_t pool_queue_num = std::size_t(schedulehint);
+            std::size_t pool_queue_num = std::size_t(data.schedulehint);
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
-
-            if (schedulehint == thread_schedule_hint_none || pool_queue_num == 32767)
+            //
+            const char* const msgs[] = {"HINT_NONE","HINT     ","ERROR", "NORMAL   "};
+            const char *msg = nullptr;
+            //
+            if (data.schedulehint == thread_schedule_hint_none || pool_queue_num == 32767)
             {
-                LOG_CUSTOM_MSG("create_thread thread_schedule_hint_none");
+                msg = msgs[0];
                 std::size_t thread_num =
                     threads::detail::thread_num_tss_.get_worker_thread_num();
                 pool_queue_num = this->global_to_local_thread_index(thread_num);
@@ -724,6 +725,7 @@ return cleanup_terminated(delete_all);
                 }
             }
             else if (pool_queue_num>=32768) {
+                msg = msgs[1];
                 domain_num = pool_queue_num - 32768;
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
@@ -736,18 +738,17 @@ return cleanup_terminated(delete_all);
                 else {
                     q_index = counters_[domain_num];
                 }
-                LOG_CUSTOM_MSG("create_thread HINT " << domain_num);
             }
             else if (pool_queue_num>num_workers_) {
                 throw std::runtime_error("Bad thread number in create_thread");
             }
             else { // everything is ok
+                msg = msgs[3];
                 domain_num = d_lookup_[pool_queue_num];
                 q_index    = q_lookup_[pool_queue_num];
-                LOG_CUSTOM_MSG("create_thread NORMAL " << domain_num);
             }
 
-            LOG_CUSTOM_MSG("create_thread "
+            LOG_CUSTOM_MSG("create_thread " << msg << " "
                            << "queue " << decnumber(pool_queue_num)
                            << "domain " << decnumber(domain_num)
                            << "qindex " << decnumber(q_index));
