@@ -24,7 +24,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/io/ios_state.hpp>
 
@@ -444,7 +444,7 @@ namespace hpx { namespace naming
 
             std::int64_t result = 0;
             {
-                hpx::util::scoped_unlock<std::unique_lock<gid_type::mutex_type> >
+                hpx::util::unlock_guard<std::unique_lock<gid_type::mutex_type>>
                     ul(l);
                  result = agas::incref(launch::sync, unlocked_gid, added_credit);
             }

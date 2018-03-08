@@ -27,7 +27,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 
@@ -486,7 +486,7 @@ void section::add_entry (std::unique_lock<mutex_type>& l,
                 std::string value = it->second.first;
                 entry_changed_func f = it->second.second;
 
-                hpx::util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 f(fullkey, value);
             }
         }
@@ -534,7 +534,7 @@ void section::add_entry (std::unique_lock<mutex_type>& l,
                 std::string value = it->second.first;
                 entry_changed_func f = it->second.second;
 
-                hpx::util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 f(fullkey, value);
             }
         }
@@ -551,7 +551,7 @@ void section::add_entry (std::unique_lock<mutex_type>& l,
                 std::string value = p.first->second.first;
                 entry_changed_func f = p.first->second.second;
 
-                hpx::util::scoped_unlock<std::unique_lock<mutex_type> > ul(l);
+                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 f(key, value);
             }
         }
