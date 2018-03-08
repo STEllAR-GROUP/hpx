@@ -1696,8 +1696,7 @@ namespace hpx { namespace threads { namespace detail
             l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
         util::yield_while([&l]()
             {
-                l.try_lock();
-                return !l.owns_lock();
+                return !l.try_lock();
             }, "scheduled_thread_pool::suspend_processing_unit_internal",
             hpx::threads::pending);
 
@@ -1796,8 +1795,7 @@ namespace hpx { namespace threads { namespace detail
             l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
         util::yield_while([&l]()
             {
-                l.try_lock();
-                return !l.owns_lock();
+                return !l.try_lock();
             }, "scheduled_thread_pool::resume_processing_unit_internal",
             hpx::threads::pending);
 
