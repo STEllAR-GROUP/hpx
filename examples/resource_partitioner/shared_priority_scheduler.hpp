@@ -214,6 +214,13 @@ namespace policies {
 #endif
     }
 
+    // see blog : A fast alternative to the modulo reduction
+    // Daniel Lemire
+    // https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction
+    uint32_t modulo(uint32_t x, uint32_t N) {
+      return ((uint64_t) x * (uint64_t) N) >> 32 ;
+    }
+
     typedef std::tuple<std::size_t, std::size_t, std::size_t> core_ratios;
 
     // ----------------------------------------------------------------
@@ -262,7 +269,7 @@ namespace policies {
             // starting with the requested queue
             // then stealing from any other one in the container
             for (std::size_t i=0; i<num_queues; ++i) {
-                std::size_t q = (id + i) % num_queues;
+                std::size_t q = modulo((id + i), num_queues);
                 if (queues_[q]->get_next_thread(thrd)) return true;
             }
             return false;
@@ -726,7 +733,7 @@ return cleanup_terminated(delete_all);
             }
             else if (pool_queue_num>=32768) {
                 msg = msgs[1];
-                domain_num = pool_queue_num - 32768;
+                domain_num = modulo((pool_queue_num - 32768), num_domains_);
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
                 std::size_t thread_num =
@@ -765,7 +772,7 @@ return cleanup_terminated(delete_all);
                 }
 
                 hp_queues_[domain_num].
-                    get_queue(q_index  % hp_queues_[domain_num].num_cores)->
+                    get_queue(modulo(q_index, hp_queues_[domain_num].num_cores))->
                         create_thread(data, thrd, initial_state, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_high "
@@ -778,7 +785,7 @@ return cleanup_terminated(delete_all);
             if (data.priority == thread_priority_low)
             {
                 lp_queues_[domain_num].
-                    get_queue(q_index % lp_queues_[domain_num].num_cores)->
+                    get_queue(modulo(q_index, lp_queues_[domain_num].num_cores))->
                         create_thread(data, thrd, initial_state, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_low "
@@ -790,7 +797,7 @@ return cleanup_terminated(delete_all);
 
             // normal priority
             np_queues_[domain_num].
-                get_queue(q_index % np_queues_[domain_num].num_cores)->
+                get_queue(modulo(q_index, np_queues_[domain_num].num_cores))->
                     create_thread(data, thrd, initial_state, ec);
 
             LOG_CUSTOM_MSG2("create_thread thread_priority_normal "
@@ -817,7 +824,7 @@ return cleanup_terminated(delete_all);
             // is there a high priority task, take first from our numa domain
             // and then try to steal from others
             for (std::size_t d=0; d<num_domains_; ++d) {
-                std::size_t dom = (domain_num+d) % num_domains_;
+                std::size_t dom = modulo((domain_num+d), num_domains_);
                 // set the preferred queue for this domain, if applicable
                 std::size_t q_index = q_lookup_[pool_queue_num];
                 // get next task, steal if from another domain
@@ -831,7 +838,7 @@ return cleanup_terminated(delete_all);
             // try a normal priority task
             if (!result) {
                 for (std::size_t d=0; d<num_domains_; ++d) {
-                    std::size_t dom = (domain_num+d) % num_domains_;
+                    std::size_t dom = modulo((domain_num+d), num_domains_);
                     // set the preferred queue for this domain, if applicable
                     std::size_t q_index = q_lookup_[pool_queue_num];
                     // get next task, steal if from another domain
