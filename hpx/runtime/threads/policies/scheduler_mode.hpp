@@ -30,6 +30,8 @@ namespace hpx { namespace threads { namespace policies
             ///< scheduler to dynamically increase and reduce the number of
             ///< processing units it runs on. Setting this value not succeed for
             ///< schedulers that do not support this functionality.
+        default_mode = do_background_work | reduce_thread_priority | delay_exit
+            ///< This option represents the default mode.
     };
 }}}
 
