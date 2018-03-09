@@ -618,7 +618,8 @@ namespace hpx { namespace threads { namespace policies
         // TODO: add recycling
         void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread) override
+            std::size_t num_thread,
+            std::size_t /*num_thread_fallback*/ = std::size_t(-1)) override
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(tree.back().size());
@@ -701,6 +702,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
+            std::size_t /*num_thread_fallback*/ = std::size_t(-1),
             thread_priority /*priority*/ = thread_priority_normal) override
         {
             HPX_ASSERT(tree.size());
@@ -710,6 +712,7 @@ namespace hpx { namespace threads { namespace policies
 
         void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
+            std::size_t /*num_thread_fallback*/ = std::size_t(-1),
             thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(tree.size());

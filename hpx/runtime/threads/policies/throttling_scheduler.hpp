@@ -110,7 +110,8 @@ namespace hpx { namespace threads { namespace policies
                 thread_queue_type* q = queues_[num_thread];
                 while (q->get_next_thread(thrd)) {
                     this->wait_or_add_new(num_thread, running, idle_loop_count) ;
-                    this->schedule_thread(thrd, num_thread, thread_priority_normal);
+                    this->schedule_thread(thrd, num_thread, num_thread,
+                        thread_priority_normal);
                 }
 
                 std::unique_lock<compat::mutex> l(mtx_);
@@ -125,6 +126,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
+            std::size_t /*num_thread_fallback*/ = std::size_t(-1),
             thread_priority priority = thread_priority_normal)
         {
             // Loop and find a thread that is not disabled
