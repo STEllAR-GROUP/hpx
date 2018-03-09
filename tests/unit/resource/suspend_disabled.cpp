@@ -49,5 +49,12 @@ int main(int argc, char* argv[])
     };
 
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+
+    // Explicitly disable elasticity if it is in defaults
+    rp.create_thread_pool("default", hpx::resource::scheduling_policy::local,
+        hpx::threads::policies::scheduler_mode(
+            hpx::threads::policies::default_mode &
+            ~hpx::threads::policies::enable_elasticity));
+
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
 }

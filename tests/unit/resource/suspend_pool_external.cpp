@@ -23,74 +23,85 @@
 #include <utility>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+// NOTE: Needed for now when initializing resource partitioner separately.
+int hpx_main()
 {
     return 0;
 }
 
-int main(int argc, char* argv[])
+void test_scheduler(int argc, char* argv[],
+    hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> scheduler_strings =
-        {
-            "local",
-            "local-priority-lifo",
-            "local-priority-fifo",
-            "static",
-            "static-priority"
-        };
-
-    for (auto const& scheduler_string : scheduler_strings)
+    std::vector<std::string> cfg =
     {
-        std::vector<std::string> cfg =
-            {
-                "hpx.os_threads=4",
-                "hpx.scheduler=" + scheduler_string
-            };
+        "hpx.os_threads=4"
+    };
 
-        hpx::start(argc, argv, std::move(cfg));
+    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
-        hpx::threads::executors::pool_executor default_exec("default");
-        hpx::threads::thread_pool_base& default_pool =
-            hpx::resource::get_thread_pool("default");
-        std::size_t const default_pool_threads =
-            hpx::resource::get_num_threads("default");
+    rp.create_thread_pool("default", scheduler);
 
-        hpx::util::high_resolution_timer t;
+    hpx::start(nullptr, argc, argv);
 
-        while (t.elapsed() < 5)
+    hpx::threads::thread_pool_base& default_pool =
+        hpx::resource::get_thread_pool("default");
+    std::size_t const default_pool_threads =
+        hpx::resource::get_num_threads("default");
+
+    hpx::util::high_resolution_timer t;
+
+    while (t.elapsed() < 2)
+    {
+        for (std::size_t i = 0;
+             i < default_pool_threads * 10000; ++i)
         {
-            for (std::size_t i = 0;
-                 i < default_pool_threads * 10000; ++i)
-            {
-                hpx::apply(default_exec, [](){});
-            }
-
-            bool suspended = false;
-            default_pool.suspend_cb([&suspended]()
-                {
-                    suspended = true;
-                });
-
-            while (!suspended)
-            {
-                hpx::compat::this_thread::yield();
-            }
-
-            bool resumed = false;
-            default_pool.resume_cb([&resumed]()
-                {
-                    resumed = true;
-                });
-
-            while (!resumed)
-            {
-                hpx::compat::this_thread::yield();
-            }
+            hpx::apply([](){});
         }
 
-        hpx::apply(default_exec, []() { hpx::finalize(); });
+        bool suspended = false;
+        default_pool.suspend_cb([&suspended]()
+                                {
+                                    suspended = true;
+                                });
 
-        HPX_TEST_EQ(hpx::stop(), 0);
+        while (!suspended)
+        {
+            hpx::compat::this_thread::yield();
+        }
+
+        bool resumed = false;
+        default_pool.resume_cb([&resumed]()
+                               {
+                                   resumed = true;
+                               });
+
+        while (!resumed)
+        {
+            hpx::compat::this_thread::yield();
+        }
+    }
+
+    hpx::apply([]() { hpx::finalize(); });
+
+    HPX_TEST_EQ(hpx::stop(), 0);
+}
+
+int main(int argc, char* argv[])
+{
+    std::vector<hpx::resource::scheduling_policy> schedulers =
+        {
+            hpx::resource::scheduling_policy::local,
+            hpx::resource::scheduling_policy::local_priority_fifo,
+            hpx::resource::scheduling_policy::local_priority_lifo,
+            hpx::resource::scheduling_policy::abp_priority_fifo,
+            hpx::resource::scheduling_policy::abp_priority_lifo,
+            hpx::resource::scheduling_policy::static_,
+            hpx::resource::scheduling_policy::static_priority
+        };
+
+    for (auto const scheduler : schedulers)
+    {
+        test_scheduler(argc, argv, scheduler);
     }
 
     return hpx::util::report_errors();
