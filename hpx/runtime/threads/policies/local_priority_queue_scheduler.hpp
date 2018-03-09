@@ -501,7 +501,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             std::unique_lock<pu_mutex_type> l;
-            select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             // now create the thread
             if (data.priority == thread_priority_high_recursive ||
@@ -622,7 +622,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             std::unique_lock<pu_mutex_type> l;
-            select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||
@@ -664,7 +664,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             std::unique_lock<pu_mutex_type> l;
-            select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||

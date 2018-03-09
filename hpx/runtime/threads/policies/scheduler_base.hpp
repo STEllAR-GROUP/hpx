@@ -191,74 +191,69 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        void select_active_pu(std::unique_lock<pu_mutex_type>& l,
-            std::size_t& num_thread,
+        std::size_t select_active_pu(std::unique_lock<pu_mutex_type>& l,
+            std::size_t num_thread,
             std::size_t num_thread_fallback = std::size_t(-1))
         {
             if (mode_ & threads::policies::enable_elasticity)
             {
                 std::size_t states_size = states_.size();
 
-                // Prefer active PUs
+                if (num_thread_fallback == std::size_t(-1))
+                {
+                    // Try indefinitely if there is no fallback
+                    hpx::util::yield_while([this, states_size, &l, &num_thread]()
+                        {
+                            for (std::size_t offset = 0; offset < states_size;
+                                ++offset)
+                            {
+                                std::size_t num_thread_local =
+                                    (num_thread + offset) % states_size;
+
+                                l = std::unique_lock<pu_mutex_type>(
+                                    pu_mtxs_[num_thread_local],
+                                    std::try_to_lock);
+
+                                if (l.owns_lock())
+                                {
+                                    if (states_[num_thread_local] <=
+                                        state_suspended)
+                                    {
+                                        num_thread = num_thread_local;
+                                        return false;
+                                    }
+
+                                    l.unlock();
+                                }
+                            }
+
+                            // Yield after trying all pus, then try again
+                            return true;
+                        });
+
+                    return num_thread;
+                }
+
+                // Try all pus only once if there is a fallback
                 for (std::size_t offset = 0; offset < states_size; ++offset)
                 {
                     std::size_t num_thread_local =
                         (num_thread + offset) % states_size;
 
-                    bool found_thread = false;
+                    l = std::unique_lock<pu_mutex_type>(
+                        pu_mtxs_[num_thread_local], std::try_to_lock);
 
-                    // Try to lock as long as thread is running
-                    hpx::util::yield_while([this, &l, &found_thread, num_thread_local, num_thread_fallback]()
-                        {
-                            l = std::unique_lock<pu_mutex_type>(
-                                pu_mtxs_[num_thread_local], std::try_to_lock);
-
-                            if (l.owns_lock())
-                            {
-                                if (states_[num_thread_local] <= state_suspended)
-                                {
-                                    // Choose this thread if got lock and running
-                                    found_thread = true;
-                                    return false;
-                                }
-
-                                // Skip this thread if not running
-                                l.unlock();
-                                return false;
-                            }
-                            else if (states_[num_thread_local] > state_suspended)
-                            {
-                                return false; // Skip this thread if not running
-                            }
-
-                            // Skip this thread if we have a fallback
-                            if (num_thread_fallback != std::size_t(-1))
-                            {
-                                return false;
-                            }
-
-                            // Continue trying if thread is running but could not get lock
-                            return true;
-                        });
-
-                    if (found_thread)
+                    if (l.owns_lock() &&
+                        states_[num_thread_local] <= state_suspended)
                     {
-                        num_thread = num_thread_local;
-                        return;
+                        return num_thread_local;
                     }
                 }
 
-                if (num_thread_fallback != std::size_t(-1))
-                {
-                    num_thread = num_thread_fallback;
-                    return;
-                }
-
-                HPX_ASSERT_MSG(false, "Could not find an active PU when"
-                    " scheduling an HPX thread. Did you try to schedule"
-                    " an HPX thread on a thread pool with all threads"
-                    " stopped?");
+                return num_thread_fallback;
             }
+
+            return num_thread;
         }
 
         // allow to access/manipulate states
