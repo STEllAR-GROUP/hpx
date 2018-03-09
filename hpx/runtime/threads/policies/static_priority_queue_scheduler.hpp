@@ -57,21 +57,11 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {}
 
+        virtual bool has_thread_stealing() const { return false; }
+
         static std::string get_scheduler_name()
         {
             return "static_priority_queue_scheduler";
-        }
-
-        void suspend(std::size_t) override
-        {
-            HPX_ASSERT_MSG(false, "static_priority_queue_scheduler does not"
-                " support suspending");
-        }
-
-        void resume(std::size_t) override
-        {
-            HPX_ASSERT_MSG(false, "static_priority_queue_scheduler does not"
-                " support resuming");
         }
 
         /// Return the next thread to be executed, return false if non is

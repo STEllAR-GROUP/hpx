@@ -30,55 +30,68 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg =
+    std::vector<std::string> scheduler_strings =
+        {
+            "local",
+            "local-priority-lifo",
+            "local-priority-fifo",
+            "static",
+            "static-priority"
+        };
+
+    for (auto const& scheduler_string : scheduler_strings)
     {
-        "hpx.os_threads=4"
-    };
-
-    hpx::start(argc, argv, std::move(cfg));
-
-    hpx::threads::executors::pool_executor default_exec("default");
-    hpx::threads::thread_pool_base& default_pool =
-        hpx::resource::get_thread_pool("default");
-    std::size_t const default_pool_threads =
-        hpx::resource::get_num_threads("default");
-
-    hpx::util::high_resolution_timer t;
-
-    while (t.elapsed() < 5)
-    {
-        for (std::size_t i = 0;
-             i < default_pool_threads * 10000; ++i)
-        {
-            hpx::apply(default_exec, [](){});
-        }
-
-        bool suspended = false;
-        default_pool.suspend_cb([&suspended]()
+        std::vector<std::string> cfg =
             {
-                suspended = true;
-            });
+                "hpx.os_threads=4",
+                "hpx.scheduler=" + scheduler_string
+            };
 
-        while (!suspended)
+        hpx::start(argc, argv, std::move(cfg));
+
+        hpx::threads::executors::pool_executor default_exec("default");
+        hpx::threads::thread_pool_base& default_pool =
+            hpx::resource::get_thread_pool("default");
+        std::size_t const default_pool_threads =
+            hpx::resource::get_num_threads("default");
+
+        hpx::util::high_resolution_timer t;
+
+        while (t.elapsed() < 5)
         {
-            hpx::compat::this_thread::yield();
-        }
-
-        bool resumed = false;
-        default_pool.resume_cb([&resumed]()
+            for (std::size_t i = 0;
+                 i < default_pool_threads * 10000; ++i)
             {
-                resumed = true;
-            });
+                hpx::apply(default_exec, [](){});
+            }
 
-        while (!resumed)
-        {
-            hpx::compat::this_thread::yield();
+            bool suspended = false;
+            default_pool.suspend_cb([&suspended]()
+                {
+                    suspended = true;
+                });
+
+            while (!suspended)
+            {
+                hpx::compat::this_thread::yield();
+            }
+
+            bool resumed = false;
+            default_pool.resume_cb([&resumed]()
+                {
+                    resumed = true;
+                });
+
+            while (!resumed)
+            {
+                hpx::compat::this_thread::yield();
+            }
         }
+
+        hpx::apply(default_exec, []() { hpx::finalize(); });
+
+        HPX_TEST_EQ(hpx::stop(), 0);
     }
-
-    hpx::apply(default_exec, []() { hpx::finalize(); });
-
-    HPX_TEST_EQ(hpx::stop(), 0);
 
     return hpx::util::report_errors();
 }

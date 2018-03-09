@@ -149,6 +149,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_ != 0; }
+        virtual bool has_thread_stealing() const { return true; }
 
         static std::string get_scheduler_name()
         {

@@ -28,11 +28,8 @@ namespace hpx { namespace threads { namespace policies
             ///< more frequently than normal. This option enables this behavior.
         enable_elasticity = 0x10,        ///< This options allows for the
             ///< scheduler to dynamically increase and reduce the number of
-            ///< processing units it runs on.
-        enable_suspension = 0x20        ///< This options allows for the
-            ///< scheduler to suspend/resume its operation. Setting this value
-            ///< may not succeed for schedulers that do not support this
-            ///< functionality.
+            ///< processing units it runs on. Setting this value not succeed for
+            ///< schedulers that do not support this functionality.
     };
 }}}
 
