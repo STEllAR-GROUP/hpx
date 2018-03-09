@@ -817,11 +817,13 @@ namespace hpx
         if (get_runtime_ptr() != nullptr)
         {
             get_runtime_ptr()->get_config().add_entry(key, value);
+            return;
         }
         if (resource::is_partitioner_valid())
         {
             resource::get_partitioner()
                 .get_command_line_switches().rtcfg_.add_entry(key, value);
+            return;
         }
     }
 
@@ -831,12 +833,14 @@ namespace hpx
         {
             get_runtime_ptr()->get_config().add_entry(
                 key, std::to_string(value));
+            return;
         }
         if (resource::is_partitioner_valid())
         {
             resource::get_partitioner()
                 .get_command_line_switches().rtcfg_.
                     add_entry(key, std::to_string(value));
+            return;
         }
     }
 
@@ -848,12 +852,14 @@ namespace hpx
         {
             get_runtime_ptr()->get_config().add_notification_callback(
                 key, callback);
+            return;
         }
         if (resource::is_partitioner_valid())
         {
-            return resource::get_partitioner()
+            resource::get_partitioner()
                 .get_command_line_switches()
                 .rtcfg_.add_notification_callback(key, callback);
+            return;
         }
     }
 
