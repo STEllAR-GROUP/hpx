@@ -52,6 +52,7 @@
 #include <vector>
 
 const char *_cudaGetErrorEnum(cublasStatus_t error);
+std::mt19937 gen;
 
 // -------------------------------------------------------------------------
 // a simple cublas wrapper helper object that can be used to synchronize
@@ -250,7 +251,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
     std::vector<T> h_CUBLAS(size_C);
 
     // Fill A and B with random numbers
-    auto randfunc = [](T &x) { x = rand() / (T)RAND_MAX; };
+    auto randfunc = [](T &x) { x = gen() / (T)RAND_MAX; };
     hpx::parallel::for_each(par, h_A.begin(), h_A.end(), randfunc);
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), randfunc);
 
@@ -435,6 +436,7 @@ int hpx_main(boost::program_options::variables_map& vm)
      if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
+    gen.seed(seed);
     std::cout << "using seed: " << seed << std::endl;
 
     //

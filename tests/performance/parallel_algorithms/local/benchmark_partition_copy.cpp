@@ -166,7 +166,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
-    std::mt19937 gen(seed);
+    _rand.seed(seed);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
