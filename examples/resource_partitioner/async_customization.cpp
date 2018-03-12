@@ -409,7 +409,9 @@ int test(Executor &exec)
         , fs1, fs2
     );
     fds.get();
-    std::cout << std::endl;
+    std::cout << "============================" << std::endl;
+    std::cout << "Complete" << std::endl;
+    std::cout << "============================" << std::endl;
     return 0;
 }
 
@@ -443,8 +445,10 @@ namespace hpx { namespace threads { namespace executors
 
 int hpx_main()
 {
+    int val = 0;
+
     test_async_executor exec;
-    int val = test(exec);
+    val = test(exec);
 
     typedef hpx::threads::executors::pool_numa_hint<dummy_tag> dummy_hint;
     hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec2(true, "default");
