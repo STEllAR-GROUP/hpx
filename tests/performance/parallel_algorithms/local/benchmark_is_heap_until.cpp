@@ -139,8 +139,10 @@ double run_is_heap_until_benchmark_par_unseq(int test_count,
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    if (vm.count("seed"))
+    if (vm.count("seed")){
         seed = vm["seed"].as<unsigned int>();
+        _rand.seed(seed);
+    }
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
