@@ -130,10 +130,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add(closure_type && f,
+        threads::thread_schedule_hint schedulehint,
         util::thread_description const& desc,
         threads::thread_state_enum initial_state,
         threads::thread_stacksize stacksize,
-        threads::thread_schedule_hint schedulehint,
         error_code& ec)
     {
         HPX_ASSERT(std::size_t(-1) != thread_num_);

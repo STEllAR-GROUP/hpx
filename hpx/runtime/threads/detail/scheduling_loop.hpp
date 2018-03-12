@@ -394,8 +394,7 @@ namespace hpx { namespace threads { namespace detail
         // Create in suspended to prevent the thread from being scheduled
         // directly...
         scheduler.SchedulingPolicy::create_thread(background_init,
-            &background_thread, suspended, hpx::throws,
-            thread_schedule_hint(num_thread));
+            &background_thread, suspended, hpx::throws);
         HPX_ASSERT(background_thread);
         scheduler.SchedulingPolicy::increment_background_thread_count();
         // We can now set the state to pending

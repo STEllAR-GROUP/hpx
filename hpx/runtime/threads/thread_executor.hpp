@@ -167,10 +167,10 @@ namespace hpx { namespace threads
             // Depending on the subclass implementation, this may block in some
             // situations.
             virtual void add(closure_type&& f,
+                threads::thread_schedule_hint schedulehint,
                 util::thread_description const& desc,
                 threads::thread_state_enum initial_state,
                 threads::thread_stacksize stacksize,
-                threads::thread_schedule_hint schedulehint,
                 error_code& ec) = 0;
 
             // Return an estimate of the number of waiting closures.
@@ -320,15 +320,14 @@ namespace hpx { namespace threads
         /// Depending on the subclass implementation, this may block in some
         /// situations.
         void add(closure_type f,
-            util::thread_description const& desc = util::thread_description(),
-            threads::thread_state_enum initial_state = threads::pending,
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-            threads::thread_schedule_hint schedulehint =
-                threads::thread_schedule_hint_none,
-            error_code& ec = throws)
+            threads::thread_schedule_hint schedulehint,
+            util::thread_description const& desc,
+            threads::thread_state_enum initial_state,
+            threads::thread_stacksize stacksize,
+            error_code& ec)
         {
-            executor_data_->add(std::move(f), desc, initial_state,
-                stacksize, schedulehint, ec);
+            executor_data_->add(std::move(f), schedulehint, desc, initial_state,
+                stacksize, ec);
         }
 
         /// Return an estimate of the number of waiting closures.

@@ -86,8 +86,7 @@ namespace hpx { namespace threads { namespace detail
             data.priority = thread_priority_normal;
 
         // create the new thread
-        thread_schedule_hint schedulehint = data.schedulehint;
-        scheduler->create_thread(data, &id, initial_state, ec, schedulehint);
+        scheduler->create_thread(data, &id, initial_state, ec);
 
         LTM_(info) << "register_thread(" << id << "): initial_state("
                    << get_thread_state_name(initial_state)
@@ -97,7 +96,7 @@ namespace hpx { namespace threads { namespace detail
                    << ")";
 
         // potentially wake up waiting thread
-        scheduler->do_some_work(schedulehint);
+        scheduler->do_some_work(data.schedulehint);
     }
 }}}
 

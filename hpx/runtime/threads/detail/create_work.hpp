@@ -93,8 +93,7 @@ namespace hpx { namespace threads { namespace detail
             data.priority = thread_priority_normal;
 
         // create the new thread
-        scheduler->create_thread(data, nullptr, initial_state, ec,
-            data.schedulehint);
+        scheduler->create_thread(data, nullptr, initial_state, ec);
     }
 }}}
 

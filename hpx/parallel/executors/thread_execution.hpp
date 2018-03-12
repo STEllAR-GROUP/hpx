@@ -113,7 +113,30 @@ namespace hpx { namespace threads
     {
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            "hpx::parallel::execution::post");
+            threads::thread_schedule_hint_none,
+            "hpx::parallel::execution::post",
+            threads::pending,
+            true,
+            exec.get_stacksize(),
+            throws);
+    }
+    ///////////////////////////////////////////////////////////////////////////
+    // post()
+    template <typename Executor, typename F, typename Hint, typename ... Ts>
+    HPX_FORCEINLINE
+    typename std::enable_if<
+        hpx::traits::is_threads_executor<Executor>::value
+    >::type
+    post(Executor && exec, F && f, Ts &&... ts, Hint && hint)
+    {
+        exec.add(
+            util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
+            std::forward<Hint>(hint),
+            "hpx::parallel::execution::post",
+            threads::pending,
+            true,
+            exec.get_stacksize(),
+            throws);
     }
 
     ///////////////////////////////////////////////////////////////////////////
