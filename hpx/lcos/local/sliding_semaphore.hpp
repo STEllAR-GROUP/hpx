@@ -62,6 +62,20 @@ namespace hpx { namespace lcos { namespace local
           : sem_(max_difference, lower_limit)
         {}
 
+        /// \brief Set/Change the difference that will cause the semaphore to trigger
+        ///
+        /// \param max_difference
+        ///                 [in] The max difference between the upper limit
+        ///                 (as set by wait()) and the lower limit (as set by
+        ///                 signal()) which is allowed without suspending any
+        ///                 thread calling wait().
+        /// \param lower_limit  [in] The initial lower limit.
+        void set_max_difference(std::int64_t max_difference,
+                std::int64_t lower_limit = 0)
+        {
+            sem_.set_max_difference(max_difference, lower_limit);
+        }
+
         /// \brief Wait for the semaphore to be signaled
         ///
         /// \param upper_limit [in] The new upper limit.
