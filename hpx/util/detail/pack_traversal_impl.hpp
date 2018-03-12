@@ -592,7 +592,8 @@ namespace util {
                 typename std::enable_if<
                     is_effective_t<M, element_of_t<T>>::value>::type* = nullptr)
             {
-                for (auto&& element : std::forward<T>(container))
+                for (auto&& element :
+                    container_accessor_of(std::forward<T>(container)))
                 {
                     std::forward<M>(mapper)(
                         std::forward<decltype(element)>(element));

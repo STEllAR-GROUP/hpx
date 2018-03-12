@@ -11,6 +11,7 @@
 
 #include <array>
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <list>
 #include <memory>
@@ -533,6 +534,19 @@ static void test_strategic_traverse()
     }
 }
 
+struct unique_move_accessor
+{
+    std::size_t& counter;
+
+    template <typename T>
+    auto operator()(T&& ptr) -> decltype((void)ptr.get())
+    {
+        auto moved(std::forward<T>(ptr));
+        HPX_TEST_EQ(*moved, 5);
+        ++counter;
+    }
+};
+
 static void test_strategic_container_traverse()
 {
     // Every element in the container is visited
@@ -601,6 +615,22 @@ static void test_strategic_container_traverse()
 
         HPX_TEST_EQ(res.size(), 1U);
         HPX_TEST_EQ(res[0], 5);
+    }
+
+    {
+        std::vector<std::unique_ptr<int>> container;
+        container.push_back(std::unique_ptr<int>(new int(5)));
+        std::size_t counter = 0;
+
+        // In order to detect this bug we have to use a callable visitor
+        // which accepts a collapsing reference of any object.
+        // Then we create a local copy from it.
+        // Otherwise this bug slips through since MSVC still has the
+        // the bug of binding l-value to r-value references sometimes.
+        traverse_pack(unique_move_accessor{counter},
+            std::make_tuple(std::move(container)));
+
+        HPX_TEST_EQ(counter, 1U);
     }
 
     // Every element in the container is remapped
