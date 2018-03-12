@@ -86,6 +86,7 @@ namespace hpx { namespace threads { namespace executors
     {
         Executor     &executor_;
         NumaFunction &numa_function_;
+        bool          hp_sync_;
         //
         template <typename F, typename ... Ts>
         auto operator()(F && f, Ts &&... ts) const
@@ -108,7 +109,8 @@ namespace hpx { namespace threads { namespace executors
                 const_cast<Executor&>(executor_),
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            if (executor_.get_priority() == hpx::threads::thread_priority_high) {
+            if (hp_sync_ &&
+                    executor_.get_priority() == hpx::threads::thread_priority_high) {
                 p.apply(
                     hpx::launch::sync,
                     executor_.get_priority(),
@@ -137,6 +139,7 @@ namespace hpx { namespace threads { namespace executors
     {
         Executor     &executor_;
         NumaFunction &numa_function_;
+        bool          hp_sync_;
         //
         template <typename F, typename Future, typename ... Ts>
         auto operator()(F && f, Future && predecessor, Ts &&... ts) const
@@ -165,7 +168,8 @@ namespace hpx { namespace threads { namespace executors
                                     std::forward<Ts>(ts)...)
             );
 
-            if (executor_.get_priority() == hpx::threads::thread_priority_high) {
+            if (hp_sync_ &&
+                    executor_.get_priority() == hpx::threads::thread_priority_high) {
                 p.apply(
                     hpx::launch::sync,
                     executor_.get_priority(),
@@ -185,35 +189,6 @@ namespace hpx { namespace threads { namespace executors
     };
 
     // --------------------------------------------------------------------
-    // base class for guided executors
-    // these differ by the numa_hint function type that is called
-    // --------------------------------------------------------------------
-    struct HPX_EXPORT guided_pool_executor_base {
-    public:
-        guided_pool_executor_base(const std::string& pool_name)
-            : pool_executor_(pool_name)
-        {}
-
-        guided_pool_executor_base(const std::string& pool_name,
-                             thread_stacksize stacksize)
-            : pool_executor_(pool_name, stacksize)
-        {}
-
-        guided_pool_executor_base(const std::string& pool_name,
-                             thread_priority priority,
-                             thread_stacksize stacksize = thread_stacksize_default)
-            : pool_executor_(pool_name, priority, stacksize)
-        {}
-
-        scheduled_executor &get_scheduled_executor() {
-            return pool_executor_;
-        }
-
-    protected:
-        pool_executor pool_executor_;
-    };
-
-    // --------------------------------------------------------------------
     template <typename H>
     struct HPX_EXPORT guided_pool_executor {};
 
@@ -224,11 +199,27 @@ namespace hpx { namespace threads { namespace executors
     // guide a lambda rather than a full function.
     template <typename Tag>
     struct HPX_EXPORT guided_pool_executor<pool_numa_hint<Tag>>
-        : guided_pool_executor_base
     {
-    public:
-        // force usage of base class constructors
-        using guided_pool_executor_base::guided_pool_executor_base;
+      public:
+        guided_pool_executor(const std::string& pool_name,
+                             bool hp_sync = false)
+            : pool_executor_(pool_name)
+            , hp_sync_(hp_sync)
+        {}
+
+        guided_pool_executor(const std::string& pool_name,
+                             thread_stacksize stacksize,
+                             bool hp_sync = false)
+            : pool_executor_(pool_name, stacksize)
+            , hp_sync_(hp_sync)
+        {}
+
+        guided_pool_executor(const std::string& pool_name, thread_priority priority,
+                             thread_stacksize stacksize = thread_stacksize_default,
+                             bool hp_sync = false)
+            : pool_executor_(pool_name, priority, stacksize)
+            , hp_sync_(hp_sync)
+        {}
 
         // --------------------------------------------------------------------
         // async execute specialized for simple arguments typical
@@ -261,7 +252,7 @@ namespace hpx { namespace threads { namespace executors
                 util::unwrapping(
                     pre_execution_async_domain_schedule<pool_executor,
                         pool_numa_hint<Tag>> {
-                            pool_executor_, hint_
+                            pool_executor_, hint_, hp_sync_
                         }
                 ),
                 std::forward<F>(f), std::forward<Ts>(ts)...
@@ -314,7 +305,7 @@ namespace hpx { namespace threads { namespace executors
                 {
                     pre_execution_then_domain_schedule<
                         pool_executor, pool_numa_hint<Tag>>
-                            pre_exec { pool_executor_, hint_ };
+                            pre_exec { pool_executor_, hint_, hp_sync_};
 
                     return pre_exec(
                         std::move(f),
@@ -378,7 +369,7 @@ namespace hpx { namespace threads { namespace executors
                 {
                     pre_execution_then_domain_schedule<pool_executor,
                         pool_numa_hint<Tag>>
-                        pre_exec { pool_executor_, hint_ };
+                        pre_exec { pool_executor_, hint_, hp_sync_ };
 
                     return pre_exec(
                         std::move(f),
@@ -450,7 +441,8 @@ namespace hpx { namespace threads { namespace executors
                 )
             );
 
-            if (pool_executor_.get_priority() == hpx::threads::thread_priority_high) {
+            if (hp_sync_ &&
+                    pool_executor_.get_priority() == hpx::threads::thread_priority_high) {
                 p.apply(
                     hpx::launch::sync,
                     pool_executor_.get_priority(),
@@ -468,7 +460,9 @@ namespace hpx { namespace threads { namespace executors
         }
 
     private:
+        pool_executor       pool_executor_;
         pool_numa_hint<Tag> hint_;
+        bool                hp_sync_;
     };
 
     // --------------------------------------------------------------------
@@ -478,24 +472,27 @@ namespace hpx { namespace threads { namespace executors
     template <typename H>
     struct HPX_EXPORT guided_pool_executor_shim {
     public:
-        guided_pool_executor_shim(bool guided, const std::string& pool_name)
+        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+                                  bool hp_sync = false)
             : guided_(guided)
-            , guided_exec_(pool_name)
+            , guided_exec_(pool_name, hp_sync)
             , pool_exec_(pool_name)
         {}
 
         guided_pool_executor_shim(bool guided, const std::string& pool_name,
-                                  thread_stacksize stacksize)
+                                  thread_stacksize stacksize,
+                                  bool hp_sync = false)
             : guided_(guided)
-            , guided_exec_(pool_name, stacksize)
+            , guided_exec_(pool_name, hp_sync, stacksize)
             , pool_exec_(pool_name, stacksize)
         {}
 
         guided_pool_executor_shim(bool guided, const std::string& pool_name,
                                   thread_priority priority,
-                                  thread_stacksize stacksize = thread_stacksize_default)
+                                  thread_stacksize stacksize = thread_stacksize_default,
+                                  bool hp_sync = false)
             : guided_(guided)
-            , guided_exec_(pool_name, priority, stacksize)
+            , guided_exec_(pool_name, priority, stacksize, hp_sync)
             , pool_exec_(pool_name, priority, stacksize)
         {}
 
