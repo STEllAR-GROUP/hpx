@@ -30,9 +30,7 @@
 #include "shared_priority_scheduler.hpp"
 #include "system_characteristics.hpp"
 
-static bool use_pools     = false;
-static bool use_scheduler = false;
-static int  pool_threads  = 0;
+static int pool_threads  = 0;
 
 #define CUSTOM_POOL_NAME "Custom"
 
@@ -129,18 +127,8 @@ using namespace hpx::threads::executors;
 // this is called on an hpx thread after the runtime starts up
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    if (vm.count("use-pools"))
-        use_pools = true;
-    if (vm.count("use-scheduler"))
-        use_scheduler = true;
-    //
-    std::cout << "[hpx_main] starting ..."
-              << "use_pools " << use_pools << " "
-              << "use_scheduler " << use_scheduler << "\n";
-
     std::size_t num_threads = hpx::get_num_worker_threads();
     std::cout << "HPX using threads = " << num_threads << std::endl;
-
 
     // ------------------------------------------------------------------------
     // test 1
@@ -152,7 +140,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // we must specialize the numa callback hint for the function type we are invoking
     using hint_type1 = pool_numa_hint<guided_test_tag>;
     // create an executor using that hint type
-    hpx::threads::executors::guided_pool_executor<hint_type1> guided_exec(CUSTOM_POOL_NAME);
+    hpx::threads::executors::guided_pool_executor<hint_type1>
+            guided_exec(CUSTOM_POOL_NAME);
     // invoke an async function using our numa hint executor
     hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided,
         std::size_t(5), true, std::string("Guided function"));
@@ -169,7 +158,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // the args of the async lambda must match the args of the hint type
     using hint_type2 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
-    hpx::threads::executors::guided_pool_executor<hint_type2> guided_lambda_exec(CUSTOM_POOL_NAME);
+    hpx::threads::executors::guided_pool_executor<hint_type2>
+            guided_lambda_exec(CUSTOM_POOL_NAME);
     // invoke a lambda asynchronously and use the numa executor
     hpx::future<double> gf2 = hpx::async(guided_lambda_exec,
         [](int a, double x, const std::string &msg) mutable -> double {
@@ -209,7 +199,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // the args of the async lambda must match the args of the hint type
     using hint_type3 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
-    hpx::threads::executors::guided_pool_executor<hint_type3> guided_cont_exec(CUSTOM_POOL_NAME);
+    hpx::threads::executors::guided_pool_executor<hint_type3>
+            guided_cont_exec(CUSTOM_POOL_NAME);
     // invoke the lambda asynchronously and use the numa executor
     auto new_future = hpx::async([]() -> double { return 2 * 3.1415; })
                           .then(guided_cont_exec, a_function);
@@ -222,7 +213,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         return d*2;
     }));
 */
-    //    new_future.get();
+    new_future.get();
 
     return hpx::finalize();
 }
@@ -234,10 +225,8 @@ int main(int argc, char* argv[])
 {
     boost::program_options::options_description desc_cmdline("Test options");
     desc_cmdline.add_options()
-        ( "use-pools,u", "Enable advanced HPX thread pools and executors")
-        ( "use-scheduler,s", "Enable custom priority scheduler")
         ( "pool-threads,m",
-          boost::program_options::value<int>()->default_value(0),
+          boost::program_options::value<int>()->default_value(1),
           "Number of threads to assign to custom pool")
     ;
 
@@ -251,14 +240,6 @@ int main(int argc, char* argv[])
             .run(),
         vm);
 
-    if (vm.count("use-pools"))
-    {
-        use_pools = true;
-    }
-    if (vm.count("use-scheduler"))
-    {
-        use_scheduler = true;
-    }
 
     pool_threads = vm["pool-threads"].as<int>();
 
