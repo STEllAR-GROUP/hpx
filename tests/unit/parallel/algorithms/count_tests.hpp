@@ -14,12 +14,17 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+std::uniform_int_distribution<> dis(1,30);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_count(ExPolicy policy, IteratorTag)
 {
@@ -31,10 +36,10 @@ void test_count(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    // assure rand() does not evalulate to zero
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
-
-    std::size_t find_count = (std::rand() % 30) + 1; //-V101
+    // assure gen() does not evalulate to zero
+    std::iota(std::begin(c), std::end(c), gen()+1);
+    
+    std::size_t find_count = dis(gen); //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
@@ -54,10 +59,10 @@ void test_count_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    // assure rand() does not evaluate to zero
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
+    // assure gen() does not evaluate to zero
+    std::iota(std::begin(c), std::end(c), gen()+1);
 
-    std::size_t find_count = (std::rand() % 30) + 1; //-V101
+    std::size_t find_count = dis(gen); //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
         c[i] = 0;
@@ -83,7 +88,7 @@ void test_count_exception(ExPolicy policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<int> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     try {
@@ -157,7 +162,7 @@ void test_count_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     try {
@@ -188,7 +193,7 @@ void test_count_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
