@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.3.2)
 
-project(test CXX)
+project(hello_world_client CXX)
 
 if(EXISTS "${HPX_DIR}")
 
@@ -19,16 +19,16 @@ if(EXISTS "${HPX_DIR}")
   include_directories(${HPX_INCLUDE_DIRS})
   link_directories(${HPX_LIBRARY_DIR})
 
-  add_library(test_component SHARED test_component.cpp)
+  add_library(hello_world_component SHARED hello_world_component.cpp)
   hpx_setup_target(
-    test_component
+    hello_world_component
     TYPE COMPONENT
   )
 
-  add_executable(test_executable test.cpp)
-  target_compile_definitions(test_executable PUBLIC -DHPX_DEBUG)
-  hpx_setup_target(test_executable
-    DEPENDENCIES test_component
+  add_executable(hello_world_client hello_world_client.cpp)
+  target_compile_definitions(hello_world_client PUBLIC -DHPX_DEBUG)
+  hpx_setup_target(hello_world_client
+    DEPENDENCIES hello_world_component
     COMPONENT_DEPENDENCIES iostreams
   )
 else()
