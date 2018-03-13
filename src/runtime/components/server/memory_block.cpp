@@ -5,6 +5,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -50,6 +51,11 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::components::memory_block_data, hpx_memory_data_type,
     hpx::actions::base_lco_with_value_hpx_memory_data_get,
     hpx::actions::base_lco_with_value_hpx_memory_data_set)
+
+HPX_DEFINE_COMPONENT_NAME(
+    hpx::components::server::memory_block, component_memory_block);
+HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(
+    hpx::components::server::memory_block, component_memory_block);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail
