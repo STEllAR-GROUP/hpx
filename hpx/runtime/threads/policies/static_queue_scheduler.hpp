@@ -95,60 +95,6 @@ namespace hpx { namespace threads { namespace policies
 
             return false;
         }
-
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// has to be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count) override
-        {
-            std::size_t queues_size = this->queues_.size();
-            HPX_ASSERT(num_thread < queues_size);
-
-            std::size_t added = 0;
-            bool result = true;
-
-            result = this->queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
-            if (0 != added) return result;
-
-            // Check if we have been disabled
-            if (!running)
-            {
-                return true;
-            }
-
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            // no new work is available, are we deadlocked?
-            if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
-            {
-                bool suspended_only = true;
-
-                for (std::size_t i = 0;
-                     suspended_only && i != queues_size; ++i)
-                {
-                    suspended_only = this->queues_[i]->dump_suspended_threads(
-                        i, idle_loop_count, running);
-                }
-
-                if (HPX_UNLIKELY(suspended_only)) {
-                    if (running) {
-                        LTM_(error) //-V128
-                            << "queue(" << num_thread << "): "
-                            << "no new work available, are we deadlocked?";
-                    }
-                    else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
-                              << "  [TM] queue(" << num_thread << "): "
-                              << "no new work available, are we deadlocked?\n";
-                    }
-                }
-            }
-#endif
-
-            return result;
-        }
     };
 }}}
 
