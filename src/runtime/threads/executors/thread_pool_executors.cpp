@@ -430,7 +430,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     this, virt_core, thread_num
                 ),
                 "thread_pool_executor thread", threads::pending,
-                threads::thread_priority_normal, 
+                threads::thread_priority_normal,
                 threads::thread_schedule_hint(thread_num),
                 threads::thread_stacksize_default, ec);
         }

@@ -116,7 +116,6 @@ namespace hpx { namespace threads
             threads::thread_schedule_hint_none,
             "hpx::parallel::execution::post",
             threads::pending,
-            true,
             exec.get_stacksize(),
             throws);
     }
@@ -134,7 +133,6 @@ namespace hpx { namespace threads
             std::forward<Hint>(hint),
             "hpx::parallel::execution::post",
             threads::pending,
-            true,
             exec.get_stacksize(),
             throws);
     }
