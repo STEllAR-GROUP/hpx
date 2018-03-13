@@ -28,10 +28,12 @@
 #include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
     random_fill(std::size_t random_range)
-        : gen(std::rand()),
+        : gen(seed),
         dist(0, random_range - 1)
     {}
 
@@ -241,11 +243,8 @@ std::string correct_data_type_str(std::string const& data_type)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
-
-    std::srand(seed);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();

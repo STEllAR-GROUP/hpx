@@ -35,13 +35,6 @@ struct pfo
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
-    if (vm.count("seed"))
-        seed = vm["seed"].as<unsigned int>();
-
-    std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
-
     hpx::compute::cuda::target_distribution_policy policy =
         hpx::compute::cuda::target_layout(hpx::compute::cuda::get_local_targets());
 
@@ -67,11 +60,6 @@ int main(int argc, char* argv[])
     using namespace boost::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
-
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

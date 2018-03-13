@@ -18,7 +18,7 @@
 int hpx_main()
 {
     std::vector<int> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), std::random_device{}());
 
     hpx::parallel::for_each(
         hpx::parallel::execution::par, c.begin(), c.end(),

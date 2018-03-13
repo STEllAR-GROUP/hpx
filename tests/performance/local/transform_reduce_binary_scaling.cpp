@@ -66,12 +66,12 @@ std::int64_t measure_inner_product(int count, ExPolicy && policy,
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int)std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     hpx::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    std::mt19937 gen(seed);
 
     std::size_t size = vm["vector_size"].as<std::size_t>();
     bool csvoutput = vm["csv_output"].as<int>() ?true : false;
@@ -80,8 +80,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::vector<float> data1(size);
     std::vector<float> data2(size);
 
-    std::iota(std::begin(data1), std::end(data1), float(std::rand()));
-    std::iota(std::begin(data2), std::end(data2), float(std::rand()));
+    std::iota(std::begin(data1), std::end(data1), float(gen()));
+    std::iota(std::begin(data2), std::end(data2), float(gen()));
 
     if (test_count <= 0)
     {
