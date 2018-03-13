@@ -297,7 +297,7 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec,
+            thread_state_enum initial_state, error_code& ec,
             std::size_t num_thread,
             std::size_t num_thread_fallback = std::size_t(-1))
         {
@@ -332,8 +332,7 @@ namespace hpx { namespace threads { namespace policies
             num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             HPX_ASSERT(num_thread < queue_size);
-            queues_[num_thread]->create_thread(data, id, initial_state,
-                run_now, ec);
+            queues_[num_thread]->create_thread(data, id, initial_state, ec);
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -353,13 +352,6 @@ namespace hpx { namespace threads { namespace policies
                 if (result)
                     return true;
                 q->increment_num_pending_misses();
-
-                bool have_staged =
-                    q->get_staged_queue_length(std::memory_order_relaxed) != 0;
-
-                // Give up, we should have work to convert.
-                if (have_staged)
-                    return false;
             }
 
             if (numa_sensitive_ != 0)

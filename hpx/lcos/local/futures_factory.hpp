@@ -107,7 +107,7 @@ namespace hpx { namespace lcos { namespace local
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(f_, "task_object::apply"),
-                        threads::pending_do_not_schedule, true,
+                        threads::pending_do_not_schedule,
                         threads::thread_priority_boost, get_worker_thread_num(),
                         stacksize, ec);
                 }
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace local
                     util::deferred_call(
                         &base_type::run_impl, std::move(this_)),
                     util::thread_description(f_, "task_object::apply"),
-                    threads::pending, false, priority, std::size_t(-1),
+                    threads::pending, priority, std::size_t(-1),
                     stacksize, ec);
                 return threads::invalid_thread_id;
             }
@@ -194,7 +194,7 @@ namespace hpx { namespace lcos { namespace local
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(this->f_, "task_object::apply"),
-                        threads::pending_do_not_schedule, true,
+                        threads::pending_do_not_schedule,
                         threads::thread_priority_boost, get_worker_thread_num(),
                         stacksize, ec);
                 }
@@ -203,7 +203,7 @@ namespace hpx { namespace lcos { namespace local
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(this->f_, "task_object::apply"),
-                        threads::pending, false, priority, std::size_t(-1),
+                        threads::pending, priority, std::size_t(-1),
                         stacksize, ec);
                     return threads::invalid_thread_id;
                 }

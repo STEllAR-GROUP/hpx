@@ -471,7 +471,7 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec,
+            thread_state_enum initial_state, error_code& ec,
             std::size_t num_thread,
             std::size_t num_thread_fallback = std::size_t(-1)) override
         {
@@ -516,20 +516,18 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t num = num_thread % high_priority_queues_.size();
 
                 high_priority_queues_[num]->create_thread(data, id,
-                    initial_state, run_now, ec);
+                    initial_state, ec);
                 return;
             }
 
             if (data.priority == thread_priority_low)
             {
-                low_priority_queue_.create_thread(data, id, initial_state,
-                    run_now, ec);
+                low_priority_queue_.create_thread(data, id, initial_state, ec);
                 return;
             }
 
             HPX_ASSERT(num_thread < queue_size);
-            queues_[num_thread]->create_thread(data, id, initial_state,
-                run_now, ec);
+            queues_[num_thread]->create_thread(data, id, initial_state, ec);
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -563,13 +561,6 @@ namespace hpx { namespace threads { namespace policies
                 if (result)
                     return true;
                 this_queue->increment_num_pending_misses();
-
-                bool have_staged = this_queue->
-                    get_staged_queue_length(std::memory_order_relaxed) != 0;
-
-                // Give up, we should have work to convert.
-                if (have_staged)
-                    return false;
             }
 
             for (std::size_t idx: victim_threads_[num_thread])

@@ -93,19 +93,8 @@ namespace hpx { namespace threads { namespace detail
             data.priority = thread_priority_normal;
 
         // create the new thread
-        if (thread_priority_high == data.priority ||
-            thread_priority_high_recursive == data.priority ||
-            thread_priority_boost == data.priority)
-        {
-            // For critical priority threads, create the thread immediately.
-            scheduler->create_thread(data, nullptr, initial_state, true, ec,
-                data.num_os_thread);
-        }
-        else {
-            // Create a task description for the new thread.
-            scheduler->create_thread(data, nullptr, initial_state, false, ec,
-                data.num_os_thread);
-        }
+        scheduler->create_thread(data, nullptr, initial_state, ec,
+            data.num_os_thread);
     }
 }}}
 

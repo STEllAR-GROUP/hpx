@@ -232,7 +232,6 @@ void stage_worker_static_balanced_stackbased(
             &invoke_worker_timed_suspension
           , "invoke_worker_timed_suspension"
           , hpx::threads::pending
-          , false
           , hpx::threads::thread_priority_normal
           , target_thread
             );
@@ -241,7 +240,6 @@ void stage_worker_static_balanced_stackbased(
             &invoke_worker_timed_no_suspension
           , "invoke_worker_timed_no_suspension"
           , hpx::threads::pending
-          , false
           , hpx::threads::thread_priority_normal
           , target_thread
             );
@@ -257,7 +255,6 @@ void stage_worker_static_imbalanced(
             &invoke_worker_timed_suspension
           , "invoke_worker_timed_suspension"
           , hpx::threads::pending
-          , false
           , hpx::threads::thread_priority_normal
           , 0
             );
@@ -266,7 +263,6 @@ void stage_worker_static_imbalanced(
             &invoke_worker_timed_no_suspension
           , "invoke_worker_timed_no_suspension"
           , hpx::threads::pending
-          , false
           , hpx::threads::thread_priority_normal
           , 0
             );
@@ -282,14 +278,12 @@ void stage_worker_round_robin(
             &invoke_worker_timed_suspension
           , "invoke_worker_timed_suspension"
           , hpx::threads::pending
-          , false
             );
     else
         hpx::threads::register_thread_plain(
             &invoke_worker_timed_no_suspension
           , "invoke_worker_timed_no_suspension"
           , hpx::threads::pending
-          , false
             );
 }
 

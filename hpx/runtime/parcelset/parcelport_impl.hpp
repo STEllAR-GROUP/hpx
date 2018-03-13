@@ -324,7 +324,7 @@ namespace hpx { namespace parcelset
                         &parcelport_impl::remove_from_connection_cache,
                         this, loc),
                     "remove_from_connection_cache_delayed",
-                    threads::pending, true, threads::thread_priority_normal,
+                    threads::pending, threads::thread_priority_normal,
                     get_next_num_thread(), threads::thread_stacksize_default,
                     ec);
                 if (!ec) return;
@@ -342,7 +342,7 @@ namespace hpx { namespace parcelset
                         &parcelport_impl::remove_from_connection_cache_delayed,
                         this, loc),
                     "remove_from_connection_cache",
-                    threads::suspended, true, threads::thread_priority_normal,
+                    threads::suspended, threads::thread_priority_normal,
                     get_next_num_thread(), threads::thread_stacksize_default,
                     ec);
             if (ec) return;

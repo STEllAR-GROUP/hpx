@@ -91,10 +91,6 @@ namespace hpx { namespace threads { namespace policies
                 if (q->get_next_thread(thrd))
                     return true;
                 q->increment_num_pending_misses();
-
-                // Give up, we should have work to convert.
-                if (q->get_staged_queue_length(std::memory_order_relaxed) != 0)
-                    return false;
             }
 
             // Limit access to the low priority queue to one worker thread

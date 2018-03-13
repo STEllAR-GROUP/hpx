@@ -652,7 +652,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::create_thread(
         thread_init_data& data, thread_id_type& id,
-        thread_state_enum initial_state, bool run_now, error_code& ec)
+        thread_state_enum initial_state, error_code& ec)
     {
         // verify state
         if (thread_count_ == 0 && !sched_->Scheduler::is_state(state_running))
@@ -665,7 +665,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         detail::create_thread(
-            sched_.get(), data, id, initial_state, run_now, ec);    //-V601
+            sched_.get(), data, id, initial_state, ec);    //-V601
 
         // update statistics
         ++tasks_scheduled_;

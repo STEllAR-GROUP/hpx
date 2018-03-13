@@ -48,7 +48,7 @@ namespace hpx { namespace threads { namespace executors
             // situations.
             void add(closure_type && f,
                 util::thread_description const& description,
-                threads::thread_state_enum initial_state, bool run_now,
+                threads::thread_state_enum initial_state,
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Schedule given function for execution in this executor no sooner

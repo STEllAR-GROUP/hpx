@@ -602,7 +602,7 @@ namespace threads {
             // create a new thread and schedule it if the initial state is equal
             // to pending
             void create_thread(thread_init_data& data, thread_id_type* thrd,
-                thread_state_enum initial_state, bool run_now, error_code& ec,
+                thread_state_enum initial_state, error_code& ec,
                 std::size_t pool_queue_num,
                 std::size_t /*pool_queue_num_fallback*/)
             {
@@ -633,7 +633,7 @@ namespace threads {
                     //
                     std::size_t hp_queue_num = hp_queue_lookup_[pool_queue_num];
                     high_priority_queues_[hp_queue_num]->create_thread(
-                        data, thrd, initial_state, run_now, ec);
+                        data, thrd, initial_state, ec);
                     LOG_CUSTOM_MSG("create_thread thread_priority_high "
                         << THREAD_DESC2(data, thrd) << "hp_queue_num "
                         << hexnumber(pool_queue_num) << "scheduler "
@@ -644,7 +644,7 @@ namespace threads {
                 if (data.priority == thread_priority_low)
                 {
                     low_priority_queue_.create_thread(
-                        data, thrd, initial_state, run_now, ec);
+                        data, thrd, initial_state, ec);
                     LOG_CUSTOM_MSG("create_thread thread_priority_low "
                         << THREAD_DESC2(data, thrd) << "pool_queue_num "
                         << hexnumber(pool_queue_num) << "scheduler "
@@ -659,7 +659,7 @@ namespace threads {
                 }
                 //
                 queues_[pool_queue_num]->create_thread(
-                    data, thrd, initial_state, run_now, ec);
+                    data, thrd, initial_state, ec);
                 LOG_CUSTOM_MSG("create_thread thread_priority_normal "
                     << THREAD_DESC2(data, thrd) << "pool_queue_num "
                     << hexnumber(pool_queue_num) << "scheduler "

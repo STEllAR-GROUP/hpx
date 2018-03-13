@@ -34,7 +34,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread_plain(
         threads::thread_function_type && func,
         util::thread_description const& desc, threads::thread_state_enum state,
-        bool run_now, threads::thread_priority priority, std::size_t os_thread,
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -53,13 +53,13 @@ namespace hpx { namespace applier
             d, 0, priority, os_thread, threads::get_stack_size(stacksize));
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
+        app->get_thread_manager().register_thread(data, id, state, ec);
         return id;
     }
 
     threads::thread_id_type register_thread_plain(
         threads::thread_init_data& data, threads::thread_state_enum state,
-        bool run_now, error_code& ec)
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (nullptr == app)
@@ -71,7 +71,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
+        app->get_thread_manager().register_thread(data, id, state, ec);
         return id;
     }
 

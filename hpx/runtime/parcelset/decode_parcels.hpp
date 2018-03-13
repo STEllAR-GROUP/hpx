@@ -219,7 +219,7 @@ namespace hpx { namespace parcelset
                                         }
                                     ), std::move(deferred_parcels[i])),
                                 "schedule_parcel",
-                                threads::pending, true, threads::thread_priority_boost,
+                                threads::pending, threads::thread_priority_boost,
                                 num_thread, threads::thread_stacksize_default);
                         }
                         // If we are the first deferred parcel, we don't need to spin
