@@ -92,6 +92,8 @@ struct lockfree_lifo_backend
 
     bool pop(reference val, bool steal = true)
     {
+        if (steal)
+            return queue_.pop_right(val);
         return queue_.pop_left(val);
     }
 
