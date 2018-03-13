@@ -723,7 +723,7 @@ namespace detail
                     this_->set_value(init);
                 },
                 "timed_future_data<Result>::timed_future_data",
-                threads::suspended, true, threads::thread_priority_boost,
+                threads::suspended, threads::thread_priority_boost,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize_current, ec);
             if (ec) {

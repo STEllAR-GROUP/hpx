@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     void current_executor::add(
         closure_type&& f, util::thread_description const& desc,
-        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_state_enum initial_state,
         threads::thread_stacksize stacksize,
         threads::thread_schedule_hint schedulehint,
         error_code& ec)
@@ -67,7 +67,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(scheduler_base_, data, id, //-V601
-            initial_state, run_now, ec);
+            initial_state, ec);
         if (ec) return;
 
         if (&ec != &throws)
@@ -87,7 +87,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread( //-V601
-            scheduler_base_, data, id, suspended, true, ec);
+            scheduler_base_, data, id, suspended, ec);
         if (ec) return;
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
 

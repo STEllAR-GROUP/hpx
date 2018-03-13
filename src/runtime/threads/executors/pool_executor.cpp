@@ -67,7 +67,7 @@ namespace hpx { namespace threads { namespace executors
         // situations.
         void pool_executor::add(closure_type&& f,
             util::thread_description const& desc,
-            threads::thread_state_enum initial_state, bool run_now,
+            threads::thread_state_enum initial_state,
             threads::thread_stacksize stacksize,
             threads::thread_schedule_hint schedulehint,
             error_code& ec)
@@ -87,11 +87,11 @@ namespace hpx { namespace threads { namespace executors
             data.schedulehint = schedulehint;
 
             threads::thread_id_type id = threads::invalid_thread_id;
-            pool_.create_thread(data, id, initial_state, run_now, ec);
+            pool_.create_thread(data, id, initial_state, ec);
             if (ec)
                 return;
 
-            HPX_ASSERT(invalid_thread_id != id || !run_now);
+            HPX_ASSERT(invalid_thread_id != id);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -118,7 +118,7 @@ namespace hpx { namespace threads { namespace executors
             data.priority = priority_;
 
             threads::thread_id_type id = threads::invalid_thread_id;
-            pool_.create_thread(data, id, suspended, true, ec);
+            pool_.create_thread(data, id, suspended, ec);
             if (ec)
                 return;
 

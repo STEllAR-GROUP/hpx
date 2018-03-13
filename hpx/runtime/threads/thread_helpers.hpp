@@ -723,12 +723,6 @@ namespace hpx { namespace applier
     ///                   should have. If this is not given it defaults to
     ///                   \a threads#pending, which means that the new thread
     ///                   will be scheduled to run as soon as it is created.
-    /// \param run_now    [in] If this is set to `true` the thread object will
-    ///                   be actually immediately created. Otherwise the
-    ///                   thread-manager creates a work-item description, which
-    ///                   will result in creating a thread object later (if
-    ///                   no work is available any more). The default is to
-    ///                   immediately create the thread object.
     /// \param priority   [in] This is the priority the newly created HPX-thread
     ///                   should be executed with. The default is \a
     ///                   threads#thread_priority_normal. This parameter is not
@@ -747,8 +741,7 @@ namespace hpx { namespace applier
     ///                   the function will throw on error instead.
     ///
     /// \returns This function will return the internal id of the newly created
-    ///          HPX-thread or threads#invalid_thread_id (if run_now is set to
-    ///          `false`).
+    ///          HPX-thread or threads#invalid_thread_id on failure
     ///
     /// \note The value returned by the thread function will be interpreted by
     ///       the thread manager as the new thread state the executed HPX-thread
@@ -771,7 +764,6 @@ namespace hpx { namespace applier
         threads::thread_function_type && func,
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
         threads::thread_schedule_hint = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
@@ -788,7 +780,7 @@ namespace hpx { namespace applier
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         threads::thread_init_data& data,
         threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true, error_code& ec = throws);
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the work to
@@ -851,7 +843,6 @@ namespace hpx { namespace applier
         F && func,
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
         threads::thread_schedule_hint os_thread = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
@@ -861,7 +852,7 @@ namespace hpx { namespace applier
             detail::thread_function<typename std::decay<F>::type>{
                 std::forward<F>(func)});
         return register_thread_plain(std::move(thread_func),
-            description, initial_state, run_now, priority, os_thread, stacksize,
+            description, initial_state, priority, os_thread, stacksize,
             ec);
     }
 
@@ -882,7 +873,6 @@ namespace hpx { namespace applier
         F && func,
         util::thread_description const& description = util::thread_description(),
         threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
         threads::thread_schedule_hint os_thread = threads::thread_schedule_hint(),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
@@ -892,7 +882,7 @@ namespace hpx { namespace applier
             detail::thread_function_nullary<typename std::decay<F>::type>{
                 std::forward<F>(func)});
         return register_thread_plain(std::move(thread_func),
-            description, initial_state, run_now, priority, os_thread, stacksize,
+            description, initial_state, priority, os_thread, stacksize,
             ec);
     }
 

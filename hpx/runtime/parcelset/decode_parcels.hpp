@@ -217,7 +217,7 @@ namespace hpx { namespace parcelset
                                         p.schedule_action(num_thread);
                                     }, std::move(deferred_parcels[i]))),
                                 "schedule_parcel",
-                                threads::pending, true,
+                                threads::pending,
                                 threads::thread_priority_boost,
                                 threads::thread_schedule_hint(
                                     static_cast<std::int16_t>(num_thread)),

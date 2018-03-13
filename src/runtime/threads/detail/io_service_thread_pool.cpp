@@ -41,7 +41,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     void io_service_thread_pool::create_thread(thread_init_data& data,
-        thread_id_type& id, thread_state_enum initial_state, bool run_now,
+        thread_id_type& id, thread_state_enum initial_state,
         error_code& ec)
     {
     }

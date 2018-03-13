@@ -61,7 +61,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_attached_executor<Scheduler>::add(closure_type && f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_state_enum initial_state,
         threads::thread_stacksize stacksize,
         threads::thread_schedule_hint schedulehint,
         error_code& ec)
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (stacksize == threads::thread_stacksize_default)
             stacksize = stacksize_;
 
-        register_thread_nullary(std::move(f), desc, initial_state, run_now,
+        register_thread_nullary(std::move(f), desc, initial_state,
             priority_,
             threads::thread_schedule_hint(
                 static_cast<std::int16_t>(get_next_thread_num())),
@@ -90,7 +90,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // create new thread
         thread_id_type id = register_thread_nullary(std::move(f), description,
-            suspended, false, priority_,
+            suspended, priority_,
             threads::thread_schedule_hint(
                 static_cast<std::int16_t>(get_next_thread_num())),
             stacksize, ec);

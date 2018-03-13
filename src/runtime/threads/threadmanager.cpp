@@ -781,7 +781,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     void threadmanager::register_thread(thread_init_data& data,
-        thread_id_type& id, thread_state_enum initial_state, bool run_now,
+        thread_id_type& id, thread_state_enum initial_state,
         error_code& ec)
     {
         thread_pool_base *pool = nullptr;
@@ -794,7 +794,7 @@ namespace hpx { namespace threads
         {
             pool = &default_pool();
         }
-        pool->create_thread(data, id, initial_state, run_now, ec);
+        pool->create_thread(data, id, initial_state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

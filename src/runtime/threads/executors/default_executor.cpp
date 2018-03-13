@@ -35,7 +35,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     void default_executor::add(closure_type&& f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_state_enum initial_state,
         threads::thread_stacksize stacksize,
         threads::thread_schedule_hint schedulehint,
         error_code& ec)
@@ -43,7 +43,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (stacksize == threads::thread_stacksize_default)
             stacksize = stacksize_;
 
-        register_thread_nullary(std::move(f), desc, initial_state, run_now,
+        register_thread_nullary(std::move(f), desc, initial_state,
             priority_, schedulehint, stacksize, ec);
     }
 
@@ -60,7 +60,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // create new thread
         thread_id_type id = register_thread_nullary(
-            std::move(f), description, suspended, false,
+            std::move(f), description, suspended,
             priority_, schedulehint_, stacksize, ec);
         if (ec) return;
 

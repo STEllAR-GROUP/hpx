@@ -383,7 +383,7 @@ namespace hpx { namespace threads { namespace detail
                 "at_timer (expire at)", 0, priority, schedulehint);
 
         thread_id_type newid = invalid_thread_id;
-        create_thread(&scheduler, data, newid, pending, true, ec); //-V601
+        create_thread(&scheduler, data, newid, pending, ec); //-V601
         return newid;
     }
 

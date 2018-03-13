@@ -114,7 +114,7 @@ namespace hpx { namespace lcos { namespace local
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(f_, "task_object::apply"),
-                        threads::pending_do_not_schedule, true,
+                        threads::pending_do_not_schedule,
                         threads::thread_priority_boost,
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(get_worker_thread_num())),
@@ -125,7 +125,7 @@ namespace hpx { namespace lcos { namespace local
                     util::deferred_call(
                         &base_type::run_impl, std::move(this_)),
                     util::thread_description(f_, "task_object::apply"),
-                    threads::pending, false, priority, schedulehint,
+                    threads::pending, priority, schedulehint,
                     stacksize, ec);
                 return threads::invalid_thread_id;
             }
@@ -255,7 +255,7 @@ namespace hpx { namespace lcos { namespace local
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(
                             this->f_, "task_object::apply"),
-                        threads::pending_do_not_schedule, true,
+                        threads::pending_do_not_schedule,
                         threads::thread_priority_boost,
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(get_worker_thread_num())),
@@ -266,7 +266,7 @@ namespace hpx { namespace lcos { namespace local
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(this->f_, "task_object::apply"),
-                        threads::pending, false, priority,
+                        threads::pending, priority,
                         schedulehint,
                         stacksize, ec);
                     return threads::invalid_thread_id;

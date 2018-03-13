@@ -245,7 +245,7 @@ namespace hpx { namespace util { namespace detail
             id = hpx::applier::register_thread_plain(
                 util::bind_front(&interval_timer::evaluate,
                     this->shared_from_this()),
-                description_.c_str(), threads::suspended, true,
+                description_.c_str(), threads::suspended,
                 threads::thread_priority_boost,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize_default, ec);
