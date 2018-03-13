@@ -54,6 +54,9 @@
 static std::chrono::high_resolution_clock::time_point log_t_start =
     std::chrono::high_resolution_clock::now();
 
+#define COMMA ,
+#define LOG_CUSTOM_VAR(x) x
+
 #define LOG_CUSTOM_WORKER(x)                                                   \
     dummy << "<CUSTOM> " << THREAD_ID << " time " << decimal(16) << nowt       \
           << ' ';                                                              \
@@ -90,6 +93,7 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
 #endif
 
 #else
+#define LOG_CUSTOM_VAR(x)
 #define LOG_CUSTOM_MSG(x)
 #define LOG_CUSTOM_MSG2(x)
 #endif
@@ -214,12 +218,7 @@ namespace policies {
 #endif
     }
 
-    // see blog : A fast alternative to the modulo reduction
-    // Daniel Lemire
-    // https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction
-    uint32_t modulo(uint32_t x, uint32_t N) {
-      return ((uint64_t) x * (uint64_t) N) >> 32 ;
-    }
+    #define modulo(x, N) (x) % N
 
     typedef std::tuple<std::size_t, std::size_t, std::size_t> core_ratios;
 
@@ -675,8 +674,8 @@ namespace policies {
         // ------------------------------------------------------------
         bool cleanup_terminated(bool delete_all)
         {
-            LOG_CUSTOM_MSG("cleanup_terminated with delete_all "
-                << delete_all);
+//            LOG_CUSTOM_MSG("cleanup_terminated with delete_all "
+//                << delete_all);
             bool empty = true;
             //
             for (std::size_t d=0; d<num_domains_; ++d) {
@@ -713,12 +712,13 @@ return cleanup_terminated(delete_all);
             std::size_t domain_num = 0;
             std::size_t q_index = std::size_t(-1);
             //
-            const char* const msgs[] = {"HINT_NONE","HINT     ","ERROR", "NORMAL   "};
-            const char *msg = nullptr;
+            LOG_CUSTOM_VAR(const char* const msgs[] =
+                {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
+            LOG_CUSTOM_VAR(const char *msg = nullptr);
             //
             if (data.schedulehint == thread_schedule_hint_none || pool_queue_num == 32767)
             {
-                msg = msgs[0];
+                LOG_CUSTOM_VAR(msg = msgs[0]);
                 std::size_t thread_num =
                     threads::detail::thread_num_tss_.get_worker_thread_num();
                 pool_queue_num = this->global_to_local_thread_index(thread_num);
@@ -732,7 +732,7 @@ return cleanup_terminated(delete_all);
                 }
             }
             else if (pool_queue_num>=32768) {
-                msg = msgs[1];
+                LOG_CUSTOM_VAR(msg = msgs[1]);
                 domain_num = modulo((pool_queue_num - 32768), num_domains_);
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
@@ -750,7 +750,7 @@ return cleanup_terminated(delete_all);
                 throw std::runtime_error("Bad thread number in create_thread");
             }
             else { // everything is ok
-                msg = msgs[3];
+                LOG_CUSTOM_VAR(msg = msgs[3]);
                 domain_num = d_lookup_[pool_queue_num];
                 q_index    = q_lookup_[pool_queue_num];
             }
@@ -776,9 +776,10 @@ return cleanup_terminated(delete_all);
                         create_thread(data, thrd, initial_state, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_high "
-                    << THREAD_DESC2(data, thrd) << "queue_num "
-                    << hexnumber(q_index) << "scheduler "
-                    << hexpointer(data.scheduler_base));
+                               << "queue " << decnumber(q_index)
+                               << "domain " << decnumber(domain_num)
+                               << "desc " << THREAD_DESC2(data, thrd)
+                               << "scheduler " << hexpointer(data.scheduler_base));
                 return;
             }
 
@@ -789,9 +790,10 @@ return cleanup_terminated(delete_all);
                         create_thread(data, thrd, initial_state, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_low "
-                    << THREAD_DESC2(data, thrd) << "pool_queue_num "
-                    << hexnumber(q_index) << "scheduler "
-                    << hexpointer(data.scheduler_base));
+                               << "queue " << decnumber(q_index)
+                               << "domain " << decnumber(domain_num)
+                               << "desc " << THREAD_DESC2(data, thrd)
+                               << "scheduler " << hexpointer(data.scheduler_base));
                 return;
             }
 
@@ -801,9 +803,10 @@ return cleanup_terminated(delete_all);
                     create_thread(data, thrd, initial_state, ec);
 
             LOG_CUSTOM_MSG2("create_thread thread_priority_normal "
-                << THREAD_DESC2(data, thrd) << "pool_queue_num "
-                << hexnumber(q_index) << "scheduler "
-                << hexpointer(data.scheduler_base));
+                            << "queue " << decnumber(q_index)
+                            << "domain " << decnumber(domain_num)
+                            << "desc " << THREAD_DESC2(data, thrd)
+                            << "scheduler " << hexpointer(data.scheduler_base));
         }
 
         /// Return the next thread to be executed, return false if none available
@@ -876,7 +879,8 @@ return cleanup_terminated(delete_all);
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
                 LOG_CUSTOM_MSG("got next thread "
                                << "queue " << decnumber(pool_queue_num)
-                               << "domain " << decnumber(domain_num));
+                               << "domain " << decnumber(domain_num)
+                               << "desc " << THREAD_DESC(thrd));
             }
 /*
             // counter for access queries
