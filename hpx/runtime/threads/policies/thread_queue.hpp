@@ -907,24 +907,6 @@ namespace hpx { namespace threads { namespace policies
             return true;
         }
 
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// has to be terminated (i.e. no more work has to be done).
-        inline bool wait_or_add_new(bool running,
-            std::int64_t& idle_loop_count, std::size_t& added,
-            thread_queue* addfrom = nullptr, bool steal = false) HPX_HOT
-        {
-            bool canexit = cleanup_terminated(true);
-            if (!running && canexit)
-            {
-                // we don't have any registered work items anymore
-                return true; // terminate scheduling loop
-            }
-
-            return false;
-        }
-
         ///////////////////////////////////////////////////////////////////////
         bool dump_suspended_threads(std::size_t num_thread
           , std::int64_t& idle_loop_count, bool running)

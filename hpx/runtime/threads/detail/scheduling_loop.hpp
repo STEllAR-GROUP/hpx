@@ -641,12 +641,6 @@ namespace hpx { namespace threads { namespace detail
                     // now we just keep it in the map of threads.
                     if (HPX_UNLIKELY(state_val == pending))
                     {
-                        if (HPX_LIKELY(next_thrd == nullptr)) {
-                            // schedule other work
-                            scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, running, idle_loop_count);
-                        }
-
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
                         scheduler.SchedulingPolicy::schedule_thread_last(thrd,
@@ -668,10 +662,6 @@ namespace hpx { namespace threads { namespace detail
                             }
                             else
                             {
-                                // schedule other work
-                                scheduler.SchedulingPolicy::wait_or_add_new(
-                                    num_thread, running, idle_loop_count);
-
                                 // schedule this thread again immediately with
                                 // boosted priority
                                 scheduler.SchedulingPolicy::schedule_thread(
@@ -725,14 +715,11 @@ namespace hpx { namespace threads { namespace detail
             {
                 ++idle_loop_count;
 
-                if (scheduler.SchedulingPolicy::wait_or_add_new(
-                        num_thread, running, idle_loop_count))
+                if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
                 {
                     // Clean up terminated threads before trying to exit
                     bool can_exit =
                         !running &&
-                        scheduler.SchedulingPolicy::cleanup_terminated(
-                            num_thread, true) &&
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
