@@ -17,6 +17,7 @@ set(subdirs
     jacobi_smp
     nqueen
     performance_counters
+    pipeline
     quickstart
     qt
     random_mem_access
