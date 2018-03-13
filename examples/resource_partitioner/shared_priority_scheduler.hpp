@@ -603,7 +603,8 @@ namespace threads {
             // to pending
             void create_thread(thread_init_data& data, thread_id_type* thrd,
                 thread_state_enum initial_state, bool run_now, error_code& ec,
-                std::size_t pool_queue_num)
+                std::size_t pool_queue_num,
+                std::size_t /*pool_queue_num_fallback*/)
             {
                 HPX_ASSERT(data.scheduler_base == this);
 
@@ -787,6 +788,7 @@ namespace threads {
             /// Schedule the passed thread
             void schedule_thread(threads::thread_data* thrd,
                 std::size_t pool_queue_num,
+                std::size_t /*pool_queue_num_fallback*/,
                 thread_priority priority = thread_priority_normal)
             {
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -826,6 +828,7 @@ namespace threads {
             /// Put task on the back of the queue
             void schedule_thread_last(threads::thread_data* thrd,
                 std::size_t num_queue,
+                std::size_t /*num_queue_fallback*/,
                 thread_priority priority = thread_priority_normal)
             {
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
