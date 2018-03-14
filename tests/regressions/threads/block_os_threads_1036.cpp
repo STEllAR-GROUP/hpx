@@ -35,7 +35,8 @@ void blocker(
         hpx::threads::register_work(
             hpx::util::bind(&blocker, entered, started, blocked_threads, worker),
             "blocker", hpx::threads::pending,
-            hpx::threads::thread_priority_normal, worker);
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(worker));
         return;
     }
 
@@ -79,7 +80,8 @@ int hpx_main()
             hpx::threads::register_work(
                 hpx::util::bind(&blocker, &entered, &started, &blocked_threads, i),
                 "blocker", hpx::threads::pending,
-                hpx::threads::thread_priority_normal, i);
+                hpx::threads::thread_priority_normal,
+                hpx::threads::thread_schedule_hint(i));
             ++scheduled;
         }
         HPX_TEST_EQ(scheduled, os_thread_count - 1);
