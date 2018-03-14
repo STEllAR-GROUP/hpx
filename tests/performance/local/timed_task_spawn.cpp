@@ -233,7 +233,7 @@ void stage_worker_static_balanced_stackbased(
           , "invoke_worker_timed_suspension"
           , hpx::threads::pending
           , hpx::threads::thread_priority_normal
-          , target_thread
+          , hpx::threads::thread_schedule_hint(target_thread)
             );
     else
         hpx::threads::register_thread_plain(
@@ -241,7 +241,7 @@ void stage_worker_static_balanced_stackbased(
           , "invoke_worker_timed_no_suspension"
           , hpx::threads::pending
           , hpx::threads::thread_priority_normal
-          , target_thread
+          , hpx::threads::thread_schedule_hint(target_thread)
             );
 }
 
@@ -256,7 +256,7 @@ void stage_worker_static_imbalanced(
           , "invoke_worker_timed_suspension"
           , hpx::threads::pending
           , hpx::threads::thread_priority_normal
-          , 0
+          , hpx::threads::thread_schedule_hint(0)
             );
     else
         hpx::threads::register_thread_plain(
@@ -264,7 +264,7 @@ void stage_worker_static_imbalanced(
           , "invoke_worker_timed_no_suspension"
           , hpx::threads::pending
           , hpx::threads::thread_priority_normal
-          , 0
+          , hpx::threads::thread_schedule_hint(0)
             );
 }
 
@@ -304,7 +304,7 @@ void stage_workers(
             , "stage_workers"
             , hpx::threads::pending
             , hpx::threads::thread_priority_normal
-            , target_thread
+            , hpx::threads::thread_schedule_hint(target_thread)
               );
         return;
     }
@@ -456,7 +456,7 @@ int hpx_main(
                 , "stage_workers"
                 , hpx::threads::pending
                 , hpx::threads::thread_priority_normal
-                , i
+                , hpx::threads::thread_schedule_hint(i)
                   );
         }
 
