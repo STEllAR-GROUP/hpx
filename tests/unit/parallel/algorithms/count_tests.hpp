@@ -38,7 +38,6 @@ void test_count(ExPolicy policy, IteratorTag)
     std::vector<int> c(10007);
     // assure gen() does not evalulate to zero
     std::iota(std::begin(c), std::end(c), gen()+1);
-    
     std::size_t find_count = dis(gen); //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
     {
