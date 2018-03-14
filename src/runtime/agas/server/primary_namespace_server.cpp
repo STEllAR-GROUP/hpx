@@ -1084,9 +1084,22 @@ void primary_namespace::free_components_sync(
         HPX_ASSERT(e.locality_ == e.gva_.prefix);
         naming::address addr(e.locality_, e.gva_.type, e.gva_.lva());
         if (e.locality_ == locality_)
-            components::deleter(e.gva_.type)(e.gid_, std::move(addr));
+        {
+            auto deleter = components::deleter(e.gva_.type);
+            if (deleter == nullptr)
+            {
+                HPX_THROWS_IF(ec, internal_server_error,
+                    "primary_namespace::free_components_sync",
+                    "Attempting to delete object of unknown component type: "
+                        + std::to_string(e.gva_.type));
+                return;
+            }
+            deleter(e.gid_, std::move(addr));
+        }
         else
+        {
             components::server::destroy_component(e.gid_, addr);
+        }
     }
 
     if (&ec != &throws)
