@@ -320,11 +320,11 @@ namespace hpx { namespace threads
         /// Depending on the subclass implementation, this may block in some
         /// situations.
         void add(closure_type f,
-            threads::thread_schedule_hint schedulehint,
-            util::thread_description const& desc,
-            threads::thread_state_enum initial_state,
-            threads::thread_stacksize stacksize,
-            error_code& ec)
+            threads::thread_schedule_hint schedulehint = threads::thread_schedule_hint_none,
+            util::thread_description const& desc = util::thread_description(),
+            threads::thread_state_enum initial_state = threads::pending,
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            error_code& ec = throws)
         {
             executor_data_->add(std::move(f), schedulehint, desc, initial_state,
                 stacksize, ec);
