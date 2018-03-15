@@ -59,7 +59,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_NORETURN void handle_termination(char const* reason)
+    void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
         {
@@ -134,6 +134,7 @@ namespace hpx
                 << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
                 << full_build_string();           // add full build information
         }
+        std::abort();
     }
 }
 
