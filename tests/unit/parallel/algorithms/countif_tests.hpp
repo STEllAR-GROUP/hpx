@@ -22,6 +22,7 @@
 //////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
+std::uniform_int_distribution<> dis(0,std::numeric_limits<int>::max());
 
 struct smaller_than_50
 {
@@ -55,7 +56,7 @@ void test_count_if(ExPolicy policy, IteratorTag)
 
     std::vector<int> c(100007);
     std::iota(std::begin(c), std::begin(c) + 50, 0);
-    std::iota(std::begin(c) + 50, std::end(c), gen() + 50);
+    std::iota(std::begin(c) + 50, std::end(c), dis(gen) + 50);
 
     diff_type num_items = hpx::parallel::count_if(policy,
         iterator(std::begin(c)), iterator(std::end(c)),
@@ -73,7 +74,7 @@ void test_count_if_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::begin(c) + 50, 0);
-    std::iota(std::begin(c) + 50, std::end(c), gen() + 50);
+    std::iota(std::begin(c) + 50, std::end(c), dis(gen) + 50);
 
     hpx::future<diff_type> f =
         hpx::parallel::count_if(p,
@@ -96,7 +97,7 @@ void test_count_if_exception(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(std::begin(c), std::end(c), gen());
+    std::iota(std::begin(c), std::end(c), dis(gen));
 
     bool caught_exception = false;
     try {
@@ -171,7 +172,7 @@ void test_count_if_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(std::begin(c), std::end(c), gen());
+    std::iota(std::begin(c), std::end(c), dis(gen));
 
     bool caught_bad_alloc = false;
     try {
@@ -202,7 +203,7 @@ void test_count_if_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    std::iota(std::begin(c), std::end(c), gen());
+    std::iota(std::begin(c), std::end(c), dis(gen));
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
