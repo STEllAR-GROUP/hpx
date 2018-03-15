@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
-std::uniform_int_distribution<> dis(0,std::numeric_limits<int>::max());
+std::uniform_int_distribution<> dis(0,(std::numeric_limits<int>::max)());
 
 template <typename ExPolicy>
 void test_copy_if(ExPolicy policy)
