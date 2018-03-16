@@ -1539,7 +1539,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    master
+    generate_guids
     ${_hpx_apex_no_update}
     VERBOSE)
 
