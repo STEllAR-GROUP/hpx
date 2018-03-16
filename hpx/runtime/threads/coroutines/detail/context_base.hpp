@@ -48,6 +48,9 @@
 #include <hpx/runtime/threads/coroutines/exception.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util/assert.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <atomic>
 #include <cstddef>
@@ -250,7 +253,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
 #if defined(HPX_HAVE_APEX)
-        void** get_apex_data() const
+        void* get_apex_data() const
         {
             // APEX wants the ADDRESS of a location to store
             // data.  This storage could be updated asynchronously,
@@ -258,7 +261,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             // to remember state for the HPX thread in-betweeen
             // calls to apex::start/stop/yield/resume().
             // APEX will change the value pointed to by the address.
-            return const_cast<void**>(&m_apex_data);
+            return m_apex_data;
+        }
+        void set_apex_data(void * data)
+        {
+            m_apex_data = data;
         }
 #endif
 
@@ -338,7 +345,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
             HPX_ASSERT(m_thread_data == 0);
 #if defined(HPX_HAVE_APEX)
-            HPX_ASSERT(m_apex_data == 0ull);
+            m_apex_data = 0ull;
 #endif
             m_type_info = std::exception_ptr();
         }

@@ -214,12 +214,19 @@ namespace hpx { namespace threads
     }
 
 #if defined(HPX_HAVE_APEX)
-    void** get_self_apex_data()
+    void* get_self_apex_data()
     {
         thread_self* self = get_self_ptr();
         if (nullptr == self)
             return nullptr;
         return self->get_apex_data();
+    }
+    void set_self_apex_data(void* data)
+    {
+        thread_self* self = get_self_ptr();
+        if (nullptr == self)
+            return;
+        self->set_apex_data(data);
     }
 #endif
 }}

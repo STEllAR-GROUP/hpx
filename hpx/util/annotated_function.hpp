@@ -73,16 +73,18 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name)
-          : apex_profiler_(name, threads::get_self_apex_data())
-        {}
+        {
+            threads::set_self_apex_data(
+                apex_update_task(threads::get_self_apex_data(), 
+                name));
+        }
         template <typename F>
         explicit annotate_function(F && f)
-          : apex_profiler_(hpx::util::thread_description(f),
-                threads::get_self_apex_data())
-        {}
-
-    private:
-        hpx::util::apex_wrapper apex_profiler_;
+        {
+            threads::set_self_apex_data(
+                apex_update_task(threads::get_self_apex_data(), 
+                hpx::util::thread_description(f)));
+        }
     };
 #else
     struct annotate_function

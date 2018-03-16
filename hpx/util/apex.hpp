@@ -35,36 +35,49 @@ namespace hpx { namespace util
         apex::finalize();
     }
 
+    inline void * apex_new_task(
+                thread_description const& description)
+    {
+        if (description.kind() == 
+                thread_description::data_type_description) {
+            return (void*)apex::new_task(description.get_description());
+        } else {
+            return (void*)apex::new_task(description.get_address());
+        }
+    }
+
+    inline void * apex_new_task(char const* name)
+    {
+        return (void*)apex::new_task(name);
+    }
+
+    inline void * apex_update_task(void * wrapper, 
+                thread_description const& description)
+    {
+        if (description.kind() == thread_description::data_type_description) {
+            return (void*)apex::update_task((apex::task_wrapper*)wrapper, 
+                description.get_description());
+        } else {
+            return (void*)apex::update_task((apex::task_wrapper*)wrapper, 
+                description.get_address());
+        }
+    }
+
+    inline void * apex_update_task(void * wrapper, char const* name)
+    {
+        return (void*)apex::update_task((apex::task_wrapper*)wrapper, name);
+    }
+
     struct apex_wrapper
     {
-        apex_wrapper(thread_description const& name)
-          : name_(name), stopped(false)
+        apex_wrapper(void* const data_ptr) : stopped(false), data_(nullptr)
         {
-            if (name_.kind() == thread_description::data_type_description)
-            {
-                profiler_ = apex::start(name_.get_description());
-            }
-            else
-            {
-                profiler_ = apex::start(
-                    apex_function_address(name_.get_address()));
-            }
-        }
-        apex_wrapper(thread_description const& name, void** const data_ptr)
-          : name_(name), stopped(false)
-        {
-            if (name_.kind() == thread_description::data_type_description)
-            {
-                // not a mistake... we need to pass in the address of this
-                // pointer, so that we can assign data to it in apex...
-                profiler_ = apex::start(name_.get_description(), data_ptr);
-            }
-            else
-            {
-                // not a mistake... we need to pass in the address of this
-                // pointer, so that we can assign data to it in apex...
-                profiler_ = apex::start(
-                    apex_function_address(name_.get_address()), data_ptr);
+            /* APEX internal actions are not timed.  Otherwise, we would
+             * end up with recursive timers. So it's possible to have
+             * a null task wrapper pointer here. */
+            if (data_ptr != nullptr) {
+                data_ = (apex::task_wrapper*)data_ptr;
+                apex::start(data_);
             }
         }
         ~apex_wrapper()
@@ -75,20 +88,29 @@ namespace hpx { namespace util
         void stop() {
             if(!stopped) {
                 stopped = true;
-                apex::stop(profiler_);
+            /* APEX internal actions are not timed.  Otherwise, we would
+             * end up with recursive timers. So it's possible to have
+             * a null task wrapper pointer here. */
+                if (data_ != nullptr) {
+                    apex::stop(data_);
+                }
             }
         }
 
         void yield() {
             if(!stopped) {
                 stopped = true;
-                apex::yield(profiler_);
+            /* APEX internal actions are not timed.  Otherwise, we would
+             * end up with recursive timers. So it's possible to have
+             * a null task wrapper pointer here. */
+                if (data_ != nullptr) {
+                    apex::yield(data_);
+                }
             }
         }
 
-        thread_description name_;
         bool stopped;
-        apex::profiler * profiler_;
+        apex::task_wrapper * data_;
     };
 
     struct apex_wrapper_init
