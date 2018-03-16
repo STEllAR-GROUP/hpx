@@ -65,7 +65,7 @@ jobs:
             cmake --version
             cmake \
                 ~/hpx/source \
-                -G Ninja \
+                -G "Unix Makefiles" \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_GIT_COMMIT=${CIRCEL_SHA1} \
@@ -101,7 +101,7 @@ jobs:
       - run:
           name: Building Inspect Tool
           command: |
-              ninja -j2 tools.inspect
+              make -j2 tools.inspect
       - run:
           name: Running Inspect Tool
           command: |
@@ -124,7 +124,7 @@ jobs:
       - run:
           name: Building Core
           command: |
-              ninja -j2 core
+              make -j2 core
       - persist_to_workspace:
           root: ~/hpx/build
           paths:
@@ -141,7 +141,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.build
+              make -j2 -k tests.unit.build
       - run:
           name: Running Unit Tests
           when: always
@@ -165,7 +165,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.diagnostics
+              make -j2 -k tests.unit.diagnostics
       - run:
           name: Running Unit Tests
           when: always
@@ -189,7 +189,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.actions
+              make -j2 -k tests.unit.actions
       - run:
           name: Running Unit Tests
           when: always
@@ -213,7 +213,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.agas
+              make -j2 -k tests.unit.agas
       - run:
           name: Running Unit Tests
           when: always
@@ -237,7 +237,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.component
+              make -j2 -k tests.unit.component
       - run:
           name: Running Unit Tests
           when: always
@@ -261,7 +261,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.computeapi
+              make -j2 -k tests.unit.computeapi
       - run:
           name: Running Unit Tests
           when: always
@@ -285,7 +285,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.lcos
+              make -j2 -k tests.unit.lcos
       - run:
           name: Running Unit Tests
           when: always
@@ -311,13 +311,13 @@ jobs:
           # We need to compile some tests serially because they eat too much
           # memory
           command: |
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_exclusive_scan
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find
-              ninja -j2 -k 0 tests.unit.parallel
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_exclusive_scan
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find
+              make -j2 -k tests.unit.parallel
       - run:
           name: Running Unit Tests
           when: always
@@ -341,7 +341,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.parcelset
+              make -j2 -k tests.unit.parcelset
       - run:
           name: Running Unit Tests
           when: always
@@ -365,7 +365,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.performance_counter
+              make -j2 -k tests.unit.performance_counter
       - run:
           name: Running Unit Tests
           when: always
@@ -389,7 +389,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.serialization
+              make -j2 -k tests.unit.serialization
       - run:
           name: Running Unit Tests
           when: always
@@ -413,7 +413,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.threads
+              make -j2 -k tests.unit.threads
       - run:
           name: Running Unit Tests
           when: always
@@ -437,7 +437,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.traits
+              make -j2 -k tests.unit.traits
       - run:
           name: Running Unit Tests
           when: always
@@ -461,7 +461,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.util
+              make -j2 -k tests.unit.util
       - run:
           name: Running Unit Tests
           when: always
@@ -485,7 +485,7 @@ jobs:
       - run:
           name: Building Regressions Tests
           command: |
-              ninja -j2 -k 0 tests.regressions
+              make -j2 -k tests.regressions
       - run:
           name: Running Regressions Tests
           when: always
@@ -737,7 +737,7 @@ jobs:
       - run:
           name: Building Performance Tests
           command: |
-              ninja -j2 tests.performance
+              make -j2 tests.performance
 
   examples:
     <<: *defaults
@@ -749,7 +749,7 @@ jobs:
       - run:
           name: Building Examples
           command: |
-              ninja -j2 examples
+              make -j2 examples
       - persist_to_workspace:
           root: ~/hpx/build
           paths:
@@ -766,7 +766,7 @@ jobs:
           name: Installing
           command: |
               ./bin/hello_world --hpx:bind=none
-              ninja -j2 install
+              make -j2 install
               hello_world --hpx:bind=none
               hpxcxx --exe=hello_world_test_build ../source/examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
               ./hello_world_test_build --hpx:bind=none
