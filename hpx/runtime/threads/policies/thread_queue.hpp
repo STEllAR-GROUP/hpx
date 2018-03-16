@@ -293,7 +293,7 @@ namespace hpx { namespace threads { namespace policies
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
-                --addfrom->new_tasks_count_;
+
 
                 // measure thread creation time
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
@@ -312,13 +312,18 @@ namespace hpx { namespace threads { namespace policies
                     thread_map_.insert(thrd);
 
                 if (HPX_UNLIKELY(!p.second)) {
+                    --addfrom->new_tasks_count_;
                     lk.unlock();
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
                         "threadmanager::add_new",
                         "Couldn't add new thread to the thread map");
                     return 0;
                 }
+                
                 ++thread_map_count_;
+                
+                // Decrement only after thread_map_count_ has been incremented
+                --addfrom->new_tasks_count_;
 
                 // only insert the thread into the work-items queue if it is in
                 // pending state
@@ -804,7 +809,7 @@ namespace hpx { namespace threads { namespace policies
             task_description* task;
             while (src->new_tasks_.pop(task))
             {
-                --src->new_tasks_count_;
+
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
@@ -816,6 +821,11 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
                 bool finish = count == ++new_tasks_count_;
+                
+                // Decrement only after the local new_tasks_count_ has
+                // been incremented
+                --src->new_tasks_count_;
+
                 if (new_tasks_.push(task))
                 {
                     if (finish)
