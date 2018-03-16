@@ -510,6 +510,8 @@ namespace hpx { namespace threads { namespace detail
                                 if (thrd_stat.get_previous() == terminated)
                                 {
                                     apex_profiler.stop();
+                                    // just in case, clean up the now dead pointer.
+                                    thrd->set_apex_data(nullptr);
                                 }
                                 else
                                 {
