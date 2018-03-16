@@ -354,29 +354,7 @@ namespace hpx { namespace threads { namespace detail
                     if (HPX_LIKELY(thrd_stat.is_valid() &&
                             thrd_stat.get_previous() == pending))
                     {
-#if defined(HPX_HAVE_APEX_disabled)
-                        // get the APEX data pointer, in case we are resuming the
-                        // thread and have to restore any leaf timers from
-                        // direct actions, etc.
-
-                        // the address of tmp_data is getting stored
-                        // by APEX during this call
-                        util::apex_wrapper apex_profiler(
-                            background_thread->get_apex_data());
-
                         thrd_stat = (*background_thread)();
-
-                        if (thrd_stat.get_previous() == terminated)
-                        {
-                            apex_profiler.stop();
-                        }
-                        else
-                        {
-                            apex_profiler.yield();
-                        }
-#else
-                        thrd_stat = (*background_thread)();
-#endif
                         thread_data* next = thrd_stat.get_next_thread();
                         if (next != nullptr && next != background_thread.get())
                         {
