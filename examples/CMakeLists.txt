@@ -12,7 +12,7 @@ set(subdirs
     async_io
     balancing
     cancelable_action
-	glob_init
+    global_init
     future_reduce
     heartbeat
     jacobi
