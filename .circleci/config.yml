@@ -27,11 +27,6 @@ core_dependency: &core_dependency
       - core
     <<: *gh_pages_filter
 
-headers_test_dependency: &headers_test_dependency
-    requires:
-      - configure
-    <<: *gh_pages_filter
-
 version: 2
 
 jobs:
@@ -865,29 +860,29 @@ workflows:
       - examples:
           <<: *core_dependency
       - tests.headers.compat:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.components:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.compute:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.config:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.include:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.lcos:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.parallel:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.performance_counters:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.plugins:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.runtime:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.traits:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - tests.headers.util:
-          <<: *headers_test_dependency
+          <<: *core_dependency
       - install:
           requires:
             - inspect
