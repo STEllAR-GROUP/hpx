@@ -527,7 +527,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compat
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compat
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -546,7 +546,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.components
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.components
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -565,7 +565,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compute
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compute
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -584,7 +584,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.config
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.config
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -603,7 +603,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.include
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.include
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -622,7 +622,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.lcos
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.lcos
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -641,7 +641,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.parallel
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.parallel
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -660,7 +660,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.performance_counters
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.performance_counters
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -679,7 +679,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.plugins
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.plugins
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -698,7 +698,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.runtime
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.runtime
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -717,7 +717,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.traits
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.traits
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -736,7 +736,7 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest -j1 -T test --no-compress-output --output-on-failure -R tests.headers.headers.util
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.util
       - run:
           <<: *convert_xml
       - store_test_results:
