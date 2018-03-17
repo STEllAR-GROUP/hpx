@@ -125,55 +125,6 @@ jobs:
           paths:
             - ./*
 
-
-  tests.unit.build:
-    <<: *defaults
-    steps:
-      - restore_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - attach_workspace:
-          at: ~/hpx/build
-      - run:
-          name: Building Unit Tests
-          command: |
-              make -j2 -k tests.unit.build
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.build
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: ~/Test.xml
-      - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/build/Test.xml
-
-  tests.unit.diagnostics:
-    <<: *defaults
-    steps:
-      - restore_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - attach_workspace:
-          at: ~/hpx/build
-      - run:
-          name: Building Unit Tests
-          command: |
-              make -j2 -k tests.unit.diagnostics
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: ~/Test.xml
-      - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/diagnostics/Test.xml
-
   tests.unit.actions:
     <<: *defaults
     steps:
@@ -222,6 +173,30 @@ jobs:
           path: ~/Test.xml
           destination: unit/agas/Test.xml
 
+  tests.unit.build:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.build
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.build
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/build/Test.xml
+
   tests.unit.component:
     <<: *defaults
     steps:
@@ -269,6 +244,30 @@ jobs:
       - store_artifacts:
           path: ~/Test.xml
           destination: unit/computeapi/Test.xml
+
+  tests.unit.diagnostics:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.diagnostics
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/diagnostics/Test.xml
 
   tests.unit.lcos:
     <<: *defaults
@@ -373,6 +372,30 @@ jobs:
       - store_artifacts:
           path: ~/Test.xml
           destination: unit/performance_counter/Test.xml
+
+  tests.unit.resource:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.resource
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.resource
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/resource/Test.xml
 
   tests.unit.serialization:
     <<: *defaults
@@ -825,17 +848,17 @@ workflows:
           requires:
             - configure
           <<: *gh_pages_filter
-      - tests.unit.build:
-          <<: *core_dependency
-      - tests.unit.diagnostics:
-          <<: *core_dependency
       - tests.unit.actions:
           <<: *core_dependency
       - tests.unit.agas:
           <<: *core_dependency
+      - tests.unit.build:
+          <<: *core_dependency
       - tests.unit.component:
           <<: *core_dependency
       - tests.unit.computeapi:
+          <<: *core_dependency
+      - tests.unit.diagnostics:
           <<: *core_dependency
       - tests.unit.lcos:
           <<: *core_dependency
@@ -844,6 +867,8 @@ workflows:
       - tests.unit.parcelset:
           <<: *core_dependency
       - tests.unit.performance_counter:
+          <<: *core_dependency
+      - tests.unit.resource:
           <<: *core_dependency
       - tests.unit.serialization:
           <<: *core_dependency
@@ -888,16 +913,17 @@ workflows:
             - inspect
             - clang_tidy
             - core
-            - tests.unit.build
-            - tests.unit.diagnostics
             - tests.unit.actions
             - tests.unit.agas
+            - tests.unit.build
             - tests.unit.component
             - tests.unit.computeapi
+            - tests.unit.diagnostics
             - tests.unit.lcos
             - tests.unit.parallel
             - tests.unit.parcelset
             - tests.unit.performance_counter
+            - tests.unit.resource
             - tests.unit.serialization
             - tests.unit.threads
             - tests.unit.traits
