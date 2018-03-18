@@ -110,12 +110,124 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    3240] - Fixed typos
+* [pr    3238] - Readding accidently removed std::abort
+* [pr    3237] - Adding Pipeline example
+* [pr    3236] - Fixing memory_block
+* [pr    3233] - Make schedule_thread take suspended threads into account
+* [issue 3226] - memory_block is breaking, signaling SIGSEGV on a thread on
+                 creation and freeing
+* [pr    3225] - Applying quick fix for hwloc-2.0
+* [issue 3224] - HPX counters crashing the application
+* [pr    3223] - Fix returns when setting config entries
+* [issue 3222] - Errors linking libhpx.so
+* [issue 3221] - HPX on Mac OS X with HWLoc 2.0.0 fails to run
+* [pr    3216] - Reorder a variadic array to satisfy VS 2017 15.6
+* [pr    3214] - Changed prerequisites.qbk to avoid confusion while building boost
+* [pr    3213] - Relax locks for thread suspension to avoid holding locks when
+                 yielding
+* [pr    3212] - Fix check in sequenced_executor test
+* [pr    3211] - Use preinit_array to set argc/argv in init_globally example
+* [pr    3210] - Adapted parallel::{search | search_n} for Ranges TS (see #1668)
+* [pr    3209] - Fix locking problems during shutdown
+* [issue 3208] - init_globally throwing a run-time error
+* [pr    3206] - Addition of new arithmetic performance counter "Count"
+* [pr    3205] - Fixing return type calculation for bulk_then_execute
+* [pr    3204] - Changing std::rand() to a better inbuilt PRNG generator
+* [pr    3203] - Resolving problems during shutdown for VS2015
+* [pr    3202] - Making sure resource partitioner is not accessed if its not valid
+* [pr    3201] - Fixing optional::swap
+* [issue 3200] - hpx::util::optional fails
+* [pr    3199] - Fix sliding_semaphore test
+* [pr    3198] - Set pre_main status before launching run_helper
+* [pr    3197] - Update README.rst
+* [pr    3194] - parallel::{fill|fill_n} updated for Ranges TS
+* [pr    3193] - Updating Runtime.cpp by adding correct description of Performance
+                 counters during register
+* [pr    3191] - Fix sliding_semaphore_2338 test
+* [pr    3190] - Topology improvements
+* [pr    3189] - Deleting one include of median from BOOST library to
+                 arithmetics_counter file
+* [pr    3188] - Optionally disable printing of diagnostics during terminate
+* [pr    3187] - Suppressing cmake warning issued by cmake > V3.11
+* [pr    3185] - Remove unused scoped_unlock, unlock_guard_try
+* [pr    3184] - Fix nqueen example
+* [pr    3183] - Add runtime start/stop, resume/suspend and OpenMP benchmarks
+* [issue 3182] - bulk_then_execute has unexpected return type/does not compile
+* [issue 3181] - hwloc 2.0 breaks topo class and cannot be used
+* [issue 3180] - Schedulers that don't support suspend/resume are unusable
+* [pr    3179] - Various minor changes to support FLeCSI
+* [pr    3178] - Fix #3124
+* [pr    3177] - Removed allgather
+* [pr    3176] - Fixed Documentation for "using_hpx_pkgconfig"
+* [pr    3174] - Add hpx::iostreams::ostream overload to format_to
+* [pr    3172] - Fix lifo queue backend
+* [pr    3171] - adding the missing unset() function to cpu_mask() for case of
+                 more than 64 threads
+* [pr    3170] - Add cmake flag -DHPX_WITH_FAULT_TOLERANCE=ON (OFF by default)
+* [pr    3169] - Adapted parallel::{count|count_if} for Ranges TS (see #1668)
+* [pr    3168] - Changing used namespace for seq execution policy
+* [issue 3167] - Update GSoC projects
+* [issue 3166] - Application (Octotiger) gets stuck on hpx::finalize when only
+                 using one thread
+* [issue 3165] - Compilation of parallel algorithms with HPX_WITH_DATAPAR is
+                 broken
+* [pr    3164] - Fixing component migration
+* [pr    3162] - regex_from_pattern: escape regex special characters to avoid
+                 misinterpretation
+* [issue 3161] - Building HPX with hwloc 2.0.0 fails
+* [pr    3160] - Fixing the handling of quoted command line arguments.
+* [pr    3158] - Fixing a race with timed suspension (second attempt)
+* [pr    3157] - Revert "Fixing a race with timed suspension"
+* [pr    3156] - Fixing serialization of classes with incompatible serialize
+                 signature
+* [pr    3154] - More refactorings based on clang-tidy reports
+* [pr    3153] - Fixing a race with timed suspension
+* [pr    3152] - Documentation for runtime suspension
+* [pr    3151] - Use small_vector only from boost version 1.59 onwards
+* [pr    3150] - Avoiding more stack overflows
+* [pr    3148] - Refactoring component_base and base_action/transfer_base_action
+* [pr    3147] - Move yield_while out of detail namespace and into own file
+* [pr    3145] - Remove a leftover of the cxx11 std array cleanup
+* [pr    3144] - Minor changes to how actions are executed
+* [pr    3143] - Fix stack overhead
+* [pr    3142] - Fix typo in config.hpp
+* [pr    3141] - Fixing small_vector compatibility with older boost version
+* [pr    3140] - is_heap_text fix
+* [issue 3139] - Error in is_heap_tests.hpp
+* [pr    3138] - Partially reverting #3126
+* [pr    3137] - Suspend speedup
+* [pr    3136] - Revert "Fixing #2325"
+* [pr    3135] - Improving destruction of threads
+* [issue 3134] - HPX_SERIALIZATION_SPLIT_FREE does not stop compiler from
+                 looking for serialize() method
+* [pr    3133] - Make hwloc compulsory
+* [pr    3132] - Update CXX14 constexpr feature test
+* [pr    3131] - Fixing #2325
+* [pr    3130] - Avoid completion handler allocation
+* [pr    3129] - Suspend runtime
+* [pr    3128] - Make docbook dtd and xsl path names consistent
+* [pr    3127] - Add hpx::start nullptr overloads
+* [pr    3126] - Cleaning up coroutine implementation
+* [pr    3125] - Replacing nullptr with hpx::threads::invalid_thread_id
+* [issue 3124] - Add hello_world_component to CI builds
+* [pr    3123] - Add new constructor.
+* [pr    3122] - Fixing #3121
+* [issue 3121] - HPX_SMT_PAUSE is broken on non-x86 platforms when __GNUC__ is
+                 defined
+* [pr    3120] - Don't use boost::intrusive_ptr for thread_id_type
+* [pr    3119] - Disable default executor compatibility with V1 executors
+* [pr    3118] - Adding performance_counter::reinit to allow for dynamically
+                 changing counter sets
 * [pr    3117] - Replace uses of boost/experimental::optional with
                  util::optional
+* [pr    3116] - Moving background thread APEX timer #2980
+* [pr    3115] - Fixing race condition in channel test
 * [pr    3114] - Avoid using util::function for thread function wrappers
 * [pr    3113] - cmake V3.10.2 has changed the variable names used for MPI
 * [pr    3112] - Minor fixes to exclusive_scan algorithm
 * [pr    3111] - Revert "fix detection of cxx11_std_atomic"
+* [pr    3110] - Suspend thread pool
 * [pr    3109] - Fixing thread scheduling when yielding a thread id
 * [pr    3108] - Revert "Suspend thread pool"
 * [pr    3107] - Remove UB from thread::id relational operators
@@ -123,6 +235,10 @@ Here is a list of the important tickets we closed for this release.
 * [pr    3105] - Fixing refcount for async traversal frame
 * [pr    3104] - Local execution of direct actions is now actually performed
                  directly
+* [pr    3103] - Adding support for generic counter_raw_values performance
+                 counter type
+* [issue 3102] - Introduce generic performance counter type returning an array
+                 of values
 * [pr    3101] - Revert "Adapting stack overhead limit for gcc 4.9"
 * [pr    3100] - Fix #3068 (condition_variable deadlock)
 * [pr    3099] - Fixing lock held during suspension in papi counter component
@@ -179,6 +295,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 3054] - Assertion failure when using bulk hpx::new_ in asynchronous mode
 * [pr    3052] - Do not bind test running to cmake test build rule
 * [pr    3051] - Fix HPX-Qt interaction in Qt example.
+* [issue 3048] - nqueen example fails occasionally
 * [pr    3047] - Fixing #3044
 * [pr    3046] - Add OS thread suspension
 * [pr    3042] - PyCicle - first attempt at a build toold for checking PR's
@@ -215,18 +332,23 @@ Here is a list of the important tickets we closed for this release.
 * [pr    3015] - Speeding up accessing the resource partitioner and the
                  topology info
 * [issue 3014] - HPX does not compile on POWER8 with gcc 5.4
+* [issue 3013] - hello_world occasionally prints multiple lines from a single
+                 OS-thread
 * [pr    3012] - Silence warning about casting away qualifiers in itt_notify.hpp
 * [pr    3011] - Fix cpuset leak in hwloc_topology_info.cpp
 * [pr    3010] - Remove useless decay_copy
+* [pr    3009] - Fixing 2996
 * [pr    3008] - Remove unused internal function
 * [pr    3007] - Fixing wrapper_heap alignment problems
 * [issue 3006] - hwloc memory leak
 * [pr    3004] - Silence C4251 (needs to have dll-interface) for future_data_void
+* [issue 3003] - Suspension of runtime
 * [pr    3001] - Attempting to avoid data races in async_traversal while
                  evaluating dataflow()
 * [pr    3000] - Adding hpx::util::optional as a first step to replace
                  experimental::optional
 * [pr    2998] - Cleanup up and Fixing component creation and deletion
+* [issue 2996] - Build fails with HPX_WITH_HWLOC=OFF
 * [pr    2995] - Push more future_data functionality to source file
 * [pr    2994] - WIP: Fix throttle test
 * [pr    2993] - Making sure --hpx:help does not throw for required (but missing)
@@ -245,9 +367,11 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2981] - Simplify allocator rebinding in pack traversal
 * [pr    2979] - Fixing integer overflows
 * [pr    2978] - Implement parallel::inplace_merge
+* [issue 2977] - Make hwloc compulsory instead of optional
 * [pr    2976] - Making sure client_base instance that registered the component
                  does not unregister it when being destructed
 * [pr    2975] - Change version of pulled APEX to master
+* [pr    2974] - Fix domain not being freed at the end of scheduling loop
 * [pr    2973] - Fix small typos
 * [pr    2972] - Adding uintstd.h header
 * [pr    2971] - Fall back to creating local components using local_new
@@ -666,6 +790,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    2447] - Implementing new executor API (P0443)
 * [issue 2439] - Implement executor proposal
 * [issue 2408] - Stackoverflow detection for linux, e.g. based on libsigsegv
+* [pr    2377] - Add a customization point for put_parcel so we can override actions
 * [issue 2368] - HPX_ASSERT problem
 * [issue 2324] - Change default number of threads used to the maximum of the
                  system
