@@ -109,7 +109,7 @@ this example, we'll choose a directory named ''my_hpx_libs''.
 
 ``
     mkdir ~/my_hpx_libs
-    mv libhello_world.so ~/my_hpx_libs
+    mv libhpx_hello_world.so ~/my_hpx_libs
 ``
 
 [note __hpx__ libraries have different names in debug and release mode. If you

@@ -326,6 +326,11 @@ namespace hpx { namespace util
             "[hpx.components.elapsed_time_counter]",
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
+            "enabled = 1",
+
+            "[hpx.components.component_memory_block]",
+            "name = hpx",
+            "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"
         };
 

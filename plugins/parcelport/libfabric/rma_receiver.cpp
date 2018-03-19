@@ -306,7 +306,7 @@ namespace libfabric
         // count reads
         ++rma_reads_;
 
-        hpx::util::yield_while([this, get_region]()
+        hpx::util::yield_while([this, get_region, remoteAddr, rkey]()
             {
                 LOG_EXCLUSIVE(
                     // write a pattern and dump out data for debugging purposes

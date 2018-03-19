@@ -54,10 +54,6 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
     /// \param rng1         Refers to the sequence of elements the algorithm
     ///                     will be examining.
     /// \param rng2         Refers to the sequence of elements the algorithm
@@ -166,12 +162,9 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
     /// \param rng1         Refers to the sequence of elements the algorithm
     ///                     will be examining.
+    /// \param count        The number of elements to apply the algorithm on.
     /// \param rng2         Refers to the sequence of elements the algorithm
     ///                     will be searching for.
     /// \param op           Refers to the binary predicate which returns true if the

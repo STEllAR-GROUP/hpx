@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file hpx/runtime/basename_registration.hpp
+/// \file hpx/runtime/basename_registration_fwd.hpp
 
 #if !defined(HPX_RUNTIME_BASENAME_REGISTRATION_FWD_AUG_17_2015_0432PM)
 #define HPX_RUNTIME_BASENAME_REGISTRATION_FWD_AUG_17_2015_0432PM
