@@ -1573,7 +1573,7 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<compat::barrier> startup, error_code& ec)
     {
-        std::unique_lock<compat::mutex>
+        std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         if (threads_.size() <= virt_core)
@@ -1643,7 +1643,7 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
-        std::unique_lock<compat::mutex>
+        std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
@@ -1692,7 +1692,7 @@ namespace hpx { namespace threads { namespace detail
     {
         // Yield to other HPX threads if lock is not available to avoid
         // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<compat::mutex>
+        std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
         util::yield_while([&l]()
             {
@@ -1791,7 +1791,7 @@ namespace hpx { namespace threads { namespace detail
     {
         // Yield to other HPX threads if lock is not available to avoid
         // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<compat::mutex>
+        std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
         util::yield_while([&l]()
             {

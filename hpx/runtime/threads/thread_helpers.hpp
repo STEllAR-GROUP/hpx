@@ -87,6 +87,8 @@ namespace hpx { namespace threads
     ///                   be modified for.
     /// \param abs_time   [in] Absolute point in time for the new thread to be
     ///                   run
+    /// \param started    [in,out] A helper variable allowing to track the
+    ///                   state of the timer helper thread
     /// \param state      [in] The new state to be set for the thread
     ///                   referenced by the \a id parameter.
     /// \param stateex    [in] The new extended state to be set for the

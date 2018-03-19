@@ -471,7 +471,8 @@ namespace hpx { namespace threads { namespace policies
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread) override
+            std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1)) override
         {
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
 //             // try to figure out the NUMA node where the data lives
@@ -486,24 +487,21 @@ namespace hpx { namespace threads { namespace policies
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queue_size;
-
-            if (num_thread >= queue_size)
-                num_thread %= queue_size;
-
-            // Select an OS thread which hasn't been disabled
-            std::unique_lock<compat::mutex> l;
-            if (mode_ & threads::policies::enable_elasticity)
             {
-                l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
-                    std::try_to_lock);
-                while (!l.owns_lock() || states_[num_thread] > state_suspended)
-                {
-                    num_thread = (num_thread + 1) % queue_size;
-                    l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
-                        std::try_to_lock);
-                }
+                num_thread = curr_queue_++ % queue_size;
             }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            if (num_thread_fallback != std::size_t(-1))
+            {
+                num_thread_fallback %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             // now create the thread
             if (data.priority == thread_priority_high_recursive ||
@@ -604,11 +602,27 @@ namespace hpx { namespace threads { namespace policies
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd,
             std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1),
             thread_priority priority = thread_priority_normal) override
         {
             std::size_t queue_size = queues_.size();
+
             if (std::size_t(-1) == num_thread)
+            {
                 num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            if (num_thread_fallback != std::size_t(-1))
+            {
+                num_thread_fallback %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||
@@ -630,11 +644,27 @@ namespace hpx { namespace threads { namespace policies
 
         void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1),
             thread_priority priority = thread_priority_normal) override
         {
             std::size_t queue_size = queues_.size();
+
             if (std::size_t(-1) == num_thread)
+            {
                 num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            if (num_thread_fallback != std::size_t(-1))
+            {
+                num_thread_fallback %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||
