@@ -319,9 +319,9 @@ namespace hpx { namespace threads { namespace policies
                         "Couldn't add new thread to the thread map");
                     return 0;
                 }
-                
+
                 ++thread_map_count_;
-                
+
                 // Decrement only after thread_map_count_ has been incremented
                 --addfrom->new_tasks_count_;
 
@@ -821,7 +821,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
                 bool finish = count == ++new_tasks_count_;
-                
+
                 // Decrement only after the local new_tasks_count_ has
                 // been incremented
                 --src->new_tasks_count_;
