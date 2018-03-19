@@ -717,7 +717,7 @@ namespace libfabric
             }
             else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
-                int err_sz = fi_cq_readerr(txcq_, &e ,0);
+                /*int err_sz =*/ fi_cq_readerr(txcq_, &e ,0);
                 // flags might not be set correctly
                 if (e.flags == (FI_MSG | FI_SEND)) {
                     LOG_ERROR_MSG("txcq Error for FI_SEND with len " << hexlength(e.len)
@@ -787,7 +787,7 @@ namespace libfabric
             }
             else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
-                int err_sz = fi_cq_readerr(rxcq_, &e ,0);
+                /*int err_sz =*/ fi_cq_readerr(rxcq_, &e ,0);
                 LOG_ERROR_MSG("rxcq Error with flags " << hexlength(e.flags)
                     << "len " << hexlength(e.len));
             }

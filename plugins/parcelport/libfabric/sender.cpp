@@ -166,7 +166,7 @@ namespace libfabric
                     }
 
                     return false;
-                }, "sender::async_write")
+                }, "sender::async_write");
         }
         else
         {
