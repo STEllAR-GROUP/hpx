@@ -98,12 +98,15 @@ particular order):
   `hpx::async` now returns a `hpx::future<future<T>>` making its behavior
   conforming to its local counterpart.
 * We have replaced the used of `boost::exception_ptr` in our APIs with the
- equivalent `std::exception_ptr`. Please change your codes accordingly.
- No compatibility settings are provided.
+  equivalent `std::exception_ptr`. Please change your codes accordingly.
+  No compatibility settings are provided.
 * We have removed the compatibility settings for
   `HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY` and
   `HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY` as their life-cycle has reached
   its end.
+* We have removed the experimental thread schedulers hierarchy_scheduler,
+  periodic_priority_scheduler and throttling_scheduler in an effort to clean up
+  and consolidate our thread schedulers.
 
 
 [heading Bug Fixes (Closed Tickets)]
