@@ -305,6 +305,7 @@ jobs:
           # We need to compile some tests serially because they eat too much
           # memory
           command: |
+              set +e
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
