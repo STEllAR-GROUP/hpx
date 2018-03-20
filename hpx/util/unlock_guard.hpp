@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -22,7 +21,7 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(unlock_guard);
 
     public:
-        typedef Mutex mutex_type;
+        using mutex_type = Mutex;
 
         explicit unlock_guard(Mutex& m)
           : m_(m)
@@ -33,30 +32,6 @@ namespace hpx { namespace util
         ~unlock_guard()
         {
             m_.lock();
-        }
-
-    private:
-        Mutex& m_;
-    };
-
-    template <typename Mutex>
-    class unlock_guard_try
-    {
-    public:
-        HPX_NON_COPYABLE(unlock_guard_try);
-
-    public:
-        typedef Mutex mutex_type;
-
-        explicit unlock_guard_try(Mutex& m)
-          : m_(m)
-        {
-            m_.unlock();
-        }
-
-        ~unlock_guard_try()
-        {
-            m_.try_lock();
         }
 
     private:

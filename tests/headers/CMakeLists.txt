@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2017 Hartmut Kaiser
+# Copyright (c) 2015-2018 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,11 +16,20 @@ set(exclude_from_all_headers
   "util/hardware/timestamp/bgq.hpp"
 )
 
+# These files are either known to expose incomplete types or are known to
+# require special handling to avoid circular #include dependencies.
 set(exclude_from_headers
   "parallel/executors/execution_fwd.hpp"
   "parallel/executors/execution_information_fwd.hpp"
   "parallel/executors/timed_execution_fwd.hpp"
+  "parallel/executors/parallel_executor.hpp"
+  "lcos/local/futures_factory.hpp"
 )
+
+if(NOT HPX_WITH_SCOPED_UNLOCK_COMPATIBILITY)
+  set(exclude_from_all_headers ${exclude_from_all_headers} "util/scoped_unlock.hpp")
+  set(exclude_from_headers ${exclude_from_headers} "util/scoped_unlock.hpp")
+endif()
 
 # If we compile with the MPI parcelport enabled, we need to additionally
 # add the MPI include path here, because for the main library, it's only

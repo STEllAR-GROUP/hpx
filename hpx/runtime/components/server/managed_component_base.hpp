@@ -45,7 +45,8 @@ namespace hpx { namespace components
         struct init<traits::construct_with_back_ptr>
         {
             template <typename Component, typename Managed>
-            static void call(Component* component, Managed* this_)
+            HPX_CXX14_CONSTEXPR static void call(Component* component,
+                Managed* this_)
             {
             }
 
@@ -99,7 +100,7 @@ namespace hpx { namespace components
         struct destroy_backptr<traits::managed_object_controls_lifetime>
         {
             template <typename BackPtr>
-            static void call(BackPtr*)
+            HPX_CXX14_CONSTEXPR static void call(BackPtr*)
             {
                 // The managed_component's lifetime is controlled by the
                 // component implementation. Do nothing.
@@ -116,7 +117,7 @@ namespace hpx { namespace components
         struct manage_lifetime<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
-            static void call(Component*)
+            HPX_CXX14_CONSTEXPR static void call(Component*)
             {
                 // The managed_component's lifetime is controlled by the
                 // component implementation. Do nothing.
@@ -148,35 +149,65 @@ namespace hpx { namespace components
             }
 
             template <typename Component>
-            static void addref(Component*)
+            HPX_CXX14_CONSTEXPR static void addref(Component*)
             {
             }
 
             template <typename Component>
-            static void release(Component*)
+            HPX_CXX14_CONSTEXPR static void release(Component*)
             {
             }
         };
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct base_managed_component
+          : public traits::detail::managed_component_tag
+        {
+            /// \brief finalize() will be called just before the instance gets
+            ///        destructed
+            HPX_CXX14_CONSTEXPR static void finalize() {}
+
+            // Pinning functionality
+            HPX_CXX14_CONSTEXPR static void pin() {}
+            HPX_CXX14_CONSTEXPR static void unpin() {}
+            HPX_CONSTEXPR static std::uint32_t pin_count() { return 0; }
+
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+            HPX_CXX14_CONSTEXPR static void mark_as_migrated()
+            {
+            }
+            HPX_CXX14_CONSTEXPR static void on_migrated()
+            {
+            }
+#else
+            static void mark_as_migrated()
+            {
+                // If this assertion is triggered then this component instance is
+                // being migrated even if the component type has not been enabled
+                // to support migration.
+                HPX_ASSERT(false);
+            }
+
+            static void on_migrated()
+            {
+                // If this assertion is triggered then this component instance is being
+                // migrated even if the component type has not been enabled to support
+                // migration.
+                HPX_ASSERT(false);
+            }
+#endif
+        };
+    }
+
     template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
-    class managed_component_base
-      : public traits::detail::managed_component_tag
+    class managed_component_base : public detail::base_managed_component
     {
     public:
         HPX_NON_COPYABLE(managed_component_base);
-
-    private:
-        Component& derived()
-        {
-            return static_cast<Component&>(*this);
-        }
-        Component const& derived() const
-        {
-            return static_cast<Component const&>(*this);
-        }
 
     public:
         typedef typename std::conditional<
@@ -223,10 +254,6 @@ namespace hpx { namespace components
         typedef managed_component<Component, Wrapper> wrapping_type;
         typedef Component base_type_holder;
 
-        /// \brief finalize() will be called just before the instance gets
-        ///        destructed
-        void finalize() {}
-
         naming::id_type get_unmanaged_id() const;
         naming::id_type get_id() const;
 
@@ -240,28 +267,6 @@ namespace hpx { namespace components
 
     protected:
         naming::gid_type get_base_gid() const;
-
-    public:
-        // Pinning functionality
-        void pin() {}
-        void unpin() {}
-        std::uint32_t pin_count() const { return 0; }
-
-        void mark_as_migrated()
-        {
-            // If this assertion is triggered then this component instance is
-            // being migrated even if the component type has not been enabled
-            // to support migration.
-            HPX_ASSERT(false);
-        }
-
-        void on_migrated()
-        {
-            // If this assertion is triggered then this component instance is being
-            // migrated even if the component type has not been enabled to support
-            // migration.
-            HPX_ASSERT(false);
-        }
 
     protected:
         template <typename>
@@ -377,7 +382,8 @@ namespace hpx { namespace components
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize() {}  // finalize the wrapped component in our destructor
+        ///
+        HPX_CXX14_CONSTEXPR static void finalize() {}
 
         /// \brief Return a pointer to the wrapped instance
         /// \note  Caller must check validity of returned pointer
@@ -524,7 +530,8 @@ namespace hpx { namespace components
         get_id() const
     {
         // all credits should have been taken already
-        naming::gid_type gid = derived().get_base_gid();
+        naming::gid_type gid =
+            static_cast<Component const&>(*this).get_base_gid();
 
         // The underlying heap will always give us a full set of credits, but
         // those are valid for the first invocation of get_base_gid() only.

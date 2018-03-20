@@ -268,7 +268,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // Allocate a new thread object.
                 thrd = thread_id_type(
-                    threads::thread_data::create(data, memory_pool_, state));
+                    new threads::thread_data(data, this, state));
             }
         }
 
@@ -293,7 +293,7 @@ namespace hpx { namespace threads { namespace policies
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
-                --addfrom->new_tasks_count_;
+
 
                 // measure thread creation time
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
@@ -312,13 +312,18 @@ namespace hpx { namespace threads { namespace policies
                     thread_map_.insert(thrd);
 
                 if (HPX_UNLIKELY(!p.second)) {
+                    --addfrom->new_tasks_count_;
                     lk.unlock();
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
                         "threadmanager::add_new",
                         "Couldn't add new thread to the thread map");
                     return 0;
                 }
+
                 ++thread_map_count_;
+
+                // Decrement only after thread_map_count_ has been incremented
+                --addfrom->new_tasks_count_;
 
                 // only insert the thread into the work-items queue if it is in
                 // pending state
@@ -331,7 +336,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // this thread has to be in the map now
                 HPX_ASSERT(thread_map_.find(thrd) != thread_map_.end());
-                HPX_ASSERT(thrd->get_pool() == &memory_pool_);
+                HPX_ASSERT(&thrd->get_queue<thread_queue>() == this);
             }
 
             if (added) {
@@ -549,7 +554,6 @@ namespace hpx { namespace threads { namespace policies
             new_tasks_wait_(0),
             new_tasks_wait_count_(0),
 #endif
-            memory_pool_(64),
             thread_heap_small_(),
             thread_heap_medium_(),
             thread_heap_large_(),
@@ -744,7 +748,7 @@ namespace hpx { namespace threads { namespace policies
 
                     // this thread has to be in the map now
                     HPX_ASSERT(thread_map_.find(thrd) != thread_map_.end());
-                    HPX_ASSERT(thrd->get_pool() == &memory_pool_);
+                    HPX_ASSERT(&thrd->get_queue<thread_queue>() == this);
 
                     // push the new thread in the pending queue thread
                     if (initial_state == pending)
@@ -805,7 +809,7 @@ namespace hpx { namespace threads { namespace policies
             task_description* task;
             while (src->new_tasks_.pop(task))
             {
-                --src->new_tasks_count_;
+
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
@@ -817,6 +821,11 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
                 bool finish = count == ++new_tasks_count_;
+
+                // Decrement only after the local new_tasks_count_ has
+                // been incremented
+                --src->new_tasks_count_;
+
                 if (new_tasks_.push(task))
                 {
                     if (finish)
@@ -882,20 +891,16 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
+        void destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
         {
-            if (thrd->get_pool() == &memory_pool_)
-            {
-                terminated_items_.push(thrd);
+            HPX_ASSERT(&thrd->get_queue<thread_queue>() == this);
+            terminated_items_.push(thrd);
 
-                std::int64_t count = ++terminated_items_count_;
-                if (count > max_terminated_threads)
-                {
-                    cleanup_terminated(true);   // clean up all terminated threads
-                }
-                return true;
+            std::int64_t count = ++terminated_items_count_;
+            if (count > max_terminated_threads)
+            {
+                cleanup_terminated(true);   // clean up all terminated threads
             }
-            return false;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1127,9 +1132,6 @@ namespace hpx { namespace threads { namespace policies
         std::atomic<std::int64_t> new_tasks_wait_count_;
         ///< overall number tasks waited
 #endif
-
-        threads::thread_pool memory_pool_;          ///< OS thread local memory pools for
-                                                    ///< HPX-threads
 
         std::list<thread_id_type> thread_heap_small_;
         std::list<thread_id_type> thread_heap_medium_;

@@ -12,9 +12,9 @@
 #include <hpx/compat/thread.hpp>
 #include <hpx/error_code.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <atomic>
@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    class scheduled_thread_pool : public thread_pool_base
+    class scheduled_thread_pool : public hpx::threads::thread_pool_base
     {
     public:
         ///////////////////////////////////////////////////////////////////
@@ -136,9 +136,11 @@ namespace hpx { namespace threads { namespace detail
 
         hpx::future<void> suspend();
         void suspend_cb(std::function<void(void)> callback, error_code& ec = throws);
+        void suspend_direct(error_code& ec = throws);
 
         hpx::future<void> resume();
         void resume_cb(std::function<void(void)> callback, error_code& ec = throws);
+        void resume_direct(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////
         compat::thread& get_os_thread_handle(std::size_t global_thread_num)

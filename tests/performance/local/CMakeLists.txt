@@ -17,7 +17,9 @@ set(benchmarks
     hpx_heterogeneous_timed_task_spawn
     parent_vs_child_stealing
     print_heterogeneous_payloads
+    resume_suspend
     skynet
+    start_stop
     timed_task_spawn
     wait_all_timings
 )
@@ -34,8 +36,11 @@ if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks
       ${benchmarks}
       openmp_homogeneous_timed_task_spawn
+      openmp_parallel_region
      )
 
+  set(openmp_homogeneous_timed_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${boost_library_dependencies})
   set(openmp_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies})
 endif()
@@ -160,6 +165,10 @@ if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(openmp_homogeneous_timed_task_spawn_exe
+    PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_parallel_region_exe
+    PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_parallel_region_exe
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 

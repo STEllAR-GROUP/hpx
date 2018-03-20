@@ -483,17 +483,17 @@ hpx::future<hpx::id_type> on_symbol_namespace_event(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<std::pair<naming::id_type, naming::address> >
+std::pair<naming::id_type, naming::address>
     begin_migration(naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.begin_migration_async(id);
+    return resolver.begin_migration(id);
 }
 
-hpx::future<bool> end_migration(naming::id_type const& id)
+bool end_migration(naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.end_migration_async(id);
+    return resolver.end_migration(id);
 }
 
 hpx::future<void> mark_as_migrated(naming::gid_type const& gid,

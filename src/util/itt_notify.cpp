@@ -4,8 +4,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 
@@ -255,7 +257,33 @@ namespace hpx { namespace util { namespace itt
     domain::domain(char const* name)
       : domain_(HPX_ITT_DOMAIN_CREATE(name))
     {
-        if (domain_) domain_->flags = 1;    // enable domain
+        if (domain_ != nullptr)
+        {
+            domain_->flags = 1;
+        }
+    }
+
+    domain::domain()
+      : domain_(nullptr) {}
+
+    struct thread_domain_tag;
+    hpx::util::thread_specific_ptr<___itt_domain, thread_domain_tag>
+        thread_domain_;
+
+    thread_domain::thread_domain() : domain()
+    {
+        if (thread_domain_.get() == nullptr)
+        {
+            thread_domain_.reset(
+                HPX_ITT_DOMAIN_CREATE(get_thread_name().c_str()));
+        }
+
+        domain_ = thread_domain_.get();
+
+        if (domain_ != nullptr)
+        {
+            domain_->flags = 1;
+        }
     }
 
     task::task(domain const& domain, util::thread_description const& name)
@@ -288,6 +316,13 @@ namespace hpx { namespace util { namespace itt
             reinterpret_cast<std::size_t>(sh_.handle_));
 
         HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+    }
+
+    task::~task()
+    {
+        HPX_ITT_TASK_END(domain_.domain_);
+
+        delete id_;
     }
 }}}
 

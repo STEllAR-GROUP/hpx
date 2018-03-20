@@ -88,6 +88,18 @@ namespace hpx { namespace util
                 result.append(1, *it);
                 break;
 
+            // escape regex special characters
+            case '+': HPX_FALLTHROUGH;
+            case '.': HPX_FALLTHROUGH;
+            case '(': HPX_FALLTHROUGH;
+            case ')': HPX_FALLTHROUGH;
+            case '{': HPX_FALLTHROUGH;
+            case '}': HPX_FALLTHROUGH;
+            case '^': HPX_FALLTHROUGH;
+            case '$':
+                result.append("\\");
+                HPX_FALLTHROUGH;
+
             default:
                 result.append(1, c);
                 break;

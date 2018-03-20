@@ -9,7 +9,6 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -42,6 +41,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util
@@ -68,13 +68,14 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline void encode (std::string &str, char s, char const *r)
+        inline void encode(
+            std::string& str, char s, char const* r, std::size_t inc = 1ull)
         {
             std::string::size_type pos = 0;
             while ((pos = str.find_first_of(s, pos)) != std::string::npos)
             {
                 str.replace (pos, 1, r);
-                ++pos;
+                pos += inc;
             }
         }
 
@@ -82,6 +83,12 @@ namespace hpx { namespace util
         {
             encode(str, '\n', "\\n");
             return str;
+        }
+
+        inline std::string encode_and_enquote(std::string str)
+        {
+            encode(str, '\"', "\\\"", 2);
+            return detail::enquote(std::move(str));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -191,7 +198,7 @@ namespace hpx { namespace util
             return num_localities;
         }
 
-        std::string handle_queueing(util::manage_config& cfgmap,
+        std::string handle_queuing(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm, std::string default_)
         {
             // command line options is used preferred
@@ -344,6 +351,30 @@ namespace hpx { namespace util
                 }
 #endif
             }
+
+            // make sure minimal requested number of threads is observed
+            std::size_t min_os_threads = cfgmap.get_value<std::size_t>(
+                "hpx.force_min_os_threads", threads);
+
+            if (min_os_threads == 0)
+            {
+                throw hpx::detail::command_line_error(
+                    "Number of hpx.force_min_os_threads must be greater than "
+                    "0");
+            }
+
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+            if (min_os_threads > HPX_HAVE_MAX_CPU_COUNT)
+            {
+                throw hpx::detail::command_line_error("Requested more than "
+                    HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)
+                    " hpx.force_min_os_threads "
+                    "to use for this application, use the option "
+                    "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+            }
+#endif
+
+            threads = (std::max)(threads, min_os_threads);
 
             if (!initial && env.found_batch_environment() &&
                 using_nodelist && (threads > batch_threads))
@@ -741,7 +772,7 @@ namespace hpx { namespace util
 #endif
 
         // handle setting related to schedulers
-        queuing_ = detail::handle_queueing(cfgmap, vm, "local-priority-fifo");
+        queuing_ = detail::handle_queuing(cfgmap, vm, "local-priority-fifo");
         ini_config += "hpx.scheduler=" + queuing_;
 
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
@@ -883,11 +914,23 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.console.timing.level=1";
             ini_config += "hpx.logging.timing.level=1";
         }
+
+        if (vm.count("hpx:debug-app-log")) {
+            ini_config += "hpx.logging.console.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.console.application.level=5";
+            ini_config += "hpx.logging.application.level=5";
+        }
 #else
         if (vm.count("hpx:debug-hpx-log") ||
             vm.count("hpx:debug-agas-log") ||
             vm.count("hpx:debug-parcel-log") ||
-            vm.count("hpx:debug-timing-log"))
+            vm.count("hpx:debug-timing-log") ||
+            vm.count("hpx:debug-app-log"))
         {
             throw hpx::detail::command_line_error(
                 "Command line option error: can't enable logging while it "
@@ -975,7 +1018,7 @@ namespace hpx { namespace util
         {
             // quote only if it contains whitespace
             std::string arg(argv[i]); //-V108
-            cmd_line += detail::enquote(arg);
+            cmd_line += detail::encode_and_enquote(arg);
 
             if ((i + 1) != argc)
                 cmd_line += " ";
@@ -999,15 +1042,17 @@ namespace hpx { namespace util
 
             iterator_type  end = unregistered_options.end();
             for (iterator_type  it = unregistered_options.begin(); it != end; ++it)
-                unregistered_options_cmd_line += " " + detail::enquote(*it);
+                unregistered_options_cmd_line +=
+                    " " + detail::encode_and_enquote(*it);
 
             ini_config_ += "hpx.unknown_cmd_line!=" +
-                detail::enquote(cmd_name) + unregistered_options_cmd_line;
+                detail::encode_and_enquote(cmd_name) +
+                unregistered_options_cmd_line;
         }
 
         ini_config_ += "hpx.program_name!=" + cmd_name;
         ini_config_ += "hpx.reconstructed_cmd_line!=" +
-            detail::enquote(cmd_name) + " " +
+            detail::encode_and_enquote(cmd_name) + " " +
             util::reconstruct_command_line(vm_) + " " +
             unregistered_options_cmd_line;
     }
@@ -1067,7 +1112,6 @@ namespace hpx { namespace util
 #endif
     }
 
-#if defined(HPX_HAVE_HWLOC)
     ///////////////////////////////////////////////////////////////////////////
     void handle_print_bind(boost::program_options::variables_map const& vm_,
         std::size_t num_threads)
@@ -1130,7 +1174,6 @@ namespace hpx { namespace util
             std::cout << strm.str();
         }
     }
-#endif
 
     void handle_list_parcelports()
     {

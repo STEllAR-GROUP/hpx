@@ -71,13 +71,15 @@ namespace hpx { namespace components
             if (pin_count_ != ~0x0u)
                 ++pin_count_;
         }
-        void unpin()
+        bool unpin()
         {
+            bool was_migrated = false;
             // make sure to always grab the AGAS lock first
             agas::mark_as_migrated(this->gid_,
-                [this]() mutable -> std::pair<bool, hpx::future<void> >
+                [this, &was_migrated]() mutable -> std::pair<bool, hpx::future<void> >
                 {
                     std::unique_lock<mutex_type> l(mtx_);
+                    was_migrated = this->pin_count_ == ~0x0u;
                     HPX_ASSERT(this->pin_count_ != 0);
                     if (this->pin_count_ != ~0x0u)
                     {
@@ -85,7 +87,8 @@ namespace hpx { namespace components
                         {
                             // trigger pending migration if this was the last
                             // unpin and a migration operation is pending
-                            if (trigger_migration_.valid() && was_marked_for_migration_)
+                            HPX_ASSERT(trigger_migration_.valid());
+                            if (was_marked_for_migration_)
                             {
                                 was_marked_for_migration_ = false;
 
@@ -100,7 +103,9 @@ namespace hpx { namespace components
                         }
                     }
                     return std::make_pair(false, make_ready_future());
-                });
+                }).get();
+
+            return was_migrated;
         }
 
         std::uint32_t pin_count() const

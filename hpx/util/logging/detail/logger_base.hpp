@@ -78,8 +78,7 @@ namespace hpx { namespace util { namespace logging {
                     m_is_cache_turned_off = true;
                     return true;
                 }
-                else
-                    return false;
+                return false;
             }
 
             /** note: this call does not need to be very efficient,

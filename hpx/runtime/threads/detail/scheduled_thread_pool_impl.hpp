@@ -28,14 +28,13 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/unlock_guard.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <boost/system/system_error.hpp>
-
-#include <hpx/runtime/threads/policies/hwloc_topology_info.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -323,6 +322,15 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_internal(bool blocking,
         error_code& ec)
     {
+        for (std::size_t virt_core = 0; virt_core != threads_.size();
+             ++virt_core)
+        {
+            if (mode_ & policies::enable_suspension)
+            {
+                this->sched_->Scheduler::resume(virt_core);
+            }
+        }
+
         if (blocking)
         {
             for (std::size_t virt_core = 0; virt_core != threads_.size();
@@ -334,14 +342,6 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
         }
-        else
-        {
-            for (std::size_t virt_core = 0; virt_core != threads_.size();
-                ++virt_core)
-            {
-                this->sched_->Scheduler::resume(virt_core);
-            }
-        }
     }
 
     template <typename Scheduler>
@@ -351,7 +351,16 @@ namespace hpx { namespace threads { namespace detail
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::resume",
-                "cannot call resume from outside HPX, use resume_cb instead");
+                "cannot call resume from outside HPX, use resume_cb or"
+                "resume_direct instead");
+            return hpx::make_ready_future();
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume",
+                "this scheduler does not support suspension");
             return hpx::make_ready_future();
         }
 
@@ -364,6 +373,14 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::resume_cb(
         std::function<void(void)> callback, error_code& ec)
     {
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume_cb",
+                "this scheduler does not support suspension");
+            return;
+        }
+
         std::function<void(void)> resume_internal_wrapper =
             [this, HPX_CAPTURE_MOVE(callback)]()
             {
@@ -382,14 +399,43 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::resume_direct(error_code& ec)
+    {
+        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::resume_direct",
+                "cannot suspend a pool from itself");
+            return;
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::resume_direct",
+                "this scheduler does not support suspension");
+            return;
+        }
+
+        this->resume_internal(true, ec);
+    }
+
+    template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::suspend_internal(error_code& ec)
     {
-        util::detail::yield_while([this]()
+        util::yield_while([this]()
             {
                 return this->sched_->Scheduler::get_thread_count() >
                     this->get_background_thread_count();
             }, "scheduled_thread_pool::suspend_internal",
             hpx::threads::pending);
+
+        for (std::size_t i = 0; i != threads_.size(); ++i)
+        {
+            hpx::state expected = state_running;
+            sched_->Scheduler::get_state(i).compare_exchange_strong(expected,
+                 state_pre_sleep);
+        }
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
@@ -404,8 +450,9 @@ namespace hpx { namespace threads { namespace detail
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::suspend",
-                "cannot call suspend from outside HPX, use suspend_cb instead");
-            return make_ready_future();
+                "cannot call suspend from outside HPX, use suspend_cb or"
+                "suspend_direct instead");
+            return hpx::make_ready_future();
         }
         else if (threads::get_self_ptr() &&
             hpx::this_thread::get_pool() == this)
@@ -414,6 +461,14 @@ namespace hpx { namespace threads { namespace detail
                 HPX_GET_EXCEPTION(bad_parameter,
                     "scheduled_thread_pool<Scheduler>::suspend",
                     "cannot suspend a pool from itself"));
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend",
+                "this scheduler does not support suspension");
+            return hpx::make_ready_future();
         }
 
         return hpx::async(
@@ -428,8 +483,16 @@ namespace hpx { namespace threads { namespace detail
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
         {
             HPX_THROWS_IF(ec, bad_parameter,
-                "scheduled_thread_pool<Scheduler>::suspend",
+                "scheduled_thread_pool<Scheduler>::suspend_cb",
                 "cannot suspend a pool from itself");
+            return;
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend_cb",
+                "this scheduler does not support suspension");
             return;
         }
 
@@ -448,6 +511,28 @@ namespace hpx { namespace threads { namespace detail
         {
             compat::thread(std::move(suspend_internal_wrapper)).detach();
         }
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::suspend_direct(error_code& ec)
+    {
+        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
+        {
+            HPX_THROWS_IF(ec, bad_parameter,
+                "scheduled_thread_pool<Scheduler>::suspend_direct",
+                "cannot suspend a pool from itself");
+            return;
+        }
+
+        if (!(mode_ & policies::enable_suspension))
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "scheduled_thread_pool<Scheduler>::suspend_direct",
+                "this scheduler does not support suspension");
+            return;
+        }
+
+        this->suspend_internal(ec);
     }
 
     template <typename Scheduler>
@@ -675,7 +760,7 @@ namespace hpx { namespace threads { namespace detail
         thread_priority priority, error_code& ec)
     {
         return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,
-            newstate_ex, priority, get_worker_thread_num(), ec);
+            newstate_ex, priority, get_worker_thread_num(), nullptr, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1488,7 +1573,7 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<compat::barrier> startup, error_code& ec)
     {
-        std::unique_lock<compat::mutex>
+        std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         if (threads_.size() <= virt_core)
@@ -1558,7 +1643,7 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
-        std::unique_lock<compat::mutex>
+        std::unique_lock<typename Scheduler::pu_mutex_type>
             l(sched_->Scheduler::get_pu_mutex(virt_core));
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
@@ -1585,11 +1670,13 @@ namespace hpx { namespace threads { namespace detail
         compat::thread t;
         std::swap(threads_[virt_core], t);
 
+        l.unlock();
+
         if (threads::get_self_ptr())
         {
             std::size_t thread_num = thread_offset_ + virt_core;
 
-            util::detail::yield_while([thread_num]()
+            util::yield_while([thread_num]()
                 {
                     return thread_num == hpx::get_worker_thread_num();
                 }, "scheduled_thread_pool::remove_processing_unit_internal",
@@ -1605,19 +1692,11 @@ namespace hpx { namespace threads { namespace detail
     {
         // Yield to other HPX threads if lock is not available to avoid
         // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core), std::try_to_lock);
-        util::detail::yield_while([&l]()
+        std::unique_lock<typename Scheduler::pu_mutex_type>
+            l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
+        util::yield_while([&l]()
             {
-                if (l.owns_lock())
-                {
-                    return false;
-                }
-                else
-                {
-                    l.try_lock();
-                    return true;
-                }
+                return !l.try_lock();
             }, "scheduled_thread_pool::suspend_processing_unit_internal",
             hpx::threads::pending);
 
@@ -1631,22 +1710,19 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
-        // inform the scheduler to suspend the virtual core
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        // check if already suspended
-        hpx::state current_state = state.load();
-        if (current_state == state_pre_sleep || current_state == state_sleeping)
-        {
-            return;
-        }
+        // Inform the scheduler to suspend the virtual core only if running
+        hpx::state expected = state_running;
+        state.compare_exchange_strong(expected, state_pre_sleep);
 
-        hpx::state oldstate = state.exchange(state_pre_sleep);
+        l.unlock();
 
-        HPX_ASSERT(oldstate == state_running);
+        HPX_ASSERT(expected == state_running || expected == state_pre_sleep ||
+            expected == state_sleeping);
 
-        util::detail::yield_while([&state]()
+        util::yield_while([&state]()
             {
                 return state.load() == state_pre_sleep;
             }, "scheduled_thread_pool::suspend_processing_unit_internal",
@@ -1715,19 +1791,11 @@ namespace hpx { namespace threads { namespace detail
     {
         // Yield to other HPX threads if lock is not available to avoid
         // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<compat::mutex>
-            l(sched_->Scheduler::get_pu_mutex(virt_core), std::try_to_lock);
-        util::detail::yield_while([&l]()
+        std::unique_lock<typename Scheduler::pu_mutex_type>
+            l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
+        util::yield_while([&l]()
             {
-                if (l.owns_lock())
-                {
-                    return false;
-                }
-                else
-                {
-                    l.try_lock();
-                    return true;
-                }
+                return !l.try_lock();
             }, "scheduled_thread_pool::resume_processing_unit_internal",
             hpx::threads::pending);
 
@@ -1741,12 +1809,17 @@ namespace hpx { namespace threads { namespace detail
             return;
         }
 
+        l.unlock();
+
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        util::detail::yield_while([this, &state, virt_core]()
+        util::yield_while([this, &state, virt_core]()
             {
-                this->sched_->Scheduler::resume(virt_core);
+                if (mode_ & policies::enable_suspension)
+                {
+                    this->sched_->Scheduler::resume(virt_core);
+                }
                 return state.load() == state_sleeping;
             }, "scheduled_thread_pool::resume_processing_unit_internal",
             hpx::threads::pending);

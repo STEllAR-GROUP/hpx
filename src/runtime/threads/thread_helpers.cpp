@@ -12,10 +12,11 @@
 #include <hpx/state.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/util/assert.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
@@ -25,7 +26,9 @@
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util/yield_while.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <limits>
 #include <sstream>
@@ -48,11 +51,12 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     thread_id_type set_thread_state(thread_id_type const& id,
-        util::steady_time_point const& abs_time, thread_state_enum state,
-        thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
+        util::steady_time_point const& abs_time, std::atomic<bool>* timer_started,
+        thread_state_enum state, thread_state_ex_enum stateex,
+        thread_priority priority, error_code& ec)
     {
         return detail::set_thread_state_timed(*id->get_scheduler_base(), abs_time, id,
-            state, stateex, priority, std::size_t(-1), ec);
+            state, stateex, priority, std::size_t(-1), timer_started, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -387,7 +391,7 @@ namespace hpx { namespace threads
         return executors::current_executor(id->get_scheduler_base());
     }
 
-    threads::detail::thread_pool_base*
+    threads::thread_pool_base*
         get_pool(thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
@@ -474,7 +478,7 @@ namespace hpx { namespace this_thread
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = threads::get_self_id();
+        threads::thread_id_type id = self.get_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id, ec);
@@ -536,7 +540,7 @@ namespace hpx { namespace this_thread
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = threads::get_self_id();
+        threads::thread_id_type id = self.get_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id, ec);
@@ -556,8 +560,9 @@ namespace hpx { namespace this_thread
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
+            std::atomic<bool> timer_started(false);
             threads::thread_id_type timer_id = threads::set_thread_state(id,
-                abs_time, threads::pending, threads::wait_timeout,
+                abs_time, &timer_started, threads::pending, threads::wait_timeout,
                 threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
@@ -579,7 +584,13 @@ namespace hpx { namespace this_thread
 
             if (statex != threads::wait_timeout)
             {
+                HPX_ASSERT(
+                    statex == threads::wait_abort ||
+                    statex == threads::wait_signaled);
                 error_code ec1(lightweight);    // do not throw
+                hpx::util::yield_while(
+                    [&timer_started]() { return !timer_started.load(); },
+                    "set_thread_state_timed");
                 threads::set_thread_state(timer_id,
                     threads::pending, threads::wait_abort,
                     threads::thread_priority_boost, ec1);
@@ -612,8 +623,7 @@ namespace hpx { namespace this_thread
         return threads::get_executor(threads::get_self_id(), ec);
     }
 
-    threads::detail::thread_pool_base*
-        get_pool(error_code& ec)
+    threads::thread_pool_base* get_pool(error_code& ec)
     {
         return threads::get_pool(threads::get_self_id(), ec);
     }

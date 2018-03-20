@@ -12,6 +12,7 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/util/lightweight_test.hpp>
 

@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/when_all_fwd.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/executors/post_policy_dispatch.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
@@ -197,7 +197,7 @@ namespace hpx { namespace parallel { namespace execution
 
                 HPX_ASSERT(size == 0);
 
-                return hpx::when_all(tasks);
+                return hpx::lcos::when_all_fwd(std::move(tasks));
             }
 
             // spawn all tasks sequentially

@@ -23,7 +23,7 @@ int hpx_main(int argc, char* argv[])
 
     try
     {
-        hpx::threads::detail::thread_pool_base& tp =
+        hpx::threads::thread_pool_base& tp =
             hpx::resource::get_thread_pool("default");
 
         // Use .get() to throw exception

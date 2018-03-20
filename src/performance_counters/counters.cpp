@@ -16,6 +16,9 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
@@ -1247,6 +1250,84 @@ namespace hpx { namespace performance_counters
 
         counter_info info(name);          // set full counter name
         return get_counter_async(info, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void counter_value::serialize(
+        serialization::output_archive& ar, const unsigned int)
+    {
+        ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
+    }
+
+    void counter_value::serialize(
+        serialization::input_archive& ar, const unsigned int)
+    {
+        ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
+    }
+
+    void counter_values_array::serialize(
+        serialization::output_archive& ar, const unsigned int)
+    {
+        ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
+    }
+
+    void counter_values_array::serialize(
+        serialization::input_archive& ar, const unsigned int)
+    {
+        ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void counter_type_path_elements::serialize(
+        serialization::output_archive& ar, const unsigned int)
+    {
+        ar & objectname_ & countername_ & parameters_;
+    }
+
+    void counter_type_path_elements::serialize(
+        serialization::input_archive& ar, const unsigned int)
+    {
+        ar & objectname_ & countername_ & parameters_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void counter_path_elements::serialize(
+        serialization::output_archive& ar, const unsigned int)
+    {
+        typedef counter_type_path_elements base_type;
+        hpx::serialization::base_object_type<counter_path_elements, base_type>
+            base = hpx::serialization::base_object<base_type>(*this);
+
+        ar & base &
+            parentinstancename_ & instancename_ & subinstancename_ &
+            parentinstanceindex_ & instanceindex_ & subinstanceindex_ &
+            parentinstance_is_basename_;
+    }
+
+    void counter_path_elements::serialize(
+        serialization::input_archive& ar, const unsigned int)
+    {
+        typedef counter_type_path_elements base_type;
+        hpx::serialization::base_object_type<counter_path_elements, base_type>
+            base = hpx::serialization::base_object<base_type>(*this);
+
+        ar & base &
+            parentinstancename_ & instancename_ & subinstancename_ &
+            parentinstanceindex_ & instanceindex_ & subinstanceindex_ &
+            parentinstance_is_basename_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void counter_info::serialize(
+        serialization::output_archive& ar, const unsigned int)
+    {
+        ar & type_ & version_ & status_ & fullname_ & helptext_ & unit_of_measure_;
+    }
+
+    void counter_info::serialize(
+        serialization::input_archive& ar, const unsigned int)
+    {
+        ar & type_ & version_ & status_ & fullname_ & helptext_ & unit_of_measure_;
     }
 }}
 

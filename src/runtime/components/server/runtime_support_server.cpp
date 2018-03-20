@@ -51,7 +51,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
@@ -410,7 +410,7 @@ namespace hpx { namespace components { namespace server
         // it hands over the token to machine nr.i.
         threads::threadmanager& tm = appl.get_thread_manager();
 
-        util::detail::yield_while([&tm]()
+        util::yield_while([&tm]()
             {
                 tm.cleanup_terminated(true);
                 return tm.get_thread_count() >
@@ -449,7 +449,7 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
 
-            util::detail::yield_while([&tm]()
+            util::yield_while([&tm]()
                 {
                     tm.cleanup_terminated(true);
                     return tm.get_thread_count() >
@@ -510,7 +510,7 @@ namespace hpx { namespace components { namespace server
         applier::applier& appl = hpx::applier::get_applier();
         threads::threadmanager& tm = appl.get_thread_manager();
 
-        util::detail::yield_while([&tm]()
+        util::yield_while([&tm]()
             {
                 tm.cleanup_terminated(true);
                 return tm.get_thread_count() >
@@ -587,7 +587,7 @@ namespace hpx { namespace components { namespace server
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
 
-            util::detail::yield_while([&tm]()
+            util::yield_while([&tm]()
                 {
                     tm.cleanup_terminated(true);
                     return tm.get_thread_count() >
@@ -827,26 +827,6 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    // let thread manager clean up HPX threads
-    template <typename Lock>
-    inline void
-    cleanup_threads(threads::threadmanager& tm, Lock& l)
-    {
-        // re-acquire pointer to self as it might have changed
-        threads::thread_self* self = threads::get_self_ptr();
-        HPX_ASSERT(nullptr != self);    // needs to be executed by a HPX thread
-
-        // give the scheduler some time to work on remaining tasks
-        {
-            util::unlock_guard<Lock> ul(l);
-            self->yield(threads::thread_result_type(threads::pending,
-                threads::invalid_thread_id));
-        }
-
-        // get rid of all terminated threads
-        tm.cleanup_terminated(true);
-    }
-
     void runtime_support::stop(double timeout,
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
@@ -868,73 +848,82 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            util::detail::yield_while(
-                [&tm, &l, timeout, &t, start_time, &timed_out]()
-                {
-                    cleanup_threads(tm, l);
+            {
+                util::unlock_guard<compat::mutex> ul(mtx_);
 
-                    if (timeout >= 0.0 && timeout < (t.elapsed() - start_time))
+                util::yield_while(
+                    [&tm, &l, timeout, &t, start_time, &timed_out]()
                     {
-                        timed_out = true;
-                        return false;
-                    }
+                        tm.cleanup_terminated(true);
 
-                    return tm.get_thread_count() >
-                        std::int64_t(1) + tm.get_background_thread_count();
-                }, "runtime_support::stop", hpx::threads::pending,
-                false); // Don't allow timed suspension
-
-            // If it took longer than expected, kill all suspended threads as
-            // well.
-            if (timed_out) {
-                // now we have to wait for all threads to be aborted
-                start_time = t.elapsed();
-
-                util::detail::yield_while([&tm, &l, timeout, &t, start_time]()
-                    {
-                        tm.abort_all_suspended_threads();
-                        cleanup_threads(tm, l);
-
-                        if (timeout >= 0.0 && timeout < (t.elapsed() - start_time))
+                        if (timeout >= 0.0 && timeout <
+                            (t.elapsed() - start_time))
                         {
+                            timed_out = true;
                             return false;
                         }
 
                         return tm.get_thread_count() >
                             std::int64_t(1) + tm.get_background_thread_count();
-                    }, "runtime_support::dijkstra_termination", hpx::threads::pending,
+                    }, "runtime_support::stop", hpx::threads::pending,
                     false); // Don't allow timed suspension
-            }
 
-            // Drop the locality from the partition table.
-            naming::gid_type here = agas_client.get_local_locality();
+                // If it took longer than expected, kill all suspended threads as
+                // well.
+                if (timed_out) {
+                    // now we have to wait for all threads to be aborted
+                    start_time = t.elapsed();
 
-            // unregister fixed components
-            agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
-            agas_client.unbind_local(appl.get_memory_raw_gid(), ec);
+                    util::yield_while(
+                        [&tm, &l, timeout, &t, start_time]()
+                        {
+                            tm.abort_all_suspended_threads();
+                            tm.cleanup_terminated(true);
 
-            if (remove_from_remote_caches)
-                remove_here_from_connection_cache();
+                            if (timeout >= 0.0 && timeout <
+                                (t.elapsed() - start_time))
+                            {
+                                return false;
+                            }
 
-            agas_client.unregister_locality(here, ec);
-
-            if (remove_from_remote_caches)
-                remove_here_from_console_connection_cache();
-
-            if (respond_to) {
-                // respond synchronously
-                typedef lcos::base_lco_with_value<void> void_lco_type;
-                typedef void_lco_type::set_event_action action_type;
-
-                naming::address addr;
-                if (agas::is_local_address_cached(respond_to, addr)) {
-                    // this should never happen
-                    HPX_ASSERT(false);
+                            return tm.get_thread_count() >
+                                std::int64_t(1) +
+                                tm.get_background_thread_count();
+                        }, "runtime_support::dijkstra_termination",
+                        hpx::threads::pending,
+                        false); // Don't allow timed suspension
                 }
-                else {
-                    // apply remotely, parcel is sent synchronously
-                    hpx::applier::detail::apply_r_sync<action_type>(
-                        std::move(addr), respond_to);
+
+                // Drop the locality from the partition table.
+                naming::gid_type here = agas_client.get_local_locality();
+
+                // unregister fixed components
+                agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
+                agas_client.unbind_local(appl.get_memory_raw_gid(), ec);
+
+                if (remove_from_remote_caches)
+                    remove_here_from_connection_cache();
+
+                agas_client.unregister_locality(here, ec);
+
+                if (remove_from_remote_caches)
+                    remove_here_from_console_connection_cache();
+
+                if (respond_to) {
+                    // respond synchronously
+                    typedef lcos::base_lco_with_value<void> void_lco_type;
+                    typedef void_lco_type::set_event_action action_type;
+
+                    naming::address addr;
+                    if (agas::is_local_address_cached(respond_to, addr)) {
+                        // this should never happen
+                        HPX_ASSERT(false);
+                    }
+                    else {
+                        // apply remotely, parcel is sent synchronously
+                        hpx::applier::detail::apply_r_sync<action_type>(
+                            std::move(addr), respond_to);
+                    }
                 }
             }
 
@@ -1062,13 +1051,12 @@ namespace hpx { namespace components { namespace server
                     util::allow_unregistered | util::report_missing_config_file,
                     get_runtime_mode_from_name(runtime_mode));
 
-#if defined(HPX_HAVE_HWLOC)
                 if (vm.count("hpx:print-bind")) {
                     std::size_t num_threads = boost::lexical_cast<std::size_t>(
                         ini.get_entry("hpx.os_threads", 1));
                     util::handle_print_bind(vm, num_threads);
                 }
-#endif
+
                 if (vm.count("hpx:list-parcel-ports"))
                     util::handle_list_parcelports();
 

@@ -31,6 +31,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -240,7 +241,8 @@ namespace hpx {
 
     threads::thread_result_type
     runtime_impl::run_helper(
-        util::function_nonser<runtime::hpx_main_function_type> func, int& result)
+        util::function_nonser<runtime::hpx_main_function_type> const& func,
+        int& result)
     {
         lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
@@ -354,9 +356,10 @@ namespace hpx {
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
 
+        this->runtime::starting();
         threads::thread_id_type id = threads:: invalid_thread_id;
         thread_manager_->register_thread(data, id);
-        this->runtime::starting();
+
         // }}}
 
         // block if required
@@ -526,6 +529,88 @@ namespace hpx {
 
         std::lock_guard<compat::mutex> l(mtx);
         cond.notify_all();                  // we're done now
+    }
+
+    int runtime_impl::suspend()
+    {
+        std::uint32_t initial_num_localities = get_initial_num_localities();
+        if (initial_num_localities > 1)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "runtime_impl::suspend",
+                "Can only suspend runtime when number of localities is 1");
+            return -1;
+        }
+
+        LRT_(info) << "runtime_impl: about to suspend runtime";
+
+        if (state_.load() == state_sleeping)
+        {
+            return 0;
+        }
+
+        if (state_.load() != state_running)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "runtime_impl::suspend",
+                "Can only suspend runtime from running state");
+            return -1;
+        }
+
+        util::yield_while(
+            [this]()
+            {
+                return thread_manager_->get_thread_count() >
+                    thread_manager_->get_background_thread_count();
+            }, "runtime_impl::suspend");
+
+        thread_manager_->suspend();
+
+        // Ignore parcel pools because suspension can only be done with one
+        // locality
+#ifdef HPX_HAVE_TIMER_POOL
+        timer_pool_.wait();
+#endif
+#ifdef HPX_HAVE_IO_POOL
+        io_pool_.wait();
+#endif
+
+        set_state(state_sleeping);
+
+        return 0;
+    }
+
+    int runtime_impl::resume()
+    {
+        std::uint32_t initial_num_localities = get_initial_num_localities();
+        if (initial_num_localities > 1)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "runtime_impl::resume",
+                "Can only suspend runtime when number of localities is 1");
+            return -1;
+        }
+
+        LRT_(info) << "runtime_impl: about to resume runtime";
+
+        if (state_.load() == state_running)
+        {
+            return 0;
+        }
+
+        if (state_.load() != state_sleeping)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "runtime_impl::resume",
+                "Can only resume runtime from suspended state");
+            return -1;
+        }
+
+        thread_manager_->resume();
+
+        set_state(state_running);
+
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

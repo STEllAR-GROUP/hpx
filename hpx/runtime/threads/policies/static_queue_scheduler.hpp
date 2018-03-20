@@ -70,13 +70,13 @@ namespace hpx { namespace threads { namespace policies
             return "static_queue_scheduler";
         }
 
-        void suspend(std::size_t)
+        void suspend(std::size_t) override
         {
             HPX_ASSERT_MSG(false, "static_queue_scheduler does not support"
                 " suspending");
         }
 
-        void resume(std::size_t)
+        void resume(std::size_t) override
         {
             HPX_ASSERT_MSG(false, "static_queue_scheduler does not support"
                 " resuming");
@@ -84,8 +84,8 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread, bool,
-            std::int64_t& idle_loop_count, threads::thread_data*& thrd)
+        bool get_next_thread(std::size_t num_thread, bool,
+            std::int64_t& idle_loop_count, threads::thread_data*& thrd) override
         {
             typedef typename base_type::thread_queue_type thread_queue_type;
 
@@ -110,8 +110,8 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count)
+        bool wait_or_add_new(std::size_t num_thread, bool running,
+            std::int64_t& idle_loop_count) override
         {
             std::size_t queues_size = this->queues_.size();
             HPX_ASSERT(num_thread < queues_size);

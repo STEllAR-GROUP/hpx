@@ -10,19 +10,21 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <numeric>
 #include <iostream>
+#include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dis(2, 101);
 
     int const N = 100;
     std::vector<int> h_A(N);
@@ -30,8 +32,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::vector<int> h_C_ref(N);
     std::vector<int> h_C(N);
 
-    std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
-    std::iota(h_B.begin(), h_B.end(), (std::rand() % 100) + 2);
+    std::iota(h_A.begin(), h_A.end(), dis(gen));
+    std::iota(h_B.begin(), h_B.end(), dis(gen);
 
     std::transform(h_A.begin(), h_A.end(), h_B.begin(), h_C_ref.begin(),
         [](int a, int b) { return a + b; });

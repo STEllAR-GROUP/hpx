@@ -9,6 +9,7 @@
 
 #include <hpx/parallel/algorithms/count.hpp>
 #include <hpx/parallel/segmented_algorithms/count.hpp>
+#include <hpx/parallel/container_algorithms/count.hpp>
 
 #endif
 

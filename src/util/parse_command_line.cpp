@@ -408,7 +408,6 @@ namespace hpx { namespace util
                 ("hpx:expect-connecting-localities",
                   "this locality expects other localities to dynamically connect "
                   "(implied if the number of initial localities is larger than 1)")
-#if defined(HPX_HAVE_HWLOC) || defined(HPX_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
@@ -421,8 +420,6 @@ namespace hpx { namespace util
                   "--hpx:queuing=local, --hpx:queuing=abp-priority, "
                   "--hpx:queuing=static, --hpx:queuing=static-priority "
                   "and --hpx:queuing=local-priority only")
-#endif
-#if defined(HPX_HAVE_HWLOC)
                 ("hpx:affinity", value<std::string>(),
                   "the affinity domain the OS threads will be confined to, "
                   "possible values: pu, core, numa, machine (default: pu), valid for "
@@ -438,7 +435,6 @@ namespace hpx { namespace util
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")
-#endif
                 ("hpx:threads", value<std::string>(),
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
@@ -450,13 +446,9 @@ namespace hpx { namespace util
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are "
                   "'local', 'local-priority-fifo','local-priority-lifo', "
-                  "'abp-priority', "
-                  "'hierarchy', 'static', 'static-priority', and "
-                  "'periodic-priority' (default: 'local-priority'; "
+                  "'abp-priority-fifo', 'abp-priority-lifo', 'static', and "
+                  "'static-priority' (default: 'local-priority'; "
                   "all option values can be abbreviated)")
-                ("hpx:hierarchy-arity", value<std::size_t>(),
-                  "the arity of the of the thread queue tree, valid for "
-                   "--hpx:queuing=hierarchy only (default: 2)")
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
@@ -501,6 +493,9 @@ namespace hpx { namespace util
                 ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the timing log channel and send all "
                   "timing logs to the target destination")
+                ("hpx:debug-app-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the application log channel and send all "
+                  "application logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)

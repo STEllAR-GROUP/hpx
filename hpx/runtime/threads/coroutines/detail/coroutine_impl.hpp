@@ -44,8 +44,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/intrusive_ptr.hpp>
-
 #include <cstddef>
 #include <utility>
 
@@ -69,68 +67,30 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
         typedef util::unique_function_nonser<result_type(arg_type)> functor_type;
 
-        typedef boost::intrusive_ptr<coroutine_impl> pointer;
-
         coroutine_impl(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size)
           : context_base(*this, stack_size, id)
-          , m_result_last(std::make_pair(thread_state_enum::unknown,
-                thread_id_type(nullptr)))
+          , m_result(unknown, invalid_thread_id)
           , m_arg(nullptr)
-          , m_result(nullptr)
           , m_fun(std::move(f))
         {}
 
-        ~coroutine_impl()
 #if defined(HPX_DEBUG)
-            ;
-#else
-        {}
+        HPX_EXPORT ~coroutine_impl();
 #endif
 
-        static inline coroutine_impl* create(
-            functor_type&& f, thread_id_type id,
-            std::ptrdiff_t stack_size = default_stack_size)
-        {
-            coroutine_impl* p = allocate(id, stack_size);
-
-            if (!p)
-            {
-                std::size_t const heap_num = std::size_t(id.get()) / 32; //-V112
-
-                // allocate a new coroutine object, if non is available (or all
-                // heaps are locked)
-                context_base::increment_allocation_count(heap_num);
-                p = new coroutine_impl(std::move(f),
-                    id, stack_size);
-            } else {
-                // we reuse an existing object, we need to rebind its function
-                p->rebind(std::move(f), id);
-            }
-            return p;
-        }
-
-        static inline void rebind(
-            coroutine_impl* p, functor_type&& f, thread_id_type id)
-        {
-            p->rebind(std::move(f), id);
-        }
-
-        static inline void destroy(coroutine_impl* p)
-        {
-            // always hand the stack back to the matching heap
-            deallocate(p);
-        }
-
-        HPX_EXPORT void operator()();
+        HPX_EXPORT void operator()() noexcept;
 
     public:
-        result_type * result()
+        void bind_result(result_type res)
         {
-            HPX_ASSERT(m_result);
-            return *this->m_result;
+            m_result = res;
         }
 
+        result_type result() const
+        {
+            return m_result;
+        }
         arg_type * args()
         {
             HPX_ASSERT(m_arg);
@@ -140,18 +100,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         void bind_args(arg_type* arg)
         {
             m_arg = arg;
-        }
-
-        void bind_result(result_type* res)
-        {
-            *m_result = res;
-        }
-
-        // Another level of indirection is needed to handle
-        // yield_to correctly.
-        void bind_result_pointer(result_type** resp)
-        {
-            m_result = resp;
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
@@ -175,16 +123,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             this->super_type::rebind_base(id);
         }
 
-    private:
-        static HPX_EXPORT coroutine_impl* allocate(
-            thread_id_type id, std::ptrdiff_t stacksize);
-
-        static HPX_EXPORT void deallocate(coroutine_impl* wrapper);
 
     private:
-        result_type m_result_last;
+        result_type m_result;
         arg_type* m_arg;
-        result_type** m_result;
 
         functor_type m_fun;
     };

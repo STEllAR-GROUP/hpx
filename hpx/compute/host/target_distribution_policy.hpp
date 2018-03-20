@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/dataflow.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>

@@ -12,6 +12,7 @@
 
 * Download the Boost c++ libraries from __boost_downloads__
 * Install the boost library as explained in the section __boost_installation__
+* Install the hwloc library as explained in the section __hwloc_installation__
 * Download the latest version of __cmake__ binaries, which are located under
   the platform section of the downloads page at __cmake_download__.
 * Download the latest version of __hpx__ from the __stellar__ website:

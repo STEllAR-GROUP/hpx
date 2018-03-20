@@ -387,13 +387,6 @@ void any_of_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
-    if (vm.count("seed"))
-        seed = vm["seed"].as<unsigned int>();
-
-    std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
-
     any_of_test();
     any_of_exception_test();
     any_of_bad_alloc_test();
@@ -406,11 +399,6 @@ int main(int argc, char* argv[])
     using namespace boost::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
-
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
 
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {

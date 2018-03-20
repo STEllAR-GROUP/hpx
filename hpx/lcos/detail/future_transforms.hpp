@@ -6,6 +6,7 @@
 #ifndef HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP
 #define HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP
 
+#include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
@@ -30,7 +31,7 @@ namespace lcos {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         bool async_visit_future(T&& current)
         {
-            auto state =
+            auto const& state =
                 traits::detail::get_shared_state(std::forward<T>(current));
 
             if ((state.get() == nullptr) || state->is_ready())
@@ -51,7 +52,7 @@ namespace lcos {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         void async_detach_future(T&& current, N&& next)
         {
-            auto state =
+            auto const& state =
                 traits::detail::get_shared_state(std::forward<T>(current));
 
             // Attach a continuation to this future which will

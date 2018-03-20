@@ -95,7 +95,7 @@ namespace hpx { namespace threads { namespace coroutines
             return IsThreadAFiber() ? true : false;
 #else
             fiber_ptr current = GetCurrentFiber();
-            return current != 0 && current != fiber_magic;
+            return current != nullptr && current != fiber_magic;
 #endif
         }
 
@@ -219,7 +219,7 @@ namespace hpx { namespace threads { namespace coroutines
 
             ~fibers_context_impl()
             {
-                if (m_ctx)
+                if (m_ctx != nullptr)
                     DeleteFiber(m_ctx);
             }
 

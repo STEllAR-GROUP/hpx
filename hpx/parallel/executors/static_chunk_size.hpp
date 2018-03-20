@@ -12,7 +12,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 
-#include <hpx/parallel/executors/execution_parameters.hpp>
+#include <hpx/parallel/executors/execution_parameters_fwd.hpp>
 
 #include <cstddef>
 #include <type_traits>

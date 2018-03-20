@@ -987,6 +987,14 @@ namespace hpx { namespace performance_counters
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
+            else if (p.countername_ == "count") {
+                typedef hpx::components::component<
+                    performance_counters::server::arithmetics_counter_extended<
+                        boost::accumulators::tag::count>
+                > counter_t;
+                gid = components::server::construct<counter_t>(
+                    complemented_info, base_counter_names);
+            }
             else {
                 HPX_THROWS_IF(ec, bad_parameter,
                     "registry::create_arithmetics_counter",

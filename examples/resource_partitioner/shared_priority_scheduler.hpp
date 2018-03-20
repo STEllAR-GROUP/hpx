@@ -603,7 +603,8 @@ namespace threads {
             // to pending
             void create_thread(thread_init_data& data, thread_id_type* thrd,
                 thread_state_enum initial_state, bool run_now, error_code& ec,
-                std::size_t pool_queue_num)
+                std::size_t pool_queue_num,
+                std::size_t /*pool_queue_num_fallback*/)
             {
                 HPX_ASSERT(data.scheduler_base == this);
 
@@ -787,6 +788,7 @@ namespace threads {
             /// Schedule the passed thread
             void schedule_thread(threads::thread_data* thrd,
                 std::size_t pool_queue_num,
+                std::size_t /*pool_queue_num_fallback*/,
                 thread_priority priority = thread_priority_normal)
             {
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -826,6 +828,7 @@ namespace threads {
             /// Put task on the back of the queue
             void schedule_thread_last(threads::thread_data* thrd,
                 std::size_t num_queue,
+                std::size_t /*num_queue_fallback*/,
                 thread_priority priority = thread_priority_normal)
             {
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -859,7 +862,7 @@ namespace threads {
             }
 
             /// Destroy the passed thread - as it has been terminated
-            bool destroy_thread(
+            void destroy_thread(
                 threads::thread_data* thrd, std::int64_t& busy_count)
             {
                 LOG_CUSTOM_MSG("destroy thread " << THREAD_DESC(thrd)
@@ -867,26 +870,8 @@ namespace threads {
                                                  << decnumber(busy_count));
                 HPX_ASSERT(thrd->get_scheduler_base() == this);
 
-                for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                {
-                    if (high_priority_queues_[i]->destroy_thread(
-                            thrd, busy_count))
-                        return true;
-                }
-
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                {
-                    if (queues_[i]->destroy_thread(thrd, busy_count))
-                        return true;
-                }
-
-                if (low_priority_queue_.destroy_thread(thrd, busy_count))
-                    return true;
-
-                // the thread has to belong to one of the queues, always
-                HPX_ASSERT(false);
-
-                return false;
+                HPX_ASSERT(thrd->get_scheduler_base() == this);
+                thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
             }
 
             ///////////////////////////////////////////////////////////////////////

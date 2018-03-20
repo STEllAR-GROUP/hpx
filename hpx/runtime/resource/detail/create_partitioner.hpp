@@ -9,7 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/util/bind_back.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/program_options.hpp>
 
@@ -23,6 +25,13 @@
 int hpx_main(boost::program_options::variables_map& vm);
 typedef int (*hpx_main_type)(boost::program_options::variables_map&);
 #endif
+
+namespace hpx { namespace detail
+{
+    HPX_EXPORT int init_helper(
+        boost::program_options::variables_map&,
+        util::function_nonser<int(int, char**)> const&);
+}}
 
 namespace hpx { namespace resource { namespace detail
 {
@@ -54,6 +63,36 @@ namespace hpx { namespace resource { namespace detail
         return create_partitioner(static_cast<hpx_main_type>(::hpx_main),
             desc_cmdline, argc, argv, std::vector<std::string>(),
             rpmode, mode, check);
+    }
+
+    inline partitioner& create_partitioner(
+        util::function_nonser<int(int, char**)> const& f, int argc, char** argv,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
+    {
+        boost::program_options::options_description desc_cmdline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(util::bind_back(hpx::detail::init_helper, f),
+            desc_cmdline, argc, argv, std::vector<std::string>(), rpmode, mode,
+            check);
+    }
+
+    inline partitioner& create_partitioner(
+        util::function_nonser<int(int, char**)> const& f, int argc, char** argv,
+        std::vector<std::string> const& cfg,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
+    {
+        boost::program_options::options_description desc_cmdline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(util::bind_back(hpx::detail::init_helper, f),
+            desc_cmdline, argc, argv, cfg, rpmode, mode, check);
     }
 
     inline partitioner &create_partitioner(

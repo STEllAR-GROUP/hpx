@@ -229,6 +229,7 @@ primary_namespace::begin_migration(naming::gid_type id)
 
     std::unique_lock<mutex_type> l(mutex_);
 
+    wait_for_migration_locked(l, id, hpx::throws);
     resolved_type r = resolve_gid_locked(l, id, hpx::throws);
     if (get<0>(r) == naming::invalid_gid)
     {
@@ -249,6 +250,10 @@ primary_namespace::begin_migration(naming::gid_type id)
                 std::forward_as_tuple(id), std::forward_as_tuple());
         HPX_ASSERT(p.second);
         it = p.first;
+    }
+    else
+    {
+        HPX_ASSERT(hpx::util::get<0>(it->second) == false);
     }
 
     // flag this id as being migrated
@@ -276,14 +281,10 @@ bool primary_namespace::end_migration(naming::gid_type id)
     if (it == migrating_objects_.end() || !get<0>(it->second))
         return false;
 
-    // ignore before notifying everyone about the ended migration.
-    {
-        hpx::util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
-        get<2>(it->second).notify_all(hpx::throws);
-    }
-
     // flag this id as not being migrated anymore
     get<0>(it->second) = false;
+
+    get<2>(it->second).notify_all(std::move(l), hpx::throws);
 
     return true;
 }
@@ -305,7 +306,8 @@ void primary_namespace::wait_for_migration_locked(
 
         get<2>(it->second).wait(l, ec);
 
-        if (--get<1>(it->second) == 0 && !get<0>(it->second))
+        HPX_ASSERT(hpx::util::get<0>(it->second) == false);
+        if (--get<1>(it->second) == 0)
             migrating_objects_.erase(it);
     }
 }
@@ -1082,9 +1084,22 @@ void primary_namespace::free_components_sync(
         HPX_ASSERT(e.locality_ == e.gva_.prefix);
         naming::address addr(e.locality_, e.gva_.type, e.gva_.lva());
         if (e.locality_ == locality_)
-            components::deleter(e.gva_.type)(e.gid_, std::move(addr));
+        {
+            auto deleter = components::deleter(e.gva_.type);
+            if (deleter == nullptr)
+            {
+                HPX_THROWS_IF(ec, internal_server_error,
+                    "primary_namespace::free_components_sync",
+                    "Attempting to delete object of unknown component type: "
+                        + std::to_string(e.gva_.type));
+                return;
+            }
+            deleter(e.gid_, std::move(addr));
+        }
         else
+        {
             components::server::destroy_component(e.gid_, addr);
+        }
     }
 
     if (&ec != &throws)

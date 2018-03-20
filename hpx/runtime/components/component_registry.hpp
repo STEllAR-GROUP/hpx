@@ -119,7 +119,7 @@ namespace hpx { namespace components
         {
             typedef typename Component::type_holder type_holder;
 
-            const char* name = components::get_component_name<type_holder>();
+            char const* name = components::get_component_name<type_holder>();
             bool enabled = true;
             hpx::util::runtime_configuration const& config = hpx::get_config();
             std::string enabled_entry = config.get_entry(

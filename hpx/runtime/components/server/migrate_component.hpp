@@ -227,25 +227,17 @@ namespace hpx { namespace components { namespace server
                     "responsible for managing the address of the given object"));
         }
 
-        return agas::begin_migration(to_migrate)
-            .then(
-                [=](future<std::pair<id_type, naming::address> > && f)
-                    ->  future<id_type>
-                {
-                    // rethrow errors
-                    std::pair<id_type, naming::address> r = f.get();
+        auto r = agas::begin_migration(to_migrate);
 
-                    // perform actual object migration
-                    typedef migrate_component_action<
-                            Component, DistPolicy
-                        > action_type;
-                    return async<action_type>(r.first, to_migrate, r.second,
-                        policy);
-                })
-            .then(
+        // perform actual object migration
+        typedef migrate_component_action<
+                Component, DistPolicy
+            > action_type;
+        return async<action_type>(r.first, to_migrate, r.second,
+            policy).then(
                 [to_migrate](future<id_type> && f) -> id_type
                 {
-                    agas::end_migration(to_migrate).get();
+                    agas::end_migration(to_migrate);
                     return f.get();
                 });
     }

@@ -47,7 +47,6 @@ add_hpx_executable(launched_process_test
   COMPONENT_DEPENDENCIES launch_process_test_server)
 
 set(action_invoke_no_more_than_PARAMETERS
-    LOCALITIES 2
     THREADS_PER_LOCALITY 4)
 set(action_invoke_no_more_than_FLAGS
     DEPENDENCIES iostreams_component)

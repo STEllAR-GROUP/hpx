@@ -40,12 +40,14 @@ int hpx_main(boost::program_options::variables_map& vm)
             accu[i].init(i);
         }
 
-        std::srand((unsigned int)std::time(nullptr));
+        auto seed = std::random_device{}();
+        std::mt19937 gen(seed);
 
         std::vector<hpx::future<void> > barrier;
         for (std::size_t i = 0; i < iterations; i++)
         {
-            std::size_t rn = std::rand() % array_size;
+            std::uniform_int_distribution<> dis(0, array_size-1);
+            std::size_t rn = dis(gen);
             //std::cout << " Random element access: " << rn << std::endl;
             barrier.push_back(accu[rn].add_async());
         }

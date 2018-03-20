@@ -11,6 +11,7 @@ set(tests
     function_argument
     function_serialization_728
     iarchive_1237
+    optional_swap_3200
     protect_with_nullary_pfo
     serialize_buffer_1069
     set_config_entry_deadlock

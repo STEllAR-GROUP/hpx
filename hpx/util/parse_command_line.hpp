@@ -67,7 +67,7 @@ namespace hpx { namespace util
     {
         inline std::string enquote(std::string const& arg)
         {
-            if (arg.find_first_of(" \t") != std::string::npos)
+            if (arg.find_first_of(" \t\"") != std::string::npos)
                 return std::string("\"") + arg + "\"";
             return arg;
         }

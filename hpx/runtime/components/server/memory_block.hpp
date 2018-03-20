@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
@@ -454,6 +455,7 @@ namespace hpx { namespace components { namespace server
     public:
         typedef detail::memory_block_header wrapped_type;
         typedef memory_block type_holder;
+        typedef memory_block base_type_holder;
 
         /// \brief Construct an empty managed_component
         memory_block()
@@ -499,6 +501,7 @@ namespace hpx { namespace components { namespace server
             component_.reset(p);
         }
 
+    public:
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
         ///
@@ -703,6 +706,42 @@ namespace hpx { namespace components { namespace server
             HPX_ASSERT(wrapper_);
             return wrapper_->get_base_gid();
         }
+    }
+
+    template <>
+    inline void destroy<memory_block>(
+        naming::gid_type const& gid, naming::address const& addr)
+    {
+        // make sure this component is located here
+        components::component_type type =
+            components::get_component_type<memory_block>();
+        if (get_locality() != addr.locality_)
+        {
+            std::ostringstream strm;
+            strm << "global id " << gid << " should not have been migrated "
+                    "instance of type: memory_block";
+            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                "destroy<memory_block>", strm.str());
+            return;
+        }
+
+        // make sure it's the correct component type
+        if (!types_are_compatible(type, addr.type_))
+        {
+            std::ostringstream strm;
+            strm << "global id " << gid << " is not bound to a component "
+                    "instance of type: " << get_component_type_name(type)
+                 << " (it is bound to a " << get_component_type_name(addr.type_)
+                 << ")";
+            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                "destroy<memory_block>", strm.str());
+            return;
+        }
+
+        --instance_count(type);
+
+        // delete the local instances
+        memory_block::destroy(reinterpret_cast<memory_block*>(addr.address_));
     }
 }}}
 

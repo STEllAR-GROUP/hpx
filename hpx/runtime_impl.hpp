@@ -51,7 +51,7 @@ namespace hpx
 
         //
         threads::thread_result_type run_helper(
-            util::function_nonser<runtime::hpx_main_function_type> func,
+            util::function_nonser<runtime::hpx_main_function_type> const& func,
             int& result);
 
         void wait_helper(compat::mutex& mtx, compat::condition_variable& cond,
@@ -134,6 +134,14 @@ namespace hpx
         ///                   all internal work to be completed.
         void stopped(bool blocking, compat::condition_variable& cond,
             compat::mutex& mtx);
+
+        /// \brief Suspend the runtime system
+        ///
+        int suspend();
+
+        /// \brief Resume the runtime system
+        ///
+        int resume();
 
         /// \brief Report a non-recoverable error to the runtime system
         ///

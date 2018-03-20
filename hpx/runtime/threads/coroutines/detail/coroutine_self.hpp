@@ -91,7 +91,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             HPX_ASSERT(m_pimpl);
 
-            this->m_pimpl->bind_result(&arg);
+            this->m_pimpl->bind_result(arg);
 
             {
                 reset_self_on_exit on_exit(this);
@@ -127,18 +127,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             yield_decorator_type tmp;
             std::swap(tmp, yield_decorator_);
             return tmp;
-        }
-
-        HPX_NORETURN void exit()
-        {
-            m_pimpl->exit_self();
-            std::terminate(); // FIXME: replace with hpx::terminate();
-        }
-
-        bool pending() const
-        {
-            HPX_ASSERT(m_pimpl);
-            return m_pimpl->pending() != 0;
         }
 
         thread_id_type get_thread_id() const

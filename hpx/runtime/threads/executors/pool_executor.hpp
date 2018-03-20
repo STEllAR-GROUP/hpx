@@ -7,8 +7,8 @@
 #define HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
 
 #include <hpx/compat/mutex.hpp>
-#include <hpx/runtime/threads/detail/thread_pool_base.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -77,7 +77,7 @@ namespace hpx { namespace threads { namespace executors
                 closure_type func);
 
         private:
-            typedef hpx::threads::detail::thread_pool_base pool_type;
+            typedef hpx::threads::thread_pool_base pool_type;
 
             // the scheduler used by this executor
             pool_type& pool_;
@@ -95,12 +95,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT pool_executor : public scheduled_executor
     {
-        pool_executor(const std::string& pool_name);
+        pool_executor() = default;
 
-        pool_executor(const std::string& pool_name,
+        pool_executor(std::string const& pool_name);
+
+        pool_executor(std::string const& pool_name,
                 thread_stacksize stacksize);
 
-        pool_executor(const std::string& pool_name,
+        pool_executor(std::string const& pool_name,
                 thread_priority priority,
                 thread_stacksize stacksize = thread_stacksize_default);
     };

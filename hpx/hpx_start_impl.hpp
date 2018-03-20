@@ -55,7 +55,7 @@ namespace hpx
     /// This is the main, non-blocking entry point for any HPX application.
     /// This function (or one of its overloads below) should be called from the
     /// users `main()` function. It will set up the HPX runtime environment and
-    /// schedule the function given by \p f as a HPX thread. It will return
+    /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     inline bool start(
@@ -84,7 +84,7 @@ namespace hpx
     /// This is the main, non-blocking entry point for any HPX application.
     /// This function (or one of its overloads below) should be called from the
     /// users `main()` function. It will set up the HPX runtime environment and
-    /// schedule the function given by \p f as a HPX thread. It will return
+    /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     inline bool
