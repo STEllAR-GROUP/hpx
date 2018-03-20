@@ -484,6 +484,8 @@ namespace hpx { namespace components
 
         template <typename Component_, typename...Ts>
         friend std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&...ts);
+#else
+    public:
 #endif
 
         naming::gid_type get_base_gid(
