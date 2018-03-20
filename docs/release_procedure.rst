@@ -121,11 +121,6 @@ the lines as they are completed to avoid confusion.
     *   ``CMakeLists.txt``
     *   Grep for old version number
 
-#.  Update ``$HPX_SOURCE/README.rst``
-
-    *   Update version (to the about-to-be-released version)
-    *   Update links to documentation
-
 #.  Create a new "What's New" section for the docs of the next anticipated release.
     Move the old (now current) "What's New" section to the section for the previous
     releases.
@@ -136,6 +131,13 @@ the lines as they are completed to avoid confusion.
 
 #.  Push changes to new branch numbered after the next release (not the current
     one).
+
+#.  Checkout the release branch.
+
+#.  Update ``$HPX_SOURCE/README.rst``
+
+    *   Update version (to the about-to-be-released version)
+    *   Update links to documentation
 
 #.  Add the release date to the caption of the current "What's New" section in
     the docs.
