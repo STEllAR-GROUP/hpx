@@ -103,7 +103,7 @@ the lines as they are completed to avoid confusion.
 
 #.  Switch Buildbot over to test the release branch
 
-    *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/master/master/master.cfg
+    *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg
     *   Line 120
 
 #.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
@@ -186,6 +186,11 @@ the lines as they are completed to avoid confusion.
 
 #.  Merge new branch containing next version numbers to master, resolve conflicts
     if necessary.
+
+#.  Switch Buildbot back to test the main branch
+
+    *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg
+    *   Line 120
 
 #.  Update Vcpkg (https://github.com/Microsoft/vcpkg) to pull from latest release.
 
