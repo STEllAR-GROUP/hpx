@@ -75,14 +75,14 @@ namespace hpx { namespace util
         explicit annotate_function(char const* name)
         {
             threads::set_self_apex_data(
-                apex_update_task(threads::get_self_apex_data(), 
+                apex_update_task(threads::get_self_apex_data(),
                 name));
         }
         template <typename F>
         explicit annotate_function(F && f)
         {
             threads::set_self_apex_data(
-                apex_update_task(threads::get_self_apex_data(), 
+                apex_update_task(threads::get_self_apex_data(),
                 hpx::util::thread_description(f)));
         }
     };

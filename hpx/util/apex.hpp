@@ -38,7 +38,7 @@ namespace hpx { namespace util
     inline void * apex_new_task(
                 thread_description const& description)
     {
-        if (description.kind() == 
+        if (description.kind() ==
                 thread_description::data_type_description) {
             return (void*)apex::new_task(description.get_description());
         } else {
@@ -51,14 +51,14 @@ namespace hpx { namespace util
         return (void*)apex::new_task(name);
     }
 
-    inline void * apex_update_task(void * wrapper, 
+    inline void * apex_update_task(void * wrapper,
                 thread_description const& description)
     {
         if (description.kind() == thread_description::data_type_description) {
-            return (void*)apex::update_task((apex::task_wrapper*)wrapper, 
+            return (void*)apex::update_task((apex::task_wrapper*)wrapper,
                 description.get_description());
         } else {
-            return (void*)apex::update_task((apex::task_wrapper*)wrapper, 
+            return (void*)apex::update_task((apex::task_wrapper*)wrapper,
                 description.get_address());
         }
     }
