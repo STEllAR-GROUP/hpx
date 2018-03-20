@@ -42,7 +42,7 @@ the lines as they are completed to avoid confusion.
 
     *   ``$HPX_SOURCE/README.rst``
          *   Update grant information
-    *   ``docs/whats_new.qbk``
+    *   ``docs/releases/whats_new_$VERSION.qbk``
     *   ``docs/people.qbk``
          *   Update collaborators
          *   Update grant information
@@ -121,23 +121,23 @@ the lines as they are completed to avoid confusion.
     *   ``CMakeLists.txt``
     *   Grep for old version number
 
-#.  Create a new 'What's New' section for the docs of the next anticipated release.
-    Move the old (now current) 'What's New' section to the section for the previous
+#.  Update ``$HPX_SOURCE/README.rst``
+
+    *   Update version (to the about-to-be-released version)
+    *   Update links to documentation
+
+#.  Create a new "What's New" section for the docs of the next anticipated release.
+    Move the old (now current) "What's New" section to the section for the previous
     releases.
 
 #.  Create new logos for documentation. Change logo by adding ``_draft`` suffix
     in ``docs/cmakelist.txt`` in the ``set(image...`` call. Update logo size
     accordingly in the call to ``hpx_quickbook_to_html``.
 
-#.  Update ``$HPX_SOURCE/README.rst``
-
-    *   Update version
-    *   Update links to documentation
-
 #.  Push changes to new branch numbered after the next release (not the current
     one).
 
-#.  Add the release date to the caption of the current 'What's New' section in
+#.  Add the release date to the caption of the current "What's New" section in
     the docs.
 
 #.  Tag the release.
