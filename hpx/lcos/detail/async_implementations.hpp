@@ -368,7 +368,8 @@ namespace hpx { namespace detail
                             id, std::move(addr), std::forward<Ts>(vs)...);
                     } else {
                         f = hpx::async(action_invoker<action_type>(),
-                                       addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                                       addr.address_,
+                                       addr.type_, std::forward<Ts>(vs)...);
 
                         return keep_alive(std::move(f), id, std::move(r.second));
                     }
