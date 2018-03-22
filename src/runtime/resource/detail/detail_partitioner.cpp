@@ -150,15 +150,6 @@ namespace hpx { namespace resource { namespace detail
         case resource::abp_priority_lifo:
             sched = "abp_priority_lifo";
             break;
-        case resource::hierarchy:
-            sched = "hierarchy";
-            break;
-        case resource::periodic_priority:
-            sched = "periodic_priority";
-            break;
-        case resource::throttle:
-            sched = "throttle";
-            break;
         }
 
         os << "\"" << sched << "\" is running on PUs : \n";
@@ -438,18 +429,6 @@ namespace hpx { namespace resource { namespace detail
         else if (0 == std::string("abp-priority-lifo").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::abp_priority_lifo;
-        }
-        else if (0 == std::string("hierarchy").find(cfg_.queuing_))
-        {
-            default_scheduler = scheduling_policy::hierarchy;
-        }
-        else if (0 == std::string("periodic-priority").find(cfg_.queuing_))
-        {
-            default_scheduler = scheduling_policy::periodic_priority;
-        }
-        else if (0 == std::string("throttle").find(cfg_.queuing_))
-        {
-            default_scheduler = scheduling_policy::throttle;
         }
         else
         {

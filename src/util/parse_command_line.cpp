@@ -446,13 +446,9 @@ namespace hpx { namespace util
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are "
                   "'local', 'local-priority-fifo','local-priority-lifo', "
-                  "'abp-priority-fifo', 'abp-priority-lifo', "
-                  "'hierarchy', 'static', 'static-priority', and "
-                  "'periodic-priority' (default: 'local-priority'; "
+                  "'abp-priority-fifo', 'abp-priority-lifo', 'static', and "
+                  "'static-priority' (default: 'local-priority'; "
                   "all option values can be abbreviated)")
-                ("hpx:hierarchy-arity", value<std::size_t>(),
-                  "the arity of the of the thread queue tree, valid for "
-                   "--hpx:queuing=hierarchy only (default: 2)")
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "

@@ -605,7 +605,7 @@ hpx_option(HPX_WITH_ITTNOTIFY BOOL
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, static, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -630,21 +630,6 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "STATIC" OR _all)
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "HIERARCHY" OR _all)
-    hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
-    set(HPX_WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-    set(HPX_WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  # The throttling scheduler has not been tested neither on Windows nor on Mac
-  if(NOT WIN32 AND NOT APPLE)
-    if(_scheduler STREQUAL "THROTTLLING" OR _all)
-      hpx_add_config_define(HPX_HAVE_THROTTLING_SCHEDULER)
-      set(HPX_WITH_THROTTLING_SCHEDULER ON CACHE INTERNAL "")
-    endif()
   endif()
   unset(_all)
 endforeach()
