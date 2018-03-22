@@ -715,11 +715,12 @@ namespace hpx { namespace threads { namespace detail
             {
                 ++idle_loop_count;
 
-                if (scheduler.SchedulingPolicy::cleanup_terminated(num_thread, true))
+                if (!running)
                 {
                     // Clean up terminated threads before trying to exit
                     bool can_exit =
-                        !running &&
+                        scheduler.SchedulingPolicy::cleanup_terminated(
+                            num_thread, true) &&
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
