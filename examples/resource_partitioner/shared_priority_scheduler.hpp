@@ -340,7 +340,7 @@ namespace policies {
     public:
         typedef std::false_type has_periodic_maintenance;
 
-        typedef thread_queue<Mutex, PendingQueuing, StagedQueuing,
+        typedef thread_queue<Mutex, PendingQueuing,
             TerminatedQueuing>
             thread_queue_type;
 
@@ -963,6 +963,7 @@ return cleanup_terminated(delete_all);
         /// Put task on the back of the queue
         void schedule_thread_last(threads::thread_data* thrd,
             std::size_t pool_queue_num,
+            std::size_t,
             thread_priority priority = thread_priority_normal)
         {
 
