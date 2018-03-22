@@ -97,9 +97,13 @@ namespace hpx { namespace threads { namespace coroutines
         }
 
 #if defined(HPX_HAVE_APEX)
-        void** get_apex_data() const
+        void* get_apex_data() const
         {
             return impl_.get_apex_data();
+        }
+        void set_apex_data(void * data)
+        {
+            return impl_.set_apex_data(data);
         }
 #endif
 

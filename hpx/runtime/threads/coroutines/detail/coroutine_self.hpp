@@ -197,10 +197,15 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         static HPX_EXPORT void reset_self();
 
 #if defined(HPX_HAVE_APEX)
-        void** get_apex_data() const
+        void* get_apex_data(void) const
         {
             HPX_ASSERT(m_pimpl);
             return m_pimpl->get_apex_data();
+        }
+        void set_apex_data(void * data)
+        {
+            HPX_ASSERT(m_pimpl);
+            m_pimpl->set_apex_data(data);
         }
 #endif
 
