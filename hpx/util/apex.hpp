@@ -36,19 +36,17 @@ namespace hpx { namespace util
     }
 
     inline void * apex_new_task(
-                thread_description const& description)
+                thread_description const& description,
+                void * parent_task)
     {
         if (description.kind() ==
                 thread_description::data_type_description) {
-            return (void*)apex::new_task(description.get_description());
+            return (void*)apex::new_task(description.get_description(),
+                UINTMAX_MAX, (apex::task_wrapper*)parent_task);
         } else {
-            return (void*)apex::new_task(description.get_address());
+            return (void*)apex::new_task(description.get_address(),
+                UINTMAX_MAX, (apex::task_wrapper*)parent_task);
         }
-    }
-
-    inline void * apex_new_task(char const* name)
-    {
-        return (void*)apex::new_task(name);
     }
 
     inline void * apex_update_task(void * wrapper,
@@ -68,6 +66,8 @@ namespace hpx { namespace util
         return (void*)apex::update_task((apex::task_wrapper*)wrapper, name);
     }
 
+    /* This is a scoped object around task scheduling to measure the time
+     * spent executing hpx threads */
     struct apex_wrapper
     {
         apex_wrapper(void* const data_ptr) : stopped(false), data_(nullptr)

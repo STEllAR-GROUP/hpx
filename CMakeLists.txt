@@ -1535,6 +1535,8 @@ if(HPX_WITH_APEX_NO_UPDATE)
   set(_hpx_apex_no_update NO_UPDATE)
 endif()
 if(HPX_WITH_APEX)
+  # We want to track parent dependencies
+  hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
   # handle APEX library
   include(GitExternal)
   git_external(apex

@@ -604,7 +604,13 @@ namespace hpx { namespace threads
                 parent_locality_id_ = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
-            set_apex_data(apex_new_task(get_description()));
+            if (parent_thread_id_) {
+                set_apex_data(apex_new_task(get_description(),
+                    parent_thread_id_.get()->get_apex_data()));
+            } else {
+                set_apex_data(apex_new_task(get_description(),
+                    nullptr));
+            }
 #endif
             HPX_ASSERT(init_data.stacksize != 0);
             HPX_ASSERT(coroutine_.is_ready());
