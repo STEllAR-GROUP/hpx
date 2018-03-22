@@ -77,7 +77,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
                     threads::register_thread_nullary(
                         util::deferred_call(put_parcel_ptr, pp,
                             dest_, std::move(messages_), std::move(handlers_)),
-                        "parcelhandler::put_parcel", threads::pending, true,
+                        "parcelhandler::put_parcel", threads::pending,
                         threads::thread_priority_boost);
                     return;
                 }

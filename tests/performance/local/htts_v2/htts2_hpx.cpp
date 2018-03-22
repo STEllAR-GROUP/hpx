@@ -97,7 +97,6 @@ struct hpx_driver : htts2::driver
                     std::ref(*this), _1)
               , nullptr // No HPX-thread name.
               , hpx::threads::pending
-              , false // Do not run immediately.
               , hpx::threads::thread_priority_normal
               , target_osthread // Place in the target OS-thread's queue.
                 );
