@@ -474,6 +474,7 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, error_code& ec) override
         {
             std::size_t num_thread = std::size_t(data.schedulehint);
+            std::size_t num_thread_fallback = std::size_t(-1);
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
 //             // try to figure out the NUMA node where the data lives
 //             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
