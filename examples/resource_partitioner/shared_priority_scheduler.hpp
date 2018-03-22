@@ -1,5 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach
+//  Copyright (c) 2017-2018 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -256,10 +255,10 @@ namespace policies {
         }
 
         // ----------------------------------------------------------------
-        inline QueueType * get_queue(std::size_t id) const
-        {
-            return queues_[get_queue_index(id)];
-        }
+//        inline QueueType * get_queue(std::size_t id) const
+//        {
+//            return queues_[get_queue_index(id)];
+//        }
 
         // ----------------------------------------------------------------
         inline bool get_next_thread(std::size_t id, threads::thread_data*& thrd)
@@ -771,9 +770,9 @@ return cleanup_terminated(delete_all);
                     data.priority = thread_priority_normal;
                 }
 
-                hp_queues_[domain_num].
-                    get_queue(modulo(q_index, hp_queues_[domain_num].num_cores))->
-                        create_thread(data, thrd, initial_state, ec);
+                hp_queues_[domain_num].queues_[hp_lookup_[
+                    modulo(q_index, hp_queues_[domain_num].num_cores)]]->
+                    create_thread(data, thrd, initial_state, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_high "
                                << "queue " << decnumber(q_index)
@@ -785,9 +784,9 @@ return cleanup_terminated(delete_all);
 
             if (data.priority == thread_priority_low)
             {
-                lp_queues_[domain_num].
-                    get_queue(modulo(q_index, lp_queues_[domain_num].num_cores))->
-                        create_thread(data, thrd, initial_state, ec);
+                lp_queues_[domain_num].queues_[lp_lookup_[
+                    modulo(q_index, lp_queues_[domain_num].num_cores)]]->
+                    create_thread(data, thrd, initial_state, ec);
 
                 LOG_CUSTOM_MSG("create_thread thread_priority_low "
                                << "queue " << decnumber(q_index)
@@ -798,9 +797,9 @@ return cleanup_terminated(delete_all);
             }
 
             // normal priority
-            np_queues_[domain_num].
-                get_queue(modulo(q_index, np_queues_[domain_num].num_cores))->
-                    create_thread(data, thrd, initial_state, ec);
+            np_queues_[domain_num].queues_[np_lookup_[
+                modulo(q_index, np_queues_[domain_num].num_cores)]]->
+                create_thread(data, thrd, initial_state, ec);
 
             LOG_CUSTOM_MSG2("create_thread thread_priority_normal "
                             << "queue " << decnumber(q_index)
@@ -934,7 +933,6 @@ return cleanup_terminated(delete_all);
                 LOG_CUSTOM_MSG("schedule_thread fallback domain " << domain_num
                                << " queue " << decnumber(pool_queue_num));
             }
-            std::size_t q_index = q_lookup_[pool_queue_num];
 
             LOG_CUSTOM_MSG("thread scheduled "
                           << "queue " << decnumber(pool_queue_num)
@@ -945,17 +943,17 @@ return cleanup_terminated(delete_all);
                 priority == thread_priority_high_recursive ||
                 priority == thread_priority_boost)
             {
-                hp_queues_[domain_num].get_queue(q_index)->
+                hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
                     schedule_thread(thrd, false);
             }
             else if (priority == thread_priority_low)
             {
-                lp_queues_[domain_num].get_queue(q_index)->
+                lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
                     schedule_thread(thrd, false);
             }
             else
             {
-                np_queues_[domain_num].get_queue(q_index)->
+                np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
                     schedule_thread(thrd, false);
             }
         }
@@ -993,7 +991,6 @@ return cleanup_terminated(delete_all);
             else {
                 domain_num = d_lookup_[pool_queue_num];
             }
-            std::size_t q_index = q_lookup_[pool_queue_num];
 
             LOG_CUSTOM_MSG2("schedule_thread last (done) " << " queue "
                                               << decnumber(pool_queue_num));
@@ -1002,17 +999,17 @@ return cleanup_terminated(delete_all);
                 priority == thread_priority_high_recursive ||
                 priority == thread_priority_boost)
             {
-                hp_queues_[domain_num].get_queue(q_index)->
+                hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
                     schedule_thread(thrd, true);
             }
             else if (priority == thread_priority_low)
             {
-                lp_queues_[domain_num].get_queue(q_index)->
+                lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
                     schedule_thread(thrd, true);
             }
             else
             {
-                np_queues_[domain_num].get_queue(q_index)->
+                np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
                     schedule_thread(thrd, true);
             }
         }
@@ -1068,16 +1065,15 @@ return cleanup_terminated(delete_all);
             if (pool_queue_num != std::size_t(-1)) {
                 // find the numa domain from the local thread index
                 std::size_t domain = d_lookup_[pool_queue_num];
-                std::size_t q_index = q_lookup_[pool_queue_num];
                 // get next task, steal if from another domain
                 std::int64_t result =
-                    hp_queues_[domain].get_queue(q_index)->get_queue_length();
+                    hp_queues_[domain].queues_[hp_lookup_[pool_queue_num]]->get_queue_length();
                 if (result>0) return result;
                 result =
-                    np_queues_[domain].get_queue(q_index)->get_queue_length();
+                    np_queues_[domain].queues_[np_lookup_[pool_queue_num]]->get_queue_length();
                 if (result>0) return result;
                 return
-                    lp_queues_[domain].get_queue(q_index)->get_queue_length();
+                    lp_queues_[domain].queues_[lp_lookup_[pool_queue_num]]->get_queue_length();
             }
             return count;
         }
@@ -1098,29 +1094,28 @@ return cleanup_terminated(delete_all);
             // if a specific worker id was requested
             if (pool_queue_num != std::size_t(-1)) {
                 std::size_t domain_num = d_lookup_[pool_queue_num];
-                std::size_t q_index = q_lookup_[pool_queue_num];
                 //
                 switch (priority) {
                 case thread_priority_default: {
-                    count += hp_queues_[domain_num].get_queue(q_index)->
+                    count += hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
                         get_thread_count(state);
-                    count += np_queues_[domain_num].get_queue(q_index)->
+                    count += np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
                         get_thread_count(state);
-                    count += lp_queues_[domain_num].get_queue(q_index)->
+                    count += lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
                         get_thread_count(state);
                     LOG_CUSTOM_MSG("default get_thread_count pool_queue_num "
                         << hexnumber(pool_queue_num) << decnumber(count));
                     return count;
                 }
                 case thread_priority_low: {
-                    count = lp_queues_[domain_num].get_queue(q_index)->
+                    count += lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
                         get_thread_count(state);
                     LOG_CUSTOM_MSG("low get_thread_count pool_queue_num "
                         << hexnumber(pool_queue_num) << decnumber(count));
                     return count;
                 }
                 case thread_priority_normal: {
-                    count = np_queues_[domain_num].get_queue(q_index)->
+                    count += np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
                         get_thread_count(state);
                     LOG_CUSTOM_MSG("normal get_thread_count pool_queue_num "
                         << hexnumber(pool_queue_num) << decnumber(count));
@@ -1129,7 +1124,7 @@ return cleanup_terminated(delete_all);
                 case thread_priority_boost:
                 case thread_priority_high:
                 case thread_priority_high_recursive: {
-                    count = hp_queues_[domain_num].get_queue(q_index)->
+                    count += hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
                         get_thread_count(state);
                     LOG_CUSTOM_MSG("high get_thread_count pool_queue_num "
                         << hexnumber(pool_queue_num) << decnumber(count));
@@ -1258,11 +1253,6 @@ return cleanup_terminated(delete_all);
                     q_lookup_[local_id] = q_counts_[d_lookup_[local_id]]++;
                 }
 
-                debug::output("d_lookup_ ", &d_lookup_[0], &d_lookup_[num_workers_]);
-                debug::output("q_lookup_ ", &q_lookup_[0], &q_lookup_[num_workers_]);
-                debug::output("counters_ ", &counters_[0], &counters_[num_domains_]);
-                debug::output("q_counts_ ", &q_counts_[0], &q_counts_[num_domains_]);
-
                 // create queue sets for each numa domain
                 for (std::size_t i=0; i<num_domains_; ++i) {
                     // high priority
@@ -1290,6 +1280,25 @@ return cleanup_terminated(delete_all);
                                     << " cores " << q_counts_[i]
                                     << " queues " << queues);
                 }
+
+                // create worker_id to queue lookups for each queue type
+                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
+                {
+                    hp_lookup_[local_id] = hp_queues_[d_lookup_[local_id]].
+                        get_queue_index(q_lookup_[local_id]);
+                    np_lookup_[local_id] = np_queues_[d_lookup_[local_id]].
+                        get_queue_index(q_lookup_[local_id]);
+                    lp_lookup_[local_id] = lp_queues_[d_lookup_[local_id]].
+                        get_queue_index(q_lookup_[local_id]);
+                }
+
+                debug::output("d_lookup_  ", &d_lookup_[0],  &d_lookup_[num_workers_]);
+                debug::output("q_lookup_  ", &q_lookup_[0],  &q_lookup_[num_workers_]);
+                debug::output("hp_lookup_ ", &hp_lookup_[0], &hp_lookup_[num_workers_]);
+                debug::output("np_lookup_ ", &np_lookup_[0], &np_lookup_[num_workers_]);
+                debug::output("lp_lookup_ ", &lp_lookup_[0], &lp_lookup_[num_workers_]);
+                debug::output("counters_  ", &counters_[0],  &counters_[num_domains_]);
+                debug::output("q_counts_  ", &q_counts_[0],  &q_counts_[num_domains_]);
             }
         }
 
@@ -1345,6 +1354,10 @@ return cleanup_terminated(delete_all);
         std::array<std::size_t, HPX_MAX_NUMA_PER_NODE> counters_;
         // lookup domain from local worker index
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> d_lookup_;
+        // index of queue on domain from local worker index
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> hp_lookup_;
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> np_lookup_;
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> lp_lookup_;
         // lookup sub domain queue index from local worker index
         std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> q_lookup_;
         // number of cores per queue for HP, NP, LP queues
