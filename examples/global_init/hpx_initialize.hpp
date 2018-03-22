@@ -85,23 +85,11 @@ manage_global_runtime init;
 //
 struct destruct {
     destruct() {
-        // Exit the hpx runtime system
-        hpx::finalize();
-        // Call init destructor to de-initialize everything before exiting
-        init.~manage_global_runtime();
-
+			  // This will call the Destructors and then safely exit
         // Safely exit the program
         std::exit(EXIT_SUCCESS);
     }
 };
 
-//////////////////////////////////////////////////////////////////////////////
-// This implemented function calls the destruct object to start the exit
-// sequence
-namespace hpx {
-    void complete() {
-        // Finalize everything
-        destruct destroy;
-    }
-}
+destruct destroy;
 ///////////////////////////////////////////////////////////////////////////////

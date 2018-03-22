@@ -78,5 +78,5 @@ int main(int argc, char* argv[])
 
     }
 
-    hpx::complete();
+    return hpx::finalize();
 }
