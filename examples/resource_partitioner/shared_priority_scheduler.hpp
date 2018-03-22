@@ -488,67 +488,12 @@ namespace policies {
             std::size_t pool_queue_num, bool reset)
         {
             return 0;
-/*
-            std::int64_t num_stolen_threads = 0;
-            if (pool_queue_num == std::size_t(-1))
-            {
-                //                num_stolen_threads += high_priority_queue_.
-                //                    get_num_stolen_from_pending(reset);
-
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads +=
-                        queues_[i]->get_num_stolen_from_pending(reset);
-
-                num_stolen_threads +=
-                    low_priority_queue_.get_num_stolen_from_pending(reset);
-
-                return num_stolen_threads;
-            }
-
-            num_stolen_threads +=
-                queues_[pool_queue_num]->get_num_stolen_from_pending(reset);
-
-            //            num_stolen_threads += high_priority_queue_.
-            //                get_num_stolen_from_pending(reset);
-
-            if (pool_queue_num == 0)
-            {
-                num_stolen_threads +=
-                    low_priority_queue_.get_num_stolen_from_pending(reset);
-            }
-            return num_stolen_threads;
-            */
         }
 
         std::int64_t get_num_stolen_to_pending(
             std::size_t pool_queue_num, bool reset)
         {
             return 0;
-            /*
-            std::int64_t num_stolen_threads = 0;
-            if (pool_queue_num == std::size_t(-1))
-            {
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads +=
-                        queues_[i]->get_num_stolen_to_pending(reset);
-
-                num_stolen_threads +=
-                    low_priority_queue_.get_num_stolen_to_pending(reset);
-
-                return num_stolen_threads;
-            }
-
-            num_stolen_threads +=
-                queues_[pool_queue_num]->get_num_stolen_to_pending(reset);
-
-            if (pool_queue_num == 0)
-            {
-                num_stolen_threads +=
-                    low_priority_queue_.get_num_stolen_to_pending(reset);
-            }
-            return num_stolen_threads;
-            */
-
         }
 #endif
 
@@ -694,9 +639,25 @@ namespace policies {
             return empty;
         }
 
-bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
-return cleanup_terminated(delete_all);
-}
+        bool cleanup_terminated(std::size_t pool_queue_num, bool delete_all)
+        {
+            if (pool_queue_num == std::size_t(-1)) {
+                throw std::runtime_error("");
+            }
+            bool empty = true;
+
+            // find the numa domain from the local thread index
+            std::size_t domain_num = d_lookup_[pool_queue_num];
+
+            // cleanup the queues assigned to this thread
+            empty = hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
+                    cleanup_terminated(delete_all) && empty;
+            empty = np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
+                    cleanup_terminated(delete_all) && empty;
+            empty = lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
+                    cleanup_terminated(delete_all) && empty;
+            return empty;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state
@@ -881,21 +842,6 @@ return cleanup_terminated(delete_all);
                                << "domain " << decnumber(domain_num)
                                << "desc " << THREAD_DESC(thrd));
             }
-/*
-            // counter for access queries
-            stealing_queue->increment_num_pending_accesses();
-            if (result)
-            {
-                HPX_ASSERT(thrd->get_scheduler_base() == this);
-                LOG_CUSTOM_MSG("get_next_thread high priority "
-                    << THREAD_DESC(thrd) << decnumber(idle_loop_count)
-                    << "pool_queue_num " << decnumber(pool_queue_num));
-                return true;
-            }
-            // counter for high priority misses
-            stealing_queue->increment_num_pending_misses();
-*/
-
             return result;
         }
 
