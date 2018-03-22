@@ -115,7 +115,7 @@ namespace throttle { namespace server
         hpx::applier::register_thread(
             hpx::util::bind(&throttle::throttle_controller, this, shepherd),
             description.c_str(),
-            hpx::threads::pending, true,
+            hpx::threads::pending,
             hpx::threads::thread_priority_high,
             hpx::threads::thread_schedule_hint(shepherd));
     }
@@ -129,7 +129,7 @@ namespace throttle { namespace server
         hpx::applier::register_thread(
             hpx::util::bind(&throttle::suspend, this, shepherd),
             description.c_str(),
-            hpx::threads::pending, true,
+            hpx::threads::pending,
             hpx::threads::thread_priority_high,
             hpx::threads::thread_schedule_hint(shepherd));
     }
