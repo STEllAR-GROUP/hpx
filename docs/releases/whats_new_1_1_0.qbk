@@ -110,6 +110,10 @@ particular order):
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    3250] - Apex refactoring with guids
+* [pr    3249] - Updating People.qbk
+* [pr    3245] - Apex refactoring with guids
+* [pr    3242] - Modify task counting in thread_queue.hpp
 * [pr    3240] - Fixed typos
 * [pr    3238] - Readding accidently removed std::abort
 * [pr    3237] - Adding Pipeline example
