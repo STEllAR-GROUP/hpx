@@ -177,6 +177,14 @@ namespace hpx { namespace util { namespace detail
         microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
     }
 
+    void interval_timer::change_interval(std::int64_t new_interval)
+    {
+        HPX_ASSERT(new_interval > 0);
+
+        std::lock_guard<mutex_type> l(mtx_);
+        microsecs_ = new_interval;
+    }
+
     threads::thread_result_type interval_timer::evaluate(
         threads::thread_state_ex_enum statex)
     {
@@ -336,6 +344,11 @@ namespace hpx { namespace util
         return timer_->speed_up(min_interval);
     }
 
+    void interval_timer::change_interval(std::int64_t new_interval)
+    {
+        return timer_->change_interval(new_interval);
+    }
+
     void interval_timer::slow_down(util::steady_duration const& max_interval)
     {
         return timer_->slow_down(max_interval.value().count() / 1000);
@@ -344,5 +357,10 @@ namespace hpx { namespace util
     void interval_timer::speed_up(util::steady_duration const& min_interval)
     {
         return timer_->speed_up(min_interval.value().count() / 1000);
+    }
+
+    void interval_timer::change_interval(util::steady_duration const& new_interval)
+    {
+        return timer_->change_interval(new_interval.value().count() / 1000);
     }
 }}
