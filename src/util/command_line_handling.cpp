@@ -522,7 +522,7 @@ namespace hpx { namespace util
             // Check for parsing failures
             if (!iftransform) {
                 throw hpx::detail::command_line_error(hpx::util::format(
-                    "Could not parse --hpx:iftransform argument '%1%'",
+                    "Could not parse --hpx:iftransform argument '{1}'",
                     vm["hpx:iftransform"].as<std::string>()));
             }
 
@@ -565,7 +565,7 @@ namespace hpx { namespace util
 
                 // raise hard error if node file could not be opened
                 throw hpx::detail::command_line_error(hpx::util::format(
-                    "Could not open nodefile: '%s'", node_file));
+                    "Could not open nodefile: '{}'", node_file));
             }
         }
         else if (vm.count("hpx:nodes")) {
@@ -981,7 +981,7 @@ namespace hpx { namespace util
 
                 throw hpx::detail::command_line_error(hpx::util::format(
                     "Invalid argument for option --hpx:print-counter-at: "
-                    "'%1%', allowed values: 'startup', 'shutdown' (default), "
+                    "'{1}', allowed values: 'startup', 'shutdown' (default), "
                     "'noshutdown'", s));
             }
         }
@@ -1081,7 +1081,7 @@ namespace hpx { namespace util
             }
             else {
                 throw hpx::detail::command_line_error(hpx::util::format(
-                    "Invalid argument for option --hpx:help: '%1%', allowed values: "
+                    "Invalid argument for option --hpx:help: '{1}', allowed values: "
                     "'minimal' (default) and 'full'", help_option));
             }
         }
@@ -1162,10 +1162,10 @@ namespace hpx { namespace util
                     HPX_THROW_EXCEPTION(invalid_status,
                         "handle_print_bind",
                         hpx::util::format(
-                            "unexpected mismatch between locality %1%: "
+                            "unexpected mismatch between locality {1}: "
                             "binding "
-                            "reported from HWLOC(%2%) and HPX(%3%) on "
-                            "thread %4%",
+                            "reported from HWLOC({2}) and HPX({3}) on "
+                            "thread {4}",
                             hpx::get_locality_id(), boundcpu_str,
                             pu_mask_str, i));
                 }

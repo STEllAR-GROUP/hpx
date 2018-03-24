@@ -174,7 +174,7 @@ int hpx_main(
                 double step_speed = (1 / local_clock.elapsed());
 
                 char const* fmt =
-                    "%016u, %.7g,%|31t| %.7g%|41t| [steps/second]\n";
+                    "{:016u}, {:.7g|31t} {:.7g|41t} [steps/second]\n";
 
                 hpx::util::format_to(std::cout, fmt, i, d, step_speed)
                     << std::flush;

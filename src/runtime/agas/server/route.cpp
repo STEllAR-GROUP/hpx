@@ -70,7 +70,7 @@ namespace hpx { namespace agas { namespace server
                 HPX_THROWS_IF(ec, no_success,
                     "primary_namespace::route",
                     hpx::util::format(
-                        "can't route parcel to unknown gid: %s",
+                        "can't route parcel to unknown gid: {}",
                         gid));
 
                 return;

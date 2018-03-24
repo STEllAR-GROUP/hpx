@@ -81,11 +81,11 @@ void symbol_namespace::register_counter_types(
         if (detail::symbol_namespace_services[i].target_
             == detail::counter_target_count)
             help = hpx::util::format(
-                "returns the number of invocations of the AGAS service '%s'",
+                "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
         else
             help = hpx::util::format(
-                "returns the overall execution time of the AGAS service '%s'",
+                "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
 
         performance_counters::install_counter_type(
@@ -208,8 +208,8 @@ bool symbol_namespace::bind(
         if (raw_gid == gid)
         {
             LAGAS_(info) << hpx::util::format(
-                "symbol_namespace::bind, key(%1%), gid(%2%), old_credit(%3%), "
-                "new_credit(%4%)",
+                "symbol_namespace::bind, key({1}), gid({2}), old_credit({3}), "
+                "new_credit({4})",
                 key, gid,
                 naming::detail::get_credit_from_gid(*(it->second)),
                 naming::detail::get_credit_from_gid(*(it->second)) + credits);
@@ -224,7 +224,7 @@ bool symbol_namespace::bind(
         {
             naming::detail::add_credit_to_gid(gid, credits);
             LAGAS_(info) << hpx::util::format(
-                "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)",
+                "symbol_namespace::bind, key({1}), gid({2}), response(no_success)",
                 key, gid);
         }
 
@@ -294,7 +294,7 @@ bool symbol_namespace::bind(
     l.unlock();
 
     LAGAS_(info) << hpx::util::format(
-        "symbol_namespace::bind, key(%1%), gid(%2%)",
+        "symbol_namespace::bind, key({1}), gid({2})",
         key, gid);
 
     return true;
@@ -316,7 +316,7 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
     if (it == end)
     {
         LAGAS_(info) << hpx::util::format(
-            "symbol_namespace::resolve, key(%1%), response(no_success)",
+            "symbol_namespace::resolve, key({1}), response(no_success)",
             key);
 
         return naming::invalid_gid;
@@ -329,7 +329,7 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
     naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid).get();
 
     LAGAS_(info) << hpx::util::format(
-        "symbol_namespace::resolve, key(%1%), gid(%2%)",
+        "symbol_namespace::resolve, key({1}), gid({2})",
         key, gid);
 
     return gid;
@@ -350,7 +350,7 @@ naming::gid_type symbol_namespace::unbind(std::string const& key)
     if (it == end)
     {
         LAGAS_(info) << hpx::util::format(
-            "symbol_namespace::unbind, key(%1%), response(no_success)",
+            "symbol_namespace::unbind, key({1}), response(no_success)",
             key);
 
         return naming::invalid_gid;
@@ -361,7 +361,7 @@ naming::gid_type symbol_namespace::unbind(std::string const& key)
     gids_.erase(it);
 
     LAGAS_(info) << hpx::util::format(
-        "symbol_namespace::unbind, key(%1%), gid(%2%)",
+        "symbol_namespace::unbind, key({1}), gid({2})",
         key, gid);
 
     return gid;

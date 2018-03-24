@@ -10,6 +10,7 @@ set(tests
     bind_action
     checkpoint
     config_entry
+    format
     function
     pack_traversal
     pack_traversal_async

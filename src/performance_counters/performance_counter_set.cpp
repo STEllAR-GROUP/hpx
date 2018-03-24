@@ -89,7 +89,7 @@ namespace hpx { namespace performance_counters
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counter_set::find_counter",
                 hpx::util::format(
-                    "unknown performance counter: '%1%' (%2%)",
+                    "unknown performance counter: '{1}' ({2})",
                     info.fullname_, ec.get_message()));
             return false;
         }

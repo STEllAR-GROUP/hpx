@@ -122,7 +122,7 @@ namespace hpx { namespace agas {
             HPX_THROWS_IF(ec, bad_parameter,
                 "primary_namespace::get_service_instance",
                 hpx::util::format(
-                    "can't retrieve a valid locality id from global address (%1%): ",
+                    "can't retrieve a valid locality id from global address ({1}): ",
                     dest));
             return naming::gid_type();
         }

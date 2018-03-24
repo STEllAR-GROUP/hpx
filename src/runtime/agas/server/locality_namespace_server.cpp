@@ -65,11 +65,11 @@ void locality_namespace::register_counter_types(
         if (detail::locality_namespace_services[i].target_ ==
             detail::counter_target_count)
             help = hpx::util::format(
-                "returns the number of invocations of the AGAS service '%s'",
+                "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
         else
             help = hpx::util::format(
-                "returns the overall execution time of the AGAS service '%s'",
+                "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
 
         performance_counters::install_counter_type(
@@ -235,8 +235,8 @@ std::uint32_t locality_namespace::allocate(
           , "locality_namespace::allocate"
           , hpx::util::format(
                 "partition table insertion failed due to a locking "
-                "error or memory corruption, endpoint(%1%), "
-                "prefix(%2%)", endpoints, prefix));
+                "error or memory corruption, endpoint({1}), "
+                "prefix({2})", endpoints, prefix));
     }
 
 
@@ -253,14 +253,14 @@ std::uint32_t locality_namespace::allocate(
             HPX_THROW_EXCEPTION(bad_request
               , "locality_namespace::allocate"
               , hpx::util::format(
-                    "unable to bind prefix(%1%) to a gid", prefix));
+                    "unable to bind prefix({1}) to a gid", prefix));
         }
         return prefix;
     }
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::allocate, ep(%1%), count(%2%), "
-        "prefix(%3%)",
+        "locality_namespace::allocate, ep({1}), count({2}), "
+        "prefix({3})",
         endpoints, count, prefix);
 
     return prefix;
@@ -347,14 +347,14 @@ void locality_namespace::free(naming::gid_type locality)
 
         /*
         LAGAS_(info) << hpx::util::format(
-            "locality_namespace::free, ep(%1%)",
+            "locality_namespace::free, ep({1})",
             ep);
         */
     }
 
     /*
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::free, ep(%1%), "
+        "locality_namespace::free, ep({1}), "
         "response(no_success)",
         ep);
     */
@@ -378,7 +378,7 @@ std::vector<std::uint32_t> locality_namespace::localities()
         p.push_back(it->first);
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::localities, localities(%1%)",
+        "locality_namespace::localities, localities({1})",
         p.size());
 
     return p;
@@ -396,7 +396,7 @@ std::uint32_t locality_namespace::get_num_localities()
         static_cast<std::uint32_t>(partitions_.size());
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::get_num_localities, localities(%1%)",
+        "locality_namespace::get_num_localities, localities({1})",
         num_localities);
 
     return num_localities;
@@ -417,7 +417,7 @@ std::vector<std::uint32_t> locality_namespace::get_num_threads()
     }
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::get_num_threads, localities(%1%)",
+        "locality_namespace::get_num_threads, localities({1})",
         num_threads.size());
 
     return num_threads;
@@ -438,7 +438,7 @@ std::uint32_t locality_namespace::get_num_overall_threads()
     }
 
     LAGAS_(info) << hpx::util::format(
-        "locality_namespace::get_num_overall_threads, localities(%1%)",
+        "locality_namespace::get_num_overall_threads, localities({1})",
         num_threads);
 
     return num_threads;

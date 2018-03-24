@@ -118,18 +118,18 @@ int hpx_main(boost::program_options::variables_map& vm)
              << hpx::endl;
     }
 
-    std::string const tasks_str = hpx::util::format("%lu", num_tasks);
-    std::string const chunks_str = hpx::util::format("%lu", num_chunks);
-    std::string const delay_str = hpx::util::format("%lu", delay);
+    std::string const tasks_str = hpx::util::format("{}", num_tasks);
+    std::string const chunks_str = hpx::util::format("{}", num_chunks);
+    std::string const delay_str = hpx::util::format("{}", delay);
 
     hpx::util::format_to(hpx::cout,
-        "%10s,%10s,%10s,%10.12s,%10.12s",
+        "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n",
         tasks_str, std::string("1"), delay_str,
         elapsed_seq, elapsed_seq / num_tasks) << hpx::endl;
     if (num_chunks != 1)
     {
         hpx::util::format_to(hpx::cout,
-            "%10s,%10s,%10s,%10.12s,%10.12s",
+            "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n",
             tasks_str, chunks_str, delay_str,
             elapsed_chunks, elapsed_chunks / num_tasks) << hpx::endl;
     }

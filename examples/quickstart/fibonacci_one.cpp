@@ -80,7 +80,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // wait for future f to return value
         std::uint64_t r = f.get();
 
-        char const* fmt = "fibonacci(%1%) == %2%, elapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci({1}) == {2}, elapsed time: {3} [s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
@@ -90,7 +90,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         std::uint64_t r = fibonacci_direct(n);;
 
-        char const* fmt = "fibonacci_direct(%1%) == %2%, elapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci_direct({1}) == {2}, elapsed time: {3} [s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
