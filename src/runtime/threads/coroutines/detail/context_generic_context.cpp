@@ -21,11 +21,7 @@ namespace hpx { namespace threads { namespace coroutines
     {
         void fcontext_context_impl::reset_stack()
         {
-#if BOOST_VERSION < 105600
-            if (ctx_.fc_stack.sp)
-#else
             if (ctx_)
-#endif
             {
 #if defined(_POSIX_VERSION)
                 void* limit = static_cast<char*>(stack_pointer_) - stack_size_;
@@ -39,19 +35,10 @@ namespace hpx { namespace threads { namespace coroutines
 
         void fcontext_context_impl::rebind_stack()
         {
-#if BOOST_VERSION < 105600
-            if (ctx_.fc_stack.sp)
-#else
             if (ctx_)
-#endif
             {
                 increment_stack_recycle_count();
-#if BOOST_VERSION < 105600
-                boost::context::fcontext_t* ctx =
-                    boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
-
-                std::swap(*ctx, ctx_);
-#elif BOOST_VERSION < 106100
+#if BOOST_VERSION < 106100
                 ctx_ =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
 #else

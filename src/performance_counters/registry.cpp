@@ -25,9 +25,7 @@
 
 #include <boost/regex.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>
-#if BOOST_VERSION >= 105600
 #include <boost/accumulators/statistics/rolling_variance.hpp>
-#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -685,7 +683,6 @@ namespace hpx { namespace performance_counters
                     complemented_info, base_counter_name, sample_interval,
                     window_size, reset_base_counter);
             }
-#if BOOST_VERSION >= 105600
             else if (p.countername_ == "rolling_stddev") {
                 typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
@@ -703,7 +700,6 @@ namespace hpx { namespace performance_counters
                     complemented_info, base_counter_name, sample_interval,
                     window_size, reset_base_counter);
             }
-#endif
             else if (p.countername_ == "median") {
                 typedef hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<

@@ -204,9 +204,7 @@ namespace hpx { namespace threads { namespace coroutines
               : cb_(std::make_pair(nullptr, nullptr))
 #endif
               , funp_(0)
-#if BOOST_VERSION > 105500
               , ctx_(0)
-#endif
               , alloc_()
               , stack_size_(0)
               , stack_pointer_(0)
@@ -222,9 +220,7 @@ namespace hpx { namespace threads { namespace coroutines
               : cb_(std::make_pair(reinterpret_cast<void*>(&cb), nullptr))
 #endif
               , funp_(&trampoline<Functor>)
-#if BOOST_VERSION > 105500
               , ctx_(0)
-#endif
               , alloc_()
               , stack_size_(
                     (stack_size == -1) ?
@@ -232,12 +228,7 @@ namespace hpx { namespace threads { namespace coroutines
                 )
               , stack_pointer_(alloc_.allocate(stack_size_))
             {
-#if BOOST_VERSION < 105600
-                boost::context::fcontext_t* ctx =
-                    boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
-
-                std::swap(*ctx, ctx_);
-#elif BOOST_VERSION < 106100
+#if BOOST_VERSION < 106100
                 ctx_ =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);
 #else
@@ -249,17 +240,11 @@ namespace hpx { namespace threads { namespace coroutines
 
             ~fcontext_context_impl()
             {
-#if BOOST_VERSION < 105600
-                if (ctx_.fc_stack.sp && stack_pointer_)
-#else
                 if (ctx_ && stack_pointer_)
-#endif
                 {
                     alloc_.deallocate(stack_pointer_, stack_size_);
-#if BOOST_VERSION < 105600
                     ctx_.fc_stack.size = 0;
                     ctx_.fc_stack.sp = 0;
-#endif
                 }
             }
 
@@ -309,9 +294,7 @@ namespace hpx { namespace threads { namespace coroutines
                 __splitstack_setcontext(to.alloc_.segments_ctx);
 #endif
                 // switch to other coroutine context
-#if BOOST_VERSION < 105600
-                boost::context::jump_fcontext(&from.ctx_, &to.ctx_, to.cb_, false);
-#elif BOOST_VERSION < 106100
+#if BOOST_VERSION < 106100
                 boost::context::jump_fcontext(&from.ctx_, to.ctx_, to.cb_, false);
 #else
                 to.cb_.second = &from.ctx_;

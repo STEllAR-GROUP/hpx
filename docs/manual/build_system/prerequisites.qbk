@@ -26,7 +26,7 @@ work, but we do not test __hpx__ with other platforms, so please be warned.
 In the simplest case, __hpx__ depends on one set of libraries: __boost__. So,
 before you read further, please make sure you have a recent version of
 __boost__ installed on your target machine. __hpx__ currently requires at least
-Boost V1.55.0 to work properly. It may build and run with older versions, but
+Boost V1.58.0 to work properly. It may build and run with older versions, but
 we do not test __hpx__ with those versions, so please be warned.
 
 Installing the Boost libraries is described in detail in Boost's own
@@ -63,7 +63,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__cmake__                  ][3.9.0              ][3.3.2           ]]
 
     [[[*Required Libraries]]]
-    [[__boost_libraries__        ][1.57.0 or newer    ][1.55.0          ]]
+    [[__boost_libraries__        ][1.62.0 or newer    ][1.58.0          ]]
     [[__hwloc__                  ][1.10                ][1.2 (Xeon Phi: 1.6)]]
 ]
 
@@ -90,8 +90,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[__cmake__                  ][3.9.0                ][3.3.2           ]]
 
     [[[*Required Libraries]]]
-    [[__boost__                  ][1.57.0 or newer    ][1.55.0          ]
-     [See below for an important limitation when using Boost V1.55.0.]]
+    [[__boost__                  ][1.62.0 or newer    ][1.58.0          ]]
     [[__hwloc__                  ][1.10                ][1.5             ]
         [Used for OS-thread pinning and NUMA awareness.]]
 ]
