@@ -21,7 +21,7 @@ namespace hpx { namespace traits
         {
             // by default we return the unchanged function
             template <typename Action>
-            static constexpr launch call(
+            static HPX_CONSTEXPR launch call(
                 wrap_int, launch policy, naming::address_type)
             {
                 return policy;
@@ -42,7 +42,7 @@ namespace hpx { namespace traits
         };
 
         template <typename Action>
-        constexpr launch call_select_direct_execution(
+        HPX_CONSTEXPR launch call_select_direct_execution(
             launch policy, naming::address_type lva)
         {
             return select_direct_execution_helper::template call<Action>(
@@ -53,7 +53,8 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_select_direct_execution
     {
-        static constexpr launch call(launch policy, naming::address_type lva)
+        static HPX_CONSTEXPR launch call(launch policy,
+            naming::address_type lva)
         {
             return detail::call_select_direct_execution<Action>(policy, lva);
         }
