@@ -5,10 +5,19 @@
 
 ###############################################################################
 
-add_hpx_executable(global_factorial
-  SOURCES factorial.cpp
-  FOLDER "Examples/Global_init/")
+set(example_programs
+    factorial
+		sierpinski
+		)
 
-add_hpx_pseudo_target(examples.global_init.global_factorial)
-add_hpx_pseudo_dependencies(examples.global_init examples.global_init.global_factorial)
-add_hpx_pseudo_dependencies(examples.global_init.global_factorial global_factorial_exe)
+foreach(example ${example_programs})
+
+    add_hpx_executable(global_${example}
+        SOURCES ${example}.cpp
+        FOLDER "Examples/Global_init/")
+
+    add_hpx_pseudo_target(examples.global_init.global_${example})
+    add_hpx_pseudo_dependencies(examples.global_init examples.global_init.global_${example})
+    add_hpx_pseudo_dependencies(examples.global_init.global_${example} global_${example}_exe)
+
+endforeach()
