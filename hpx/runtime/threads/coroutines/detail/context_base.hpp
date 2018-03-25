@@ -91,6 +91,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     /////////////////////////////////////////////////////////////////////////////
     std::ptrdiff_t const default_stack_size = -1;
 
+#if defined(HPX_HAVE_APEX)
+    void * rebind_base_apex(void * apex_data_ptr, thread_id_type id);
+#endif
+
     class context_base : public default_context_impl
     {
     public:
@@ -345,7 +349,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
             HPX_ASSERT(m_thread_data == 0);
 #if defined(HPX_HAVE_APEX)
-            m_apex_data = 0ull;
+            m_apex_data = rebind_base_apex(m_apex_data, id);
 #endif
             m_type_info = std::exception_ptr();
         }
