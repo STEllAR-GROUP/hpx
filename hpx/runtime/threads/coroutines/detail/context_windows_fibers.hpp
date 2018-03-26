@@ -206,7 +206,7 @@ namespace hpx { namespace threads { namespace coroutines
                     ),
                 stacksize_(stack_size == -1 ? default_stack_size : stack_size)
             {
-                if (m_ctx == nullptr)
+                if (nullptr == m_ctx)
                 {
                     throw boost::system::system_error(
                         boost::system::error_code(
