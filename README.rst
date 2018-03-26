@@ -56,7 +56,7 @@ What's so special about HPX?
 
 The documentation for the latest release of HPX (currently V1.0) can be
 `found here <http://stellar.cct.lsu.edu/files/hpx-1.0.0/html/index.html>`_.
-In publications, this release of HPX can be cited as: |zenodo_doi|.
+In publications this release of HPX can be cited as: |zenodo_doi|.
 
 .. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.556772.svg
      :target: https://doi.org/10.5281/zenodo.556772
@@ -67,7 +67,7 @@ Additionally, we regularly upload the current status of the documentation
 single-page version of the documentation
 `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
-If you plan to use HPX we suggest starting with the latest released version
+If you plan to use HPX we suggest to start with the latest released version
 (currently HPX V1.0) which can be
 `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
@@ -371,9 +371,9 @@ and Technology (CCT) at Louisiana State University, and the Department of
 Computer Science 3 - Computer Architecture at the University of Erlangen
 Nuremberg who fund and support our work.
 
-We would also like to thank the following
-organizations for granting us allocations of their compute resources:
-LSU HPC, LONI, XSEDE, NERSC, and the Gauss Center for Supercomputing.
+We would also like to thank the following organizations for granting us
+allocations of their compute resources: LSU HPC, LONI, XSEDE, NERSC, CSCS/ETHZ,
+and the Gauss Center for Supercomputing.
 
 HPX is currently funded by
 

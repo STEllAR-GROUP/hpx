@@ -8,11 +8,12 @@ hpx_write_boostbook_catalog("${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml")
 file(GLOB base_files "${PROJECT_SOURCE_DIR}/docs/*.qbk")
 file(GLOB manual_files "${PROJECT_SOURCE_DIR}/docs/manual/*.qbk")
 file(GLOB build_system_files "${PROJECT_SOURCE_DIR}/docs/manual/build_system/*.qbk")
+file(GLOB_RECURSE releases_files "${PROJECT_SOURCE_DIR}/docs/releases/*.qbk")
 file(GLOB_RECURSE tutorial_files "${PROJECT_SOURCE_DIR}/docs/tutorial/*.qbk")
 file(GLOB_RECURSE index_files "${PROJECT_SOURCE_DIR}/docs/*.idx")
 
 set(documentation_files
-    ${manual_files} ${build_system_files} ${tutorial_files}
+    ${manual_files} ${build_system_files} ${releases_files} ${tutorial_files}
     ${base_files} ${index_files})
 
 set(documentation_dependencies
@@ -263,7 +264,7 @@ if(BOOSTAUTOINDEX_FOUND)
 endif()
 
 set(image
-    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}_draft.png)
+    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
 
 set(HPX_CMAKE_OPTIONS "")
 foreach(_cat ${HPX_OPTION_CATEGORIES})
@@ -362,8 +363,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=531
-                boost.image.h=105
+                boost.image.w=536
+                boost.image.h=100
                 boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
@@ -430,6 +431,7 @@ create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})
 source_group("Documentation\\Manual\\BuildSystem" FILES ${build_system_files})
+source_group("Documentation\\Releases" FILES ${releases_files})
 source_group("Documentation\\Tutorial" FILES ${tutorial_files})
 if(BOOSTAUTOINDEX_FOUND)
   source_group("Documentation\\Index" FILES ${index_files})
