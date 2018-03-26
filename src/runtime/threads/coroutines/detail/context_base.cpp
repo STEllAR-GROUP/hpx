@@ -24,7 +24,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     // adding this here, because the thread_id_type and thread_data types
     // aren't fully defined in the header.
     void * rebind_base_apex(void * apex_data_ptr, thread_id_type id) {
-        return ::hpx::util::apex_update_task(apex_data_ptr, 
+        return ::hpx::util::apex_update_task(apex_data_ptr,
             id.get()->get_description());
     }
 #endif
