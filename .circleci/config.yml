@@ -1,0 +1,953 @@
+#  Copyright (c) 2015 Martin Stumpf
+#  Copyright (c) 2017 Thomas Heller
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+defaults: &defaults
+    working_directory: ~/hpx/build
+    docker:
+      - image: stellargroup/build_env:debian_clang
+
+convert_xml: &convert_xml
+    name: Converting XML
+    when: always
+    command: |
+        xsltproc \
+          ~/hpx/conv.xsl Testing/`head -n 1 < Testing/TAG`/Test.xml \
+          > ~/Test.xml
+
+gh_pages_filter: &gh_pages_filter
+    filters:
+      branches:
+        ignore: gh-pages
+
+core_dependency: &core_dependency
+    requires:
+      - core
+    <<: *gh_pages_filter
+
+version: 2
+
+jobs:
+  checkout_code:
+    docker:
+      - image: stellargroup/build_env:debian_clang
+    working_directory: ~/hpx
+    steps:
+      - checkout:
+          path: ~/hpx/source
+      - run:
+          name: Downloading CTest XML to Junit XML
+          command: |
+              curl \
+                https://raw.githubusercontent.com/Kitware/CDash/master/tests/circle/conv.xsl \
+                -o ~/hpx/conv.xsl
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/hpx/source
+            - ~/hpx/conv.xsl
+
+  configure:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          name: Running CMake
+          command: |
+            cmake --version
+            cmake \
+                ~/hpx/source \
+                -G "Unix Makefiles" \
+                -DCMAKE_BUILD_TYPE=Debug \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_GIT_COMMIT=${CIRCEL_SHA1} \
+                -DHPX_WITH_TOOLS=On \
+                -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
+                -DHPX_WITH_TESTS_HEADERS=On \
+                -DHPX_WITH_DEPRECATION_WARNINGS=Off \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+      - persist_to_workspace:
+          root: ~/hpx/build
+          paths:
+            - ./*
+
+  clang_tidy:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Running clang-tidy
+          command: |
+              ~/hpx/source/tools/clang-tidy.sh -diff-master
+
+  inspect:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Inspect Tool
+          command: |
+              make -j2 tools.inspect
+      - run:
+          name: Running Inspect Tool
+          command: |
+              ./bin/inspect --all --output=./hpx_inspect_report.html ~/hpx/source
+      - store_artifacts:
+          path: hpx_inspect_report.html
+          destination: hpx_inspect_report.html
+      - persist_to_workspace:
+          root: ~/hpx/build
+          paths:
+            - ./*
+
+  core:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Core
+          command: |
+              make -j2 core
+      - persist_to_workspace:
+          root: ~/hpx/build
+          paths:
+            - ./*
+
+  tests.unit.actions:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.actions
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.actions
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/actions/Test.xml
+
+  tests.unit.agas:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.agas
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.agas
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/agas/Test.xml
+
+  tests.unit.build:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.build
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.build
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/build/Test.xml
+
+  tests.unit.component:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.component
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.component
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/component/Test.xml
+
+  tests.unit.computeapi:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.computeapi
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/computeapi/Test.xml
+
+  tests.unit.diagnostics:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.diagnostics
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/diagnostics/Test.xml
+
+  tests.unit.lcos:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.lcos
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.lcos
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/lcos/Test.xml
+
+  tests.unit.parallel:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          # We need to compile some tests serially because they eat too much
+          # memory
+          command: |
+              set +e
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_exclusive_scan
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find
+              make -j2 -k tests.unit.parallel
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/parallel/Test.xml
+
+  tests.unit.parcelset:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.parcelset
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parcelset
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/parcelset/Test.xml
+
+  tests.unit.performance_counter:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.performance_counter
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.performance_counter
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/performance_counter/Test.xml
+
+  tests.unit.resource:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.resource
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.resource
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/resource/Test.xml
+
+  tests.unit.serialization:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.serialization
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.serialization
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/serialization/Test.xml
+
+  tests.unit.threads:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.threads
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.threads
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/threads/Test.xml
+
+  tests.unit.traits:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.traits
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.traits
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/traits/Test.xml
+
+  tests.unit.util:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              make -j2 -k tests.unit.util
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.util
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: unit/util/Test.xml
+
+  tests.regressions:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Regressions Tests
+          command: |
+              make -j2 -k tests.regressions
+      - run:
+          name: Running Regressions Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.regressions
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: regressions/Test.xml
+
+  tests.headers.compat:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compat
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/compat/Test.xml
+
+  tests.headers.components:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.components
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/components/Test.xml
+
+  tests.headers.compute:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.compute
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/compute/Test.xml
+
+  tests.headers.config:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.config
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/config/Test.xml
+
+  tests.headers.include:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.include
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/include/Test.xml
+
+  tests.headers.lcos:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.lcos
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/lcos/Test.xml
+
+  tests.headers.parallel:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.parallel
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/parallel/Test.xml
+
+  tests.headers.performance_counters:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.performance_counters
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/performance_counters/Test.xml
+
+  tests.headers.plugins:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.plugins
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/plugins/Test.xml
+
+  tests.headers.runtime:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.runtime
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/runtime/Test.xml
+
+  tests.headers.traits:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.traits
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/traits/Test.xml
+
+  tests.headers.util:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest -j2 -T test --no-compress-output --output-on-failure -R tests.headers.headers.util
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: ~/Test.xml
+      - store_artifacts:
+          path: ~/Test.xml
+          destination: headers/util/Test.xml
+
+  tests.performance:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Performance Tests
+          command: |
+              make -j2 tests.performance
+
+  examples:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Examples
+          command: |
+              make -j2 examples
+      - persist_to_workspace:
+          root: ~/hpx/build
+          paths:
+            - ./*
+
+  install:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Installing
+          command: |
+              ./bin/hello_world --hpx:bind=none
+              make -j2 install
+              hello_world --hpx:bind=none
+              hpxcxx --exe=hello_world_test_build ../source/examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
+              ./hello_world_test_build --hpx:bind=none
+              hpxrun.py -l 2 -t 1 ./hello_world_test_build -- --hpx:bind=none
+
+  deploy:
+    working_directory: ~/hpx
+    docker:
+      - image: stellargroup/build_env:debian_clang
+    environment:
+      TARGET_IMAGE_NAME: stellargroup/hpx:dev
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - setup_remote_docker
+      - run:
+          name: Deploy Docker Image
+          # TODO replace this line with "docker build" once docker managed to
+          # introduce temporal file copies that don't show in the resulting image
+          # size.
+          # The problem is the "ADD/COPY" and "RUN rm" in Dockerfile. Those count
+          # as separate steps and keep the temporal files stored as part of the
+          # image, expanding it by about 500 MB.
+          # docker-compile.pl is a dirty workaround, and shall be removed ASAP.
+          command: |
+              cp source/tools/docker/Dockerfile source/tools/docker/.dockerignore
+              .source/tools/docker/docker-compile.pl ${TARGET_IMAGE_NAME}
+              docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} \
+                hello_world --hpx:bind=none
+              docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} \
+                hpxcxx --exe=hello_world_test_build                      \
+                source/examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
+              docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} \
+                ./hello_world_test_build --hpx:bind=none
+              docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} \
+                hpxrun.py -l 2 -t 2 ./hello_world_test_build -- --hpx:bind=none
+              docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
+              docker push ${TARGET_IMAGE_NAME}
+
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - checkout_code
+      - configure:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
+      - clang_tidy:
+          requires:
+            - configure
+          <<: *gh_pages_filter
+      - inspect:
+          requires:
+            - configure
+          <<: *gh_pages_filter
+      - core:
+          requires:
+            - configure
+          <<: *gh_pages_filter
+      - tests.unit.actions:
+          <<: *core_dependency
+      - tests.unit.agas:
+          <<: *core_dependency
+      - tests.unit.build:
+          <<: *core_dependency
+      - tests.unit.component:
+          <<: *core_dependency
+      - tests.unit.computeapi:
+          <<: *core_dependency
+      - tests.unit.diagnostics:
+          <<: *core_dependency
+      - tests.unit.lcos:
+          <<: *core_dependency
+      - tests.unit.parallel:
+          <<: *core_dependency
+      - tests.unit.parcelset:
+          <<: *core_dependency
+      - tests.unit.performance_counter:
+          <<: *core_dependency
+      - tests.unit.resource:
+          <<: *core_dependency
+      - tests.unit.serialization:
+          <<: *core_dependency
+      - tests.unit.threads:
+          <<: *core_dependency
+      - tests.unit.traits:
+          <<: *core_dependency
+      - tests.unit.util:
+          <<: *core_dependency
+      - tests.regressions:
+          <<: *core_dependency
+      - tests.performance:
+          <<: *core_dependency
+      - examples:
+          <<: *core_dependency
+      - tests.headers.compat:
+          <<: *core_dependency
+      - tests.headers.components:
+          <<: *core_dependency
+      - tests.headers.compute:
+          <<: *core_dependency
+      - tests.headers.config:
+          <<: *core_dependency
+      - tests.headers.include:
+          <<: *core_dependency
+      - tests.headers.lcos:
+          <<: *core_dependency
+      - tests.headers.parallel:
+          <<: *core_dependency
+      - tests.headers.performance_counters:
+          <<: *core_dependency
+      - tests.headers.plugins:
+          <<: *core_dependency
+      - tests.headers.runtime:
+          <<: *core_dependency
+      - tests.headers.traits:
+          <<: *core_dependency
+      - tests.headers.util:
+          <<: *core_dependency
+      - install:
+          requires:
+            - inspect
+            - clang_tidy
+            - core
+            - tests.unit.actions
+            - tests.unit.agas
+            - tests.unit.build
+            - tests.unit.component
+            - tests.unit.computeapi
+            - tests.unit.diagnostics
+            - tests.unit.lcos
+            - tests.unit.parallel
+            - tests.unit.parcelset
+            - tests.unit.performance_counter
+            - tests.unit.resource
+            - tests.unit.serialization
+            - tests.unit.threads
+            - tests.unit.traits
+            - tests.unit.util
+            - tests.headers.compat
+            - tests.headers.components
+            - tests.headers.compute
+            - tests.headers.config
+            - tests.headers.include
+            - tests.headers.lcos
+            - tests.headers.parallel
+            - tests.headers.performance_counters
+            - tests.headers.plugins
+            - tests.headers.runtime
+            - tests.headers.traits
+            - tests.headers.util
+            - examples
+            - tests.performance
+            - tests.regressions
+          <<: *gh_pages_filter
+      - deploy:
+          requires:
+            - install
+          filters:
+            branches:
+              only: master
