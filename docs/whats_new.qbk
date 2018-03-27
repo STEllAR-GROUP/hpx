@@ -8,10 +8,11 @@
 
 [section:whats_new What's New]
 
-[include releases/whats_new_1_1_0.qbk]
+[include releases/whats_new_1_2_0.qbk]
 
 [section:hpx_previous Previous __hpx__ Releases]
 
+[include releases/whats_new_1_1_0.qbk]
 [include releases/whats_new_1_0_0.qbk]
 [include releases/whats_new_0_9_99.qbk]
 [include releases/whats_new_0_9_11.qbk]
