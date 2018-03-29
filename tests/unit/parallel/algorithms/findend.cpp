@@ -12,12 +12,18 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+std::uniform_int_distribution<> dis(3,102);
+std::uniform_int_distribution<> dist(7,106);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end1(ExPolicy policy, IteratorTag)
 {
@@ -30,7 +36,7 @@ void test_find_end1(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    std::fill(std::begin(c), std::end(c), dis(gen));
     // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
@@ -54,7 +60,7 @@ void test_find_end1_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    std::fill(std::begin(c), std::end(c), dis(gen));
     // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
@@ -112,7 +118,7 @@ void test_find_end2(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values about 2
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    std::fill(std::begin(c), std::end(c), dis(gen));
     // create subsequence at start and end
     c[0] = 1;
     c[1] = 2;
@@ -138,7 +144,7 @@ void test_find_end2_async(ExPolicy p, IteratorTag)
 
     // fill vector with random values above 2
     std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence at start and end
     c[0] = 1;
@@ -199,7 +205,7 @@ void test_find_end3(ExPolicy policy, IteratorTag)
 
     // fill vector with random values above 2
     std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence large enough to always be split into multiple partitions
     std::iota(std::begin(c), std::begin(c) + c.size()/16+1, 1);
@@ -225,7 +231,7 @@ void test_find_end3_async(ExPolicy p, IteratorTag)
 
     // fill vector with random values above 6
     std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 7);
+    std::fill(std::begin(c), std::end(c), dist(gen));
 
     // create subsequence large enough to always be split into multiple partitions
     std::iota(std::begin(c), std::begin(c) + c.size()/16+1, 1);
@@ -287,7 +293,7 @@ void test_find_end4(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     // fill vector with random values above 2
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    std::fill(std::begin(c), std::end(c), dis(gen));
     // create subsequence in middle of vector
     c[c.size()/2] = 1;
     c[c.size()/2 + 1] = 2;
@@ -314,7 +320,7 @@ void test_find_end4_async(ExPolicy p, IteratorTag)
 
     // fill vector with random values above 2
     std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence in middle of vector
     c[c.size()/2] = 1;
@@ -376,7 +382,7 @@ void test_find_end_exception(ExPolicy policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand() + 1);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
     c[c.size()/2] = 1;
     c[c.size()/2+1] = 2;
 
@@ -415,7 +421,7 @@ void test_find_end_exception_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand() + 1);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
     c[c.size()/2] = 1;
     c[c.size()/2+1] = 2;
 
@@ -493,7 +499,7 @@ void test_find_end_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(100007);
-    std::iota(std::begin(c), std::end(c), std::rand() + 1);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
     c[c.size()/2] = 0;
 
     std::size_t h[] = { 1, 2 };
@@ -528,7 +534,7 @@ void test_find_end_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand() + 1);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
     c[c.size()/2] = 0;
 
     std::size_t h[] = { 1, 2 };
@@ -594,12 +600,11 @@ void find_end_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     find_end_test1();
     find_end_test2();

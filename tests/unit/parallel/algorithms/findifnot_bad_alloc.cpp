@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_find_if_not_bad_alloc(ExPolicy policy, IteratorTag)
 {
@@ -30,7 +34,7 @@ void test_find_if_not_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(100007);
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), gen()+1);
     c[c.size()/2]=0;
 
     bool caught_bad_alloc = false;
@@ -61,7 +65,7 @@ void test_find_if_not_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), gen()+1);
     c[c.size()/2] = 0;
 
     bool caught_bad_alloc = false;
@@ -128,12 +132,11 @@ void find_if_not_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     find_if_not_bad_alloc_test();
     return hpx::finalize();
