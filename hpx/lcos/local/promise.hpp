@@ -73,13 +73,8 @@ namespace hpx { namespace lcos { namespace local
                 unique_pointer p (traits::allocate(alloc, 1),
                     deleter<other_allocator>{alloc});
 
-#if BOOST_VERSION >= 105600
                 traits::construct(alloc, p.get(), init_no_addref(), alloc);
                 shared_state_.reset(p.release(), false);
-#else
-                traits::construct(alloc, p.get(), alloc);
-                shared_state_ = boost::intrusive_ptr<shared_state_type>(p.release());
-#endif
             }
 
             promise_base(promise_base&& other) noexcept

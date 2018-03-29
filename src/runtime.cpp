@@ -442,7 +442,6 @@ namespace hpx
               ""
             },
 
-#if BOOST_VERSION >= 105600
             // rolling stddev counter
             { "/statistics/rolling_stddev", performance_counters::counter_aggregating,
               "returns the rolling standard deviation value of its base counter over "
@@ -453,7 +452,6 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
-#endif
 
             // median counter
             { "/statistics/median", performance_counters::counter_aggregating,
