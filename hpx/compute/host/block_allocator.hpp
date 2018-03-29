@@ -162,6 +162,11 @@ namespace hpx { namespace compute { namespace host
         template <typename U, typename ... Args>
         void bulk_construct(U* p, std::size_t count, Args &&... args)
         {
+            if (count == std::size_t(0))
+            {
+                return;
+            }
+
             auto irange = boost::irange(std::size_t(0), count);
             auto policy =
                 hpx::parallel::execution::parallel_policy()
@@ -236,6 +241,11 @@ namespace hpx { namespace compute { namespace host
         template <typename U>
         void bulk_destroy(U* p, std::size_t count)
         {
+            if (count == std::size_t(0))
+            {
+                return;
+            }
+
             // keep memory locality, use executor...
             auto irange = boost::irange(std::size_t(0), count);
             hpx::parallel::for_each(
