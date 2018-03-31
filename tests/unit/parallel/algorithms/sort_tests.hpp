@@ -98,7 +98,7 @@ int verify_(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
         {
             if (comp((*it), temp)) {
                 if (print)
-                    hpx::util::format_to(std::cout, "fail %8.6f", elapsed / 1e9)
+                    hpx::util::format_to(std::cout, "fail {:8.6}", elapsed / 1e9)
                       << A.size() << std::endl;
                 return 0;
             }
@@ -106,7 +106,7 @@ int verify_(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
         }
     }
     if (print)
-        hpx::util::format_to(std::cout, "OK %8.6f", elapsed / 1e9)
+        hpx::util::format_to(std::cout, "OK {:8.6}", elapsed / 1e9)
           << A.size() << std::endl;
     return 1;
 }

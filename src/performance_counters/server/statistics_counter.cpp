@@ -500,7 +500,7 @@ namespace hpx { namespace performance_counters { namespace server
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "statistics_counter<Statistic>::evaluate_base_counter",
                     hpx::util::format(
-                        "could not get or create performance counter: '%s'",
+                        "could not get or create performance counter: '{}'",
                         base_counter_name_));
                 return false;
             }

@@ -14,6 +14,7 @@
 #include <cstring>
 #include <string>
 
+#include <windows.h> // this must go before psapi.h
 #include <psapi.h>
 
 namespace hpx { namespace performance_counters { namespace memory
@@ -41,8 +42,8 @@ namespace hpx { namespace performance_counters { namespace memory
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "hpx::performance_counters::memory::read_psm_virtual",
-                    hpx::util::format("format message failed with %x (while "
-                        "retrieving message for %x)", GetLastError(), hr));
+                    hpx::util::format("format message failed with {:x} (while "
+                        "retrieving message for {:x})", GetLastError(), hr));
                 return std::uint64_t(-1);
             }
 
@@ -79,8 +80,8 @@ namespace hpx { namespace performance_counters { namespace memory
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "hpx::performance_counters::memory::read_psm_resident",
-                    hpx::util::format("format message failed with %x (while "
-                        "retrieving message for %x)", GetLastError(), hr));
+                    hpx::util::format("format message failed with {:x} (while "
+                        "retrieving message for {:x})", GetLastError(), hr));
                 return std::uint64_t(-1);
             }
 
@@ -114,8 +115,8 @@ namespace hpx { namespace performance_counters { namespace memory
             {
                 HPX_THROW_EXCEPTION(kernel_error,
                     "hpx::performance_counters::memory::read_total_mem_avail",
-                    hpx::util::format("format message failed with %x (while "
-                        "retrieving message for %x)", GetLastError(), hr));
+                    hpx::util::format("format message failed with {:x} (while "
+                        "retrieving message for {:x})", GetLastError(), hr));
                 return std::uint64_t(-1);
             }
 

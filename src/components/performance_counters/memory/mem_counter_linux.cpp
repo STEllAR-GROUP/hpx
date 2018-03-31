@@ -94,7 +94,7 @@ namespace hpx { namespace performance_counters { namespace memory
     bool read_proc_statm(proc_statm& ps, std::int32_t pid)
     {
         std::string filename
-            = hpx::util::format("/proc/%1%/statm", pid);
+            = hpx::util::format("/proc/{1}/statm", pid);
 
         ifstream_raii in(filename.c_str(), std::ios_base::in);
 
@@ -126,7 +126,7 @@ namespace hpx { namespace performance_counters { namespace memory
             HPX_THROW_EXCEPTION(
                 hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_virtual",
-                hpx::util::format("failed to parse '/proc/%1%/statm'",
+                hpx::util::format("failed to parse '/proc/{1}/statm'",
                     getpid()));
             return std::uint64_t(-1);
         }
@@ -145,7 +145,7 @@ namespace hpx { namespace performance_counters { namespace memory
             HPX_THROW_EXCEPTION(
                 hpx::invalid_data,
                 "hpx::performance_counters::memory::read_psm_resident",
-                hpx::util::format("failed to parse '/proc/%1%/statm'",
+                hpx::util::format("failed to parse '/proc/{1}/statm'",
                     getpid()));
             return std::uint64_t(-1);
         }

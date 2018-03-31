@@ -149,7 +149,7 @@ namespace hpx { namespace util
             *out  << "," << value.count_ << ",";
 
             double elapsed = static_cast<double>(value.time_) * 1e-9;
-            *out << hpx::util::format("%.6f", elapsed)
+            *out << hpx::util::format("{:.6}", elapsed)
                 << ",[s]," << val;
             if (!uom.empty())
                 *out << ",[" << uom << "]";
@@ -175,7 +175,7 @@ namespace hpx { namespace util
         *out << "," << value.count_ << ",";
 
         double elapsed = static_cast<double>(value.time_) * 1e-9;
-        *out << hpx::util::format("%.6f", elapsed) << ",[s],";
+        *out << hpx::util::format("{:.6}", elapsed) << ",[s],";
 
         bool first = true;
         for (std::int64_t val : value.values_)

@@ -254,7 +254,7 @@ int hpx_main(
 
                 if (vm.count("csv"))
                     hpx::util::format_to(cout,
-                        "%3%,%4%,%5%,%2%\n",
+                        "{3},{4},{5},{2}\n",
                         count,
                         duration,
                         k1,
@@ -263,8 +263,8 @@ int hpx_main(
                     ) << flush;
                 else
                     hpx::util::format_to(cout,
-                        "invoked %1% futures in %2% seconds "
-                        "(k1 = %3%, k2 = %4%, k3 = %5%)\n",
+                        "invoked {1} futures in {2} seconds "
+                        "(k1 = {3}, k2 = {4}, k3 = {5})\n",
                         count,
                         duration,
                         k1,

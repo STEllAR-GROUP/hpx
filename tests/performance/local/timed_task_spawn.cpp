@@ -148,7 +148,7 @@ void print_results(
     }
 
     hpx::util::format_to(cout,
-        "%lu, %lu, %lu, %lu, %.14g, %.14g",
+        "{}, {}, {}, {}, {:.14g}, {:.14g}",
         delay,
         tasks,
         suspended_tasks,
@@ -160,7 +160,7 @@ void print_results(
     if (ac)
     {
         for (std::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            hpx::util::format_to(cout, ", %.14g",
+            hpx::util::format_to(cout, ", {:.14g}",
                 counter_values[i].get_value<double>());
     }
 

@@ -142,8 +142,8 @@ namespace hpx { namespace actions { namespace detail
                 HPX_THROWS_IF(ec, bad_parameter,
                     "invocation_count_registry::counter_discoverer",
                     hpx::util::format(
-                        "action type %s does not match any known type, "
-                        "known action types: \n%s", p.parameters_, types));
+                        "action type {} does not match any known type, "
+                        "known action types: \n{}", p.parameters_, types));
                 return false;
             }
 
@@ -168,8 +168,8 @@ namespace hpx { namespace actions { namespace detail
             HPX_THROWS_IF(ec, bad_parameter,
                 "invocation_count_registry::counter_discoverer",
                 hpx::util::format(
-                    "action type %s does not match any known type, "
-                    "known action types: \n%s", p.parameters_, types));
+                    "action type {} does not match any known type, "
+                    "known action types: \n{}", p.parameters_, types));
             return false;
         }
 

@@ -64,7 +64,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         fibonacci_action fib;
         std::uint64_t r = fib(hpx::find_here(), n);
 
-        char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci({1}) == {2}\nelapsed time: {3} [s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 

@@ -66,8 +66,8 @@ class simple_profiler {
             }
           );
           // prepare format string for output
-          char const* fmt1 = "Profile %20s : %2i %5i %9.3f %s %7.3f";
-          std::string fmt2 = "Total   " + std::string(41,' ') + " %s %7.3f";
+          char const* fmt1 = "Profile {:20} : {:2} {:5} {:9.3} {} {:7.3}";
+          std::string fmt2 = "Total   " + std::string(41,' ') + " {} {:7.3}";
           // add this level to top of list
           this->_profiles[this->_title] = std::make_tuple(elapsed,0,1);
           // print each of the sub nodes

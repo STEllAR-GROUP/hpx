@@ -48,7 +48,7 @@ int hpx_main(variables_map& vm)
                 {
                     address addr = hpx::agas::resolve(locality_).get();
 
-                    hpx::util::format_to(std::cout, "  [%1%] %2%\n",
+                    hpx::util::format_to(std::cout, "  [{1}] {2}\n",
                         get_locality_id_from_gid(locality_.get_gid()),
                         addr.locality_);
                 }
@@ -57,7 +57,7 @@ int hpx_main(variables_map& vm)
             }
 
             else if (0 != std::string("help").find(arg))
-                hpx::util::format_to(std::cout, "error: unknown command '%1%'\n",
+                hpx::util::format_to(std::cout, "error: unknown command '{1}'\n",
                     arg);
 
             std::cout << "commands: localities, help, quit\n";

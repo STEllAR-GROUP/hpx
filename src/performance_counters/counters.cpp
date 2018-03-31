@@ -294,7 +294,7 @@ namespace hpx { namespace performance_counters
         if (!parse_counter_name(name, elements))
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                hpx::util::format("invalid counter name format: %s", name));
+                hpx::util::format("invalid counter name format: {}", name));
             return status_invalid_data;
         }
 
@@ -350,7 +350,7 @@ namespace hpx { namespace performance_counters
                         HPX_THROWS_IF(ec, bad_parameter,
                             "get_counter_path_elements",
                             hpx::util::format(
-                                "invalid counter name format: %s", name));
+                                "invalid counter name format: {}", name));
                         return status_invalid_data;
                     }
                 }
@@ -388,7 +388,7 @@ namespace hpx { namespace performance_counters
         if (!parse_counter_name(name, elements))
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
-                hpx::util::format("invalid counter name format: %s", name));
+                hpx::util::format("invalid counter name format: {}", name));
             return status_invalid_data;
         }
 
@@ -1113,7 +1113,7 @@ namespace hpx { namespace performance_counters
                     throw;
                 ec = make_error_code(e.get_error(), e.what());
                 LPCS_(warning) << hpx::util::format(
-                    "failed to create counter %s (%s)",
+                    "failed to create counter {} ({})",
                     remove_counter_prefix(complemented_info.fullname_), e.what());
                 return lcos::future<naming::id_type>();
             }

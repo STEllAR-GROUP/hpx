@@ -193,14 +193,14 @@ namespace hpx { namespace threads { namespace coroutines
                 {
                     throw std::runtime_error(
                         hpx::util::format(
-                            "stack size of %1% is not page aligned, page size is %2%",
+                            "stack size of {1} is not page aligned, page size is {2}",
                             m_stack_size, EXEC_PAGESIZE));
                 }
 
                 if (0 >= m_stack_size)
                 {
                     throw std::runtime_error(
-                        hpx::util::format("stack size of %1% is invalid",
+                        hpx::util::format("stack size of {1} is invalid",
                             m_stack_size));
                 }
 
