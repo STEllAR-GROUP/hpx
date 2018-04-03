@@ -422,22 +422,22 @@ namespace hpx { namespace threads { namespace executors
     template <>
     struct HPX_EXPORT pool_numa_hint<dummy_tag>
     {
-      int operator()(const int, const double, const char *) {
+      int operator()(const int, const double, const char *) const {
           std::cout << "Hint 1 \n";
           return 0;
       }
-      int operator()(const int ) {
+      int operator()(const int ) const {
           std::cout << "Hint 2 \n";
           return 0;
       }
-      int operator()(const uint16_t, const double) {
+      int operator()(const uint16_t, const double) const {
           std::cout << "Hint 3 \n";
           return 0;
       }
-      int operator()(const util::tuple<future<int>, future<double>> &) {
+      int operator()(const util::tuple<future<int>, future<double>> &) const {
           return 0;
       }
-      int operator()(const util::tuple<future<long unsigned int>, shared_future<float>> &) {
+      int operator()(const util::tuple<future<long unsigned int>, shared_future<float>> &) const {
           return 0;
       }
     };
