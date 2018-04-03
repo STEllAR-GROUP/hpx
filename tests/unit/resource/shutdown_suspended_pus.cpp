@@ -69,8 +69,7 @@ void test_scheduler(int argc, char* argv[])
                 hpx::threads::policies::do_background_work |
                 hpx::threads::policies::reduce_thread_priority |
                 hpx::threads::policies::delay_exit |
-                hpx::threads::policies::enable_elasticity |
-                hpx::threads::policies::enable_suspension);
+                hpx::threads::policies::enable_elasticity);
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
                 new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
@@ -85,14 +84,43 @@ void test_scheduler(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    // NOTE: Static schedulers do not support suspending the own worker thread
-    // because they do not steal work. Periodic priority scheduler not tested
-    // because it does not take into account scheduler states when scheduling
-    // work.
+    // NOTE: Periodic priority scheduler not tested because it does not take
+    // into account scheduler states when scheduling work.
 
     test_scheduler<hpx::threads::policies::local_queue_scheduler<>>(argc, argv);
     test_scheduler<hpx::threads::policies::local_priority_queue_scheduler<>>(argc,
         argv);
+
+    {
+        bool exception_thrown = false;
+        try
+        {
+            test_scheduler<hpx::threads::policies::static_queue_scheduler<>>(argc,
+                argv);
+        }
+        catch (hpx::exception const&)
+        {
+            exception_thrown = true;
+        }
+
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        bool exception_thrown = false;
+        try
+        {
+            test_scheduler<
+                hpx::threads::policies::static_priority_queue_scheduler<>
+            >(argc, argv);
+        }
+        catch (hpx::exception const&)
+        {
+            exception_thrown = true;
+        }
+
+        HPX_TEST(exception_thrown);
+    }
 
     return hpx::util::report_errors();
 }

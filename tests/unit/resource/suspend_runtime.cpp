@@ -20,38 +20,51 @@
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg =
+    std::vector<std::string> scheduler_strings =
     {
-        "hpx.os_threads=4"
+        "local",
+        "local-priority-lifo",
+        "local-priority-fifo",
+        "static",
+        "static-priority"
     };
 
-    hpx::start(nullptr, argc, argv, cfg);
-
-    // Wait for runtime to start
-    hpx::runtime* rt = hpx::get_runtime_ptr();
-    hpx::util::yield_while([rt]()
-        { return rt->get_state() < hpx::state_running; });
-
-    hpx::suspend();
-
-    for (std::size_t i = 0; i < 100; ++i)
+    for (auto const& scheduler_string : scheduler_strings)
     {
-        hpx::resume();
-
-        hpx::async([]()
+        std::vector<std::string> cfg =
             {
-                for (std::size_t i = 0; i < 10000; ++i)
-                {
-                    hpx::async([](){});
-                }
-            });
+                "hpx.os_threads=4",
+                "hpx.scheduler=" + scheduler_string
+            };
+
+        hpx::start(nullptr, argc, argv, cfg);
+
+        // Wait for runtime to start
+        hpx::runtime* rt = hpx::get_runtime_ptr();
+        hpx::util::yield_while([rt]()
+            { return rt->get_state() < hpx::state_running; });
 
         hpx::suspend();
-    }
 
-    hpx::resume();
-    hpx::async([]() { hpx::finalize(); });
-    hpx::stop();
+        for (std::size_t i = 0; i < 100; ++i)
+        {
+            hpx::resume();
+
+            hpx::async([]()
+                       {
+                           for (std::size_t i = 0; i < 10000; ++i)
+                           {
+                               hpx::async([](){});
+                           }
+                       });
+
+            hpx::suspend();
+        }
+
+        hpx::resume();
+        hpx::async([]() { hpx::finalize(); });
+        hpx::stop();
+    }
 
     return hpx::util::report_errors();
 }

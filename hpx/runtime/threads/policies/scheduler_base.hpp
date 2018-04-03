@@ -333,6 +333,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
+        virtual bool has_thread_stealing() const { return false; }
 
         inline std::size_t domain_from_local_thread_index(std::size_t n)
         {

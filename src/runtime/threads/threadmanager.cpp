@@ -350,8 +350,7 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                            policies::delay_exit),
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -393,8 +392,7 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                            policies::delay_exit),
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -430,8 +428,7 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                            policies::delay_exit),
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -551,8 +548,7 @@ namespace hpx { namespace threads
                         notifier_, i, name.c_str(),
                         policies::scheduler_mode(policies::do_background_work |
                             policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                            policies::delay_exit),
                         thread_offset));
                 pools_.push_back(std::move(pool));
 #else
@@ -1779,11 +1775,7 @@ namespace hpx { namespace threads
 
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    fs.push_back(pool_iter->suspend());
-                }
+                fs.push_back(pool_iter->suspend());
             }
 
             hpx::wait_all(fs);
@@ -1792,11 +1784,7 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    pool_iter->suspend_direct();
-                }
+                pool_iter->suspend_direct();
             }
         }
     }
@@ -1809,11 +1797,7 @@ namespace hpx { namespace threads
 
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    fs.push_back(pool_iter->resume());
-                }
+                fs.push_back(pool_iter->resume());
             }
             hpx::wait_all(fs);
         }
@@ -1821,11 +1805,7 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    pool_iter->resume_direct();
-                }
+                pool_iter->resume_direct();
             }
         }
     }
