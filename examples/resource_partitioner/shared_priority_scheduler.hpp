@@ -149,63 +149,6 @@ namespace hpx { namespace debug {
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// if abp scheduler is disabled in hpx, then we cannot see certain structs
-// ... so make them visible here
-//
-// FIFO + stealing at opposite end.
-#if !defined(HPX_HAVE_ABP_SCHEDULER)
-struct lockfree_abp_fifo;
-struct lockfree_abp_lifo;
-
-template <typename T>
-struct lockfree_abp_fifo_backend
-{
-    typedef boost::lockfree::deque<T> container_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef T const& const_reference;
-    typedef std::uint64_t size_type;
-
-    lockfree_abp_fifo_backend(
-        size_type initial_size = 0
-      , size_type num_thread = size_type(-1)
-        )
-      : queue_(std::size_t(initial_size))
-    {}
-
-    bool push(const_reference val, bool /*other_end*/ = false)
-    {
-        return queue_.push_left(val);
-    }
-
-    bool pop(reference val, bool steal = true)
-    {
-        if (steal)
-            return queue_.pop_left(val);
-        return queue_.pop_right(val);
-    }
-
-    bool empty()
-    {
-        return queue_.empty();
-    }
-
-  private:
-    container_type queue_;
-};
-
-struct lockfree_abp_fifo
-{
-    template <typename T>
-    struct apply
-    {
-        typedef lockfree_abp_fifo_backend<T> type;
-    };
-};
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 namespace threads {
 namespace policies {
@@ -320,7 +263,7 @@ namespace policies {
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     template <typename Mutex = compat::mutex,
-        typename PendingQueuing = lockfree_abp_fifo,
+        typename PendingQueuing = lockfree_lifo,
         typename TerminatedQueuing = lockfree_lifo>
     class shared_priority_scheduler : public scheduler_base
     {
@@ -339,8 +282,7 @@ namespace policies {
     public:
         typedef std::false_type has_periodic_maintenance;
 
-        typedef thread_queue<Mutex, PendingQueuing,
-            TerminatedQueuing>
+        typedef thread_queue<Mutex, PendingQueuing, TerminatedQueuing>
             thread_queue_type;
 
         shared_priority_scheduler(
