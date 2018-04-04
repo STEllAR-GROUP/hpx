@@ -243,8 +243,6 @@ namespace hpx { namespace threads { namespace coroutines
                 if (ctx_ && stack_pointer_)
                 {
                     alloc_.deallocate(stack_pointer_, stack_size_);
-                    ctx_.fc_stack.size = 0;
-                    ctx_.fc_stack.sp = 0;
                 }
             }
 
