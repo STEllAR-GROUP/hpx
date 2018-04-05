@@ -6,6 +6,10 @@
 #if !defined(TEST_TRANSFORM_BINARY_HPP)
 #define TEST_TRANSFORM_BINARY_HPP
 
+#include <hpx/include/partitioned_vector_predef.hpp>
+#include <hpx/include/parallel_transform.hpp>
+#include <hpx/include/parallel_count.hpp>
+
 #include <cstddef>
 #include <vector>
 

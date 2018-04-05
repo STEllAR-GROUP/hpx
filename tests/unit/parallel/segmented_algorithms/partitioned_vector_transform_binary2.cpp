@@ -10,6 +10,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <vector>
+
 #include "test_transform_binary2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
