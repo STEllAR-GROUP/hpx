@@ -111,6 +111,6 @@ void transform_scan_tests(std::vector<hpx::id_type> &localities)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    transform_scan_tests<int>(localities);
+    transform_scan_tests<double>(localities);
     return hpx::util::report_errors();
 }

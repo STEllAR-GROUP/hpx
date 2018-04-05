@@ -20,7 +20,7 @@ int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    transform_binary_tests<int, int, double>(localities);
+    transform_binary_tests<double, double, int>(localities);
 
     return hpx::util::report_errors();
 }

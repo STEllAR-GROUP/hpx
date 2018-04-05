@@ -10,17 +10,14 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <cstddef>
-#include <vector>
-
-#include "test_transform_binary.hpp"
+#include "test_transform_binary2.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    transform_binary_tests<int, int, double>(localities);
+    transform_binary2_tests<int, int, double>(localities);
 
     return hpx::util::report_errors();
 }
