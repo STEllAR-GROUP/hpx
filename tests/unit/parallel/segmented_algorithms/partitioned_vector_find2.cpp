@@ -24,7 +24,7 @@ struct cond1
     }
 };
 
-template<typename T>
+template <typename T>
 struct cond2
 {
     bool operator()(T v) const
@@ -34,12 +34,11 @@ struct cond2
 };
 
 template <typename ExPolicy, typename T>
-void test_find(ExPolicy && policy,
-    hpx::partitioned_vector<T> & xvalues, T val)
+void test_find(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
-    auto last = hpx::parallel::find(policy, xvalues.begin(),
-        xvalues.end(), val);
-    HPX_TEST_EQ(*last,val);
+    auto last =
+        hpx::parallel::find(policy, xvalues.begin(), xvalues.end(), val);
+    HPX_TEST_EQ(*last, val);
 }
 
 template <typename ExPolicy, typename T>
@@ -87,8 +86,9 @@ void test_find_if_not_async(ExPolicy && policy,
     HPX_TEST_EQ(*last,val);
 }
 
+
 template <typename T>
-void find_tests(std::vector<hpx::id_type>& localities)
+void find_tests(std::vector<hpx::id_type> &localities)
 {
     std::size_t const num = 1000;
     hpx::partitioned_vector<T> xvalues(
@@ -128,6 +128,6 @@ void find_tests(std::vector<hpx::id_type>& localities)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    find_tests<int>(localities);
+    find_tests<double>(localities);
     return hpx::util::report_errors();
 }

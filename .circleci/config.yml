@@ -309,9 +309,16 @@ jobs:
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary1
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary2
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary3
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_exclusive_scan
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan2
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan2
               make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find
+              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find2
               make -j2 -k tests.unit.parallel
       - run:
           name: Running Unit Tests
