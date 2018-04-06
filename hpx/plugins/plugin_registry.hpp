@@ -57,11 +57,11 @@ namespace hpx { namespace plugins
         bool get_plugin_info(std::vector<std::string>& fillini)
         {
             using namespace boost::assign;
-            fillini += std::string("[hpx.plugins.") +
+            fillini += std::string("[" HPX_PLUGIN_CONFIG_SECTION ".plugins.") +
                 unique_plugin_name<plugin_registry>::call() + "]";
             fillini += "name = " HPX_PLUGIN_STRING;
-            fillini += std::string("path = ") +
-                util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
+            fillini += std::string("path = ") + util::find_prefixes(
+                    "/" HPX_PLUGIN_PATH_SUFFIX, HPX_PLUGIN_STRING);
             fillini += "enabled = 1";
 
             char const* more = traits::plugin_config_data<Plugin>::call();
