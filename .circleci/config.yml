@@ -918,39 +918,7 @@ workflows:
           <<: *core_dependency
       - install:
           requires:
-            - inspect
-            - clang_tidy
-            - core
-            - tests.unit.actions
-            - tests.unit.agas
-            - tests.unit.build
-            - tests.unit.component
-            - tests.unit.computeapi
-            - tests.unit.diagnostics
-            - tests.unit.lcos
-            - tests.unit.parallel
-            - tests.unit.parcelset
-            - tests.unit.performance_counter
-            - tests.unit.resource
-            - tests.unit.serialization
-            - tests.unit.threads
-            - tests.unit.traits
-            - tests.unit.util
-            - tests.headers.compat
-            - tests.headers.components
-            - tests.headers.compute
-            - tests.headers.config
-            - tests.headers.include
-            - tests.headers.lcos
-            - tests.headers.parallel
-            - tests.headers.performance_counters
-            - tests.headers.plugins
-            - tests.headers.runtime
-            - tests.headers.traits
-            - tests.headers.util
             - examples
-            - tests.performance
-            - tests.regressions
           <<: *gh_pages_filter
       - deploy:
           requires:
