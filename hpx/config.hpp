@@ -347,14 +347,6 @@
 #  define HPX_PLUGIN_PLUGIN_PREFIX HPX_MANGLE_NAME(HPX_PLUGIN_NAME)
 #endif
 
-#if !defined(HPX_PLUGIN_PATH_SUFFIX)
-#  define HPX_PLUGIN_PATH_SUFFIX "hpx"
-#endif
-
-#if !defined(HPX_PLUGIN_CONFIG_SECTION)
-#  define HPX_PLUGIN_CONFIG_SECTION "hpx"
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_APPLICATION_STRING)
 #  if defined(HPX_APPLICATION_NAME)
