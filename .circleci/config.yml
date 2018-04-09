@@ -763,6 +763,7 @@ jobs:
               ./bin/hello_world --hpx:bind=none
               ninja -j2 install
               hello_world --hpx:bind=none
+              ldconfig
               hpxcxx --exe=hello_world_test_build ../source/examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
               ./hello_world_test_build --hpx:bind=none
               hpxrun.py -l 2 -t 1 ./hello_world_test_build -- --hpx:bind=none
