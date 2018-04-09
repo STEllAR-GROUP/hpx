@@ -104,10 +104,6 @@ jobs:
       - store_artifacts:
           path: hpx_inspect_report.html
           destination: hpx_inspect_report.html
-      - persist_to_workspace:
-          root: ~/hpx/build
-          paths:
-            - ./*
 
   core:
     <<: *defaults
