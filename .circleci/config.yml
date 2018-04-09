@@ -13,9 +13,10 @@ convert_xml: &convert_xml
     name: Converting XML
     when: always
     command: |
+        mkdir ${CIRCLE_JOB}
         xsltproc \
           ~/hpx/conv.xsl Testing/`head -n 1 < Testing/TAG`/Test.xml \
-          > ~/Test.xml
+          > ${CIRCLE_JOB}/Test.xml
 
 gh_pages_filter: &gh_pages_filter
     filters:
@@ -60,7 +61,7 @@ jobs:
             cmake --version
             cmake \
                 ~/hpx/source \
-                -G "Unix Makefiles" \
+                -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_GIT_COMMIT=${CIRCEL_SHA1} \
@@ -96,7 +97,7 @@ jobs:
       - run:
           name: Building Inspect Tool
           command: |
-              make -j2 tools.inspect
+              ninja -j2 tools.inspect
       - run:
           name: Running Inspect Tool
           command: |
@@ -104,10 +105,6 @@ jobs:
       - store_artifacts:
           path: hpx_inspect_report.html
           destination: hpx_inspect_report.html
-      - persist_to_workspace:
-          root: ~/hpx/build
-          paths:
-            - ./*
 
   core:
     <<: *defaults
@@ -119,7 +116,7 @@ jobs:
       - run:
           name: Building Core
           command: |
-              make -j2 core
+              ninja -j2 core
       - persist_to_workspace:
           root: ~/hpx/build
           paths:
@@ -135,7 +132,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.actions
+              ninja -j2 -k 0 tests.unit.actions
       - run:
           name: Running Unit Tests
           when: always
@@ -144,10 +141,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.actions
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/actions/Test.xml
+          path: tests.unit.actions
 
   tests.unit.agas:
     <<: *defaults
@@ -159,7 +155,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.agas
+              ninja -j2 -k 0 tests.unit.agas
       - run:
           name: Running Unit Tests
           when: always
@@ -168,10 +164,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.agas
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/agas/Test.xml
+          path: tests.unit.agas
 
   tests.unit.build:
     <<: *defaults
@@ -183,7 +178,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.build
+              ninja -j2 -k 0 tests.unit.build
       - run:
           name: Running Unit Tests
           when: always
@@ -192,10 +187,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.build
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/build/Test.xml
+          path: tests.unit.build
 
   tests.unit.component:
     <<: *defaults
@@ -207,7 +201,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.component
+              ninja -j2 -k 0 tests.unit.component
       - run:
           name: Running Unit Tests
           when: always
@@ -216,10 +210,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.component
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/component/Test.xml
+          path: tests.unit.component
 
   tests.unit.computeapi:
     <<: *defaults
@@ -231,7 +224,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.computeapi
+              ninja -j2 -k 0 tests.unit.computeapi
       - run:
           name: Running Unit Tests
           when: always
@@ -240,10 +233,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.computeabi
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/computeapi/Test.xml
+          path: tests.unit.computeabi
 
   tests.unit.diagnostics:
     <<: *defaults
@@ -255,7 +247,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.diagnostics
+              ninja -j2 -k 0 tests.unit.diagnostics
       - run:
           name: Running Unit Tests
           when: always
@@ -264,10 +256,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.diagnostics
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/diagnostics/Test.xml
+          path: tests.unit.diagnostics
 
   tests.unit.lcos:
     <<: *defaults
@@ -279,7 +270,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.lcos
+              ninja -j2 -k 0 tests.unit.lcos
       - run:
           name: Running Unit Tests
           when: always
@@ -288,10 +279,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.lcos
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/lcos/Test.xml
+          path: tests.unit.lcos
 
   tests.unit.parallel:
     <<: *defaults
@@ -306,20 +296,20 @@ jobs:
           # memory
           command: |
               set +e
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary1
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary2
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary3
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_exclusive_scan
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan2
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan2
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find
-              make -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find2
-              make -j2 -k tests.unit.parallel
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary1
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary2
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary3
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_exclusive_scan
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan2
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan2
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find
+              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find2
+              ninja -j2 -k 0 tests.unit.parallel
       - run:
           name: Running Unit Tests
           when: always
@@ -328,10 +318,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.parallel
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/parallel/Test.xml
+          path: tests.unit.parallel
 
   tests.unit.parcelset:
     <<: *defaults
@@ -343,7 +332,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.parcelset
+              ninja -j2 -k 0 tests.unit.parcelset
       - run:
           name: Running Unit Tests
           when: always
@@ -352,10 +341,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.parcelset
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/parcelset/Test.xml
+          path: tests.unit.parcelset
 
   tests.unit.performance_counter:
     <<: *defaults
@@ -367,7 +355,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.performance_counter
+              ninja -j2 -k 0 tests.unit.performance_counter
       - run:
           name: Running Unit Tests
           when: always
@@ -376,10 +364,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.performance_counter
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/performance_counter/Test.xml
+          path: tests.unit.performance_counter
 
   tests.unit.resource:
     <<: *defaults
@@ -391,7 +378,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.resource
+              ninja -j2 -k 0 tests.unit.resource
       - run:
           name: Running Unit Tests
           when: always
@@ -400,10 +387,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.resource
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/resource/Test.xml
+          path: tests.unit.resource
 
   tests.unit.serialization:
     <<: *defaults
@@ -415,7 +401,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.serialization
+              ninja -j2 -k 0 tests.unit.serialization
       - run:
           name: Running Unit Tests
           when: always
@@ -424,10 +410,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.serialization
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/serialization/Test.xml
+          path: tests.unit.serialization
 
   tests.unit.threads:
     <<: *defaults
@@ -439,7 +424,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.threads
+              ninja -j2 -k 0 tests.unit.threads
       - run:
           name: Running Unit Tests
           when: always
@@ -448,10 +433,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.threads
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/threads/Test.xml
+          path: tests.unit.threads
 
   tests.unit.traits:
     <<: *defaults
@@ -463,7 +447,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.traits
+              ninja -j2 -k 0 tests.unit.traits
       - run:
           name: Running Unit Tests
           when: always
@@ -472,10 +456,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.traits
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/traits/Test.xml
+          path: tests.unit.traits
 
   tests.unit.util:
     <<: *defaults
@@ -487,7 +470,7 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              make -j2 -k tests.unit.util
+              ninja -j2 -k 0 tests.unit.util
       - run:
           name: Running Unit Tests
           when: always
@@ -496,10 +479,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.unit.util
       - store_artifacts:
-          path: ~/Test.xml
-          destination: unit/util/Test.xml
+          path: tests.unit.util
 
   tests.regressions:
     <<: *defaults
@@ -511,7 +493,7 @@ jobs:
       - run:
           name: Building Regressions Tests
           command: |
-              make -j2 -k tests.regressions
+              ninja -j2 -k 0 tests.regressions
       - run:
           name: Running Regressions Tests
           when: always
@@ -520,10 +502,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.regressions
       - store_artifacts:
-          path: ~/Test.xml
-          destination: regressions/Test.xml
+          path: tests.regressions
 
   tests.headers.compat:
     <<: *defaults
@@ -539,10 +520,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.compat
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/compat/Test.xml
+          path: tests.headers.compat
 
   tests.headers.components:
     <<: *defaults
@@ -558,10 +538,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.components
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/components/Test.xml
+          path: tests.headers.components
 
   tests.headers.compute:
     <<: *defaults
@@ -577,10 +556,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.compute
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/compute/Test.xml
+          path: tests.headers.compute
 
   tests.headers.config:
     <<: *defaults
@@ -596,10 +574,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.config
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/config/Test.xml
+          path: tests.headers.config
 
   tests.headers.include:
     <<: *defaults
@@ -615,10 +592,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.include
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/include/Test.xml
+          path: tests.headers.include
 
   tests.headers.lcos:
     <<: *defaults
@@ -634,10 +610,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.lcos
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/lcos/Test.xml
+          path: tests.headers.lcos
 
   tests.headers.parallel:
     <<: *defaults
@@ -653,10 +628,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.parallel
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/parallel/Test.xml
+          path: tests.headers.parallel
 
   tests.headers.performance_counters:
     <<: *defaults
@@ -672,10 +646,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.performance_counters
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/performance_counters/Test.xml
+          path: tests.headers.performance_counters
 
   tests.headers.plugins:
     <<: *defaults
@@ -691,10 +664,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.plugins
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/plugins/Test.xml
+          path: tests.headers.plugins
 
   tests.headers.runtime:
     <<: *defaults
@@ -710,10 +682,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.runtime
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/runtime/Test.xml
+          path: tests.headers.runtime
 
   tests.headers.traits:
     <<: *defaults
@@ -729,10 +700,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.traits
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/traits/Test.xml
+          path: tests.headers.traits
 
   tests.headers.util:
     <<: *defaults
@@ -748,10 +718,9 @@ jobs:
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: ~/Test.xml
+          path: tests.headers.util
       - store_artifacts:
-          path: ~/Test.xml
-          destination: headers/util/Test.xml
+          path: tests.headers.util
 
   tests.performance:
     <<: *defaults
@@ -763,7 +732,7 @@ jobs:
       - run:
           name: Building Performance Tests
           command: |
-              make -j2 tests.performance
+              ninja -j2 tests.performance
 
   examples:
     <<: *defaults
@@ -775,7 +744,7 @@ jobs:
       - run:
           name: Building Examples
           command: |
-              make -j2 examples
+              ninja -j2 examples
       - persist_to_workspace:
           root: ~/hpx/build
           paths:
@@ -792,11 +761,13 @@ jobs:
           name: Installing
           command: |
               ./bin/hello_world --hpx:bind=none
-              make -j2 install
+              ninja -j2 install
               hello_world --hpx:bind=none
+              ldconfig
               hpxcxx --exe=hello_world_test_build ../source/examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
               ./hello_world_test_build --hpx:bind=none
               hpxrun.py -l 2 -t 1 ./hello_world_test_build -- --hpx:bind=none
+          when: always
 
   deploy:
     working_directory: ~/hpx
@@ -833,6 +804,7 @@ jobs:
                 hpxrun.py -l 2 -t 2 ./hello_world_test_build -- --hpx:bind=none
               docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
               docker push ${TARGET_IMAGE_NAME}
+          when: always
 
 
 workflows:
