@@ -26,6 +26,7 @@ foreach(benchmark ${benchmarks})
   # add example executable
   add_hpx_executable(${benchmark}
                      SOURCES ${sources}
+                     EXCLUDE_FROM_ALL
                      ${${benchmark}_FLAGS}
                      FOLDER "Benchmarks/ParallelAlgorithms/Local")
 
