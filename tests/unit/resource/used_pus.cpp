@@ -18,7 +18,7 @@
 int hpx_main(int argc, char* argv[])
 {
     std::size_t num_threads = hpx::resource::get_num_threads("default");
-    hpx::threads::detail::thread_pool_base& tp =
+    hpx::threads::thread_pool_base& tp =
                 hpx::resource::get_thread_pool("default");
 
     auto used_pu_mask = tp.get_used_processing_units();

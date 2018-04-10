@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_JAN_03_2017_1145AM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -192,7 +193,6 @@ namespace hpx { namespace threads
             >::type func_result_type;
 
         typedef std::vector<hpx::lcos::future<func_result_type> > result_type;
-        typedef hpx::lcos::future<result_type> result_future_type;
 
         auto func =
             parallel::execution::detail::make_fused_bulk_async_execute_helper<
@@ -200,14 +200,30 @@ namespace hpx { namespace threads
             >(exec, std::forward<F>(f), shape,
                 hpx::util::make_tuple(std::forward<Ts>(ts)...));
 
+        // void or std::vector<func_result_type>
+        typedef typename parallel::execution::detail::bulk_then_execute_result<
+                F, Shape, Future, Ts...
+            >::type vector_result_type;
+
+        typedef hpx::future<vector_result_type> result_future_type;
+
         typedef typename hpx::traits::detail::shared_state_ptr<
-                result_type
+                result_future_type
             >::type shared_state_type;
 
+        typedef typename std::decay<Future>::type future_type;
+
         shared_state_type p =
-            lcos::detail::make_continuation_exec<result_type>(
+            lcos::detail::make_continuation_exec<result_future_type>(
                 std::forward<Future>(predecessor),
-                std::forward<Executor>(exec), std::move(func));
+                std::forward<Executor>(exec),
+                [HPX_CAPTURE_MOVE(func)](future_type&& predecessor) mutable
+                ->  result_future_type
+                {
+                    return hpx::dataflow(
+                        hpx::util::functional::unwrap{},
+                        func(std::move(predecessor)));
+                });
 
         return hpx::traits::future_access<result_future_type>::create(
             std::move(p));

@@ -10,6 +10,7 @@
 #include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/resource/detail/create_partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/program_options.hpp>
@@ -141,6 +142,22 @@ namespace hpx { namespace resource
         {}
 
 #if !defined(HPX_EXPORTS)
+        partitioner(util::function_nonser<int(int, char**)> const& f,
+            int argc, char** argv,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            hpx::runtime_mode mode = hpx::runtime_mode_default)
+          : partitioner_(
+                detail::create_partitioner(f, argc, argv, rpmode, mode))
+        {}
+
+        partitioner(util::function_nonser<int(int, char**)> const& f,
+            int argc, char** argv, std::vector<std::string> const& cfg,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            hpx::runtime_mode mode = hpx::runtime_mode_default)
+          : partitioner_(
+                detail::create_partitioner(f, argc, argv, cfg, rpmode, mode))
+        {}
+
         partitioner(int argc, char** argv,
             resource::partitioner_mode rpmode = resource::mode_default,
             runtime_mode mode = runtime_mode_default)
@@ -178,7 +195,9 @@ namespace hpx { namespace resource
         ///////////////////////////////////////////////////////////////////////
         // Create one of the predefined thread pools
         HPX_EXPORT void create_thread_pool(std::string const& name,
-            scheduling_policy sched = scheduling_policy::unspecified);
+            scheduling_policy sched = scheduling_policy::unspecified,
+            hpx::threads::policies::scheduler_mode =
+                hpx::threads::policies::scheduler_mode::default_mode);
 
         // Create a custom thread pool with a callback function
         HPX_EXPORT void create_thread_pool(std::string const& name,

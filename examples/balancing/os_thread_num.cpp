@@ -113,12 +113,12 @@ int hpx_main(variables_map& vm)
         {
             if (csv)
                 hpx::util::format_to(cout,
-                    "%1%,%2%\n",
+                    "{1},{2}\n",
                     result.second,
                     result.first) << flush;
             else
                 hpx::util::format_to(cout,
-                    "OS-thread %1% ran %2% PX-threads\n",
+                    "OS-thread {1} ran {2} PX-threads\n",
                     result.second,
                     result.first) << flush;
         }

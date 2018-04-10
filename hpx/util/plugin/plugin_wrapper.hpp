@@ -15,7 +15,7 @@ namespace hpx { namespace util { namespace plugin {
     {
         struct dll_handle_holder
         {
-            dll_handle_holder(dll_handle dll)
+            dll_handle_holder(dll_handle const& dll)
             :   m_dll(dll) {}
 
             ~dll_handle_holder()

@@ -53,17 +53,18 @@ void test_for_each(executor_type& exec, target_vector& d_A)
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int)std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dis(2, 101);
 
     int const N = 100;
     std::vector<int> h_A(N);
 
-    std::iota(h_A.begin(), h_A.end(), (std::rand() % 100) + 2);
+    std::iota(h_A.begin(), h_A.end(), dis(gen));
 
     // define execution target (here device 0)
     hpx::compute::cuda::target target;

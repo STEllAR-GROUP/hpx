@@ -158,8 +158,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                     "affinity_data::affinity_data",
                     hpx::util::format(
                         "The number of OS threads requested "
-                        "(%1%) does not match the number of threads to "
-                        "bind (%2%)", num_threads_, num_initialized));
+                        "({1}) does not match the number of threads to "
+                        "bind ({2})", num_threads_, num_initialized));
             }
         }
         else if (pu_offset == std::size_t(-1))

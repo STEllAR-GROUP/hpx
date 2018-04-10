@@ -130,10 +130,8 @@ macro(hpx_boostbook_to_docbook name)
   set(multi_value_args DEPENDENCIES CATALOG XSLTPROC_ARGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  if(NOT BOOST_ROOT)
-    set(BOOST_ROOT_FOR_DOCS ".")
-  else()
-    set(BOOST_ROOT_FOR_DOCS "${BOOST_ROOT}")
+  if(NOT HPX_ROOT_FOR_DOCS)
+    set(HPX_ROOT_FOR_DOCS "./code")
   endif()
 
   xsltproc(
@@ -145,7 +143,7 @@ macro(hpx_boostbook_to_docbook name)
       boost.graphics.root=images/
       admon.graphics.path=images/
       callout.graphics.path=images/
-      boost.root=${BOOST_ROOT_FOR_DOCS}
+      boost.root=${HPX_ROOT_FOR_DOCS}
       html.stylesheet=src/boostbook.css
       ${${name}_XSLTPROC_ARGS}
     CATALOG ${${name}_CATALOG}
@@ -160,10 +158,8 @@ macro(hpx_docbook_to_xslfo name)
   set(multi_value_args DEPENDENCIES CATALOG XSLTPROC_ARGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  if(NOT BOOST_ROOT)
-    set(BOOST_ROOT_FOR_DOCS ".")
-  else()
-    set(BOOST_ROOT_FOR_DOCS "${BOOST_ROOT}")
+  if(NOT HPX_ROOT_FOR_DOCS)
+    set(HPX_ROOT_FOR_DOCS "./code")
   endif()
 
   xsltproc(
@@ -208,10 +204,8 @@ macro(hpx_docbook_to_html name)
   set(multi_value_args DEPENDENCIES CATALOG XSLTPROC_ARGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  if(NOT BOOST_ROOT)
-    set(BOOST_ROOT_FOR_DOCS ".")
-  else()
-    set(BOOST_ROOT_FOR_DOCS "${BOOST_ROOT}")
+  if(NOT HPX_ROOT_FOR_DOCS)
+    set(HPX_ROOT_FOR_DOCS "./code")
   endif()
 
   set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
@@ -235,7 +229,7 @@ macro(hpx_docbook_to_html name)
       boost.graphics.root=images/
       admon.graphics.path=images/
       callout.graphics.path=images/
-      boost.root=${BOOST_ROOT_FOR_DOCS}
+      boost.root=${HPX_ROOT_FOR_DOCS}
       html.stylesheet=src/boostbook.css
       manifest=${CMAKE_CURRENT_BINARY_DIR}/${main_xsl_script_manifest}
       ${${name}_XSLTPROC_ARGS}

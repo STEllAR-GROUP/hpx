@@ -11,28 +11,28 @@
 #define HPX_RUNTIME_ACTIONS_TRANSFER_BASE_ACTION_HPP
 
 #include <hpx/runtime/actions_fwd.hpp>
+
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_id_type.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <hpx/util/itt_notify.hpp>
+#endif
 
 #include <atomic>
 #include <cstddef>
@@ -139,7 +139,7 @@ namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    struct transfer_base_action : base_action
+    struct transfer_base_action : base_action_data
     {
     public:
         HPX_NON_COPYABLE(transfer_base_action);
@@ -159,58 +159,43 @@ namespace hpx { namespace actions
         // This is the priority value this action has been instantiated with
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
-        enum { priority_value = traits::action_priority<Action>::value };
+        HPX_STATIC_CONSTEXPR std::uint32_t priority_value =
+            traits::action_priority<Action>::value;
 
         // This is the stacksize value this action has been instantiated with
         // (statically). This value might be different from the stacksize member
         // holding the runtime value an action has been created with
-        enum { stacksize_value = traits::action_stacksize<Action>::value };
+        HPX_STATIC_CONSTEXPR std::uint32_t stacksize_value =
+            traits::action_stacksize<Action>::value;
 
         typedef typename Action::direct_execution direct_execution;
 
         // construct an empty transfer_action to avoid serialization overhead
-        transfer_base_action()
-        {}
+        transfer_base_action() = default;
 
         // construct an action from its arguments
-        template <typename ...Ts>
+        template <typename... Ts>
         explicit transfer_base_action(Ts&&... vs)
-          : arguments_(std::forward<Ts>(vs)...),
-#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            parent_locality_(transfer_base_action::get_locality_id()),
-            parent_id_(threads::get_parent_id()),
-            parent_phase_(threads::get_parent_phase()),
-#endif
-            priority_(
-                detail::thread_priority<
-                    static_cast<threads::thread_priority>(priority_value)
-                >::call(threads::thread_priority_default)),
-            stacksize_(
-                detail::thread_stacksize<
-                    static_cast<threads::thread_stacksize>(stacksize_value)
-                >::call(threads::thread_stacksize_default))
+          : base_action_data(
+                detail::thread_priority<static_cast<threads::thread_priority>(
+                    priority_value)>::call(threads::thread_priority_default),
+                detail::thread_stacksize<static_cast<threads::thread_stacksize>(
+                    stacksize_value)>::call(threads::thread_stacksize_default))
+          , arguments_(std::forward<Ts>(vs)...)
         {}
 
         template <typename ...Ts>
         transfer_base_action(threads::thread_priority priority, Ts&&... vs)
-          : arguments_(std::forward<Ts>(vs)...),
-#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            parent_locality_(transfer_base_action::get_locality_id()),
-            parent_id_(threads::get_parent_id()),
-            parent_phase_(threads::get_parent_phase()),
-#endif
-            priority_(
-                detail::thread_priority<
-                    static_cast<threads::thread_priority>(priority_value)
-                >::call(priority)),
-            stacksize_(
-                detail::thread_stacksize<
-                    static_cast<threads::thread_stacksize>(stacksize_value)
-                >::call(threads::thread_stacksize_default))
+          : base_action_data(
+                detail::thread_priority<static_cast<threads::thread_priority>(
+                    priority_value)>::call(priority),
+                detail::thread_stacksize<static_cast<threads::thread_stacksize>(
+                    stacksize_value)>::call(threads::thread_stacksize_default))
+          , arguments_(std::forward<Ts>(vs)...)
         {}
 
         //
-        virtual ~transfer_base_action() noexcept
+        ~transfer_base_action() noexcept override
         {
             detail::register_action<derived_type>::instance.instantiate();
         }
@@ -225,21 +210,21 @@ namespace hpx { namespace actions
     private:
         /// The function \a get_component_type returns the \a component_type
         /// of the component this action belongs to.
-        int get_component_type() const
+        int get_component_type() const override
         {
             return derived_type::get_component_type();
         }
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
-        char const* get_action_name() const
+        char const* get_action_name() const override
         {
             return detail::get_action_name<derived_type>();
         }
 
         /// The function \a get_serialization_id returns the id which has been
         /// associated with this action (mainly used for serialization purposes).
-        std::uint32_t get_action_id() const
+        std::uint32_t get_action_id() const override
         {
             return detail::get_action_id<derived_type>();
         }
@@ -247,7 +232,7 @@ namespace hpx { namespace actions
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         /// The function \a get_action_name_itt returns the name of this action
         /// as a ITT string_handle
-        util::itt::string_handle const& get_action_name_itt() const
+        util::itt::string_handle const& get_action_name_itt() const override
         {
             return detail::get_action_name_itt<derived_type>();
         }
@@ -255,63 +240,13 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        action_type get_action_type() const
+        action_type get_action_type() const override
         {
             return derived_type::get_action_type();
         }
 
-#if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-        /// Return the locality of the parent thread
-        std::uint32_t get_parent_locality_id() const
-        {
-            return naming::invalid_locality_id;
-        }
-
-        /// Return the thread id of the parent thread
-        threads::thread_id_type get_parent_thread_id() const
-        {
-            return threads::invalid_thread_id;
-        }
-
-        /// Return the phase of the parent thread
-        std::uint64_t get_parent_thread_phase() const
-        {
-            return 0;
-        }
-#else
-        /// Return the locality of the parent thread
-        std::uint32_t get_parent_locality_id() const
-        {
-            return parent_locality_;
-        }
-
-        /// Return the thread id of the parent thread
-        threads::thread_id_type get_parent_thread_id() const
-        {
-            return parent_id_;
-        }
-
-        /// Return the phase of the parent thread
-        std::uint64_t get_parent_thread_phase() const
-        {
-            return parent_phase_;
-        }
-#endif
-
-        /// Return the thread priority this action has to be executed with
-        threads::thread_priority get_thread_priority() const
-        {
-            return priority_;
-        }
-
-        /// Return the thread stacksize this action has to be executed with
-        threads::thread_stacksize get_thread_stacksize() const
-        {
-            return stacksize_;
-        }
-
         /// Return whether the embedded action is part of termination detection
-        bool does_termination_detection() const
+        bool does_termination_detection() const override
         {
             return traits::action_does_termination_detection<derived_type>::call();
         }
@@ -319,7 +254,7 @@ namespace hpx { namespace actions
         /// Return whether the given object was migrated
         std::pair<bool, components::pinned_ptr>
             was_object_migrated(hpx::naming::gid_type const& id,
-                naming::address::address_type lva)
+                naming::address::address_type lva) override
         {
             return traits::action_was_object_migrated<derived_type>::call(id, lva);
         }
@@ -327,7 +262,7 @@ namespace hpx { namespace actions
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
         serialization::binary_filter* get_serialization_filter(
-            parcelset::parcel const& p) const
+            parcelset::parcel const& p) const override
         {
             return traits::action_serialization_filter<derived_type>::call(p);
         }
@@ -335,7 +270,7 @@ namespace hpx { namespace actions
         /// Return a pointer to the message handler to be used for this action.
         parcelset::policies::message_handler* get_message_handler(
             parcelset::parcelhandler* ph, parcelset::locality const& loc,
-            parcelset::parcel const& p) const
+            parcelset::parcel const& p) const override
         {
             return traits::action_message_handler<derived_type>::
                 call(ph, loc, p);
@@ -344,7 +279,8 @@ namespace hpx { namespace actions
     public:
         /// retrieve the N's argument
         template <std::size_t N>
-        inline typename util::tuple_element<N, arguments_type>::type const&
+        HPX_CONSTEXPR inline
+        typename util::tuple_element<N, arguments_type>::type const&
         get() const
         {
             return util::get<N>(arguments_);
@@ -361,58 +297,18 @@ namespace hpx { namespace actions
         void load_base(hpx::serialization::input_archive & ar)
         {
             ar >> arguments_;
-
-            // Always serialize the parent information to maintain binary
-            // compatibility on the wire.
-
-            detail::action_serialization_data data;
-            ar >> data;
-
-#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            parent_locality_ = data.parent_locality_;
-            parent_id_ = threads::thread_id_type(
-                reinterpret_cast<threads::thread_data*>(data.parent_id_));
-            parent_phase_ = data.parent_phase_;
-#endif
-            priority_ = data.priority_;
-            stacksize_ = data.stacksize_;
+            this->base_action_data::load_base(ar);
         }
 
         // saving ...
         void save_base(hpx::serialization::output_archive & ar)
         {
             ar << arguments_;
-
-            // Always serialize the parent information to maintain binary
-            // compatibility on the wire.
-
-#if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            std::uint32_t parent_locality_ = naming::invalid_locality_id;
-            threads::thread_id_type parent_id_;
-            std::uint64_t parent_phase_ = 0;
-#endif
-            detail::action_serialization_data data(parent_locality_,
-                parent_id_, parent_phase_, priority_, stacksize_);
-            ar << data;
-        }
-
-    private:
-        static std::uint32_t get_locality_id()
-        {
-            error_code ec(lightweight);      // ignore any errors
-            return hpx::get_locality_id(ec);
+            this->base_action_data::save_base(ar);
         }
 
     protected:
         arguments_type arguments_;
-
-#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-        std::uint32_t parent_locality_;
-        threads::thread_id_type parent_id_;
-        std::uint64_t parent_phase_;
-#endif
-        threads::thread_priority priority_;
-        threads::thread_stacksize stacksize_;
 
     private:
         static std::atomic<std::int64_t> invocation_count_;
@@ -443,7 +339,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t N, typename Action>
-    inline typename util::tuple_element<
+    HPX_CONSTEXPR inline typename util::tuple_element<
         N, typename transfer_action<Action>::arguments_type
     >::type const& get(transfer_base_action<Action> const& args)
     {

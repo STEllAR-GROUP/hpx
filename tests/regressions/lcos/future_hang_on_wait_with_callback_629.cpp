@@ -156,7 +156,7 @@ int hpx_main(
             d += null_act(here, 0, children, 1, max_depth, delay_iterations);
 
             if (verbose)
-                hpx::util::format_to(std::cout, "%016u : %f\n", i, d)
+                hpx::util::format_to(std::cout, "{:016u} : {}\n", i, d)
                     << std::flush;
         }
     }

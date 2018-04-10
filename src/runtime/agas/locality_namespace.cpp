@@ -24,6 +24,11 @@ HPX_DEFINE_COMPONENT_NAME(locality_namespace,
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     locality_namespace, component_agas_locality_namespace)
 
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::parcelset::endpoints_type, parcelset_endpoints_type,
+    hpx::actions::base_lco_with_value_parcelset_endpoints_get,
+    hpx::actions::base_lco_with_value_parcelset_endpoints_set)
+
 HPX_REGISTER_ACTION_ID(
     locality_namespace::allocate_action,
     locality_namespace_allocate_action,

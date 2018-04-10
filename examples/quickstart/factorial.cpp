@@ -46,8 +46,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         double elapsed = t.elapsed();
         hpx::util::format_to(std::cout,
-            "factorial(%1%) == %2%\n"
-            "elapsed time == %3% [s]\n",
+            "factorial({1}) == {2}\n"
+            "elapsed time == {3} [s]\n",
             n, r, elapsed);
     }
 

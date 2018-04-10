@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
-#include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/basename_registration_fwd.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
@@ -91,6 +91,14 @@ namespace hpx
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
     HPX_API_EXPORT bool is_starting();
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Test if HPX runs in fault-tolerant mode
+    ///
+    /// This function returns whether the runtime system is running
+    /// in fault-tolerant mode
+    HPX_API_EXPORT bool tolerate_node_faults();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently running.

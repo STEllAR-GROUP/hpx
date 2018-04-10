@@ -58,13 +58,13 @@ int monitor(std::uint64_t pause, std::uint64_t values)
 
     using hpx::performance_counters::performance_counter;
     performance_counter sine_explicit(hpx::util::format(
-        "/sine{locality#%d/instance#%d}/immediate/explicit",
+        "/sine{{locality#{}/instance#{}}/immediate/explicit",
         prefix, 0));
     performance_counter sine_implicit(hpx::util::format(
-        "/sine{locality#%d/total}/immediate/implicit",
+        "/sine{{locality#{}/total}/immediate/implicit",
         prefix));
     performance_counter sine_average(hpx::util::format(
-        "/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average@100",
+        "/statistics{{/sine{{locality#{}/instance#{}}/immediate/explicit}/average@100",
         prefix, 1));
 
     // We need to explicitly start all counters before we can use them. For
@@ -92,7 +92,7 @@ int monitor(std::uint64_t pause, std::uint64_t values)
             if (!start_time)
                 start_time = value2.time_;
 
-            hpx::util::format_to(std::cout, "%.3f: %.4f, %.4f, %.4f\n",
+            hpx::util::format_to(std::cout, "{:.3}: {:.4}, {:.4}, {:.4}\n",
                 (value2.time_ - start_time) * 1e-9,
                 value1.get_value<double>(),
                 value2.get_value<double>() / 100000.,

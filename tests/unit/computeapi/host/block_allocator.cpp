@@ -72,24 +72,27 @@ struct test
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int)std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dis(1, 512);
 
     {
-        std::size_t count = std::rand() % 512;
+        std::size_t count = dis(gen);
         test_bulk_allocator<int>(count);
     }
 
     {
-        std::size_t count = std::rand() % 512;
+        std::size_t count = dis(gen);
         test_bulk_allocator<test>(count);
         HPX_TEST_EQ(construction_count.load(), count);
         HPX_TEST_EQ(destruction_count.load(), count);
     }
+
+    test_bulk_allocator<int>(0);
 
     return hpx::finalize();
 }

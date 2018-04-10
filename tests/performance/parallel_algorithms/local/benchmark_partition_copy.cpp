@@ -27,10 +27,15 @@
 #include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = (unsigned int)std::random_device{}();
+std::mt19937 _rand(seed);
+
+///////////////////////////////////////////////////////////////////////////////
+
 struct random_fill
 {
     random_fill()
-        : gen(std::rand()),
+        : gen(_rand()),
         dist(0, RAND_MAX)
     {}
 
@@ -109,7 +114,7 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     std::cout << "* Running Benchmark..." << std::endl;
 
-    int rand_base = std::rand();
+    int rand_base = _rand();
 
     auto pred = [rand_base](int t) {
         return t < rand_base;
@@ -136,7 +141,7 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
             first, last, dest_true, dest_false, pred);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "partition_copy (%1%) : %2%(sec)";
+    auto fmt = "partition_copy ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
@@ -158,11 +163,10 @@ std::string correct_iterator_tag_str(std::string iterator_tag)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
-    std::srand(seed);
+    _rand.seed(seed);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();

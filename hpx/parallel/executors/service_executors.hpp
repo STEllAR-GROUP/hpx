@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/parallel/executors/thread_execution.hpp>
 #include <hpx/runtime/threads/executors/service_executors.hpp>

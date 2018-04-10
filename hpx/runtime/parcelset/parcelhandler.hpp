@@ -437,7 +437,7 @@ namespace hpx { namespace parcelset
             return priority_.find(name)->second;
         }
 
-        parcelport *find_parcelport(std::string const& type, error_code = throws) const
+        parcelport *find_parcelport(std::string const& type, error_code& = throws) const
         {
             int priority = get_priority(type);
             if(priority <= 0) return nullptr;

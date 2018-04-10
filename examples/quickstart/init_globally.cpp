@@ -33,14 +33,14 @@
 int __argc = 0;
 char** __argv = nullptr;
 
-void set_argv_argv(int argc, char* argv[], char* env[])
+void set_argc_argv(int argc, char* argv[], char* env[])
 {
     __argc = argc;
     __argv = argv;
 }
 
-__attribute__((section(".init_array")))
-    void (*set_global_argc_argv)(int, char*[], char*[]) = &set_argv_argv;
+__attribute__((section(".preinit_array")))
+    void (*set_global_argc_argv)(int, char*[], char*[]) = &set_argc_argv;
 
 #elif defined(__APPLE__)
 

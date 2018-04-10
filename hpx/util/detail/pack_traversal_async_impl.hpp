@@ -447,10 +447,10 @@ namespace util {
                 pack_c<std::size_t, Sequence...>,
                 Current&& current)
             {
-                int dummy[] = {0,
-                    ((void) async_traverse_one_checked(
-                         current.template relocate<Sequence>()),
-                        0)...};
+                int dummy[] = {((void) async_traverse_one_checked(
+                                    current.template relocate<Sequence>()),
+                                   0)...,
+                    0};
                 (void) dummy;
             }
 

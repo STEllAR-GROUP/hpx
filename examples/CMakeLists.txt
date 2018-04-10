@@ -8,7 +8,6 @@
 set(subdirs
     1d_stencil
     accumulators
-    allgather
     async_io
     balancing
     cancelable_action
@@ -18,6 +17,7 @@ set(subdirs
     jacobi_smp
     nqueen
     performance_counters
+    pipeline
     quickstart
     qt
     random_mem_access

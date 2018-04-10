@@ -75,11 +75,11 @@ void component_namespace::register_counter_types(
         if (detail::component_namespace_services[i].target_ ==
              detail::counter_target_count)
             help = hpx::util::format(
-                "returns the number of invocations of the AGAS service '%s'",
+                "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
         else
             help = hpx::util::format(
-                "returns the overall execution time of the AGAS service '%s'",
+                "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
 
         performance_counters::install_counter_type(
@@ -222,7 +222,7 @@ components::component_type component_namespace::bind_prefix(
               , "component_namespace::bind_prefix"
               , hpx::util::format(
                     "component id is already registered for the given "
-                    "locality, key(%1%), prefix(%2%), ctype(%3%)",
+                    "locality, key({1}), prefix({2}), ctype({3})",
                     key, prefix, cit->second));
             return components::component_invalid;
         }
@@ -233,8 +233,8 @@ components::component_type component_namespace::bind_prefix(
         // convey the fact that another locality already registered this
         // component type.
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
-            "ctype(%3%), response(no_success)",
+            "component_namespace::bind_prefix, key({1}), prefix({2}), "
+            "ctype({3}), response(no_success)",
             key, prefix, cit->second);
 
         return cit->second;
@@ -259,7 +259,7 @@ components::component_type component_namespace::bind_prefix(
     fit->second.insert(prefix);
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::bind_prefix, key(%1%), prefix(%2%), ctype(%3%)",
+        "component_namespace::bind_prefix, key({1}), prefix({2}), ctype({3})",
         key, prefix, cit->second);
 
     return cit->second;
@@ -301,7 +301,7 @@ components::component_type component_namespace::bind_name(
     }
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::bind_name, key(%1%), ctype(%2%)",
+        "component_namespace::bind_name, key({1}), ctype({2})",
         key, it->second);
 
     return it->second;
@@ -331,7 +331,7 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
     if (it == end || it->second.empty())
     {
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::resolve_id, key(%1%), localities(0)",
+            "component_namespace::resolve_id, key({1}), localities(0)",
             key);
 
         return std::vector<std::uint32_t>();
@@ -349,7 +349,7 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
             p.push_back(*pit);
 
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::resolve_id, key(%1%), localities(%2%)",
+            "component_namespace::resolve_id, key({1}), localities({2})",
             key, prefixes.size());
 
         return p;
@@ -373,7 +373,7 @@ bool component_namespace::unbind(
     if (it == component_ids_.left.end())
     {
         LAGAS_(info) <<hpx::util::format(
-            "component_namespace::unbind, key(%1%), response(no_success)",
+            "component_namespace::unbind, key({1}), response(no_success)",
             key);
 
        return false;
@@ -385,7 +385,7 @@ bool component_namespace::unbind(
     component_ids_.left.erase(it);
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::unbind, key(%1%)",
+        "component_namespace::unbind, key({1})",
         key);
 
     return true;
@@ -457,7 +457,7 @@ std::string component_namespace::get_component_type_name(
     {
         LAGAS_(info) << hpx::util::format(
             "component_namespace::get_component_typename, "
-            "key(%1%/%2%), response(no_success)",
+            "key({1}/{2}), response(no_success)",
             int(components::get_derived_type(t)),
             int(components::get_base_type(t)));
 
@@ -465,7 +465,7 @@ std::string component_namespace::get_component_type_name(
     }
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::get_component_typename, key(%1%/%2%), response(%3%)",
+        "component_namespace::get_component_typename, key({1}/{2}), response({3})",
         int(components::get_derived_type(t)),
         int(components::get_base_type(t)),
         result);
@@ -494,7 +494,7 @@ std::uint32_t component_namespace::get_num_localities(
     if (it == end)
     {
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::get_num_localities, key(%1%), localities(0)",
+            "component_namespace::get_num_localities, key({1}), localities(0)",
             key);
 
         return std::uint32_t(0);
@@ -503,7 +503,7 @@ std::uint32_t component_namespace::get_num_localities(
     std::uint32_t num_localities = static_cast<std::uint32_t>(it->second.size());
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::get_num_localities, key(%1%), localities(%2%)",
+        "component_namespace::get_num_localities, key({1}), localities({2})",
         key, num_localities);
 
     return num_localities;

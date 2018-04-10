@@ -9,7 +9,7 @@
 #define HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <string>

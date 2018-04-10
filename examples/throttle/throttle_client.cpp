@@ -30,7 +30,7 @@ using hpx::naming::get_agas_client;
 int hpx_main(variables_map& vm)
 {
     try {
-        hpx::util::format_to(std::cout, "prefix: %d",
+        hpx::util::format_to(std::cout, "prefix: {}",
             hpx::naming::get_locality_id_from_id(hpx::find_here())) << std::endl;
 
         // Try to connect to existing throttle instance, create a new one if

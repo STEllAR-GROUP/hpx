@@ -186,16 +186,6 @@ namespace hpx { namespace threads { namespace executors
     };
 #endif
 
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
-    struct HPX_EXPORT throttling_executor : public scheduled_executor
-    {
-        throttling_executor();
-
-        explicit throttling_executor(std::size_t max_punits,
-            std::size_t min_punits = 1);
-    };
-#endif
-
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>

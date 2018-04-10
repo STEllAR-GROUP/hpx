@@ -180,25 +180,16 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(naming::invalid_id);
         }
 
-        return agas::begin_migration(to_migrate)
-            .then(
-                [to_migrate, target_storage](
-                    future<std::pair<naming::id_type, naming::address> > && f)
-                        -> future<naming::id_type>
-                {
-                    // rethrow errors
-                    std::pair<naming::id_type, naming::address> r = f.get();
+        auto r= agas::begin_migration(to_migrate);
 
-                    // perform actual object migration
-                    typedef server::migrate_to_storage_here_action<Component>
-                        action_type;
-                    return async<action_type>(r.first, to_migrate, r.second,
-                        target_storage);
-                })
-            .then(
+        // perform actual object migration
+        typedef server::migrate_to_storage_here_action<Component>
+            action_type;
+        return async<action_type>(r.first, to_migrate, r.second,
+            target_storage).then(
                 [to_migrate](future<naming::id_type> && f) -> naming::id_type
                 {
-                    agas::end_migration(to_migrate).get();
+                    agas::end_migration(to_migrate);
                     return f.get();
                 });
     }

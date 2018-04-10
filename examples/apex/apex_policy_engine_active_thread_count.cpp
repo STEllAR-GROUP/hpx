@@ -57,14 +57,14 @@ using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
 static bool counters_initialized = false;
-static const char * counter_name = "/threadqueue{locality#%d/total}/length";
+static const char * counter_name = "/threadqueue{{locality#{}/total}/length";
 
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     std::uint32_t const prefix = hpx::get_locality_id();
     /*
     id_type id = get_counter(hpx::util::format(
-        "/threads{locality#%d/total}/count/instantaneous/active",
+        "/threads{{locality#{}/total}/count/instantaneous/active",
         prefix));
     */
     id_type id = get_counter(hpx::util::format(counter_name, prefix));
@@ -104,7 +104,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         fibonacci_action fib;
         std::uint64_t r = fib(hpx::find_here(), n);
 
-        char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci({1}) == {2}\nelapsed time: {3} [s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 

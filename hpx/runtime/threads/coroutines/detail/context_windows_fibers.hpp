@@ -57,8 +57,8 @@ namespace hpx { namespace threads { namespace coroutines
     {
         prepare_main_thread()
         {
-            LPVOID result = ConvertThreadToFiber(0);
-            HPX_ASSERT(0 != result);
+            LPVOID result = ConvertThreadToFiber(nullptr);
+            HPX_ASSERT(nullptr != result);
             HPX_UNUSED(result);
         }
 
@@ -95,7 +95,7 @@ namespace hpx { namespace threads { namespace coroutines
             return IsThreadAFiber() ? true : false;
 #else
             fiber_ptr current = GetCurrentFiber();
-            return current != 0 && current != fiber_magic;
+            return current != nullptr && current != fiber_magic;
 #endif
         }
 
@@ -113,7 +113,7 @@ namespace hpx { namespace threads { namespace coroutines
              * An empty context cannot be restored from,
              * but can be saved in.
              */
-            fibers_context_impl_base() : m_ctx(0) {}
+            fibers_context_impl_base() : m_ctx(nullptr) {}
 
             /*
              * Free function. Saves the current context in @p from
@@ -133,9 +133,9 @@ namespace hpx { namespace threads { namespace coroutines
             {
                 if (!is_fiber())
                 {
-                    HPX_ASSERT(from.m_ctx == 0);
-                    from.m_ctx = ConvertThreadToFiber(0);
-                    HPX_ASSERT(from.m_ctx != 0);
+                    HPX_ASSERT(from.m_ctx == nullptr);
+                    from.m_ctx = ConvertThreadToFiber(nullptr);
+                    HPX_ASSERT(from.m_ctx != nullptr);
 
 #if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
                     switch_to_fiber(to.m_ctx);
@@ -145,9 +145,9 @@ namespace hpx { namespace threads { namespace coroutines
                     BOOL result = ConvertFiberToThread();
                     HPX_ASSERT(result);
                     HPX_UNUSED(result);
-                    from.m_ctx = 0;
+                    from.m_ctx = nullptr;
                 } else {
-                    bool call_from_main = from.m_ctx == 0;
+                    bool call_from_main = from.m_ctx == nullptr;
                     if (call_from_main)
                         from.m_ctx = GetCurrentFiber();
 #if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
@@ -156,7 +156,7 @@ namespace hpx { namespace threads { namespace coroutines
                     SwitchToFiber(to.m_ctx);
 #endif
                     if (call_from_main)
-                        from.m_ctx = 0;
+                        from.m_ctx = nullptr;
                 }
             }
 
@@ -206,7 +206,7 @@ namespace hpx { namespace threads { namespace coroutines
                     ),
                 stacksize_(stack_size == -1 ? default_stack_size : stack_size)
             {
-                if (0 == m_ctx)
+                if (nullptr == m_ctx)
                 {
                     throw boost::system::system_error(
                         boost::system::error_code(
@@ -219,7 +219,7 @@ namespace hpx { namespace threads { namespace coroutines
 
             ~fibers_context_impl()
             {
-                if (m_ctx)
+                if (m_ctx != nullptr)
                     DeleteFiber(m_ctx);
             }
 

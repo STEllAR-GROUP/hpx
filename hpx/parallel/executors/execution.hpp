@@ -13,9 +13,11 @@
 #include <hpx/parallel/executors/execution_fwd.hpp>
 
 #include <hpx/exception_list.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
+#include <hpx/traits/executor_traits.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -1091,7 +1093,7 @@ namespace hpx { namespace parallel { namespace execution
                     typename hpx::util::detail::make_index_pack<
                         sizeof...(Ts)
                     >::type(), args_);
-            };
+            }
         };
 
         template <typename Result, typename Executor, typename F,
@@ -1133,6 +1135,7 @@ namespace hpx { namespace parallel { namespace execution
                 typedef typename bulk_then_execute_result<
                         F, Shape, Future, Ts...
                     >::type result_type;
+
                 typedef typename hpx::traits::detail::shared_state_ptr<
                         result_type
                     >::type shared_state_type;
@@ -1266,7 +1269,7 @@ namespace hpx { namespace parallel { namespace execution
                     typename hpx::util::detail::make_index_pack<
                         sizeof...(Ts)
                     >::type(), args_);
-            };
+            }
         };
 
         template <typename Result, typename Executor, typename F,
@@ -1304,15 +1307,17 @@ namespace hpx { namespace parallel { namespace execution
                     Future&& predecessor, Ts &&... ts)
             ->  typename hpx::traits::executor_future<
                     Executor,
-                    typename then_bulk_function_result<
+                    typename bulk_then_execute_result<
                         F, Shape, Future, Ts...
                     >::type
                 >::type
             {
+                // result_of_t<F(Shape::value_type, Future)>
                 typedef typename then_bulk_function_result<
                         F, Shape, Future, Ts...
                     >::type func_result_type;
 
+                // std::vector<future<func_result_type>>
                 typedef std::vector<typename hpx::traits::executor_future<
                         Executor, func_result_type, Ts...
                     >::type> result_type;
@@ -1321,18 +1326,33 @@ namespace hpx { namespace parallel { namespace execution
                     exec, std::forward<F>(f), shape,
                     hpx::util::make_tuple(std::forward<Ts>(ts)...));
 
+                // void or std::vector<func_result_type>
+                typedef typename bulk_then_execute_result<
+                        F, Shape, Future, Ts...
+                    >::type vector_result_type;
+
+                // future<vector_result_type>
+                typedef typename hpx::traits::executor_future<
+                        Executor, vector_result_type
+                    >::type result_future_type;
+
                 typedef typename hpx::traits::detail::shared_state_ptr<
-                        result_type
+                        result_future_type
                     >::type shared_state_type;
 
-                shared_state_type p =
-                    lcos::detail::make_continuation_exec<result_type>(
-                        std::forward<Future>(predecessor),
-                        std::forward<BulkExecutor>(exec), std::move(func));
+                typedef typename std::decay<Future>::type future_type;
 
-                typedef typename hpx::traits::executor_future<
-                        Executor, result_type
-                    >::type result_future_type;
+                shared_state_type p =
+                    lcos::detail::make_continuation_exec<result_future_type>(
+                        std::forward<Future>(predecessor),
+                        std::forward<BulkExecutor>(exec),
+                        [HPX_CAPTURE_MOVE(func)](future_type&& predecessor) mutable
+                        ->  result_future_type
+                        {
+                            return hpx::dataflow(
+                                hpx::util::functional::unwrap{},
+                                func(std::move(predecessor)));
+                        });
 
                 return hpx::traits::future_access<result_future_type>::create(
                     std::move(p));
@@ -1375,8 +1395,6 @@ namespace hpx { namespace parallel { namespace execution
     }
     /// \endcond
 }}}
-
-
 
 #endif
 

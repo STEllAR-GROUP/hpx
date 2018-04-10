@@ -18,12 +18,12 @@ implementation of a new programming model for conventional systems, such as
 classic Linux based Beowulf clusters or multi-socket highly parallel SMP
 nodes. At the same time, we want to have a very modular and well designed
 runtime system architecture which would allow us to port our implementation
-onto new computer system architectures. We want to use real world applications
+onto new computer system architectures. We want to use real-world applications
 to drive the development of the runtime system, coining out required
 functionalities and converging onto a stable API which will provide a
 smooth migration path for developers.
 
-The API exposed by HPX is not only modelled after the interfaces defined by the
+The API exposed by HPX is not only modeled after the interfaces defined by the
 C++11/14/17 ISO standard, it also adheres to the programming guidelines used by the
 Boost collection of C++ libraries. We aim to improve the scalability of today's
 applications and to expose new levels of parallelism which are necessary to
@@ -33,7 +33,7 @@ take advantage of the exascale systems of the future.
 What's so special about HPX?
 ****************************
 
-* HPX exposes an uniform, standards-oriented API for ease of programming
+* HPX exposes a uniform, standards-oriented API for ease of programming
   parallel and distributed applications.
 * It enables programmers to write fully asynchronous code using hundreds
   of millions of threads.
@@ -54,12 +54,12 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V1.0) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-1.0.0/html/index.html>`_.
+The documentation for the latest release of HPX (currently V1.1) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-1.1.0/html/index.html>`_.
 In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.556772.svg
-     :target: https://doi.org/10.5281/zenodo.556772
+.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1206917.svg
+     :target: https://doi.org/10.5281/zenodo.1206917
 
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
@@ -68,7 +68,7 @@ single-page version of the documentation
 `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V1.0) which can be
+(currently HPX V1.1) which can be
 `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
@@ -98,7 +98,7 @@ any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
 
 Also, if you have any questions feel free to ask it over at
-`stackoverflow <http://stackoverflow.com>`_
+`StackOverflow <http://stackoverflow.com>`_
 and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
 
 For a full list of support options please see our
@@ -245,8 +245,8 @@ Windows
 3) Create a build folder. HPX requires an out-of-tree-build. This means that you
    will be unable to run CMake in the HPX source folder.
 
-4) Open up the CMake GUI. In the input box labelled "Where is the source code:",
-   enter the full path to the source folder. In the input box labelled
+4) Open up the CMake GUI. In the input box labeled "Where is the source code:",
+   enter the full path to the source folder. In the input box labeled
    "Where to build the binaries:", enter the full path to the build folder you
    created in step 2.
 
@@ -259,7 +259,7 @@ Windows
 6) Press the "Configure" button. A window will pop up asking you which compiler
    to use. Select the x64 Visual Studio 2012 compiler. Note that while it is
    possible to build HPX for x86 we don't recommend doing so as 32 bit runs are
-   severely restricted by a 32 bit Windows system limitation affecting the number
+   severely restricted by a 32-bit Windows system limitation affecting the number
    of HPX threads you can create.
 
 7) If the "Generate" button is not clickable, press "Configure" again. Repeat
@@ -371,9 +371,9 @@ and Technology (CCT) at Louisiana State University, and the Department of
 Computer Science 3 - Computer Architecture at the University of Erlangen
 Nuremberg who fund and support our work.
 
-We would also like to thank the following
-organizations for granting us allocations of their compute resources:
-LSU HPC, LONI, XSEDE, NERSC, and the Gauss Center for Supercomputing.
+We would also like to thank the following organizations for granting us
+allocations of their compute resources: LSU HPC, LONI, XSEDE, NERSC, CSCS/ETHZ,
+and the Gauss Center for Supercomputing.
 
 HPX is currently funded by
 
@@ -387,7 +387,7 @@ HPX is currently funded by
 * The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS).
 
   Neither the United States Government nor any agency thereof, nor any of
-  their employees, makes any warranty, express or implied, or assumes any
+  their employees makes any warranty, express or implied, or assumes any
   legal liability or responsibility for the accuracy, completeness, or
   usefulness of any information, apparatus, product, or process disclosed,
   or represents that its use would not infringe privately owned rights.

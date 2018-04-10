@@ -15,6 +15,8 @@
 #include <hpx/runtime/actions/transfer_base_action.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -43,7 +45,7 @@ namespace hpx { namespace actions
     public:
         // construct an empty transfer_continuation_action to avoid serialization
         // overhead
-        transfer_continuation_action();
+        transfer_continuation_action() = default;
 
         // construct an action from its arguments
         template <typename ...Ts>
@@ -54,7 +56,7 @@ namespace hpx { namespace actions
             threads::thread_priority priority, continuation_type&& cont,
             Ts&&... vs);
 
-        bool has_continuation() const;
+        bool has_continuation() const override;
 
         /// The \a get_thread_function constructs a proper thread function for
         /// a \a thread, encapsulating the functionality and the arguments
@@ -78,9 +80,9 @@ namespace hpx { namespace actions
         threads::thread_function_type
         get_thread_function(naming::id_type&& target,
             naming::address::address_type lva,
-            naming::address::component_type comptype);
+            naming::address::component_type comptype) override;
 
-        template <std::size_t ...Is>
+        template <std::size_t... Is>
         void schedule_thread(util::detail::pack_c<std::size_t, Is...>,
             naming::gid_type const& target_gid,
             naming::address::address_type lva,
@@ -89,28 +91,25 @@ namespace hpx { namespace actions
         // schedule a new thread
         void schedule_thread(naming::gid_type const& target_gid,
             naming::address::address_type lva,
-            naming::address::component_type comptype, std::size_t num_thread);
+            naming::address::component_type comptype,
+            std::size_t num_thread) override;
 
         // serialization support
         // loading ...
-        void load(hpx::serialization::input_archive & ar);
+        void load(hpx::serialization::input_archive & ar) override;
 
         // saving ...
-        void save(hpx::serialization::output_archive & ar);
+        void save(hpx::serialization::output_archive & ar) override;
 
         void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
             naming::component_type comptype, std::size_t num_thread,
-            bool& deferred_schedule);
+            bool& deferred_schedule) override;
 
     private:
         continuation_type cont_;
     };
     /// \endcond
-
-    template <typename Action>
-    transfer_continuation_action<Action>::transfer_continuation_action()
-    {}
 
     template <typename Action>
     template <typename ...Ts>
@@ -227,12 +226,13 @@ namespace hpx { namespace actions
         {
             // If this is a direct action and deferred schedule was requested,
             // that is we are not the last parcel, return immediately
-            if (base_type::direct_execution::value)
+            if (base_type::direct_execution::value) {
                 return;
-
-            // If this is not a direct action, we can safely set deferred_schedule
-            // to false
-            deferred_schedule = false;
+            } else {
+                // If this is not a direct action, we can safely set deferred_schedule
+                // to false
+                deferred_schedule = false;
+            }
         }
 
         schedule_thread(std::move(target), lva, comptype, num_thread);

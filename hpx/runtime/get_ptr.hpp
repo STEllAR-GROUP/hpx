@@ -54,10 +54,8 @@ namespace hpx
             template <typename Component>
             void operator()(Component* p)
             {
-                bool was_migrated = p->pin_count() == ~0x0u;
-                p->unpin();
+                bool was_migrated = p->unpin();
 
-                HPX_ASSERT(was_migrated);
                 if (was_migrated)
                 {
                     components::component_type type =

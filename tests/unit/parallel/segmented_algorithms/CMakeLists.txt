@@ -12,13 +12,19 @@ set(tests
     partitioned_vector_target
     partitioned_vector_transform
     partitioned_vector_transform_binary
+    partitioned_vector_transform_binary1
+    partitioned_vector_transform_binary2
+    partitioned_vector_transform_binary3
     partitioned_vector_transform_reduce
     partitioned_vector_fill
+    partitioned_vector_find
+    partitioned_vector_find2
     partitioned_vector_inclusive_scan
+    partitioned_vector_inclusive_scan2
     partitioned_vector_exclusive_scan
     partitioned_vector_transform_scan
+    partitioned_vector_transform_scan2
     partitioned_vector_reduce
-    partitioned_vector_find
    )
 
 # add dependencies to partitioned_vector_target when Cuda is enabled

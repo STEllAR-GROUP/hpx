@@ -222,14 +222,15 @@ void test_async_one(std::vector<int> a)
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int)std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dis(0, 99);
 
-    auto get_next_num = [](int& num){ num = std::rand() % 100; };
+    auto get_next_num = [&dis, &gen](int& num){ num = dis(gen); };
 
     std::vector<int> a1(8); std::for_each(a1.begin(), a1.end(), get_next_num);
     test_one(a1);

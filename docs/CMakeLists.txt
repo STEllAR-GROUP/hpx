@@ -8,11 +8,12 @@ hpx_write_boostbook_catalog("${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml")
 file(GLOB base_files "${PROJECT_SOURCE_DIR}/docs/*.qbk")
 file(GLOB manual_files "${PROJECT_SOURCE_DIR}/docs/manual/*.qbk")
 file(GLOB build_system_files "${PROJECT_SOURCE_DIR}/docs/manual/build_system/*.qbk")
+file(GLOB_RECURSE releases_files "${PROJECT_SOURCE_DIR}/docs/releases/*.qbk")
 file(GLOB_RECURSE tutorial_files "${PROJECT_SOURCE_DIR}/docs/tutorial/*.qbk")
 file(GLOB_RECURSE index_files "${PROJECT_SOURCE_DIR}/docs/*.idx")
 
 set(documentation_files
-    ${manual_files} ${build_system_files} ${tutorial_files}
+    ${manual_files} ${build_system_files} ${releases_files} ${tutorial_files}
     ${base_files} ${index_files})
 
 set(documentation_dependencies
@@ -47,6 +48,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/error.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/error_code.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception.hpp"
@@ -110,7 +112,10 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_move.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_value_construct.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/unique.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/all_any_none.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/count.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/fill.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/is_heap.hpp"
@@ -122,6 +127,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/replace.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/reverse.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/rotate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/search.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/sort.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/unique.hpp"
@@ -140,7 +146,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_localities.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_colocation_id.hpp"
@@ -172,6 +178,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_pool_base.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/barrier.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
@@ -356,8 +363,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=531
-                boost.image.h=105
+                boost.image.w=567
+                boost.image.h=125
                 boost.image.alt="HPX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
@@ -424,6 +431,7 @@ create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})
 source_group("Documentation\\Manual\\BuildSystem" FILES ${build_system_files})
+source_group("Documentation\\Releases" FILES ${releases_files})
 source_group("Documentation\\Tutorial" FILES ${tutorial_files})
 if(BOOSTAUTOINDEX_FOUND)
   source_group("Documentation\\Index" FILES ${index_files})

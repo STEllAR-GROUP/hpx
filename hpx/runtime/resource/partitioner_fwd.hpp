@@ -34,6 +34,7 @@ namespace hpx
         // May be used anywhere in code and returns a reference to the single,
         // global resource partitioner.
         HPX_EXPORT detail::partitioner& get_partitioner();
+        HPX_EXPORT bool is_partitioner_valid();
 
         // resource_partitioner mode
         enum partitioner_mode
@@ -45,7 +46,7 @@ namespace hpx
 
         using scheduler_function =
             util::function_nonser<
-                std::unique_ptr<hpx::threads::detail::thread_pool_base>(
+                std::unique_ptr<hpx::threads::thread_pool_base>(
                     hpx::threads::policies::callback_notifier&,
                     std::size_t, std::size_t, std::size_t, std::string const&
                 )>;
@@ -61,10 +62,8 @@ namespace hpx
             local_priority_lifo = 2,
             static_ = 3,
             static_priority = 4,
-            abp_priority = 5,
-            hierarchy = 6,
-            periodic_priority = 7,
-            throttle = 8
+            abp_priority_fifo = 5,
+            abp_priority_lifo = 6,
         };
     }
 }

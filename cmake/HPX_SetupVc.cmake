@@ -78,6 +78,8 @@ if(NOT MSVC)
   foreach(_flag ${Vc_ARCHITECTURE_FLAGS})
     hpx_add_compile_flag(${_flag})
   endforeach()
+else()
+  hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 endif()
 
 hpx_add_config_define(HPX_HAVE_DATAPAR)

@@ -309,8 +309,8 @@ namespace hpx { namespace plugins { namespace parcel
                 HPX_THROWS_IF(ec, bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
                     hpx::util::format(
-                        "action type %s does not match any known type, "
-                        "known action types: \n%s", p.parameters_, types));
+                        "action type {} does not match any known type, "
+                        "known action types: \n{}", p.parameters_, types));
                 return false;
             }
 
@@ -339,8 +339,8 @@ namespace hpx { namespace plugins { namespace parcel
                 HPX_THROWS_IF(ec, bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
                     hpx::util::format(
-                        "action type %s does not match any known type, "
-                        "known action types: \n%s", p.parameters_, types));
+                        "action type {} does not match any known type, "
+                        "known action types: \n{}", p.parameters_, types));
                 return false;
             }
         }

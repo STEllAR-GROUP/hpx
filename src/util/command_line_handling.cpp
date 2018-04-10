@@ -41,6 +41,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util
@@ -67,13 +68,14 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline void encode (std::string &str, char s, char const *r)
+        inline void encode(
+            std::string& str, char s, char const* r, std::size_t inc = 1ull)
         {
             std::string::size_type pos = 0;
             while ((pos = str.find_first_of(s, pos)) != std::string::npos)
             {
                 str.replace (pos, 1, r);
-                ++pos;
+                pos += inc;
             }
         }
 
@@ -81,6 +83,12 @@ namespace hpx { namespace util
         {
             encode(str, '\n', "\\n");
             return str;
+        }
+
+        inline std::string encode_and_enquote(std::string str)
+        {
+            encode(str, '\"', "\\\"", 2);
+            return detail::enquote(std::move(str));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -190,7 +198,7 @@ namespace hpx { namespace util
             return num_localities;
         }
 
-        std::string handle_queueing(util::manage_config& cfgmap,
+        std::string handle_queuing(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm, std::string default_)
         {
             // command line options is used preferred
@@ -344,6 +352,30 @@ namespace hpx { namespace util
 #endif
             }
 
+            // make sure minimal requested number of threads is observed
+            std::size_t min_os_threads = cfgmap.get_value<std::size_t>(
+                "hpx.force_min_os_threads", threads);
+
+            if (min_os_threads == 0)
+            {
+                throw hpx::detail::command_line_error(
+                    "Number of hpx.force_min_os_threads must be greater than "
+                    "0");
+            }
+
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+            if (min_os_threads > HPX_HAVE_MAX_CPU_COUNT)
+            {
+                throw hpx::detail::command_line_error("Requested more than "
+                    HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)
+                    " hpx.force_min_os_threads "
+                    "to use for this application, use the option "
+                    "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+            }
+#endif
+
+            threads = (std::max)(threads, min_os_threads);
+
             if (!initial && env.found_batch_environment() &&
                 using_nodelist && (threads > batch_threads))
             {
@@ -490,7 +522,7 @@ namespace hpx { namespace util
             // Check for parsing failures
             if (!iftransform) {
                 throw hpx::detail::command_line_error(hpx::util::format(
-                    "Could not parse --hpx:iftransform argument '%1%'",
+                    "Could not parse --hpx:iftransform argument '{1}'",
                     vm["hpx:iftransform"].as<std::string>()));
             }
 
@@ -533,7 +565,7 @@ namespace hpx { namespace util
 
                 // raise hard error if node file could not be opened
                 throw hpx::detail::command_line_error(hpx::util::format(
-                    "Could not open nodefile: '%s'", node_file));
+                    "Could not open nodefile: '{}'", node_file));
             }
         }
         else if (vm.count("hpx:nodes")) {
@@ -740,7 +772,7 @@ namespace hpx { namespace util
 #endif
 
         // handle setting related to schedulers
-        queuing_ = detail::handle_queueing(cfgmap, vm, "local-priority-fifo");
+        queuing_ = detail::handle_queuing(cfgmap, vm, "local-priority-fifo");
         ini_config += "hpx.scheduler=" + queuing_;
 
         affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
@@ -949,7 +981,7 @@ namespace hpx { namespace util
 
                 throw hpx::detail::command_line_error(hpx::util::format(
                     "Invalid argument for option --hpx:print-counter-at: "
-                    "'%1%', allowed values: 'startup', 'shutdown' (default), "
+                    "'{1}', allowed values: 'startup', 'shutdown' (default), "
                     "'noshutdown'", s));
             }
         }
@@ -986,7 +1018,7 @@ namespace hpx { namespace util
         {
             // quote only if it contains whitespace
             std::string arg(argv[i]); //-V108
-            cmd_line += detail::enquote(arg);
+            cmd_line += detail::encode_and_enquote(arg);
 
             if ((i + 1) != argc)
                 cmd_line += " ";
@@ -1010,15 +1042,17 @@ namespace hpx { namespace util
 
             iterator_type  end = unregistered_options.end();
             for (iterator_type  it = unregistered_options.begin(); it != end; ++it)
-                unregistered_options_cmd_line += " " + detail::enquote(*it);
+                unregistered_options_cmd_line +=
+                    " " + detail::encode_and_enquote(*it);
 
             ini_config_ += "hpx.unknown_cmd_line!=" +
-                detail::enquote(cmd_name) + unregistered_options_cmd_line;
+                detail::encode_and_enquote(cmd_name) +
+                unregistered_options_cmd_line;
         }
 
         ini_config_ += "hpx.program_name!=" + cmd_name;
         ini_config_ += "hpx.reconstructed_cmd_line!=" +
-            detail::enquote(cmd_name) + " " +
+            detail::encode_and_enquote(cmd_name) + " " +
             util::reconstruct_command_line(vm_) + " " +
             unregistered_options_cmd_line;
     }
@@ -1047,7 +1081,7 @@ namespace hpx { namespace util
             }
             else {
                 throw hpx::detail::command_line_error(hpx::util::format(
-                    "Invalid argument for option --hpx:help: '%1%', allowed values: "
+                    "Invalid argument for option --hpx:help: '{1}', allowed values: "
                     "'minimal' (default) and 'full'", help_option));
             }
         }
@@ -1128,10 +1162,10 @@ namespace hpx { namespace util
                     HPX_THROW_EXCEPTION(invalid_status,
                         "handle_print_bind",
                         hpx::util::format(
-                            "unexpected mismatch between locality %1%: "
+                            "unexpected mismatch between locality {1}: "
                             "binding "
-                            "reported from HWLOC(%2%) and HPX(%3%) on "
-                            "thread %4%",
+                            "reported from HWLOC({2}) and HPX({3}) on "
+                            "thread {4}",
                             hpx::get_locality_id(), boundcpu_str,
                             pu_mask_str, i));
                 }

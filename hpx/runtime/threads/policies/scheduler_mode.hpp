@@ -26,9 +26,12 @@ namespace hpx { namespace threads { namespace policies
             ///< to act as 'embedded' schedulers. In this case it needs to
             ///< periodically invoke a provided callback into the outer scheduler
             ///< more frequently than normal. This option enables this behavior.
-        enable_elasticity = 0x10        ///< This options allows for the
+        enable_elasticity = 0x10,        ///< This options allows for the
             ///< scheduler to dynamically increase and reduce the number of
-            ///< processing units it runs on.
+            ///< processing units it runs on. Setting this value not succeed for
+            ///< schedulers that do not support this functionality.
+        default_mode = do_background_work | reduce_thread_priority | delay_exit
+            ///< This option represents the default mode.
     };
 }}}
 

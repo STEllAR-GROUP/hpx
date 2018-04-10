@@ -29,12 +29,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 const int random_fill_range = (std::min)(100000, RAND_MAX);
+unsigned int seed = std::random_device{}();
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
     random_fill()
-        : gen(std::rand()),
+        : gen(seed),
         dist(0, random_fill_range)
     {}
 
@@ -143,7 +144,7 @@ void run_benchmark(std::size_t vector_size, int test_count, int base_num,
             first, last, pred);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "partition (%1%) : %2%(sec)";
+    auto fmt = "partition ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
@@ -180,15 +181,15 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     // If simply using current time as seed, random numbers are closer
     //     when time is closer.
-    std::uint32_t seed = hash(std::uint32_t(std::time(nullptr)));
     if (vm.count("seed"))
         seed = vm["seed"].as<std::uint32_t>();
 
-    std::srand(static_cast<unsigned int>(seed));
+    std::mt19937 gen(static_cast<unsigned int>(seed));
+    std::uniform_int_distribution<> dis(0,random_fill_range-1);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    int base_num = std::rand() % random_fill_range;
+    int base_num = dis(gen);
     if (vm.count("base_num"))
         base_num = vm["base_num"].as<int>();
     int test_count = vm["test_count"].as<int>();
@@ -237,8 +238,8 @@ int main(int argc, char* argv[])
             boost::program_options::value<int>(),
             hpx::util::format(
                 "the base number for partitioning."
-                " The range of random_fill is [0, %1%]"
-                " (default: random number in the range [0, %2%]",
+                " The range of random_fill is [0, {1}]"
+                " (default: random number in the range [0, {2}]",
                 random_fill_range, random_fill_range).c_str())
         ("test_count",
             boost::program_options::value<int>()->default_value(10),

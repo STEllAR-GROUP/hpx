@@ -52,18 +52,19 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name)
-          : task_(hpx::get_thread_itt_domain(),
+          : task_(thread_domain_,
                 hpx::util::itt::string_handle(name))
         {}
         template <typename F>
         explicit annotate_function(F && f)
-          : task_(hpx::get_thread_itt_domain(),
+          : task_(thread_domain_,
                 hpx::traits::get_function_annotation_itt<
                     typename std::decay<F>::type
                 >::call(f))
         {}
 
     private:
+        hpx::util::itt::thread_domain thread_domain_;
         hpx::util::itt::task task_;
     };
 #elif defined(HPX_HAVE_APEX)
@@ -72,16 +73,18 @@ namespace hpx { namespace util
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name)
-          : apex_profiler_(name, threads::get_self_apex_data())
-        {}
+        {
+            threads::set_self_apex_data(
+                apex_update_task(threads::get_self_apex_data(),
+                name));
+        }
         template <typename F>
         explicit annotate_function(F && f)
-          : apex_profiler_(hpx::util::thread_description(f),
-                threads::get_self_apex_data())
-        {}
-
-    private:
-        hpx::util::apex_wrapper apex_profiler_;
+        {
+            threads::set_self_apex_data(
+                apex_update_task(threads::get_self_apex_data(),
+                hpx::util::thread_description(f)));
+        }
     };
 #else
     struct annotate_function

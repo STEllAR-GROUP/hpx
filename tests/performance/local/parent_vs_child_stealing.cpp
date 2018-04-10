@@ -90,7 +90,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     hpx::util::format_to(hpx::cout,
-        "%d,%d,%f,%f",
+        "{},{},{},{}",
         num_cores,
         iterations,
         child_stealing_time,

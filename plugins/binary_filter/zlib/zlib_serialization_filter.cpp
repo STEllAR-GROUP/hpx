@@ -96,7 +96,7 @@ namespace hpx { namespace plugins { namespace compression
             HPX_THROW_EXCEPTION(serialization_error,
                 "zlib_serialization_filter::load",
                 hpx::util::format("decompression failure, number of "
-                    "bytes expected: %d, number of bytes decoded: %d",
+                    "bytes expected: {}, number of bytes decoded: {}",
                     size, s));
             return 0;
         }

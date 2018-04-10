@@ -13,16 +13,18 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>    // EXPORTS get_next_id
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/backtrace.hpp>
@@ -57,21 +59,22 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_NORETURN void handle_termination(char const* reason)
+    void handle_termination(char const* reason)
     {
         if (get_config_entry("hpx.attach_debugger", "") == "exception")
         {
             util::attach_debugger();
         }
 
-        std::cerr
+        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        {
+            std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::util::trace() << "\n"
+                << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
-            << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
-            << full_build_string();           // add full build information
-
-        std::abort();
+                << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
+                << full_build_string();           // add full build information
+        }
     }
 
     HPX_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
@@ -121,14 +124,16 @@ namespace hpx
             util::attach_debugger();
         }
 
-        char* reason = strsignal(signum);
-        std::cerr
+        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        {
+            char* reason = strsignal(signum);
+            std::cerr
 #if defined(HPX_HAVE_STACKTRACES)
-            << "{stack-trace}: " << hpx::util::trace() << "\n"
+                << "{stack-trace}: " << hpx::util::trace() << "\n"
 #endif
-            << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
-            << full_build_string();           // add full build information
-
+                << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
+                << full_build_string();           // add full build information
+        }
         std::abort();
     }
 }
@@ -428,7 +433,7 @@ namespace hpx
 
             // rolling_averaging counter
             { "/statistics/rolling_average", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the rolling average value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/rolling_averaging",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -437,7 +442,6 @@ namespace hpx
               ""
             },
 
-#if BOOST_VERSION >= 105600
             // rolling stddev counter
             { "/statistics/rolling_stddev", performance_counters::counter_aggregating,
               "returns the rolling standard deviation value of its base counter over "
@@ -448,11 +452,10 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
-#endif
 
             // median counter
             { "/statistics/median", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the median value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/median",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -463,7 +466,7 @@ namespace hpx
 
             // max counter
             { "/statistics/max", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the maximum value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -474,7 +477,7 @@ namespace hpx
 
             // min counter
             { "/statistics/min", performance_counters::counter_aggregating,
-              "returns the averaged value of its base counter over "
+              "returns the minimum value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -645,6 +648,16 @@ namespace hpx
               &performance_counters::default_counter_discoverer,
               ""
             },
+            // arithmetics count counter
+            { "/arithmetics/count", performance_counters::counter_aggregating,
+              "returns the count value of all values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/count@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_extended_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
         };
         performance_counters::install_counter_types(
             arithmetic_counter_types,
@@ -775,6 +788,10 @@ namespace hpx
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
+        if (!resource::is_partitioner_valid())
+        {
+            return dflt;
+        }
         return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
@@ -785,6 +802,10 @@ namespace hpx
         {
             return get_runtime().get_config().get_entry(key, dflt);
         }
+        if (!resource::is_partitioner_valid())
+        {
+            return std::to_string(dflt);
+        }
         return resource::get_partitioner()
             .get_command_line_switches().rtcfg_.get_entry(key, dflt);
     }
@@ -794,22 +815,32 @@ namespace hpx
     {
         if (get_runtime_ptr() != nullptr)
         {
-            return get_runtime_ptr()->get_config().add_entry(key, value);
+            get_runtime_ptr()->get_config().add_entry(key, value);
+            return;
         }
-        return resource::get_partitioner()
-            .get_command_line_switches().rtcfg_.add_entry(key, value);
+        if (resource::is_partitioner_valid())
+        {
+            resource::get_partitioner()
+                .get_command_line_switches().rtcfg_.add_entry(key, value);
+            return;
+        }
     }
 
     void set_config_entry(std::string const& key, std::size_t value)
     {
         if (get_runtime_ptr() != nullptr)
         {
-            return get_runtime_ptr()->get_config().add_entry(
+            get_runtime_ptr()->get_config().add_entry(
                 key, std::to_string(value));
+            return;
         }
-        return resource::get_partitioner()
-            .get_command_line_switches().rtcfg_.
-                add_entry(key, std::to_string(value));
+        if (resource::is_partitioner_valid())
+        {
+            resource::get_partitioner()
+                .get_command_line_switches().rtcfg_.
+                    add_entry(key, std::to_string(value));
+            return;
+        }
     }
 
     void set_config_entry_callback(std::string const& key,
@@ -818,12 +849,17 @@ namespace hpx
     {
         if (get_runtime_ptr() != nullptr)
         {
-            return get_runtime_ptr()->get_config().add_notification_callback(
+            get_runtime_ptr()->get_config().add_notification_callback(
                 key, callback);
+            return;
         }
-        return resource::get_partitioner()
-            .get_command_line_switches()
-            .rtcfg_.add_notification_callback(key, callback);
+        if (resource::is_partitioner_valid())
+        {
+            resource::get_partitioner()
+                .get_command_line_switches()
+                .rtcfg_.add_notification_callback(key, callback);
+            return;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1132,6 +1168,15 @@ namespace hpx
         return true;        // assume stopped
     }
 
+    bool HPX_EXPORT tolerate_node_faults()
+    {
+#ifdef HPX_HAVE_FAULT_TOLERANCE
+        return true;
+#else
+        return false;
+#endif
+    }
+
     bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();
@@ -1225,17 +1270,6 @@ namespace hpx
     std::string get_thread_name()
     {
         return runtime::get_thread_name();
-    }
-
-    struct itt_domain_tag {};
-    static util::thread_specific_ptr<util::itt::domain, itt_domain_tag> d;
-
-    util::itt::domain const& get_thread_itt_domain()
-    {
-        if (nullptr == d.get())
-            d.reset(new util::itt::domain(get_thread_name().c_str()));
-
-        return *d;
     }
 
     std::uint64_t get_system_uptime()

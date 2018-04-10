@@ -18,10 +18,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> count(0);
 
-void worker(hpx::lcos::local::sliding_semaphore& sem, std::size_t i)
+void worker(hpx::lcos::local::sliding_semaphore& sem)
 {
-    ++count;
-    sem.signal(i);   // signal main thread
+    sem.signal(++count);   // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,7 +29,7 @@ int hpx_main()
     hpx::lcos::local::sliding_semaphore sem(9);
 
     for (std::size_t i = 0; i != 10; ++i)
-        hpx::apply(&worker, std::ref(sem), i + 1);
+        hpx::apply(&worker, std::ref(sem));
 
     // Wait for all threads to finish executing.
     sem.wait(19);

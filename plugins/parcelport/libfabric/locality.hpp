@@ -8,6 +8,7 @@
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 //
 #include <utility>
 #include <cstring>

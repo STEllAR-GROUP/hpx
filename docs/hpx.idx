@@ -92,6 +92,9 @@ get_thread_priority_name              "" "hpx\.threads\.get_thread_priority_name
 get_thread_state_ex_name              "" "hpx\.threads\.get_thread_state_ex_name.*"
 get_stack_size_name                   "" "hpx\.threads\.get_stack_size_name.*"
 
+# hpx/runtime/threads/thread_pool_base.hpp
+thread_pool_base                      "" "hpx\.runtime\.threads\.thread_pool_base.*"
+
 # hpx/components/component_storage/migrate_from_storage.hpp
 migrate_from_storage                  "" "hpx\.components\.migrate_from_s.*"
 
@@ -587,6 +590,10 @@ init                                  "" "hpx\.init_id.*"
 
 # hpx/hpx_start.hpp
 start                                 "" "hpx\.start_id.*"
+
+# hpx/hpx_suspend.hpp
+resume                                "" "hpx\.suspend.*"
+suspend                               "" "hpx\.resume.*"
 
 # hpx/performance_counters/manage_counter_type.hpp
 install_counter_type                  "" "hpx\.performance_counters\.install_counter_type.*"

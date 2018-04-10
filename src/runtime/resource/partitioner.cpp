@@ -54,13 +54,13 @@ namespace hpx { namespace resource
         return get_partitioner().get_pool_name(pool_index);
     }
 
-    threads::detail::thread_pool_base& get_thread_pool(
+    threads::thread_pool_base& get_thread_pool(
         std::string const& pool_name)
     {
         return get_runtime().get_thread_manager().get_pool(pool_name);
     }
 
-    threads::detail::thread_pool_base& get_thread_pool(std::size_t pool_index)
+    threads::thread_pool_base& get_thread_pool(std::size_t pool_index)
     {
         return get_thread_pool(get_pool_name(pool_index));
     }
@@ -140,7 +140,8 @@ namespace hpx { namespace resource
 
         void delete_partitioner()
         {
-            std::lock_guard<compat::mutex> l(partitioner_mtx());
+            // don't lock the mutex as otherwise will be still locked while
+            // being destroyed (leading to problems on some platforms)
             std::unique_ptr<detail::partitioner>& part = partitioner_ref();
             if (part)
                 part.reset();
@@ -153,6 +154,16 @@ namespace hpx { namespace resource
     detail::partitioner &get_partitioner()
     {
         std::unique_ptr<detail::partitioner>& rp = detail::get_partitioner();
+
+        if (!rp)
+        {
+            // if the resource partitioner is not accessed for the first time
+            // if the command-line parsing has not yet been done
+            throw std::invalid_argument(
+                "hpx::resource::get_partitioner() can be called only after "
+                "the resource partitioner has been initialized and before it "
+                "has been deleted");
+        }
 
         if (!rp->cmd_line_parsed())
         {
@@ -175,6 +186,11 @@ namespace hpx { namespace resource
         }
 
         return *rp;
+    }
+
+    bool is_partitioner_valid()
+    {
+        return bool(detail::get_partitioner());
     }
 
     namespace detail
@@ -226,9 +242,10 @@ namespace hpx { namespace resource
 
     ///////////////////////////////////////////////////////////////////////////
     void partitioner::create_thread_pool(std::string const& name,
-        scheduling_policy sched /*= scheduling_policy::unspecified*/)
+        scheduling_policy sched /*= scheduling_policy::unspecified*/,
+        hpx::threads::policies::scheduler_mode mode)
     {
-        partitioner_.create_thread_pool(name, sched);
+        partitioner_.create_thread_pool(name, sched, mode);
     }
 
     void partitioner::create_thread_pool(

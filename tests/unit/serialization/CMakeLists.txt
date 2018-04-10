@@ -21,6 +21,7 @@ set(tests
     serialization_partitioned_vector
     serialization_variant
     serialize_buffer
+    serialize_with_incompatible_signature
     zero_copy_serialization
 )
 

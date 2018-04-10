@@ -26,10 +26,11 @@
 #include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
 struct random_fill
 {
     random_fill(std::size_t random_range)
-        : gen(std::rand()),
+        : gen(seed),
         dist(0, random_range - 1)
     {}
 
@@ -126,7 +127,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
             first, last, dest);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "unique_copy (%1%) : %2%(sec)";
+    auto fmt = "unique_copy ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
@@ -148,11 +149,8 @@ std::string correct_iterator_tag_str(std::string iterator_tag)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
-
-    std::srand(seed);
 
     // pull values from cmd
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();

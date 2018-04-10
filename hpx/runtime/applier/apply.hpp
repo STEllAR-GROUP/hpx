@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@
 #define HPX_APPLIER_APPLY_NOV_27_2008_0957AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
@@ -17,8 +16,9 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
+#include <hpx/runtime/parcelset/put_parcel.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_action.hpp>
@@ -407,8 +407,7 @@ namespace hpx
                 parcelset::write_handler_type(), 0,
                 [](parcelset::parcel&& p, parcelset::write_handler_type&&)
                 {
-                    hpx::get_runtime().get_parcel_handler()
-                        .sync_put_parcel(std::move(p));
+                    hpx::parcelset::sync_put_parcel(std::move(p));
                 });
             return false;     // destination is remote
         }

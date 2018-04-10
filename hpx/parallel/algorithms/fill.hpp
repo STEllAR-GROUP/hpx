@@ -160,11 +160,11 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy>::type
-    >::type
+    template <typename ExPolicy, typename FwdIter, typename T,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_forward_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy>::type
     fill(ExPolicy && policy, FwdIter first, FwdIter last, T value)
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
@@ -268,11 +268,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    >::type
+    template <typename ExPolicy, typename FwdIter,
+        typename Size, typename T,
+    HPX_CONCEPT_REQUIRES_(
+        execution::is_execution_policy<ExPolicy>::value &&
+        hpx::traits::is_forward_iterator<FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     fill_n(ExPolicy && policy, FwdIter first, Size count, T value)
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)

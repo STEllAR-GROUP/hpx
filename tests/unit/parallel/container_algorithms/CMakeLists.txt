@@ -8,6 +8,8 @@ set(tests
     any_of_range
     copy_range
     copyif_range
+    count_range
+    countif_range
     foreach_range
     foreach_range_projection
     generate_range
@@ -34,6 +36,8 @@ set(tests
     reverse_copy_range
     rotate_range
     rotate_copy_range
+    search_range
+    searchn_range
     sort_range
     transform_range
     transform_range_binary

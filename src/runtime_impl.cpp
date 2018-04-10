@@ -241,7 +241,8 @@ namespace hpx {
 
     threads::thread_result_type
     runtime_impl::run_helper(
-        util::function_nonser<runtime::hpx_main_function_type> func, int& result)
+        util::function_nonser<runtime::hpx_main_function_type> const& func,
+        int& result)
     {
         lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
@@ -355,9 +356,9 @@ namespace hpx {
             "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
             threads::get_stack_size(threads::thread_stacksize_large));
 
+        this->runtime::starting();
         threads::thread_id_type id = threads:: invalid_thread_id;
         thread_manager_->register_thread(data, id);
-        this->runtime::starting();
 
         // }}}
 
@@ -813,7 +814,7 @@ namespace hpx {
 //                         , "runtime_impl::init_tss_ex"
 //                         , hpx::util::format(
 //                             "failed to set thread affinity mask ("
-//                             HPX_CPU_MASK_PREFIX "%x) for service thread: %s",
+//                             HPX_CPU_MASK_PREFIX "{:x}) for service thread: {}",
 //                             used_processing_units, runtime::thread_name_.get()));
 //                 }
             }

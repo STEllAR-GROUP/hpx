@@ -79,13 +79,13 @@ namespace hpx { namespace performance_counters { namespace io
     void parse_proc_io(proc_io& pio)
     {
         pid_t pid = getpid();
-        std::string fn = hpx::util::format("/proc/%1%/io", pid);
+        std::string fn = hpx::util::format("/proc/{1}/io", pid);
         std::ifstream ins(fn);
 
         if (!ins.is_open())
             HPX_THROW_EXCEPTION(hpx::no_success,
                 "hpx::performance_counters::io::parse_proc_io",
-                hpx::util::format("failed to open /proc/%1%/io", pid));
+                hpx::util::format("failed to open /proc/{1}/io", pid));
 
         typedef boost::spirit::basic_istream_iterator<char> iterator;
         iterator it(ins), end;
@@ -94,7 +94,7 @@ namespace hpx { namespace performance_counters { namespace io
         if (!qi::phrase_parse(it, end, p, ascii::space, pio))
             HPX_THROW_EXCEPTION(hpx::no_success,
                 "hpx::performance_counters::io::parse_proc_io",
-                hpx::util::format("failed to parse /proc/%1%/io", pid));
+                hpx::util::format("failed to parse /proc/{1}/io", pid));
     }
 
     std::uint64_t get_pio_riss(bool)

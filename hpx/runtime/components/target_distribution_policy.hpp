@@ -9,14 +9,15 @@
 #define HPX_COMPONENTS_TARGET_DISTRIBUTION_POLICY_APR_12_2015_1245PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>

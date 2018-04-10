@@ -91,7 +91,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // now schedule new thread for execution
         threads::detail::set_thread_state_timed(
-            *scheduler_base_, abs_time, id, ec);
+            *scheduler_base_, abs_time, id, nullptr, ec);
         if (ec) return;
 
         if (&ec != &throws)

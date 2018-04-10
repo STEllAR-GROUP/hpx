@@ -16,7 +16,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/throw_exception.hpp>
-#include <hpx/util/yield_while.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/bind.hpp>
@@ -281,7 +280,7 @@ namespace hpx { namespace threads { namespace detail
         util::steady_clock::time_point& abs_time,
         thread_id_type const& thrd, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
-        std::atomic<bool>& started)
+        std::atomic<bool>* started)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -330,7 +329,8 @@ namespace hpx { namespace threads { namespace detail
                 }
             });
 
-        started.store(true);
+        if (started != nullptr)
+            started->store(true);
 
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
@@ -360,7 +360,8 @@ namespace hpx { namespace threads { namespace detail
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_time_point const& abs_time, thread_id_type const& thrd,
         thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, std::size_t thread_num, error_code& ec)
+        thread_priority priority, std::size_t thread_num,
+        std::atomic<bool>* started, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
@@ -371,27 +372,24 @@ namespace hpx { namespace threads { namespace detail
 
         // this creates a new thread which creates the timer and handles the
         // requested actions
-        std::atomic<bool> started(false);
         thread_init_data data(
             util::bind(&at_timer<SchedulingPolicy>,
                 std::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
-                priority, std::ref(started)),
+                priority, started),
             "at_timer (expire at)", 0, priority, thread_num);
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, pending, true, ec); //-V601
-        hpx::util::yield_while(
-            [&started]() { return !started.load(); }, "set_thread_state_timed");
         return newid;
     }
 
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_time_point const& abs_time, thread_id_type const& id,
-        error_code& ec)
+        std::atomic<bool>* started, error_code& ec)
     {
         return set_thread_state_timed(scheduler, abs_time, id, pending,
-            wait_timeout, thread_priority_normal, std::size_t(-1), ec);
+            wait_timeout, thread_priority_normal, std::size_t(-1), started, ec);
     }
 
     /// Set a timer to set the state of the given \a thread to the given
@@ -400,19 +398,20 @@ namespace hpx { namespace threads { namespace detail
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_duration const& rel_time, thread_id_type const& thrd,
         thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, std::size_t thread_num, error_code& ec)
+        thread_priority priority, std::size_t thread_num,
+        std::atomic<bool>& started, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
-            newstate, newstate_ex, priority, thread_num, ec);
+            newstate, newstate_ex, priority, thread_num, started, ec);
     }
 
     template <typename SchedulingPolicy>
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_duration const& rel_time, thread_id_type const& thrd,
-        error_code& ec)
+        std::atomic<bool>* started, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
-            pending, wait_timeout, thread_priority_normal, std::size_t(-1), ec);
+            pending, wait_timeout, thread_priority_normal, std::size_t(-1), started, ec);
     }
 }}}
 

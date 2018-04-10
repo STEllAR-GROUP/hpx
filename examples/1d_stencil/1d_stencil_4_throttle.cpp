@@ -42,7 +42,7 @@ using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
 static bool counters_initialized = false;
-static const char * counter_name = "/threadqueue{locality#%d/total}/length";
+static const char * counter_name = "/threadqueue{{locality#{}/total}/length";
 hpx::naming::id_type counter_id;
 
 id_type get_counter_id() {

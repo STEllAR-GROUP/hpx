@@ -1,4 +1,5 @@
 # Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2018 Nikunj Gupta
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,7 +35,7 @@ macro(create_cmake_test name hpx_dir)
   add_custom_target(${name}.make_configure
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
-      "${PROJECT_SOURCE_DIR}/tests/unit/build/src"
+      "${PROJECT_SOURCE_DIR}/examples/hello_world_component"
       -DHPX_DIR=${hpx_dir}
       ${ADDITIONAL_CMAKE_OPTIONS}
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
@@ -75,8 +76,8 @@ macro(create_pkgconfig_test name hpx_dir)
   add_custom_target(${name}.make_compile
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" make
-      -f "${PROJECT_SOURCE_DIR}/tests/unit/build/src/Makefile"
-      SRC_DIR=${PROJECT_SOURCE_DIR}/tests/unit/build/src
+      -f "${PROJECT_SOURCE_DIR}/examples/hello_world_component/Makefile"
+      SRC_DIR=${PROJECT_SOURCE_DIR}/examples/hello_world_component
       HPX_DIR=${hpx_dir}
       CXX=${CMAKE_CXX_COMPILER}
       CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}

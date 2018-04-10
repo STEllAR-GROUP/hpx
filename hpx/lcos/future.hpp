@@ -37,6 +37,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/lazy_enable_if.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/void_guard.hpp>
 
@@ -895,13 +896,8 @@ namespace hpx { namespace lcos
         ) : base_type(other.valid() ?
                 detail::downcast_to_void(other, false) : nullptr)
         {
-#if BOOST_VERSION >= 105600
             traits::future_access<future<T> >::
                 detach_shared_state(std::move(other));
-#else
-            // Boost before 1.56 doesn't support detaching intrusive pointers
-            other = future<T>();
-#endif
         }
 
         // Effects:

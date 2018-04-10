@@ -10,7 +10,7 @@
 #define HPX_RUNTIME_GET_COLOCATION_ID_HPP
 
 #include <hpx/exception_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 

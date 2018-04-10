@@ -31,6 +31,8 @@
 #include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/format.hpp>
@@ -45,6 +47,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/when_all.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -247,7 +250,7 @@ void addressing_service::launch_bootstrap(
             symbol_ns_.ptr());
 
     rt.get_config().parse("assigned locality",
-        hpx::util::format("hpx.locality!=%1%",
+        hpx::util::format("hpx.locality!={1}",
             naming::get_locality_id_from_gid(here)));
 
     std::uint32_t num_threads = hpx::util::get_entry_as<std::uint32_t>(
@@ -286,8 +289,8 @@ void addressing_service::adjust_local_cache_size(std::size_t cache_size)
             gva_cache_->reserve(cache_size);
 
         LAGAS_(info) << hpx::util::format(
-            "addressing_service::adjust_local_cache_size, previous size: %1%, "
-            "new size: %2%",
+            "addressing_service::adjust_local_cache_size, previous size: {1}, "
+            "new size: {2}",
             previous, cache_size);
     }
 } // }}}
@@ -508,7 +511,7 @@ bool addressing_service::get_console_locality(
 
             LAGAS_(debug) << hpx::util::format(
                 "addressing_server::get_console_locality, "
-                "caching console locality, prefix(%1%)",
+                "caching console locality, prefix({1})",
                 console);
 
             return true;
@@ -1135,7 +1138,7 @@ bool addressing_service::resolve_cached(
 /*
         LAGAS_(debug) << hpx::util::format(
             "addressing_service::resolve_cached, "
-            "cache hit for address %1%, lva %2% (base %3%, lva %4%)",
+            "cache hit for address {1}, lva {2} (base {3}, lva {4})",
             id,
             reinterpret_cast<void*>(addr.address_),
             idbase.get_gid(),
@@ -1150,7 +1153,7 @@ bool addressing_service::resolve_cached(
 
     LAGAS_(debug) << hpx::util::format(
         "addressing_service::resolve_cached, "
-        "cache miss for address %1%",
+        "cache miss for address {1}",
         id);
 
     return false;
@@ -1447,7 +1450,7 @@ lcos::future<std::int64_t> addressing_service::incref_async(
     {
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
-          , hpx::util::format("invalid credit count of %1%", credit));
+          , hpx::util::format("invalid credit count of {1}", credit));
         return lcos::future<std::int64_t>();
     }
 
@@ -1563,7 +1566,7 @@ void addressing_service::decref(
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "addressing_service::decref"
-          , hpx::util::format("invalid credit count of %1%", credit));
+          , hpx::util::format("invalid credit count of {1}", credit));
         return;
     }
 
@@ -1591,7 +1594,7 @@ void addressing_service::decref(
                 HPX_THROWS_IF(ec, bad_parameter
                   , "addressing_service::decref"
                   , hpx::util::format("couldn't insert decref request "
-                        "for %1% (%2%)", raw, credit));
+                        "for {1} ({2})", raw, credit));
                 return;
             }
         }
@@ -1806,7 +1809,7 @@ void addressing_service::update_cache_entry(
         const std::uint64_t count = (g.count ? g.count : 1);
 
         LAGAS_(debug) << hpx::util::format(
-            "addressing_service::update_cache_entry, gid(%1%), count(%2%)",
+            "addressing_service::update_cache_entry, gid({1}), count({2})",
             gid, count);
 
         const gva_cache_key key(gid, count);
@@ -1834,7 +1837,7 @@ void addressing_service::update_cache_entry(
                     LAGAS_(warning) << hpx::util::format(
                         "addressing_service::update_cache_entry, "
                         "aborting update due to key collision in cache, "
-                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)",
+                        "new_gid({1}), new_count({2}), old_gid({3}), old_count({4})",
                         gid, count, idbase.get_gid(), idbase.get_count());
                 }
             }
@@ -2400,7 +2403,7 @@ void addressing_service::send_refcnt_requests(
 
         std::stringstream ss;
         hpx::util::format_to(ss,
-            "%1%, dumping client-side refcnt table, requests(%2%):",
+            "{1}, dumping client-side refcnt table, requests({2}):",
             func_name, requests.size());
 
         typedef addressing_service::refcnt_requests_type::const_reference
@@ -2411,7 +2414,7 @@ void addressing_service::send_refcnt_requests(
             // The [client] tag is in there to make it easier to filter
             // through the logs.
             hpx::util::format_to(ss,
-                "\n  [client] gid(%1%), credits(%2%)",
+                "\n  [client] gid({1}), credits({2})",
                 e.first,
                 e.second);
         }
@@ -2443,7 +2446,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         LAGAS_(info) << hpx::util::format(
             "addressing_service::send_refcnt_requests_non_blocking, "
-            "requests(%1%)",
+            "requests({1})",
             p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -2516,7 +2519,7 @@ addressing_service::send_refcnt_requests_async(
 
     LAGAS_(info) << hpx::util::format(
         "addressing_service::send_refcnt_requests_async, "
-        "requests(%1%)",
+        "requests({1})",
         p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -2668,17 +2671,16 @@ void addressing_service::unmark_as_migrated(
     }
 }
 
-hpx::future<std::pair<naming::id_type, naming::address> >
-addressing_service::begin_migration_async(naming::id_type const& id)
+std::pair<naming::id_type, naming::address>
+addressing_service::begin_migration(naming::id_type const& id)
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
 
     if (!id)
     {
-        return hpx::make_exceptional_future<result_type>(
-            HPX_GET_EXCEPTION(bad_parameter,
-                "addressing_service::begin_migration_async",
-                "invalid reference id"));
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::begin_migration_async",
+            "invalid reference id");
     }
 
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
@@ -2686,16 +2688,15 @@ addressing_service::begin_migration_async(naming::id_type const& id)
     return primary_ns_.begin_migration(gid);
 }
 
-hpx::future<bool> addressing_service::end_migration_async(
+bool addressing_service::end_migration(
     naming::id_type const& id
     )
 {
     if (!id)
     {
-        return hpx::make_exceptional_future<bool>(
-            HPX_GET_EXCEPTION(bad_parameter,
-                "addressing_service::end_migration_async",
-                "invalid reference id"));
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::end_migration_async",
+            "invalid reference id");
     }
 
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
@@ -2852,6 +2853,19 @@ namespace hpx
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
         return agas::register_name(std::move(name), id);
+    }
+
+    hpx::future<bool> register_with_basename(std::string base_name,
+        hpx::future<hpx::id_type> f, std::size_t sequence_nr)
+    {
+        return f.then(
+            [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
+                hpx::future<hpx::id_type> && f
+            ) mutable -> hpx::future<bool>
+            {
+                return register_with_basename(
+                    std::move(base_name), f.get(), sequence_nr);
+            });
     }
 
     hpx::future<hpx::id_type> unregister_with_basename(
