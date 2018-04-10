@@ -792,7 +792,11 @@ jobs:
           # docker-compile.pl is a dirty workaround, and shall be removed ASAP.
           command: |
               cp source/tools/docker/Dockerfile source/tools/docker/.dockerignore
-              .source/tools/docker/docker-compile.pl ${TARGET_IMAGE_NAME}
+              VER="17.03.0-ce"
+              curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+              tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+              mv /tmp/docker/* /usr/bin
+              ./source/tools/docker/docker-compile.pl ${TARGET_IMAGE_NAME}
               docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} \
                 hello_world --hpx:bind=none
               docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} \
