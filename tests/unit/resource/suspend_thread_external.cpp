@@ -7,9 +7,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -23,14 +23,12 @@
 
 int hpx_main(int argc, char* argv[])
 {
-    std::size_t const num_threads = hpx::resource::get_num_threads("default");
+    std::size_t const num_threads = hpx::resource::get_num_threads("worker");
 
-    HPX_TEST_EQ(std::size_t(4), num_threads);
+    HPX_TEST_EQ(std::size_t(3), num_threads);
 
     hpx::threads::thread_pool_base& tp =
-        hpx::resource::get_thread_pool("default");
-
-    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(4));
+        hpx::resource::get_thread_pool("worker");
 
     {
         // Check number of used resources
@@ -50,56 +48,10 @@ int hpx_main(int argc, char* argv[])
     }
 
     {
-        // Check suspending pu on which current thread is running.
-
-        // NOTE: This only works as long as there is another OS thread which has
-        // no work and is able to steal.
-        std::size_t worker_thread_num = hpx::get_worker_thread_num();
-        tp.suspend_processing_unit(worker_thread_num).get();
-        tp.resume_processing_unit(worker_thread_num).get();
-    }
-
-    {
-        // Check when suspending all but one, we end up on the same thread
-        std::size_t thread_num = 0;
-        auto test_function = [&thread_num, &tp]()
-        {
-            HPX_TEST_EQ(thread_num + tp.get_thread_offset(),
-                hpx::get_worker_thread_num());
-        };
-
-        for (thread_num = 0; thread_num < num_threads;
-            ++thread_num)
-        {
-            for (std::size_t thread_num_suspend = 0;
-                thread_num_suspend < num_threads;
-                ++thread_num_suspend)
-            {
-                if (thread_num != thread_num_suspend)
-                {
-                    tp.suspend_processing_unit(thread_num_suspend).get();
-                }
-            }
-
-            hpx::async(test_function).get();
-
-            for (std::size_t thread_num_resume = 0;
-                thread_num_resume < num_threads;
-                ++thread_num_resume)
-            {
-                if (thread_num != thread_num_resume)
-                {
-                    tp.resume_processing_unit(thread_num_resume).get();
-                }
-            }
-        }
-    }
-
-    {
         // Check suspending and resuming the same thread without waiting for
         // each to finish.
         for (std::size_t thread_num = 0;
-             thread_num < hpx::resource::get_num_threads("default");
+             thread_num < hpx::resource::get_num_threads("worker");
              ++thread_num)
         {
             std::vector<hpx::future<void>> fs;
@@ -144,7 +96,7 @@ int hpx_main(int argc, char* argv[])
         while (t.elapsed() < 2)
         {
             for (std::size_t i = 0;
-                i < hpx::resource::get_num_threads("default") * 10;
+                i < hpx::resource::get_num_threads("worker") * 10;
                 ++i)
             {
                 fs.push_back(hpx::async([](){}));
@@ -152,14 +104,14 @@ int hpx_main(int argc, char* argv[])
 
             if (up)
             {
-                if (thread_num != hpx::resource::get_num_threads("default") - 1)
+                if (thread_num < hpx::resource::get_num_threads("worker"))
                 {
                     tp.suspend_processing_unit(thread_num).get();
                 }
 
                 ++thread_num;
 
-                if (thread_num == hpx::resource::get_num_threads("default"))
+                if (thread_num == hpx::resource::get_num_threads("worker"))
                 {
                     up = false;
                     --thread_num;
@@ -191,8 +143,8 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-template <typename Scheduler>
-void test_scheduler(int argc, char* argv[])
+void test_scheduler(int argc, char* argv[],
+    hpx::resource::scheduling_policy scheduler)
 {
     std::vector<std::string> cfg =
     {
@@ -201,70 +153,48 @@ void test_scheduler(int argc, char* argv[])
 
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
-    rp.create_thread_pool("default",
-        [](hpx::threads::policies::callback_notifier& notifier,
-            std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, std::string const& pool_name)
-        -> std::unique_ptr<hpx::threads::thread_pool_base>
+    rp.create_thread_pool("worker", scheduler,
+        hpx::threads::policies::scheduler_mode(
+            hpx::threads::policies::default_mode |
+            hpx::threads::policies::enable_elasticity));
+
+    int const worker_pool_threads = 3;
+    int worker_pool_threads_added = 0;
+
+    for (const hpx::resource::numa_domain& d : rp.numa_domains())
+    {
+        for (const hpx::resource::core& c : d.cores())
         {
-            typename Scheduler::init_parameter_type init(num_threads);
-            std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
-
-            auto mode = hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::do_background_work |
-                hpx::threads::policies::reduce_thread_priority |
-                hpx::threads::policies::delay_exit |
-                hpx::threads::policies::enable_elasticity);
-
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
-                    std::move(scheduler), notifier, pool_index, pool_name, mode,
-                    thread_offset));
-
-            return pool;
-        });
+            for (const hpx::resource::pu& p : c.pus())
+            {
+                if (worker_pool_threads_added < worker_pool_threads)
+                {
+                    rp.add_resource(p, "worker");
+                    ++worker_pool_threads_added;
+                }
+            }
+        }
+    }
 
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
 }
 
 int main(int argc, char* argv[])
 {
-    // NOTE: Static schedulers do not support suspending the own worker thread
-    // because they do not steal work.
+    std::vector<hpx::resource::scheduling_policy> schedulers =
+        {
+            hpx::resource::scheduling_policy::local,
+            hpx::resource::scheduling_policy::local_priority_fifo,
+            hpx::resource::scheduling_policy::local_priority_lifo,
+            hpx::resource::scheduling_policy::abp_priority_fifo,
+            hpx::resource::scheduling_policy::abp_priority_lifo,
+            hpx::resource::scheduling_policy::static_,
+            hpx::resource::scheduling_policy::static_priority,
+        };
 
-    test_scheduler<hpx::threads::policies::local_queue_scheduler<>>(argc, argv);
-    test_scheduler<hpx::threads::policies::local_priority_queue_scheduler<>>(argc,
-        argv);
-
+    for (auto const scheduler : schedulers)
     {
-        bool exception_thrown = false;
-        try
-        {
-            test_scheduler<hpx::threads::policies::static_queue_scheduler<>>(argc,
-                argv);
-        }
-        catch (hpx::exception const&)
-        {
-            exception_thrown = true;
-        }
-
-        HPX_TEST(exception_thrown);
-    }
-
-    {
-        bool exception_thrown = false;
-        try
-        {
-            test_scheduler<
-                hpx::threads::policies::static_priority_queue_scheduler<>
-            >(argc, argv);
-        }
-        catch (hpx::exception const&)
-        {
-            exception_thrown = true;
-        }
-
-        HPX_TEST(exception_thrown);
+        test_scheduler(argc, argv, scheduler);
     }
 
     return hpx::util::report_errors();

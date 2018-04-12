@@ -18,52 +18,69 @@
 #include <utility>
 #include <vector>
 
-int main(int argc, char* argv[])
+// NOTE: Needed for now when initializing resource partitioner separately.
+int hpx_main()
 {
-    std::vector<std::string> scheduler_strings =
+    return 0;
+}
+
+void test_scheduler(int argc, char* argv[],
+    hpx::resource::scheduling_policy scheduler)
+{
+    std::vector<std::string> cfg =
     {
-        "local",
-        "local-priority-lifo",
-        "local-priority-fifo",
-        "static",
-        "static-priority"
+        "hpx.os_threads=4"
     };
 
-    for (auto const& scheduler_string : scheduler_strings)
+    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+
+    rp.create_thread_pool("default", scheduler);
+
+    hpx::start(argc, argv, cfg);
+
+    // Wait for runtime to start
+    hpx::runtime* rt = hpx::get_runtime_ptr();
+    hpx::util::yield_while([rt]()
+        { return rt->get_state() < hpx::state_running; });
+
+    hpx::suspend();
+
+    for (std::size_t i = 0; i < 100; ++i)
     {
-        std::vector<std::string> cfg =
+        hpx::resume();
+
+        hpx::async([]()
             {
-                "hpx.os_threads=4",
-                "hpx.scheduler=" + scheduler_string
-            };
-
-        hpx::start(nullptr, argc, argv, cfg);
-
-        // Wait for runtime to start
-        hpx::runtime* rt = hpx::get_runtime_ptr();
-        hpx::util::yield_while([rt]()
-            { return rt->get_state() < hpx::state_running; });
+                for (std::size_t i = 0; i < 10000; ++i)
+                {
+                    hpx::async([](){});
+                }
+            });
 
         hpx::suspend();
+    }
 
-        for (std::size_t i = 0; i < 100; ++i)
+    hpx::resume();
+    hpx::async([]() { hpx::finalize(); });
+    HPX_TEST_EQ(hpx::stop(), 0);
+}
+
+int main(int argc, char* argv[])
+{
+    std::vector<hpx::resource::scheduling_policy> schedulers =
         {
-            hpx::resume();
+            hpx::resource::scheduling_policy::local,
+            hpx::resource::scheduling_policy::local_priority_fifo,
+            hpx::resource::scheduling_policy::local_priority_lifo,
+            hpx::resource::scheduling_policy::abp_priority_fifo,
+            hpx::resource::scheduling_policy::abp_priority_lifo,
+            hpx::resource::scheduling_policy::static_,
+            hpx::resource::scheduling_policy::static_priority
+        };
 
-            hpx::async([]()
-                       {
-                           for (std::size_t i = 0; i < 10000; ++i)
-                           {
-                               hpx::async([](){});
-                           }
-                       });
-
-            hpx::suspend();
-        }
-
-        hpx::resume();
-        hpx::async([]() { hpx::finalize(); });
-        hpx::stop();
+    for (auto const scheduler : schedulers)
+    {
+        test_scheduler(argc, argv, scheduler);
     }
 
     return hpx::util::report_errors();
