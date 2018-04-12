@@ -1238,6 +1238,7 @@ namespace hpx { namespace threads
     bool topology::set_area_membind_nodeset(
         const void *addr, std::size_t len, void *nodeset) const
     {
+#if !defined(__APPLE__)
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
         int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
@@ -1250,6 +1251,7 @@ namespace hpx { namespace threads
               , "hwloc_set_area_membind_nodeset failed : " + msg);
             return false;
         }
+#endif
         return true;
     }
 
