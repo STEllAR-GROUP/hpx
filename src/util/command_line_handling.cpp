@@ -1199,12 +1199,12 @@ namespace hpx { namespace util
 
         util::manage_config cfgmap(ini_config_);
 
-        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
-            plugin_registries = rtcfg_.load_modules();
-
-        // insert the pre-configured ini settings after loading modules
+        // insert the pre-configured ini settings before loading modules
         for (std::string const& e : ini_config_)
             rtcfg_.parse("<user supplied config>", e, true, false);
+
+        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+            plugin_registries = rtcfg_.load_modules();
 
         // support re-throwing command line exceptions for testing purposes
         int error_mode = util::allow_unregistered;
