@@ -865,6 +865,23 @@ namespace hpx { namespace performance_counters
             return true;
         }
 
+        bool expand_counter_info_pool_threads(
+            counter_info& i, counter_path_elements& p,
+            discover_counter_func const& f, error_code& ec)
+        {
+            std::size_t num_threads =
+                hpx::resource::get_num_threads(p.instanceindex_);
+            for (std::size_t t = 0; t != num_threads; ++t)
+            {
+                p.subinstanceindex_ = static_cast<std::int64_t>(t);
+
+                counter_status status = get_counter_name(p, i.fullname_, ec);
+                if (!status_is_valid(status) || !f(i, ec) || ec)
+                    return false;
+            }
+            return true;
+        }
+
         bool expand_counter_info_threads(
             counter_info& i, counter_path_elements& p,
             discover_counter_func const& f, error_code& ec)
@@ -992,6 +1009,13 @@ namespace hpx { namespace performance_counters
                 return detail::expand_counter_info_pools(
                     expand_threads, i, p, f, ec);
             }
+            else if (p.instancename_ == "pool" && p.subinstancename_ == "*")
+            {
+                p.subinstancename_ = "worker-thread";
+                p.subinstanceindex_ = -1;
+                counter_info i = info;
+                return detail::expand_counter_info_pool_threads(i, p, f, ec);
+            }
 
             if (detail::is_thread_kind(p.instancename_))
             {
@@ -1104,9 +1128,11 @@ namespace hpx { namespace performance_counters
                 }
 
                 // attach the function which registers the id_type with AGAS
-                return f.then(hpx::util::bind(&register_with_agas,
-                    hpx::util::placeholders::_1,
-                    complemented_info.fullname_));
+                return f.then(
+                    hpx::launch::sync,
+                    hpx::util::bind(&register_with_agas,
+                        hpx::util::placeholders::_1,
+                        complemented_info.fullname_));
             }
             catch (hpx::exception const& e) {
                 if (&ec == &throws)
