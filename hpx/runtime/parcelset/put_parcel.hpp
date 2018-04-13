@@ -129,6 +129,7 @@ namespace hpx { namespace parcelset {
                 else
                 {
                     split_gid.then(
+                        hpx::launch::sync,
                         hpx::util::bind(
                             hpx::util::one_shot(
                                 [is_continuation, dest]

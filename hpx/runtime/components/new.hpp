@@ -435,6 +435,7 @@ namespace hpx { namespace components
                         std::forward<Ts>(vs)...
                     )
                     .then(
+                        hpx::launch::sync,
                         [](hpx::future<std::vector<hpx::id_type> > && v)
                             -> std::vector<Client>
                         {
@@ -478,6 +479,7 @@ namespace hpx { namespace components
                         std::forward<Ts>(ts)...
                     )
                     .then(
+                        hpx::launch::sync,
                         [](hpx::future<std::vector<hpx::id_type> > && v)
                             -> std::vector<Client>
                         {

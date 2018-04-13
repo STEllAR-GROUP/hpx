@@ -158,6 +158,7 @@ namespace hpx { namespace performance_counters
         future<T> get_value(bool reset = false)
         {
             return get_counter_value(reset).then(
+                hpx::launch::sync,
                 util::bind_front(
                     &performance_counter::extract_value<T>));
         }
@@ -172,6 +173,7 @@ namespace hpx { namespace performance_counters
         future<T> get_value() const
         {
             return get_counter_value().then(
+                hpx::launch::sync,
                 util::bind_front(
                     &performance_counter::extract_value<T>));
         }
