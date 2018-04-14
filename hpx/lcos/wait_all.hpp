@@ -261,9 +261,8 @@ namespace hpx { namespace lcos
                             // Attach a continuation to this future which will
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
-                            boost::intrusive_ptr<wait_all_frame> this_(this);
                             next_future_data->set_on_completed(
-                                util::deferred_call(f, std::move(this_),
+                                util::deferred_call(f, this,
                                     std::move(next), std::move(end)));
                             return;
                         }
@@ -316,9 +315,8 @@ namespace hpx { namespace lcos
                         void (wait_all_frame::*f)(std::true_type, std::false_type) =
                             &wait_all_frame::await_next<I>;
 
-                        boost::intrusive_ptr<wait_all_frame> this_(this);
                         next_future_data->set_on_completed(util::deferred_call(
-                            f, std::move(this_), std::true_type(), std::false_type()));
+                            f, this, std::true_type(), std::false_type()));
                         return;
                     }
                 }
@@ -369,9 +367,8 @@ namespace hpx { namespace lcos
         typedef typename frame_type::init_no_addref init_no_addref;
 
         result_type data(values);
-        boost::intrusive_ptr<frame_type> frame(
-            new frame_type(data, init_no_addref()), false);
-        frame->wait_all();
+        frame_type frame{data, init_no_addref()};
+        frame.wait_all();
     }
 
     template <typename Future>
@@ -395,9 +392,8 @@ namespace hpx { namespace lcos
         typedef typename frame_type::init_no_addref init_no_addref;
 
         result_type data(values);
-        boost::intrusive_ptr<frame_type> frame(
-            new frame_type(data, init_no_addref()), false);
-        frame->wait_all();
+        frame_type frame (data, init_no_addref());
+        frame.wait_all();
     }
 
     template <typename Future, std::size_t N>
@@ -471,9 +467,8 @@ namespace hpx { namespace lcos
         result_type values =
             result_type(traits::detail::get_shared_state(ts)...);
 
-        boost::intrusive_ptr<frame_type> frame(
-            new frame_type(values, init_no_addref()), false);
-        frame->wait_all();
+        frame_type frame(values, init_no_addref());
+        frame.wait_all();
     }
 }}
 
