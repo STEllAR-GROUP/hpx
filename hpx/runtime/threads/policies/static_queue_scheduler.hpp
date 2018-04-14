@@ -65,7 +65,7 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {}
 
-        virtual bool has_thread_stealing() const { return false; }
+        virtual bool has_thread_stealing() const override { return false; }
 
         static std::string get_scheduler_name()
         {
