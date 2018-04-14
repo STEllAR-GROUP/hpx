@@ -23,6 +23,7 @@ if(EXISTS "${HPX_DIR}")
   hpx_setup_target(
     hello_world_component
     TYPE COMPONENT
+    COMPONENT_DEPENDENCIES iostreams
   )
 
   add_executable(hello_world_client hello_world_client.cpp)

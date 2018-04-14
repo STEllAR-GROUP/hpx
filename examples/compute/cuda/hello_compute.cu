@@ -33,7 +33,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::vector<int> h_C(N);
 
     std::iota(h_A.begin(), h_A.end(), dis(gen));
-    std::iota(h_B.begin(), h_B.end(), dis(gen);
+    std::iota(h_B.begin(), h_B.end(), dis(gen));
 
     std::transform(h_A.begin(), h_A.end(), h_B.begin(), h_C_ref.begin(),
         [](int a, int b) { return a + b; });
