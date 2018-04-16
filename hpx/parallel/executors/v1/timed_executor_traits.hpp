@@ -14,6 +14,7 @@
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/parallel/executors/v1/executor_traits.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/detail/wrap_int.hpp>
 #include <hpx/traits/is_timed_executor.hpp>
 #include <hpx/util/bind.hpp>
@@ -50,6 +51,7 @@ namespace hpx { namespace parallel { inline namespace v3
             {
                 make_ready_future_at(abs_time)
                     .then(
+                        hpx::launch::sync,
                         hpx::util::bind(
                             hpx::util::one_shot(post_at_helper()),
                             hpx::util::placeholders::_1, std::ref(exec),
@@ -137,6 +139,7 @@ namespace hpx { namespace parallel { inline namespace v3
             {
                 return make_ready_future_at(abs_time)
                     .then(
+                        hpx::launch::sync,
                         hpx::util::bind(
                             hpx::util::one_shot(async_execute_at_helper()),
                             hpx::util::placeholders::_1, std::ref(exec),
@@ -240,6 +243,7 @@ namespace hpx { namespace parallel { inline namespace v3
             {
                 return make_ready_future_at(abs_time)
                     .then(
+                        hpx::launch::sync,
                         hpx::util::bind(
                             hpx::util::one_shot(execute_at_helper()),
                             hpx::util::placeholders::_1, std::ref(exec),

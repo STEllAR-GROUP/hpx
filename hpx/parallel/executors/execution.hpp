@@ -1350,6 +1350,7 @@ namespace hpx { namespace parallel { namespace execution
                         ->  result_future_type
                         {
                             return hpx::dataflow(
+                                hpx::launch::sync,
                                 hpx::util::functional::unwrap{},
                                 func(std::move(predecessor)));
                         });
