@@ -1074,15 +1074,38 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        thread_pool_base& pool = default_pool();
+        using performance_counters::detail::create_raw_counter;
 
+        thread_pool_base& pool = default_pool();
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
         {
-            // overall counter
-            using performance_counters::detail::create_raw_counter;
+            // counter for default pool
             util::function_nonser<std::int64_t()> f = util::bind_back(
                 &thread_pool_base::get_scheduler_utilization, &pool);
             return create_raw_counter(info, std::move(f), ec);
+        }
+        else if (paths.instancename_ == "pool")
+        {
+            if (paths.instanceindex_ < 0)
+            {
+                // counter for default pool
+                util::function_nonser<std::int64_t()> f = util::bind_back(
+                    &thread_pool_base::get_scheduler_utilization, &pool);
+                return create_raw_counter(info, std::move(f), ec);
+            }
+            else if (std::size_t(paths.instanceindex_) <
+                hpx::resource::get_num_thread_pools())
+            {
+                // counter specific for given pool
+                thread_pool_base& pool_instance =
+                    hpx::resource::get_thread_pool(paths.instanceindex_);
+
+                util::function_nonser<std::int64_t()> f =
+                    util::bind_back(
+                        &thread_pool_base::get_scheduler_utilization,
+                            &pool_instance);
+                return create_raw_counter(info, std::move(f), ec);
+            }
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "scheduler_utilization_creator",
