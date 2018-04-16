@@ -30,6 +30,7 @@
 #include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
 #include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
@@ -801,7 +802,9 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     future<bool> f = primary_ns_.bind_gid_async(g, id, locality);
 
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&addressing_service::bind_postproc),
             this, _1, id, g
         ));
@@ -1268,7 +1271,9 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
         primary_ns_.resolve_full(gid);
 
     using util::placeholders::_1;
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&addressing_service::resolve_full_postproc),
             this, _1, gid
         ));
@@ -1529,7 +1534,9 @@ lcos::future<std::int64_t> addressing_service::incref_async(
 
     // pass the amount of compensated decrefs to the callback
     using util::placeholders::_1;
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&addressing_service::synchronize_with_async_incref),
             this, _1, keep_alive, pending_decrefs
         ));
@@ -1648,7 +1655,9 @@ lcos::future<bool> addressing_service::register_name_async(
     std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
-        return f.then(util::bind_back(
+        return f.then(
+            hpx::launch::sync,
+            util::bind_back(
                 util::one_shot(&correct_credit_on_failure),
                 id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
             ));
@@ -1728,7 +1737,9 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         symbol_ns_.on_event(name, call_for_past_events, p.get_id());
 
     using util::placeholders::_1;
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&detail::on_register_event), _1, std::move(result_f)
         ));
 }
@@ -2859,6 +2870,7 @@ namespace hpx
         hpx::future<hpx::id_type> f, std::size_t sequence_nr)
     {
         return f.then(
+            hpx::launch::sync,
             [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
                 hpx::future<hpx::id_type> && f
             ) mutable -> hpx::future<bool>

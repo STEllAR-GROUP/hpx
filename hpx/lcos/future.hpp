@@ -1080,6 +1080,7 @@ namespace hpx { namespace lcos
         make_future_helper(Future && f) //-V659
         {
             return f.then(
+                hpx::launch::sync,
                 [](Future && f) -> T
                 {
                     return util::void_guard<T>(), f.get();
@@ -1121,6 +1122,7 @@ namespace hpx { namespace lcos
         convert_future_helper(Future && f, Conv && conv) //-V659
         {
             return f.then(
+                hpx::launch::sync,
                 [HPX_CAPTURE_FORWARD(conv)](Future && f) -> T
                 {
                     return hpx::util::invoke(conv, f.get());
@@ -1422,6 +1424,7 @@ namespace hpx { namespace lcos
             "result type by using the supplied conversion function");
 
         return f.then(
+                hpx::launch::sync,
             [HPX_CAPTURE_FORWARD(conv)](hpx::shared_future<U> const& f)
             {
                 return hpx::util::invoke(conv, f.get());
