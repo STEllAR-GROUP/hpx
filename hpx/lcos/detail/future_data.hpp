@@ -268,8 +268,7 @@ namespace detail
         result_type* get_result_void(void const* storage, error_code& ec = throws);
         virtual result_type* get_result_void(error_code& ec = throws) = 0;
 
-        virtual void set_exception(std::exception_ptr data,
-            error_code& ec = throws) = 0;
+        virtual void set_exception(std::exception_ptr data) = 0;
 
         // continuation support
 
@@ -319,6 +318,21 @@ namespace detail
     {
         HPX_NON_COPYABLE(future_data_base);
 
+    private:
+        static void construct(void* p)
+        {
+            ::new (p) result_type();
+        }
+
+        template <typename T, typename ... Ts>
+        static void construct(void* p, T && t, Ts &&... ts)
+        {
+            ::new (p) result_type(
+                future_data_result<Result>::set(std::forward<T>(t)),
+                std::forward<Ts>(ts)...);
+        }
+
+    public:
         typedef typename future_data_result<Result>::type result_type;
         typedef future_data_base<traits::detail::future_data_void> base_type;
         typedef lcos::local::spinlock mutex_type;
@@ -333,18 +347,26 @@ namespace detail
           : base_type(no_addref)
         {}
 
-        template <typename Target>
-        future_data_base(Target && data, init_no_addref no_addref)
+        struct default_construct {};
+
+        future_data_base(init_no_addref no_addref, default_construct)
           : base_type(no_addref)
         {
-            result_type* value_ptr =
-                reinterpret_cast<result_type*>(&storage_);
-            ::new ((void*)value_ptr) result_type(
-                future_data_result<Result>::set(std::forward<Target>(data)));
+            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            construct(value_ptr);
             state_ = value;
         }
 
-        future_data_base(std::exception_ptr const& e, init_no_addref no_addref)
+        template <typename ... Ts>
+        future_data_base(init_no_addref no_addref, Ts&&... ts)
+          : base_type(no_addref)
+        {
+            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            construct(value_ptr, std::forward<Ts>(ts)...);
+            state_ = value;
+        }
+
+        future_data_base(init_no_addref no_addref, std::exception_ptr const& e)
           : base_type(no_addref)
         {
             std::exception_ptr* exception_ptr =
@@ -352,7 +374,7 @@ namespace detail
             ::new ((void*)exception_ptr) std::exception_ptr(e);
             state_ = exception;
         }
-        future_data_base(std::exception_ptr && e, init_no_addref no_addref)
+        future_data_base(init_no_addref no_addref, std::exception_ptr && e)
           : base_type(no_addref)
         {
             std::exception_ptr* exception_ptr =
@@ -394,16 +416,16 @@ namespace detail
             return base_type::get_result_void(&storage_, ec);
         }
 
-        /// Set the result of the requested action.
-        template <typename Target>
-        void set_value(Target && data, error_code& ec = throws)
+        // Set the result of the requested action.
+        template <typename ... Ts>
+        void set_value(Ts&& ... ts)
         {
             std::unique_lock<mutex_type> l(mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked(l)) {
                 l.unlock();
-                HPX_THROWS_IF(ec, promise_already_satisfied,
+                HPX_THROW_EXCEPTION(promise_already_satisfied,
                     "future_data_base::set_value",
                     "data has already been set for this future");
                 return;
@@ -413,10 +435,8 @@ namespace detail
             on_completed_ = completed_callback_vector_type();
 
             // set the data
-            result_type* value_ptr =
-                reinterpret_cast<result_type*>(&storage_);
-            ::new ((void*)value_ptr) result_type(
-                future_data_result<Result>::set(std::forward<Target>(data)));
+            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            construct(value_ptr, std::forward<Ts>(ts)...);
             state_ = value;
 
             // handle all threads waiting for the future to become ready
@@ -428,7 +448,7 @@ namespace detail
             //       relinquishes the lock before resuming the waiting thread
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
-            while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
+            while (cond_.notify_one(std::move(l), threads::thread_priority_boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -441,15 +461,14 @@ namespace detail
                 handle_on_completed(std::move(on_completed));
         }
 
-        void set_exception(
-            std::exception_ptr data, error_code& ec = throws) override
+        void set_exception(std::exception_ptr data) override
         {
             std::unique_lock<mutex_type> l(mtx_);
 
             // check whether the data has already been set
             if (is_ready_locked(l)) {
                 l.unlock();
-                HPX_THROWS_IF(ec, promise_already_satisfied,
+                HPX_THROW_EXCEPTION(promise_already_satisfied,
                     "future_data_base::set_exception",
                     "data has already been set for this future");
                 return;
@@ -473,7 +492,7 @@ namespace detail
             //       relinquishes the lock before resuming the waiting thread
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
-            while (cond_.notify_one(std::move(l), threads::thread_priority_boost, ec))
+            while (cond_.notify_one(std::move(l), threads::thread_priority_boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -583,16 +602,16 @@ namespace detail
           : future_data_base<Result>(no_addref)
         {}
 
-        template <typename Target>
-        future_data(Target && data, init_no_addref no_addref)
-          : future_data_base<Result>(std::forward<Target>(data), no_addref)
+        template <typename ... Ts>
+        future_data(init_no_addref no_addref, Ts&&... ts)
+          : future_data_base<Result>(no_addref, std::forward<Ts>(ts)...)
         {}
 
-        future_data(std::exception_ptr const& e, init_no_addref no_addref)
-          : future_data_base<Result>(e, no_addref)
+        future_data(init_no_addref no_addref, std::exception_ptr const& e)
+          : future_data_base<Result>(no_addref, e)
         {}
-        future_data(std::exception_ptr && e, init_no_addref no_addref)
-          : future_data_base<Result>(std::move(e), no_addref)
+        future_data(init_no_addref no_addref, std::exception_ptr && e)
+          : future_data_base<Result>(no_addref, std::move(e))
         {}
 
         ~future_data() noexcept override = default;
@@ -613,24 +632,29 @@ namespace detail
             other_allocator;
 
         future_data_allocator(other_allocator const& alloc)
-          : future_data<Result>(), alloc_(alloc)
+          : future_data<Result>()
+          , alloc_(alloc)
         {}
         future_data_allocator(init_no_addref no_addref,
                 other_allocator const& alloc)
-          : future_data<Result>(no_addref), alloc_(alloc)
+          : future_data<Result>(no_addref)
+          , alloc_(alloc)
         {}
-        template <typename Target>
-        future_data_allocator(Target && data, init_no_addref no_addref,
+        template <typename... T>
+        future_data_allocator(init_no_addref no_addref, T&&... ts,
                 other_allocator const& alloc)
-          : future_data<Result>(std::forward<Target>(data), no_addref), alloc_(alloc)
+          : future_data<Result>(no_addref, std::forward<T>(ts)...)
+          , alloc_(alloc)
         {}
-        future_data_allocator(std::exception_ptr const& e,
-                init_no_addref no_addref, other_allocator const& alloc)
-          : future_data<Result>(e, no_addref), alloc_(alloc)
+        future_data_allocator(init_no_addref no_addref,
+                std::exception_ptr const& e, other_allocator const& alloc)
+          : future_data<Result>(no_addref, e)
+          , alloc_(alloc)
         {}
-        future_data_allocator(std::exception_ptr && e,
-                init_no_addref no_addref, other_allocator const& alloc)
-          : future_data<Result>(std::move(e), no_addref), alloc_(alloc)
+        future_data_allocator(init_no_addref no_addref,
+                std::exception_ptr && e, other_allocator const& alloc)
+          : future_data<Result>(no_addref, std::move(e))
+          , alloc_(alloc)
         {}
 
     private:
@@ -668,9 +692,10 @@ namespace detail
 
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
-                util::bind(util::one_shot(&timed_future_data::set_value),
-                    std::move(this_),
-                    future_data_result<Result>::set(std::forward<Result_>(init))),
+                [HPX_CAPTURE_MOVE(this_), HPX_CAPTURE_FORWARD(init)]()
+                {
+                    this_->set_value(init);
+                },
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, true, threads::thread_priority_boost,
                 std::size_t(-1), threads::thread_stacksize_current, ec);
@@ -686,11 +711,6 @@ namespace detail
                 // thread scheduling failed, report error to the new future
                 this->base_type::set_exception(hpx::detail::access_exception(ec));
             }
-        }
-
-        void set_value(result_type const& value)
-        {
-            this->base_type::set_value(value);
         }
     };
 
@@ -815,10 +835,9 @@ namespace detail
             this->future_data<Result>::set_data(std::forward<T>(result));
         }
 
-        void set_exception(
-            std::exception_ptr e, error_code& ec = throws)
+        void set_exception(std::exception_ptr e)
         {
-            this->future_data<Result>::set_exception(std::move(e), ec);
+            this->future_data<Result>::set_exception(std::move(e));
         }
 
         virtual void do_run()

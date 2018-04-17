@@ -54,12 +54,12 @@ namespace hpx { namespace lcos { namespace local
               : f_(std::move(f))
             {}
 
-            task_object(F const& f, init_no_addref no_addref)
+            task_object(init_no_addref no_addref, F const& f)
               : base_type(no_addref)
               , f_(f)
             {}
 
-            task_object(F&& f, init_no_addref no_addref)
+            task_object(init_no_addref no_addref, F&& f)
               : base_type(no_addref)
               , f_(std::move(f))
             {}
@@ -152,23 +152,23 @@ namespace hpx { namespace lcos { namespace local
               , exec_(&exec)
             {}
 
-            task_object(F const& f, init_no_addref no_addref)
+            task_object(init_no_addref no_addref, F const& f)
               : base_type(f, no_addref)
               , exec_(nullptr)
             {}
 
-            task_object(F&& f, init_no_addref no_addref)
+            task_object(init_no_addref no_addref, F&& f)
               : base_type(std::move(f), no_addref)
               , exec_(nullptr)
             {}
 
-            task_object(Executor& exec, F const& f, init_no_addref no_addref)
-              : base_type(f, no_addref)
+            task_object(Executor& exec, init_no_addref no_addref, F const& f)
+              : base_type(no_addref, f)
               , exec_(&exec)
             {}
 
-            task_object(Executor& exec, F&& f, init_no_addref no_addref)
-              : base_type(std::move(f), no_addref)
+            task_object(Executor& exec, init_no_addref no_addref, F&& f)
+              : base_type(no_addref, std::move(f))
               , exec_(&exec)
             {}
 
@@ -234,12 +234,12 @@ namespace hpx { namespace lcos { namespace local
               : base_type(std::move(f))
             {}
 
-            cancelable_task_object(F const& f, init_no_addref no_addref)
-              : base_type(f, no_addref)
+            cancelable_task_object(init_no_addref no_addref, F const& f)
+              : base_type(no_addref, f)
             {}
 
-            cancelable_task_object(F && f, init_no_addref no_addref)
-              : base_type(std::move(f), no_addref)
+            cancelable_task_object(init_no_addref no_addref, F && f)
+              : base_type(no_addref, std::move(f))
             {}
         };
 
@@ -271,22 +271,22 @@ namespace hpx { namespace lcos { namespace local
               : base_type(exec, std::move(f))
             {}
 
-            cancelable_task_object(F const& f, init_no_addref no_addref)
-              : base_type(f, no_addref)
+            cancelable_task_object(init_no_addref no_addref, F const& f)
+              : base_type(no_addref, f)
             {}
 
-            cancelable_task_object(F && f, init_no_addref no_addref)
-              : base_type(std::move(f), no_addref)
+            cancelable_task_object(init_no_addref no_addref, F && f)
+              : base_type(no_addref, std::move(f))
             {}
 
-            cancelable_task_object(Executor& exec, F const& f,
-                    init_no_addref no_addref)
-              : base_type(exec, f, no_addref)
+            cancelable_task_object(
+                    Executor& exec, init_no_addref no_addref, F const& f)
+              : base_type(exec, no_addref, f)
             {}
 
-            cancelable_task_object(Executor& exec, F && f,
-                    init_no_addref no_addref)
-              : base_type(exec, std::move(f), no_addref)
+            cancelable_task_object(
+                    Executor& exec, init_no_addref no_addref, F&& f)
+              : base_type(exec, no_addref, std::move(f))
             {}
         };
     }
@@ -320,8 +320,8 @@ namespace hpx { namespace lcos { namespace local
             static return_type call(F&& f)
             {
                 return return_type(
-                    new task_object<Result, F, void>(
-                        std::forward<F>(f), init_no_addref()),
+                    new task_object<Result, F, void>(init_no_addref{},
+                        std::forward<F>(f)),
                     false);
             }
 
@@ -330,7 +330,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return return_type(
                     new task_object<Result, Result (*)(), void>(
-                        f, init_no_addref()),
+                        init_no_addref{}, f),
                     false);
             }
         };
@@ -351,7 +351,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return return_type(
                     new task_object<Result, F, Executor>(exec,
-                        std::forward<F>(f), init_no_addref()),
+                        init_no_addref{}, std::forward<F>(f)),
                     false);
             }
 
@@ -360,7 +360,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return return_type(
                     new task_object<Result, Result (*)(), Executor>(
-                        exec, f, init_no_addref()),
+                        exec, init_no_addref{}, f),
                     false);
             }
         };
@@ -381,7 +381,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return return_type(
                     new cancelable_task_object<Result, F, void>(
-                        std::forward<F>(f), init_no_addref()),
+                        init_no_addref{}, std::forward<F>(f)),
                     false);
             }
 
@@ -390,7 +390,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return return_type(
                     new cancelable_task_object<Result, Result (*)(), void>(
-                        f, init_no_addref()),
+                        init_no_addref{}, f),
                     false);
             }
         };
@@ -411,7 +411,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return return_type(
                     new cancelable_task_object<Result, F, Executor>(
-                        exec, std::forward<F>(f), init_no_addref()),
+                        exec, init_no_addref{}, std::forward<F>(f)),
                     false);
             }
 
@@ -420,7 +420,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 return return_type(
                     new cancelable_task_object<Result, Result (*)(), Executor>(
-                        exec, f, init_no_addref()),
+                        exec, init_no_addref{}, f),
                     false);
             }
         };

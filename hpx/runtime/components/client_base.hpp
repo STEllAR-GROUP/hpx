@@ -172,16 +172,16 @@ namespace hpx { namespace lcos { namespace detail
           : future_data_base<id_type>(no_addref)
         {}
 
-        template <typename Target>
-        future_data(Target && data, init_no_addref no_addref)
-          : future_data_base<id_type>(std::forward<Target>(data), no_addref)
+        template <typename ... T>
+        future_data(init_no_addref no_addref, T&& ... ts)
+          : future_data_base<id_type>(no_addref, std::forward<T>(ts)...)
         {}
 
-        future_data(std::exception_ptr const& e, init_no_addref no_addref)
-          : future_data_base<id_type>(e, no_addref)
+        future_data(init_no_addref no_addref, std::exception_ptr const& e)
+          : future_data_base<id_type>(no_addref, e)
         {}
-        future_data(std::exception_ptr && e, init_no_addref no_addref)
-          : future_data_base<id_type>(std::move(e), no_addref)
+        future_data(init_no_addref no_addref, std::exception_ptr && e)
+          : future_data_base<id_type>(no_addref, std::move(e))
         {}
 
         ~future_data() noexcept override
