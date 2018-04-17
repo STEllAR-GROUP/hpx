@@ -514,6 +514,11 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename R>
+    typename hpx::traits::detail::shared_state_ptr<
+        typename future_unwrap_result<future<R>>::result_type>::type
+    unwrap(future<R> && future, error_code& ec = throws);
+
     template <typename Future>
     typename hpx::traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
