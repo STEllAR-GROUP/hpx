@@ -9,6 +9,7 @@ set(example_programs)
 if(HPX_WITH_CUDA)
   set(example_programs ${example_programs}
       cublas_matmul
+      cuda_future
       data_copy
       hello_compute
     )
@@ -25,9 +26,11 @@ if(HPX_WITH_CUDA)
   set(cublas_matmul_FLAGS
       DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
 
-  set(cublas_matmul_CUDA Off)
-  set(data_copy_CUDA On)
-  set(hello_compute_CUDA On)
+  set(cublas_matmul_CUDA OFF)
+  set(data_copy_CUDA ON)
+  set(hello_compute_CUDA ON)
+  set(cuda_future_CUDA OFF)
+  set(cuda_future_CUDA_SOURCE trivial_demo)
   set(partitioned_vector_CUDA ON)
   set(partitioned_vector_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
 endif()
@@ -39,6 +42,12 @@ foreach(example_program ${example_programs})
   else()
     set(sources
         ${example_program}.cpp)
+  endif()
+
+  if(${example_program}_CUDA_SOURCE)
+    message("got ${${example_program}_CUDA_SOURCE} " ${${example_program}_CUDA_SOURCE})
+    set(sources
+      ${sources} ${${example_program}_CUDA_SOURCE}.cu)
   endif()
 
   source_group("Source Files" FILES ${sources})
@@ -60,4 +69,3 @@ foreach(example_program ${example_programs})
   add_hpx_pseudo_dependencies(examples.compute.cuda.${example_program}
                               ${example_program}_exe)
 endforeach()
-

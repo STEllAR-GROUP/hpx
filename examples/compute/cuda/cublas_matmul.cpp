@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 John Biddiscombe
+//  Copyright (c) 2017-2018 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -50,8 +50,9 @@
 #include <sstream>
 #include <utility>
 #include <vector>
-
-const char *_cudaGetErrorEnum(cublasStatus_t error);
+//
+#include "cuda_future_helper.h"
+//
 std::mt19937 gen;
 
 // -------------------------------------------------------------------------
@@ -59,82 +60,62 @@ std::mt19937 gen;
 // cublas calls with an hpx future.
 // -------------------------------------------------------------------------
 template<typename T>
-struct cublas_helper
+struct cublas_helper : hpx::compute::util::cuda_future_helper
 {
-public:
-    using future_type    = hpx::future<void>;
-
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     using allocator_type = typename hpx::compute::cuda::allocator<T>;
     using vector_type    = typename hpx::compute::vector<T, allocator_type>;
 #endif
 
     // construct a cublas stream
-    cublas_helper(std::size_t device=0) : target_(device) {
+    cublas_helper(std::size_t device=0) : hpx::compute::util::cuda_future_helper(device) {
         handle_ = 0;
-        stream_ = target_.native_handle().get_stream();
-        cublas_error(cublasCreate(&handle_));
+        hpx::compute::util::cublas_error(cublasCreate(&handle_));
     }
 
+    cublas_helper(cublas_helper& other) = delete;
+    cublas_helper(const cublas_helper& other) = delete;
+    cublas_helper operator=(const cublas_helper& other) = delete;
+
     ~cublas_helper() {
-        cublas_error(cublasDestroy(handle_));
+        hpx::compute::util::cublas_error(cublasDestroy(handle_));
+    }
+
+    // -------------------------------------------------------------------------
+    // launch a cuBlas function and return a future that will become ready
+    // when the task completes, this allows integregration of GPU kernels with
+    // hpx::futuresa and the tasking DAG.
+    template <typename R, typename... Params, typename... Args>
+     hpx::future<void> async(R(*cublas_function)(Params...), Args &&... args) {
+        // make sue we run on the correct device
+        hpx::compute::util::cuda_error(cudaSetDevice(target_.native_handle().get_device()));
+        // make sure this operation takes place on our stream
+        hpx::compute::util::cublas_error(cublasSetStream(handle_, stream_));
+        // insert the cublas handle in the arg list and call the cublas function
+        hpx::compute::util::detail::async_helper<R, Params...> helper;
+        helper(cublas_function, handle_, std::forward<Args>(args)...);
+        return get_future();
     }
 
     // This is a simple wrapper for any cublas call, pass in the same arguments
     // that you would use for a cublas call except the cublas handle which is omitted
     // as the wrapper will supply that for you
-    template <typename Func, typename ...Args>
-    void operator()(Func && cublas_function, Args&&... args)
-    {
+    template <typename R, typename... Params, typename... Args>
+    R apply(R(*cublas_function)(Params...), Args &&... args) {
         // make sue we run on the correct device
-        cuda_error(cudaSetDevice(target_.native_handle().get_device()));
-
+        hpx::compute::util::cuda_error(cudaSetDevice(target_.native_handle().get_device()));
         // make sure this operation takes place on our stream
-        cublas_error(cublasSetStream(handle_, stream_));
-
+        hpx::compute::util::cublas_error(cublasSetStream(handle_, stream_));
         // insert the cublas handle in the arg list and call the cublas function
-        cublas_error(cublas_function(handle_, std::forward<Args>(args)...));
+        hpx::compute::util::detail::async_helper<R, Params...> helper;
+        return helper(cublas_function, handle_, std::forward<Args>(args)...);
     }
-
-    template <typename ...Args>
-    void copy_async(Args&&... args)
-    {
-        // make sue we run on the correct device
-        cuda_error(cudaSetDevice(target_.native_handle().get_device()));
-
-        // insert the uda stream in the arg list and call the cuda memcpy
-        cuda_error(cudaMemcpyAsync (std::forward<Args>(args)..., stream_));
-    }
-
-    // get the future to synchronize this cublas stream with
-    future_type get_future() { return target_.get_future(); }
 
     // return a copy of the cublas handle
-    cublasHandle_t handle() { return handle_; }
-
-    // return a reference to the compute::cuda object owned by this class
-    hpx::compute::cuda::target & target() { return target_; }
-
-    static void cublas_error(cublasStatus_t err) {
-        if (err != CUBLAS_STATUS_SUCCESS) {
-            std::stringstream temp;
-            temp << "cublas function returned error code " << _cudaGetErrorEnum(err);
-            throw std::runtime_error(temp.str());
-        }
-    }
-
-    static void cuda_error(cudaError_t err) {
-        if (err != cudaSuccess) {
-            std::stringstream temp;
-            temp << "cuda function returned error code " << cudaGetErrorString(err);
-            throw std::runtime_error(temp.str());
-        }
-    }
+    cublasHandle_t get_handle() { return handle_; }
 
 private:
-    cublasHandle_t             handle_;
-    cudaStream_t               stream_;
-    hpx::compute::cuda::target target_;
+    cublasHandle_t handle_;
 };
 
 // -------------------------------------------------------------------------
@@ -203,36 +184,6 @@ compare_L2_err(const float *reference, const float *data,
 }
 
 // -------------------------------------------------------------------------
-// not all of these are supported by all cuda/cublas versions
-// comment them out if they cause compiler errors
-const char *_cudaGetErrorEnum(cublasStatus_t error)
-{
-    switch (error) {
-        case CUBLAS_STATUS_SUCCESS:
-            return "CUBLAS_STATUS_SUCCESS";
-        case CUBLAS_STATUS_NOT_INITIALIZED:
-            return "CUBLAS_STATUS_NOT_INITIALIZED";
-        case CUBLAS_STATUS_ALLOC_FAILED:
-            return "CUBLAS_STATUS_ALLOC_FAILED";
-        case CUBLAS_STATUS_INVALID_VALUE:
-            return "CUBLAS_STATUS_INVALID_VALUE";
-        case CUBLAS_STATUS_ARCH_MISMATCH:
-            return "CUBLAS_STATUS_ARCH_MISMATCH";
-        case CUBLAS_STATUS_MAPPING_ERROR:
-            return "CUBLAS_STATUS_MAPPING_ERROR";
-        case CUBLAS_STATUS_EXECUTION_FAILED:
-            return "CUBLAS_STATUS_EXECUTION_FAILED";
-        case CUBLAS_STATUS_INTERNAL_ERROR:
-            return "CUBLAS_STATUS_INTERNAL_ERROR";
-        case CUBLAS_STATUS_NOT_SUPPORTED:
-            return "CUBLAS_STATUS_NOT_SUPPORTED";
-        case CUBLAS_STATUS_LICENSE_ERROR:
-            return "CUBLAS_STATUS_LICENSE_ERROR";
-    }
-    return "<unknown>";
-}
-
-// -------------------------------------------------------------------------
 // Run a simple test matrix multiply using CUBLAS
 // -------------------------------------------------------------------------
 template <typename T>
@@ -257,8 +208,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
 
     // create a cublas helper object we'll use to futurize the cuda events
     cublas_helper<T> cublas(device);
-
-    using cublas_future    = typename cublas_helper<T>::future_type;
+    using cublas_future = typename cublas_helper<T>::future_type;
 
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // for convenience
@@ -286,27 +236,27 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
 
 #else
     T *d_A, *d_B, *d_C;
-    cublas_helper<T>::cuda_error(
+    hpx::compute::util::cuda_error(
         cudaMalloc((void **) &d_A, size_A*sizeof(T)));
 
-    cublas_helper<T>::cuda_error(
+    hpx::compute::util::cuda_error(
         cudaMalloc((void **) &d_B, size_B*sizeof(T)));
 
-    cublas_helper<T>::cuda_error(
+    hpx::compute::util::cuda_error(
         cudaMalloc((void **) &d_C, size_C*sizeof(T)));
 
     // adding async copy operations into the stream before cublas calls puts
     // the copies in the queue before the matrix operations.
-    cublas.copy_async(
+    cublas.copy_apply(
         d_A, h_A.data(), size_A*sizeof(T), cudaMemcpyHostToDevice);
 
-    cublas.copy_async(
+    auto copy_future = cublas.copy_async(
         d_B, h_B.data(), size_B*sizeof(T), cudaMemcpyHostToDevice);
 
     // we can call get_future multiple times on the cublas helper.
     // Each one returns a new future that will be set ready when the stream event
     // for this point is triggered
-    auto copy_future = cublas.get_future().then([](cublas_future &&f){
+    copy_future.then([](cublas_future &&f){
         std::cout << "The async host->device copy operation completed" << std::endl;
     });
 
@@ -321,7 +271,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
     hpx::util::high_resolution_timer t1;
     //
     std::cout << "calling CUBLAS...\n";
-    cublas(
+    auto fut =cublas.async(
         &cublasSgemm,
         CUBLAS_OP_N, CUBLAS_OP_N,
         matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA,
@@ -332,7 +282,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
         d_C, matrix_size.uiWA);
 
     // wait until the operation completes
-    cublas.get_future().get();
+    fut.get();
 
     double us1 = t1.elapsed_microseconds();
     std::cout << "warmup: elapsed_microseconds " << us1 << std::endl;
@@ -343,7 +293,7 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
 
     hpx::util::high_resolution_timer t2;
     for (std::size_t j=0; j<iterations; j++) {
-        cublas(
+        cublas.apply(
             &cublasSgemm,
             CUBLAS_OP_N, CUBLAS_OP_N,
             matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA,
@@ -358,11 +308,8 @@ void matrixMultiply(sMatrixSize &matrix_size, std::size_t device, std::size_t it
 
 #ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // when the matrix operations complete, copy the result to the host
-    cublas.copy_async(
+    auto copy_finished = cublas.copy_async(
         h_CUBLAS.data(), d_C, size_C*sizeof(T), cudaMemcpyDeviceToHost);
-
-    // and get another future when the copy back is done
-    auto copy_finished = cublas.get_future();
 
 #endif
 
