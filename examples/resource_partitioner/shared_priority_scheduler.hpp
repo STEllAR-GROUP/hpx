@@ -437,6 +437,18 @@ namespace policies {
         {
             return 0;
         }
+
+        std::int64_t get_num_stolen_from_staged(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+        }
+
+        std::int64_t get_num_stolen_to_staged(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+        }
 #endif
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
