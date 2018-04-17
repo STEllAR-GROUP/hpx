@@ -183,13 +183,7 @@ namespace hpx { namespace lcos { namespace local
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
-                if (exec_) {
-                    parallel::execution::post(*exec_,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)));
-                    return threads::invalid_thread_id;
-                }
-                else if (policy == launch::fork) {
+                if (policy == launch::fork) {
                     return threads::register_thread_nullary(
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
