@@ -267,8 +267,8 @@ namespace libfabric
             delete snd;
         }
         LOG_DEBUG_MSG(
-            << "sends_posted "  << decnumber(sends_posted)
-            << "sends_deleted " << decnumber(sends_posted)
+               "sends_posted "  << decnumber(sends_posted)
+            << "sends_deleted " << decnumber(sends_deleted)
             << "acks_received " << decnumber(acks_received)
             << "non_rma-send "  << decnumber(sends_posted-acks_received));
         //
