@@ -26,7 +26,7 @@ set(Boost_ADDITIONAL_VERSIONS
 set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
    HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
-  set(__boost_libraries ${__boost_libraries} log log_setup)
+  set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
 endif()
 
 if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
