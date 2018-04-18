@@ -727,7 +727,7 @@ namespace libfabric
                 struct fi_cq_err_entry e = {};
                 int err_sz = fi_cq_readerr(txcq_, &e ,0);
                 // from the manpage 'man 3 fi_cq_readerr'
-                // 
+                //
                 // On error, a negative value corresponding to
                 // 'fabric errno' is returned
                 //
@@ -806,7 +806,7 @@ namespace libfabric
                 struct fi_cq_err_entry e = {};
                 int err_sz = fi_cq_readerr(rxcq_, &e ,0);
                 // from the manpage 'man 3 fi_cq_readerr'
-                // 
+                //
                 // On error, a negative value corresponding to
                 // 'fabric errno' is returned
                 //
