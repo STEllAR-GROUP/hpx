@@ -40,16 +40,10 @@
 // when we have maxed out the number of sends we can handle
 #define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE  (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS/2)
 
-
 // --------------------------------------------------------------------
 // Enable the use of boost small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
-
-// until we implement immediate data, or counted rdma send completions
-// we will use a small message returned to the sender to signal ok
-// to release buffers.
-#define HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED 1
 
 // --------------------------------------------------------------------
 #include <plugins/parcelport/unordered_map.hpp>
@@ -267,8 +261,8 @@ namespace libfabric
             delete snd;
         }
         LOG_DEBUG_MSG(
-            << "sends_posted "  << decnumber(sends_posted)
-            << "sends_deleted " << decnumber(sends_posted)
+               "sends_posted "  << decnumber(sends_posted)
+            << "sends_deleted " << decnumber(sends_deleted)
             << "acks_received " << decnumber(acks_received)
             << "non_rma-send "  << decnumber(sends_posted-acks_received));
         //
