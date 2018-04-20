@@ -614,7 +614,7 @@ namespace hpx { namespace threads
                 parent_locality_id_ = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
-            if (parent_thread_id_) {
+            if (parent_thread_id_ != nullptr) {
                 set_apex_data(apex_new_task(get_description(),
                     parent_thread_id_.get()->get_apex_data()));
             } else {
@@ -676,6 +676,15 @@ namespace hpx { namespace threads
             }
             if (0 == parent_locality_id_)
                 parent_locality_id_ = get_locality_id();
+#endif
+#if defined(HPX_HAVE_APEX)
+            if (parent_thread_id_ != nullptr) {
+                set_apex_data(apex_new_task(get_description(),
+                    parent_thread_id_.get()->get_apex_data()));
+            } else {
+                set_apex_data(apex_new_task(get_description(),
+                    nullptr));
+            }
 #endif
         }
 
