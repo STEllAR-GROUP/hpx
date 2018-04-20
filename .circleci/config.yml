@@ -287,7 +287,122 @@ jobs:
       - store_artifacts:
           path: tests.unit.lcos
 
-  tests.unit.parallel:
+  tests.unit.parallel.algorithms:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.parallel.algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.algorithms
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.unit.parallel.algorithms
+      - store_artifacts:
+          path: tests.unit.parallel.algorithms
+
+  tests.unit.parallel.block:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.parallel.block
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.block
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.unit.parallel.block
+      - store_artifacts:
+          path: tests.unit.parallel.block
+
+  tests.unit.parallel.container_algorithms:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.parallel.container_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.container_algorithms
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.unit.parallel.container_algorithms
+      - store_artifacts:
+          path: tests.unit.parallel.container_algorithms
+
+  tests.unit.parallel.datapar_algorithms:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.parallel.datapar_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.datapar_algorithms
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.unit.parallel.datapar_algorithms
+      - store_artifacts:
+          path: tests.unit.parallel.datapar_algorithms
+
+  tests.unit.parallel.executors:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: ~/hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.parallel.executors
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.executors
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.unit.parallel.executors
+      - store_artifacts:
+          path: tests.unit.parallel.executors
+
+  tests.unit.parallel.segmented_algorithms:
     <<: *defaults
     steps:
       - restore_cache:
@@ -299,32 +414,18 @@ jobs:
           # We need to compile some tests serially because they eat too much
           # memory
           command: |
-              set +e
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_for_each
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary1
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary2
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_binary3
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_exclusive_scan
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_inclusive_scan2
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_transform_scan2
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find
-              ninja -j1 tests.unit.parallel.segmented_algorithms.partitioned_vector_find2
-              ninja -j2 -k 0 tests.unit.parallel
+              ninja -j1 -k 0 tests.unit.parallel.segmented_algorithms
       - run:
           name: Running Unit Tests
           when: always
           command: |
-              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.parallel.segmented_algorithms
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.unit.parallel
+          path: tests.unit.parallel.segmented_algorithms
       - store_artifacts:
-          path: tests.unit.parallel
+          path: tests.unit.parallel.segmented_algorithms
 
   tests.unit.parcelset:
     <<: *defaults
@@ -844,7 +945,17 @@ workflows:
           <<: *core_dependency
       - tests.unit.lcos:
           <<: *core_dependency
-      - tests.unit.parallel:
+      - tests.unit.parallel.algorithms:
+          <<: *core_dependency
+      - tests.unit.parallel.block:
+          <<: *core_dependency
+      - tests.unit.parallel.container_algorithms:
+          <<: *core_dependency
+      - tests.unit.parallel.datapar_algorithms:
+          <<: *core_dependency
+      - tests.unit.parallel.executors:
+          <<: *core_dependency
+      - tests.unit.parallel.segmented_algorithms:
           <<: *core_dependency
       - tests.unit.parcelset:
           <<: *core_dependency
@@ -902,7 +1013,12 @@ workflows:
             - tests.unit.computeapi
             - tests.unit.diagnostics
             - tests.unit.lcos
-            - tests.unit.parallel
+            - tests.unit.parallel.algorithms
+            - tests.unit.parallel.block
+            - tests.unit.parallel.container_algorithms
+            - tests.unit.parallel.datapar_algorithms
+            - tests.unit.parallel.executors
+            - tests.unit.parallel.segmented_algorithms
             - tests.unit.parcelset
             - tests.unit.performance_counter
             - tests.unit.resource
