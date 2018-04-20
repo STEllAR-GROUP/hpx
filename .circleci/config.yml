@@ -291,9 +291,9 @@ jobs:
     <<: *defaults
     steps:
       - restore_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
       - attach_workspace:
-          at: ~/hpx/build
+          at: /hpx/build
       - run:
           name: Building Unit Tests
           command: |
@@ -314,9 +314,9 @@ jobs:
     <<: *defaults
     steps:
       - restore_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
       - attach_workspace:
-          at: ~/hpx/build
+          at: /hpx/build
       - run:
           name: Building Unit Tests
           command: |
@@ -337,9 +337,9 @@ jobs:
     <<: *defaults
     steps:
       - restore_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
       - attach_workspace:
-          at: ~/hpx/build
+          at: /hpx/build
       - run:
           name: Building Unit Tests
           command: |
@@ -360,9 +360,9 @@ jobs:
     <<: *defaults
     steps:
       - restore_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
       - attach_workspace:
-          at: ~/hpx/build
+          at: /hpx/build
       - run:
           name: Building Unit Tests
           command: |
@@ -383,9 +383,9 @@ jobs:
     <<: *defaults
     steps:
       - restore_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
       - attach_workspace:
-          at: ~/hpx/build
+          at: /hpx/build
       - run:
           name: Building Unit Tests
           command: |
