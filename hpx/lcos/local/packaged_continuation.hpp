@@ -836,7 +836,7 @@ namespace hpx { namespace lcos { namespace detail
         typename future_unwrap_result<Future>::result_type>::type
     unwrap(Future && future, error_code& ec)
     {
-        return unwrap_impl(std::move(future), ec);
+        return unwrap_impl(std::forward<Future>(future), ec);
     }
 }}}
 
