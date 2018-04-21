@@ -159,7 +159,8 @@ namespace hpx { namespace threads
         thread_state_enum state = unknown);
 
 #if defined(HPX_HAVE_APEX)
-    HPX_API_EXPORT void** get_self_apex_data();
+    HPX_API_EXPORT void* get_self_apex_data(void);
+    HPX_API_EXPORT void set_self_apex_data(void * data);
 #endif
 }}
 

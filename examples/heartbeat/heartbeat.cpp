@@ -45,7 +45,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
     if (!id)
     {
         hpx::util::format_to(std::cout,
-            "error: performance counter not found (%s)",
+            "error: performance counter not found ({})",
             name) << std::endl;
         return 1;
     }
@@ -54,7 +54,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
     if (locality_id == hpx::naming::get_locality_id_from_gid(id.get_gid()))
     {
         hpx::util::format_to(std::cout,
-            "error: cannot query performance counters on its own locality (%s)",
+            "error: cannot query performance counters on its own locality ({})",
             name) << std::endl;
         return 1;
     }
@@ -86,7 +86,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
                 zero_time = value.time_;
 
             hpx::util::format_to(std::cout,
-                "  %s,%d,%d[s],%d\n",
+                "  {},{},{}[s],{}\n",
                 name,
                 value.count_,
                 double((value.time_ - zero_time) * 1e-9),

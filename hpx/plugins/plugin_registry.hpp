@@ -38,12 +38,10 @@ namespace hpx { namespace plugins
     /// functions to be exposed by a plugin's registry instance.
     ///
     /// \tparam Plugin   The plugin type this registry should be responsible for.
-    template <typename Plugin>
+    template <typename Plugin, char const* const Name,
+        char const* const Section, char const* const Suffix>
     struct plugin_registry : public plugin_registry_base
     {
-        ///
-        ~plugin_registry() {}
-
         /// \brief Return the ini-information for all contained components
         ///
         /// \param fillini  [in] The module is expected to fill this vector
@@ -54,14 +52,14 @@ namespace hpx { namespace plugins
         /// \return Returns \a true if the parameter \a fillini has been
         ///         successfully initialized with the registry data of all
         ///         implemented in this module.
-        bool get_plugin_info(std::vector<std::string>& fillini)
+        bool get_plugin_info(std::vector<std::string>& fillini) override
         {
             using namespace boost::assign;
-            fillini += std::string("[hpx.plugins.") +
+            fillini += std::string("[") + Section + ".plugins." +
                 unique_plugin_name<plugin_registry>::call() + "]";
-            fillini += "name = " HPX_PLUGIN_STRING;
+            fillini += std::string("name = ") + Name;
             fillini += std::string("path = ") +
-                util::find_prefixes("/hpx", HPX_PLUGIN_STRING);
+                util::find_prefixes(std::string("/") + Suffix, Name);
             fillini += "enabled = 1";
 
             char const* more = traits::plugin_config_data<Plugin>::call();
@@ -89,15 +87,32 @@ namespace hpx { namespace plugins
     )(__VA_ARGS__))                                                           \
 /**/
 
-#define HPX_REGISTER_PLUGIN_REGISTRY_2(PluginType, pluginname)                \
-    typedef hpx::plugins::plugin_registry<PluginType>                         \
-        pluginname ## _plugin_registry_type;                                  \
-    HPX_REGISTER_PLUGIN_BASE_REGISTRY(                                        \
-        pluginname ## _plugin_registry_type, pluginname)                      \
-    HPX_DEF_UNIQUE_PLUGIN_NAME(                                               \
-        pluginname ## _plugin_registry_type, pluginname)                      \
-    template struct hpx::plugins::plugin_registry<PluginType >;               \
-/**/
+#define HPX_REGISTER_PLUGIN_REGISTRY_2(PluginType, pluginname)                 \
+    HPX_REGISTER_PLUGIN_REGISTRY_5(                                            \
+        PluginType, pluginname, HPX_PLUGIN_NAME, "hpx", "hpx")                 \
+    /**/
+#define HPX_REGISTER_PLUGIN_REGISTRY_4(                                        \
+    PluginType, pluginname, pluginsection, pluginsuffix)                       \
+    HPX_REGISTER_PLUGIN_REGISTRY_5(PluginType, pluginname, HPX_PLUGIN_NAME,    \
+        pluginsection, pluginsuffix)                                           \
+    /**/
+#define HPX_REGISTER_PLUGIN_REGISTRY_5(                                        \
+        PluginType, pluginname, pluginstring, pluginsection, pluginsuffix)     \
+    HPX_CXX14_CONSTEXPR char __##pluginname##_string[] =                       \
+        HPX_PP_STRINGIZE(pluginstring);                                        \
+    HPX_CXX14_CONSTEXPR char __##pluginname##_section[] = pluginsection;       \
+    HPX_CXX14_CONSTEXPR char __##pluginname##_suffix[] = pluginsuffix;         \
+    typedef hpx::plugins::plugin_registry<PluginType, __##pluginname##_string, \
+        __##pluginname##_section, __##pluginname##_suffix>                     \
+        __##pluginname##_plugin_registry_type;                                 \
+    HPX_REGISTER_PLUGIN_BASE_REGISTRY(                                         \
+        __##pluginname##_plugin_registry_type, pluginname)                     \
+    HPX_DEF_UNIQUE_PLUGIN_NAME(                                                \
+        __##pluginname##_plugin_registry_type, pluginname)                     \
+    template struct hpx::plugins::plugin_registry<PluginType,                  \
+        __##pluginname##_string, __##pluginname##_section,                     \
+        __##pluginname##_suffix>;                                              \
+    /**/
 
 #endif
 

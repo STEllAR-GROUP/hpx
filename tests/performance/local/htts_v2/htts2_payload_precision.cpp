@@ -182,7 +182,7 @@ struct payload_precision_driver : htts2::driver
                 << "\n";
 
         hpx::util::format_to(std::cout,
-            "%lu,%lu,%lu,%.14g,%.14g,%.14g,%.14g\n",
+            "{},{},{},{:.14g},{:.14g},{:.14g},{:.14g}\n",
             this->osthreads_,
             this->tasks_,
             this->payload_duration_,

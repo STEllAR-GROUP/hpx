@@ -411,6 +411,13 @@ namespace libfabric
             bind_endpoint_to_queues(ep_active_);
 #else
             bind_endpoint_to_queues(ep_passive_);
+            fabric_info_->handle = &(ep_passive->fid);
+
+            LOG_DEBUG_MSG("Creating active endpoint");
+            new_endpoint_active(fabric_info_, &ep_active_);
+            LOG_DEBUG_MSG("active endpoint " << hexpointer(ep_active_);
+
+            bind_endpoint_to_queues(ep_active_);
 #endif
 
             // filling our vector of receivers...
@@ -487,6 +494,7 @@ namespace libfabric
         locality create_local_endpoint()
         {
             struct fid *id;
+            int ret;
 #ifdef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
             LOG_DEBUG_MSG("Creating active endpoint");
             new_endpoint_active(fabric_info_, &ep_active_);
@@ -504,7 +512,7 @@ namespace libfabric
             locality::locality_data local_addr;
             std::size_t addrlen = locality::array_size;
             LOG_DEBUG_MSG("Fetching local address using size " << decnumber(addrlen));
-            int ret = fi_getname(id, local_addr.data(), &addrlen);
+            ret = fi_getname(id, local_addr.data(), &addrlen);
             if (ret || (addrlen>locality::array_size)) {
                 fabric_error(ret, "fi_getname - size error or other problem");
             }
@@ -718,6 +726,15 @@ namespace libfabric
             else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
                 int err_sz = fi_cq_readerr(txcq_, &e ,0);
+                // from the manpage 'man 3 fi_cq_readerr'
+                //
+                // On error, a negative value corresponding to
+                // 'fabric errno' is returned
+                //
+                if(e.err == err_sz) {
+                    LOG_ERROR_MSG("txcq_ Error with len " << hexlength(e.len)
+                        << "context " << hexpointer(e.op_context));
+                }
                 // flags might not be set correctly
                 if (e.flags == (FI_MSG | FI_SEND)) {
                     LOG_ERROR_MSG("txcq Error for FI_SEND with len " << hexlength(e.len)
@@ -788,6 +805,15 @@ namespace libfabric
             else if (ret == -FI_EAVAIL) {
                 struct fi_cq_err_entry e = {};
                 int err_sz = fi_cq_readerr(rxcq_, &e ,0);
+                // from the manpage 'man 3 fi_cq_readerr'
+                //
+                // On error, a negative value corresponding to
+                // 'fabric errno' is returned
+                //
+                if(e.err == err_sz) {
+                    LOG_ERROR_MSG("txcq_ Error with len " << hexlength(e.len)
+                        << "context " << hexpointer(e.op_context));
+                }
                 LOG_ERROR_MSG("rxcq Error with flags " << hexlength(e.flags)
                     << "len " << hexlength(e.len));
             }

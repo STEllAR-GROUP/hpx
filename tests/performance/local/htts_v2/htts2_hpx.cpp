@@ -206,7 +206,7 @@ struct hpx_driver : htts2::driver
                 << "Total Walltime [nanoseconds]"
                 << "\n";
 
-        hpx::util::format_to(std::cout, "%lu,%lu,%lu,%.14g\n",
+        hpx::util::format_to(std::cout, "{},{},{},{:.14g}\n",
             this->osthreads_,
             this->tasks_,
             this->payload_duration_,

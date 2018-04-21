@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/runtime/threads/coroutines/detail/tss.hpp>
@@ -69,6 +70,8 @@ namespace hpx { namespace threads { namespace policies
         HPX_NON_COPYABLE(scheduler_base);
 
     public:
+        typedef compat::mutex pu_mutex_type;
+
         scheduler_base(std::size_t num_threads,
                 char const* description = "",
                 scheduler_mode mode = nothing_special)
@@ -123,7 +126,7 @@ namespace hpx { namespace threads { namespace policies
             // woken up on new work.
             std::chrono::milliseconds period(++wait_count_);
 
-            std::unique_lock<compat::mutex> l(mtx_);
+            std::unique_lock<pu_mutex_type> l(mtx_);
             cond_.wait_for(l, period);
 #endif
         }
@@ -159,7 +162,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(num_thread < suspend_conds_.size());
 
             states_[num_thread].store(state_sleeping);
-            std::unique_lock<compat::mutex> l(suspend_mtxs_[num_thread]);
+            std::unique_lock<pu_mutex_type> l(suspend_mtxs_[num_thread]);
             suspend_conds_[num_thread].wait(l);
 
             // Only set running if still in state_sleeping. Can be set with
@@ -186,6 +189,71 @@ namespace hpx { namespace threads { namespace policies
                 HPX_ASSERT(num_thread < suspend_conds_.size());
                 suspend_conds_[num_thread].notify_one();
             }
+        }
+
+        std::size_t select_active_pu(std::unique_lock<pu_mutex_type>& l,
+            std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1))
+        {
+            if (mode_ & threads::policies::enable_elasticity)
+            {
+                std::size_t states_size = states_.size();
+
+                if (num_thread_fallback == std::size_t(-1))
+                {
+                    // Try indefinitely if there is no fallback
+                    hpx::util::yield_while([this, states_size, &l, &num_thread]()
+                        {
+                            for (std::size_t offset = 0; offset < states_size;
+                                ++offset)
+                            {
+                                std::size_t num_thread_local =
+                                    (num_thread + offset) % states_size;
+
+                                l = std::unique_lock<pu_mutex_type>(
+                                    pu_mtxs_[num_thread_local],
+                                    std::try_to_lock);
+
+                                if (l.owns_lock())
+                                {
+                                    if (states_[num_thread_local] <=
+                                        state_suspended)
+                                    {
+                                        num_thread = num_thread_local;
+                                        return false;
+                                    }
+
+                                    l.unlock();
+                                }
+                            }
+
+                            // Yield after trying all pus, then try again
+                            return true;
+                        });
+
+                    return num_thread;
+                }
+
+                // Try all pus only once if there is a fallback
+                for (std::size_t offset = 0; offset < states_size; ++offset)
+                {
+                    std::size_t num_thread_local =
+                        (num_thread + offset) % states_size;
+
+                    l = std::unique_lock<pu_mutex_type>(
+                        pu_mtxs_[num_thread_local], std::try_to_lock);
+
+                    if (l.owns_lock() &&
+                        states_[num_thread_local] <= state_suspended)
+                    {
+                        return num_thread_local;
+                    }
+                }
+
+                return num_thread_fallback;
+            }
+
+            return num_thread;
         }
 
         // allow to access/manipulate states
@@ -257,7 +325,7 @@ namespace hpx { namespace threads { namespace policies
             mode_.store(mode);
         }
 
-        compat::mutex& get_pu_mutex(std::size_t num_thread)
+        pu_mutex_type& get_pu_mutex(std::size_t num_thread)
         {
             HPX_ASSERT(num_thread < pu_mtxs_.size());
             return pu_mtxs_[num_thread];
@@ -265,6 +333,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
+        virtual bool has_thread_stealing() const { return false; }
 
         inline std::size_t domain_from_local_thread_index(std::size_t n)
         {
@@ -375,16 +444,19 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread) = 0;
+            std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1)) = 0;
 
         virtual bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd) = 0;
 
         virtual void schedule_thread(threads::thread_data* thrd,
             std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1),
             thread_priority priority = thread_priority_normal) = 0;
         virtual void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1),
             thread_priority priority = thread_priority_normal) = 0;
 
         virtual void destroy_thread(threads::thread_data* thrd,
@@ -416,16 +488,16 @@ namespace hpx { namespace threads { namespace policies
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
-        compat::mutex mtx_;
+        pu_mutex_type mtx_;
         compat::condition_variable cond_;
         std::atomic<std::uint32_t> wait_count_;
 #endif
 
         // support for suspension of pus
-        std::vector<compat::mutex> suspend_mtxs_;
+        std::vector<pu_mutex_type> suspend_mtxs_;
         std::vector<compat::condition_variable> suspend_conds_;
 
-        std::vector<compat::mutex> pu_mtxs_;
+        std::vector<pu_mutex_type> pu_mtxs_;
 
         std::vector<std::atomic<hpx::state> > states_;
         char const* description_;

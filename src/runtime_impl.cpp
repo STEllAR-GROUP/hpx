@@ -814,7 +814,7 @@ namespace hpx {
 //                         , "runtime_impl::init_tss_ex"
 //                         , hpx::util::format(
 //                             "failed to set thread affinity mask ("
-//                             HPX_CPU_MASK_PREFIX "%x) for service thread: %s",
+//                             HPX_CPU_MASK_PREFIX "{:x}) for service thread: {}",
 //                             used_processing_units, runtime::thread_name_.get()));
 //                 }
             }

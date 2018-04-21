@@ -129,6 +129,7 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/when_some.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -430,8 +431,9 @@ namespace hpx { namespace lcos
         std::transform(begin, end, std::back_inserter(lazy_values_),
             traits::acquire_future_disp());
 
-        return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind_back(&detail::return_iterator<Iterator>, end));
+        return lcos::when_each(std::forward<F>(f), lazy_values_)
+            .then(hpx::launch::sync,
+                util::bind_back(&detail::return_iterator<Iterator>, end));
     }
 
     template <typename F, typename Iterator>
@@ -449,8 +451,9 @@ namespace hpx { namespace lcos
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        return lcos::when_each(std::forward<F>(f), lazy_values_).then(
-            util::bind_back(&detail::return_iterator<Iterator>, begin));
+        return lcos::when_each(std::forward<F>(f), lazy_values_)
+            .then(hpx::launch::sync,
+                util::bind_back(&detail::return_iterator<Iterator>, begin));
     }
 
     template <typename F>

@@ -852,7 +852,7 @@ namespace hpx { namespace components { namespace server
                 util::unlock_guard<compat::mutex> ul(mtx_);
 
                 util::yield_while(
-                    [&tm, &l, timeout, &t, start_time, &timed_out]()
+                    [&tm, timeout, &t, start_time, &timed_out]()
                     {
                         tm.cleanup_terminated(true);
 
@@ -875,7 +875,7 @@ namespace hpx { namespace components { namespace server
                     start_time = t.elapsed();
 
                     util::yield_while(
-                        [&tm, &l, timeout, &t, start_time]()
+                        [&tm, timeout, &t, start_time]()
                         {
                             tm.abort_all_suspended_threads();
                             tm.cleanup_terminated(true);
@@ -1967,7 +1967,7 @@ namespace hpx { namespace components { namespace server
                               << ": " << e.what();
                 if (e.get_error_code().value() == hpx::commandline_option_error)
                 {
-                    std::cerr << "runtime_support::load_pluginss: "
+                    std::cerr << "runtime_support::load_plugins: "
                               << "invalid command line option(s) to "
                               << instance << " component: " << e.what()
                               << std::endl;

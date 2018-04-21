@@ -39,7 +39,7 @@ namespace hpx { namespace util { namespace functional
                 HPX_THROW_EXCEPTION(hpx::no_success,
                     "extract_locality::operator()",
                     hpx::util::format(
-                        "could not resolve colocated locality for id(%1%)",
+                        "could not resolve colocated locality for id({1})",
                         id));
                 return naming::invalid_id;
             }

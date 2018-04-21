@@ -1,6 +1,6 @@
 [/==============================================================================
     Copyright (C) 2007-2015 Hartmut Kaiser
-    Copyright (C) 2016-2017 Adrian Serio
+    Copyright (C) 2016-2018 Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -67,6 +67,7 @@ our tables below.
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
   [[Agustin Berge]           [__cct__, __lsu__]   [[$./images/emails/aberge.png]]]
+  [[Mikael Simberg]          [__cscs__]           [[$./images/emails/msimberg.png]]]
   [[John Biddiscombe]        [__cscs__]           [[$./images/emails/biddisco.png]]]
   [[Anton Bikineev]          [__cct__, __lsu__]   [[$./images/emails/antbikineev.png]]]
   [[Martin Stumpf]           [__inf3__, __fau__]  [[$./images/emails/martinhstumpf.png]]]
@@ -97,6 +98,13 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Mikael Simberg (__cscs__), for his tireless help cleaning up 
+  and maintaining __hpx__.
+* Christopher Ogle, for his contributions to the parallel algorithms.
+* Surya Priy, for his work with statistic performance counters.
+* Anushi Maheshwari, for her work on random number generation.
+* Bruno Pitrus, for his work with parallel algorithms.
+* Nikunj Gupta, for his fixes for tests.
 * Christopher Taylor, for his interest in __hpx__ and the fixes he provided.
 * Shoshana Jakobovits, for her work on the resource partitioner.
 * Denis Blank, who re-wrote our unwrapped function to accept plain values
@@ -104,10 +112,12 @@ the project through discussions, pull requests, documentation patches, etc.
 * Ajai V. George, who implemented several of the parallel algorithms.
 * Taeguk Kwon, who worked on implementing parallel algorithms as well as 
   adapting the parallel algorithms to the Ranges TS.
-* Zach Byerly, who in his work developing applications on top of __hpx__
+* Zach Byerly (__lsu__), who in his work developing applications 
+  on top of __hpx__
   opened tickets and contributed to the __hpx__ examples.
 * Daniel Estermann, for his work porting __hpx__ to the Raspberry Pi.
-* Alireza Kheirkhahan, who built and administered our local cluster as well
+* Alireza Kheirkhahan (__lsu__), who built and administered our 
+  local cluster as well
   as his work in distributed IO.
 * Abhimanyu Rawat, who worked on stack overflow detection.
 * David Pfander, who improved signal handling in __hpx__, provided his
@@ -116,14 +126,14 @@ the project through discussions, pull requests, documentation patches, etc.
 * Denis Demidov, who contributed his insights with VexCL.
 * Khalid Hasanov, who contributed changes which allowed to run __hpx__ on 64Bit
   power-pc architectures.
-* Zahra Khatami, who contributed the prefetching iterators and the persistent
-  auto chunking executor parameters implementation.
+* Zahra Khatami (__lsu__), who contributed the prefetching iterators 
+  and the persistent auto chunking executor parameters implementation.
 * Marcin Copik, who worked on implementing GPU support for C++AMP and HCC.
   He also worked on implementing a HCC backend for __hpx_compute__.
 * Minh-Khanh Do, who contributed the implementation of several segmented
   algorithms.
-* Bibek Wagle, who worked on fixing and analyzing the performance of the parcel
-  coalescing plugin in __hpx__.
+* Bibek Wagle (__lsu__), who worked on fixing and analyzing the 
+  performance of the parcel coalescing plugin in __hpx__.
 * Lukas Troska, who reported several problems and contributed various test cases
   allowing to reproduce the corresponding issues.
 * Andreas Schaefer, who worked on integrating his library (__lgd__) with __hpx__.
@@ -133,12 +143,12 @@ the project through discussions, pull requests, documentation patches, etc.
 * Brandon Cordes, who contributed several improvements to the inspect tool.
 * Harris Brakmic, who contributed an extensive build system description for
   building __hpx__ with Visual Studio.
-* Parsa Amini, who refactored and simplified the implementation of AGAS in
-  __hpx__ and who works on its implementation and optimization.
+* Parsa Amini (__lsu__), who refactored and simplified the implementation 
+  of AGAS in __hpx__ and who works on its implementation and optimization.
 * Luis Martinez de Bartolome who implemented a build system extension for
   __hpx__ integrating it with the __conan__ C/C++ package manager.
-* Vinay C Amatya, who contributed to the documentation and provided some
-  of the __hpx__ examples.
+* Vinay C Amatya (__lsu__), who contributed to the documentation and 
+  provided some of the __hpx__ examples.
 * Kevin Huck and Nick Chaimov (__ou__), who contributed the integration of APEX
   (Autonomic Performance Environment for eXascale) with __hpx__.
 * Francisco Jose Tapia, who helped with implementing the parallel sort
@@ -182,7 +192,10 @@ the project through discussions, pull requests, documentation patches, etc.
 * Patricia Grubel (__nmsu__), who contributed the description
   of the different __hpx__ thread scheduler policies and is working on the
   performance analysis of our thread scheduling subsystem.
-* Lars Viklund, who contributed platform specific patches for FreeBSD and MSVC12.
+* Lars Viklund, whose wit, passion for testing, and love of odd architectures 
+  has been an amazing contribution to our team. He has also 
+  contributed platform specific 
+  patches for FreeBSD and MSVC12.
 * Agustin Berge, who contributed patches fixing some very nasty hidden template
   meta-programming issues. He rewrote large parts of the API elements ensuring
   strict conformance with C++11/14.
@@ -202,24 +215,27 @@ the project through discussions, pull requests, documentation patches, etc.
 * Chen Guo, helvihartmann, Nicholas Pezolano, and John West who added
   and improved examples in __hpx__.
 * Joseph Kleinhenz, Markus Elfring, Kirill Kropivyansky, Alexander Neundorf, 
-  and BryantLam who improved our CMake. 
-* Praveen Velliengiri, Element-126, ShmuelLevine, Aalekh Nigam, 
-  HadrienG2, Prayag Verma, and
+  Bryant Lam, and Alex Hirsch who improved our CMake. 
+* Jakub Golinowski, Praveen Velliengiri, Jean-Loup Tastet, Michael Levine, 
+  Aalekh Nigam, HadrienG2, Prayag Verma, and
   Avyav Kumar who improved the documentation.
-* J. F. Bastien, Christopher Hinz, Brandon Kohn, hendrx, Dekken, 
+* J. F. Bastien, Christopher Hinz, Brandon Kohn, Mario Lang, 
+  pierrele, hendrx, Dekken, 
   woodmeister123, Andrew Kemp, Dylan Stark, and Matthew Anderson who 
   contributed to the general improvement of __hpx__
 
 In addition to the people who worked directly with __hpx__ development we would
-like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and
+like to acknowledge the NSF, DoE, DARPA, __cct__, __inf3__, and 
+__cscs__ who fund and
 support our work. We would also like to thank the following organizations for
 granting us allocations of their compute resources:
-LSU HPC, LONI, XSEDE and the Gauss Center for Supercomputing.
+LSU HPC, LONI, XSEDE, NERSC, and the Gauss Center for Supercomputing.
 
 __hpx__ is currently funded by the following grants:
 
 * The National Science Foundation through awards
-  1117470 (APX), 1240655 (STAR), 1447831 (PXFS), and 1339782 (STORM).
+  1117470 (APX), 1240655 (STAR), 1447831 (PXFS), 1339782 (STORM), and 
+  1737785 (Phylanx).
   Any opinions, findings, and conclusions or
   recommendations expressed in this material are those of the author(s) and do
   not necessarily reflect the views of the National Science Foundation.

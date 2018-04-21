@@ -9,17 +9,16 @@
 
 [section:schedulers __hpx__ Thread Scheduling Policies]
 
-The HPX runtime has six thread scheduling policies: local-priority, local,
-abp-priority, hierarchy, static-priority, and periodic-priority. These policies
-can be specified from the command line using the command line option
-[hpx_cmdline `--hpx:queuing`]. In order to use a particular scheduling policy,
-the runtime system must be built with the appropriate scheduler flag turned on
-(e.g. `cmake -DHPX_THREAD_SCHEDULERS=local`, see __cmake_options__ for more
-information).
+The HPX runtime has five thread scheduling policies: local-priority,
+static-priority, local, static and abp-priority. These policies can be specified
+from the command line using the command line option [hpx_cmdline
+`--hpx:queuing`]. In order to use a particular scheduling policy, the runtime
+system must be built with the appropriate scheduler flag turned on (e.g. `cmake
+-DHPX_THREAD_SCHEDULERS=local`, see __cmake_options__ for more information).
 
 [heading Priority Local Scheduling Policy (default policy)]
 
-* default or invoke using: [hpx_cmdline `--hpx:queuing=local-priority-fifo`] (or `-qlo`)
+* default or invoke using: [hpx_cmdline `--hpx:queuing=local-priority-fifo`]
 
 The priority local scheduling policy maintains one queue per operating system
 (OS) thread. The OS thread pulls its work from this queue. By default the number
@@ -95,30 +94,6 @@ This scheduler can be used with two underlying queuing policies (FIFO:
 first-in-first-out, and LIFO: last-in-first-out). In order to use the LIFO
 policy use the command line option [hpx_cmdline
 `--hpx:queuing=abp-priority-lifo`].
-
-[heading Hierarchy Scheduling Policy]
-
-* invoke using: [hpx_cmdline `--hpx:queuing=hierarchy`] (or `-qh`)
-* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
-  `HPX_THREAD_SCHEDULERS=hierarchy`
-
-The hierarchy policy maintains a tree of work items. Every OS thread walks the
-tree to obtain new work.  Arity of the thread queue tree can be specified on
-the command line using [hpx_cmdline `--hpx:hierarchy-arity`] (default is 2).
-Work stealing is done from the parent queue in that tree.
-
-[heading Periodic Priority Scheduling Policy]
-
-* invoke using: [hpx_cmdline `--hpx:queuing=periodic-priority`] (or `-qpe`)
-* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
-  `HPX_THREAD_SCHEDULERS=periodic-priority`
-
-Maintains one queue of work items (user threads) for each OS thread. Maintains
-a number of high priority queues (specified by
-[hpx_cmdline `--hpx:high-priority-threads`]) and one low priority queue. High
-priority threads are executed by the specified number of OS threads before any
-other work is executed. Low priority threads are executed when no other work
-is available.
 
 [/
     Questions, concerns and notes:

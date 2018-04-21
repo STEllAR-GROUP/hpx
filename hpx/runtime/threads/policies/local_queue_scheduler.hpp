@@ -149,6 +149,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_ != 0; }
+        virtual bool has_thread_stealing() const { return true; }
 
         static std::string get_scheduler_name()
         {
@@ -297,7 +298,8 @@ namespace hpx { namespace threads { namespace policies
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread)
+            std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1))
         {
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
 //             // try to figure out the NUMA node where the data lives
@@ -309,27 +311,25 @@ namespace hpx { namespace threads { namespace policies
 //                 }
 //             }
 #endif
+
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queue_size;
-
-            if (num_thread >= queue_size)
-                num_thread %= queue_size;
-
-            // Select an OS thread which hasn't been disabled
-            std::unique_lock<compat::mutex> l;
-            if (mode_ & threads::policies::enable_elasticity)
             {
-                l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
-                    std::try_to_lock);
-                while (!l.owns_lock() || states_[num_thread] > state_suspended)
-                {
-                    num_thread = (num_thread + 1) % queue_size;
-                    l = std::unique_lock<compat::mutex>(pu_mtxs_[num_thread],
-                        std::try_to_lock);
-                }
+                num_thread = curr_queue_++ % queue_size;
             }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            if (num_thread_fallback != std::size_t(-1))
+            {
+                num_thread_fallback %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             HPX_ASSERT(num_thread < queue_size);
             queues_[num_thread]->create_thread(data, id, initial_state,
@@ -455,10 +455,27 @@ namespace hpx { namespace threads { namespace policies
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1),
             thread_priority priority = thread_priority_normal)
         {
+            std::size_t queue_size = queues_.size();
+
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+            {
+                num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            if (num_thread_fallback != std::size_t(-1))
+            {
+                num_thread_fallback %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -468,10 +485,27 @@ namespace hpx { namespace threads { namespace policies
 
         void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
+            std::size_t num_thread_fallback = std::size_t(-1),
             thread_priority priority = thread_priority_normal)
         {
+            std::size_t queue_size = queues_.size();
+
             if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+            {
+                num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            if (num_thread_fallback != std::size_t(-1))
+            {
+                num_thread_fallback %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 

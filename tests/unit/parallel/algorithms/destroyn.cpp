@@ -15,6 +15,7 @@
 #include <iostream>
 #include <memory>
 #include <numeric>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -22,6 +23,8 @@
 #include "test_utils.hpp"
 
 std::atomic<std::size_t> destruct_count(0);
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
 
 struct destructable
 {
@@ -160,7 +163,8 @@ void test_destroy_n_exception(ExPolicy policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::uniform_int_distribution<> dis(0,data_size-1);
+    std::atomic<std::size_t> throw_after(dis(gen)); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_exception = false;
@@ -215,7 +219,8 @@ void test_destroy_n_exception_async(
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::uniform_int_distribution<> dis(0,data_size-1);
+    std::atomic<std::size_t> throw_after(dis(gen)); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_exception = false;
@@ -312,7 +317,8 @@ void test_destroy_n_bad_alloc(ExPolicy policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::uniform_int_distribution<> dis(0,data_size-1);
+    std::atomic<std::size_t> throw_after(dis(gen)); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_bad_alloc = false;
@@ -367,7 +373,8 @@ void test_destroy_n_bad_alloc_async(
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::uniform_int_distribution<> dis(0,data_size-1);
+    std::atomic<std::size_t> throw_after(dis(gen)); //-V104
     std::size_t throw_after_ = throw_after.load();
 
     bool caught_bad_alloc = false;
@@ -447,12 +454,11 @@ void destroy_n_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     destroy_n_test();
     destroy_n_exception_test();

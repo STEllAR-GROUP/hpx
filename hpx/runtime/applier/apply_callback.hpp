@@ -156,7 +156,7 @@ namespace hpx
         if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
                 hpx::util::format(
-                    "the target (destination) does not match the action type (%s)",
+                    "the target (destination) does not match the action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }

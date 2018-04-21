@@ -23,7 +23,7 @@ namespace server
         int register_view(const hpx::naming::id_type &gid)
         {
             hpx::util::format_to(std::cout,
-                "register view at %1% by %2%",
+                "register view at {1} by {2}",
                 this->get_unmanaged_id(), gid) << std::endl;
             registered_regions_.push_back(gid);
             return 0;
@@ -98,7 +98,7 @@ namespace server
             for (const auto &id : writers)
             {
                 hpx::util::format_to(std::cout,
-                    "%1% registering region at %2%",
+                    "{1} registering region at {2}",
                     this->get_unmanaged_id(), id) << std::endl;
 
                 client::view_registry listener(id);

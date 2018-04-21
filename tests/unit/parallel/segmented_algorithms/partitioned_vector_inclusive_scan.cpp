@@ -17,10 +17,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-// The vector types to be used are defined in partitioned_vector module.
-// HPX_REGISTER_PARTITIONED_VECTOR(double);
-// HPX_REGISTER_PARTITIONED_VECTOR(int);
-
 #define msg7(a, b, c, d, e, f, g)                                              \
     std::cout << std::setw(60) << a << std::setw(40) << b << std::setw(10)     \
               << c << std::setw(6) << " " << #d << " " << e << " " << f << " " \
@@ -349,7 +345,5 @@ int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     inclusive_scan_tests<long long>(localities);
-    inclusive_scan_tests<double>(localities);
-
     return hpx::util::report_errors();
 }

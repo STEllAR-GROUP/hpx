@@ -27,7 +27,7 @@ managed_refcnt_checker::~managed_refcnt_checker()
 
     if (!references_.empty())
     {
-        hpx::util::format_to(strm, "[%1%/%2%]: held references\n",
+        hpx::util::format_to(strm, "[{1}/{2}]: held references\n",
             prefix_, this_);
 
         for (naming::id_type const& ref : references_)
@@ -44,10 +44,10 @@ managed_refcnt_checker::~managed_refcnt_checker()
 
     if (naming::invalid_id != target_)
     {
-        hpx::util::format_to(strm, "[%1%/%2%]: destroying object\n",
+        hpx::util::format_to(strm, "[{1}/{2}]: destroying object\n",
             prefix_, this_);
 
-        hpx::util::format_to(strm, "[%1%/%2%]: triggering flag %3%\n",
+        hpx::util::format_to(strm, "[{1}/{2}]: triggering flag {3}\n",
             prefix_, this_, target_);
 
         hpx::trigger_lco_event(target_);

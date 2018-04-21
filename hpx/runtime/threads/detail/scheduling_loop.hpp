@@ -129,6 +129,77 @@ namespace hpx { namespace threads { namespace detail
         bool need_restore_state_;
     };
 
+    class switch_status_background
+    {
+    public:
+        switch_status_background(thread_data* t, thread_state prev_state)
+          : thread_(t)
+          , prev_state_(prev_state)
+          , next_thread_id_(nullptr)
+          , need_restore_state_(
+                t->set_state_tagged(active, prev_state_, orig_state_,
+                    std::memory_order_relaxed))
+        {}
+
+        ~switch_status_background()
+        {
+            if (need_restore_state_)
+                store_state(prev_state_);
+        }
+
+        bool is_valid() const { return need_restore_state_; }
+
+        // allow to change the state the thread will be switched to after
+        // execution
+        thread_state operator=(thread_result_type && new_state)
+        {
+            prev_state_ = thread_state(new_state.first,
+                prev_state_.state_ex(), prev_state_.tag() + 1);
+            next_thread_id_ = std::move(new_state.second);
+            return prev_state_;
+        }
+
+        // Get the state this thread was in before execution (usually pending),
+        // this helps making sure no other worker-thread is started to execute this
+        // HPX-thread in the meantime.
+        thread_state_enum get_previous() const
+        {
+            return prev_state_.state();
+        }
+
+        // This restores the previous state, while making sure that the
+        // original state has not been changed since we started executing this
+        // thread. The function returns true if the state has been set, false
+        // otherwise.
+        bool store_state(thread_state& newstate)
+        {
+            disable_restore();
+            if (thread_->restore_state(prev_state_, orig_state_,
+                    std::memory_order_relaxed, std::memory_order_relaxed))
+            {
+                newstate = prev_state_;
+                return true;
+            }
+            return false;
+        }
+
+        // disable default handling in destructor
+        void disable_restore() { need_restore_state_ = false; }
+
+        thread_data* get_next_thread() const
+        {
+            // we know that the thread-id is just the pointer to the thread_data
+            return next_thread_id_.get();
+        }
+
+    private:
+        thread_data* thread_;
+        thread_state prev_state_;
+        thread_state orig_state_;
+        thread_id_type next_thread_id_;
+        bool need_restore_state_;
+    };
+
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     struct idle_collect_rate
     {
@@ -323,7 +394,8 @@ namespace hpx { namespace threads { namespace detail
         // Create in suspended to prevent the thread from being scheduled
         // directly...
         scheduler.SchedulingPolicy::create_thread(background_init,
-            &background_thread, suspended, true, hpx::throws, num_thread);
+            &background_thread, suspended, true, hpx::throws, num_thread,
+            num_thread);
         HPX_ASSERT(background_thread);
         scheduler.SchedulingPolicy::increment_background_thread_count();
         // We can now set the state to pending
@@ -350,34 +422,13 @@ namespace hpx { namespace threads { namespace detail
                 {
                     // tries to set state to active (only if state is still
                     // the same as 'state')
-                    detail::switch_status thrd_stat (background_thread.get(), state);
+                    detail::switch_status_background thrd_stat(
+                        background_thread.get(), state);
+
                     if (HPX_LIKELY(thrd_stat.is_valid() &&
                             thrd_stat.get_previous() == pending))
                     {
-#if defined(HPX_HAVE_APEX)
-                        // get the APEX data pointer, in case we are resuming the
-                        // thread and have to restore any leaf timers from
-                        // direct actions, etc.
-
-                        // the address of tmp_data is getting stored
-                        // by APEX during this call
-                        util::apex_wrapper apex_profiler(
-                            background_thread->get_description(),
-                            background_thread->get_apex_data());
-
                         thrd_stat = (*background_thread)();
-
-                        if (thrd_stat.get_previous() == terminated)
-                        {
-                            apex_profiler.stop();
-                        }
-                        else
-                        {
-                            apex_profiler.yield();
-                        }
-#else
-                        thrd_stat = (*background_thread)();
-#endif
                         thread_data* next = thrd_stat.get_next_thread();
                         if (next != nullptr && next != background_thread.get())
                         {
@@ -388,7 +439,7 @@ namespace hpx { namespace threads { namespace detail
                             else
                             {
                                 next->get_scheduler_base()->schedule_thread(
-                                    next, num_thread);
+                                    next, num_thread, num_thread);
                             }
                         }
                     }
@@ -526,7 +577,6 @@ namespace hpx { namespace threads { namespace detail
                                 // the address of tmp_data is getting stored
                                 // by APEX during this call
                                 util::apex_wrapper apex_profiler(
-                                    thrd->get_description(),
                                     thrd->get_apex_data());
 
                                 thrd_stat = (*thrd)();
@@ -534,6 +584,8 @@ namespace hpx { namespace threads { namespace detail
                                 if (thrd_stat.get_previous() == terminated)
                                 {
                                     apex_profiler.stop();
+                                    // just in case, clean up the now dead pointer.
+                                    thrd->set_apex_data(nullptr);
                                 }
                                 else
                                 {
@@ -596,7 +648,7 @@ namespace hpx { namespace threads { namespace detail
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
                         scheduler.SchedulingPolicy::schedule_thread_last(thrd,
-                            num_thread);
+                            num_thread, num_thread);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                     else if (HPX_UNLIKELY(state_val == pending_boost))
@@ -621,7 +673,8 @@ namespace hpx { namespace threads { namespace detail
                                 // schedule this thread again immediately with
                                 // boosted priority
                                 scheduler.SchedulingPolicy::schedule_thread(
-                                    thrd, num_thread, thread_priority_boost);
+                                    thrd, num_thread, num_thread,
+                                    thread_priority_boost);
                                 scheduler.SchedulingPolicy::do_some_work(
                                     num_thread);
                             }
@@ -631,7 +684,8 @@ namespace hpx { namespace threads { namespace detail
                             // schedule this thread again immediately with
                             // boosted priority
                             scheduler.SchedulingPolicy::schedule_thread(
-                                thrd, num_thread, thread_priority_boost);
+                                thrd, num_thread, num_thread,
+                                thread_priority_boost);
                             scheduler.SchedulingPolicy::do_some_work(
                                 num_thread);
                         }
@@ -647,7 +701,8 @@ namespace hpx { namespace threads { namespace detail
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
-                    scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
+                    scheduler.SchedulingPolicy::schedule_thread(thrd,
+                        num_thread, num_thread);
                 }
 
                 // Remove the mapping from thread_map_ if HPX thread is depleted
@@ -705,7 +760,7 @@ namespace hpx { namespace threads { namespace detail
                                     scheduler.SchedulingPolicy::
                                         decrement_background_thread_count();
                                     scheduler.SchedulingPolicy::schedule_thread(
-                                        background_thread.get(), num_thread);
+                                        background_thread.get(), num_thread, num_thread);
                                     background_thread.reset();
                                     background_running.reset();
                                 }
@@ -799,7 +854,7 @@ namespace hpx { namespace threads { namespace detail
                         scheduler.SchedulingPolicy::
                             decrement_background_thread_count();
                         scheduler.SchedulingPolicy::schedule_thread(
-                            background_thread.get(), num_thread);
+                            background_thread.get(), num_thread, num_thread);
                         background_thread.reset();
                         background_running.reset();
                     }

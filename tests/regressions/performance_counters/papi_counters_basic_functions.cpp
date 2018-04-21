@@ -31,7 +31,7 @@ int hpx_main(boost::program_options::variables_map&)
     using hpx::performance_counters::counter_value;
 
     id_type id = get_counter(hpx::util::format(
-        "/papi{locality#%d/worker-thread#0}/PAPI_FP_INS", prefix));
+        "/papi{{locality#{}/worker-thread#0}/PAPI_FP_INS", prefix));
 
     performance_counter::start(hpx::launch::sync, id);
 

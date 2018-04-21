@@ -129,7 +129,6 @@ namespace libfabric
             // potentially block all background threads.
             const long max_receivers =
                 HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS;
-            std::size_t k = 0;
             if (threads::threadmanager_is_at_least(state_running)
                 && hpx::threads::get_self_ptr())
             {

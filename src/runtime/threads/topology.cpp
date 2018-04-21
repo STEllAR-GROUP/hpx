@@ -112,6 +112,20 @@ namespace hpx { namespace threads { namespace detail
 
             return static_cast<std::size_t>(obj->logical_index);
         }
+
+        hwloc_obj_t adjust_node_obj(hwloc_obj_t node) noexcept
+        {
+#if HWLOC_API_VERSION >= 0x00020000
+            // www.open-mpi.org/projects/hwloc/doc/hwloc-v2.0.0-letter.pdf:
+            // Starting with hwloc v2.0, NUMA nodes are not in the main tree
+            // anymore. They are attached under objects as Memory Children
+            // on the side of normal children.
+            while (hwloc_obj_type_is_memory(node->type))
+                  node = node->parent;
+            HPX_ASSERT(node);
+#endif
+            return node;
+        }
 }}}
 
 namespace hpx { namespace threads
@@ -745,6 +759,7 @@ namespace hpx { namespace threads
         {
             HPX_ASSERT(numa_node == detail::get_index(node_obj));
             std::size_t pu_count = 0;
+            node_obj = detail::adjust_node_obj(node_obj);
             return extract_node_count(node_obj, HWLOC_OBJ_PU, pu_count);
         }
 
@@ -810,6 +825,7 @@ namespace hpx { namespace threads
         {
             HPX_ASSERT(numa_node == detail::get_index(node_obj));
             std::size_t pu_count = 0;
+            node_obj = detail::adjust_node_obj(node_obj);
             return extract_node_count(node_obj, HWLOC_OBJ_CORE, pu_count);
         }
 
@@ -985,6 +1001,7 @@ namespace hpx { namespace threads
             mask_type node_affinity_mask = mask_type();
             resize(node_affinity_mask, get_number_of_pus());
 
+            numa_node_obj = detail::adjust_node_obj(numa_node_obj);
             extract_node_mask(numa_node_obj, node_affinity_mask);
             return node_affinity_mask;
         }
@@ -1221,6 +1238,7 @@ namespace hpx { namespace threads
     bool topology::set_area_membind_nodeset(
         const void *addr, std::size_t len, void *nodeset) const
     {
+#if !defined(__APPLE__)
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
         int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
@@ -1233,6 +1251,7 @@ namespace hpx { namespace threads
               , "hwloc_set_area_membind_nodeset failed : " + msg);
             return false;
         }
+#endif
         return true;
     }
 

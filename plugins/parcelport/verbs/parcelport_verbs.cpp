@@ -1668,7 +1668,7 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
             boost::log::keywords::format =
                 (
                     boost::log::expressions::stream
-                    // << hpx::util::format("%05d", expr::attr< unsigned int >("LineID"))
+                    // << hpx::util::format("{:05}", expr::attr< unsigned int >("LineID"))
                     << boost::log::expressions::attr< unsigned int >("LineID")
                     << ": <" << boost::log::trivial::severity
                     << "> " << boost::log::expressions::smessage

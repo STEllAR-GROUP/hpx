@@ -46,8 +46,8 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-template <typename Scheduler>
-void test_scheduler(int argc, char* argv[])
+void test_scheduler(int argc, char* argv[],
+    hpx::resource::scheduling_policy scheduler)
 {
     std::vector<std::string> cfg =
     {
@@ -56,43 +56,59 @@ void test_scheduler(int argc, char* argv[])
 
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
-    rp.create_thread_pool("default",
-        [](hpx::threads::policies::callback_notifier& notifier,
-            std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, std::string const& pool_name)
-        -> std::unique_ptr<hpx::threads::thread_pool_base>
-        {
-            typename Scheduler::init_parameter_type init(num_threads);
-            std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
-
-            auto mode = hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::do_background_work |
-                hpx::threads::policies::reduce_thread_priority |
-                hpx::threads::policies::delay_exit |
-                hpx::threads::policies::enable_elasticity |
-                hpx::threads::policies::enable_suspension);
-
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
-                    std::move(scheduler), notifier, pool_index, pool_name, mode,
-                    thread_offset));
-
-            return pool;
-        });
+    rp.create_thread_pool("default", scheduler,
+        hpx::threads::policies::scheduler_mode(
+            hpx::threads::policies::default_mode |
+            hpx::threads::policies::enable_elasticity));
 
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
 }
 
 int main(int argc, char* argv[])
 {
-    // NOTE: Static schedulers do not support suspending the own worker thread
-    // because they do not steal work. Periodic priority scheduler not tested
-    // because it does not take into account scheduler states when scheduling
-    // work.
+    // NOTE: Periodic priority scheduler not tested because it does not take
+    // into account scheduler states when scheduling work.
 
-    test_scheduler<hpx::threads::policies::local_queue_scheduler<>>(argc, argv);
-    test_scheduler<hpx::threads::policies::local_priority_queue_scheduler<>>(argc,
-        argv);
+    {
+        // These schedulers should succeed
+        std::vector<hpx::resource::scheduling_policy> schedulers =
+            {
+                hpx::resource::scheduling_policy::local,
+                hpx::resource::scheduling_policy::local_priority_fifo,
+                hpx::resource::scheduling_policy::local_priority_lifo,
+                hpx::resource::scheduling_policy::abp_priority_fifo,
+                hpx::resource::scheduling_policy::abp_priority_lifo
+            };
+
+        for (auto const scheduler : schedulers)
+        {
+            test_scheduler(argc, argv, scheduler);
+        }
+    }
+
+    {
+        // These schedulers should fail
+        std::vector<hpx::resource::scheduling_policy> schedulers =
+        {
+            hpx::resource::scheduling_policy::static_,
+            hpx::resource::scheduling_policy::static_priority,
+        };
+
+        for (auto const scheduler : schedulers)
+        {
+            bool exception_thrown = false;
+            try
+            {
+                test_scheduler(argc, argv, scheduler);
+            }
+            catch (hpx::exception const&)
+            {
+                exception_thrown = true;
+            }
+
+            HPX_TEST(exception_thrown);
+        }
+    }
 
     return hpx::util::report_errors();
 }

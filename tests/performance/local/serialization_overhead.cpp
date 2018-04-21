@@ -177,7 +177,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     if (print_header)
         hpx::cout << "datasize,testcount,average_time[s]\n" << hpx::flush;
 
-    hpx::util::format_to(hpx::cout, "%d,%d,%f\n",
+    hpx::util::format_to(hpx::cout, "{},{},{}\n",
         data_size, iterations, overall_time / concurrency) << hpx::flush;
 
     return hpx::finalize();

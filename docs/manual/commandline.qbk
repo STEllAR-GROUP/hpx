@@ -59,13 +59,9 @@ described in the table below:
                                  dynamically connect (this is implied if the
                                  number of initial localities is larger than 1)]]
     [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
-                                 run on (default: 0), valid for
-                                 `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,
-                                 `--hpx:queuing=static`, and `--hpx:queuing=local-priority` only]]
+                                 run on (default: 0)]]
     [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
-                                 instance of __hpx__ (default: 1), valid for
-                                 `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,
-                                 `--hpx:queuing=static` and `--hpx:queuing=local-priority` only]]
+                                 instance of __hpx__ (default: 1)]]
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
@@ -73,9 +69,7 @@ described in the table below:
                                  locality (default: 'all', i.e. the number of cores is based on
                                  the number of threads (`--hpx:threads`) assuming `--hpx:bind=compact`)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
-                                 possible values: pu, core, numa, machine (default: pu), valid for
-                                 `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,
-                                 `--hpx:queuing=static`, and `--hpx:queuing=local-priority` only]]
+                                 possible values: pu, core, numa, machine (default: pu)]]
     [[`--hpx:bind arg`]         [the detailed affinity description for the OS threads, see
                                  [link hpx.manual.init.commandline.details the additional documentation]
                                  for a detailed description of possible
@@ -85,19 +79,15 @@ described in the table below:
     [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
-                                 'local/l', 'local-priority-fifo/lo', 'local-priority-lifo',
-                                 'abp-priority-fifo/a', 'abp-priority-lifo', 'hierarchy/h', and
-                                 'periodic/pe' (default: local-priority-fifo/lo)]]
-    [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
-                                 `--hpx:queuing=hierarchy` only (default: 2)]]
+                                 'local', 'local-priority-fifo', 'local-priority-lifo',
+                                 'static', 'static-priority', 'abp-priority-fifo'
+                                 and 'abp-priority-lifo' (default: local-priority-fifo)]]
     [[`--hpx:high-priority-threads arg`] [the number of operating system threads
                                  maintaining a high priority queue (default:
-                                 number of OS threads), valid for `--hpx:queuing=local`,
-                                 `--hpx:queuing=abp-priority`, and `--hpx:queuing=local-priority` only]]
-    [[`--hpx:numa-sensitive`]   [makes the local-priority scheduler NUMA sensitive, valid for
-                                 `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,
-                                 `--hpx:queuing=static`, and
-                                 `--hpx:queuing=local-priority` only]]
+                                 number of OS threads), valid for
+                                 `--hpx:queuing=abp-priority`, `--hpx:queuing=static-priority`
+                                 and `--hpx:queuing=local-priority` only]]
+    [[`--hpx:numa-sensitive`]   [makes the scheduler NUMA sensitive]]
 
     [[[*__hpx__ configuration options]]]
     [[`--hpx:app-config arg`]   [load the specified application configuration

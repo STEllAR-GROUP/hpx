@@ -144,7 +144,7 @@ void run_benchmark(std::size_t vector_size, int test_count, int base_num,
             first, last, pred);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "partition (%1%) : %2%(sec)";
+    auto fmt = "partition ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
@@ -238,8 +238,8 @@ int main(int argc, char* argv[])
             boost::program_options::value<int>(),
             hpx::util::format(
                 "the base number for partitioning."
-                " The range of random_fill is [0, %1%]"
-                " (default: random number in the range [0, %2%]",
+                " The range of random_fill is [0, {1}]"
+                " (default: random number in the range [0, {2}]",
                 random_fill_range, random_fill_range).c_str())
         ("test_count",
             boost::program_options::value<int>()->default_value(10),

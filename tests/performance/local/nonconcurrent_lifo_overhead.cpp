@@ -94,7 +94,7 @@ void print_results(
 
     if (iterations != 0)
         hpx::util::format_to(std::cout,
-            "%lu %lu %lu %.14g %.14g %.14g %.14g\n",
+            "{} {} {} {:.14g} {:.14g} {:.14g} {:.14g}\n",
             iterations,
             blocksize,
             threads,
@@ -105,7 +105,7 @@ void print_results(
         );
     else
         hpx::util::format_to(std::cout,
-            "%lu %lu %lu %.14g %.14g %.14g %.14g\n",
+            "{} {} {} {:.14g} {:.14g} {:.14g} {:.14g}\n",
             iterations,
             blocksize,
             threads,

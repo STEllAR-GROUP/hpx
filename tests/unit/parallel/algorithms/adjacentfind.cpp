@@ -18,6 +18,11 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+std::uniform_int_distribution<> dis(2,101);
+std::uniform_int_distribution<> dist(2,10005);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find(ExPolicy policy, IteratorTag)
 {
@@ -30,9 +35,9 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
 
     // fill vector with random values about 1
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), (std::rand() % 100) + 2);
+    std::iota(std::begin(c), std::end(c), dis(gen));
 
-    std::size_t random_pos = (std::rand() % 10004) + 2; //-V101
+    std::size_t random_pos = dist(gen); //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
@@ -53,9 +58,9 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
 
     // fill vector with random values above 1
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), (std::rand() % 100) + 2);
+    std::iota(std::begin(c), std::end(c), dis(gen));
 
-    std::size_t random_pos = (std::rand() % 10004) + 2; //-V101
+    std::size_t random_pos = dist(gen); //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
@@ -100,12 +105,11 @@ void adjacent_find_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     adjacent_find_test();
     return hpx::finalize();

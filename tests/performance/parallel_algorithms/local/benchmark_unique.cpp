@@ -180,7 +180,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
             org_first, org_last, first, last);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "unique (%1%) : %2%(sec)";
+    auto fmt = "unique ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;

@@ -62,8 +62,7 @@ namespace hpx { namespace util { namespace detail
 
         std::int64_t get_interval() const;
 
-        void slow_down(std::int64_t max_interval);
-        void speed_up(std::int64_t min_interval);
+        void change_interval(std::int64_t new_interval);
 
     protected:
         // schedule a high priority task after a given time interval
@@ -144,11 +143,9 @@ namespace hpx { namespace util
 
         std::int64_t get_interval() const;
 
-        void slow_down(std::int64_t max_interval);
-        void speed_up(std::int64_t min_interval);
+        void change_interval(std::int64_t new_interval);
 
-        void slow_down(util::steady_duration const& max_interval);
-        void speed_up(util::steady_duration const& min_interval);
+        void change_interval(util::steady_duration const& new_interval);
 
     private:
         std::shared_ptr<detail::interval_timer> timer_;

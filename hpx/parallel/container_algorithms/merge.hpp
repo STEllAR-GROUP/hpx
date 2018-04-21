@@ -187,8 +187,6 @@ namespace hpx { namespace parallel { inline namespace v1
     /// \param middle       Refers to the end of the first sorted range and
     ///                     the beginning of the second sorted range
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the second sorted range
-    ///                     the algorithm will be applied to.
     /// \param comp         \a comp is a callable object which returns true if
     ///                     the first argument is less than the second,
     ///                     and false otherwise. The signature of this

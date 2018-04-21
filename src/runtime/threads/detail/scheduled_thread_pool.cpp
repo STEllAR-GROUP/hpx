@@ -42,21 +42,3 @@ template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_priority_queue_scheduler<hpx::compat::mutex,
         hpx::threads::policies::lockfree_abp_lifo>>;
 #endif
-
-#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
-#include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
-template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::hierarchy_scheduler<>>;
-#endif
-
-#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-#include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
-template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::periodic_priority_queue_scheduler<>>;
-#endif
-
-#if defined(HPX_HAVE_THROTTLING_SCHEDULER)
-#include <hpx/runtime/threads/policies/throttling_scheduler.hpp>
-template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::throttling_scheduler<>>;
-#endif

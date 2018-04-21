@@ -78,7 +78,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     std::cout << "using seed: " << seed << std::endl;
     std::mt19937 gen(seed);
-    std::uniform_int_distribution<> dis(0, 511);
+    std::uniform_int_distribution<> dis(1, 512);
 
     {
         std::size_t count = dis(gen);
@@ -91,6 +91,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         HPX_TEST_EQ(construction_count.load(), count);
         HPX_TEST_EQ(destruction_count.load(), count);
     }
+
+    test_bulk_allocator<int>(0);
 
     return hpx::finalize();
 }

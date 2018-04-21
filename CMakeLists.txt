@@ -42,7 +42,7 @@ endif()
 project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 1)
+set(HPX_MINOR_VERSION 2)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
@@ -605,7 +605,7 @@ hpx_option(HPX_WITH_ITTNOTIFY BOOL
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, static, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -630,21 +630,6 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "STATIC" OR _all)
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "HIERARCHY" OR _all)
-    hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
-    set(HPX_WITH_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-    set(HPX_WITH_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  # The throttling scheduler has not been tested neither on Windows nor on Mac
-  if(NOT WIN32 AND NOT APPLE)
-    if(_scheduler STREQUAL "THROTTLLING" OR _all)
-      hpx_add_config_define(HPX_HAVE_THROTTLING_SCHEDULER)
-      set(HPX_WITH_THROTTLING_SCHEDULER ON CACHE INTERNAL "")
-    endif()
   endif()
   unset(_all)
 endforeach()
@@ -1535,11 +1520,13 @@ if(HPX_WITH_APEX_NO_UPDATE)
   set(_hpx_apex_no_update NO_UPDATE)
 endif()
 if(HPX_WITH_APEX)
+  # We want to track parent dependencies
+  hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
   # handle APEX library
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    master
+    v2.0
     ${_hpx_apex_no_update}
     VERBOSE)
 

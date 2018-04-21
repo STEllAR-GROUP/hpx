@@ -197,7 +197,7 @@ namespace hpx {namespace parallel { inline namespace v1
     ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
-    /// param proj1         Specifies the function (or function object) which
+    /// \param proj1        Specifies the function (or function object) which
     ///                     will be invoked for each of the elements of type
     ///                     dereferenced \a FwdIter1 as a projection operation
     ///                     before the actual predicate \a is invoked.
@@ -419,6 +419,14 @@ namespace hpx {namespace parallel { inline namespace v1
     ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of type
+    ///                     dereferenced \a FwdIter1 as a projection operation
+    ///                     before the actual predicate \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of type
+    ///                     dereferenced \a FwdIter2 as a projection operation
+    ///                     before the actual predicate \a is invoked.
     ///
     /// The comparison operations in the parallel \a search_n algorithm invoked
     /// with an execution policy object of type \a sequenced_policy

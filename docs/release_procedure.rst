@@ -42,7 +42,7 @@ the lines as they are completed to avoid confusion.
 
     *   ``$HPX_SOURCE/README.rst``
          *   Update grant information
-    *   ``docs/whats_new.qbk``
+    *   ``docs/releases/whats_new_$VERSION.qbk``
     *   ``docs/people.qbk``
          *   Update collaborators
          *   Update grant information
@@ -51,22 +51,27 @@ the lines as they are completed to avoid confusion.
     create a tag from the old release branch before deleting the old release
     branch in the next step.
 
+#.  Unprotect the release branch in the github repository settings so that it
+    can be deleted and recreated.
+
 #.  Delete the old release branch, and create a new one by branching a stable
     point from master.
 
-    *   ``git push origin --delete [branch name]``
-    *   ``git branch -D [branch name]``
-    *   ``git branch [new branch name]``
-    *   ``git push origin [new branch name]``
-    *   ``git branch --set-upstream-to=origin/[branch name] [branch name]``
+    *   ``git push origin --delete release``
+    *   ``git branch -D release``
+    *   ``git checkout [stable point in master]``
+    *   ``git branch release``
+    *   ``git push origin release``
+    *   ``git branch --set-upstream-to=origin/release release``
 
-#.  Checkout the release branch, and remove the ``-trunk`` tag from
-    ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
-    and later with an empty string for the actual release).
+#.  Protect the release branch again to disable deleting and force pushes.
 
-#.  Change logo for release documentation by removing '_draft' suffix
-    in ``docs/cmakelist.txt`` on line 234. Update logo size accordingly on
-    lines 330/331.
+#.  Checkout the release branch, and replace the ``-trunk`` tag in
+    ``hpx/config/version.hpp`` with ``-rc1``.
+
+#.  Change logo for release documentation by removing ``_draft`` suffix
+    in ``docs/CMakeLists.txt`` in the ``set(image...`` call. Update logo size
+    accordingly in the call to ``hpx_quickbook_to_html``.
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.
@@ -87,7 +92,9 @@ the lines as they are completed to avoid confusion.
     The main CMakeLists.txt contains a comment indicating for which version
     the breaking change was introduced first.
 
-#.  Tag a release candidate from the release branch.
+#.  Tag a release candidate from the release branch, where tag name is the
+    version to be released with a "-rcN" suffix and description is
+    "HPX V$VERSION: The C++ Standards Library for Parallelism and Concurrency".
 
     *   ``git tag -a [tag name] -m '[description]'``
     *   ``git push origin [tag name]``
@@ -95,7 +102,7 @@ the lines as they are completed to avoid confusion.
 
 #.  Switch Buildbot over to test the release branch
 
-    *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/master/master/master.cfg
+    *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg
     *   Line 120
 
 #.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
@@ -106,33 +113,34 @@ the lines as they are completed to avoid confusion.
 
     *   Use ``git merge`` when possible, and fall back to ``git cherry-pick``
         when needed.
+    * Repeat by tagging a new release candidate as many times as needed.
 
-#.  Checkout the main branch, and bump the HPX version to the next release
-    target. The following files contain version info:
+#.  Checkout the release branch, and replace the ``-rcN`` tag in
+    ``hpx/config/version.hpp`` with an empty string.
 
-    *   ``hpx/config/version.hpp``
-    *   ``docs/hpx.qbk``
-    *   ``CMakeLists.txt``
-    *   Grep for old version number
+#.  Add the release date to the caption of the current "What's New" section in
+    the docs.
 
-#.  Create new logos for documentation. Update the logo used on line 234
-    (add '_draft') and change the size accordingly in ``docs/cmakelist.txt``
-    lines 330/331.
+#.  Tag the release from the release branch, where tag name is the version to be
+    released and description is "HPX V$VERSION: The C++ Standards Library for
+    Parallelism and Concurrency".
 
-#.  Update ``$HPX_SOURCE/README.rst``
+    *   ``git tag -a [tag name] -m '[description]'``
+    *   ``git push origin [tag name]``
 
-    *   Update version
-    *   Update links to documentation
+#.  Create a release on github
 
-#.  Push changes to new branch numbered after the next release (not the current
-    one).
-
-#.  Tag the release.
+    *   Refer to 'What's New' section in the documentation you uploaded in the
+        notes for the Github release (see previous releases for a hint).
+    *   A DOI number using Zenodo is automatically assigned once the release is
+        created as such on github.
+    *   Verify on Zenodo (https://zenodo.org/) that release was uploaded.
+        Logging into zenodo using the github credentials might be necessary to
+        see the new release as it usually takes a while for it to propagate to
+        the search engine used on zenodo.
 
 #.  Roll a release candidate using ``tools/roll_release.sh`` (from root directory), and add the
     hashsums generated by the script to the "downloads" page of the website.
-
-#.  Post the draft of the release notes.
 
 #.  Upload the packages and generated documentation to the website. Use the following
     formats::
@@ -145,26 +153,45 @@ the lines as they are completed to avoid confusion.
         http://stellar.cct.lsu.edu/files/hpx_#.#.#/html/code
         http://stellar.cct.lsu.edu/downloads/hpx-v#-#-#-release-notes
 
-#.  Write a new blog post announcing the release.
+#.  Update the website with the following:
 
-#.  Create a release on github
-
-    *   Refer to 'What's New' section in the documentation you uploaded in the
-        notes for the Github release (see previous releases for a hint).
-    *   A DOI number using Zenodo is automatically assigned once the release is
-        created as such on github.
-    *   Verify on Zenodo (https://zenodo.org/) that release was uploaded.
-        Logging into zenodo using the github credentials might be necessary to
-        see the new release as it usually takes a while for it to propagate to
-        the search engine used on zenodo.
-    *   Fix zenodo reference number in main Readme.rst on the branch which holds
-        the versioning changes.
+    * Download links on the download page
+    * Documentation links on the docs page
+    * A new blog post announcing the release
 
 #.  Merge release branch into master.
 
+#.  Create a new branch from master, and check that branch out (name it for
+    example by the next version number). Bump the HPX version to the next
+    release target. The following files contain version info:
+
+    *   ``hpx/config/version.hpp``
+    *   ``docs/hpx.qbk``
+    *   ``CMakeLists.txt``
+    *   Grep for old version number
+
+#.  Create a new "What's New" section for the docs of the next anticipated release.
+    Move the old (now current) "What's New" section to the section for the previous
+    releases.
+
+#.  Create new logos for documentation. Change logo by adding ``_draft`` suffix
+    in ``docs/cmakelist.txt`` in the ``set(image...`` call. Update logo size
+    accordingly in the call to ``hpx_quickbook_to_html``.
+
+#.  Update ``$HPX_SOURCE/README.rst``
+
+    *   Update version (to the about-to-be-released version)
+    *   Update links to documentation
+    *   Fix zenodo reference number
+
 #.  Merge new branch containing next version numbers to master, resolve conflicts
     if necessary.
-    
+
+#.  Switch Buildbot back to test the main branch
+
+    *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg
+    *   Line 120
+
 #.  Update Vcpkg (https://github.com/Microsoft/vcpkg) to pull from latest release.
 
     *  Update version number in CONTROL
@@ -173,7 +200,7 @@ the lines as they are completed to avoid confusion.
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu,
     stellar@cct.lsu.edu, allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
     xpress@crest.iu.edu, Sonia Sachs, our list of external collaborators,
-    isocpp.org, HPC Wire, Inside HPC, and a CCT press release.
+    isocpp.org, reddit.com, HPC Wire, Inside HPC, and a CCT press release.
 
 #.  Beer and pizza.
 

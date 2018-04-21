@@ -9,19 +9,20 @@
 
 #include <hpx/error_code.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/state.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/state.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -243,6 +244,7 @@ namespace hpx { namespace naming
             {
                 ar.await_future(
                     split_gid_if_needed(const_cast<id_type_impl&>(*this)).then(
+                        hpx::launch::sync,
                         [&ar, this](hpx::future<gid_type> && gid_future)
                         {
                             ar.add_gid(*this, gid_future.get());
@@ -355,6 +357,7 @@ namespace hpx { namespace naming
                     HPX_ASSERT(new_gid != invalid_gid);
                     return agas::incref(new_gid, new_credit)
                         .then(
+                            hpx::launch::sync,
                             hpx::util::bind(postprocess_incref, std::ref(gid))
                         );
                 }

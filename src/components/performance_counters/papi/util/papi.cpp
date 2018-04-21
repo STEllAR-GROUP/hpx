@@ -205,11 +205,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         for (it = boost::make_generator_iterator(gen); *it != nullptr; ++it)
         {
             hpx::util::format_to(std::cout,
-                "Event        : %s\n"
-                "Type         : %s\n"
-                "Code         : 0x%x\n"
-                "Derived from : %s\n"
-                "Description  : %s\n",
+                "Event        : {}\n"
+                "Type         : {}\n"
+                "Code         : {:x}\n"
+                "Derived from : {}\n"
+                "Description  : {}\n",
                 (*it)->symbol,
                 decode_preset_type((*it)->event_type),
                 (*it)->event_code,
@@ -235,7 +235,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             {
                 if (!regs.empty()) regs += std::string(15, ' ');
                 regs += hpx::util::format(
-                    "reg[%d] name: %-20s value: 0x%16x\n",
+                    "reg[{}] name: {:-20} value: {:#16x}\n",
                     i, info.name[i], info.code[i]);
             }
         }
@@ -245,11 +245,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     void print_native_info(PAPI_event_info_t const& info)
     {
         hpx::util::format_to(std::cout,
-            "Event        : %s\n"
+            "Event        : {}\n"
             "Type         : native\n"
-            "Code         : 0x%x\n"
-            "Derived from : %s\n"
-            "Description  : %s\n",
+            "Code         : {:#x}\n"
+            "Derived from : {}\n"
+            "Description  : {}\n",
             info.symbol,
             info.event_code,
             registers(info),
@@ -286,11 +286,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         std::string hdr("PAPI events available on ");
         if (!host.empty())
         {
-            hdr += hpx::util::format("%s (locality %d):", host, hpx::get_locality_id());
+            hdr += hpx::util::format("{} (locality {}):", host, hpx::get_locality_id());
         }
         else
         {
-            hdr += hpx::util::format("locality %d:", hpx::get_locality_id());
+            hdr += hpx::util::format("locality {}:", hpx::get_locality_id());
         }
         std::cout << hdr << std::endl
                   << std::string(hdr.length(), '=') << std::endl;
@@ -308,7 +308,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         }
         else
         {
-            label = hpx::util::format("%s#%d", cpe.instancename_, cpe.instanceindex_);
+            label = hpx::util::format("{}#{}", cpe.instancename_, cpe.instanceindex_);
         }
         return tm.get_thread_index(label);
     }

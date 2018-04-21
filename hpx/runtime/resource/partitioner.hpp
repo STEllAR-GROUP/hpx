@@ -10,6 +10,7 @@
 #include <hpx/runtime/resource/partitioner_fwd.hpp>
 #include <hpx/runtime/resource/detail/create_partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/program_options.hpp>
@@ -194,7 +195,9 @@ namespace hpx { namespace resource
         ///////////////////////////////////////////////////////////////////////
         // Create one of the predefined thread pools
         HPX_EXPORT void create_thread_pool(std::string const& name,
-            scheduling_policy sched = scheduling_policy::unspecified);
+            scheduling_policy sched = scheduling_policy::unspecified,
+            hpx::threads::policies::scheduler_mode =
+                hpx::threads::policies::scheduler_mode::default_mode);
 
         // Create a custom thread pool with a callback function
         HPX_EXPORT void create_thread_pool(std::string const& name,

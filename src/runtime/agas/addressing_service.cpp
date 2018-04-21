@@ -30,6 +30,7 @@
 #include <hpx/runtime/agas/detail/bootstrap_component_namespace.hpp>
 #include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
@@ -250,7 +251,7 @@ void addressing_service::launch_bootstrap(
             symbol_ns_.ptr());
 
     rt.get_config().parse("assigned locality",
-        hpx::util::format("hpx.locality!=%1%",
+        hpx::util::format("hpx.locality!={1}",
             naming::get_locality_id_from_gid(here)));
 
     std::uint32_t num_threads = hpx::util::get_entry_as<std::uint32_t>(
@@ -289,8 +290,8 @@ void addressing_service::adjust_local_cache_size(std::size_t cache_size)
             gva_cache_->reserve(cache_size);
 
         LAGAS_(info) << hpx::util::format(
-            "addressing_service::adjust_local_cache_size, previous size: %1%, "
-            "new size: %2%",
+            "addressing_service::adjust_local_cache_size, previous size: {1}, "
+            "new size: {2}",
             previous, cache_size);
     }
 } // }}}
@@ -511,7 +512,7 @@ bool addressing_service::get_console_locality(
 
             LAGAS_(debug) << hpx::util::format(
                 "addressing_server::get_console_locality, "
-                "caching console locality, prefix(%1%)",
+                "caching console locality, prefix({1})",
                 console);
 
             return true;
@@ -801,7 +802,9 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     future<bool> f = primary_ns_.bind_gid_async(g, id, locality);
 
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&addressing_service::bind_postproc),
             this, _1, id, g
         ));
@@ -1138,7 +1141,7 @@ bool addressing_service::resolve_cached(
 /*
         LAGAS_(debug) << hpx::util::format(
             "addressing_service::resolve_cached, "
-            "cache hit for address %1%, lva %2% (base %3%, lva %4%)",
+            "cache hit for address {1}, lva {2} (base {3}, lva {4})",
             id,
             reinterpret_cast<void*>(addr.address_),
             idbase.get_gid(),
@@ -1153,7 +1156,7 @@ bool addressing_service::resolve_cached(
 
     LAGAS_(debug) << hpx::util::format(
         "addressing_service::resolve_cached, "
-        "cache miss for address %1%",
+        "cache miss for address {1}",
         id);
 
     return false;
@@ -1268,7 +1271,9 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
         primary_ns_.resolve_full(gid);
 
     using util::placeholders::_1;
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&addressing_service::resolve_full_postproc),
             this, _1, gid
         ));
@@ -1450,7 +1455,7 @@ lcos::future<std::int64_t> addressing_service::incref_async(
     {
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
-          , hpx::util::format("invalid credit count of %1%", credit));
+          , hpx::util::format("invalid credit count of {1}", credit));
         return lcos::future<std::int64_t>();
     }
 
@@ -1529,7 +1534,9 @@ lcos::future<std::int64_t> addressing_service::incref_async(
 
     // pass the amount of compensated decrefs to the callback
     using util::placeholders::_1;
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&addressing_service::synchronize_with_async_incref),
             this, _1, keep_alive, pending_decrefs
         ));
@@ -1566,7 +1573,7 @@ void addressing_service::decref(
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "addressing_service::decref"
-          , hpx::util::format("invalid credit count of %1%", credit));
+          , hpx::util::format("invalid credit count of {1}", credit));
         return;
     }
 
@@ -1594,7 +1601,7 @@ void addressing_service::decref(
                 HPX_THROWS_IF(ec, bad_parameter
                   , "addressing_service::decref"
                   , hpx::util::format("couldn't insert decref request "
-                        "for %1% (%2%)", raw, credit));
+                        "for {1} ({2})", raw, credit));
                 return;
             }
         }
@@ -1648,7 +1655,9 @@ lcos::future<bool> addressing_service::register_name_async(
     std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
-        return f.then(util::bind_back(
+        return f.then(
+            hpx::launch::sync,
+            util::bind_back(
                 util::one_shot(&correct_credit_on_failure),
                 id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
             ));
@@ -1728,7 +1737,9 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         symbol_ns_.on_event(name, call_for_past_events, p.get_id());
 
     using util::placeholders::_1;
-    return f.then(util::bind(
+    return f.then(
+        hpx::launch::sync,
+        util::bind(
             util::one_shot(&detail::on_register_event), _1, std::move(result_f)
         ));
 }
@@ -1809,7 +1820,7 @@ void addressing_service::update_cache_entry(
         const std::uint64_t count = (g.count ? g.count : 1);
 
         LAGAS_(debug) << hpx::util::format(
-            "addressing_service::update_cache_entry, gid(%1%), count(%2%)",
+            "addressing_service::update_cache_entry, gid({1}), count({2})",
             gid, count);
 
         const gva_cache_key key(gid, count);
@@ -1837,7 +1848,7 @@ void addressing_service::update_cache_entry(
                     LAGAS_(warning) << hpx::util::format(
                         "addressing_service::update_cache_entry, "
                         "aborting update due to key collision in cache, "
-                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)",
+                        "new_gid({1}), new_count({2}), old_gid({3}), old_count({4})",
                         gid, count, idbase.get_gid(), idbase.get_count());
                 }
             }
@@ -2403,7 +2414,7 @@ void addressing_service::send_refcnt_requests(
 
         std::stringstream ss;
         hpx::util::format_to(ss,
-            "%1%, dumping client-side refcnt table, requests(%2%):",
+            "{1}, dumping client-side refcnt table, requests({2}):",
             func_name, requests.size());
 
         typedef addressing_service::refcnt_requests_type::const_reference
@@ -2414,7 +2425,7 @@ void addressing_service::send_refcnt_requests(
             // The [client] tag is in there to make it easier to filter
             // through the logs.
             hpx::util::format_to(ss,
-                "\n  [client] gid(%1%), credits(%2%)",
+                "\n  [client] gid({1}), credits({2})",
                 e.first,
                 e.second);
         }
@@ -2446,7 +2457,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         LAGAS_(info) << hpx::util::format(
             "addressing_service::send_refcnt_requests_non_blocking, "
-            "requests(%1%)",
+            "requests({1})",
             p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -2519,7 +2530,7 @@ addressing_service::send_refcnt_requests_async(
 
     LAGAS_(info) << hpx::util::format(
         "addressing_service::send_refcnt_requests_async, "
-        "requests(%1%)",
+        "requests({1})",
         p->size());
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -2859,6 +2870,7 @@ namespace hpx
         hpx::future<hpx::id_type> f, std::size_t sequence_nr)
     {
         return f.then(
+            hpx::launch::sync,
             [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
                 hpx::future<hpx::id_type> && f
             ) mutable -> hpx::future<bool>

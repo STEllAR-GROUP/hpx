@@ -17,6 +17,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/util/assert.hpp>
@@ -150,8 +151,10 @@ namespace hpx
     get_ptr(naming::id_type const& id)
     {
         hpx::future<naming::address> f = agas::resolve(id);
-        return f.then(util::bind_back(
-            &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>, id));
+        return f.then(hpx::launch::sync,
+            util::bind_back(
+                &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>,
+                id));
     }
 
     /// \brief Returns a future referring to the pointer to the

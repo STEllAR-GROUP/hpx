@@ -8,6 +8,7 @@
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/assert.hpp>
@@ -55,10 +56,12 @@ namespace hpx { namespace resource { namespace detail
     std::size_t init_pool_data::num_threads_overall = 0;
 
     init_pool_data::init_pool_data(
-            std::string const& name, scheduling_policy sched)
+            std::string const& name, scheduling_policy sched,
+            hpx::threads::policies::scheduler_mode mode)
         : pool_name_(name)
         , scheduling_policy_(sched)
         , num_threads_(0)
+        , mode_(mode)
     {
         if (name.empty())
         {
@@ -72,6 +75,7 @@ namespace hpx { namespace resource { namespace detail
         : pool_name_(name)
         , scheduling_policy_(user_defined)
         , num_threads_(0)
+        , mode_(hpx::threads::policies::scheduler_mode::default_mode)
         , create_function_(std::move(create_func))
     {
         if (name.empty())
@@ -149,15 +153,6 @@ namespace hpx { namespace resource { namespace detail
             break;
         case resource::abp_priority_lifo:
             sched = "abp_priority_lifo";
-            break;
-        case resource::hierarchy:
-            sched = "hierarchy";
-            break;
-        case resource::periodic_priority:
-            sched = "periodic_priority";
-            break;
-        case resource::throttle:
-            sched = "throttle";
             break;
         }
 
@@ -439,18 +434,6 @@ namespace hpx { namespace resource { namespace detail
         {
             default_scheduler = scheduling_policy::abp_priority_lifo;
         }
-        else if (0 == std::string("hierarchy").find(cfg_.queuing_))
-        {
-            default_scheduler = scheduling_policy::hierarchy;
-        }
-        else if (0 == std::string("periodic-priority").find(cfg_.queuing_))
-        {
-            default_scheduler = scheduling_policy::periodic_priority;
-        }
-        else if (0 == std::string("throttle").find(cfg_.queuing_))
-        {
-            default_scheduler = scheduling_policy::throttle;
-        }
         else
         {
             throw hpx::detail::command_line_error(
@@ -540,8 +523,9 @@ namespace hpx { namespace resource { namespace detail
     }
 
     // create a new thread_pool
-    void partitioner::create_thread_pool(
-        std::string const& pool_name, scheduling_policy sched)
+    void partitioner::create_thread_pool(std::string const& pool_name,
+        scheduling_policy sched,
+        hpx::threads::policies::scheduler_mode mode)
     {
         if (get_runtime_ptr() != nullptr)
         {
@@ -564,7 +548,7 @@ namespace hpx { namespace resource { namespace detail
         if (pool_name==get_default_pool_name())
         {
             initial_thread_pools_[0] = detail::init_pool_data(
-                get_default_pool_name(), sched);
+                get_default_pool_name(), sched, mode);
             return;
         }
 
@@ -581,7 +565,7 @@ namespace hpx { namespace resource { namespace detail
             }
         }
 
-        initial_thread_pools_.push_back(detail::init_pool_data(pool_name, sched));
+        initial_thread_pools_.push_back(detail::init_pool_data(pool_name, sched, mode));
     }
 
     // create a new thread_pool
@@ -831,6 +815,13 @@ namespace hpx { namespace resource { namespace detail
     {
         std::unique_lock<mutex_type> l(mtx_);
         return get_pool_data(l, pool_name).num_threads_;
+    }
+
+    hpx::threads::policies::scheduler_mode
+    partitioner::get_scheduler_mode(std::size_t pool_index) const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_index).mode_;
     }
 
     detail::init_pool_data const& partitioner::get_pool_data(

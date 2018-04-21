@@ -514,6 +514,11 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename R>
+    typename hpx::traits::detail::shared_state_ptr<
+        typename future_unwrap_result<future<R>>::result_type>::type
+    unwrap(future<R> && future, error_code& ec = throws);
+
     template <typename Future>
     typename hpx::traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
@@ -896,13 +901,8 @@ namespace hpx { namespace lcos
         ) : base_type(other.valid() ?
                 detail::downcast_to_void(other, false) : nullptr)
         {
-#if BOOST_VERSION >= 105600
             traits::future_access<future<T> >::
                 detach_shared_state(std::move(other));
-#else
-            // Boost before 1.56 doesn't support detaching intrusive pointers
-            other = future<T>();
-#endif
         }
 
         // Effects:
@@ -1085,6 +1085,7 @@ namespace hpx { namespace lcos
         make_future_helper(Future && f) //-V659
         {
             return f.then(
+                hpx::launch::sync,
                 [](Future && f) -> T
                 {
                     return util::void_guard<T>(), f.get();
@@ -1126,6 +1127,7 @@ namespace hpx { namespace lcos
         convert_future_helper(Future && f, Conv && conv) //-V659
         {
             return f.then(
+                hpx::launch::sync,
                 [HPX_CAPTURE_FORWARD(conv)](Future && f) -> T
                 {
                     return hpx::util::invoke(conv, f.get());
@@ -1427,6 +1429,7 @@ namespace hpx { namespace lcos
             "result type by using the supplied conversion function");
 
         return f.then(
+                hpx::launch::sync,
             [HPX_CAPTURE_FORWARD(conv)](hpx::shared_future<U> const& f)
             {
                 return hpx::util::invoke(conv, f.get());

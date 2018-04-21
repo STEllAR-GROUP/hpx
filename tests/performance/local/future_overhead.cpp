@@ -81,12 +81,12 @@ void measure_action_futures(std::uint64_t count, bool csv)
 
     if (csv)
         hpx::util::format_to(cout,
-            "%1%,%2%\n",
+            "{1},{2}\n",
             count,
             duration) << flush;
     else
         hpx::util::format_to(cout,
-            "invoked %1% futures (actions) in %2% seconds\n",
+            "invoked {1} futures (actions) in {2} seconds\n",
             count,
             duration) << flush;
 }
@@ -110,12 +110,12 @@ void measure_function_futures(std::uint64_t count, bool csv)
 
     if (csv)
         hpx::util::format_to(cout,
-            "%1%,%2%\n",
+            "{1},{2}\n",
             count,
             duration) << flush;
     else
         hpx::util::format_to(cout,
-            "invoked %1% futures (functions) in %2% seconds\n",
+            "invoked {1} futures (functions) in {2} seconds\n",
             count,
             duration) << flush;
 }
