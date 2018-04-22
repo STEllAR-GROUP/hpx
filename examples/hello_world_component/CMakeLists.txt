@@ -22,8 +22,8 @@ if(EXISTS "${HPX_DIR}")
   add_library(hello_world_component SHARED hello_world_component.cpp)
   hpx_setup_target(
     hello_world_component
+    DEPENDENCIES iostreams_component
     TYPE COMPONENT
-    COMPONENT_DEPENDENCIES iostreams
   )
 
   add_executable(hello_world_client hello_world_client.cpp)
