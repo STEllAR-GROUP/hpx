@@ -406,10 +406,11 @@ namespace hpx { namespace threads { namespace coroutines
             void * cb_;
             void(*funp_)(void*);
 
+#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             struct sigaction action;
             stack_t segv_stack;
+#endif
         };
-
         typedef ucontext_context_impl context_impl;
     }}
 }}}
