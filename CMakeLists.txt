@@ -215,6 +215,10 @@ hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
   "The HPX documentation should be built as a single page HTML (default OFF)."
   OFF CATEGORY "Build Targets")
 
+hpx_option(HPX_WITH_DOCUMENTATION_SPHINX BOOL
+  "Build the HPX documentation using sphinx (default OFF)."
+  OFF CATEGORY "Build Targets")
+
 if(MSVC)
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
     "Force creating pseudo targets and pseudo dependencies (default OFF)."
@@ -226,8 +230,8 @@ else()
 endif()
 
 hpx_option(HPX_WITH_DYNAMIC_HPX_MAIN BOOL
-  "Enable dynamic overload of system 'main()` (Linux only, default: ON)"
-  ON ADVANCED CATEGORY "Utility")
+  "Enable dynamic overload of system ``main()`` (Linux only, default: ON)"
+  ON ADVANCED)
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   hpx_add_config_cond_define(HPX_HAVE_DYNAMIC_HPX_MAIN 1)
 endif()
@@ -1828,7 +1832,7 @@ if(HPX_WITH_RUNTIME)
   add_subdirectory(runtime)
 endif()
 
-if(HPX_WITH_DOCUMENTATION)
+if(HPX_WITH_DOCUMENTATION OR HPX_WITH_DOCUMENTATION_SPHINX)
   add_subdirectory(docs)
 endif()
 
@@ -1989,8 +1993,8 @@ install(
 if(HPX_WITH_DOCUMENTATION)
   # Install HPX documentation files
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs
+    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html"
+    DESTINATION share/hpx-${HPX_VERSION}/docs/html
     COMPONENT docs
     OPTIONAL
     FILES_MATCHING PATTERN "*.html"
@@ -2017,6 +2021,12 @@ if(HPX_WITH_DOCUMENTATION)
     DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
     COMPONENT docs
     FILES_MATCHING PATTERN "*.png"
+    PATTERN ".git" EXCLUDE)
+
+  install(
+    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/sphinx/"
+    DESTINATION share/hpx-${HPX_VERSION}/docs/sphinx
+    COMPONENT docs
     PATTERN ".git" EXCLUDE)
 endif()
 

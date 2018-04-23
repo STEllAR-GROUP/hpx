@@ -6,6 +6,8 @@
 set(example_programs
   oversubscribing_resource_partitioner
   simple_resource_partitioner
+  simplest_resource_partitioner_1
+  simplest_resource_partitioner_2
 )
 
 set(oversubscribing_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)

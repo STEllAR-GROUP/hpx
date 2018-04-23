@@ -87,7 +87,8 @@ jobs:
                 -DHPX_WITH_TESTS_HEADERS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=Off \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
+                -DHPX_WITH_DOCUMENTATION=On
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -133,6 +134,30 @@ jobs:
           root: /hpx
           paths:
             - ./build/bin/inspect
+
+  docs:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Sphinx Documentation
+          command: |
+              ninja docs
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+
+  docs_push:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Pushing Sphinx Documentation
+          command: |
+              ninja git_docs
 
   core:
     <<: *defaults
@@ -879,6 +904,17 @@ workflows:
           requires:
             - configure
           <<: *gh_pages_filter
+      - docs:
+          requires:
+            - configure
+            # Force docs to be built after examples so that workspace doesn't
+            # have conflicts
+            - examples
+          <<: *gh_pages_filter
+      - docs_push:
+          requires:
+            - docs
+          <<: *gh_pages_filter
       - core:
           requires:
             - configure
@@ -958,6 +994,7 @@ workflows:
             - inspect
             - clang_tidy
             - core
+            - docs
             - tests.unit.actions
             - tests.unit.agas
             - tests.unit.build
