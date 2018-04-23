@@ -6,6 +6,8 @@
 set(example_programs
   oversubscribing_resource_partitioner
   simple_resource_partitioner
+  simplest_resource_partitioner_1
+  simplest_resource_partitioner_2
 )
 
 set(oversubscribing_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
@@ -15,6 +17,8 @@ set(oversubscribing_resource_partitioner_PARAMETERS
     THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
 set(simple_resource_partitioner_PARAMETERS
     THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
+set(simplest_resource_partitioner_1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(simplest_resource_partitioner_2_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(example_program ${example_programs})
   set(sources
