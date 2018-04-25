@@ -603,7 +603,10 @@ namespace hpx
         std::size_t const* thread_id =
             xi.get<hpx::detail::throw_thread_id>();
         if (thread_id && *thread_id)
-            hpx::util::format_to(strm, "{thread-id}: {:016x}\n", *thread_id);
+        {
+            strm << "{thread-id}: ";
+            hpx::util::format_to(strm, "{:016x}\n", *thread_id);
+        }
 
         std::string const* thread_description =
             xi.get<hpx::detail::throw_thread_name>();

@@ -8,17 +8,18 @@
 
 #include <hpx/include/components.hpp>
 
-#include <tests/regressions/actions/components/stubs/action_move_semantics.hpp>
+#include <tests/regressions/actions/components/server/action_move_semantics.hpp>
 
 #include <utility>
 
 namespace hpx { namespace test
 {
     struct action_move_semantics
-      : components::client_base<action_move_semantics, stubs::action_move_semantics>
+      : components::client_base<action_move_semantics,
+            server::action_move_semantics>
     {
         typedef components::client_base<
-            action_move_semantics, stubs::action_move_semantics
+            action_move_semantics, server::action_move_semantics
         > base_type;
 
         action_move_semantics() {}

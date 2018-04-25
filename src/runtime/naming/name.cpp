@@ -577,7 +577,7 @@ namespace hpx { namespace naming
             detail::get_internal_bits(lhs.id_msb_);
 
         std::uint64_t msb_test =
-            detail::strip_internal_bits_from_gid(lhs.id_msb_) +
+            detail::strip_internal_bits_and_component_type_from_gid(lhs.id_msb_) +
             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
 
         HPX_ASSERT(msb == (msb_test | lhs_internal_bits));
