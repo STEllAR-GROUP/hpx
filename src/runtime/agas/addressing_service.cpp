@@ -869,6 +869,7 @@ bool addressing_service::is_local_address_cached(
     // Assume non-local operation if the gid is known to have been migrated
     naming::gid_type id(naming::detail::get_stripped_gid_except_dont_cache(gid));
 
+    if (naming::detail::is_migratable(gid))
     {
         std::lock_guard<mutex_type> lock(migrated_objects_mtx_);
         if (was_object_migrated_locked(id))
@@ -1126,6 +1127,7 @@ bool addressing_service::resolve_cached(
     }
 
     // force routing if target object was migrated
+    if (naming::detail::is_migratable(id))
     {
         std::lock_guard<mutex_type> lock(migrated_objects_mtx_);
         if (was_object_migrated_locked(id))
@@ -2615,6 +2617,8 @@ hpx::future<void> addressing_service::mark_as_migrated(
                 "invalid reference gid"));
     }
 
+    HPX_ASSERT(naming::detail::is_migratable(gid_));
+
     naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
     // Always first grab the AGAS lock before invoking the user supplied
@@ -2668,6 +2672,8 @@ void addressing_service::unmark_as_migrated(
         return;
     }
 
+    HPX_ASSERT(naming::detail::is_migratable(gid_));
+
     naming::gid_type gid(naming::detail::get_stripped_gid(gid_));
 
     std::unique_lock<mutex_type> lock(migrated_objects_mtx_);
@@ -2704,6 +2710,8 @@ addressing_service::begin_migration(naming::id_type const& id)
             "invalid reference id");
     }
 
+    HPX_ASSERT(naming::detail::is_migratable(id.get_gid()));
+
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
 
     return primary_ns_.begin_migration(gid);
@@ -2719,6 +2727,8 @@ bool addressing_service::end_migration(
             "addressing_service::end_migration_async",
             "invalid reference id");
     }
+
+    HPX_ASSERT(naming::detail::is_migratable(id.get_gid()));
 
     naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
 
@@ -2748,6 +2758,11 @@ std::pair<bool, components::pinned_ptr>
             "addressing_service::was_object_migrated",
             "invalid reference gid");
         return std::make_pair(false, components::pinned_ptr());
+    }
+
+    if (!naming::detail::is_migratable(gid))
+    {
+        return std::make_pair(false, f());
     }
 
     // Always first grab the AGAS lock before invoking the user supplied
