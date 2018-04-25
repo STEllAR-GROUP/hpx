@@ -1,3 +1,4 @@
+//  Copyright (c) 2018 Mikael Simberg
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +14,10 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/threads.hpp>
+#include <hpx/util/yield_while.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
@@ -91,7 +95,7 @@ void measure_action_futures(std::uint64_t count, bool csv)
             duration) << flush;
 }
 
-void measure_function_futures(std::uint64_t count, bool csv)
+void measure_function_futures_wait_each(std::uint64_t count, bool csv)
 {
     std::vector<future<double> > futures;
 
@@ -115,7 +119,71 @@ void measure_function_futures(std::uint64_t count, bool csv)
             duration) << flush;
     else
         hpx::util::format_to(cout,
-            "invoked {1} futures (functions) in {2} seconds\n",
+            "invoked {1} futures (functions, wait_each) in {2} seconds\n",
+            count,
+            duration) << flush;
+}
+
+void measure_function_futures_wait_all(std::uint64_t count, bool csv)
+{
+    std::vector<future<double> > futures;
+
+    futures.reserve(count);
+
+    // start the clock
+    high_resolution_timer walltime;
+
+    for (std::uint64_t i = 0; i < count; ++i)
+        futures.push_back(async(&null_function));
+
+    wait_all(futures);
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+
+    if (csv)
+        hpx::util::format_to(cout,
+            "{1},{2}\n",
+           count,
+           duration) << flush;
+    else
+        hpx::util::format_to(cout,
+            "invoked {1} futures (functions, wait_all) in {2} seconds\n",
+            count,
+            duration) << flush;
+}
+
+void measure_function_futures_thread_count(std::uint64_t count, bool csv)
+{
+    std::vector<future<double> > futures;
+
+    futures.reserve(count);
+
+    // start the clock
+    high_resolution_timer walltime;
+
+    for (std::uint64_t i = 0; i < count; ++i)
+        async(&null_function);
+
+    // Yield until there is only this and background threads left.
+    auto this_pool = hpx::this_thread::get_pool();
+    hpx::util::yield_while([this_pool]()
+        {
+            return this_pool->get_thread_count_unknown(std::size_t(-1), false) >
+                this_pool->get_background_thread_count() + 1;
+        });
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+
+    if (csv)
+        hpx::util::format_to(cout,
+            "{1},{2}\n",
+            count,
+            duration) << flush;
+    else
+        hpx::util::format_to(cout,
+            "invoked {1} futures (functions, thread count) in {2} seconds\n",
             count,
             duration) << flush;
 }
@@ -134,7 +202,9 @@ int hpx_main(
             throw std::logic_error("error: count of 0 futures specified\n");
 
         measure_action_futures(count, vm.count("csv") != 0);
-        measure_function_futures(count, vm.count("csv") != 0);
+        measure_function_futures_wait_each(count, vm.count("csv") != 0);
+        measure_function_futures_wait_all(count, vm.count("csv") != 0);
+        measure_function_futures_thread_count(count, vm.count("csv") != 0);
     }
 
     finalize();
