@@ -120,11 +120,12 @@ namespace hpx { namespace components
             //
             // Returns he global id (GID) assigned to this instance of a component
             HPX_EXPORT naming::gid_type get_base_gid_dynamic(
-                naming::gid_type const& assign_gid,
-                naming::address const& addr) const;
+                naming::gid_type const& assign_gid, naming::address const& addr,
+                naming::gid_type (*f)(naming::gid_type) = nullptr) const;
 
             HPX_EXPORT naming::gid_type get_base_gid(
-                naming::address const& addr) const;
+                naming::address const& addr,
+                naming::gid_type (*f)(naming::gid_type) = nullptr) const;
 
         protected:
             mutable naming::gid_type gid_;

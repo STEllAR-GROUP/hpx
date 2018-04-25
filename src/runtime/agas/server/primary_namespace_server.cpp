@@ -500,7 +500,10 @@ primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type
         std::unique_lock<mutex_type> l(mutex_);
 
         // wait for any migration to be completed
-        wait_for_migration_locked(l, id, hpx::throws);
+        if (naming::detail::is_migratable(id))
+        {
+            wait_for_migration_locked(l, id, hpx::throws);
+        }
 
         // now, resolve the id
         r = resolve_gid_locked(l, id, hpx::throws);
@@ -882,8 +885,11 @@ void primary_namespace::resolve_free_list(
         // The mapping's key space.
         key_type gid = it->first;
 
-        // wait for any migration to be completed
-        wait_for_migration_locked(l, gid, ec);
+        if (naming::detail::is_migratable(gid))
+        {
+            // wait for any migration to be completed
+            wait_for_migration_locked(l, gid, ec);
+        }
 
         // Resolve the query GID.
         resolved_type r = resolve_gid_locked(l, gid, ec);

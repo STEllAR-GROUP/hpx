@@ -59,7 +59,10 @@ namespace hpx { namespace agas { namespace server
             std::unique_lock<mutex_type> l(mutex_);
 
             // wait for any migration to be completed
-            wait_for_migration_locked(l, gid, ec);
+            if (naming::detail::is_migratable(gid))
+            {
+                wait_for_migration_locked(l, gid, ec);
+            }
 
             cache_address = resolve_gid_locked(l, gid, ec);
 

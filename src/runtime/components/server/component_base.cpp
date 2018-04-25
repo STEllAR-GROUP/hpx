@@ -33,13 +33,22 @@ namespace hpx { namespace components { namespace detail
     }
 
     naming::gid_type base_component::get_base_gid_dynamic(
-        naming::gid_type const& assign_gid, naming::address const& addr) const
+        naming::gid_type const& assign_gid, naming::address const& addr,
+        naming::gid_type (*f)(naming::gid_type)) const
     {
         if (!gid_)
         {
             if (!assign_gid)
             {
-                gid_ = hpx::detail::get_next_id();
+                if (f != nullptr)
+                {
+                    gid_ = f(hpx::detail::get_next_id());
+                }
+                else
+                {
+                    gid_ = hpx::detail::get_next_id();
+                }
+
                 if (!applier::bind_gid_local(gid_, addr))
                 {
                     std::ostringstream strm;
@@ -98,13 +107,20 @@ namespace hpx { namespace components { namespace detail
         return gid;
     }
 
-    naming::gid_type base_component::get_base_gid(
-        naming::address const& addr) const
+    naming::gid_type base_component::get_base_gid(naming::address const& addr,
+        naming::gid_type (*f)(naming::gid_type)) const
     {
         if (!gid_)
         {
             // generate purely local gid
-            gid_ = naming::gid_type(addr.address_);
+            if (f != nullptr)
+            {
+                gid_ = f(naming::gid_type(addr.address_));
+            }
+            else
+            {
+                gid_ = naming::gid_type(addr.address_);
+            }
 
             naming::detail::set_credit_for_gid(
                 gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
