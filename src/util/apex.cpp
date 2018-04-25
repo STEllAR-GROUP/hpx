@@ -11,6 +11,7 @@
 
 namespace hpx { namespace util
 {
+#ifdef HPX_HAVE_APEX
     void * apex_new_task(thread_description const& description,
            threads::thread_id_type const& parent_task)
     {
@@ -27,5 +28,6 @@ namespace hpx { namespace util
                 UINTMAX_MAX, parent_wrapper);
         }
     }
+#endif
 }}
 
