@@ -35,19 +35,9 @@ namespace hpx { namespace util
         apex::finalize();
     }
 
-    inline void * apex_new_task(
+    void * apex_new_task(
                 thread_description const& description,
-                void * parent_task)
-    {
-        if (description.kind() ==
-                thread_description::data_type_description) {
-            return (void*)apex::new_task(description.get_description(),
-                UINTMAX_MAX, (apex::task_wrapper*)parent_task);
-        } else {
-            return (void*)apex::new_task(description.get_address(),
-                UINTMAX_MAX, (apex::task_wrapper*)parent_task);
-        }
-    }
+                threads::thread_id_type const& parent_task);
 
     inline void * apex_update_task(void * wrapper,
                 thread_description const& description)

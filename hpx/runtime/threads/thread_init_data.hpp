@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/apex.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -38,6 +39,11 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id(0), parent_id(nullptr), parent_phase(0),
 #endif
+#ifdef HPX_HAVE_APEX
+        /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+         * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
+            apex_data(apex_new_task(description,parent_id)),
+#endif
             priority(thread_priority_normal),
             num_os_thread(std::size_t(-1)),
             stacksize(get_default_stack_size()),
@@ -55,6 +61,11 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
             parent_phase(rhs.parent_phase),
+#endif
+#ifdef HPX_HAVE_APEX
+        /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+         * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
+            apex_data(apex_new_task(description,parent_id)),
 #endif
             priority(rhs.priority),
             num_os_thread(rhs.num_os_thread),
@@ -82,6 +93,11 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id(0), parent_id(nullptr), parent_phase(0),
 #endif
+#ifdef HPX_HAVE_APEX
+        /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+         * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
+            apex_data(apex_new_task(description,parent_id)),
+#endif
             priority(priority_), num_os_thread(os_thread),
             stacksize(stacksize_ == std::ptrdiff_t(-1) ?
                 get_default_stack_size() : stacksize_),
@@ -103,6 +119,11 @@ namespace hpx { namespace threads
         std::uint32_t parent_locality_id;
         threads::thread_id_type parent_id;
         std::size_t parent_phase;
+#endif
+#ifdef HPX_HAVE_APEX
+        /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
+         * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
+        void * apex_data;
 #endif
 
         thread_priority priority;
