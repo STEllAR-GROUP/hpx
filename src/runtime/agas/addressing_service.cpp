@@ -937,31 +937,41 @@ bool addressing_service::resolve_locally_known_addresses(
 {
     // LVA-encoded GIDs (located on this machine)
     std::uint64_t lsb = id.get_lsb();
-    std::uint64_t msb =
-        naming::detail::strip_internal_bits_from_gid(id.get_msb());
+    std::uint64_t msb = id.get_msb();
 
     if (is_local_lva_encoded_address(msb))
     {
         addr.locality_ = get_local_locality();
 
         // An LSB of 0 references the runtime support component
-        HPX_ASSERT(rts_lva_);
-
         if (0 == lsb || lsb == rts_lva_)
         {
+            HPX_ASSERT(rts_lva_);
+
             addr.type_ = components::component_runtime_support;
             addr.address_ = rts_lva_;
+            return true;
         }
-        else
+
+        if (naming::refers_to_virtual_memory(msb))
         {
             HPX_ASSERT(mem_lva_);
 
             addr.type_ = components::component_memory;
             addr.address_ = mem_lva_;
+            return true;
         }
 
-        return true;
+        if (naming::refers_to_local_lva(id))
+        {
+            // handle (non-migratable) components located on this locality first
+            addr.type_ = naming::detail::get_component_type_from_gid(msb);
+            addr.address_ = lsb;
+            return true;
+        }
     }
+
+    msb = naming::detail::strip_internal_bits_from_gid(msb);
 
     // explicitly resolve localities
     if (naming::is_locality(id))

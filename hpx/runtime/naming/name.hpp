@@ -86,10 +86,21 @@ namespace hpx { namespace naming
         // don't cache this id in the AGAS caches
         static std::uint64_t const dont_cache_mask = 0x800000ull; //-V112
 
+        // Bit 64 is set for all dynamically assigned ids (if this is not set
+        // then the lsb corresponds to the lva of the referenced object).
+        static std::uint64_t const dynamically_assigned = 0x1ull;
+
+        // Bits 65-84 are used to store the component type (20 bits) if bit
+        // 64 is not set.
+        static std::uint64_t const component_type_base_mask = 0xfffffull;
+        static std::uint64_t const component_type_shift = 1ull;
+        static std::uint64_t const component_type_mask =
+            component_type_base_mask << component_type_shift;
+
         static std::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
-        static std::uint64_t const internal_bits_mask =
-            credit_bits_mask | is_locked_mask | dont_cache_mask;
+        static std::uint64_t const internal_bits_mask = credit_bits_mask |
+            is_locked_mask | dont_cache_mask | component_type_mask;
         static std::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask;
 
@@ -447,9 +458,31 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline bool refers_to_virtual_memory(std::uint64_t msb)
+    {
+        return !(msb & gid_type::virtual_memory_mask);
+    }
+
     inline bool refers_to_virtual_memory(gid_type const& gid)
     {
-        return !(gid.get_msb() & gid_type::virtual_memory_mask);
+        return refers_to_virtual_memory(gid.get_msb());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline bool refers_to_local_lva(gid_type const& gid)
+    {
+        return !(gid.get_msb() & gid_type::dynamically_assigned);
+    }
+
+    inline gid_type replace_component_type(gid_type const& gid,
+        std::uint32_t type)
+    {
+        std::uint64_t msb = gid.get_msb() & ~gid_type::component_type_mask;
+
+        HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
+        msb |= ((type << gid_type::component_type_shift) &
+                    gid_type::component_type_mask);
+        return gid_type(msb, gid.get_lsb());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -555,6 +588,23 @@ namespace hpx { namespace naming
                 std::uint64_t msb)
         {
             return msb & ~gid_type::special_bits_mask;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline std::uint32_t get_component_type_from_gid(std::uint64_t msb)
+        {
+            HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
+            return (msb >> gid_type::component_type_shift) &
+                gid_type::component_type_base_mask;
+        }
+
+        inline std::uint64_t add_component_type_to_gid(std::uint64_t msb,
+            std::uint32_t type)
+        {
+            HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
+            return (msb & ~gid_type::component_type_mask) |
+                ((type << gid_type::component_type_shift) &
+                    gid_type::component_type_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
