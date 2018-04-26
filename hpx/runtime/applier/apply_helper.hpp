@@ -12,6 +12,7 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -229,7 +230,8 @@ namespace hpx { namespace applier { namespace detail
         {
             // Direct actions should be able to be executed from a
             // non-HPX thread as well
-            if (this_thread::has_sufficient_stack_space() ||
+            if ((nullptr == hpx::threads::get_self_ptr()) ||
+                this_thread::has_sufficient_stack_space() ||
                 !threads::threadmanager_is_at_least(state_running))
             {
                 call_sync<Action>(lva, comptype, std::forward<Ts>(vs)...);
@@ -250,7 +252,8 @@ namespace hpx { namespace applier { namespace detail
         {
             // Direct actions should be able to be executed from a
             // non-HPX thread as well
-            if (this_thread::has_sufficient_stack_space() ||
+            if ((nullptr == hpx::threads::get_self_ptr()) ||
+                this_thread::has_sufficient_stack_space() ||
                 !threads::threadmanager_is_at_least(state_running))
             {
                 call_sync<Action>(std::forward<Continuation>(cont), lva,

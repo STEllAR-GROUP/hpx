@@ -119,9 +119,13 @@ namespace hpx { namespace components
             // with the AGAS service
             //
             // Returns he global id (GID) assigned to this instance of a component
+            HPX_EXPORT naming::gid_type get_base_gid_dynamic(
+                naming::gid_type const& assign_gid, naming::address const& addr,
+                naming::gid_type (*f)(naming::gid_type) = nullptr) const;
+
             HPX_EXPORT naming::gid_type get_base_gid(
-                naming::gid_type const& assign_gid,
-                naming::address const& addr) const;
+                naming::address const& addr,
+                naming::gid_type (*f)(naming::gid_type) = nullptr) const;
 
         protected:
             mutable naming::gid_type gid_;
@@ -200,7 +204,8 @@ namespace hpx { namespace components
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
-            return this->detail::base_component::get_base_gid(assign_gid,
+            HPX_ASSERT(!assign_gid);        // migration is not supported here
+            return this->detail::base_component::get_base_gid(
                 static_cast<Component const&>(*this).get_current_address());
         }
     };

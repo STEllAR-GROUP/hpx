@@ -448,7 +448,7 @@ namespace hpx { namespace lcos { namespace detail
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
-                if (this->is_ready_locked(l))
+                if (this->is_ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
