@@ -217,7 +217,7 @@ namespace hpx { namespace lcos
               : t_(t)
             {}
 
-            wait_all_frame(Tuple const& t, init_no_addref no_addref)
+            wait_all_frame(init_no_addref no_addref, Tuple const& t)
               : base_type(no_addref), t_(t)
             {}
 
@@ -367,7 +367,7 @@ namespace hpx { namespace lcos
         typedef typename frame_type::init_no_addref init_no_addref;
 
         result_type data(values);
-        frame_type frame{data, init_no_addref()};
+        frame_type frame{init_no_addref{}, data};
         frame.wait_all();
     }
 
@@ -392,7 +392,7 @@ namespace hpx { namespace lcos
         typedef typename frame_type::init_no_addref init_no_addref;
 
         result_type data(values);
-        frame_type frame (data, init_no_addref());
+        frame_type frame (init_no_addref{}, data);
         frame.wait_all();
     }
 
@@ -467,7 +467,7 @@ namespace hpx { namespace lcos
         result_type values =
             result_type(traits::detail::get_shared_state(ts)...);
 
-        frame_type frame(values, init_no_addref());
+        frame_type frame(init_no_addref{}, values);
         frame.wait_all();
     }
 }}
