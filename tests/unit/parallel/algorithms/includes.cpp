@@ -90,7 +90,6 @@ void test_includes1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
-    
     std::uniform_int_distribution<> dis(0,c1.size()-1);
     std::size_t start = dis(gen);
     std::uniform_int_distribution<> dist(0,c1.size()-start-1);

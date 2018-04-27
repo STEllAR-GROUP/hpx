@@ -12,7 +12,7 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
-#include <random> 
+#include <random>
 #include <string>
 #include <vector>
 
@@ -75,7 +75,7 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
     std::vector<int> d(c.size());
     std::uniform_int_distribution<> dis(0,(c.size()>>1)-1);
     std::uniform_int_distribution<> dist(0,c.size()-1);
-    
+
     std::size_t middle_idx = dis(gen);
     auto middle = std::begin(c) + middle_idx;
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
