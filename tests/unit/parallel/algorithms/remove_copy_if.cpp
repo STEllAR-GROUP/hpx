@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random> 
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_remove_copy_if(ExPolicy policy, IteratorTag)
 {
@@ -30,9 +34,12 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::uniform_int_distribution<> dis(0,(c.size()>>1)-1);
+    std::uniform_int_distribution<> dist(0,c.size()-1);
+
+    std::size_t middle_idx = dis(gen);
     auto middle = std::begin(c) + middle_idx;
-    std::iota(std::begin(c), middle, static_cast<int>(std::rand() % c.size()));
+    std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
     hpx::parallel::remove_copy_if(policy,
@@ -66,9 +73,12 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::uniform_int_distribution<> dis(0,(c.size()>>1)-1);
+    std::uniform_int_distribution<> dist(0,c.size()-1);
+    
+    std::size_t middle_idx = dis(gen);
     auto middle = std::begin(c) + middle_idx;
-    std::iota(std::begin(c), middle, static_cast<int>(std::rand() % c.size()));
+    std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
     auto f =
@@ -108,9 +118,12 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::uniform_int_distribution<> dis(0,(c.size()>>1)-1);
+    std::uniform_int_distribution<> dist(0,c.size()-1);
+
+    std::size_t middle_idx = dis(gen);
     auto middle = std::begin(c) + middle_idx;
-    std::iota(std::begin(c), middle, static_cast<int>(std::rand() % c.size()));
+    std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
     hpx::parallel::remove_copy_if(policy,
@@ -134,9 +147,12 @@ void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    std::size_t middle_idx = std::rand() % (c.size()/2);
+    std::uniform_int_distribution<> dis(0,(c.size()>>1)-1);
+    std::uniform_int_distribution<> dist(0,c.size()-1);
+
+    std::size_t middle_idx = dis(gen);
     auto middle = std::begin(c) + middle_idx;
-    std::iota(std::begin(c), middle, static_cast<int>(std::rand() % c.size()));
+    std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
     auto f =
@@ -222,7 +238,7 @@ void test_remove_copy_if_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     try {
@@ -252,7 +268,7 @@ void test_remove_copy_if_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -331,7 +347,7 @@ void test_remove_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     try {
@@ -361,7 +377,7 @@ void test_remove_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -433,7 +449,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     remove_copy_if_test();
     remove_copy_if_exception_test();

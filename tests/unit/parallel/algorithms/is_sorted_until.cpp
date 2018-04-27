@@ -12,12 +12,17 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+std::uniform_int_distribution<> dis(0,99);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_sorted_until1(ExPolicy policy, IteratorTag)
 {
@@ -411,9 +416,9 @@ void test_sorted_until_bad_alloc(ExPolicy policy, IteratorTag)
     //fill first half of array with even numbers and second half
     //with odd numbers
     std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(std::rand() % 100));
+        2*(dis(gen)));
     std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(std::rand() % 100) + 1);
+        2*(dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
     try {
@@ -447,9 +452,9 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
     //fill first half of array with even numbers and second half
     //with odd numbers
     std::fill(std::begin(c), std::begin(c) + c.size()/2,
-        2*(std::rand() % 100));
+        2*(dis(gen)));
     std::fill(std::begin(c) + c.size()/2, std::end(c),
-        2*(std::rand() % 100) + 1);
+        2*(dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
     try {

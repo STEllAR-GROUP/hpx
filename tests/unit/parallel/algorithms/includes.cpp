@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_includes1(ExPolicy policy, IteratorTag)
 {
@@ -29,11 +33,13 @@ void test_includes1(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
-    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    std::size_t first_value = gen(); //-V101
+    std::iota(std::begin(c1), std::end(c1), first_value);
 
     HPX_ASSERT(start <= end);
 
@@ -59,7 +65,8 @@ void test_includes1(ExPolicy policy, IteratorTag)
 
         if (!c2.empty())
         {
-            ++c2[std::rand() % c2.size()]; //-V104
+            std::uniform_int_distribution<> dis(0,c2.size()-1);
+            ++c2[dis(gen)]; //-V104
 
             bool result = hpx::parallel::includes(policy,
                 iterator(std::begin(c1)), iterator(std::end(c1)),
@@ -81,11 +88,13 @@ void test_includes1_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
-
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
     HPX_ASSERT(start <= end);
 
@@ -113,7 +122,8 @@ void test_includes1_async(ExPolicy p, IteratorTag)
 
         if (!c2.empty())
         {
-            ++c2[std::rand() % c2.size()]; //-V104
+            std::uniform_int_distribution<> dis(0,c2.size()-1);
+            ++c2[dis(gen)]; //-V104
 
             hpx::future<bool> result =
                 hpx::parallel::includes(p,
@@ -175,11 +185,13 @@ void test_includes2(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
     HPX_ASSERT(start <= end);
 
@@ -205,7 +217,8 @@ void test_includes2(ExPolicy policy, IteratorTag)
 
         if (!c2.empty())
         {
-            ++c2[std::rand() % c2.size()]; //-V104
+            std::uniform_int_distribution<> dis(0,c2.size()-1);
+            ++c2[dis(gen)]; //-V104
 
             bool result = hpx::parallel::includes(policy,
                 iterator(std::begin(c1)), iterator(std::end(c1)),
@@ -227,11 +240,13 @@ void test_includes2_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
     HPX_ASSERT(start <= end);
 
@@ -259,7 +274,8 @@ void test_includes2_async(ExPolicy p, IteratorTag)
 
         if (!c2.empty())
         {
-            ++c2[std::rand() % c2.size()]; //-V104
+            std::uniform_int_distribution<> dis(0,c2.size()-1);
+            ++c2[dis(gen)]; //-V104
 
             hpx::future<bool> result =
                 hpx::parallel::includes(p,
@@ -321,11 +337,13 @@ void test_includes_exception(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
     HPX_ASSERT(start <= end);
 
@@ -366,11 +384,13 @@ void test_includes_exception_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
     HPX_ASSERT(start <= end);
 
@@ -457,11 +477,13 @@ void test_includes_bad_alloc(ExPolicy policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
     HPX_ASSERT(start <= end);
 
@@ -501,11 +523,13 @@ void test_includes_bad_alloc_async(ExPolicy p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::size_t start = std::rand() % c1.size();
-    std::size_t end = start + (std::rand() % (c1.size() - start));
+    std::uniform_int_distribution<> dis(0,c1.size()-1);
+    std::size_t start = dis(gen);
+    std::uniform_int_distribution<> dist(0,c1.size()-start-1);
+    std::size_t end = start + dist(gen);
 
     HPX_ASSERT(start <= end);
 
@@ -587,7 +611,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     includes_test1();
     includes_test2();

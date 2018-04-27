@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -20,6 +21,10 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+std::uniform_int_distribution<> dis(1,10006);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_for_loop_strided(ExPolicy && policy, IteratorTag)
 {
@@ -31,7 +36,7 @@ void test_for_loop_strided(ExPolicy && policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
@@ -40,7 +45,7 @@ void test_for_loop_strided(ExPolicy && policy, IteratorTag)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
+    int stride = dis(gen); //-V103
 
     hpx::parallel::for_loop_strided(
         std::forward<ExPolicy>(policy),
@@ -74,7 +79,7 @@ void test_for_loop_strided_async(ExPolicy && p, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
@@ -83,7 +88,7 @@ void test_for_loop_strided_async(ExPolicy && p, IteratorTag)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
+    int stride = dis(gen); //-V103
 
     auto f =
         hpx::parallel::for_loop_strided(
@@ -143,7 +148,7 @@ void test_for_loop_strided_idx(ExPolicy && policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
@@ -152,7 +157,7 @@ void test_for_loop_strided_idx(ExPolicy && policy)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
+    int stride = dis(gen); //-V103
 
     hpx::parallel::for_loop_strided(
         std::forward<ExPolicy>(policy),
@@ -185,7 +190,7 @@ void test_for_loop_strided_idx_async(ExPolicy && p)
     typedef std::vector<std::size_t>::iterator base_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::for_each(std::begin(c), std::end(c),
         [](std::size_t& v) -> void
@@ -194,7 +199,7 @@ void test_for_loop_strided_idx_async(ExPolicy && p)
                 v = 43;
         });
 
-    int stride = (std::rand() % (c.size() - 1)) + 1; //-V103
+    int stride = dis(gen); //-V103
 
     auto f =
         hpx::parallel::for_loop_strided(
@@ -243,7 +248,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     for_loop_strided_test();
     for_loop_strided_test_idx();
