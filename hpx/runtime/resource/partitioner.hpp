@@ -190,6 +190,31 @@ namespace hpx { namespace resource
           : partitioner_(detail::create_partitioner(
                 desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode))
         {}
+
+        partitioner(std::nullptr_t f, int argc, char** argv,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            hpx::runtime_mode mode = hpx::runtime_mode_default)
+          : partitioner_(
+                detail::create_partitioner(f, argc, argv, rpmode, mode))
+        {}
+
+        partitioner(std::nullptr_t f, int argc, char** argv,
+            std::vector<std::string> const& cfg,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            hpx::runtime_mode mode = hpx::runtime_mode_default)
+          : partitioner_(
+                detail::create_partitioner(f, argc, argv, cfg, rpmode, mode))
+        {}
+
+        partitioner(std::nullptr_t f,
+            boost::program_options::options_description const& desc_cmdline,
+            int argc, char** argv, std::vector<std::string> ini_config,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            runtime_mode mode = runtime_mode_default)
+            : partitioner_(detail::create_partitioner(
+                  f, desc_cmdline, argc, argv, std::move(ini_config), rpmode,
+                  mode))
+        {}
 #endif
 
         ///////////////////////////////////////////////////////////////////////
