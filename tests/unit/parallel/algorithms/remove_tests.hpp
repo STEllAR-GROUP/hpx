@@ -22,8 +22,8 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
-std::mt19937 gen(seed);
+unsigned int seed = std::random_device{}();
+std::mt19937 _gen(seed);
 
 struct throw_always
 {
@@ -47,9 +47,11 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-        : val(rand_no),
-        name(name_list[gen() % name_list.size()])
-    {}
+        : val(rand_no)
+    {
+        std::uniform_int_distribution<> dis(0,name_list.size()-1);
+        name = name_list[dis(_gen)];
+    }
 
     bool operator<(user_defined_type const& t) const
     {
@@ -95,7 +97,7 @@ struct random_fill
 {
     random_fill() = default;
     random_fill(int rand_base, int range)
-        : gen(gen()),
+        : gen(_gen()),
         dist(rand_base - range / 2, rand_base + range / 2)
     {}
 
@@ -577,7 +579,7 @@ void test_remove_if(IteratorTag, int rand_base)
 template <typename IteratorTag>
 void test_remove(bool test_for_remove_if = false)
 {
-    int rand_base = gen();
+    int rand_base = _gen();
 
     if (test_for_remove_if)
     {
