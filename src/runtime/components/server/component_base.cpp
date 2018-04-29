@@ -18,6 +18,7 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <cstdint>
 #include <mutex>
 #include <sstream>
 
@@ -32,14 +33,23 @@ namespace hpx { namespace components { namespace detail
         }
     }
 
-    naming::gid_type base_component::get_base_gid(
-        naming::gid_type const& assign_gid, naming::address const& addr) const
+    naming::gid_type base_component::get_base_gid_dynamic(
+        naming::gid_type const& assign_gid, naming::address const& addr,
+        naming::gid_type (*f)(naming::gid_type)) const
     {
         if (!gid_)
         {
             if (!assign_gid)
             {
-                gid_ = hpx::detail::get_next_id();
+                if (f != nullptr)
+                {
+                    gid_ = f(hpx::detail::get_next_id());
+                }
+                else
+                {
+                    gid_ = hpx::detail::get_next_id();
+                }
+
                 if (!applier::bind_gid_local(gid_, addr))
                 {
                     std::ostringstream strm;
@@ -88,6 +98,62 @@ namespace hpx { namespace components { namespace detail
 
         naming::detail::strip_credits_from_gid(
             const_cast<naming::gid_type&>(gid_));
+
+        HPX_ASSERT(naming::detail::has_credits(gid));
+
+        // We have to assume this credit was split as otherwise the gid
+        // returned at this point will control the lifetime of the
+        // component.
+        naming::detail::set_credit_split_mask_for_gid(gid);
+        return gid;
+    }
+
+    naming::gid_type base_component::get_base_gid(naming::address const& addr,
+        naming::gid_type (*f)(naming::gid_type)) const
+    {
+        if (!gid_)
+        {
+            // generate purely local gid
+            if (f != nullptr)
+            {
+                gid_ = f(naming::gid_type(addr.address_));
+            }
+            else
+            {
+                gid_ = naming::gid_type(addr.address_);
+            }
+
+            naming::detail::set_credit_for_gid(
+                gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+            gid_ = naming::replace_component_type(gid_, addr.type_);
+            gid_ = naming::replace_locality_id(gid_, agas::get_locality_id());
+
+            if (!applier::bind_gid_local(gid_, addr))
+            {
+                std::ostringstream strm;
+                strm << "failed to bind id " << gid_
+                        << "to locality: " << hpx::get_locality();
+
+                gid_ = naming::invalid_gid;    // invalidate GID
+
+                HPX_THROW_EXCEPTION(duplicate_component_address,
+                    "component_base<Component>::get_base_gid",
+                    strm.str());
+            }
+        }
+
+        std::unique_lock<naming::gid_type::mutex_type> l(gid_.get_mutex());
+
+        if (!naming::detail::has_credits(gid_))
+        {
+            naming::gid_type gid = gid_;
+            return gid;
+        }
+
+        // on first invocation take all credits to avoid a self reference
+        naming::gid_type gid = gid_;
+
+        naming::detail::strip_credits_from_gid(gid_);
 
         HPX_ASSERT(naming::detail::has_credits(gid));
 

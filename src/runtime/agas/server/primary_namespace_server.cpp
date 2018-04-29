@@ -324,6 +324,7 @@ bool primary_namespace::bind_gid(
     counter_data_.increment_bind_gid_count();
     using hpx::util::get;
 
+    naming::gid_type gid = id;
     naming::detail::strip_internal_bits_from_gid(id);
 
     std::unique_lock<mutex_type> l(mutex_);
@@ -338,6 +339,18 @@ bool primary_namespace::bind_gid(
         // binding (e.g. move semantics).
         if (it->first == id)
         {
+            // non-migratable gids can't be rebound
+            if (naming::refers_to_local_lva(gid) &&
+                !naming::refers_to_virtual_memory(gid))
+            {
+                l.unlock();
+
+                HPX_THROW_EXCEPTION(bad_parameter, "primary_namespace::bind_gid",
+                    "cannot rebind gids for non-migratable objects");
+
+                return false;
+            }
+
             gva& gaddr = it->second.first;
             naming::gid_type& loc = it->second.second;
 
@@ -427,6 +440,17 @@ bool primary_namespace::bind_gid(
               , "primary_namespace::bind_gid"
               , "the new GID is contained in an existing range");
         }
+    }
+
+    // non-migratable gids don't need to be bound
+    if (naming::refers_to_local_lva(gid) &&
+        !naming::refers_to_virtual_memory(gid))
+    {
+        LAGAS_(info) << hpx::util::format(
+            "primary_namespace::bind_gid, gid({1}), gva({2}), locality({3})",
+            gid, g, locality);
+
+        return true;
     }
 
     naming::gid_type upper_bound(id + (g.count - 1));
@@ -557,6 +581,23 @@ naming::address primary_namespace::unbind_gid(
             id, count, data.first, data.second);
 
         gva g = data.first;
+        return naming::address(g.prefix, g.type, g.lva());
+    }
+
+    // non-migratable gids are not bound
+    if (naming::refers_to_local_lva(id) &&
+        !naming::refers_to_virtual_memory(id))
+    {
+        naming::gid_type locality = naming::get_locality_from_gid(id);
+        gva g(locality,
+            naming::detail::get_component_type_from_gid(id.get_msb()),
+            0, id.get_lsb());
+
+        LAGAS_(info) << hpx::util::format(
+            "primary_namespace::unbind_gid, gid({1}), count({2}), gva({3}), "
+            "locality({4})",
+            id, count, g, g.prefix);
+
         return naming::address(g.prefix, g.type, g.lva());
     }
 
@@ -1113,6 +1154,17 @@ primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
     )
 { // {{{ resolve_gid_locked implementation
     HPX_ASSERT_OWNS_LOCK(l);
+
+    // handle (non-migratable) components located on this locality first
+    if (naming::refers_to_local_lva(gid) &&
+        !naming::refers_to_virtual_memory(gid))
+    {
+        naming::gid_type locality = naming::get_locality_from_gid(gid);
+        gva addr(locality,
+            naming::detail::get_component_type_from_gid(gid.get_msb()),
+            1, gid.get_lsb());
+        return resolved_type(gid, addr, locality);
+    }
 
     // parameters
     naming::gid_type id = gid;

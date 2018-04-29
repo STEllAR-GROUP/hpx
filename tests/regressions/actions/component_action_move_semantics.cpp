@@ -232,19 +232,21 @@ void test_direct_actions()
                 >(id)
             ), 0u);
         } else {
-            HPX_TEST_EQ((
+            HPX_TEST_RANGE((
                 pass_object<
                     action_move_semantics::test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 1u); // transfer_action
+            ), 1u, 3u); // transfer_action (if parcel is being routed)
+                        // transfer_action, function + call (otherwise)
 
-            HPX_TEST_EQ((
+            HPX_TEST_RANGE((
                 move_object<
                     action_move_semantics::test_non_movable_direct_action,
                 non_movable_object
                 >(id)
-            ), 1u); // transfer_action
+            ), 1u, 3u); // transfer_action (if parcel is being routed)
+                        // transfer_action, function + call (otherwise)
         }
 
         // test movable_object()

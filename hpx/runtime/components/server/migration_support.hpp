@@ -54,14 +54,21 @@ namespace hpx { namespace components
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
-            // we don't store migrating objects in the AGAS cache
-            naming::gid_type result = this->base_type::get_base_gid(assign_gid);
-            naming::detail::set_dont_store_in_cache(result);
+            naming::gid_type result =
+                this->BaseComponent::get_base_gid_dynamic(assign_gid,
+                    static_cast<this_component_type const&>(*this)
+                        .get_current_address(),
+                    [](naming::gid_type gid) -> naming::gid_type
+                    {
+                        // we don't store migrating objects in the AGAS cache
+                        naming::detail::set_dont_store_in_cache(gid);
+                        return gid;
+                    });
             return result;
         }
 
         // This component type supports migration.
-        static HPX_CONSTEXPR bool supports_migration() { return true; }
+        HPX_CONSTEXPR static bool supports_migration() { return true; }
 
         // Pinning functionality
         void pin()
@@ -158,7 +165,7 @@ namespace hpx { namespace components
 
         /// This hook is invoked on the newly created object after the migration
         /// has been finished
-        void on_migrated() {}
+        HPX_CXX14_CONSTEXPR void on_migrated() {}
 
         typedef void decorates_action;
 
