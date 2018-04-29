@@ -379,6 +379,38 @@ namespace hpx { namespace util
         }
     }
 
+    void add_plugin_name(
+        std::map<std::string, boost::filesystem::path>& basenames,
+        std::vector<std::pair<boost::filesystem::path, std::string> >& libdata,
+        boost::filesystem::path const& curr, std::string const& name)
+    {
+        // ensure base directory, remove symlinks, etc.
+        boost::system::error_code fsec;
+        boost::filesystem::path canonical_curr =
+            util::canonical_path(curr, fsec);
+        if (fsec)
+            canonical_curr = curr;
+
+        // make sure every module name is loaded exactly once, the
+        // first occurrence of a module name is used
+        std::string basename = canonical_curr.filename().string();
+        std::pair<
+            std::map<std::string, boost::filesystem::path>::iterator, bool
+        > p = basenames.insert(std::make_pair(basename, canonical_curr));
+
+        if (p.second)
+        {
+            libdata.push_back(std::make_pair(canonical_curr, name));
+        }
+        else
+        {
+            LRT_(warning) << "skipping module " << basename << " ("
+                            << canonical_curr.string() << ")"
+                            << ": ignored because of: "
+                            << (*p.first).second.string();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     init_ini_data_default(std::string const& libs, util::section& ini,
@@ -430,32 +462,15 @@ namespace hpx { namespace util
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
-#if defined(__APPLE__) // shared library version is added berfore extension
+                add_plugin_name(basenames, libdata, curr, name);
+#if defined(__APPLE__)
+                // additionally shared library version is added before extension
                 const std::string version = hpx::full_version_as_string();
                 std::string::size_type i = name.find(version);
                 if (i != std::string::npos)
                     name.erase(i - 1, version.length() + 1); // - 1 for one more dot
+                add_plugin_name(basenames, libdata, curr, name);
 #endif
-                // ensure base directory, remove symlinks, etc.
-                boost::system::error_code fsec;
-                fs::path canonical_curr = util::canonical_path(curr, fsec);
-                if (fsec)
-                    canonical_curr = curr;
-
-                // make sure every module name is loaded exactly once, the
-                // first occurrence of a module name is used
-                std::string basename = canonical_curr.filename().string();
-                std::pair<std::map<std::string, fs::path>::iterator, bool> p =
-                    basenames.insert(std::make_pair(basename, canonical_curr));
-
-                if (p.second) {
-                    libdata.push_back(std::make_pair(canonical_curr, name));
-                }
-                else {
-                    LRT_(warning) << "skipping module " << basename
-                        << " (" << canonical_curr.string() << ")"
-                        << ": ignored because of: " << (*p.first).second.string();
-                }
             }
         }
         catch (fs::filesystem_error const& e) {
