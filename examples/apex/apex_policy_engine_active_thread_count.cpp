@@ -57,14 +57,14 @@ using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
 static bool counters_initialized = false;
-static const char * counter_name = "/threadqueue{{locality#{}/total}/length";
+static const char * counter_name = "/threadqueue{{locality#{}/total}}/length";
 
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     std::uint32_t const prefix = hpx::get_locality_id();
     /*
     id_type id = get_counter(hpx::util::format(
-        "/threads{{locality#{}/total}/count/instantaneous/active",
+        "/threads{{locality#{}/total}}/count/instantaneous/active",
         prefix));
     */
     id_type id = get_counter(hpx::util::format(counter_name, prefix));
