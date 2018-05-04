@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace detail
             recurse_asynchronously =
                 !this_thread::has_sufficient_stack_space();
 #else
-            struct
+            struct handle_continuation_recursion_count
             {
                 handle_continuation_recursion_count()
                   : count_(threads::get_continuation_recursion_count())
