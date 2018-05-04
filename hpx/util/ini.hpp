@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2016 Hartmut Kaiser
+//  Copyright (c) 2005-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -118,15 +118,16 @@ namespace hpx { namespace util
 
         void parse(std::string const& sourcename,
             std::vector<std::string> const& lines, bool verify_existing = true,
-            bool weed_out_comments = true);
+            bool weed_out_comments = true, bool replace_existing = true);
 
         void parse(std::string const& sourcename,
             std::string const& line, bool verify_existing = true,
-            bool weed_out_comments = true)
+            bool weed_out_comments = true, bool replace_existing = true)
         {
             std::vector<std::string> lines;
             lines.push_back(line);
-            parse(sourcename, lines, verify_existing, weed_out_comments);
+            parse(sourcename, lines, verify_existing, weed_out_comments,
+                replace_existing);
         }
 
         void read(std::string const& filename);
