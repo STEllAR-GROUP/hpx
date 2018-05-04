@@ -259,9 +259,11 @@ namespace hpx { namespace compute { namespace util
         static void print_local_targets(void) {
             auto targets = hpx::compute::cuda::target::get_local_targets();
             for (auto target : targets) {
-                std::cout << "GPU Device " << target.native_handle().get_device() << ": \""
+                std::cout << "GPU Device " << target.native_handle().get_device()
+                          << ": \""
                           << target.native_handle().processor_name() << "\" "
-                          << "with compute capability " << target.native_handle().processor_family()
+                          << "with compute capability "
+                          << target.native_handle().processor_family()
                           << "\n";
             }
         }

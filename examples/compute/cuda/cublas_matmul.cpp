@@ -88,7 +88,8 @@ struct cublas_helper : hpx::compute::util::cuda_future_helper
     template <typename R, typename... Params, typename... Args>
      hpx::future<void> async(R(*cublas_function)(Params...), Args &&... args) {
         // make sue we run on the correct device
-        hpx::compute::util::cuda_error(cudaSetDevice(target_.native_handle().get_device()));
+        hpx::compute::util::cuda_error(
+            cudaSetDevice(target_.native_handle().get_device()));
         // make sure this operation takes place on our stream
         hpx::compute::util::cublas_error(cublasSetStream(handle_, stream_));
         // insert the cublas handle in the arg list and call the cublas function
@@ -103,7 +104,8 @@ struct cublas_helper : hpx::compute::util::cuda_future_helper
     template <typename R, typename... Params, typename... Args>
     R apply(R(*cublas_function)(Params...), Args &&... args) {
         // make sue we run on the correct device
-        hpx::compute::util::cuda_error(cudaSetDevice(target_.native_handle().get_device()));
+        hpx::compute::util::cuda_error(
+            cudaSetDevice(target_.native_handle().get_device()));
         // make sure this operation takes place on our stream
         hpx::compute::util::cublas_error(cublasSetStream(handle_, stream_));
         // insert the cublas handle in the arg list and call the cublas function
