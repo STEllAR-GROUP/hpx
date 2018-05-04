@@ -84,10 +84,13 @@ namespace hpx { namespace naming
         static std::uint64_t const locality_id_mask = 0xffffffff00000000ull;
         static std::uint16_t const locality_id_shift = 32; //-V112
 
-        static std::uint64_t const virtual_memory_mask = 0x7fffffull;
+        static std::uint64_t const virtual_memory_mask = 0x3fffffull;
 
         // don't cache this id in the AGAS caches
         static std::uint64_t const dont_cache_mask = 0x800000ull; //-V112
+
+        // the object is migratable
+        static std::uint64_t const is_migratable = 0x400000ull; //-V112
 
         // Bit 64 is set for all dynamically assigned ids (if this is not set
         // then the lsb corresponds to the lva of the referenced object).
@@ -103,7 +106,7 @@ namespace hpx { namespace naming
         static std::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
         static std::uint64_t const internal_bits_mask = credit_bits_mask |
-            is_locked_mask | dont_cache_mask;
+            is_locked_mask | dont_cache_mask | is_migratable;
         static std::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask | component_type_mask;
 
@@ -548,6 +551,17 @@ namespace hpx { namespace naming
         inline void set_dont_store_in_cache(id_type& id)
         {
             id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline bool is_migratable(gid_type const& id)
+        {
+            return (id.get_msb() & gid_type::is_migratable) ? true : false;
+        }
+
+        inline void set_is_migratable(gid_type& gid)
+        {
+            gid.set_msb(gid.get_msb() | gid_type::is_migratable);
         }
 
         ///////////////////////////////////////////////////////////////////////
