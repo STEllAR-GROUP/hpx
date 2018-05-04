@@ -45,7 +45,6 @@ foreach(example_program ${example_programs})
   endif()
 
   if(${example_program}_CUDA_SOURCE)
-    message("got ${${example_program}_CUDA_SOURCE} " ${${example_program}_CUDA_SOURCE})
     set(sources
       ${sources} ${${example_program}_CUDA_SOURCE}.cu)
   endif()
