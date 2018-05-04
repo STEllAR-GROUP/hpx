@@ -1,5 +1,5 @@
 # Copyright (c) 2016 Thomas Heller
-# Copyright (c) 2016-2017 Hartmut Kaiser
+# Copyright (c) 2016-2018 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,10 @@
 # - Please do _not_ configure your editor to automatically format the source
 #   file while saving edits to disk
 # - Please do _not_ reformat a full source file without dire need.
+
+# PLEASE NOTE: This file requires to use a recent version of clang-format. It
+#              is known to work with clang-format V7.0, other (earlier) version
+#              may work as well.
 
 ---
 AccessModifierOffset: -4
@@ -57,6 +61,7 @@ BreakConstructorInitializersBeforeComma: true
 BreakStringLiterals: true
 ColumnLimit: 80
 CommentPragmas: "///"
+CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 4
@@ -85,7 +90,7 @@ Language: Cpp
 # MacroBlockBegin: ''
 # MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: Inner
+NamespaceIndentation: All
 PenaltyBreakBeforeFirstCallParameter: 1
 PenaltyBreakComment: 300
 PenaltyBreakFirstLessLess: 120
