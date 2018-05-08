@@ -340,7 +340,7 @@ namespace hpx { namespace util
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 
         // don't overload user overrides
-        this->parse("<static defaults>", lines, false, false);
+        this->parse("<static defaults>", lines, false, false, false);
 
         need_to_call_pre_initialize = false;
     }
