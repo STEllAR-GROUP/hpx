@@ -41,5 +41,15 @@ int main(int argc, char* argv[])
         HPX_TEST_EQ((format("{} {}", true, false)), "1 0");
     }
 
+    {
+        HPX_TEST_EQ((format("{{ {}", 1)), "{ 1");
+        HPX_TEST_EQ((format("}} {}", 1)), "} 1");
+        HPX_TEST_EQ((format("{{}} {}", 1)), "{} 1");
+        HPX_TEST_EQ((format("{} {{}}", 1)), "1 {}");
+        HPX_TEST_EQ((format("{} {{", 1)), "1 {");
+        HPX_TEST_EQ((format("{} }}", 1)), "1 }");
+        HPX_TEST_EQ((format("{{{1}}}", 2)), "{2}");
+    }
+
     return hpx::util::report_errors();
 }

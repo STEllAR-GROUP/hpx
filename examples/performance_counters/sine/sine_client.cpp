@@ -58,13 +58,13 @@ int monitor(std::uint64_t pause, std::uint64_t values)
 
     using hpx::performance_counters::performance_counter;
     performance_counter sine_explicit(hpx::util::format(
-        "/sine{{locality#{}/instance#{}}/immediate/explicit",
+        "/sine{{locality#{}/instance#{}}}/immediate/explicit",
         prefix, 0));
     performance_counter sine_implicit(hpx::util::format(
-        "/sine{{locality#{}/total}/immediate/implicit",
+        "/sine{{locality#{}/total}}/immediate/implicit",
         prefix));
     performance_counter sine_average(hpx::util::format(
-        "/statistics{{/sine{{locality#{}/instance#{}}/immediate/explicit}/average@100",
+        "/statistics{{/sine{{locality#{}/instance#{}}}/immediate/explicit}}/average@100",
         prefix, 1));
 
     // We need to explicitly start all counters before we can use them. For
