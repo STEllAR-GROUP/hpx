@@ -16,6 +16,7 @@
 #define HPX_LCOS_DATAFLOW_HPP
 
 #include <hpx/lcos/detail/future_transforms.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>
@@ -203,7 +204,38 @@ namespace hpx { namespace lcos { namespace detail
         HPX_FORCEINLINE
         void finalize(hpx::detail::sync_policy, Futures&& futures)
         {
-            done(std::move(futures));
+            // We need to run the completion on a new thread if we are on a
+            // non HPX thread.
+            bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            recurse_asynchronously =
+                !this_thread::has_sufficient_stack_space();
+#else
+            struct handle_continuation_recursion_count
+            {
+                handle_continuation_recursion_count()
+                  : count_(threads::get_continuation_recursion_count())
+                {
+                    ++count_;
+                }
+                ~handle_continuation_recursion_count()
+                {
+                    --count_;
+                }
+
+                std::size_t& count_;
+            } cnt;
+            recurse_asynchronously = recurse_asynchronously ||
+                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+#endif
+            if (!recurse_asynchronously)
+            {
+                done(std::move(futures));
+            }
+            else
+            {
+                finalize(hpx::launch::async, std::move(futures));
+            }
         }
 
         void finalize(hpx::detail::fork_policy policy, Futures&& futures)

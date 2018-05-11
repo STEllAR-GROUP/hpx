@@ -102,9 +102,18 @@ jobs:
           name: Running Inspect Tool
           command: |
               ./bin/inspect --all --output=./hpx_inspect_report.html /hpx/source
+      - run:
+          name: Convert inspect HTML output to XML
+          command: |
+              mkdir -p /report
+              /hpx/source/tools/inspect/inspect_to_junit.py \
+                  ./hpx_inspect_report.html \
+                  /report/hpx_inspect.xml
       - store_artifacts:
           path: hpx_inspect_report.html
           destination: hpx_inspect_report.html
+      - store_test_results:
+          path: /report
       - persist_to_workspace:
           root: /hpx/build
           paths:

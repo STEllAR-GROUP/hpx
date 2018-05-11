@@ -62,6 +62,8 @@ namespace hpx { namespace components
                     {
                         // we don't store migrating objects in the AGAS cache
                         naming::detail::set_dont_store_in_cache(gid);
+                        // also mark gid as migratable
+                        naming::detail::set_is_migratable(gid);
                         return gid;
                     });
             return result;

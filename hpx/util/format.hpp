@@ -325,13 +325,14 @@ namespace hpx { namespace util { namespace detail
         std::size_t index = 0;
         while (!format_str.empty())
         {
-            if (format_str[0] == '{')
+            if (format_str[0] == '{' || format_str[0] == '}')
             {
                 HPX_ASSERT(!format_str.empty());
-                if (format_str[1] == '{')
+                if (format_str[1] == format_str[0])
                 {
-                    os.write(format_str.data(), 1); // '{'
+                    os.write(format_str.data(), 1); // '{' or '}'
                 } else {
+                    HPX_ASSERT(format_str[0] != '}');
                     std::size_t const end = format_str.find('}');
                     boost::string_ref field_str = format_substr(format_str, 1, end);
                     format_field const field = parse_field(field_str);
@@ -344,7 +345,7 @@ namespace hpx { namespace util { namespace detail
                 }
                 format_str.remove_prefix(2);
             } else {
-                std::size_t const next = format_str.find('{');
+                std::size_t const next = format_str.find_first_of("{}");
                 std::size_t const count =
                     next != format_str.npos ? next : format_str.size();
 

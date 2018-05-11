@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2016 Hartmut Kaiser
+//  Copyright (c) 2005-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -199,7 +199,7 @@ bool force_entry(std::string& str)
 // parse file
 void section::parse (std::string const& sourcename,
     std::vector<std::string> const& lines, bool verify_existing,
-    bool weed_out_comments)
+    bool weed_out_comments, bool replace_existing)
 {
     int linenum = 0;
     section* current = this;
@@ -277,7 +277,10 @@ void section::parse (std::string const& sourcename,
                     linenum, line);
             }
 
-            current->add_entry (l, sec_name + "." + key, key, what[3]);
+            if (replace_existing || !current->has_entry(l, key))
+            {
+                current->add_entry (l, sec_name + "." + key, key, what[3]);
+            }
 
             // restore the old section
             current = s;
@@ -326,7 +329,11 @@ void section::parse (std::string const& sourcename,
                 line_msg ("Attempt to initialize unknown entry: ", sourcename,
                     linenum, line);
             }
-            current->add_entry (l, key, key, what[2]);
+
+            if (replace_existing || !current->has_entry(l, key))
+            {
+                current->add_entry (l, key, key, what[2]);
+            }
         }
         else
         {
