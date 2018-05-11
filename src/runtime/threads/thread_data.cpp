@@ -15,6 +15,9 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/unlock_guard.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -214,14 +217,14 @@ namespace hpx { namespace threads
     }
 
 #if defined(HPX_HAVE_APEX)
-    void* get_self_apex_data()
+    apex_task_wrapper get_self_apex_data()
     {
         thread_self* self = get_self_ptr();
         if (nullptr == self)
             return nullptr;
         return self->get_apex_data();
     }
-    void set_self_apex_data(void* data)
+    void set_self_apex_data(apex_task_wrapper data)
     {
         thread_self* self = get_self_ptr();
         if (nullptr == self)

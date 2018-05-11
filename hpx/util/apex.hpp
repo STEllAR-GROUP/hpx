@@ -15,6 +15,8 @@
 #include "apex_api.hpp"
 #endif
 
+typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
+
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
@@ -35,38 +37,38 @@ namespace hpx { namespace util
         apex::finalize();
     }
 
-    void * apex_new_task(
+    apex_task_wrapper apex_new_task(
                 thread_description const& description,
                 threads::thread_id_type const& parent_task);
 
-    inline void * apex_update_task(void * wrapper,
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
                 thread_description const& description)
     {
         if (description.kind() == thread_description::data_type_description) {
-            return (void*)apex::update_task((apex::task_wrapper*)wrapper,
+            return apex::update_task(wrapper,
                 description.get_description());
         } else {
-            return (void*)apex::update_task((apex::task_wrapper*)wrapper,
+            return apex::update_task(wrapper,
                 description.get_address());
         }
     }
 
-    inline void * apex_update_task(void * wrapper, char const* name)
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper, char const* name)
     {
-        return (void*)apex::update_task((apex::task_wrapper*)wrapper, name);
+        return apex::update_task(wrapper, name);
     }
 
     /* This is a scoped object around task scheduling to measure the time
      * spent executing hpx threads */
     struct apex_wrapper
     {
-        apex_wrapper(void* const data_ptr) : stopped(false), data_(nullptr)
+        apex_wrapper(apex_task_wrapper data_ptr) : stopped(false), data_(nullptr)
         {
             /* APEX internal actions are not timed.  Otherwise, we would
              * end up with recursive timers. So it's possible to have
              * a null task wrapper pointer here. */
             if (data_ptr != nullptr) {
-                data_ = (apex::task_wrapper*)data_ptr;
+                data_ = data_ptr;
                 apex::start(data_);
             }
         }
@@ -100,7 +102,7 @@ namespace hpx { namespace util
         }
 
         bool stopped;
-        apex::task_wrapper * data_;
+        apex_task_wrapper data_;
     };
 
     struct apex_wrapper_init

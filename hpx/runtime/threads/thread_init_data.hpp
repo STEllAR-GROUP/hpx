@@ -13,7 +13,9 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -121,7 +123,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-        void * apex_data;
+        apex_task_wrapper apex_data;
 #endif
 
         thread_priority priority;

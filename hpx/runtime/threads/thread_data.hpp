@@ -24,6 +24,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -536,11 +539,11 @@ namespace hpx { namespace threads
         }
 
 #if defined(HPX_HAVE_APEX)
-        void* get_apex_data() const
+        apex_task_wrapper get_apex_data() const
         {
             return coroutine_.get_apex_data();
         }
-        void set_apex_data(void * data)
+        void set_apex_data(apex_task_wrapper data)
         {
             return coroutine_.set_apex_data(data);
         }

@@ -36,6 +36,9 @@
 #include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <cstddef>
 #include <exception>
@@ -197,12 +200,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         static HPX_EXPORT void reset_self();
 
 #if defined(HPX_HAVE_APEX)
-        void* get_apex_data(void) const
+        apex_task_wrapper get_apex_data(void) const
         {
             HPX_ASSERT(m_pimpl);
             return m_pimpl->get_apex_data();
         }
-        void set_apex_data(void * data)
+        void set_apex_data(apex_task_wrapper data)
         {
             HPX_ASSERT(m_pimpl);
             m_pimpl->set_apex_data(data);

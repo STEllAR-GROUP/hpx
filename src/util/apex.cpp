@@ -12,19 +12,19 @@
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
-    void * apex_new_task(thread_description const& description,
+    apex_task_wrapper apex_new_task(thread_description const& description,
            threads::thread_id_type const& parent_task)
     {
-        apex::task_wrapper* parent_wrapper = nullptr;
+        apex_task_wrapper parent_wrapper = nullptr;
         if (parent_task != nullptr) {
-            parent_wrapper = (apex::task_wrapper*)(parent_task.get()->get_apex_data());
+            parent_wrapper = parent_task.get()->get_apex_data();
         }
         if (description.kind() ==
                 thread_description::data_type_description) {
-            return (void*)apex::new_task(description.get_description(),
+            return apex::new_task(description.get_description(),
                 UINTMAX_MAX, parent_wrapper);
         } else {
-            return (void*)apex::new_task(description.get_address(),
+            return apex::new_task(description.get_address(),
                 UINTMAX_MAX, parent_wrapper);
         }
     }
