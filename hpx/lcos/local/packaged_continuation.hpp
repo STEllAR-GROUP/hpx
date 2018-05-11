@@ -223,7 +223,7 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         template <typename Func>
-        continuation(Func && f, init_no_addref no_addref)
+        continuation(init_no_addref no_addref, Func && f)
           : base_type(no_addref),
             started_(false), id_(threads::invalid_thread_id),
             f_(std::forward<Func>(f))
@@ -628,7 +628,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(std::forward<F>(f), init_no_addref()), false);
+            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
         static_cast<shared_state*>(p.get())->attach(
             future, std::forward<Policy>(policy));
         return p;
@@ -649,7 +649,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(std::forward<F>(f), init_no_addref()), false);
+            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
         static_cast<shared_state*>(p.get())->attach_exec_v1(future, exec);
         return p;
     }
@@ -665,7 +665,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // create a continuation
         typename traits::detail::shared_state_ptr<ContResult>::type p(
-            new shared_state(std::forward<F>(f), init_no_addref()), false);
+            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
         static_cast<shared_state*>(p.get())->template attach_exec<Executor>(
             future, exec);
         return p;
@@ -803,7 +803,7 @@ namespace hpx { namespace lcos { namespace detail
 
         // create a continuation
         typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(init_no_addref()), false);
+            new shared_state(init_no_addref{}), false);
         static_cast<shared_state*>(p.get())->attach(std::forward<Future>(future));
         return p;
     }

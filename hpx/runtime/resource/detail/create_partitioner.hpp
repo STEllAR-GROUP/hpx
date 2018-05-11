@@ -136,6 +136,58 @@ namespace hpx { namespace resource { namespace detail
             desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode,
             check);
     }
+
+    inline partitioner& create_partitioner(
+        std::nullptr_t f, int argc, char** argv,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
+    {
+        boost::program_options::options_description desc_cmdline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            >(),
+            desc_cmdline, argc, argv, std::vector<std::string>(), rpmode, mode,
+            check);
+    }
+
+    inline partitioner& create_partitioner(
+        std::nullptr_t f, int argc, char** argv,
+        std::vector<std::string> const& cfg,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
+    {
+        boost::program_options::options_description desc_cmdline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING + " [options]");
+
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            >(),
+            desc_cmdline, argc, argv, cfg, rpmode, mode, check);
+    }
+
+    inline partitioner& create_partitioner(
+        std::nullptr_t f,
+        boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        resource::partitioner_mode rpmode = resource::mode_default,
+        hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
+    {
+        util::set_hpx_prefix(HPX_PREFIX);
+
+        return create_partitioner(
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            >(),
+            desc_cmdline, argc, argv, cfg, rpmode, mode, check);
+    }
 #endif
 }}}
 

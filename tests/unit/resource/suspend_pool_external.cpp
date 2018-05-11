@@ -23,12 +23,6 @@
 #include <utility>
 #include <vector>
 
-// NOTE: Needed for now when initializing resource partitioner separately.
-int hpx_main()
-{
-    return 0;
-}
-
 void test_scheduler(int argc, char* argv[],
     hpx::resource::scheduling_policy scheduler)
 {
@@ -37,7 +31,7 @@ void test_scheduler(int argc, char* argv[],
         "hpx.os_threads=4"
     };
 
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+    hpx::resource::partitioner rp(nullptr, argc, argv, std::move(cfg));
 
     rp.create_thread_pool("default", scheduler);
 

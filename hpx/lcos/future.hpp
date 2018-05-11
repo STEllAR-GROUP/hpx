@@ -74,7 +74,7 @@ namespace hpx { namespace lcos { namespace detail
         ar >> value;
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(std::move(value), init_no_addref()), false);
+            new shared_state(init_no_addref{}, std::move(value)), false);
 
         f = hpx::traits::future_access<Future>::create(std::move(p));
     }
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace detail
             serialization::detail::constructor_selector<value_type>::create(ar));
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(std::move(*value), init_no_addref()), false);
+            new shared_state(init_no_addref{}, std::move(*value)), false);
 
         f = hpx::traits::future_access<Future>::create(std::move(p));
     }
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace detail
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(std::move(exception), init_no_addref()), false);
+                new shared_state(init_no_addref{}, std::move(exception)), false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -141,7 +141,7 @@ namespace hpx { namespace lcos { namespace detail
         if (state == future_state::has_value)
         {
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(hpx::util::unused, init_no_addref()), false);
+                new shared_state(init_no_addref{}, hpx::util::unused), false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos { namespace detail
             ar >> exception;
 
             boost::intrusive_ptr<shared_state> p(
-                new shared_state(std::move(exception), init_no_addref()), false);
+                new shared_state(init_no_addref{}, std::move(exception)), false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
@@ -1472,21 +1472,68 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
-    template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
-    make_ready_future(Result && init)
+    template <typename T>
+    typename std::enable_if<
+       !std::is_void<T>::value,
+        future<typename hpx::util::decay_unwrap<T>::type>
+    >::type
+    make_ready_future(T&& init)
     {
-        typedef typename hpx::util::decay_unwrap<Result>::type result_type;
+        typedef typename hpx::util::decay_unwrap<T>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
         typedef typename shared_state::init_no_addref init_no_addref;
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(std::forward<Result>(init), init_no_addref()),
+            new shared_state(init_no_addref{}, std::forward<T>(init)),
             false);
 
-        return hpx::traits::future_access<future<result_type> >::create(std::move(p));
+        return hpx::traits::future_access<future<result_type>>::create(
+            std::move(p));
     }
 
+    // Extension (see wg21.link/P0319)
+    template <typename T>
+    typename std::enable_if<
+        std::is_constructible<T>::value && !std::is_void<T>::value,
+        future<typename hpx::util::decay_unwrap<T>::type>
+    >::type
+    make_ready_future()
+    {
+        typedef typename hpx::util::decay_unwrap<T>::type result_type;
+        typedef lcos::detail::future_data<result_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
+        typedef typename shared_state::default_construct default_construct;
+
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(init_no_addref{}, default_construct{}),
+            false);
+
+        return hpx::traits::future_access<future<result_type>>::create(
+            std::move(p));
+    }
+
+    // Extension (see wg21.link/P0319)
+    template <typename T, typename T1, typename ... Ts>
+    typename std::enable_if<
+        std::is_constructible<T, T1&&, Ts&&...>::value,
+        future<typename hpx::util::decay_unwrap<T>::type>
+    >::type
+    make_ready_future(T1&& t1, Ts&&... ts)
+    {
+        typedef typename hpx::util::decay_unwrap<T>::type result_type;
+        typedef lcos::detail::future_data<result_type> shared_state;
+        typedef typename shared_state::init_no_addref init_no_addref;
+
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(init_no_addref{},
+                std::forward<T1>(t1), std::forward<Ts>(ts)...),
+            false);
+
+        return hpx::traits::future_access<future<result_type>>::create(
+            std::move(p));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which holds the
     // given error
     template <typename T>
@@ -1496,7 +1543,7 @@ namespace hpx { namespace lcos
         typedef typename shared_state::init_no_addref init_no_addref;
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(e, init_no_addref()), false);
+            new shared_state(init_no_addref{}, e), false);
 
         return hpx::traits::future_access<future<T> >::create(std::move(p));
     }
@@ -1514,29 +1561,40 @@ namespace hpx { namespace lcos
         return future<T>();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
-    template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
+    template <typename T>
+    typename std::enable_if<
+       !std::is_void<T>::value,
+        future<typename hpx::util::decay_unwrap<T>::type>
+    >::type
     make_ready_future_at(hpx::util::steady_time_point const& abs_time,
-        Result&& init)
+        T&& init)
     {
-        typedef typename hpx::util::decay_unwrap<Result>::type result_type;
+        typedef typename hpx::util::decay_unwrap<T>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
+        boost::intrusive_ptr<shared_state> p(
+            new shared_state(abs_time.value(), std::forward<T>(init)));
+
         return hpx::traits::future_access<future<result_type> >::create(
-            new shared_state(abs_time.value(), std::forward<Result>(init)));
+            std::move(p));
     }
 
-    template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
+    template <typename T>
+    typename std::enable_if<
+       !std::is_void<T>::value,
+        future<typename hpx::util::decay_unwrap<T>::type>
+    >::type
     make_ready_future_after(hpx::util::steady_duration const& rel_time,
-        Result && init)
+        T&& init)
     {
         return make_ready_future_at(rel_time.from_now(),
-            std::forward<Result>(init));
+            std::forward<T>(init));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     inline future<void> make_ready_future()
     {
@@ -1544,9 +1602,17 @@ namespace hpx { namespace lcos
         typedef shared_state::init_no_addref init_no_addref;
 
         boost::intrusive_ptr<shared_state> p(
-            new shared_state(hpx::util::unused, init_no_addref()), false);
+            new shared_state(init_no_addref{}, hpx::util::unused), false);
 
         return hpx::traits::future_access<future<void> >::create(std::move(p));
+    }
+
+    // Extension (see wg21.link/P0319)
+    template <typename T>
+    typename std::enable_if<std::is_void<T>::value, future<void> >::type
+    make_ready_future()
+    {
+        return make_ready_future();
     }
 
     // extension: create a pre-initialized future object which gets ready at
@@ -1560,8 +1626,23 @@ namespace hpx { namespace lcos
             new shared_state(abs_time.value(), hpx::util::unused));
     }
 
+    template <typename T>
+    typename std::enable_if<std::is_void<T>::value, future<void> >::type
+    make_ready_future_at(hpx::util::steady_time_point const& abs_time)
+    {
+        return make_ready_future_at(abs_time);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     inline future<void> make_ready_future_after(
         hpx::util::steady_duration const& rel_time)
+    {
+        return make_ready_future_at(rel_time.from_now());
+    }
+
+    template <typename T>
+    typename std::enable_if<std::is_void<T>::value, future<void> >::type
+    make_ready_future_after(hpx::util::steady_duration const& rel_time)
     {
         return make_ready_future_at(rel_time.from_now());
     }

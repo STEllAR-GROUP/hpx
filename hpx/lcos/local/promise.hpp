@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             promise_base()
-              : shared_state_(new shared_state_type(init_no_addref()), false)
+              : shared_state_(new shared_state_type(init_no_addref{}), false)
               , future_retrieved_(false)
             {}
 
@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace local
                 unique_pointer p (traits::allocate(alloc, 1),
                     deleter<other_allocator>{alloc});
 
-                traits::construct(alloc, p.get(), init_no_addref(), alloc);
+                traits::construct(alloc, p.get(), init_no_addref{}, alloc);
                 shared_state_.reset(p.release(), false);
             }
 
@@ -140,12 +140,16 @@ namespace hpx { namespace lcos { namespace local
                 return traits::future_access<future<R> >::create(shared_state_);
             }
 
-            template <typename T>
-            void set_value(T&& value, error_code& ec = throws)
+            template <typename... Ts>
+            typename std::enable_if<
+                std::is_constructible<R, Ts&&...>::value ||
+                    std::is_void<R>::value
+            >::type
+            set_value(Ts&&... ts)
             {
                 if (shared_state_ == nullptr)
                 {
-                    HPX_THROWS_IF(ec, no_state,
+                    HPX_THROW_EXCEPTION(no_state,
                         "local::detail::promise_base<R>::set_value",
                         "this promise has no valid shared state");
                     return;
@@ -153,22 +157,21 @@ namespace hpx { namespace lcos { namespace local
 
                 if (shared_state_->is_ready())
                 {
-                    HPX_THROWS_IF(ec, promise_already_satisfied,
+                    HPX_THROW_EXCEPTION(promise_already_satisfied,
                         "local::detail::promise_base<R>::set_value",
                         "result has already been stored for this promise");
                     return;
                 }
 
-                shared_state_->set_value(std::forward<T>(value), ec);
-                if (ec) return;
+                shared_state_->set_value(std::forward<Ts>(ts)...);
             }
 
             template <typename T>
-            void set_exception(T&& value, error_code& ec = throws)
+            void set_exception(T&& value)
             {
                 if (shared_state_ == nullptr)
                 {
-                    HPX_THROWS_IF(ec, no_state,
+                    HPX_THROW_EXCEPTION(no_state,
                         "local::detail::promise_base<R>::set_exception",
                         "this promise has no valid shared state");
                     return;
@@ -176,14 +179,13 @@ namespace hpx { namespace lcos { namespace local
 
                 if (shared_state_->is_ready())
                 {
-                    HPX_THROWS_IF(ec, promise_already_satisfied,
+                    HPX_THROW_EXCEPTION(promise_already_satisfied,
                         "local::detail::promise_base<R>::set_exception",
                         "result has already been stored for this promise");
                     return;
                 }
 
-                shared_state_->set_exception(std::forward<T>(value), ec);
-                if (ec) return;
+                shared_state_->set_exception(std::forward<T>(value));
             }
 
         protected:
@@ -282,9 +284,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_value(R const& r, error_code& ec = throws)
+        void set_value(R const& r)
         {
-            base_type::set_value(r, ec);
+            base_type::set_value(r);
         }
 
         // Effects: atomically stores the value r in the shared state and makes
@@ -298,9 +300,32 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_value(R&& r, error_code& ec = throws)
+        void set_value(R&& r)
         {
-            base_type::set_value(std::move(r), ec);
+            base_type::set_value(std::move(r));
+        }
+
+        // Extension (see wg21.link/P0319)
+        //
+        // Effects: atomically initializes the stored value as if
+        //          direct-non-list-initializing an object of type R with the
+        //          arguments forward<Args>(args)...) in the shared state and
+        //          makes that state ready.
+        // Requires:
+        //      - std::is_constructible<R, Ts&&...>::value == true
+        // Throws:
+        //   - future_error if its shared state already has a stored value or
+        //     exception, or
+        //   - any exception thrown by the constructor selected to move an
+        //     object of R.
+        // Error conditions:
+        //   - promise_already_satisfied if its shared state already has a
+        //     stored value or exception.
+        //   - no_state if *this has no shared state.
+        template <typename ... Ts>
+        void set_value(Ts&&... ts)
+        {
+            base_type::set_value(std::forward<Ts>(ts)...);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -311,9 +336,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr e, error_code& ec = throws)
+        void set_exception(std::exception_ptr e)
         {
-            base_type::set_exception(std::move(e), ec);
+            base_type::set_exception(std::move(e));
         }
     };
 
@@ -394,9 +419,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_value(R& r, error_code& ec = throws)
+        void set_value(R& r)
         {
-            base_type::set_value(r, ec);
+            base_type::set_value(r);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -407,9 +432,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr e, error_code& ec = throws)
+        void set_exception(std::exception_ptr e)
         {
-            base_type::set_exception(std::move(e), ec);
+            base_type::set_exception(std::move(e));
         }
     };
 
@@ -492,9 +517,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_value(error_code& ec = throws)
+        void set_value()
         {
-            base_type::set_value(hpx::util::unused, ec);
+            base_type::set_value(hpx::util::unused);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -505,9 +530,9 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_exception(std::exception_ptr e, error_code& ec = throws)
+        void set_exception(std::exception_ptr e)
         {
-            base_type::set_exception(std::move(e), ec);
+            base_type::set_exception(std::move(e));
         }
     };
 

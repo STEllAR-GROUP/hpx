@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,6 +18,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdlib>
+#include <exception>
 #include <functional>
 #include <mutex>
 #include <thread>
@@ -44,6 +45,7 @@ namespace hpx { namespace threads
             // allows to support non-default-constructible and move-only
             // types.
             hpx::util::optional<result_type> result;
+            std::exception_ptr exception;
 
             // This lambda function will be scheduled to run as an HPX
             // thread
@@ -51,9 +53,18 @@ namespace hpx { namespace threads
             auto && wrapper =
                 [&]() mutable
                 {
-                    // Execute the given function, forward all parameters,
-                    // store result.
-                    result.emplace(util::invoke_fused(f, std::move(args)));
+                    try
+                    {
+                        // Execute the given function, forward all parameters,
+                        // store result.
+                        result.emplace(util::invoke_fused(f, std::move(args)));
+                    }
+                    catch (...)
+                    {
+                        // make sure exceptions do not escape the HPX thread
+                        // scheduler
+                        exception = std::current_exception();
+                    }
 
                     // Now signal to the waiting thread that we're done.
                     {
@@ -71,6 +82,12 @@ namespace hpx { namespace threads
             while (!stopping)
                 cond.wait(lk);
 
+            // rethrow exceptions
+            if (exception)
+            {
+                std::rethrow_exception(exception);
+            }
+
             return std::move(*result);
         }
 
@@ -82,14 +99,25 @@ namespace hpx { namespace threads
             std::condition_variable_any cond;
             bool stopping = false;
 
+            std::exception_ptr exception;
+
             // This lambda function will be scheduled to run as an HPX
             // thread
             auto && args = util::forward_as_tuple(std::forward<Ts>(ts)...);
             auto && wrapper =
                 [&]() mutable
                 {
-                    // Execute the given function, forward all parameters.
-                    util::invoke_fused(f, std::move(args));
+                    try
+                    {
+                        // Execute the given function, forward all parameters.
+                        util::invoke_fused(f, std::move(args));
+                    }
+                    catch (...)
+                    {
+                        // make sure exceptions do not escape the HPX thread
+                        // scheduler
+                        exception = std::current_exception();
+                    }
 
                     // Now signal to the waiting thread that we're done.
                     {
@@ -106,6 +134,12 @@ namespace hpx { namespace threads
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
             while (!stopping)
                 cond.wait(lk);
+
+            // rethrow exceptions
+            if (exception)
+            {
+                std::rethrow_exception(exception);
+            }
         }
     }
 

@@ -35,6 +35,7 @@ set(tests
     future_then_executor
     future_wait
     global_spmd_block
+    make_ready_future
     local_latch
     local_barrier
     local_dataflow
@@ -47,6 +48,7 @@ set(tests
     packaged_action
     promise
     promise_allocator
+    promise_emplace
     reduce
     remote_dataflow
     remote_latch
