@@ -768,13 +768,11 @@ namespace hpx { namespace threads { namespace detail
                                     background_running.reset();
                                 }
                                 else
+#endif
                                 {
                                     this_state.store(state_stopped);
                                     break;
                                 }
-#else
-                                this_state.store(state_stopped);
-#endif
                             }
                             else
                             {
