@@ -13,9 +13,9 @@
 
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
-#endif
-
+#include <memory>
 typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
+#endif
 
 namespace hpx { namespace util
 {
