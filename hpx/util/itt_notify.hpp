@@ -603,18 +603,18 @@ inline ___itt_counter* itt_counter_create_typed(char const*, char const*, int)
 inline void itt_counter_destroy(___itt_counter*) {}
 inline void itt_counter_set_value(___itt_counter*, void *) {}
 
-inline int itt_event_create(char const *name, int namelen)  { return 0; }
-inline int itt_event_start(int evnt) { return 0; }
-inline int itt_event_end(int evnt) { return 0; }
+inline int itt_event_create(char const *, int)  { return 0; }
+inline int itt_event_start(int ) { return 0; }
+inline int itt_event_end(int) { return 0; }
 
-inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, std::uint64_t const& data) {}
-inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, double const& data) {}
-inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, char const* data) {}
-inline void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
-    ___itt_string_handle* key, void const* data) {}
+inline void itt_metadata_add(___itt_domain*, ___itt_id*,
+    ___itt_string_handle*, std::uint64_t const&) {}
+inline void itt_metadata_add(___itt_domain*, ___itt_id*,
+    ___itt_string_handle*, double const&) {}
+inline void itt_metadata_add(___itt_domain*, ___itt_id*,
+    ___itt_string_handle*, char const*) {}
+inline void itt_metadata_add(___itt_domain*, ___itt_id*,
+    ___itt_string_handle*, void const*) {}
 
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -687,7 +687,7 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct string_handle
     {
-        string_handle(char const* s = nullptr) {}
+        string_handle(char const* = nullptr) {}
     };
 
     //////////////////////////////////////////////////////////////////////////

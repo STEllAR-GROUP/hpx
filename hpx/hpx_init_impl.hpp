@@ -328,7 +328,7 @@ namespace hpx
     }
 
     inline int
-    init(std::nullptr_t f, std::string const& app_name, int argc, char** argv,
+    init(std::nullptr_t, std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
@@ -355,7 +355,7 @@ namespace hpx
     }
 
     inline int
-    init(std::nullptr_t f,
+    init(std::nullptr_t,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
