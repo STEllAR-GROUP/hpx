@@ -237,8 +237,9 @@ namespace hpx { namespace resource { namespace detail
     {
         threads::mask_type pu_mask = threads::mask_type();
         threads::set(pu_mask, pu_num);
+        threads::topology& topo = get_topology();
 
-        threads::mask_type comp = affinity_data_.get_used_pus_mask(pu_num);
+        threads::mask_type comp = affinity_data_.get_used_pus_mask(topo, pu_num);
         return threads::any(comp & pu_mask);
     }
 
@@ -280,7 +281,7 @@ namespace hpx { namespace resource { namespace detail
                     if (pu_exposed(pid))
                     {
                         c.pus_.emplace_back(pid, &c,
-                            affinity_data_.get_thread_occupancy(pid));
+                            affinity_data_.get_thread_occupancy(topo, pid));
                         pu &p = c.pus_.back();
 
                         if (p.thread_occupancy_ == 0)
