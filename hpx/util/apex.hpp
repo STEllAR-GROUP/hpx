@@ -37,7 +37,7 @@ namespace hpx { namespace util
         apex::finalize();
     }
 
-    apex_task_wrapper apex_new_task(
+    HPX_EXPORT apex_task_wrapper apex_new_task(
                 thread_description const& description,
                 threads::thread_id_type const& parent_task);
 
