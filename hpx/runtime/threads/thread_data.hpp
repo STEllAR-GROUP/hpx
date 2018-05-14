@@ -24,6 +24,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -536,11 +539,11 @@ namespace hpx { namespace threads
         }
 
 #if defined(HPX_HAVE_APEX)
-        void* get_apex_data() const
+        apex_task_wrapper get_apex_data() const
         {
             return coroutine_.get_apex_data();
         }
-        void set_apex_data(void * data)
+        void set_apex_data(apex_task_wrapper data)
         {
             return coroutine_.set_apex_data(data);
         }
@@ -614,13 +617,7 @@ namespace hpx { namespace threads
                 parent_locality_id_ = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
-            if (parent_thread_id_ != nullptr) {
-                set_apex_data(apex_new_task(get_description(),
-                    parent_thread_id_.get()->get_apex_data()));
-            } else {
-                set_apex_data(apex_new_task(get_description(),
-                    nullptr));
-            }
+            set_apex_data(init_data.apex_data);
 #endif
             HPX_ASSERT(init_data.stacksize != 0);
             HPX_ASSERT(coroutine_.is_ready());
@@ -678,13 +675,7 @@ namespace hpx { namespace threads
                 parent_locality_id_ = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
-            if (parent_thread_id_ != nullptr) {
-                set_apex_data(apex_new_task(get_description(),
-                    parent_thread_id_.get()->get_apex_data()));
-            } else {
-                set_apex_data(apex_new_task(get_description(),
-                    nullptr));
-            }
+            set_apex_data(init_data.apex_data);
 #endif
         }
 

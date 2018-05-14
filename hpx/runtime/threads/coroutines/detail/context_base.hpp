@@ -92,7 +92,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     std::ptrdiff_t const default_stack_size = -1;
 
 #if defined(HPX_HAVE_APEX)
-    void * rebind_base_apex(void * apex_data_ptr, thread_id_type id);
+    apex_task_wrapper rebind_base_apex(thread_id_type id);
 #endif
 
     class context_base : public default_context_impl
@@ -113,7 +113,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
             m_thread_data(0),
 #if defined(HPX_HAVE_APEX)
-            m_apex_data(0ull),
+            m_apex_data(nullptr),
 #endif
             m_type_info(),
             m_thread_id(id),
@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_thread_data = 0;
 #endif
 #if defined(HPX_HAVE_APEX)
-            m_apex_data = 0ull;
+            m_apex_data = nullptr;
 #endif
             m_thread_id.reset();
         }
@@ -230,7 +230,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             m_thread_data = 0;
 #endif
 #if defined(HPX_HAVE_APEX)
-            m_apex_data = 0ull;
+            m_apex_data = nullptr;
 #endif
         }
 
@@ -257,7 +257,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         }
 
 #if defined(HPX_HAVE_APEX)
-        void* get_apex_data() const
+        apex_task_wrapper get_apex_data() const
         {
             // APEX wants the ADDRESS of a location to store
             // data.  This storage could be updated asynchronously,
@@ -267,7 +267,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             // APEX will change the value pointed to by the address.
             return m_apex_data;
         }
-        void set_apex_data(void * data)
+        void set_apex_data(apex_task_wrapper data)
         {
             m_apex_data = data;
         }
@@ -349,7 +349,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
             HPX_ASSERT(m_thread_data == 0);
 #if defined(HPX_HAVE_APEX)
-            m_apex_data = rebind_base_apex(m_apex_data, id);
+            m_apex_data = rebind_base_apex(id);
 #endif
             m_type_info = std::exception_ptr();
         }
@@ -403,7 +403,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #if defined(HPX_HAVE_APEX)
         // This is a pointer that APEX will use to maintain state
         // when an HPX thread is pre-empted.
-        void* m_apex_data;
+        apex_task_wrapper m_apex_data;
 #endif
 
         // This is used to generate a meaningful exception trace.

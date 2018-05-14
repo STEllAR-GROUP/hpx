@@ -16,6 +16,11 @@
 #include <hpx/util_fwd.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/unique_function.hpp>
+#if defined(HPX_HAVE_APEX)
+// forward declare the APEX object
+namespace apex { struct task_wrapper; }
+typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -159,8 +164,8 @@ namespace hpx { namespace threads
         thread_state_enum state = unknown);
 
 #if defined(HPX_HAVE_APEX)
-    HPX_API_EXPORT void* get_self_apex_data(void);
-    HPX_API_EXPORT void set_self_apex_data(void * data);
+    HPX_API_EXPORT apex_task_wrapper get_self_apex_data(void);
+    HPX_API_EXPORT void set_self_apex_data(apex_task_wrapper data);
 #endif
 }}
 
