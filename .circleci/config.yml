@@ -917,7 +917,8 @@ jobs:
               docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
               docker push ${TARGET_IMAGE_NAME}
           filters:
-              branches: master
+              branches:
+                  only: master
 
 workflows:
   version: 2
