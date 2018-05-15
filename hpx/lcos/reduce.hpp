@@ -227,7 +227,7 @@ namespace hpx { namespace lcos
                 action_result;
 
             template <typename ReduceOp>
-            struct reduce_invoker
+            struct reduce_invoker_helper
             {
                 typedef
                     typename util::decay<ReduceOp>::type
@@ -338,7 +338,7 @@ namespace hpx { namespace lcos
 
                 typedef
                     typename detail::make_reduce_action<Action>::
-                        template reduce_invoker<ReduceOp>::type
+                        template reduce_invoker_helper<ReduceOp>::type
                     reduce_impl_action;
 
                 while(it != ids.end())
@@ -387,7 +387,7 @@ namespace hpx { namespace lcos
     {
         typedef
             typename detail::make_reduce_action<Action>::
-                template reduce_invoker<ReduceOp>::type
+                template reduce_invoker_helper<ReduceOp>::type
             reduce_impl_action;
 
         typedef
@@ -488,14 +488,14 @@ namespace hpx { namespace lcos
 #define HPX_REGISTER_REDUCE_ACTION_DECLARATION_2(Action, ReduceOp)            \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
-            reduce_invoker<ReduceOp>::type                                    \
+            reduce_invoker_helper<ReduceOp>::type                             \
       , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_DECLARATION_3(Action, ReduceOp, Name)      \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
-            reduce_invoker<ReduceOp>::type                                    \
+            reduce_invoker_helper<ReduceOp>::type                             \
       , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
@@ -513,14 +513,14 @@ namespace hpx { namespace lcos
 #define HPX_REGISTER_REDUCE_ACTION_2(Action, ReduceOp)                        \
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
-            reduce_invoker<ReduceOp>::type                                    \
+            reduce_invoker_helper<ReduceOp>::type                             \
       , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_3(Action, ReduceOp, Name)                  \
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
-            reduce_invoker<ReduceOp>::type                                    \
+            reduce_invoker_helper<ReduceOp>::type                             \
       , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
@@ -540,7 +540,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
-        >::reduce_invoker<ReduceOp>::type                                     \
+        >::reduce_invoker_helper<ReduceOp>::type                              \
       , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
@@ -548,7 +548,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
-        >::reduce_invoker<ReduceOp>::type                                     \
+        >::reduce_invoker_helper<ReduceOp>::type                              \
       , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
@@ -567,7 +567,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
-        >::reduce_invoker<ReduceOp>::type                                     \
+        >::reduce_invoker_helper<ReduceOp>::type                              \
       , HPX_PP_CAT(HPX_PP_CAT(reduce_, Action), ReduceOp)                     \
     )                                                                         \
 /**/
@@ -575,7 +575,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
-        >::reduce_invoker<ReduceOp>::type                                     \
+        >::reduce_invoker_helper<ReduceOp>::type                              \
       , HPX_PP_CAT(reduce_, Name)                                             \
     )                                                                         \
 /**/
