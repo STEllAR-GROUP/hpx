@@ -33,8 +33,8 @@ unsigned int seed = std::random_device{}();
 struct random_fill
 {
     random_fill(std::size_t random_range)
-        : gen(seed),
-          dist(0, random_range - 1)
+      : gen(seed),
+        dist(0, static_cast<int>(random_range - 1))
     {}
 
     int operator()()
@@ -59,8 +59,7 @@ struct vector_type
 
     bool operator==(vector_type const & t) const
     {
-        return std::equal(std::begin(vec_), std::end(vec_),
-            std::begin(t.vec_), std::end(t.vec_));
+        return vec_ == t.vec_;
     }
 
     std::vector<int> vec_;
@@ -78,8 +77,7 @@ struct array_type
 
     bool operator==(array_type const & t) const
     {
-        return std::equal(std::begin(arr_), std::end(arr_),
-            std::begin(t.arr_), std::end(t.arr_));
+        return arr_ == t.arr_;
     }
 
     static const std::size_t arr_size_{ 30 };
@@ -101,7 +99,7 @@ double run_remove_benchmark_std(int test_count,
             org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
-        std::remove(first, last, value);
+        (void)std::remove(first, last, value);
         time += hpx::util::high_resolution_clock::now() - elapsed;
     }
 
@@ -153,7 +151,7 @@ void run_benchmark(std::size_t vector_size, int test_count,
         random_fill(random_range));
     org_v = v;
 
-    auto value = DataType(random_range / 2);
+    auto value = DataType(static_cast<int>(random_range / 2));
 
     auto dest_dist = std::distance(first, std::remove(first, last, value));
 
