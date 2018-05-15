@@ -152,7 +152,7 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_noreturn_attribute(
     DEFINITIONS HPX_HAVE_CXX11_NORETURN_ATTRIBUTE)
 
-  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+  if(HPX_WITH_CXX1Y OR HPX_WITH_CXX14 OR HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++14 language features
     hpx_check_for_cxx14_constexpr(
       DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
@@ -182,7 +182,7 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx14_return_type_deduction()
   endif()
 
-  if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17)
+  if(HPX_WITH_CXX1Z OR HPX_WITH_CXX17 OR HPX_WITH_CXX2A)
     # Check the availability of certain C++17 language features
     hpx_check_for_cxx17_fold_expressions(
         DEFINITIONS HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
