@@ -500,6 +500,7 @@ namespace hpx { namespace threads { namespace detail
         // spin for some time after queues have become empty
         bool may_exit = false;
 
+#if defined(HPX_HAVE_NETWORKING)
         std::shared_ptr<bool> background_running = nullptr;
         thread_id_type background_thread;
 
@@ -510,6 +511,7 @@ namespace hpx { namespace threads { namespace detail
             background_thread = create_background_thread(scheduler, params,
                 background_running, num_thread, idle_loop_count);
         }
+#endif
 
         thread_data* next_thrd = nullptr;
         while (true) {
@@ -753,6 +755,7 @@ namespace hpx { namespace threads { namespace detail
                             if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                             {
                                 // If this is an inner scheduler, try to exit immediately
+#if defined(HPX_HAVE_NETWORKING)
                                 if (background_thread != nullptr)
                                 {
                                     HPX_ASSERT(background_running);
@@ -765,6 +768,7 @@ namespace hpx { namespace threads { namespace detail
                                     background_running.reset();
                                 }
                                 else
+#endif
                                 {
                                     this_state.store(state_stopped);
                                     break;
@@ -781,6 +785,7 @@ namespace hpx { namespace threads { namespace detail
                     }
                 }
 
+#if defined(HPX_HAVE_NETWORKING)
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running))
@@ -799,6 +804,7 @@ namespace hpx { namespace threads { namespace detail
                     background_thread = create_background_thread(scheduler, params,
                         background_running, num_thread, idle_loop_count);
                 }
+#endif
 
                 // call back into invoking context
                 if (!params.inner_.empty())
@@ -813,6 +819,7 @@ namespace hpx { namespace threads { namespace detail
             {
                 busy_loop_count = 0;
 
+#if defined(HPX_HAVE_NETWORKING)
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running))
@@ -831,6 +838,7 @@ namespace hpx { namespace threads { namespace detail
                     background_thread = create_background_thread(scheduler, params,
                         background_running, num_thread, idle_loop_count);
                 }
+#endif
             }
             else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
                 idle_loop_count > params.max_idle_loop_count_ || may_exit)
@@ -847,6 +855,7 @@ namespace hpx { namespace threads { namespace detail
                 {
                     HPX_ASSERT(this_state.load() != state_pre_sleep);
 
+#if defined(HPX_HAVE_NETWORKING)
                     if (background_thread)
                     {
                         HPX_ASSERT(background_running);
@@ -859,6 +868,7 @@ namespace hpx { namespace threads { namespace detail
                         background_running.reset();
                     }
                     else
+#endif
                     {
                         bool can_exit =
                             !running &&

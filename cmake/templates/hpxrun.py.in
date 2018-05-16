@@ -54,11 +54,16 @@ def subproc(cmd):
 # Run with no run wrapper
 # This is just starting "localities" processes on the local node
 def run_none(cmd, localities, verbose):
-    for locality in range(localities):
-        exec_cmd = cmd + ['--hpx:node=' + str(locality)]
-        if verbose:
-            print('Executing command: ' + ' '.join(exec_cmd))
-        subproc(exec_cmd)
+    if localities > 1:
+        for locality in range(localities):
+            exec_cmd = cmd + ['--hpx:node=' + str(locality)]
+            if verbose:
+                print('Executing command: ' + ' '.join(exec_cmd))
+            subproc(exec_cmd)
+    else:
+         if verbose:
+             print('Executing command: ' + ' '.join(cmd))
+         subproc(cmd)
 
 # Run with mpiexec
 # This is executing mpiexec with the "-np" option set to the number of localities
@@ -113,7 +118,8 @@ def build_cmd(options, args):
         cmd += ['--hpx:threads=' + str(options.threads)]
 
     # set number of localities
-    cmd += ['--hpx:localities=' + str(options.localities)]
+    if options.localities > 1:
+        cmd += ['--hpx:localities=' + str(options.localities)]
 
     # Append the remaining args
     for arg in args:

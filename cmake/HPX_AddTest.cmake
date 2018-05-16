@@ -44,8 +44,13 @@ macro(add_hpx_test category name)
           "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
           ${_exe}
           "-e" "${expected}"
-          "-l" "${${name}_LOCALITIES}"
           "-t" "${${name}_THREADS_PER_LOCALITY}")
+
+  if(HPX_WITH_NETWORKING)
+      list(APPEND cmd "-l" "${${name}_LOCALITIES}")
+  else()
+      set(${name}_LOCALITIES "1")
+  endif()
 
   if(${name}_LOCALITIES STREQUAL "1")
     add_test(

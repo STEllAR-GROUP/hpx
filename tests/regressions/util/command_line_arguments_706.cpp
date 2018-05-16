@@ -12,8 +12,8 @@
 char const* argv[] =
 {
     "command_line_argument_test",
-    // We force one locality here
-    "--hpx:localities=1",
+    // We need only one thread, this argument should be gone in hpx_main
+    "--hpx:threads=1",
     "nx=1",
     "ny=1=5"
 };
