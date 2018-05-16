@@ -12,7 +12,9 @@
 // The only difference to 1d_stencil_1 is that this example uses OpenMP for
 // parallelizing the inner loop.
 
-#include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
+// Include before any Boost header and avoid issues with Intel14/libstdc++4.4
+// nullptr
+#include <hpx/config.hpp>
 
 #include <boost/program_options.hpp>
 

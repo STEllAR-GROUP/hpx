@@ -218,9 +218,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         test_mixed_arguments(id);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     // compare number of parcels with number of messages generated
     print_counters("/parcels/count/*/sent");
     print_counters("/messages/count/*/sent");
+#endif
 
     return hpx::finalize();
 }
@@ -240,7 +242,9 @@ int main(int argc, char* argv[])
 
     // explicitly disable message handlers (parcel coalescing)
     std::vector<std::string> const cfg = {
+#if defined(HPX_HAVE_NETWORKING)
         "hpx.parcel.message_handlers=0"
+#endif
     };
 
     // Initialize and run HPX
