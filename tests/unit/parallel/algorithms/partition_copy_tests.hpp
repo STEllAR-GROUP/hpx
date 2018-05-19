@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -120,10 +120,10 @@ void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
 
     HPX_TEST(get<0>(result).base() == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), get<1>(result).base(),
         std::begin(d_true_sol), get<0>(solution));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), get<2>(result).base(),
         std::begin(d_false_sol), get<1>(solution));
 
@@ -161,10 +161,10 @@ void test_partition_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred
 
     HPX_TEST(get<0>(result).base() == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), get<1>(result).base(),
         std::begin(d_true_sol), get<0>(solution));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), get<2>(result).base(),
         std::begin(d_false_sol), get<1>(solution));
 

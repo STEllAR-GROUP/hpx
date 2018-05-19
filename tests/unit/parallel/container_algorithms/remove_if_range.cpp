@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -84,7 +84,7 @@ void test_remove_if(ExPolicy policy, DataType)
     auto result = hpx::parallel::remove_if(policy, c, pred);
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(c), result,
         std::begin(d), solution);
 
@@ -111,7 +111,7 @@ void test_remove_if_async(ExPolicy policy, DataType)
     auto result = f.get();
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(c), result,
         std::begin(d), solution);
 

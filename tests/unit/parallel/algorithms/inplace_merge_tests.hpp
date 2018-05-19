@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -147,9 +147,7 @@ void test_inplace_merge(ExPolicy policy, IteratorTag, DataType, Comp comp,
         sol_first, sol_middle, sol_last,
         comp);
 
-    bool equality = std::equal(
-        res_first, res_last,
-        sol_first, sol_last);
+    bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
     HPX_TEST(equality);
 }
@@ -192,9 +190,7 @@ void test_inplace_merge_async(ExPolicy policy, IteratorTag, DataType, Comp comp,
         sol_first, sol_middle, sol_last,
         comp);
 
-    bool equality = std::equal(
-        res_first, res_last,
-        sol_first, sol_last);
+    bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
     HPX_TEST(equality);
 }
@@ -406,9 +402,7 @@ void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
         std::inplace_merge(
             sol_first, sol_middle, sol_last);
 
-        bool equality = std::equal(
-            res_first, res_last,
-            sol_first, sol_last);
+        bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
         HPX_TEST(equality);
     }
@@ -432,9 +426,7 @@ void test_inplace_merge_etc(ExPolicy policy, IteratorTag,
             });
 
         // The container must not be changed.
-        bool equality = std::equal(
-            res_first, res_last,
-            sol_first, sol_last);
+        bool equality = test::equal(res_first, res_last, sol_first, sol_last);
 
         HPX_TEST(equality);
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -107,10 +107,10 @@ void test_partition_copy(ExPolicy policy, DataType)
     HPX_UNUSED(solution);
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 
@@ -151,10 +151,10 @@ void test_partition_copy_async(ExPolicy policy, DataType)
     HPX_UNUSED(solution);
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 
@@ -194,10 +194,10 @@ void test_partition_copy_outiter(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 
@@ -237,10 +237,10 @@ void test_partition_copy_outiter_async(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 

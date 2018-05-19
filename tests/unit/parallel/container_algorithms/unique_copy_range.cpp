@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -80,7 +80,7 @@ void test_unique_copy(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<1>(result),
         std::begin(dest_sol), solution);
 
@@ -108,7 +108,7 @@ void test_unique_copy_async(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<1>(result),
         std::begin(dest_sol), solution);
 
@@ -136,7 +136,7 @@ void test_unique_copy_outiter(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), std::end(dest_res),
         std::begin(dest_sol), std::end(dest_sol));
 
@@ -164,7 +164,7 @@ void test_unique_copy_outiter_async(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), std::end(dest_res),
         std::begin(dest_sol), std::end(dest_sol));
 
