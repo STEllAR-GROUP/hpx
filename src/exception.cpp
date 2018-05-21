@@ -76,7 +76,10 @@ namespace hpx
       : boost::system::system_error(make_error_code(e, plain))
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        LERR_(error) << "created exception: " << this->what();
+        if (e != success)
+        {
+            LERR_(error) << "created exception: " << this->what();
+        }
     }
 
     /// Construct a hpx::exception from a boost#system_error.
@@ -101,7 +104,10 @@ namespace hpx
       : boost::system::system_error(make_system_error_code(e, mode), msg)
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        LERR_(error) << "created exception: " << this->what();
+        if (e != success)
+        {
+            LERR_(error) << "created exception: " << this->what();
+        }
     }
 
     /// Construct a hpx::exception from a \a hpx::error and an error message.
@@ -119,7 +125,10 @@ namespace hpx
       : boost::system::system_error(make_system_error_code(e, mode), msg)
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        LERR_(error) << "created exception: " << this->what();
+        if (e != success)
+        {
+            LERR_(error) << "created exception: " << this->what();
+        }
     }
 
     /// Destruct a hpx::exception
