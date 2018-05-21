@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/traits/component_pin_support.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <memory>
@@ -64,13 +65,19 @@ namespace hpx { namespace components
             void pin()
             {
                 if (0 != this->lva_)
-                    get_lva<Component>::call(this->lva_)->pin();
+                {
+                    traits::component_pin_support<Component>::pin(
+                        get_lva<Component>::call(this->lva_));
+                }
             }
 
             void unpin()
             {
                 if (0 != this->lva_)
-                    get_lva<Component>::call(this->lva_)->unpin();
+                {
+                    traits::component_pin_support<Component>::unpin(
+                        get_lva<Component>::call(this->lva_));
+                }
                 this->lva_ = 0;
             }
         };

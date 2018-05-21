@@ -82,8 +82,19 @@ namespace hpx { namespace components
         }
         bool unpin()
         {
-            bool was_migrated = false;
+            // no need to go through AGAS if the object is currently pinned
+            // more than once
+            {
+                std::unique_lock<mutex_type> l(mtx_);
+                if (this->pin_count_ != ~0x0u && this->pin_count_ > 1)
+                {
+                    --this->pin_count_;
+                    return false;
+                }
+            }
+
             // make sure to always grab the AGAS lock first
+            bool was_migrated = false;
             agas::mark_as_migrated(this->gid_,
                 [this, &was_migrated]() mutable -> std::pair<bool, hpx::future<void> >
                 {
@@ -185,7 +196,7 @@ namespace hpx { namespace components
                 util::one_shot(&migration_support::thread_function),
                 get_lva<this_component_type>::call(lva),
                 util::placeholders::_1,
-                traits::action_decorate_function<base_type>::call(
+                traits::component_decorate_function<base_type>::call(
                     lva, std::forward<F>(f)),
                 components::pinned_ptr::create<this_component_type>(lva));
         }

@@ -170,11 +170,6 @@ namespace hpx { namespace components
             ///        destructed
             HPX_CXX14_CONSTEXPR static void finalize() {}
 
-            // Pinning functionality
-            HPX_CXX14_CONSTEXPR static void pin() {}
-            HPX_CXX14_CONSTEXPR static void unpin() {}
-            HPX_CONSTEXPR static std::uint32_t pin_count() { return 0; }
-
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
             HPX_CXX14_CONSTEXPR static void mark_as_migrated()
             {

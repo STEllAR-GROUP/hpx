@@ -230,11 +230,9 @@ namespace hpx { namespace components { namespace server
         auto r = agas::begin_migration(to_migrate);
 
         // perform actual object migration
-        typedef migrate_component_action<
-                Component, DistPolicy
-            > action_type;
-        return async<action_type>(r.first, to_migrate, r.second,
-            policy).then(
+        typedef migrate_component_action<Component, DistPolicy> action_type;
+        return async<action_type>(r.first, to_migrate, r.second, policy)
+            .then(
                 [to_migrate](future<id_type> && f) -> id_type
                 {
                     agas::end_migration(to_migrate);

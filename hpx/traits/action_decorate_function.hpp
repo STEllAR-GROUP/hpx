@@ -24,7 +24,7 @@ namespace hpx { namespace traits
         struct decorate_function_helper
         {
             // by default we return the unchanged function
-            template <typename Action, typename F>
+            template <typename Component, typename F>
             static threads::thread_function_type
             call(wrap_int, naming::address_type lva, F && f)
             {
@@ -32,24 +32,20 @@ namespace hpx { namespace traits
             }
 
             // forward the call if the component implements the function
-            template <typename Action, typename F>
+            template <typename Component, typename F>
             static auto
             call(int, naming::address_type lva, F && f)
-            ->  decltype(
-                    Action::component_type::decorate_action(
-                        lva, std::forward<F>(f))
-                )
+            ->  decltype(Component::decorate_action(lva, std::forward<F>(f)))
             {
-                typedef typename Action::component_type component_type;
-                return component_type::decorate_action(lva, std::forward<F>(f));
+                return Component::decorate_action(lva, std::forward<F>(f));
             }
         };
 
-        template <typename Action, typename F>
+        template <typename Component, typename F>
         threads::thread_function_type
         call_decorate_function(naming::address_type lva, F && f)
         {
-            return decorate_function_helper::template call<Action>(
+            return decorate_function_helper::template call<Component>(
                 0, lva, std::forward<F>(f));
         }
 
@@ -58,7 +54,8 @@ namespace hpx { namespace traits
 
     template <typename Action, typename Enable = void>
     struct has_decorates_action
-      : detail::has_decorates_action<typename std::decay<Action>::type>
+      : detail::has_decorates_action<
+            typename std::decay<Action>::type::component_type>
     {};
 
     template <typename Action, typename Enable = void>
@@ -70,7 +67,21 @@ namespace hpx { namespace traits
         static threads::thread_function_type
         call(naming::address_type lva, F && f)
         {
-            return detail::call_decorate_function<Action>(
+            typedef typename std::decay<Action>::type::component_type
+                component_type;
+            return detail::call_decorate_function<component_type>(
+                lva, std::forward<F>(f));
+        }
+    };
+
+    template <typename Component, typename Enable = void>
+    struct component_decorate_function
+    {
+        template <typename F>
+        static threads::thread_function_type
+        call(naming::address_type lva, F && f)
+        {
+            return detail::call_decorate_function<Component>(
                 lva, std::forward<F>(f));
         }
     };

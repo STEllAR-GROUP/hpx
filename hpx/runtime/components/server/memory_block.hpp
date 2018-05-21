@@ -438,7 +438,10 @@ namespace hpx { namespace components { namespace server { namespace detail
         HPX_DEFINE_COMPONENT_ACTION(memory_block, clone);
 
         // This component type requires valid id for its actions to be invoked
-        static bool is_target_valid(naming::id_type const& id) { return true; }
+        HPX_CONSTEXPR static bool is_target_valid(naming::id_type const& id)
+        {
+            return true;
+        }
     };
 }}}}
 
@@ -508,7 +511,7 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The HPX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the
         ///             component instance.
-        void finalize() {}
+        HPX_CXX14_CONSTEXPR static void finalize() {}
 
     public:
         /// \brief The destructor releases any wrapped instances
