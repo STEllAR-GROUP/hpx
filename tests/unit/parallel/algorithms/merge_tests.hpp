@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -142,7 +142,7 @@ void test_merge(ExPolicy policy, IteratorTag, DataType, Comp comp,
         std::begin(dest_sol),
         comp);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<2>(result).base(),
         std::begin(dest_sol), solution);
 
@@ -183,7 +183,7 @@ void test_merge_async(ExPolicy policy, IteratorTag, DataType, Comp comp,
         std::begin(dest_sol),
         comp);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<2>(result).base(),
         std::begin(dest_sol), solution);
 
@@ -383,7 +383,7 @@ void test_merge_etc(ExPolicy policy, IteratorTag,
             std::begin(src2), std::end(src2),
             std::begin(dest_sol));
 
-        bool equality = std::equal(
+        bool equality = test::equal(
             std::begin(dest_res), get<2>(result).base(),
             std::begin(dest_sol), solution);
 
@@ -445,7 +445,7 @@ void test_merge_etc(ExPolicy policy, IteratorTag,
             std::begin(src2), std::end(src2),
             std::begin(dest_sol));
 
-        bool equality = std::equal(
+        bool equality = test::equal(
             std::begin(dest_res), get<2>(result).base(),
             std::begin(dest_sol), solution);
 

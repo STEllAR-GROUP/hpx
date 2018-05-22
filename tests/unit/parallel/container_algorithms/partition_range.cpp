@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -117,7 +117,7 @@ void test_partition(ExPolicy policy, DataType)
     std::sort(std::begin(c), std::end(c));
     std::sort(std::begin(c_org), std::end(c_org));
 
-    bool unchanged = std::equal(
+    bool unchanged = test::equal(
         std::begin(c), std::end(c),
         std::begin(c_org), std::end(c_org));
 
@@ -161,7 +161,7 @@ void test_partition_async(ExPolicy policy, DataType)
     std::sort(std::begin(c), std::end(c));
     std::sort(std::begin(c_org), std::end(c_org));
 
-    bool unchanged = std::equal(
+    bool unchanged = test::equal(
         std::begin(c), std::end(c),
         std::begin(c_org), std::end(c_org));
 

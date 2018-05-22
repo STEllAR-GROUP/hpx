@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -116,7 +116,7 @@ void test_inplace_merge(ExPolicy policy, DataType)
 
     HPX_TEST(result == res_last);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         res_first, res_last,
         sol_first, sol_last);
 
@@ -153,7 +153,7 @@ void test_inplace_merge_async(ExPolicy policy, DataType)
 
     HPX_TEST(result == res_last);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         res_first, res_last,
         std::begin(sol), std::end(sol));
 
