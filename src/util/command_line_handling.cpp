@@ -19,6 +19,7 @@
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -1203,9 +1204,6 @@ namespace hpx { namespace util
         for (std::string const& e : ini_config_)
             rtcfg_.parse("<user supplied config>", e, true, false);
 
-        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
-            plugin_registries = rtcfg_.load_modules();
-
         // support re-throwing command line exceptions for testing purposes
         int error_mode = util::allow_unregistered;
         if (cfgmap.get_value("hpx.commandline.rethrow_errors", 0) != 0)
@@ -1230,7 +1228,7 @@ namespace hpx { namespace util
             }
 
             // handle all --hpx:foo options, determine node
-            std::vector<std::string> ini_config;    // will be discarded
+            std::vector<std::string> ini_config;
             if (!handle_arguments(cfgmap, prevm, ini_config, node_, true))
                 return -2;
 
@@ -1252,8 +1250,20 @@ namespace hpx { namespace util
             std::copy(ini_config_.begin(), ini_config_.end(),
                 std::back_inserter(cfg));
 
+            std::copy(ini_config.begin(), ini_config.end(),
+                std::back_inserter(cfg));
+
             rtcfg_.reconfigure(cfg);
         }
+
+        // initialize logging
+        util::detail::init_logging(
+            rtcfg_, rtcfg_.mode_ == runtime_mode_console);
+
+        // load plugin modules (after first pass of command line handling,
+        // so that settings given on command line could propagate to modules)
+        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+            plugin_registries = rtcfg_.load_modules();
 
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
