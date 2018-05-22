@@ -175,22 +175,22 @@ calls of the server side implementation objects corresponding to the
 
     // create one instance on the given locality
     hpx::id_type here = hpx::find_here();
-    client_type c = hpx::new_<client_type>(here, ...);
+    client_type c = hpx::new_<some_component_type>(here, ...);
 
     // create one instance using the given distribution
     // policy (here: hpx::colocating_distribution_policy)
     hpx::id_type here = hpx::find_here();
-    client_type c = hpx::new_<client_type>(hpx::colocated(here), ...);
+    client_type c = hpx::new_<some_component_type>(hpx::colocated(here), ...);
 
 
     // create multiple instances on the given locality
     hpx::id_type here = hpx::find_here();
     hpx::future<std::vector<client_type>> f =
-        hpx::new_<client_type[]>(here, num, ...);
+        hpx::new_<some_component_type[]>(here, num, ...);
 
     // create multiple instances using the given distribution
     // policy (here: hpx::binpacking_distribution_policy)
-    hpx::future<std::vector<client_type>> f = hpx::new_<client_type[]>(
+    hpx::future<std::vector<client_type>> f = hpx::new_<some_component_type[]>(
         hpx::binpacking(hpx::find_all_localities()), num, ...);
 
 
