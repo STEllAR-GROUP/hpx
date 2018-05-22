@@ -272,7 +272,8 @@ namespace hpx { namespace util
             HPX_HOST_DEVICE tuple_impl& operator=(UTuple&& other)
             {
                 int const _sequencer[]= {
-                    ((this->get<Is>() = util::get<Is>(other)), 0)...
+                    ((this->get<Is>() =
+                      util::get<Is>(std::forward<UTuple>(other))), 0)...
                 };
                 (void)_sequencer;
                 return *this;
