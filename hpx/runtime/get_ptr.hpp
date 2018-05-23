@@ -19,6 +19,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
@@ -40,7 +41,7 @@ namespace hpx
             void operator()(Component* p)
             {
                 id_ = naming::invalid_id;       // release component
-                p->unpin();
+                traits::component_pin_support<Component>::unpin(p);
             }
 
             naming::id_type id_;                // holds component alive
@@ -55,7 +56,8 @@ namespace hpx
             template <typename Component>
             void operator()(Component* p)
             {
-                bool was_migrated = p->unpin();
+                bool was_migrated =
+                    traits::component_pin_support<Component>::unpin(p);
 
                 if (was_migrated)
                 {
@@ -94,7 +96,8 @@ namespace hpx
             Component* p = get_lva<Component>::call(addr.address_);
             std::shared_ptr<Component> ptr(p, Deleter(id));
 
-            ptr->pin();     // the shared_ptr pins the component
+            // the shared_ptr pins the component
+            traits::component_pin_support<Component>::pin(ptr.get());
             return ptr;
         }
 

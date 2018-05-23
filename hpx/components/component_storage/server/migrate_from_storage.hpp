@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/util/bind_back.hpp>
 
@@ -103,7 +104,7 @@ namespace hpx { namespace components { namespace server
             }
 
             // make sure the migration code works properly
-            ptr->pin();
+            traits::component_pin_support<Component>::pin(ptr.get());
 
             // if target locality is not specified, use the address of the last
             // locality where the object was living before

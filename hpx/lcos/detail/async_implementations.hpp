@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/action_select_direct_execution.hpp>
 #include <hpx/traits/component_supports_migration.hpp>

@@ -12,7 +12,9 @@
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
+#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
@@ -23,6 +25,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -31,6 +34,17 @@
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
+    namespace detail
+    {
+        struct keep_object_pinned
+        {
+            void operator()() const {}
+
+            components::pinned_ptr p_;
+        };
+
+        template <typename R> struct tag {};
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic non-const component action types allowing to hold
@@ -55,14 +69,44 @@ namespace hpx { namespace actions
             return name.str();
         }
 
+        template <typename R_, typename ...Ts>
+        static typename std::enable_if<!traits::is_future<R_>::value, R_>::type
+        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            basic_action<Component, R_(Ps...), Derived>::
+                increment_invocation_count();
+            return (get_lva<Component>::call(lva)->*F)(std::forward<Ts>(vs)...);
+        }
+
+        template <typename R_, typename ...Ts>
+        static typename std::enable_if<traits::is_future<R_>::value, R_>::type
+        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            basic_action<Component, R_(Ps...), Derived>::
+                increment_invocation_count();
+
+            // additional pinning is required such that the object becomes
+            // unpinned only after the returned future has become ready
+            components::pinned_ptr p =
+                components::pinned_ptr::create<Component>(lva);
+
+            auto result =
+                (get_lva<Component>::call(lva)->*F)(std::forward<Ts>(vs)...);
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                detail::keep_object_pinned{std::move(p)});
+
+            return result;
+        }
+
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component, R(Ps...), Derived>::
-                increment_invocation_count();
-            return (get_lva<Component>::call(lva)->*F)
-                (std::forward<Ts>(vs)...);
+            return invoke_helper(
+                detail::tag<R>{}, lva, comptype, std::forward<Ts>(vs)...);
         }
     };
 
@@ -89,14 +133,45 @@ namespace hpx { namespace actions
             return name.str();
         }
 
+        template <typename R_, typename ...Ts>
+        static typename std::enable_if<!traits::is_future<R_>::value, R_>::type
+        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            basic_action<Component const, R_(Ps...), Derived>::
+                increment_invocation_count();
+            return (get_lva<Component const>::call(lva)->*F)(
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename R_, typename ...Ts>
+        static typename std::enable_if<traits::is_future<R_>::value, R_>::type
+        invoke_helper(detail::tag<R_>, naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            basic_action<Component const, R_(Ps...), Derived>::
+                increment_invocation_count();
+
+            // additional pinning is required such that the object becomes
+            // unpinned only after the returned future has become ready
+            components::pinned_ptr p =
+                components::pinned_ptr::create<Component>(lva);
+
+            auto result = (get_lva<Component const>::call(lva)->*F)(
+                std::forward<Ts>(vs)...);
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                detail::keep_object_pinned{std::move(p)});
+
+            return result;
+        }
+
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component const, R(Ps...), Derived>::
-                increment_invocation_count();
-            return (get_lva<Component const>::call(lva)->*F)
-                (std::forward<Ts>(vs)...);
+            return invoke_helper(
+                detail::tag<R>{}, lva, comptype, std::forward<Ts>(vs)...);
         }
     };
 
