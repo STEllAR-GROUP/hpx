@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/component_pin_support.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -89,31 +90,51 @@ namespace hpx { namespace components
     private:
         template <typename T> struct id {};
 
-    public:
-        pinned_ptr() {}
-
-        pinned_ptr(pinned_ptr && rhs)
-          : data_(std::move(rhs.data_))
-        {}
-
-        pinned_ptr& operator= (pinned_ptr && rhs)
+        // created pinned_ptr does not pin object it refers to
+        template <typename Component, typename Enable = void>
+        struct create_helper
         {
-            data_ = std::move(rhs.data_);
-            return *this;
+            static pinned_ptr call(naming::address::address_type)
+            {
+                return pinned_ptr{};
+            }
+        };
+
+        // created pinned_ptr actually pins object it refers to
+        template <typename Component>
+        struct create_helper<Component,
+            typename std::enable_if<
+                traits::component_decorates_action<Component>::value
+            >::type>
+        {
+            static pinned_ptr call(naming::address::address_type lva)
+            {
+                return pinned_ptr(lva, id<Component>{});
+            }
+        };
+
+        template <typename Component>
+        pinned_ptr(naming::address::address_type lva, id<Component>)
+          : data_(new detail::pinned_ptr<Component>(lva))
+        {
         }
+
+    public:
+        pinned_ptr() = default;
+
+        pinned_ptr(pinned_ptr const& rhs) = delete;
+        pinned_ptr(pinned_ptr && rhs) = default;
+
+        pinned_ptr& operator= (pinned_ptr const& rhs) = delete;
+        pinned_ptr& operator= (pinned_ptr && rhs) = default;
 
         template <typename Component>
         static pinned_ptr create(naming::address::address_type lva)
         {
-            return pinned_ptr(lva, id<Component>());
+            return create_helper<Component>::call(lva);
         }
 
     private:
-        template <typename Component>
-        pinned_ptr(naming::address::address_type lva, id<Component>)
-          : data_(new detail::pinned_ptr<Component>(lva))
-        {}
-
         std::unique_ptr<detail::pinned_ptr_base> data_;
     };
 }}

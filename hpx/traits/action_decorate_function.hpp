@@ -74,6 +74,11 @@ namespace hpx { namespace traits
         }
     };
 
+    template <typename Action, typename Enable = void>
+    struct component_decorates_action
+      : detail::has_decorates_action<typename std::decay<Action>::type>
+    {};
+
     template <typename Component, typename Enable = void>
     struct component_decorate_function
     {
