@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -20,6 +21,9 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_for_loop_induction(ExPolicy && policy, IteratorTag)
 {
@@ -32,7 +36,7 @@ void test_for_loop_induction(ExPolicy && policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
@@ -73,7 +77,7 @@ void test_for_loop_induction_stride(ExPolicy && policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
@@ -116,7 +120,7 @@ void test_for_loop_induction_life_out(ExPolicy && policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t curr = 0;
 
@@ -160,7 +164,7 @@ void test_for_loop_induction_stride_life_out(ExPolicy && policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t curr1 = 0;
     std::size_t curr2 = 0;
@@ -239,7 +243,7 @@ void test_for_loop_induction_idx(ExPolicy && policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
@@ -271,7 +275,7 @@ void test_for_loop_induction_stride_idx(ExPolicy && policy)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     auto f = hpx::parallel::for_loop(
         std::forward<ExPolicy>(policy),
@@ -316,7 +320,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     for_loop_induction_test();
     for_loop_induction_test_idx();

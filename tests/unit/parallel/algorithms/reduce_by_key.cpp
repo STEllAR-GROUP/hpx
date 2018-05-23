@@ -98,6 +98,9 @@ struct almost_equal
 
 
 ////////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template<typename ExPolicy, typename Tkey, typename Tval, typename Op, typename HelperOp>
 void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const Op &op,
     const HelperOp &ho)
@@ -120,11 +123,11 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::mt19937 eng(static_cast<unsigned int>(gen()));
     std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::mt19937 engk(static_cast<unsigned int>(gen()));
     std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
@@ -218,11 +221,11 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::mt19937 eng(static_cast<unsigned int>(gen()));
     std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::mt19937 engk(static_cast<unsigned int>(gen()));
     std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
@@ -319,11 +322,11 @@ void test_reduce_by_key_async(ExPolicy && policy, Tkey, Tval, const Op &op,
     std::vector<Tval> check_values;
 
     // use the default random engine and an uniform distribution for values
-    std::mt19937 eng(static_cast<unsigned int>(std::rand()));
+    std::mt19937 eng(static_cast<unsigned int>(gen()));
     std::uniform_real_distribution<double> distr(rnd_min, rnd_max);
 
     // use the default random engine and an uniform distribution for keys
-    std::mt19937 engk(static_cast<unsigned int>(std::rand()));
+    std::mt19937 engk(static_cast<unsigned int>(gen()));
     std::uniform_real_distribution<double> distrk(0, 256);
 
     // generate test data
@@ -491,7 +494,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     test_reduce_by_key1();
 //    test_reduce_by_key2();
