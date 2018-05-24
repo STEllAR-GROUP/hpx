@@ -98,9 +98,9 @@
 [def __macports__               [@http://www.macports.org/ MacPorts]]
 
 [/ External dependencies]
-[def __cmake__                  [@http://www.cmake.org CMake]]
-[def __ctest__                  [@http://cmake.org/Wiki/CMake/Testing_With_CTest CTest]]
-[def __ctest_doc__              [@http://www.cmake.org/cmake/help/v2.8.11/ctest.html CTest Documentation]]
+[def __cmake__                  [@https://www.cmake.org CMake]]
+[def __ctest__                  [@https://gitlab.kitware.com/cmake/community/wikis/doc/ctest/Testing-With-CTest CTest]]
+[def __ctest_doc__              [@https://www.cmake.org/cmake/help/latest/manual/ctest.1.html CTest Documentation]]
 [def __cmake_download__         [@http://www.cmake.org/cmake/resources/software.html CMake Downloads]]
 [def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
 [def __clang__                  [@http://clang.llvm.org/ clang: a C language family frontend for LLVM]]
