@@ -11,6 +11,7 @@
 #include <hpx/include/parallel_sort.hpp>
 
 #include <random>
+#include <vector>
 
 void final_task(hpx::future<hpx::util::tuple<hpx::future<double>, hpx::future<void>>>)
 {
