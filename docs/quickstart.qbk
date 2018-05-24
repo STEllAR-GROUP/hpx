@@ -140,7 +140,7 @@ The following `CMakeLists.txt` is a minimal example of what you need in order to
 build an executable using __cmake__ and __hpx__:
 
 ``
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.3.2)
 project(my_hpx_project CXX)
 find_package(hpx REQUIRED)
 add_hpx_executable(my_hpx_program SOURCES main.cpp)
