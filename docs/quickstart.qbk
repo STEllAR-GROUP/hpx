@@ -207,7 +207,8 @@ __hpx__ runtime. ]
 [caution When including `hpx_main.hpp` the user-defined `main` gets renamed and
 the real `main` function is defined by __hpx__. This means that the user-defined
 `main` must include a return statement, unlike the real `main`. If you do not
-include the return statement you may end up with confusing runtime errors.]
+include the return statement you may end up with confusing compile time errors
+mentioning `user_main` or even runtime errors.]
 
 [heading Writing task-based applications]
 
