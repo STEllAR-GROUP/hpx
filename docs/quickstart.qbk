@@ -102,7 +102,7 @@ If you did not run `make install` earlier do so now or build the
 ``
 
 __hpx__ executables end up in the `bin` directory in your build directory. You
-can now run `simplest_hello_world` and should see the following output:
+can now run `simplest_hello_world_1` and should see the following output:
 
 ``
 ./bin/simplest_hello_world_1
@@ -110,11 +110,12 @@ Hello World!
 ``
 
 You've just run an example which prints `Hello World!` from the __hpx__ runtime.
-The source for the example is in `examples/quickstart/simplest_hello_world.cpp`.
-The `hello_world` example (also available in the `examples/quickstart` directory
-is a distributed hello world program which is described in
-__hello_world_example__. It is recommended that you go through that example only
-once you are more familiar with the distributed concepts of __HPX__.
+The source for the example is in
+`examples/quickstart/simplest_hello_world_1.cpp`. The `hello_world` example
+(also available in the `examples/quickstart` directory is a distributed hello
+world program which is described in __hello_world_example__. It is recommended
+that you go through that example only once you are more familiar with the
+distributed concepts of __HPX__.
 
 [tip Most build targets in __hpx__ have two names: a simple name suffixed with
 `_exe` and a hierarchical name corresponding to what type of example or test the
@@ -203,6 +204,11 @@ __hpx__ with other runtimes.
 See __writing_applications__ for more details on how to initialize and run the
 __hpx__ runtime. ]
 
+[caution When including `hpx_main.hpp` the user-defined `main` gets renamed and
+the real `main` function is defined by __hpx__. This means that the user-defined
+`main` must include a return statement, unlike the real `main`. If you do not
+include the return statement you may end up with confusing runtime errors.]
+
 [heading Writing task-based applications]
 
 So far we haven't done anything that can't be done using the C++ standard
@@ -210,8 +216,8 @@ library. In this section we will give a short overview of what you can do with
 __hpx__ on a single node. The essence is to avoid global synchronization and
 break up your application into small, composable tasks whose dependencies
 control the flow of your application. Remember, however, that __hpx__ allows you
-to write distributed applications in similarly to how you would write
-applications for a single node (see the __intro__).
+to write distributed applications similarly to how you would write applications
+for a single node (see the __intro__).
 
 If you are already familiar with `async` and `future`s from the C++ standard
 library, the same functionality is available in __hpx__.
@@ -254,8 +260,8 @@ tricky to get right (the continuation needs to take the future as an argument).
 
 [note __hpx__ programs accept command line arguments. The most important one is
 `--hpx:threads=N` to set the number of OS-threads used by __hpx__. __hpx__ uses
-all available threads by default. Play around with the example above and see
-what difference the number of threads makes on the `sort` function. See
+all available processing units by default. Play around with the example above
+and see what difference the number of threads makes on the `sort` function. See
 __launching__ for more details on how and what options you can pass to __hpx__.]
 
 [tip The example above used the construction `hpx::when_all(...).then(...)`. For
