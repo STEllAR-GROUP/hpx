@@ -186,12 +186,16 @@
 [template cxx_crtp              [@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern [str]]]
 
 [/ Section link shortcuts]
+[def __manual__                 [link hpx.manual Manual]]
+[def __writing_applications__   [link hpx.manual.applications Writing __hpx__ applications]]
 [def __boost_installation__     [link hpx.manual.build_system.prerequisites.boost_installation Installing Boost Libraries]]
 [def __hwloc_installation__     [link hpx.manual.build_system.prerequisites.hwloc_installation Installing Hwloc]]
 [def __prerequisites__          [link hpx.manual.build_system.prerequisites Build Prerequisites]]
 [def __unix_installation__      [link hpx.manual.build_system.building_hpx.build_recipes.unix_installation How to Install __hpx__ on Unix Variants]]
 [def __macos_installation__     [link hpx.manual.build_system.building_hpx.build_recipes.macos_installation How to Install __hpx__ on Mac OS]]
 [def __windows_installation__   [link hpx.manual.build_system.building_hpx.build_recipes.windows_installation How to Install __hpx__ on Windows]]
+[def __iostreams_component__    [link hpx.manual.system_components.iostreams HPX I/O-streams Component]]
+[def __tutorial__               [link hpx.tutorial Tutorial]]
 [def __using_pbs__              [link hpx.tutorial.getting_started.unix_pbs Using PBS]]
 [def __using_slurm__            [link hpx.tutorial.getting_started.unix_slurm Using SLURM]]
 
@@ -230,6 +234,9 @@
 [def __cmake_options__          [link hpx.manual.build_system.building_hpx.cmake_variables CMake Variables used to configure __hpx__]]
 [def __cmake_doc_tools__        [link hpx.manual.cmake.doc_tools Setting up the __hpx__ Documentation Tool Chain]]
 [def __pkg_config__             [link hpx.manual.build_system.using_hpx.pkgconfig.comps How to Build __hpx__ Components with pkg-config]]
+[def __using_hpx_cmake__        [link hpx.manual.build_system.using_hpx.using_hpx_cmake Using __hpx__ with CMake based projects]]
+
+[def __terminology__            [link hpx.terminology Terminology]]
 
 [/ Do not add any whitespace between [str]and the template body, it ends up in the
    generated docs, which may cause unwanted effects.]
@@ -318,6 +325,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
+[include quickstart.qbk]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:tutorial Tutorial]
