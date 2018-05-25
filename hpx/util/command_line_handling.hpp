@@ -74,6 +74,9 @@ namespace hpx { namespace util
             std::vector<std::string>& ini_config, std::size_t& node,
             bool initial = false);
 
+        void enable_logging_settings(boost::program_options::variables_map& vm,
+            std::vector<std::string>& ini_config);
+
         void store_command_line(int argc, char** argv);
         void store_unregistered_options(std::string const& cmd_name,
             std::vector<std::string> const& unregistered_options);
