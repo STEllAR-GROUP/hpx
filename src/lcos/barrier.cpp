@@ -11,6 +11,7 @@
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/run_as_hpx_thread.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/unused.hpp>
@@ -99,17 +100,26 @@ namespace hpx { namespace lcos {
                 hpx::threads::threadmanager_is(state_running) &&
                 !hpx::is_stopped_or_shutting_down())
             {
+                // make sure this runs as an HPX thread
+                if (hpx::threads::get_self_ptr() == nullptr)
+                {
+                    return hpx::threads::run_as_hpx_thread(
+                        &barrier::release, this);
+                }
+
                 hpx::future<void> f;
                 if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+                {
                     f = hpx::unregister_with_basename(
                         (*node_)->base_name_, (*node_)->rank_);
+                }
 
                 // we need to wait on everyone to have its name unregistered,
                 // and hold on to our node long enough...
                 boost::intrusive_ptr<wrapping_type> node = node_;
                 hpx::when_all(f, wait(hpx::launch::async)).then(
                     hpx::launch::sync,
-                    [node](hpx::future<void> f)
+                    [HPX_CAPTURE_MOVE(node)](hpx::future<void> f)
                     {
                         HPX_UNUSED(node);
                         f.get();
