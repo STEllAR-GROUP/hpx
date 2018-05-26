@@ -1,4 +1,5 @@
 [/==============================================================================
+    Copyright (C) 2018 Mikael Simberg
     Copyright (C) 2014 Thomas Heller
     Copyright (C) 2007-2013 Hartmut Kaiser
 
@@ -71,11 +72,14 @@ macro and add it to the `CMakeLists.txt` file:
 
 ``
     # build your application using HPX
-    add_hpx_component(hello_world_component
+    add_hpx_component(hello_world
         SOURCES hello_world_component.cpp
         HEADERS hello_world_component.hpp
         COMPONENT_DEPENDENCIES iostreams)
 ``
+
+[note `add_hpx_component` adds a `_component` suffix to the target name. In the
+example above a `hello_world_component` target will be created. ]
 
 The available options to `add_hpx_component` are:
 
@@ -110,6 +114,12 @@ After adding the component, the way you add the executable is as follows:
         SOURCES hello_world_client.cpp
         COMPONENT_DEPENDENCIES hello_world)
 ``
+
+[note `add_hpx_executable` adds a `_exe` suffix to the target name. In the
+example above a `hello_world_exe` target will be created. In addition, a
+`_component` suffix will automatically be added to dependencies specified in
+`COMPONENT_DEPENDENCIES`, meaning you can directly use the name given when
+adding a component using `add_hpx_component`. ]
 
 When you configure your application, all you need to do is set the
 HPX_DIR variable to point to the installation of __hpx__!
