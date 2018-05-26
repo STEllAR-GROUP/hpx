@@ -95,7 +95,7 @@ by section basis below.
       separated by `':'` (Linux, Android, and MacOS) or using `';'` (Windows).]]
     [[`hpx.os_threads`]
      [This setting reflects the number of OS-threads used for running __hpx__-threads.
-      Defaults to `1`.]]
+      Defaults to number of detected PUs.]]
     [[`hpx.localities`]
      [This setting reflects the number of localities the application is running on.
       Defaults to `1`.]]
