@@ -21,6 +21,7 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_config_data.hpp>
+#include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>

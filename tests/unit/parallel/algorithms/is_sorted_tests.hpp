@@ -15,12 +15,16 @@
 #include <cstddef>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_sorted1(ExPolicy && policy, IteratorTag)
 {
@@ -216,7 +220,7 @@ void test_sorted_exception_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand() + 1);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
 
     bool caught_exception = false;
     try {

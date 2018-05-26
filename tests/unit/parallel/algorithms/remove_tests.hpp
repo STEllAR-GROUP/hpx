@@ -22,6 +22,9 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 g(seed);
+
 struct throw_always
 {
     template <typename T>
@@ -44,9 +47,11 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-        : val(rand_no),
-        name(name_list[std::rand() % name_list.size()])
-    {}
+        : val(rand_no)
+    {
+        std::uniform_int_distribution<> dis(0,name_list.size()-1);
+        name = name_list[dis(g)];
+    }
 
     bool operator<(user_defined_type const& t) const
     {
@@ -92,7 +97,7 @@ struct random_fill
 {
     random_fill() = default;
     random_fill(int rand_base, int range)
-        : gen(std::rand()),
+        : gen(g()),
         dist(rand_base - range / 2, rand_base + range / 2)
     {}
 
@@ -574,7 +579,7 @@ void test_remove_if(IteratorTag, int rand_base)
 template <typename IteratorTag>
 void test_remove(bool test_for_remove_if = false)
 {
-    int rand_base = std::rand();
+    int rand_base = g();
 
     if (test_for_remove_if)
     {

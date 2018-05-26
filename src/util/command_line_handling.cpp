@@ -19,6 +19,7 @@
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/detail/reset_function.hpp>
 #include <hpx/util/format.hpp>
+#include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -870,74 +871,7 @@ namespace hpx { namespace util
         ini_config += "hpx.agas.service_mode=bootstrap";
 #endif
 
-#if defined(HPX_HAVE_LOGGING)
-        if (vm.count("hpx:debug-hpx-log")) {
-            ini_config += "hpx.logging.console.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-hpx-log"].as<std::string>());
-            ini_config += "hpx.logging.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-hpx-log"].as<std::string>());
-            ini_config += "hpx.logging.console.level=5";
-            ini_config += "hpx.logging.level=5";
-        }
-
-        if (vm.count("hpx:debug-agas-log")) {
-            ini_config += "hpx.logging.console.agas.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-agas-log"].as<std::string>());
-            ini_config += "hpx.logging.agas.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-agas-log"].as<std::string>());
-            ini_config += "hpx.logging.console.agas.level=5";
-            ini_config += "hpx.logging.agas.level=5";
-        }
-
-        if (vm.count("hpx:debug-parcel-log")) {
-            ini_config += "hpx.logging.console.parcel.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-parcel-log"].as<std::string>());
-            ini_config += "hpx.logging.parcel.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-parcel-log"].as<std::string>());
-            ini_config += "hpx.logging.console.parcel.level=5";
-            ini_config += "hpx.logging.parcel.level=5";
-        }
-
-        if (vm.count("hpx:debug-timing-log")) {
-            ini_config += "hpx.logging.console.timing.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-timing-log"].as<std::string>());
-            ini_config += "hpx.logging.timing.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-timing-log"].as<std::string>());
-            ini_config += "hpx.logging.console.timing.level=1";
-            ini_config += "hpx.logging.timing.level=1";
-        }
-
-        if (vm.count("hpx:debug-app-log")) {
-            ini_config += "hpx.logging.console.application.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-app-log"].as<std::string>());
-            ini_config += "hpx.logging.application.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-app-log"].as<std::string>());
-            ini_config += "hpx.logging.console.application.level=5";
-            ini_config += "hpx.logging.application.level=5";
-        }
-#else
-        if (vm.count("hpx:debug-hpx-log") ||
-            vm.count("hpx:debug-agas-log") ||
-            vm.count("hpx:debug-parcel-log") ||
-            vm.count("hpx:debug-timing-log") ||
-            vm.count("hpx:debug-app-log"))
-        {
-            throw hpx::detail::command_line_error(
-                "Command line option error: can't enable logging while it "
-                "was disabled at configuration time. Please re-configure "
-                "HPX using the option -DHPX_WITH_LOGGING=On.");
-        }
-#endif
+        enable_logging_settings(vm, ini_config);
 
         // Set number of cores and OS threads in configuration.
         ini_config += "hpx.os_threads=" +
@@ -1005,6 +939,83 @@ namespace hpx { namespace util
         }
 
         return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void command_line_handling::enable_logging_settings(
+        boost::program_options::variables_map& vm,
+        std::vector<std::string>& ini_config)
+    {
+#if defined(HPX_HAVE_LOGGING)
+        using namespace boost::assign;
+
+        if (vm.count("hpx:debug-hpx-log")) {
+            ini_config += "hpx.logging.console.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-hpx-log"].as<std::string>());
+            ini_config += "hpx.logging.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-hpx-log"].as<std::string>());
+            ini_config += "hpx.logging.console.level=5";
+            ini_config += "hpx.logging.level=5";
+        }
+
+        if (vm.count("hpx:debug-agas-log")) {
+            ini_config += "hpx.logging.console.agas.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-agas-log"].as<std::string>());
+            ini_config += "hpx.logging.agas.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-agas-log"].as<std::string>());
+            ini_config += "hpx.logging.console.agas.level=5";
+            ini_config += "hpx.logging.agas.level=5";
+        }
+
+        if (vm.count("hpx:debug-parcel-log")) {
+            ini_config += "hpx.logging.console.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.console.parcel.level=5";
+            ini_config += "hpx.logging.parcel.level=5";
+        }
+
+        if (vm.count("hpx:debug-timing-log")) {
+            ini_config += "hpx.logging.console.timing.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-timing-log"].as<std::string>());
+            ini_config += "hpx.logging.timing.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-timing-log"].as<std::string>());
+            ini_config += "hpx.logging.console.timing.level=1";
+            ini_config += "hpx.logging.timing.level=1";
+        }
+
+        if (vm.count("hpx:debug-app-log")) {
+            ini_config += "hpx.logging.console.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.application.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-app-log"].as<std::string>());
+            ini_config += "hpx.logging.console.application.level=5";
+            ini_config += "hpx.logging.application.level=5";
+        }
+#else
+        if (vm.count("hpx:debug-hpx-log") ||
+            vm.count("hpx:debug-agas-log") ||
+            vm.count("hpx:debug-parcel-log") ||
+            vm.count("hpx:debug-timing-log") ||
+            vm.count("hpx:debug-app-log"))
+        {
+            throw hpx::detail::command_line_error(
+                "Command line option error: can't enable logging while it "
+                "was disabled at configuration time. Please re-configure "
+                "HPX using the option -DHPX_WITH_LOGGING=On.");
+        }
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1203,9 +1214,6 @@ namespace hpx { namespace util
         for (std::string const& e : ini_config_)
             rtcfg_.parse("<user supplied config>", e, true, false);
 
-        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
-            plugin_registries = rtcfg_.load_modules();
-
         // support re-throwing command line exceptions for testing purposes
         int error_mode = util::allow_unregistered;
         if (cfgmap.get_value("hpx.commandline.rethrow_errors", 0) != 0)
@@ -1230,7 +1238,7 @@ namespace hpx { namespace util
             }
 
             // handle all --hpx:foo options, determine node
-            std::vector<std::string> ini_config;    // will be discarded
+            std::vector<std::string> ini_config;    // discard
             if (!handle_arguments(cfgmap, prevm, ini_config, node_, true))
                 return -2;
 
@@ -1252,8 +1260,24 @@ namespace hpx { namespace util
             std::copy(ini_config_.begin(), ini_config_.end(),
                 std::back_inserter(cfg));
 
+            // enable logging if invoked requested from command line
+            std::vector<std::string> ini_config_logging;
+            enable_logging_settings(prevm, ini_config_logging);
+
+            std::copy(ini_config_logging.begin(), ini_config_logging.end(),
+                std::back_inserter(cfg));
+
             rtcfg_.reconfigure(cfg);
         }
+
+        // initialize logging
+        util::detail::init_logging(
+            rtcfg_, rtcfg_.mode_ == runtime_mode_console);
+
+        // load plugin modules (after first pass of command line handling,
+        // so that settings given on command line could propagate to modules)
+        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+            plugin_registries = rtcfg_.load_modules();
 
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.

@@ -58,7 +58,7 @@ namespace hpx
         namespace server
         {
             class runtime_support;
-            class memory;
+            class HPX_EXPORT memory;
         }
     }
 

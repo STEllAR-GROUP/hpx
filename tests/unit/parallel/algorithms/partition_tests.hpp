@@ -21,6 +21,9 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 _gen(seed);
+
 struct throw_always
 {
     template <typename T>
@@ -43,9 +46,11 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-        : val(rand_no),
-        name(name_list[std::rand() % name_list.size()])
-    {}
+        : val(rand_no)
+    {
+        std::uniform_int_distribution<> dis(0,name_list.size()-1);
+        name = name_list[dis(_gen)];
+    }
 
     bool operator<(int rand_base) const
     {
@@ -83,7 +88,7 @@ const std::vector<std::string> user_defined_type::name_list{
 struct random_fill
 {
     random_fill(int rand_base, int half_range /* >= 0 */)
-        : gen(std::rand()),
+        : gen(_gen()),
         dist(rand_base - half_range, rand_base + half_range)
     {}
 
@@ -189,7 +194,7 @@ void test_partition_exception(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_exception = false;
     try {
@@ -219,7 +224,7 @@ void test_partition_exception_async(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -257,7 +262,7 @@ void test_partition_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_bad_alloc = false;
     try {
@@ -286,7 +291,7 @@ void test_partition_bad_alloc_async(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -336,13 +341,14 @@ template <typename ExPolicy, typename IteratorTag, typename DataType, typename P
 void test_partition_heavy(ExPolicy policy, IteratorTag, DataType, Pred pred,
     int rand_base)
 {
+    std::uniform_int_distribution<> dis(0,10000000-1);
     auto size_list = {
         1, 2, 3, 4, 5, 6, 7, 8,        /* very small size */
         16, 24, 32, 48, 64,            /* intent the number of core */
         123, 4567, 65432, 123456,      /* various size */
         961230, 170228, 3456789,       /* big size */
-        std::rand() % 10000000,        /* random size */
-        std::rand() % 10000000
+        dis(_gen),        /* random size */
+        dis(_gen)
     };
 
     for (auto size : size_list)
@@ -366,7 +372,7 @@ void test_partition()
 {
     using namespace hpx::parallel;
 
-    int rand_base = std::rand();
+    int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_partition(execution::seq, IteratorTag(), int(),

@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each_n_bad_alloc(ExPolicy policy, IteratorTag, Proj && proj)
 {
@@ -29,7 +33,7 @@ void test_for_each_n_bad_alloc(ExPolicy policy, IteratorTag, Proj && proj)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     try {
@@ -57,7 +61,7 @@ void test_for_each_n_bad_alloc_async(ExPolicy p, IteratorTag, Proj && proj)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -139,7 +143,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     for_each_n_bad_alloc_test<hpx::parallel::util::projection_identity>();
 

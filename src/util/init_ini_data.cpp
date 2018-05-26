@@ -479,6 +479,8 @@ namespace hpx { namespace util
         typedef std::pair<fs::path, std::string> libdata_type;
         for (libdata_type const& p : libdata)
         {
+            LRT_(info) << "attempting to load: " << p.first.string();
+
             // get the handle of the library
             error_code ec(lightweight);
             hpx::util::plugin::dll d(p.first.string(), p.second);
@@ -490,6 +492,8 @@ namespace hpx { namespace util
                 continue;
             }
 
+            bool must_keep_loaded = false;
+
             // get the component factory
             std::string curr_fullname(p.first.parent_path().string());
             load_component_factory(d, ini, curr_fullname, p.second, ec);
@@ -500,22 +504,35 @@ namespace hpx { namespace util
                     << ": " << get_error_what(ec);
                 ec = error_code(lightweight);   // reinit ec
             }
+            else {
+                LRT_(debug)
+                    << "load_component_factory succeeded: " << p.first.string();
+                must_keep_loaded = true;
+            }
 
             // get the plugin factory
             plugin_list_type tmp_regs =
                 load_plugin_factory(d, ini, curr_fullname, p.second, ec);
 
-            std::copy(tmp_regs.begin(), tmp_regs.end(),
-                std::back_inserter(plugin_registries));
             if (ec) {
                 LRT_(info)
                     << "skipping (load_plugin_factory failed): "
                     << p.first.string()
                     << ": " << get_error_what(ec);
             }
+            else {
+                LRT_(debug)
+                    << "load_plugin_factory succeeded: " << p.first.string();
+
+                std::copy(tmp_regs.begin(), tmp_regs.end(),
+                    std::back_inserter(plugin_registries));
+                must_keep_loaded = true;
+            }
 
             // store loaded library for future use
-            modules.insert(std::make_pair(p.second, std::move(d)));
+            if (must_keep_loaded) {
+                modules.insert(std::make_pair(p.second, std::move(d)));
+            }
         }
         return plugin_registries;
     }
