@@ -505,6 +505,29 @@ jobs:
       - store_artifacts:
           path: tests.unit.resource
 
+  tests.unit.runtime:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: v2-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - attach_workspace:
+          at: /hpx/build
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 tests.unit.runtime
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.unit.runtime
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.unit.runtime
+      - store_artifacts:
+          path: tests.unit.runtime
+
   tests.unit.serialization:
     <<: *defaults
     steps:
