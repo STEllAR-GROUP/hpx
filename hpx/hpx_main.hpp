@@ -10,8 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 
-#if defined(__GNUC__) || (__clang__)
-
+#if (defined(__GNUC__) || (__clang__)) && !defined(HPX_HAVE_STATIC_LINKING)
 #define _GNU_SOURCE
 
 #include <hpx/hpx.hpp>
@@ -29,17 +28,20 @@ char** __argv = nullptr;
 char** __envp = nullptr;
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Default implementation of __hpx_entry() for initializing the HPX runtime
-// system
-//
-int __hpx_entry(int argc, char* argv[])
-{
-    // Call to the Compiler's main with HPX runt time
-    // initiated.
-    actual_main(__argc, __argv, __envp);
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////////
+    // Default implementation of hpx_entry() for initializing the HPX runtime
+    // system
+    //
+    int hpx_entry(int argc, char* argv[])
+    {
+        // Call to the Compiler's main with HPX runt time
+        // initiated.
+        actual_main(__argc, __argv, __envp);
 
-    return hpx::finalize();
+        return hpx::finalize();
+    }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,12 +59,12 @@ int __initializing_main (int argc, char** argv, char** envp)
     std::vector<std::string> const cfg = {
         // allow for unknown command line options
         "hpx.commandline.allow_unknown!=1",
-	};
+    };
 
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
     hpx::util::function_nonser<int(int, char**)> start_function =
-        hpx::util::bind(&__hpx_entry, _1, _2);
+        hpx::util::bind(&hpx::hpx_entry, _1, _2);
 
     // Initializing HPX runtime using hpx::init
     return hpx::init(start_function, argc, argv, cfg, hpx::runtime_mode_console);
@@ -89,7 +91,7 @@ extern "C" int __libc_start_main (
             init, fini, rtld_fini, stack_end);
 }
 
-#elif defined(HPX_HAVE_STATIC_LINKING)
+#else
 #include <hpx/hpx_main_impl.hpp>
 
 // We support redefining the plain C-main provided by the user to be executed

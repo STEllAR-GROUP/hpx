@@ -4,13 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Simple test verifying runtime initialization sequence
-
-#define _GNU_SOURCE
-
-#include <dlfcn.h>
-#include <iostream>
-#include <vector>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/lightweight_test.hpp>

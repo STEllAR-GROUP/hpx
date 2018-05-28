@@ -36,7 +36,4 @@ if(NOT MSVC)
                                 ${test}_test_exe)
   endforeach()
 
-else()
-  message(FATAL_ERROR "This test is meant only for gcc and clang compilers.")
-
 endif()
