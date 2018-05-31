@@ -1013,8 +1013,16 @@ namespace hpx { namespace components { namespace server
                     &still_unregistered_options);
 
                 std::string still_unknown_commandline;
-                for (std::string const& s: still_unregistered_options)
-                    still_unknown_commandline += " " + util::detail::enquote(s);
+                for (std::size_t i = 1; i != still_unregistered_options.size();
+                     ++i)
+                {
+                    if (i != 1)
+                    {
+                        still_unknown_commandline += " ";
+                    }
+                    still_unknown_commandline +=
+                        util::detail::enquote(still_unregistered_options[i]);
+                }
 
                 if (!still_unknown_commandline.empty())
                 {
