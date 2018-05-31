@@ -12,7 +12,7 @@
 In Addition to the pkg-config support discussed on the previous pages, __hpx__
 comes with full CMake support. In order to integrate __hpx__ into your existing,
 or new CMakeLists.txt you can leverage the
-[@http://www.cmake.org/cmake/help/v2.8.11/cmake.html#command:find_package find_package]
+[@https://www.cmake.org/cmake/help/latest/command/find_package.html find_package]
 command integrated into CMake. Following is a Hello World component example using
 CMake.
 
@@ -27,7 +27,7 @@ The basic structure to include __hpx__ into your CMakeLists.txt is shown here:
 [teletype]
 ``
     # Require a recent version of cmake
-    cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+    cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
     # This project is C++ based.
     project(your_app CXX)
@@ -126,7 +126,7 @@ HPX_DIR variable to point to the installation of __hpx__!
 
 [note All library targets built with __hpx__ are exported and readily available
       to be used as arguments to
-      [@http://www.cmake.org/cmake/help/v2.8.11/cmake.html#command:target_link_libraries `target_link_libraries`]
+      [@https://www.cmake.org/cmake/help/latest/command/target_link_libraries.html `target_link_libraries`]
       in your targets. The HPX include directories are available with the [^HPX_INCLUDE_DIRS]
       CMake variable]
 
@@ -165,6 +165,7 @@ to the section on __pkg_config__.
       If HPX isn't installed into a path which is configured as a linker search path, external projects
       need to either set RPATH or adapt LD_LIBRARY_PATH to point to where the hpx libraries reside.
       In order to set RPATHs, you can include HPX_SetFullRPATH in your project after all libraries you want
-      to link against have been added. Please also consult the CMake documentation [@http://www.cmake.org/Wiki/CMake_RPATH_handling `here`]]
+      to link against have been added. Please also consult the CMake documentation
+      [@https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling `here`]]
 
 [endsect] [/ Using HPX with CMake based projects]

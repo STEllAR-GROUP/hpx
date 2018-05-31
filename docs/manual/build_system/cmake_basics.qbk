@@ -52,7 +52,7 @@ this to CMake with the `-G` option.
 
 We use here the command-line, non-interactive __cmake__ interface.
 
-# Download and install CMake here: __cmake_download__. Version 2.8 is the
+# Download and install CMake here: __cmake_download__. Version 3.3.2 is the
   minimally required version for __hpx__.
 
 # Open a shell. Your development tools must be reachable from this shell through
@@ -83,7 +83,7 @@ itself is the correct one for you development environment. CMake will refuse to
 build MinGW makefiles if you have a POSIX shell reachable through the PATH
 environment variable, for instance. You can force CMake to use various compilers
 and tools. Please visit
-[@http://www.cmake.org/Wiki/CMake_Useful_Variables#Compilers_and_Tools CMake Useful Variables]
+[@https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/Useful-Variables#Compilers-and-Tools CMake Useful Variables]
 for a detailed overview of specific __cmake__ variables.
 
 [heading:options Options and Variables]
