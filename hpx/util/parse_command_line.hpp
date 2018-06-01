@@ -29,8 +29,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
-    HPX_API_EXPORT bool parse_commandline(
-        hpx::util::section const& rtcfg,
+    HPX_API_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         std::string const& cmdline, boost::program_options::variables_map& vm,
         std::size_t node, int error_mode = return_on_error,
@@ -38,11 +37,11 @@ namespace hpx { namespace util
         boost::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
 
-    HPX_API_EXPORT bool parse_commandline(
-        hpx::util::section const& rtcfg,
+    HPX_API_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
-        int argc, char** argv, boost::program_options::variables_map& vm,
-        std::size_t node, int error_mode = return_on_error,
+        std::string const& arg0, std::vector<std::string> const& args,
+        boost::program_options::variables_map& vm, std::size_t node,
+        int error_mode = return_on_error,
         hpx::runtime_mode mode = runtime_mode_default,
         boost::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);

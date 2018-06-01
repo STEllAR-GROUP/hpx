@@ -37,6 +37,7 @@ set(tests
     id_type_ref_counting_1032
     multiple_init
     multiple_init_2918
+    options_as_config_3339
     unhandled_exception_582
    )
 

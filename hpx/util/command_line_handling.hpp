@@ -84,6 +84,9 @@ namespace hpx { namespace util
             boost::program_options::options_description const& help);
 
         void handle_attach_debugger();
+
+        std::vector<std::string> preprocess_config_settings(
+            int argc, char** argv);
     };
 
     void handle_print_bind(boost::program_options::variables_map const& vm,
