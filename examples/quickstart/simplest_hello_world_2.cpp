@@ -18,8 +18,8 @@ int hpx_main(int, char**)
     return hpx::finalize();
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    return hpx::init();
+    return hpx::init(argc, argv);
 }
 //]
