@@ -143,7 +143,7 @@ build an executable using __cmake__ and __hpx__:
 ``
 cmake_minimum_required(VERSION 3.3.2)
 project(my_hpx_project CXX)
-find_package(hpx REQUIRED)
+find_package(HPX REQUIRED)
 add_hpx_executable(my_hpx_program SOURCES main.cpp)
 ``
 
