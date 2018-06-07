@@ -66,6 +66,7 @@ add_hpx_library_sources(hpx_external GLOB APPEND)
 
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
+    enable_language(ASM)
     set(switch_to_fiber_source
       "${PROJECT_SOURCE_DIR}/src/runtime/threads/coroutines/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects

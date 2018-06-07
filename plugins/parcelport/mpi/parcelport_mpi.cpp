@@ -117,7 +117,7 @@ namespace hpx { namespace parcelset
         public:
             parcelport(util::runtime_configuration const& ini,
                 util::function_nonser<void(std::size_t, char const*)> const& on_start,
-                util::function_nonser<void()> const& on_stop)
+                util::function_nonser<void(std::size_t, char const*)> const& on_stop)
               : base_type(ini, here(), on_start, on_stop)
               , stopped_(false)
               , receiver_(*this)

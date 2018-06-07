@@ -105,22 +105,22 @@ namespace hpx { namespace parcelset
     public:
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
-            locality const & here,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread)
+            locality const& here,
+            util::function_nonser<void(std::size_t, char const*)> const&
+                on_start_thread,
+            util::function_nonser<void(std::size_t, char const*)> const&
+                on_stop_thread)
           : parcelport(ini, here, connection_handler_type())
-          , io_service_pool_(thread_pool_size(ini),
-                on_start_thread, on_stop_thread, pool_name(), pool_name_postfix())
-          , connection_cache_(max_connections(ini), max_connections_per_loc(ini))
+          , io_service_pool_(thread_pool_size(ini), on_start_thread,
+                on_stop_thread, pool_name(), pool_name_postfix())
+          , connection_cache_(
+                max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(0)
           , operations_in_flight_(0)
           , num_thread_(0)
           , max_background_thread_(hpx::util::safe_lexical_cast<std::size_t>(
-                hpx::get_config_entry(
-                    "hpx.max_background_threads",
-                        (std::numeric_limits<std::size_t>::max)()
-                )
-            ))
+                hpx::get_config_entry("hpx.max_background_threads",
+                    (std::numeric_limits<std::size_t>::max)())))
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
