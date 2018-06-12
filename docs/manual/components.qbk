@@ -15,7 +15,7 @@ highlight how components can be defined, created, and used.
 [section:components_server Defining Components]
 
 In order for a C++ class type to be managed remotely in __hpx__, the type must
-be derived from the `hpx::components::simple_component_base` template type. We
+be derived from the `hpx::components::component_base` template type. We
 call such C++ class types 'components'.
 
 Note that the component type itself is passed as a template argument to the
@@ -29,7 +29,7 @@ base class.
     {
         // Define a new component type 'some_component'
         struct some_component
-          : hpx::components::simple_component_base<some_component>
+          : hpx::components::component_base<some_component>
         {
             // This member function is has to be invoked remotely
             int some_member_function(std::string const& s)
@@ -68,7 +68,7 @@ For instance:
     // remote creation of 'app::some_component' instances with 'hpx::new_<>()'
     //
     using some_component = app::some_component;
-    using some_component_type = hpx::components::simple_component<some_component>;
+    using some_component_type = hpx::components::component<some_component>;
 
     // Please note that the second argument to this macro must be a
     // (system-wide) unique C++-style identifier (without any namespaces)
