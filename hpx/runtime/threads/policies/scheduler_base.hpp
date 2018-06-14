@@ -133,7 +133,7 @@ namespace hpx { namespace threads { namespace policies
 
             // Exponential backoff with a maximum sleep time.
             std::chrono::milliseconds period(
-                std::lround(std::min(max_idle_backoff_time_,
+                std::lround((std::min)(max_idle_backoff_time_,
                     std::pow(2.0, wait_count_))));
 
             ++wait_count_;
