@@ -370,6 +370,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Maximum sleep time for idle backoff in milliseconds.
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+#  if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
+#    define HPX_IDLE_BACKOFF_TIME_MAX 1000
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_WRAPPER_HEAP_STEP)
 #  define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif
