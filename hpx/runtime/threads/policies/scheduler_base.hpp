@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -134,7 +135,7 @@ namespace hpx { namespace threads { namespace policies
             // Exponential backoff with a maximum sleep time.
             std::chrono::milliseconds period(
                 std::lround((std::min)(max_idle_backoff_time_,
-                    std::pow(2.0, wait_count_))));
+                    std::pow(2.0, double(wait_count_)))));
 
             ++wait_count_;
 
