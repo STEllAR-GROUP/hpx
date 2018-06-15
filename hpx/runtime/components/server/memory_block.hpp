@@ -246,19 +246,19 @@ namespace hpx { namespace components
         }
 
         template <typename T>
-        T& get()
+        T& get_data()
         {
             return *reinterpret_cast<T*>(get_ptr());
         }
 
         template <typename T>
-        T const& get() const
+        T const& get_data() const
         {
             return *reinterpret_cast<T const*>(get_ptr());
         }
 
         template <typename T>
-        void set (T const& val)
+        void set_data (T const& val)
         {
             if (!data_) {
                 std::ostringstream strm;
@@ -266,7 +266,7 @@ namespace hpx { namespace components
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "memory_block_data::set",
+                    "memory_block_data::set_data",
                     strm.str());
             }
             if (!data_->is_master())
@@ -276,7 +276,7 @@ namespace hpx { namespace components
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "memory_block_data::set",
+                    "memory_block_data::set_data",
                     strm.str());
             }
             *reinterpret_cast<T*>(data_->get_ptr()) = val;
