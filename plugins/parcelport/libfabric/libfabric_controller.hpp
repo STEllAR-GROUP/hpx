@@ -509,6 +509,14 @@ namespace libfabric
             LOG_DEBUG_MSG("passive endpoint " << hexpointer(ep_passive_));
             id = &ep_passive_->fid;
 #endif
+
+#ifdef HPX_HAVE_PARCELPORT_TCP
+            // with tcp we do not use PMI boot, so enable the endpoint now
+            LOG_DEBUG_MSG("Enabling endpoint (TCP) " << hexpointer(ep_active_));
+            ret = fi_enable(ep_active_);
+            if (ret) throw fabric_error(ret, "fi_enable");
+#endif
+
             locality::locality_data local_addr;
             std::size_t addrlen = locality::array_size;
             LOG_DEBUG_MSG("Fetching local address using size " << decnumber(addrlen));
