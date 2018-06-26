@@ -11,6 +11,7 @@ set(subdirs
     async_io
     balancing
     cancelable_action
+    global_init
     future_reduce
     heartbeat
     jacobi
@@ -60,4 +61,3 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(examples examples.${subdir})
 endforeach()
-
