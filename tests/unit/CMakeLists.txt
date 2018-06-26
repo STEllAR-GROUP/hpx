@@ -15,6 +15,7 @@ set(subdirs
     parcelset
     performance_counter
     resource
+    runtime
     serialization
     threads
     traits
