@@ -44,7 +44,10 @@ namespace hpx { namespace util
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
                 thread_description const& description)
     {
-        if (description.kind() == thread_description::data_type_description) {
+        if (wrapper == nullptr) {
+            threads::thread_id_type parent_task(nullptr);
+            return apex_new_task(description, parent_task);
+        } else if (description.kind() == thread_description::data_type_description) {
             return apex::update_task(wrapper,
                 description.get_description());
         } else {
@@ -55,6 +58,10 @@ namespace hpx { namespace util
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper, char const* name)
     {
+        if (wrapper == nullptr) {
+            apex_task_wrapper parent_task(nullptr);
+            return apex::new_task(std::string(name), UINTMAX_MAX, parent_task);
+        }
         return apex::update_task(wrapper, name);
     }
 
@@ -122,10 +129,22 @@ namespace hpx { namespace util
     inline void apex_init() {}
     inline void apex_finalize() {}
 
+    HPX_EXPORT apex_task_wrapper apex_new_task(
+                thread_description const& description,
+                threads::thread_id_type const& parent_task) {return nullptr;}
+
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
+                thread_description const& description) {return nullptr;}
+
+    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
+                char const* name) {return nullptr;}
+
     struct apex_wrapper
     {
-        apex_wrapper(thread_description const& name) {}
+        apex_wrapper(apex_task_wrapper data_ptr) {}
         ~apex_wrapper() {}
+        void stop(void) {}
+        void yield(void) {}
     };
 
     struct apex_wrapper_init
