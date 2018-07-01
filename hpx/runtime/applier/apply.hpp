@@ -437,7 +437,7 @@ namespace hpx
             threads::thread_init_data data;
 #ifdef HPX_HAVE_APEX
             data.apex_data = hpx::util::apex_new_task(
-                data.description, 
+                data.description,
                 data.parent_locality_id,
                 data.parent_id);
 #endif
