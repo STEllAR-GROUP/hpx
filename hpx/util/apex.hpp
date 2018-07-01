@@ -14,12 +14,14 @@
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
 #include <memory>
+#include <atomic>
 typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
 #endif
 
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
+
     static void hpx_util_apex_init_startup(void)
     {
         apex::init(nullptr, hpx::get_locality_id(),
@@ -39,6 +41,7 @@ namespace hpx { namespace util
 
     HPX_EXPORT apex_task_wrapper apex_new_task(
                 thread_description const& description,
+                std::uint32_t parent_task_locality,
                 threads::thread_id_type const& parent_task);
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
@@ -46,7 +49,8 @@ namespace hpx { namespace util
     {
         if (wrapper == nullptr) {
             threads::thread_id_type parent_task(nullptr);
-            return apex_new_task(description, parent_task);
+            // doesn't matter which locality we use, the parent is null
+            return apex_new_task(description, 0, parent_task);
         } else if (description.kind() == thread_description::data_type_description) {
             return apex::update_task(wrapper,
                 description.get_description());
@@ -131,6 +135,7 @@ namespace hpx { namespace util
 
     HPX_EXPORT apex_task_wrapper apex_new_task(
                 thread_description const& description,
+                std::uint32_t parent_task_locality,
                 threads::thread_id_type const& parent_task) {return nullptr;}
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
