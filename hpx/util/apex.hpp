@@ -17,6 +17,8 @@
 #include <cstdint>
 #include <string>
 typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
+#else
+typedef void* apex_task_wrapper;
 #endif
 
 namespace hpx { namespace util
