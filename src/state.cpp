@@ -22,7 +22,7 @@ namespace hpx
             hpx::runtime* rt = get_runtime_ptr();
             if (nullptr == rt) {
                 // we're probably either starting or stopping
-                return st == state_starting || st == state_stopping;
+                return st <= state_starting || st >= state_stopping;
             }
             return (rt->get_thread_manager().status() == st);
         }
