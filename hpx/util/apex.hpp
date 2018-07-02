@@ -136,7 +136,7 @@ namespace hpx { namespace util
     inline void apex_init() {}
     inline void apex_finalize() {}
 
-    HPX_EXPORT apex_task_wrapper apex_new_task(
+    inline apex_task_wrapper apex_new_task(
                 thread_description const& description,
                 std::uint32_t parent_task_locality,
                 threads::thread_id_type const& parent_task) {return nullptr;}
