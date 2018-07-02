@@ -9,6 +9,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/find_localities.hpp>
+#include <cstdint>
 
 namespace hpx { namespace util
 {
