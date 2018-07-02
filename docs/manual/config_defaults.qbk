@@ -65,6 +65,7 @@ by section basis below.
     max_background_threads = ${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}
     max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:<hpx_idle_loop_count_max>}
     max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
+    max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:<hpx_idle_backoff_time_max>}
 
     [hpx.stacks]
     small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -145,6 +146,14 @@ by section basis below.
       scheduler. By default this is defined by the preprocessor constant
       `HPX_BUSY_LOOP_COUNT_MAX`. This is an internal setting which you should
       change only if you know exactly what you are doing.]]
+    [[`hpx.max_idle_backoff_time`]
+     [This setting defines the maximum time (in milliseconds) for the scheduler
+      to sleep after being idle for `hpx.max_idle_loop_count` iterations. This
+      setting is applicable only if `HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF` is set
+      during configuration in CMake. By default this is defined by the
+      preprocessor constant `HPX_IDLE_BACKOFF_TIME_MAX`. This is an internal
+      setting which you should change only if you know exactly what you are
+      doing.]]
 
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.

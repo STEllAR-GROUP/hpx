@@ -451,7 +451,7 @@ hpx_option(HPX_WITH_THREAD_STACK_MMAP BOOL
   CATEGORY "Thread Manager" ADVANCED)
 
 hpx_option(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF BOOL
-  "HPX scheduler threads are backing off on idle queues (default: ON)"
+  "HPX scheduler threads do exponential backoff on idle queues (default: ON)"
   ON
   CATEGORY "Thread Manager" ADVANCED)
 
