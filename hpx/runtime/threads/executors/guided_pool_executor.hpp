@@ -201,6 +201,12 @@ namespace hpx { namespace threads { namespace executors
     struct HPX_EXPORT guided_pool_executor<pool_numa_hint<Tag>>
     {
       public:
+//        guided_pool_executor(const guided_pool_executor<Tag>& other)
+//            : pool_executor_(other.pool_executor_)
+//            , hint_(hint_)
+//            , hp_sync_(other.hp_sync_)
+//        {}
+
         guided_pool_executor(const std::string& pool_name,
                              bool hp_sync = false)
             : pool_executor_(pool_name)
@@ -459,6 +465,9 @@ namespace hpx { namespace threads { namespace executors
             return p.get_future();
         }
 
+        auto get_stacksize() { return pool_executor_.get_stacksize(); }
+        auto get_priority() { return pool_executor_.get_priority(); }
+
     private:
         pool_executor       pool_executor_;
         pool_numa_hint<Tag> hint_;
@@ -469,17 +478,22 @@ namespace hpx { namespace threads { namespace executors
     // guided_pool_executor_shim
     // an executor compatible with scheduled executor API
     // --------------------------------------------------------------------
+    enum executor_type {
+        guided_executor_flag,
+        default_executor_flag,
+    };
+
     template <typename H>
     struct HPX_EXPORT guided_pool_executor_shim {
     public:
-        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+        guided_pool_executor_shim(executor_type guided, const std::string& pool_name,
                                   bool hp_sync = false)
             : guided_(guided)
             , guided_exec_(pool_name, hp_sync)
             , pool_exec_(pool_name)
         {}
 
-        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+        guided_pool_executor_shim(executor_type guided, const std::string& pool_name,
                                   thread_stacksize stacksize,
                                   bool hp_sync = false)
             : guided_(guided)
@@ -487,7 +501,7 @@ namespace hpx { namespace threads { namespace executors
             , pool_exec_(pool_name, stacksize)
         {}
 
-        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+        guided_pool_executor_shim(executor_type guided, const std::string& pool_name,
                                   thread_priority priority,
                                   thread_stacksize stacksize = thread_stacksize_default,
                                   bool hp_sync = false)
@@ -503,9 +517,11 @@ namespace hpx { namespace threads { namespace executors
         future<typename util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F && f, Ts &&... ts)
         {
-            if (guided_) return guided_exec_.async_execute(
-                std::forward<F>(f), std::forward<Ts>(ts)...);
-            else {
+            if (guided_==guided_executor_flag) {
+                return guided_exec_.async_execute(
+                            std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+            else { // default_executor_flag)
                 typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
                     result_type;
 
@@ -536,9 +552,11 @@ namespace hpx { namespace threads { namespace executors
         ->  future<typename util::detail::invoke_deferred_result<
             F, Future, Ts...>::type>
         {
-            if (guided_) return guided_exec_.then_execute(
-                std::forward<F>(f), std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...);
+            if (guided_==guided_executor_flag) {
+                return guided_exec_.then_execute(
+                            std::forward<F>(f), std::forward<Future>(predecessor),
+                            std::forward<Ts>(ts)...);
+            }
             else {
                 typedef typename hpx::util::detail::invoke_deferred_result<
                         F, Future, Ts...
@@ -560,11 +578,10 @@ namespace hpx { namespace threads { namespace executors
 
         // --------------------------------------------------------------------
 
-        bool                    guided_;
+        executor_type           guided_;
         guided_pool_executor<H> guided_exec_;
         pool_executor           pool_exec_;
     };
-
 
 }}}
 

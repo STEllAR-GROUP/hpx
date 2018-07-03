@@ -8,6 +8,7 @@ set(example_programs
   oversubscribing_resource_partitioner
   simple_resource_partitioner
   async_customization
+  cuda_graphs_customization
 )
 
 set(guided_pool_test_FLAGS DEPENDENCIES iostreams_component)

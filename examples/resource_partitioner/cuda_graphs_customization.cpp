@@ -2,6 +2,7 @@
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/executors/logging_executor.hpp>
+#include <hpx/runtime/threads/executors/cuda_graphs_executor.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 #include <hpx/runtime/resource/partitioner.hpp>
 //#include <hpx/runtime/threads/cpu_mask.hpp>
@@ -430,10 +431,10 @@ int graph_test(Executor &exec)
     }, 1, 2.2, "Hello");
     fa.get();
 
-//    auto f1 = hpx::async(exec, [](){ return nullptr;});
+    auto f1 = hpx::async(exec, [](){ return nullptr;});
 //    auto f2 = f1.then(exec, [](hpx::future<nullptr_t>&&){ return nullptr;});
 //    auto f3 = f2.then(exec, [](hpx::future<nullptr_t>&&){ return nullptr;});
-//    f1.get();
+    f1.get();
     return 0;
 }
 
@@ -477,22 +478,24 @@ namespace hpx { namespace threads { namespace executors
 
 int hpx_main()
 {
-    using namespace hpx::threads::executors;
     int val = 0;
 
     test_async_executor exec;
-    val = test(exec);
+//    val = test(exec);
+//    val = graph_test(exec);
 
-    typedef pool_numa_hint<dummy_tag> dummy_hint;
-    guided_pool_executor_shim<dummy_hint> exec2(guided_executor_flag, "default");
-    val = test(exec2);
+    typedef hpx::threads::executors::pool_numa_hint<dummy_tag> dummy_hint;
+    hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec2(hpx::threads::executors::guided_executor_flag, "default");
+//    val = test(exec2);
 
-    guided_pool_executor_shim<dummy_hint> exec3(default_executor_flag, "default");
-    val = test(exec3);
+    hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec3(hpx::threads::executors::default_executor_flag, "default");
+//    val = test(exec3);
 
-    logging_executor<guided_pool_executor_shim<dummy_hint>>
-        exec4(guided_pool_executor_shim<dummy_hint>(guided_executor_flag, "default"));
-    val = test(exec4);
+//    hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec4(hpx::threads::executors::logging_executor_flag, "default");
+//    val = graph_test(exec4);
+
+    hpx::threads::executors::cuda_graphs_executor exec5("default");
+    val = graph_test(exec5);
 
     return val;
 }
