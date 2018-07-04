@@ -14,12 +14,12 @@
 // System in use.
 #if defined(__linux) || defined(__linux__) || defined(linux)
 
-namespace hpx {
+namespace hpx_start {
     // include_libhpx_wrap here is an override for the one present in
     // src/hpx_wrap.cpp. The value of this variable defines if we need
     // to change the program's entry point or not.
-    extern int include_libhpx_wrap;
-    int include_libhpx_wrap = 1;
+    extern bool include_libhpx_wrap;
+    bool include_libhpx_wrap = true;
 }
 
 #else

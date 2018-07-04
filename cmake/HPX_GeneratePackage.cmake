@@ -74,6 +74,11 @@ else()
   endif()
 endif()
 
+set(HPX_LINKER_FLAGS "")
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+    set(HPX_LINKER_FLAGS "-Wl,-wrap=__libc_start_main")
+endif()
+
 # Get the include directories we need ...
 get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
@@ -230,4 +235,3 @@ install(
   DESTINATION ${LIB}/bazel
   COMPONENT bazel
 )
-
