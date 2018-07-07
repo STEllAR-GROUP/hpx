@@ -1,5 +1,6 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
+# Copyright (c)      2018 Nikunj Gupta
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +21,7 @@ endforeach()
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp")
+  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp|hpx_wrap.cpp")
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/pre_main.cpp"
   APPEND)
@@ -43,7 +44,6 @@ add_hpx_library_sources(hpx
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compat/*.cpp"
   APPEND)
-
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
