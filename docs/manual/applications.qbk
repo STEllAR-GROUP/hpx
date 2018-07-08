@@ -22,8 +22,8 @@ in 3 different ways:
 [heading:minimal Re-use the `main()` function as the main __hpx__ entry point]
 
 This method is the least intrusive to your code. It however provides you with
-the smallest flexibility in terms of initializing the __hpx__ runtime system
-only. The following code snippet shows what a minimal __hpx__ application using
+the smallest flexibility in terms of initializing the __hpx__ runtime system.
+ The following code snippet shows what a minimal __hpx__ application using
 this technique looks like:
 
     #include <``[headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`]``>
@@ -37,7 +37,7 @@ The only change to your code you have to make is to include the file
 [headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`].
 In this case the function `main()` will be invoked as the first __hpx__ thread
 of the application. The runtime system will be initialized behind the scenes
-before the function `main()` is executed and will automatically stopped after
+before the function `main()` is executed and will automatically stop after
 `main()` has returned. All __hpx__ API functions can be used from within this
 function now.
 
@@ -62,13 +62,22 @@ __commandline__ for more details on what options are recognized by __hpx__).
 The value returned from the function `main()` as shown above will be returned
 to the operating system as usual.
 
-[important To achieve this seamless integration, the header file
-           [headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`] defines a macro
-           ``
-              #define main hpx_startup::user_main
-           ``
-           which could result in unexpected behavior.]
+[important To achieve this seamless integration, we use different implementations
+            for different Operating Systems. In case of Linux or Mac OSX, the code
+            present in `hpx_wrap.cpp` is put into action. We hook into the system function
+            in case of Linux and provide alternate entry point in case of Mac OSX.
+            For other Operating Systems we rely on a macro
+            ``
+                #define main hpx_startup::user_main
+            ``
+            provided in the header file [headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`].
+            This implementation can result in unexpected behavior.]
 
+[caution We make use of an __override__ variable `include_libhpx_wrap` in the header file
+            [headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`] to swiftly choose the
+            function call stack at runtime. Therefore, the header file should __only__ be
+            included in the main executable. Including it in the components will result
+            in multiple definition of the variable.]
 
 [heading:medium Supply your own main __hpx__ entry point while blocking the main thread]
 
