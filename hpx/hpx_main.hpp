@@ -12,7 +12,7 @@
 
 // We support different implementation depending upon the Operating
 // System in use.
-#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) && \
+#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
     (defined(__linux) || defined(__linux__) || defined(linux))
 
 namespace hpx_start
