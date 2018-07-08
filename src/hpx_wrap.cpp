@@ -3,14 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// The following implementation is only possible for Linux systems.
-#if defined(__linux) || defined(__linux__) || defined(linux)
+#include <hpx/config.hpp>
 
-namespace hpx_start {
+// The following implementation is only possible for Linux systems.
+#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
+    (defined(__linux) || defined(__linux__) || defined(linux))
+
+namespace hpx_start
+{
     // include_libhpx_wrap is a weak symbol which helps to determine the course
-    // of function calls at runtime. It has a deafult value of `false` which
+    // of function calls at runtime. It has a default value of `false` which
     // corresponds to the program's entry point being main().
-    // It is overriden in hpx/hpx_main.hpp. Thus, inclusion of the header file
+    // It is overridden in hpx/hpx_main.hpp. Thus, inclusion of the header file
     // will change the program's entry point to HPX's own custom entry point
     // initialize_main. Subsequent calls before entering main() are handled
     // by this code.
@@ -21,14 +25,14 @@ namespace hpx_start {
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include<vector>
 #include <iostream>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Function declarations
 //
-
-namespace hpx_start{
+namespace hpx_start
+{
     // Main entry point of HPX runtime system
     extern int hpx_entry(int argc, char* argv[]);
 }
@@ -52,8 +56,8 @@ extern "C" int __wrap___libc_start_main (
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global pointers
-
-namespace hpx_start {
+namespace hpx_start
+{
     // actual_main is responsible to store the pointer to the main()
     // function. POSIX implementation of main requires pointer to envp
     // so it is stored as well.
@@ -114,7 +118,8 @@ extern "C" int __wrap___libc_start_main (
 
     // We determine the function call stack at runtime from the
     // value of include_libhpx_wrap.
-    if(hpx_start::include_libhpx_wrap) {
+    if(hpx_start::include_libhpx_wrap)
+    {
         // Assigning pointer to C main to actual_main
         hpx_start::actual_main = main;
 
