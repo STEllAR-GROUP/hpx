@@ -60,6 +60,11 @@ namespace hpx { namespace util
         DECL_TYPE_SPECIFIER(double, lf);
         DECL_TYPE_SPECIFIER(long double, Lf);
 
+        // the following type-specifiers are used elsewhere, we add them for
+        // completeness
+        DECL_TYPE_SPECIFIER(char const*, s);
+        DECL_TYPE_SPECIFIER(wchar_t const*, ls);
+
 #       undef DECL_TYPE_SPECIFIER
 
         ///////////////////////////////////////////////////////////////////////
