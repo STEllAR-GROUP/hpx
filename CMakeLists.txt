@@ -225,6 +225,15 @@ else()
     ON CATEGORY "Build Targets")
 endif()
 
+if(NOT MSVC)
+  hpx_option(HPX_WITH_DYNAMIC_HPX_MAIN BOOL
+    "Enable dynamic overload of system 'main()` (default: ON)"
+    ON ADVANCED CATEGORY "Utility")
+  if(HPX_WITH_DYNAMIC_HPX_MAIN)
+    hpx_add_config_define(HPX_HAVE_DYNAMIC_HPX_MAIN)
+  endif()
+endif()
+
 ################################################################################
 # Some platforms do not support dynamic linking. Enable this to link all
 # libraries statically. This also changes some of the internals of HPX related
