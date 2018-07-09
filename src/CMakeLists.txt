@@ -45,10 +45,16 @@ add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compat/*.cpp"
   APPEND)
 
+# libhpx_wrap sources
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+  add_hpx_library_sources (hpx_Wrap
+      GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+endif()
+
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_*.cpp"
-  EXCLUDE "hpx_init[.]cpp")
+  EXCLUDE "hpx_init[.]cpp|hpx_wrap.cpp")
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/util/lightweight_test.cpp"
   APPEND)
@@ -155,6 +161,14 @@ add_hpx_source_group(
   CLASS "Header Files"
   ROOT "${PROJECT_SOURCE_DIR}/hpx"
   TARGETS ${hpx_HEADERS})
+
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+  add_hpx_source_group(
+    NAME hpx_wrap
+    CLASS "Source Files"
+    ROOT "${PROECT_SOURCE_DIR}/src"
+    TARGETS "${PROECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+endif()
 
 add_hpx_source_group(
   NAME hpx_init
@@ -316,11 +330,64 @@ foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
   endif()
 endforeach()
 
+################################################################################
+# libhpx_wrap
+
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+  if(NOT HPX_WITH_STATIC_LINKING)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    if(HPX_WITH_DEFAULT_TARGETS)
+      if(HPX_WITH_CUDA)
+        cuda_add_library(hpx_wrap STATIC
+          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+      else()
+        add_library(hpx_wrap STATIC
+          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+      endif()
+    else()
+      if(HPX_WITH_CUDA)
+        cuda_add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
+          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+      else()
+        add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
+          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+      endif()
+    endif()
+
+    set_property(TARGET hpx_wrap APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      "HPX_APPLICATION_EXPORTS"
+      "HPX_ENABLE_ASSERT_HANDLER")
+
+    set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
+    set(hpx_targets ${hpx_targets} hpx_wrap)
+  endif()
+
+endif()
+
+get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
+  GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
+foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
+  target_compile_definitions(hpx INTERFACE ${_flag})
+  target_compile_definitions(hpx PUBLIC ${_flag})
+  if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+    target_compile_definitions(hpx_wrap INTERFACE ${_flag})
+    target_compile_definitions(hpx_wrap PUBLIC ${_flag})
+  endif()
+  if(NOT HPX_WITH_STATIC_LINKING)
+    target_compile_definitions(hpx_init PUBLIC ${_flag})
+  endif()
+endforeach()
+
 get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
   GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
 foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
   target_compile_options(hpx INTERFACE ${_flag})
   target_compile_options(hpx PUBLIC ${_flag})
+  if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+    target_compile_options(hpx_wrap INTERFACE ${_flag})
+    target_compile_options(hpx_wrap PUBLIC ${_flag})
+  endif()
   if(NOT HPX_WITH_STATIC_LINKING)
     target_compile_options(hpx_init PUBLIC ${_flag})
   endif()
