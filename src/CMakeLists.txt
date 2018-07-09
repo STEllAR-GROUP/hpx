@@ -47,7 +47,7 @@ add_hpx_library_sources(hpx
 
 # libhpx_wrap sources
 if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
-  add_hpx_library_sources (hpx_Wrap
+  add_hpx_library_sources (hpx_wrap
       GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
 endif()
 
@@ -167,7 +167,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
     NAME hpx_wrap
     CLASS "Source Files"
     ROOT "${PROECT_SOURCE_DIR}/src"
-    TARGETS "${PROECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+    TARGETS "${hpx_wrap_SOURCES}")
 endif()
 
 add_hpx_source_group(
@@ -339,18 +339,18 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
     if(HPX_WITH_DEFAULT_TARGETS)
       if(HPX_WITH_CUDA)
         cuda_add_library(hpx_wrap STATIC
-          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+          "${hpx_wrap_SOURCES}")
       else()
         add_library(hpx_wrap STATIC
-          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+          "${hpx_wrap_SOURCES}")
       endif()
     else()
       if(HPX_WITH_CUDA)
         cuda_add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
-          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+          "${hpx_wrap_SOURCES}")
       else()
         add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
-          "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+          "${hpx_wrap_SOURCES}")
       endif()
     endif()
 
@@ -360,7 +360,6 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
       "HPX_ENABLE_ASSERT_HANDLER")
 
     set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
-    set(hpx_targets ${hpx_targets} hpx_wrap)
   endif()
 
 endif()
@@ -393,6 +392,11 @@ foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
   endif()
 endforeach()
 
+set(export_hpx_wrap "")
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+  set(export_hpx_wrap "hpx_wrap")
+endif()
+
 set(_optional)
 if(HPX_WITH_DEFAULT_TARGETS)
   set(_optional OPTIONAL)
@@ -401,6 +405,7 @@ endif()
 install(
   TARGETS
     ${hpx_targets}
+    ${export_hpx_wrap}
   EXPORT HPXTargets
   LIBRARY DESTINATION ${LIB}
   ARCHIVE DESTINATION ${LIB}
