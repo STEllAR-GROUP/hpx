@@ -38,38 +38,24 @@ namespace hpx_start
 }
 
 // HPX's implented program's entry point
-extern int initialize_main(int argc, char** argv, char** envp);
+extern int initialize_main(int argc, char** argv);
 
-// Real libc function __libc_start_main. Function definition can be
-// found in the glibc source in `glibc/csu/libc-start.c`
-extern "C" int __real___libc_start_main (
-                int (*main)(int, char**, char**), int argc, char * * ubp_av,
-                void (*init) (void), void (*fini) (void),
-                void (*rtld_fini) (void), void (* stack_end));
+// Actual main() function
+extern "C" int __real_main(int argc, char** argv);
 
-// Wrapper function for __libc_start_main
-extern "C" int __wrap___libc_start_main (
-                int (*main)(int, char**, char**), int argc, char * * ubp_av,
-                void (*init) (void), void (*fini) (void),
-                void (*rtld_fini) (void), void (* stack_end));
+// Our wrapper for main() function
+extern "C" int __wrap_main(int argc, char** argv);
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global pointers
 namespace hpx_start
 {
-    // actual_main is responsible to store the pointer to the main()
-    // function. POSIX implementation of main requires pointer to envp
-    // so it is stored as well.
-    int (*actual_main)(int, char**, char**) = nullptr;
-    char** __envp = nullptr;
-
-
     // main entry point of the HPX runtime system
     int hpx_entry(int argc, char* argv[])
     {
         // Call to the main() function
-        int return_value = hpx_start::actual_main(argc, argv, __envp);
+        int return_value = __real_main(argc, argv);
 
         //Finalizing the HPX runtime
         return hpx::finalize(return_value);
@@ -80,12 +66,8 @@ namespace hpx_start
 // The HPX runtime system is initialized here, which
 // is similar to initializing HPX from main() and utilising
 // the hpx_main() as the entry point.
-int initialize_main(int argc, char** argv, char** envp)
+int initialize_main(int argc, char** argv)
 {
-    // initializing envp pointer to utilize when
-    // calling the actual main.
-    hpx_start::__envp = envp;
-
     // Configuring HPX system before runtime
     std::vector<std::string> const cfg = {
         "hpx.commandline.allow_unknown!=1",
@@ -104,32 +86,22 @@ int initialize_main(int argc, char** argv, char** envp)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Wrapper for the libc function __libc_start_main
+// Wrapper for main function
 //
 
-// We are hooking into __libc_start_main to change the entry
-// point of the C runtime system to our custom implemented
-// function initialize_main
-extern "C" int __wrap___libc_start_main (
-                int (*main)(int, char**, char**), int argc, char * * ubp_av,
-                void (*init) (void), void (*fini) (void),
-                void (*rtld_fini) (void), void (* stack_end))
+// We are wrapping the main function to initialize our
+// runtime system prior to real main call.
+extern "C" int __wrap_main(int argc, char** argv)
 {
-
-    // We determine the function call stack at runtime from the
-    // value of include_libhpx_wrap.
+    // We determine the function call stack at runtime
+    // from the value of include_libhpx_wrap. If hpx_main
+    // is included include_libhpx_wrap is set to 1
+    // due to override variable.
     if(hpx_start::include_libhpx_wrap)
-    {
-        // Assigning pointer to C main to actual_main
-        hpx_start::actual_main = main;
+        return initialize_main(argc, argv);
 
-        // Calling original __libc_start_main with our custom entry point.
-        return __real___libc_start_main(&initialize_main, argc, ubp_av, init,
-            fini, rtld_fini, stack_end);
-    }
-    return __real___libc_start_main(main, argc, ubp_av, init,
-        fini, rtld_fini, stack_end);
-
+    // call main() since hpx_main.hpp is not included
+    return __real_main(argc, argv);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
