@@ -188,7 +188,7 @@ function(hpx_setup_target target)
   endif()
 
   if(NOT target_NOLIBS)
-    if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+    if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") AND ("${_type}" STREQUAL "EXECUTABLE"))
       set(hpx_libs hpx_wrap)
       set_target_properties(${target} PROPERTIES LINK_FLAGS "-Wl,-wrap=__libc_start_main")
     endif()
