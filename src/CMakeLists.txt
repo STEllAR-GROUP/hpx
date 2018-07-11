@@ -339,18 +339,18 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
     if(HPX_WITH_DEFAULT_TARGETS)
       if(HPX_WITH_CUDA)
         cuda_add_library(hpx_wrap STATIC
-          "${hpx_wrap_SOURCES}")
+          ${hpx_wrap_SOURCES})
       else()
         add_library(hpx_wrap STATIC
-          "${hpx_wrap_SOURCES}")
+          ${hpx_wrap_SOURCES})
       endif()
     else()
       if(HPX_WITH_CUDA)
         cuda_add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
-          "${hpx_wrap_SOURCES}")
+          ${hpx_wrap_SOURCES})
       else()
         add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
-          "${hpx_wrap_SOURCES}")
+          ${hpx_wrap_SOURCES})
       endif()
     endif()
 
@@ -360,6 +360,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
       "HPX_ENABLE_ASSERT_HANDLER")
 
     set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
+    set(hpx_targets ${hpx_targets} hpx_wrap)
   endif()
 
 endif()
@@ -392,11 +393,6 @@ foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
   endif()
 endforeach()
 
-set(export_hpx_wrap "")
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
-  set(export_hpx_wrap "hpx_wrap")
-endif()
-
 set(_optional)
 if(HPX_WITH_DEFAULT_TARGETS)
   set(_optional OPTIONAL)
@@ -405,7 +401,6 @@ endif()
 install(
   TARGETS
     ${hpx_targets}
-    ${export_hpx_wrap}
   EXPORT HPXTargets
   LIBRARY DESTINATION ${LIB}
   ARCHIVE DESTINATION ${LIB}
