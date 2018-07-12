@@ -39,7 +39,7 @@ endif()
 ################################################################################
 # project metadata
 ################################################################################
-project(HPX CXX C)
+project(HPX CXX C ASM)
 
 set(HPX_MAJOR_VERSION 1)
 set(HPX_MINOR_VERSION 2)
@@ -607,7 +607,6 @@ endif()
 
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
-
 ################################################################################
 # enable OpenMP emulation
 ################################################################################
@@ -1605,12 +1604,14 @@ if(HPX_WITH_HPXMP)
   # handle hpxMP library
   include(GitExternal)
   git_external(hpxmp
-    https://github.com/STEllAR-GROUP/hpxMP
+    https://github.com/STEllAR-GROUP/hpxMP.git
     master
     ${_hpxmp_no_update}
     VERBOSE)
 
   add_subdirectory(hpxmp/src)
+
+  SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
