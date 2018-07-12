@@ -39,7 +39,7 @@ endif()
 ################################################################################
 # project metadata
 ################################################################################
-project(HPX CXX C ASM)
+project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 1)
 set(HPX_MINOR_VERSION 2)
@@ -1596,6 +1596,11 @@ if(HPX_WITH_APEX)
 endif()
 
 if(HPX_WITH_HPXMP)
+
+  # hpxMP requires ASM support
+  enable_language(ASM)
+  set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+
   set(_hpxmp_no_update)
   if(HPX_WITH_HPXMP_NO_UPDATE)
     set(_hpxmp_no_update NO_UPDATE)
@@ -1611,7 +1616,6 @@ if(HPX_WITH_HPXMP)
 
   add_subdirectory(hpxmp/src)
 
-  SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
