@@ -85,7 +85,7 @@ endif()
 
 set(HPX_LINKER_FLAGS "")
 if(HPX_WITH_DYNAMIC_HPX_MAIN AND (CMAKE_SYSTEM_NAME STREQUAL Linux))
-    set(HPX_LINKER_FLAGS "-Wl,-wrap=__libc_start_main")
+    set(HPX_LINKER_FLAGS "-Wl,-wrap=main")
 endif()
 
 # Get the include directories we need ...
