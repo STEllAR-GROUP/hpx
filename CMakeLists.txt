@@ -607,6 +607,20 @@ endif()
 
 hpx_option(HPX_WITH_ITTNOTIFY BOOL
   "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+################################################################################
+# enable OpenMP emulation
+################################################################################
+hpx_option(HPX_WITH_HPXMP BOOL
+  "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP")
+if(HPX_WITH_HPXMP)
+  if(NOT MSVC AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+    hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
+      "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
+  else()
+    hpx_warn("hpxMP can be used only when compiling with clang")
+    set(HPX_WITH_HPXMP OFF)
+  endif()
+endif()
 
 ################################################################################
 # Scheduler configuration
@@ -1022,13 +1036,13 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
 elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-  if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_error("HPX on the BG/Q can only be compiled with bgclang")
   endif()
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if((MSVC14 AND CMAKE_CL_64) OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   hpx_option(HPX_WITH_AWAIT BOOL
       "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
@@ -1522,11 +1536,17 @@ endif()
 ################################################################################
 # Enable integration with Apex event counters
 ################################################################################
-set(_hpx_apex_no_update)
-if(HPX_WITH_APEX_NO_UPDATE)
-  set(_hpx_apex_no_update NO_UPDATE)
-endif()
+
+# reset external source lists
+add_hpx_library_sources_noglob(hpx_external)
+add_hpx_library_headers_noglob(hpx_external)
+
 if(HPX_WITH_APEX)
+  set(_hpx_apex_no_update)
+  if(HPX_WITH_APEX_NO_UPDATE)
+    set(_hpx_apex_no_update NO_UPDATE)
+  endif()
+
   # We want to track parent dependencies
   hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
   # handle APEX library
@@ -1573,6 +1593,29 @@ if(HPX_WITH_APEX)
     set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify_lib)
   endif()
+endif()
+
+if(HPX_WITH_HPXMP)
+
+  # hpxMP requires ASM support
+  enable_language(ASM)
+  set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+
+  set(_hpxmp_no_update)
+  if(HPX_WITH_HPXMP_NO_UPDATE)
+    set(_hpxmp_no_update NO_UPDATE)
+  endif()
+
+  # handle hpxMP library
+  include(GitExternal)
+  git_external(hpxmp
+    https://github.com/STEllAR-GROUP/hpxMP.git
+    master
+    ${_hpxmp_no_update}
+    VERBOSE)
+
+  add_subdirectory(hpxmp/src)
+
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)

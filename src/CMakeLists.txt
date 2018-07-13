@@ -7,7 +7,7 @@
 
 add_subdirectory(components)
 
-foreach(lib "hpx")
+foreach(lib "hpx" "hpx_init")
   set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
 
   if(MSVC)
@@ -21,7 +21,8 @@ endforeach()
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp|hpx_wrap.cpp")
+  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp|hpx_wrap.cpp"
+  APPEND)
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/pre_main.cpp"
   APPEND)
@@ -61,7 +62,7 @@ add_hpx_library_sources(hpx_init
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/main.cpp" APPEND)
 
-set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
+add_hpx_library_sources(hpx_external GLOB APPEND)
 
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
@@ -98,7 +99,8 @@ endif()
 # libhpx headers
 add_hpx_library_headers(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/*.hpp"
-  EXCLUDE ".*hpx_main.*[.]hpp")
+  EXCLUDE ".*hpx_main.*[.]hpp"
+  APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/runtime/*.hpp"
   APPEND)
@@ -144,6 +146,8 @@ endif()
 add_hpx_library_headers(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/hpx_main*.hpp")
 
+add_hpx_library_headers(hpx_external GLOB APPEND)
+
 ################################################################################
 # make source groups
 add_hpx_source_group(
@@ -153,7 +157,7 @@ add_hpx_source_group(
 
 add_hpx_source_group(
   NAME hpx CLASS "External Source Files"
-  ROOT "${PROJECT_SOURCE_DIR}/external"
+  ROOT "${PROJECT_SOURCE_DIR}"
   TARGETS ${hpx_external_SOURCES})
 
 add_hpx_source_group(
