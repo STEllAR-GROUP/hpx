@@ -47,7 +47,7 @@ add_hpx_library_sources(hpx
   APPEND)
 
 # libhpx_wrap sources
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   add_hpx_library_sources (hpx_wrap
       GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
 endif()
@@ -166,7 +166,7 @@ add_hpx_source_group(
   ROOT "${PROJECT_SOURCE_DIR}/hpx"
   TARGETS ${hpx_HEADERS})
 
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   add_hpx_source_group(
     NAME hpx_wrap
     CLASS "Source Files"
@@ -337,7 +337,7 @@ endforeach()
 ################################################################################
 # libhpx_wrap
 
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   if(NOT HPX_WITH_STATIC_LINKING)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     if(HPX_WITH_DEFAULT_TARGETS)
@@ -374,7 +374,7 @@ get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
 foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
   target_compile_definitions(hpx INTERFACE ${_flag})
   target_compile_definitions(hpx PUBLIC ${_flag})
-  if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+  if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
     target_compile_definitions(hpx_wrap INTERFACE ${_flag})
     target_compile_definitions(hpx_wrap PUBLIC ${_flag})
   endif()
@@ -388,7 +388,7 @@ get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
 foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
   target_compile_options(hpx INTERFACE ${_flag})
   target_compile_options(hpx PUBLIC ${_flag})
-  if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+  if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
     target_compile_options(hpx_wrap INTERFACE ${_flag})
     target_compile_options(hpx_wrap PUBLIC ${_flag})
   endif()
