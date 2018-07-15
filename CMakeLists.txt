@@ -1616,6 +1616,8 @@ if(HPX_WITH_HPXMP)
 
   add_subdirectory(hpxmp/src)
 
+  # make sure thread-local storage is supported
+  hpx_add_config_define(HPX_HAVE_THREAD_LOCAL_STORAGE)
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
