@@ -18,8 +18,8 @@ namespace hpx_start
     // will change the program's entry point to HPX's own custom entry point
     // initialize_main. Subsequent calls before entering main() are handled
     // by this code.
-    extern bool include_libhpx_wrap;
-    bool include_libhpx_wrap __attribute__((weak)) = false;
+    HPX_SYMBOL_EXPORT extern bool include_libhpx_wrap;
+    HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
 }
 
 #include <hpx/hpx_init.hpp>
