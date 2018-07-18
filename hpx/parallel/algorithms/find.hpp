@@ -579,7 +579,7 @@ namespace hpx { namespace parallel { inline namespace v1
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(std::forward<ExPolicy>(policy),
                         first1, count - diff + 1, 1,
-                        [=, HPX_CAPTURE_FORWARD(op)](
+                        [count, diff, tok, first2, HPX_CAPTURE_FORWARD(op)](
                             FwdIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void

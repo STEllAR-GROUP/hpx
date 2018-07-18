@@ -88,7 +88,7 @@ namespace hpx {namespace parallel { inline namespace v1
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
                     std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
-                    [=,
+                    [diff, count, tok, s_first,
                         HPX_CAPTURE_FORWARD(op),
                         HPX_CAPTURE_FORWARD(proj1),
                         HPX_CAPTURE_FORWARD(proj2)
@@ -99,7 +99,7 @@ namespace hpx {namespace parallel { inline namespace v1
 
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
-                            [=, &tok, &curr,
+                            [diff, count, s_first, &tok, &curr,
                                 HPX_CAPTURE_FORWARD(op),
                                 HPX_CAPTURE_FORWARD(proj1),
                                 HPX_CAPTURE_FORWARD(proj2)
@@ -316,7 +316,7 @@ namespace hpx {namespace parallel { inline namespace v1
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
                     std::forward<ExPolicy>(policy), first, count-(diff-1), 1,
-                    [=,
+                    [count, diff, tok, s_first,
                         HPX_CAPTURE_FORWARD(op),
                         HPX_CAPTURE_FORWARD(proj1),
                         HPX_CAPTURE_FORWARD(proj2)
@@ -327,7 +327,7 @@ namespace hpx {namespace parallel { inline namespace v1
 
                         util::loop_idx_n(
                             base_idx, it, part_size, tok,
-                            [=, &tok, &curr,
+                            [count, diff, s_first, &tok, &curr,
                                 HPX_CAPTURE_FORWARD(op),
                                 HPX_CAPTURE_FORWARD(proj1),
                                 HPX_CAPTURE_FORWARD(proj2)
