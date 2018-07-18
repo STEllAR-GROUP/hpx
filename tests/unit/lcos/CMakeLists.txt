@@ -20,6 +20,7 @@ set(tests
     async_local_executor
     async_remote
     async_remote_client
+    barrier
     broadcast
     broadcast_apply
     channel
@@ -27,7 +28,6 @@ set(tests
     client_then
     condition_variable
     counting_semaphore
-    barrier
     fold
     future
     future_ref
@@ -39,6 +39,7 @@ set(tests
     local_latch
     local_barrier
     local_dataflow
+    local_dataflow_boost_small_vector
     local_dataflow_executor
     local_dataflow_std_array
     local_event
