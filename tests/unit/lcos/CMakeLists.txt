@@ -20,6 +20,7 @@ set(tests
     async_local_executor
     async_remote
     async_remote_client
+    async_unwrap_result
     barrier
     broadcast
     broadcast_apply
@@ -58,6 +59,7 @@ set(tests
     sliding_semaphore
     split_future
     split_shared_future
+    sync_remote
     use_allocator
     wait_all_std_array
     wait_any_std_array

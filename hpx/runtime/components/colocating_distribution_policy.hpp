@@ -147,11 +147,16 @@ namespace hpx { namespace components
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename ...Ts>
-        hpx::future<
-            typename traits::promise_local_result<
+        template <typename Action>
+        struct async_result
+        {
+            using type = hpx::future<typename traits::promise_local_result<
                 typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type>
+            >::type>;
+        };
+
+        template <typename Action, typename ...Ts>
+        typename async_result<Action>::type
         async(launch policy, Ts&&... vs) const
         {
             if (!id_)
@@ -167,10 +172,7 @@ namespace hpx { namespace components
         ///       this class
         ///
         template <typename Action, typename Callback, typename ...Ts>
-        hpx::future<
-            typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type>
+        typename async_result<Action>::type
         async_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
