@@ -60,6 +60,12 @@ namespace libfabric
             uint32_t  num_chunks;
             uint32_t  flags;     // for padding to nice boundary (only need a few bits)
         };
+
+        struct fflib_info {
+            uint64_t  data_size;
+            int       rank;
+            // ... more things in here
+        };
     }
 
     template <int SIZE>
@@ -67,11 +73,14 @@ namespace libfabric
     {
         static constexpr unsigned int header_block_size = sizeof(detail::header_block);
         static constexpr unsigned int data_size_        = SIZE - header_block_size;
+        static constexpr unsigned int fflib_size_       = header_block_size + sizeof(fflib_info);
+
         //
-        static const unsigned int chunk_flag    = 0x01; // chunks piggybacked
-        static const unsigned int message_flag  = 0x02; // message pigybacked
+        static const unsigned int chunk_flag    = 0x01; // chunks piggybacked (assume true)
+        static const unsigned int message_flag  = 0x02; // message piggybacked
         static const unsigned int normal_flag   = 0x04; // normal chunks present
         static const unsigned int zerocopy_flag = 0x08; // zerocopy chunks present
+        static const unsigned int fflib_format  = 0x10; // this is an fflib message
 
         typedef serialization::serialization_chunk chunktype;
 
@@ -83,7 +92,7 @@ namespace libfabric
         std::array<char, data_size_> data_;
         // the data block is laid out as follows for each optional item
         // message_header - always present header_block_size
-        // chunk data   : sizeof(chunktype) * numchunks : when chunks piggybacked
+        // chunk list   : sizeof(chunktype) * numchunks : when chunks piggybacked
         //           or : sizeof(chunk_header)  : when chunks not piggybacked
         // rma_info     : sizeof(rma_info)      : when we have anything to be rma'd
         // message_info : sizeof(message_info)  : only when message pigybacked
@@ -91,8 +100,19 @@ namespace libfabric
         // .....
         // message      : buffer.size_ : only when message piggybacked
 
+        // if flags -> fflib_format is set
+        // header -> FFLIB_HEADER_SIZE  bytes of special stuff
+        // fflib_data
+
     public:
         //
+        header(void *fflib_buffer, std::size_t length) {
+            // code only works when buffer<4096 bytes
+            message_header.flags = fflib_format;
+            memcpy(message_ptr(), fflib_buffer, length);
+
+        }
+
         template <typename Buffer>
         header(Buffer const & buffer, void* tag)
         {
@@ -245,6 +265,9 @@ namespace libfabric
         // ------------------------------------------------------------------
         inline char *message_ptr()
         {
+            if ((message_header.flags & fflib_format) != 0) {
+                return reinterpret_cast<char*>(&data_[fflib_info_offset()]);
+            }
             if ((message_header.flags & message_flag) == 0) {
                 return nullptr;
             }
@@ -275,18 +298,30 @@ namespace libfabric
         inline uint32_t message_info_offset() const
         {
             // add the rma info offset
-            std::uint32_t size = rma_info_offset();
+            std::uint32_t size = fflib_size_;
             if ((message_header.flags & zerocopy_flag) != 0) {
                 size += sizeof(detail::rma_info);
             }
             return size;
         }
 
+        inline uint32_t fflib_info_offset() const
+        {
+            // add the rma info offset
+            if ((message_header.flags & fflib_format) != 0) {
+                return header_block_size;
+            }
+            return 0;
+        }
+
         inline uint32_t message_offset() const
         {
             // add the message info offset
             std::uint32_t size = message_info_offset();
-            if ((message_header.flags & message_flag) !=0) {
+            if ((message_header.flags & fflib_format) != 0) {
+                return fflib_size_;
+            }
+            else if ((message_header.flags & message_flag) !=0) {
                 size += sizeof(detail::message_info);
             }
             else if ((message_header.flags & message_flag) == 0 &&

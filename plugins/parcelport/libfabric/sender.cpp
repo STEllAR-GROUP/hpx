@@ -27,6 +27,48 @@ namespace parcelset {
 namespace policies {
 namespace libfabric
 {
+
+    void sender::fflib_send(void *fflib_buffer, std::size_t length, mystery_endpoint dest)
+    {
+        LOG_DEBUG_MSG("Placement new for header");
+
+        // option 1 - copy the data into the header and send 1 IOV in fi_send
+        // create the header using placement new in the pinned memory block
+        char *header_memory = (char*)(header_region_->get_address());
+        header_= new(header_memory) header_type(fflib_buffer, size, this);
+        header_region_->set_message_length(header_->message_offset() +  length);
+
+        region_list_[0] = {
+            header_region_->get_address(), header_region_->get_message_length() };
+
+        desc_[0] = header_region_->get_desc();
+
+        // send just the header region - a single message
+        hpx::util::yield_while([this]()
+            {
+                int ret = fi_send(this->endpoint_,
+                    this->region_list_[0].iov_base,
+                    this->region_list_[0].iov_len,
+                    this->desc_[0], this->dst_addr_, this);
+
+                if (ret == -FI_EAGAIN)
+                {
+                    LOG_ERROR_MSG("reposting fi_send...\n");
+                    return true;
+                }
+                else if (ret)
+                {
+                    throw fabric_error(ret, "fi_sendv");
+                }
+
+                return false;
+            }, "sender::fflib_send");
+
+        // option 2 - register the memory with a memory region
+        // and sed the header block (SMALL) + this data as the second IOV
+        // rma_memory_region fflib_region = rma_memory_region(provider, buffer, length)
+    }
+
     // --------------------------------------------------------------------
     // The main message send routine
     void sender::async_write_impl()

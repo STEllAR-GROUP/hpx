@@ -154,8 +154,16 @@ namespace libfabric
         // we dispatch our work to our rma_receiver once it completed the
         // prior message. The saved region is passed to the rma handler
         ++messages_handled_;
-        recv->read_message(region, src_addr);
 
+        typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
+        header_type *header = reinterpret_cast<header_type*>(region->get_address());
+        //
+        if (header->message_header.flags & fflib_format !=0) {
+            recv->fflib_message(region, src_addr);
+        }
+        else {
+            recv->read_message(region, src_addr);
+        }
         FUNC_END_DEBUG_MSG;
     }
 

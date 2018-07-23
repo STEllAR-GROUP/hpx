@@ -49,6 +49,12 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
+    void rma_receiver::fflib_message(region_type* region,
+        fi_addr_t const& src_addr)
+    {
+    }
+
+    // --------------------------------------------------------------------
     void rma_receiver::read_message(region_type* region,
         fi_addr_t const& src_addr)
     {

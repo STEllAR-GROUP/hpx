@@ -97,6 +97,8 @@ namespace libfabric
         // @TODO: unused, but required by the parcelport interface
         void verify_(parcelset::locality const & parcel_locality_id) const {}
 
+        void fflib_send(void *buffer, std::size_t lengthendpoint dest);
+
         // --------------------------------------------------------------------
         // The main message send routine : package the header, send it
         // with an optional extra message region if it cannot be piggybacked
