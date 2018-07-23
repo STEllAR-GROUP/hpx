@@ -878,6 +878,14 @@ if(HPX_WITH_NETWORKING)
     "Enable the parcel coalescing plugin (default: ON)." ON ADVANCED)
   if(HPX_WITH_PARCEL_COALESCING)
     hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+
+    #Adaptive parcel coalescing related metrics counters
+    hpx_option(HPX_WITH_ADAPTIVE_COALESCING_COUNTERS BOOL
+       "Enable performance counters related to adaptive parcel coalescing (default: OFF)." OFF ADVANCED)
+    if(HPX_WITH_ADAPTIVE_COALESCING_COUNTERS)
+      hpx_add_config_define(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS)
+    endif()
+
   endif()
 endif()
 
