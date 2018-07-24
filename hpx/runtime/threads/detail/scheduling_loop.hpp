@@ -279,7 +279,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-#ifdef HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
 
     struct background_work_duration_counter
     {
@@ -467,7 +467,7 @@ namespace hpx { namespace threads { namespace detail
                     if (HPX_LIKELY(thrd_stat.is_valid() &&
                             thrd_stat.get_previous() == pending))
                     {
-#ifdef HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                         //count background work duration
                         background_work_duration_counter bg_work_duration(
                             background_work_exec_time_init);

@@ -1213,7 +1213,7 @@ system and application performance.
     ]
         [///////////////////////////////////////////////////////////////////////////////]
         [///////////// Adaptive Coalescing Related Counters ////////////////////////////]
-        [   [`/threads/time/experimental-bg-work`]
+        [   [`/threads/time/background-work-duration`]
                 [`locality#*/total` or[br]
                  `locality#*/worker-thread#*`
 
@@ -1236,10 +1236,14 @@ system and application performance.
                  performing background work for all worker threads
                  (cores) on that locality. If the instance name is `worker-thread#*`
                  the counter will return the overall time spent performing backgound work
-                 for all worker threads separately. ]
+                 for all worker threads separately.
+                 This counter is available only if the configuration time constants
+                 `HPX_WITH_ADAPTIVE_COALESCING_COUNTERS` (default: OFF) and
+                 `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
+                  The unit of  measure for this counter is nanosecond [ns].]
                 [None]
         ]
-        [   [`/threads/time/experimental-bg-overhead`]
+        [   [`/threads/background-overhead`]
                 [`locality#*/total` or[br]
                  `locality#*/worker-thread#*`
 
@@ -1261,7 +1265,11 @@ system and application performance.
                  instance name is `total` the counter returns the background overhead
                   for all worker threads (cores) on that locality. If the instance name
                   is `worker-thread#*` the counter will return background overhead
-                 for all worker threads separately. ]
+                 for all worker threads separately.
+                 This counter is available only if the configuration time constants
+                 `HPX_WITH_ADAPTIVE_COALESCING_COUNTERS` (default: OFF) and
+                 `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
+                  The unit of  measure displayed for this counter is 0.1%.]
                 [None]
         ]
         [///////////////////////////////////////////////////////////////////////////]

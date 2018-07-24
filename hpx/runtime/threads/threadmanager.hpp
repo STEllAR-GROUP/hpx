@@ -346,7 +346,7 @@ namespace hpx { namespace threads
         std::int64_t get_average_thread_wait_time(bool reset);
         std::int64_t get_average_task_wait_time(bool reset);
 #endif
-#ifdef HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         std::int64_t get_background_work_duration(bool reset);
         std::int64_t get_background_overhead(bool reset);
 #endif    //HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS

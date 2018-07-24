@@ -824,7 +824,7 @@ namespace hpx { namespace threads
         return result;
     }
 
-#ifdef HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
     std::int64_t threadmanager::get_background_work_duration(bool reset)
     {
         std::int64_t result = 0;
@@ -1513,8 +1513,8 @@ namespace hpx { namespace threads
 #endif
 #endif
 
-#ifdef HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
-            {"/threads/time/experimental-bg-work",
+#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+            {"/threads/time/background-work-duration",
                 performance_counters::counter_raw,
                 "returns the overall time spent running background work",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -1524,7 +1524,7 @@ namespace hpx { namespace threads
                     &thread_pool_base::get_background_work_duration),
                 &performance_counters::locality_pool_thread_counter_discoverer,
                 "ns"},
-            {"/threads/time/experimental-bg-overhead",
+            {"/threads/background-overhead",
                 performance_counters::counter_raw,
                 "returns the overall background overhead",
                 HPX_PERFORMANCE_COUNTER_V1,
