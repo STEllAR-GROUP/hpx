@@ -1617,7 +1617,7 @@ if(HPX_WITH_HPXMP)
     ${_hpxmp_no_update}
     VERBOSE)
 
-  add_subdirectory(hpxmp/src)
+  add_subdirectory(hpxmp)
 
   # make sure thread-local storage is supported
   hpx_add_config_define(HPX_HAVE_THREAD_LOCAL_STORAGE)
