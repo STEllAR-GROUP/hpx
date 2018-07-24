@@ -272,6 +272,9 @@ hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED C
 hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
   ON CATEGORY "Build Targets")
+hpx_option(HPX_WITH_FAIL_COMPILE_TESTS BOOL
+  "Create build system support for fail compile HPX tests (default ON)"
+  ON CATEGORY "Build Targets")
 
 # Enable IO-counters on linux systems only
 set(HPX_WITH_IO_COUNTERS_DEFAULT OFF)

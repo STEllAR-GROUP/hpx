@@ -172,14 +172,20 @@ endforeach()
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
   set(compile_tests
-      fail_compile_mutex_move
-      fail_compile_spinlock_move
-      fail_compile_spinlock_no_backoff_move
      )
 
-  set(fail_compile_mutex_move_FLAGS FAILURE_EXPECTED)
-  set(fail_compile_spinlock_move_FLAGS FAILURE_EXPECTED)
-  set(fail_compile_spinlock_no_backoff_move_FLAGS FAILURE_EXPECTED)
+  if(HPX_WITH_FAIL_COMPILE_TESTS)
+    set(fail_compile_tests
+        fail_compile_mutex_move
+        fail_compile_spinlock_move
+        fail_compile_spinlock_no_backoff_move
+       )
+    foreach(fail_compile_test ${fail_compile_tests})
+      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
+    endforeach()
+
+    set(compile_tests ${compile_tests} ${fail_compile_tests})
+  endif()
 
   foreach(compile_test ${compile_tests})
     set(sources
