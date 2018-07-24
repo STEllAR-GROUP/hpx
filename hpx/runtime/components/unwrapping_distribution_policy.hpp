@@ -68,7 +68,7 @@ namespace hpx { namespace components
         };
 
         template <typename Action, typename ...Ts>
-        typename async_result<Action>::type
+        HPX_FORCEINLINE typename async_result<Action>::type
         async(launch policy, Ts&&... vs) const
         {
             return hpx::detail::async_unwrap_result_impl<Action>(
@@ -76,7 +76,7 @@ namespace hpx { namespace components
         }
 
         template <typename Action, typename ...Ts>
-        typename async_result<Action>::type
+        HPX_FORCEINLINE typename async_result<Action>::type
         async(launch::sync_policy, Ts&&... vs) const
         {
             return hpx::detail::sync_impl<Action>(
