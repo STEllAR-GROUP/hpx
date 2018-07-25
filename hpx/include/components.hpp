@@ -52,7 +52,7 @@
 #include <hpx/runtime/components/binpacking_distribution_policy.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
-#include <hpx/runtime/components/unwrapping_distribution_policy.hpp>
+#include <hpx/runtime/components/unwrapping_result_policy.hpp>
 
 #include <hpx/runtime/get_ptr.hpp>
 

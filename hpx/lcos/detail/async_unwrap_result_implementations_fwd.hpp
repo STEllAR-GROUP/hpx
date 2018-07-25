@@ -16,25 +16,9 @@
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
+    template <typename Action, typename Launch, typename ...Ts>
     typename hpx::traits::extract_action<Action>::type::local_result_type
-    async_unwrap_result_impl(launch policy, hpx::id_type const& id,
-        Ts&&... vs);
-
-    template <typename Action, typename ...Ts>
-    typename hpx::traits::extract_action<Action>::type::local_result_type
-    async_unwrap_result_impl(hpx::launch::sync_policy, hpx::id_type const& id,
-        Ts&&... vs);
-
-    template <typename Action, typename ...Ts>
-    typename hpx::traits::extract_action<Action>::type::local_result_type
-    async_unwrap_result_impl(hpx::launch::async_policy, hpx::id_type const& id,
-        Ts&&... vs);
-
-    template <typename Action, typename... Ts>
-    typename hpx::traits::extract_action<Action>::type::local_result_type
-    async_unwrap_result_impl(
-        hpx::launch::deferred_policy, hpx::id_type const& id, Ts&&... vs);
+    async_unwrap_result_impl(Launch && policy, hpx::id_type const& id, Ts&&... vs);
 }}
 
 #endif

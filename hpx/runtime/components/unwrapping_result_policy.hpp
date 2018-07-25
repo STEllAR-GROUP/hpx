@@ -5,8 +5,8 @@
 
 /// \file colocating_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_UNWRAPPING_DISTRIBUTION_POLICY_JUL_22_2018_1240PM)
-#define HPX_COMPONENTS_UNWRAPPING_DISTRIBUTION_POLICY_JUL_22_2018_1240PM
+#if !defined(HPX_COMPONENTS_UNWRAPPING_RESULT_POLICY_JUL_22_2018_1240PM)
+#define HPX_COMPONENTS_UNWRAPPING_RESULT_POLICY_JUL_22_2018_1240PM
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
@@ -29,34 +29,34 @@ namespace hpx { namespace components
     /// This class is a distribution policy that can be using with actions that
     /// return futures. For those actions it is possible to apply certain
     /// optimizations if the action is invoked synchronously.
-    struct unwrapping_distribution_policy : target_distribution_policy
+    struct unwrapping_result_policy : target_distribution_policy
     {
     public:
-        /// Default-construct a new instance of a \a unwrapping_distribution_policy.
+        /// Default-construct a new instance of a \a unwrapping_result_policy.
         /// This policy will represent the local locality.
-        unwrapping_distribution_policy() = default;
+        unwrapping_result_policy() = default;
 
-        /// Create a new \a unwrapping_distribution_policy representing the
+        /// Create a new \a unwrapping_result_policy representing the
         /// target locality
         ///
         /// \param id     [in] The global address of the target object
         ///
-        unwrapping_distribution_policy operator()(id_type const& id) const
+        unwrapping_result_policy operator()(id_type const& id) const
         {
-            return unwrapping_distribution_policy(id);
+            return unwrapping_result_policy(id);
         }
 
-        /// Create a new \a unwrapping_distribution_policy representing the
+        /// Create a new \a unwrapping_result_policy representing the
         /// target locality
         ///
         /// \param client  [in] The client side representation of the target
         ///                object
         ///
         template <typename Client, typename Stub>
-        unwrapping_distribution_policy operator()(
+        unwrapping_result_policy operator()(
             client_base<Client, Stub> const& client) const
         {
-            return unwrapping_distribution_policy(client.get_id());
+            return unwrapping_result_policy(client.get_id());
         }
 
         template <typename Action>
@@ -93,7 +93,7 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        unwrapping_distribution_policy(id_type const& id)
+        unwrapping_result_policy(id_type const& id)
           : target_distribution_policy(id)
         {}
         /// \endcond
@@ -102,19 +102,19 @@ namespace hpx { namespace components
     /// A predefined instance of the unwrap_result \a distribution_policy. It
     /// will represent the local locality and will place all items to create
     /// here.
-    static unwrapping_distribution_policy const unwrap_result;
+    static unwrapping_result_policy const unwrap_result;
 }}
 
 /// \cond NOINTERNAL
 namespace hpx
 {
-    using hpx::components::unwrapping_distribution_policy;
+    using hpx::components::unwrapping_result_policy;
     using hpx::components::unwrap_result;
 
     namespace traits
     {
         template <>
-        struct is_distribution_policy<components::unwrapping_distribution_policy>
+        struct is_distribution_policy<components::unwrapping_result_policy>
           : std::true_type
         {};
     }
