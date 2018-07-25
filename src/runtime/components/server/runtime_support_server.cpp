@@ -272,8 +272,8 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     runtime_support::runtime_support(hpx::util::runtime_configuration & cfg)
-      : stopped_(false), terminated_(false), dijkstra_color_(false),
-        shutdown_all_invoked_(false),
+      : stop_called_(false), stop_done_(false), terminated_(false),
+        dijkstra_color_(false), shutdown_all_invoked_(false),
         modules_(cfg.modules())
     {}
 
@@ -811,7 +811,8 @@ namespace hpx { namespace components { namespace server
     void runtime_support::run()
     {
         std::unique_lock<compat::mutex> l(mtx_);
-        stopped_ = false;
+        stop_called_ = false;
+        stop_done_ = false;
         terminated_ = false;
         shutdown_all_invoked_.store(false);
     }
@@ -819,10 +820,9 @@ namespace hpx { namespace components { namespace server
     void runtime_support::wait()
     {
         std::unique_lock<compat::mutex> l(mtx_);
-        while (!stopped_) {
+        while (!stop_done_) {
             LRT_(info) << "runtime_support: about to enter wait state";
             wait_condition_.wait(l);
-
             LRT_(info) << "runtime_support: exiting wait state";
         }
     }
@@ -831,7 +831,7 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
         std::unique_lock<compat::mutex> l(mtx_);
-        if (!stopped_) {
+        if (!stop_called_) {
             // push pending logs
             components::cleanup_logging();
 
@@ -846,7 +846,7 @@ namespace hpx { namespace components { namespace server
             bool timed_out = false;
             error_code ec(lightweight);
 
-            stopped_ = true;
+            stop_called_ = true;
 
             {
                 util::unlock_guard<compat::mutex> ul(mtx_);
@@ -927,6 +927,7 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
+            stop_done_ = true;
             wait_condition_.notify_all();
             stop_condition_.wait(l);        // wait for termination
         }
@@ -935,8 +936,9 @@ namespace hpx { namespace components { namespace server
     void runtime_support::notify_waiting_main()
     {
         std::unique_lock<compat::mutex> l(mtx_);
-        if (!stopped_) {
-            stopped_ = true;
+        if (!stop_called_) {
+            stop_called_ = true;
+            stop_done_ = true;
             wait_condition_.notify_all();
             stop_condition_.wait(l);        // wait for termination
         }
