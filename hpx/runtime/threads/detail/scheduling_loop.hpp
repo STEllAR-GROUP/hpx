@@ -313,7 +313,7 @@ namespace hpx { namespace threads { namespace detail
         std::uint64_t timestamp_;
         background_work_duration_counter& background_work_duration_;
     };
-#endif    //HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
 
     ///////////////////////////////////////////////////////////////////////////
     struct is_active_wrapper
@@ -468,12 +468,12 @@ namespace hpx { namespace threads { namespace detail
                             thrd_stat.get_previous() == pending))
                     {
 #if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-                        //count background work duration
+                        // count background work duration
                         background_work_duration_counter bg_work_duration(
                             background_work_exec_time_init);
                         background_exec_time_wrapper bg_exec_time(
                             bg_work_duration);
-#endif    //HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
                         thrd_stat = (*background_thread)();
                         thread_data* next = thrd_stat.get_next_thread();
                         if (next != nullptr && next != background_thread.get())

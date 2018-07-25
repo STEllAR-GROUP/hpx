@@ -1239,7 +1239,7 @@ namespace hpx { namespace threads { namespace detail
 
         tfunc_total -= reset_tfunc_total;
         bg_total -= reset_bg_total;
-        //this is now a 0.1 %
+        // this is now a 0.1 %
         return std::uint64_t((double(bg_total) / tfunc_total) * 1000);
     }
 
@@ -1280,7 +1280,7 @@ namespace hpx { namespace threads { namespace detail
         return std::uint64_t(double(bg_total) * timestamp_scale_);
     }
 
-#endif    //HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
           //////////////////////////////////////////////////////////////////////
 
     template <typename Scheduler>
@@ -1538,7 +1538,7 @@ namespace hpx { namespace threads { namespace detail
         reset_background_duration_.resize(pool_threads);
         reset_background_tfunc_times_.resize(pool_threads);
         reset_background_overhead_.resize(pool_threads);
-#endif    //HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         // timestamps/values of last reset operation for various

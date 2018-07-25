@@ -343,7 +343,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             // FIXME: turn these values into performance counters
             std::int64_t executed_threads = 0, executed_thread_phases = 0;
-            std::uint64_t overall_times = 0, thread_times = 0, bg_work=0;
+            std::uint64_t overall_times = 0, thread_times = 0, bg_work = 0;
             std::int64_t idle_loop_count = 0, busy_loop_count = 0;
             std::uint8_t task_active = 0;
 
