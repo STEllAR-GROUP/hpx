@@ -367,10 +367,8 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::uint64_t> exec_times_, tfunc_times_;
         std::vector<std::uint64_t> reset_tfunc_times_;
 
-        // background duration for adaptive coalescing counters
-        std::vector<std::uint64_t> background_duration_;
-
 #if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        std::vector<std::uint64_t> background_duration_;
         std::vector<std::uint64_t> reset_background_duration_;
         std::vector<std::uint64_t> reset_background_tfunc_times_;
         std::vector<std::uint64_t> reset_background_overhead_;

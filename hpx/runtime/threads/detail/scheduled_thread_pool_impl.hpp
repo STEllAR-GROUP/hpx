@@ -572,8 +572,12 @@ namespace hpx { namespace threads { namespace detail
                     exec_times_[thread_num],
                     idle_loop_counts_[thread_num],
                     busy_loop_counts_[thread_num],
+#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                     tasks_active_[thread_num],
                     background_duration_[thread_num]);
+#else
+                    tasks_active_[thread_num]);
+#endif // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
 
                 detail::scheduling_callbacks callbacks(
                     util::bind(    //-V107
@@ -1532,9 +1536,8 @@ namespace hpx { namespace threads { namespace detail
 
         tasks_active_.resize(pool_threads);
 
-        background_duration_.resize(pool_threads);
-
 #if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        background_duration_.resize(pool_threads);
         reset_background_duration_.resize(pool_threads);
         reset_background_tfunc_times_.resize(pool_threads);
         reset_background_overhead_.resize(pool_threads);
