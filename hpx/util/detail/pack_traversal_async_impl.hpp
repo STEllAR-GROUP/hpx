@@ -596,16 +596,15 @@ namespace util {
             typename types::visitor_pointer_type
         {
             // Create the frame on the heap which stores the arguments
-            // to traverse asynchronous.
-            auto frame = [&] {
-                auto ptr = new
-                    typename types::frame_type(std::forward<Visitor>(visitor),
-                        std::forward<Args>(args)...);
-
-                // Create an intrusive_ptr from the heap object, don't increase
-                // reference count (it's already 'one').
-                return typename types::frame_pointer_type(ptr, false);
-            }();
+            // to traverse asynchronously.
+            //
+            // Create an intrusive_ptr without increasing its reference count
+            // (it's already 'one').
+            auto frame = typename types::frame_pointer_type(
+                new typename types::frame_type(
+                    std::forward<Visitor>(visitor),
+                    std::forward<Args>(args)...),
+                false);
 
             // Create a static range for the top level tuple
             auto range = make_static_range(frame->head());

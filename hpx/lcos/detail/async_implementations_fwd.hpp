@@ -16,33 +16,11 @@
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
+    template <typename Action, typename Launch, typename ...Ts>
     hpx::future<
         typename hpx::traits::extract_action<Action>::type::local_result_type
     >
-    async_impl(launch policy, hpx::id_type const& id,
-        Ts&&... vs);
-
-    template <typename Action, typename ...Ts>
-    hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_impl(hpx::detail::sync_policy, hpx::id_type const& id,
-        Ts&&... vs);
-
-    template <typename Action, typename ...Ts>
-    hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_impl(hpx::detail::async_policy, hpx::id_type const& id,
-        Ts&&... vs);
-
-    template <typename Action, typename ...Ts>
-    hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
-        Ts&&... vs);
+    async_impl(Launch && policy, hpx::id_type const& id, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>
