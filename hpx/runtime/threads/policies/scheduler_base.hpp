@@ -32,6 +32,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -133,9 +134,11 @@ namespace hpx { namespace threads { namespace policies
             // woken up on new work.
 
             // Exponential backoff with a maximum sleep time.
-            std::chrono::milliseconds period(
-                std::lround((std::min)(max_idle_backoff_time_,
-                    std::pow(2.0, double(wait_count_)))));
+            double exponent = (std::min)(double(wait_count_),
+                double(std::numeric_limits<double>::max_exponent - 1));
+
+            std::chrono::milliseconds period(std::lround(
+                (std::min)(max_idle_backoff_time_, std::pow(2.0, exponent))));
 
             ++wait_count_;
 
