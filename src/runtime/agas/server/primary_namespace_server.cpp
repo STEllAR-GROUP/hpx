@@ -1407,8 +1407,8 @@ naming::gid_type primary_namespace::statistics_counter(std::string const& name)
         case primary_ns_end_migration:
             get_data_func = util::bind_front(&cd::get_end_migration_time,
                 &counter_data_);
-            break;
             counter_data_.end_migration_.enabled_ = true;
+            break;
         case primary_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
