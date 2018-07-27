@@ -1212,7 +1212,7 @@ system and application performance.
         [None]
     ]
         [///////////////////////////////////////////////////////////////////////////////]
-        [///////////// Adaptive Coalescing Related Counters ////////////////////////////]
+        [///////////// Background Thread Related Counters ////////////////////////////]
         [   [`/threads/time/background-work-duration`]
                 [`locality#*/total` or[br]
                  `locality#*/worker-thread#*`
@@ -1238,7 +1238,7 @@ system and application performance.
                  the counter will return the overall time spent performing backgound work
                  for all worker threads separately.
                  This counter is available only if the configuration time constants
-                 `HPX_WITH_ADAPTIVE_COALESCING_COUNTERS` (default: OFF) and
+                 `HPX_WITH_BACKGROUND_THREAD_COUNTERS` (default: OFF) and
                  `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
                   The unit of  measure for this counter is nanosecond [ns].]
                 [None]
@@ -1267,7 +1267,7 @@ system and application performance.
                   is `worker-thread#*` the counter will return background overhead
                  for all worker threads separately.
                  This counter is available only if the configuration time constants
-                 `HPX_WITH_ADAPTIVE_COALESCING_COUNTERS` (default: OFF) and
+                 `HPX_WITH_BACKGROUND_THREAD_COUNTERS` (default: OFF) and
                  `HPX_WITH_THREAD_IDLE_RATES` are set to `ON` (default: OFF).
                   The unit of  measure displayed for this counter is 0.1%.]
                 [None]

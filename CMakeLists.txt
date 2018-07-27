@@ -884,10 +884,10 @@ if(HPX_WITH_NETWORKING)
     # Adaptive parcel coalescing related metrics counters are enabled only if both
     # parcel coalescing plugin and thread idle rate counters are enabled.
       if(HPX_WITH_THREAD_IDLE_RATES)
-        hpx_option(HPX_WITH_ADAPTIVE_COALESCING_COUNTERS BOOL
+        hpx_option(HPX_WITH_BACKGROUND_THREAD_COUNTERS BOOL
            "Enable performance counters related to adaptive parcel coalescing (default: OFF)." OFF ADVANCED)
-        if(HPX_WITH_ADAPTIVE_COALESCING_COUNTERS)
-          hpx_add_config_define(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS)
+        if(HPX_WITH_BACKGROUND_THREAD_COUNTERS)
+          hpx_add_config_define(HPX_HAVE_BACKGROUND_THREAD_COUNTERS)
         endif()
        endif()
   endif()

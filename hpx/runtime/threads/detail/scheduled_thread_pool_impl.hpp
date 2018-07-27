@@ -572,12 +572,12 @@ namespace hpx { namespace threads { namespace detail
                     exec_times_[thread_num],
                     idle_loop_counts_[thread_num],
                     busy_loop_counts_[thread_num],
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                     tasks_active_[thread_num],
                     background_duration_[thread_num]);
 #else
                     tasks_active_[thread_num]);
-#endif // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
                 detail::scheduling_callbacks callbacks(
                     util::bind(    //-V107
@@ -1186,7 +1186,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 #endif
 
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
     ////////////////////////////////////////////////////////////
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_background_overhead(
@@ -1284,7 +1284,7 @@ namespace hpx { namespace threads { namespace detail
         return std::uint64_t(double(bg_total) * timestamp_scale_);
     }
 
-#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
           //////////////////////////////////////////////////////////////////////
 
     template <typename Scheduler>
@@ -1536,12 +1536,12 @@ namespace hpx { namespace threads { namespace detail
 
         tasks_active_.resize(pool_threads);
 
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         background_duration_.resize(pool_threads);
         reset_background_duration_.resize(pool_threads);
         reset_background_tfunc_times_.resize(pool_threads);
         reset_background_overhead_.resize(pool_threads);
-#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         // timestamps/values of last reset operation for various

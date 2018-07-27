@@ -279,7 +279,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
 
     struct background_work_duration_counter
     {
@@ -313,7 +313,7 @@ namespace hpx { namespace threads { namespace detail
         std::uint64_t timestamp_;
         background_work_duration_counter& background_work_duration_;
     };
-#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
     ///////////////////////////////////////////////////////////////////////////
     struct is_active_wrapper
@@ -332,7 +332,7 @@ namespace hpx { namespace threads { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
     struct scheduling_counters
     {
         scheduling_counters(std::int64_t& executed_threads,
@@ -385,7 +385,7 @@ namespace hpx { namespace threads { namespace detail
         std::uint8_t& is_active_;
     };
 
-#endif // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
     struct scheduling_callbacks
     {
@@ -475,7 +475,7 @@ namespace hpx { namespace threads { namespace detail
     // and create a new one that is supposed to be executed inside the
     // scheduling_loop, true otherwise
     template <typename SchedulingPolicy>
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
     bool call_background_thread(thread_id_type& background_thread,
         thread_data*& next_thrd, SchedulingPolicy& scheduler, std::size_t num_thread,
         bool running, std::uint64_t& background_work_exec_time_init)
@@ -501,13 +501,13 @@ namespace hpx { namespace threads { namespace detail
                     if (HPX_LIKELY(thrd_stat.is_valid() &&
                             thrd_stat.get_previous() == pending))
                     {
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                         // count background work duration
                         background_work_duration_counter bg_work_duration(
                             background_work_exec_time_init);
                         background_exec_time_wrapper bg_exec_time(
                             bg_work_duration);
-#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
                         thrd_stat = (*background_thread)();
                         thread_data* next = thrd_stat.get_next_thread();
                         if (next != nullptr && next != background_thread.get())
@@ -572,9 +572,9 @@ namespace hpx { namespace threads { namespace detail
         std::int64_t& idle_loop_count = counters.idle_loop_count_;
         std::int64_t& busy_loop_count = counters.busy_loop_count_;
 
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         std::uint64_t& bg_work_exec_time_init = counters.background_work_duration_;
-#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);
@@ -870,14 +870,14 @@ namespace hpx { namespace threads { namespace detail
                 }
 
 #if defined(HPX_HAVE_NETWORKING)
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running, bg_work_exec_time_init))
 #else
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running))
-#endif // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
                 {
                     // Let the current background thread terminate as soon as
                     // possible. No need to reschedule, as another LCO will
@@ -909,7 +909,7 @@ namespace hpx { namespace threads { namespace detail
                 busy_loop_count = 0;
 
 #if defined(HPX_HAVE_NETWORKING)
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running, bg_work_exec_time_init))
@@ -917,7 +917,7 @@ namespace hpx { namespace threads { namespace detail
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd, scheduler,
                     num_thread, running))
-#endif // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
                 {
                     // Let the current background thread terminate as soon as
                     // possible. No need to reschedule, as another LCO will

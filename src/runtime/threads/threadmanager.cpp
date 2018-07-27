@@ -824,7 +824,7 @@ namespace hpx { namespace threads
         return result;
     }
 
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
     std::int64_t threadmanager::get_background_work_duration(bool reset)
     {
         std::int64_t result = 0;
@@ -840,7 +840,7 @@ namespace hpx { namespace threads
             result += pool_iter->get_background_overhead(all_threads, reset);
         return result;
     }
-#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     std::int64_t threadmanager::avg_idle_rate(bool reset)
@@ -1512,7 +1512,7 @@ namespace hpx { namespace threads
 #endif
 #endif
 
-#if defined(HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
             {"/threads/time/background-work-duration",
                 performance_counters::counter_raw,
                 "returns the overall time spent running background work",
@@ -1533,7 +1533,7 @@ namespace hpx { namespace threads
                     &thread_pool_base::get_background_overhead),
                 &performance_counters::locality_pool_thread_counter_discoverer,
                 "0.1%"},
-#endif    // HPX_HAVE_ADAPTIVE_COALESCING_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
             {"/threads/time/overall", performance_counters::counter_raw,
                 "returns the overall time spent running the scheduler on a "
