@@ -99,7 +99,9 @@ namespace hpx { namespace lcos { namespace detail
         // - there are multiple readers only (shared_future, lock hurts
         //   concurrency)
 
-        if (state_ == empty) {
+        state s = state_.load(std::memory_order_acquire);
+        if (s == empty)
+        {
             // the value has already been moved out of this future
             HPX_THROWS_IF(ec, no_state,
                 "future_data_base::get_result",
@@ -110,7 +112,7 @@ namespace hpx { namespace lcos { namespace detail
         // the thread has been re-activated by one of the actions
         // supported by this promise (see promise::set_event
         // and promise::set_exception).
-        if (state_ == exception)
+        if (s == exception)
         {
             std::exception_ptr const* exception_ptr =
                 static_cast<std::exception_ptr const*>(storage);
@@ -237,31 +239,48 @@ namespace hpx { namespace lcos { namespace detail
     {
         if (!data_sink) return;
 
-        std::unique_lock<mutex_type> l(mtx_);
-
-        if (is_ready_locked(l)) {
-
-            HPX_ASSERT(on_completed_.empty());
-
+        if (is_ready())
+        {
             // invoke the callback (continuation) function right away
-            l.unlock();
-
             handle_on_completed(std::move(data_sink));
         }
-        else {
-            on_completed_.push_back(std::move(data_sink));
+        else
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            if (is_ready(std::memory_order_relaxed))
+            {
+#if !(defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) ||        \
+    defined(NDEBUG))
+                // HPX_ASSERT might suspend
+                auto t = std::move(on_completed_);
+                l.unlock();
+                HPX_ASSERT(t.empty());
+#else
+                l.unlock();
+#endif
+
+                // invoke the callback (continuation) function
+                handle_on_completed(std::move(data_sink));
+            }
+            else
+            {
+                on_completed_.push_back(std::move(data_sink));
+            }
         }
     }
 
     void future_data_base<traits::detail::future_data_void>::
         wait(error_code& ec)
     {
-        std::unique_lock<mutex_type> l(mtx_);
-
         // block if this entry is empty
-        if (state_ == empty) {
-            cond_.wait(l, "future_data_base::wait", ec);
-            if (ec) return;
+        if (state_.load(std::memory_order_acquire) == empty)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            if (state_.load(std::memory_order_relaxed) == empty)
+            {
+                cond_.wait(l, "future_data_base::wait", ec);
+                if (ec) return;
+            }
         }
 
         if (&ec != &throws)
@@ -271,19 +290,20 @@ namespace hpx { namespace lcos { namespace detail
     future_status future_data_base<traits::detail::future_data_void>::
         wait_until(util::steady_clock::time_point const& abs_time, error_code& ec)
     {
-        std::unique_lock<mutex_type> l(mtx_);
-
         // block if this entry is empty
-        if (state_ == empty) {
-            threads::thread_state_ex_enum const reason =
-                cond_.wait_until(l, abs_time,
-                    "future_data_base::wait_until", ec);
-            if (ec) return future_status::uninitialized;
+        if (state_.load(std::memory_order_acquire) == empty)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            if (state_.load(std::memory_order_relaxed) == empty)
+            {
+                threads::thread_state_ex_enum const reason =
+                    cond_.wait_until(l, abs_time,
+                        "future_data_base::wait_until", ec);
+                if (ec) return future_status::uninitialized;
 
-            if (reason == threads::wait_timeout)
-                return future_status::timeout;
-
-            return future_status::ready;
+                if (reason == threads::wait_timeout)
+                    return future_status::timeout;
+            }
         }
 
         if (&ec != &throws)
