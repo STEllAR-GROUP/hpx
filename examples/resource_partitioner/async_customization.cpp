@@ -494,7 +494,7 @@ int hpx_main()
         exec4(guided_pool_executor_shim<dummy_hint>(guided_executor_flag, "default"));
     val = test(exec4);
 
-    return val;
+    return hpx::finalize(val);
 }
 
 int main(int argc, char** argv)
