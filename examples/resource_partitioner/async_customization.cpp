@@ -454,7 +454,7 @@ int hpx_main()
     hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec2(true, "default");
     val = test(exec2);
 
-    return val;
+    return hpx::finalize(val);
 }
 
 int main(int argc, char** argv)
