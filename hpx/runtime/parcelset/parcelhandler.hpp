@@ -86,11 +86,12 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(
-            util::runtime_configuration& cfg,
+        parcelhandler(util::runtime_configuration& cfg,
             threads::threadmanager* tm,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const&
+                on_start_thread,
+            util::function_nonser<void(std::size_t, char const*)> const&
+                on_stop_thread);
 
         ~parcelhandler() {}
 
