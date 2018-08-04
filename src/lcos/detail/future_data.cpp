@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace detail
         // - there are multiple readers only (shared_future, lock hurts
         //   concurrency)
 
-        state s = state_.load(std::memory_order_acquire);
+        state s = state_.load(std::memory_order_relaxed);
         if (s == empty)
         {
             // the value has already been moved out of this future
@@ -247,7 +247,7 @@ namespace hpx { namespace lcos { namespace detail
         else
         {
             std::unique_lock<mutex_type> l(mtx_);
-            if (is_ready(std::memory_order_relaxed))
+            if (is_ready())
             {
 #if !(defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) ||        \
     defined(NDEBUG))

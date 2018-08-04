@@ -348,7 +348,7 @@ namespace detail
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
             construct(value_ptr);
-            state_.store(value, std::memory_order_release);
+            state_.store(value, std::memory_order_relaxed);
         }
 
         template <typename ... Ts>
@@ -366,7 +366,7 @@ namespace detail
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             ::new ((void*)exception_ptr) std::exception_ptr(e);
-            state_.store(exception, std::memory_order_release);
+            state_.store(exception, std::memory_order_relaxed);
         }
         future_data_base(init_no_addref no_addref, std::exception_ptr && e)
           : base_type(no_addref)
@@ -374,7 +374,7 @@ namespace detail
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             ::new ((void*)exception_ptr) std::exception_ptr(std::move(e));
-            state_.store(exception, std::memory_order_release);
+            state_.store(exception, std::memory_order_relaxed);
         }
 
         virtual ~future_data_base() noexcept
@@ -933,7 +933,7 @@ namespace detail
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
-                if (this->is_ready(std::memory_order_relaxed))
+                if (this->is_ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
