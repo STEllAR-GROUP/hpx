@@ -357,7 +357,7 @@ namespace detail
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
             construct(value_ptr, std::forward<Ts>(ts)...);
-            state_ = value;
+            state_.store(value, std::memory_order_relaxed);
         }
 
         future_data_base(init_no_addref no_addref, std::exception_ptr const& e)

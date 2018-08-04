@@ -249,15 +249,7 @@ namespace hpx { namespace lcos { namespace detail
             std::unique_lock<mutex_type> l(mtx_);
             if (is_ready())
             {
-#if !(defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) ||        \
-    defined(NDEBUG))
-                // HPX_ASSERT might suspend
-                auto t = std::move(on_completed_);
                 l.unlock();
-                HPX_ASSERT(t.empty());
-#else
-                l.unlock();
-#endif
 
                 // invoke the callback (continuation) function
                 handle_on_completed(std::move(data_sink));
