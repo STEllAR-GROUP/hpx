@@ -102,7 +102,7 @@ namespace hpx { namespace components
     /// A predefined instance of the unwrap_result \a distribution_policy. It
     /// will represent the local locality and will place all items to create
     /// here.
-    static unwrapping_result_policy const unwrap_result;
+    static unwrapping_result_policy const unwrap_result{};
 }}
 
 /// \cond NOINTERNAL
