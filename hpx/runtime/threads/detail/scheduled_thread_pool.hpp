@@ -242,6 +242,11 @@ namespace hpx { namespace threads { namespace detail
 
         std::int64_t get_cumulative_duration(std::size_t, bool);
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        std::int64_t get_background_work_duration(std::size_t, bool);
+        std::int64_t get_background_overhead(std::size_t, bool);
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
         std::int64_t avg_idle_rate_all(bool reset);
         std::int64_t avg_idle_rate(std::size_t, bool);
@@ -361,6 +366,13 @@ namespace hpx { namespace threads { namespace detail
         // tfunc_impl timers
         std::vector<std::uint64_t> exec_times_, tfunc_times_;
         std::vector<std::uint64_t> reset_tfunc_times_;
+
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        std::vector<std::uint64_t> background_duration_;
+        std::vector<std::uint64_t> reset_background_duration_;
+        std::vector<std::uint64_t> reset_background_tfunc_times_;
+        std::vector<std::uint64_t> reset_background_overhead_;
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
         std::vector<std::int64_t> idle_loop_counts_, busy_loop_counts_;
 

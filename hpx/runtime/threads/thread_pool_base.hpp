@@ -233,6 +233,13 @@ namespace hpx { namespace threads
         virtual std::int64_t get_cumulative_duration(
             std::size_t thread_num, bool reset) { return 0; }
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+        virtual std::int64_t get_background_work_duration(
+            std::size_t thread_num, bool reset) { return 0; }
+        virtual std::int64_t get_background_overhead(
+            std::size_t thread_num, bool reset) { return 0; }
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
         virtual std::int64_t avg_idle_rate_all(bool reset) { return 0; }
         virtual std::int64_t avg_idle_rate(std::size_t, bool) { return 0; }
