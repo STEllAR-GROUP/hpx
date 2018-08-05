@@ -424,6 +424,10 @@ namespace detail
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
             construct(value_ptr, std::forward<Ts>(ts)...);
 
+            // At this point the lock needs to be acquired to safely access the
+            // registered continuations
+            std::unique_lock<mutex_type> l(mtx_);
+
             // The value has been set, changing the state to 'value' at this
             // point signals to all other threads that this future is ready.
             state expected = empty;
@@ -432,15 +436,12 @@ namespace detail
             {
                 // this future should be 'empty' still (it can't be made ready
                 // more than once).
+                l.unlock();
                 HPX_THROW_EXCEPTION(promise_already_satisfied,
                     "future_data_base::set_value",
                     "data has already been set for this future");
                 return;
             }
-
-            // At this point the lock needs to be acquired to safely access the
-            // registered continuations
-            std::unique_lock<mutex_type> l(mtx_);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = std::move(on_completed_);
@@ -479,6 +480,10 @@ namespace detail
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             ::new ((void*)exception_ptr) std::exception_ptr(std::move(data));
 
+            // At this point the lock needs to be acquired to safely access the
+            // registered continuations
+            std::unique_lock<mutex_type> l(mtx_);
+
             // The value has been set, changing the state to 'exception' at this
             // point signals to all other threads that this future is ready.
             state expected = empty;
@@ -487,15 +492,12 @@ namespace detail
             {
                 // this future should be 'empty' still (it can't be made ready
                 // more than once).
+                l.unlock();
                 HPX_THROW_EXCEPTION(promise_already_satisfied,
                     "future_data_base::set_exception",
                     "data has already been set for this future");
                 return;
             }
-
-            // At this point the lock needs to be acquired to safely access the
-            // registered continuations
-            std::unique_lock<mutex_type> l(mtx_);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = std::move(on_completed_);
