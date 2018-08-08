@@ -347,6 +347,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [include manual/system_components.qbk]
 
 [include manual/applications.qbk]
+[include manual/hpx_main_usage.qbk]
 [include manual/names.qbk]
 [include manual/applying_actions.qbk]
 [/ include manual/plain_actions.qbk]
