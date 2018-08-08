@@ -74,18 +74,22 @@ else()
   endif()
 endif()
 
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   set(HPX_LINK_LIBRARIES "general;hpx_wrap;")
 endif()
 
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux"))
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
     set(HPX_PKG_DEBUG_LINK_LIBRARIES "\${libdir}/libhpx_wrapd.a")
     set(HPX_PKG_LINK_LIBRARIES "\${libdir}/libhpx_wrap.a")
 endif()
 
 set(HPX_LINKER_FLAGS "")
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND (CMAKE_SYSTEM_NAME STREQUAL Linux))
-    set(HPX_LINKER_FLAGS "-Wl,-wrap=main")
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+    if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+        set(HPX_LINKER_FLAGS "-Wl,-wrap=main")
+    elseif(APPLE)
+        set(HPX_LINKER_FLAGS "-Wl,-e,_initialize_main")
+    endif()
 endif()
 
 # Get the include directories we need ...

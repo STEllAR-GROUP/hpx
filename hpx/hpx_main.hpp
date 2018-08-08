@@ -13,7 +13,8 @@
 // We support different implementation depending upon the Operating
 // System in use.
 #if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
-    (defined(__linux) || defined(__linux__) || defined(linux))
+    (defined(__linux) || defined(__linux__) || defined(linux) || \
+    defined(__APPLE__))
 
 namespace hpx_start
 {

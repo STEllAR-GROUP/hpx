@@ -5,9 +5,10 @@
 
 #include <hpx/config.hpp>
 
-// The following implementation is only possible for Linux systems.
+// The following implementation has been divided for Linux and Mac OSX
 #if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
-    (defined(__linux) || defined(__linux__) || defined(linux))
+    (defined(__linux) || defined(__linux__) || defined(linux) || \
+    defined(__APPLE__))
 
 namespace hpx_start
 {
@@ -37,54 +38,74 @@ namespace hpx_start
     extern int hpx_entry(int argc, char* argv[]);
 }
 
-// HPX's implented program's entry point
-extern int initialize_main(int argc, char** argv);
+// Program's entry point depending upon Operating System.
+// For Mac OSX it is the program's entry point. In case of Linux
+// it is called by __wrap_main.
+extern "C" int initialize_main(int argc, char** argv);
 
+#if defined(__linux) || defined(__linux__) || defined(linux)
 // Actual main() function
 extern "C" int __real_main(int argc, char** argv);
 
 // Our wrapper for main() function
 extern "C" int __wrap_main(int argc, char** argv);
+#endif
 
+#if defined(__APPLE__)
+// Declaration for main() for Mac OS implementation
+extern "C" int main(int argc, char** argv);
+#endif
 
-////////////////////////////////////////////////////////////////////////////////
-// Global pointers
 namespace hpx_start
 {
     // main entry point of the HPX runtime system
     int hpx_entry(int argc, char* argv[])
     {
+        #if defined(__linux) || defined(__linux__) || defined(linux)
         // Call to the main() function
         int return_value = __real_main(argc, argv);
+        #else /* APPLE */
+        // call to the main() function
+        int return_value = main(argc, argv);
+        #endif
 
         //Finalizing the HPX runtime
         return hpx::finalize(return_value);
     }
 }
 
+
 // This is the main entry point of C runtime system.
 // The HPX runtime system is initialized here, which
 // is similar to initializing HPX from main() and utilising
 // the hpx_main() as the entry point.
-int initialize_main(int argc, char** argv)
+extern "C" int initialize_main(int argc, char** argv)
 {
-    // Configuring HPX system before runtime
-    std::vector<std::string> const cfg = {
-        "hpx.commandline.allow_unknown!=1",
-        "hpx.commandline.aliasing=0",
-    };
+    #if defined(__APPLE__)
+    if(hpx_start::include_libhpx_wrap)
+    {
+    #endif
+        // Configuring HPX system before runtime
+        std::vector<std::string> const cfg = {
+            "hpx.commandline.allow_unknown!=1",
+            "hpx.commandline.aliasing=0",
+        };
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    hpx::util::function_nonser<int(int, char**)> start_function =
-        hpx::util::bind(&hpx_start::hpx_entry, _1, _2);
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+        hpx::util::function_nonser<int(int, char**)> start_function =
+            hpx::util::bind(&hpx_start::hpx_entry, _1, _2);
 
-    // Initialize the HPX runtime system
-    return hpx::init(start_function, argc, argv,
-        cfg, hpx::runtime_mode_console);
+        // Initialize the HPX runtime system
+        return hpx::init(start_function, argc, argv,
+            cfg, hpx::runtime_mode_console);
+    #if defined(__APPLE__)
+    }
+    return main(argc, argv);
+    #endif
 }
 
-
+#if defined(__linux) || defined(__linux__) || defined(linux)
 ////////////////////////////////////////////////////////////////////////////////
 // Wrapper for main function
 //
@@ -104,5 +125,6 @@ extern "C" int __wrap_main(int argc, char** argv)
     return __real_main(argc, argv);
 }
 ////////////////////////////////////////////////////////////////////////////////
+#endif
 
 #endif
