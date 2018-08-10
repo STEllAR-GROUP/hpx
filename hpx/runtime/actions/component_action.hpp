@@ -72,7 +72,7 @@ namespace hpx { namespace actions
         template <typename R_, typename ...Ts>
         static typename std::enable_if<!traits::is_future<R_>::value, R_>::type
         invoke_helper(detail::tag<R_>, naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
+            naming::address::component_type /*comptype*/, Ts&&... vs)
         {
             basic_action<Component, R_(Ps...), Derived>::
                 increment_invocation_count();
@@ -136,7 +136,7 @@ namespace hpx { namespace actions
         template <typename R_, typename ...Ts>
         static typename std::enable_if<!traits::is_future<R_>::value, R_>::type
         invoke_helper(detail::tag<R_>, naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
+            naming::address::component_type /*comptype*/, Ts&&... vs)
         {
             basic_action<Component const, R_(Ps...), Derived>::
                 increment_invocation_count();

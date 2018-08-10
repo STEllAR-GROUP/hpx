@@ -246,7 +246,7 @@ namespace hpx { namespace threads
         }
 
         // Return the (global) sequence number of the current thread
-        std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
+        std::size_t get_worker_thread_num(bool* /*numa_sensitive*/ = nullptr)
         {
             if (get_self_ptr() == nullptr)
                 return std::size_t(-1);

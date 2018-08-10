@@ -253,7 +253,7 @@ namespace hpx { namespace threads { namespace coroutines
 //
 #define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
 
-            static void sigsegv_handler(int signum, siginfo_t *infoptr,
+            static void sigsegv_handler(int /*signum*/, siginfo_t *infoptr,
                 void *ctxptr)
             {
                 ucontext_t * uc_ctx = static_cast< ucontext_t* >(ctxptr);

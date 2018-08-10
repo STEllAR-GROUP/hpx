@@ -139,7 +139,7 @@ struct gva
     friend class hpx::serialization::access;
 
     template<class Archive>
-    void save(Archive& ar, const unsigned int version) const
+    void save(Archive& ar, const unsigned int /*version*/) const
     { ar << prefix << type << count << lva_ << offset; } //-V128
 
     template<class Archive>

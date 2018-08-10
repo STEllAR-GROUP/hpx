@@ -188,7 +188,7 @@ namespace hpx { namespace threads
 
             // Set the new scheduler mode
             virtual void set_scheduler_mode(
-                threads::policies::scheduler_mode mode) {}
+                threads::policies::scheduler_mode /*mode*/) {}
 
             // retrieve executor id
             virtual executor_id get_id() const

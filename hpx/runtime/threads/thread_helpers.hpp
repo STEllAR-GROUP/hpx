@@ -118,7 +118,7 @@ namespace hpx { namespace threads
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
         thread_priority priority = thread_priority_normal,
-        error_code& ec = throws)
+        error_code& /*ec*/ = throws)
     {
         return set_thread_state(id, abs_time, nullptr, state, stateex,
             priority, throws);
