@@ -24,6 +24,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/steady_clock.hpp>
+#include <hpx/util/thread_allocator.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -648,26 +649,35 @@ namespace detail
                     rebind_alloc<future_data_allocator>
             other_allocator;
 
+        typedef typename future_data_base<Result>::default_construct
+            default_construct;
+
         future_data_allocator(other_allocator const& alloc)
           : future_data<Result>()
           , alloc_(alloc)
         {}
-        future_data_allocator(init_no_addref no_addref,
-                other_allocator const& alloc)
-          : future_data<Result>(no_addref)
-          , alloc_(alloc)
-        {}
+
         template <typename... T>
-        future_data_allocator(init_no_addref no_addref, T&&... ts,
-                other_allocator const& alloc)
+        future_data_allocator(init_no_addref no_addref,
+                other_allocator const& alloc, T&&... ts)
           : future_data<Result>(no_addref, std::forward<T>(ts)...)
           , alloc_(alloc)
         {}
+
+        template <typename... T>
+        future_data_allocator(init_no_addref no_addref,
+                default_construct defctr,
+                other_allocator const& alloc, T&&... ts)
+          : future_data<Result>(no_addref, defctr, std::forward<T>(ts)...)
+          , alloc_(alloc)
+        {}
+
         future_data_allocator(init_no_addref no_addref,
                 std::exception_ptr const& e, other_allocator const& alloc)
           : future_data<Result>(no_addref, e)
           , alloc_(alloc)
         {}
+
         future_data_allocator(init_no_addref no_addref,
                 std::exception_ptr && e, other_allocator const& alloc)
           : future_data<Result>(no_addref, std::move(e))

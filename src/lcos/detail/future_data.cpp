@@ -176,14 +176,14 @@ namespace hpx { namespace lcos { namespace detail
     {
         // We need to run the completion on a new thread if we are on a
         // non HPX thread.
-        bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-        recurse_asynchronously =
+        bool recurse_asynchronously =
             !this_thread::has_sufficient_stack_space();
 #else
         handle_continuation_recursion_count cnt;
-        recurse_asynchronously = recurse_asynchronously ||
-            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+        bool recurse_asynchronously =
+            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
+            (hpx::threads::get_self_ptr() == nullptr);
 #endif
         if (!recurse_asynchronously)
         {

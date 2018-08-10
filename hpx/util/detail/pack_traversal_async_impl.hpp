@@ -7,6 +7,7 @@
 #define HPX_UTIL_DETAIL_PACK_TRAVERSAL_ASYNC_IMPL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/detail/container_category.hpp>
@@ -102,6 +103,7 @@ namespace util {
         template <typename Visitor, typename... Args>
         class async_traversal_frame : public Visitor
         {
+        protected:
             tuple<Args...> args_;
             std::atomic<bool> finished_;
 
@@ -187,6 +189,61 @@ namespace util {
             }
         };
 
+        /// Stores the visitor and the arguments to traverse
+        template <typename Allocator, typename Visitor, typename... Args>
+        class async_traversal_frame_allocator
+          : public async_traversal_frame<Visitor, Args...>
+        {
+            typedef async_traversal_frame<Visitor, Args...> base_type;
+            typedef typename
+                    std::allocator_traits<Allocator>::template
+                        rebind_alloc<async_traversal_frame_allocator>
+                other_allocator;
+
+        public:
+            explicit async_traversal_frame_allocator(
+                    other_allocator const& alloc, Visitor visitor, Args... args)
+              : base_type(std::move(visitor), std::move(args)...)
+              , alloc_(alloc)
+            {}
+
+            template <typename MapperArg>
+            explicit async_traversal_frame_allocator(
+                    other_allocator const& alloc,
+                    async_traverse_in_place_tag<Visitor> tag,
+                    MapperArg&& mapper_arg, Args... args)
+              : base_type(tag, std::forward<MapperArg>(mapper_arg),
+                  std::move(args)...)
+              , alloc_(alloc)
+            {}
+
+        private:
+            void destroy() override
+            {
+                typedef std::allocator_traits<other_allocator> traits;
+
+                other_allocator alloc(alloc_);
+                traits::destroy(alloc, this);
+                traits::deallocate(alloc, this, 1);
+            }
+
+            other_allocator alloc_;
+        };
+    }}
+
+    namespace traits { namespace detail
+    {
+        template <typename Visitor, typename... Args, typename Allocator>
+        struct shared_state_allocator<
+            util::detail::async_traversal_frame<Visitor, Args...>, Allocator>
+        {
+            typedef util::detail::async_traversal_frame_allocator<
+                Allocator, Visitor, Args...> type;
+        };
+    }}
+
+    namespace util { namespace detail
+    {
         template <typename Target, std::size_t Begin, std::size_t End>
         struct static_async_range
         {
@@ -605,6 +662,50 @@ namespace util {
                     std::forward<Visitor>(visitor),
                     std::forward<Args>(args)...),
                 false);
+
+            // Create a static range for the top level tuple
+            auto range = make_static_range(frame->head());
+
+            auto resumer = make_resume_traversal_callable(
+                frame, util::make_tuple(std::move(range)));
+
+            // Start the asynchronous traversal
+            resumer();
+            return frame;
+        }
+
+        /// Traverses the given pack with the given mapper, uses given allocator
+        /// to allocate the traversal frame
+        template <typename Allocator, typename Visitor, typename... Args,
+            typename types = async_traversal_types<Visitor, Args...>>
+        auto apply_pack_transform_async_allocator(
+                Allocator const& alloc, Visitor&& visitor, Args&&... args)
+        -> typename types::visitor_pointer_type
+        {
+            // Create the frame on the heap which stores the arguments
+            // to traverse asynchronously.
+            //
+            // Create an intrusive_ptr without increasing its reference count
+            // (it's already 'one').
+            using shared_state = typename traits::detail::shared_state_allocator<
+                    typename types::frame_type, Allocator
+                >::type;
+
+            using allocator = typename std::allocator_traits<Allocator>::
+                template rebind_alloc<shared_state>;
+            using traits = std::allocator_traits<allocator>;
+
+            using unique_ptr = std::unique_ptr<shared_state,
+                util::allocator_deleter<allocator>>;
+
+            allocator frame_alloc{};
+            unique_ptr p(traits::allocate(frame_alloc, 1),
+                util::allocator_deleter<allocator>{frame_alloc});
+            traits::construct(
+                frame_alloc, p.get(), frame_alloc,
+                std::forward<Visitor>(visitor), std::forward<Args>(args)...);
+
+            auto frame = typename types::frame_pointer_type(p.release(), false);
 
             // Create a static range for the top level tuple
             auto range = make_static_range(frame->head());
