@@ -1,5 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach
+//  Copyright (c) 2017-2018 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +14,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
@@ -36,16 +36,31 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <numeric>
 
-#if !defined(HPX_MSVC)
+#define HPX_MAX_NUMA_PER_NODE 4
+//#define SHARED_PRIORITY_SCHEDULER_DEBUG 1
+//#define SHARED_PRIORITY_SCHEDULER_MINIMAL_DEBUG 1
+
+// for debug reasons, we might want to pretend a single socket machine has 2 numa domains
+//#define DEBUG_FORCE_2_NUMA_DOMAINS
+
+// @TODO :
+// min_tasks_to_steal_pending
+// min_tasks_to_steal_staged
+
+#if !defined(HPX_MSVC) && defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
 static std::chrono::high_resolution_clock::time_point log_t_start =
     std::chrono::high_resolution_clock::now();
+
+#define COMMA ,
+#define LOG_CUSTOM_VAR(x) x
 
 #define LOG_CUSTOM_WORKER(x)                                                   \
     dummy << "<CUSTOM> " << THREAD_ID << " time " << decimal(16) << nowt       \
           << ' ';                                                              \
     if (parent_pool_)                                                          \
-        dummy << "pool " << std::setfill(' ') << std::setw(8)                  \
+        dummy << "pool " << std::setfill(' ') << std::setw(7)                  \
               << parent_pool_->get_pool_name() << " " << x << std::endl;       \
     else                                                                       \
         dummy << "pool (unset) " << x << std::endl;                            \
@@ -73,1225 +88,1191 @@ static std::chrono::high_resolution_clock::time_point log_t_start =
          << hexpointer(thrd ? thrd->get() : 0)
 #else
 #define THREAD_DESC2(data, thrd)                                               \
-    hexpointer(thrd ? thrd->get() : 0)
+    hexpointer(thrd ? thrd : 0)
 #endif
 
+#else
+#define LOG_CUSTOM_VAR(x)
+#define LOG_CUSTOM_MSG(x)
+#define LOG_CUSTOM_MSG2(x)
+#endif
+
+#if defined(HPX_MSVC)
+#undef SHARED_PRIORITY_SCHEDULER_DEBUG
 #undef LOG_CUSTOM_MSG
 #undef LOG_CUSTOM_MSG2
 #define LOG_CUSTOM_MSG(x)
 #define LOG_CUSTOM_MSG2(x)
-#else
-#define LOG_CUSTOM_MSG(x)
-#define LOG_CUSTOM_MSG2(x)
-#endif
-
-#define EXTRA_DEBUG
-
-#if defined(HPX_MSVC)
-#undef EXTRA_DEBUG
 #endif
 
 //
-namespace debug {
+namespace hpx { namespace debug {
+#ifdef SHARED_PRIORITY_SCHEDULER_MINIMAL_DEBUG
     template<typename T>
     void output(const std::string &name, const std::vector<T> &v) {
-#ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {" << decnumber(v.size()) << "} : ";
         std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
         std::cout << "\n";
-#endif
+    }
+
+    template<typename T, std::size_t N>
+    void output(const std::string &name, const std::array<T, N> &v) {
+        std::cout << name.c_str() << "\t : {" << decnumber(v.size()) << "} : ";
+        std::copy(std::begin(v), std::end(v), std::ostream_iterator<T>(std::cout, ", "));
+        std::cout << "\n";
     }
 
     template<typename Iter>
     void output(const std::string &name, Iter begin, Iter end) {
-#ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {"
                   << decnumber(std::distance(begin,end)) << "} : ";
         std::copy(begin, end,
             std::ostream_iterator<typename std::iterator_traits<Iter>::
             value_type>(std::cout, ", "));
-        std::cout << "\n";
-#endif
+        std::cout << std::endl;
     }
-#if defined(EXTRA_DEBUG)
-# define debug_msg(a) std::cout << a
 #else
-# define debug_msg(a)
+    template<typename T>
+    void output(const std::string &name, const std::vector<T> &v) {
+    }
+
+    template<typename T, std::size_t N>
+    void output(const std::string &name, const std::array<T, N> &v) {
+    }
+
+    template<typename Iter>
+    void output(const std::string &name, Iter begin, Iter end) {
+    }
 #endif
-};
+}}
 
 #include <hpx/config/warnings_prefix.hpp>
-
-// TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 namespace threads {
-    namespace policies {
-        ///////////////////////////////////////////////////////////////////////////
-        /// The shared_priority_scheduler maintains exactly one queue of work
-        /// items (threads) per OS thread, where this OS thread pulls its next
-        /// work
-        /// from. Additionally it maintains separate queues: several for high
-        /// priority threads and one for low priority threads.
-        /// High priority threads are executed by the first N OS threads before any
-        /// other work is executed. Low priority threads are executed by the last
-        /// OS thread whenever no other work is available.
-        template <typename Mutex = compat::mutex,
-            typename PendingQueuing = lockfree_abp_fifo,
-            typename StagedQueuing = lockfree_fifo,
-            typename TerminatedQueuing = lockfree_lifo>
-        class shared_priority_scheduler : public scheduler_base
+namespace policies {
+
+    inline void spin_for_time(std::size_t microseconds, const char *task) {
+#ifdef SHARED_PRIORITY_SCHEDULER_DEBUG
+        hpx::util::annotate_function apex_profiler(task);
+        std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
+#endif
+    }
+
+    #define modulo(x, N) (x) % N
+
+    typedef std::tuple<std::size_t, std::size_t, std::size_t> core_ratios;
+
+    // ----------------------------------------------------------------
+    // helper class to hold a set of queues
+    // ----------------------------------------------------------------
+    template <typename QueueType>
+    struct queue_holder
+    {
+        void init(std::size_t cores,
+                  std::size_t queues,
+                  std::size_t max_tasks)
         {
-        protected:
-            // The maximum number of active threads this thread manager should
-            // create. This number will be a constraint only as long as the work
-            // items queue is not empty. Otherwise the number of active threads
-            // will be incremented in steps equal to the \a min_add_new_count
-            // specified above.
-            // FIXME: this is specified both here, and in thread_queue.
-            enum
-            {
-                max_thread_count = 1000
-            };
-
-        public:
-            typedef std::false_type has_periodic_maintenance;
-
-            typedef thread_queue<Mutex, PendingQueuing, StagedQueuing,
-                TerminatedQueuing>
-                thread_queue_type;
-
-            shared_priority_scheduler(std::size_t num_worker_queues,
-                std::size_t num_high_priority_queues_,
-                bool numa_sensitive,
-                bool numa_pinned,
-                char const* description,
-                int max_tasks = max_thread_count)
-              : scheduler_base(num_worker_queues, description)
-              , max_queue_thread_count_(max_tasks)
-              , queues_(num_worker_queues)
-              , high_priority_queues_(num_high_priority_queues_)
-              , low_priority_queue_(max_tasks)
-              , curr_queue_(0)
-              , curr_hp_queue_(0)
-              , numa_sensitive_(numa_sensitive)
-              , numa_pinned_(numa_pinned)
-              , initialized_(false)
-            {
-                LOG_CUSTOM_MSG("Constructing scheduler with num queues "
-                    << decnumber(num_worker_queues));
-                victim_queues_.clear();
-                victim_queues_.resize(num_worker_queues);
-                //
-                HPX_ASSERT(num_worker_queues != 0);
-                for (std::size_t i = 0; i < num_worker_queues; ++i)
-                    queues_[i] = new thread_queue_type(max_tasks);
-
-                for (std::size_t i = 0; i < num_high_priority_queues_; ++i)
-                    high_priority_queues_[i] = new thread_queue_type(max_tasks);
+            num_cores  = cores;
+            num_queues = queues;
+            scale      = num_cores==1 ? 0
+                         : static_cast<double>(num_queues-1)/(num_cores-1);
+            //
+            queues_.resize(num_queues);
+            for (std::size_t i = 0; i < num_queues; ++i) {
+                queues_[i] = new QueueType(max_tasks);
             }
+        }
+        // ----------------------------------------------------------------
+        ~queue_holder()
+        {
+            for(auto &q : queues_) delete q;
+            queues_.clear();
+        }
 
-            virtual ~shared_priority_scheduler()
-            {
-                LOG_CUSTOM_MSG(this->get_description()
-                    << " - Deleting shared_priority_scheduler ");
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                {
-                    LOG_CUSTOM_MSG2("Deleting queue " << i);
-                    delete queues_[i];
-                }
-            }
+        // ----------------------------------------------------------------
+        inline std::size_t get_queue_index(std::size_t id) const
+        {
+            return static_cast<std::size_t>(0.5 + id*scale);;
+        }
 
-            bool numa_sensitive() const
-            {
-                return numa_sensitive_ != 0;
-            }
+        // ----------------------------------------------------------------
+//        inline QueueType * get_queue(std::size_t id) const
+//        {
+//            return queues_[get_queue_index(id)];
+//        }
 
-            static std::string get_scheduler_name()
-            {
-                return "shared_priority_scheduler";
+        // ----------------------------------------------------------------
+        inline bool get_next_thread(std::size_t id, threads::thread_data*& thrd)
+        {
+            // loop over all queues and take one task,
+            // starting with the requested queue
+            // then stealing from any other one in the container
+            for (std::size_t i=0; i<num_queues; ++i) {
+                std::size_t q = modulo((id + i), num_queues);
+                if (queues_[q]->get_next_thread(thrd)) return true;
             }
+            return false;
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t get_queue_length() const
+        {
+            std::size_t len = 0;
+            for (auto &q : queues_) len += q->get_queue_length();
+            return len;
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t get_thread_count(thread_state_enum state = unknown) const
+        {
+            std::size_t len = 0;
+            for (auto &q : queues_) len += q->get_thread_count(state);
+            return len;
+        }
+
+        // ----------------------------------------------------------------
+        bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const
+        {
+            bool result = true;
+            for (auto &q : queues_) result = result && q->enumerate_threads(f, state);
+            return result;
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t size() const {
+            return num_queues;
+        }
+
+        // ----------------------------------------------------------------
+        std::size_t             num_cores;
+        std::size_t             num_queues;
+        double                  scale;
+        std::vector<QueueType*> queues_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// The shared_priority_scheduler maintains exactly one queue of work
+    /// items (threads) per OS thread, where this OS thread pulls its next
+    /// work
+    /// from. Additionally it maintains separate queues: several for high
+    /// priority threads and one for low priority threads.
+    /// High priority threads are executed by the first N OS threads before any
+    /// other work is executed. Low priority threads are executed by the last
+    /// OS thread whenever no other work is available.
+    template <typename Mutex = compat::mutex,
+        typename PendingQueuing = lockfree_lifo,
+        typename TerminatedQueuing = lockfree_lifo>
+    class shared_priority_scheduler : public scheduler_base
+    {
+    protected:
+        // The maximum number of active threads this thread manager should
+        // create. This number will be a constraint only as long as the work
+        // items queue is not empty. Otherwise the number of active threads
+        // will be incremented in steps equal to the \a min_add_new_count
+        // specified above.
+        // FIXME: this is specified both here, and in thread_queue.
+        enum
+        {
+            max_thread_count = 1000
+        };
+
+    public:
+        typedef std::false_type has_periodic_maintenance;
+
+        typedef thread_queue<Mutex, PendingQueuing, TerminatedQueuing>
+            thread_queue_type;
+
+        shared_priority_scheduler(
+            std::size_t num_worker_threads,
+            core_ratios cores_per_queue,
+            char const* description,
+            int max_tasks = max_thread_count)
+          : scheduler_base(num_worker_threads, description)
+          , cores_per_queue_(cores_per_queue)
+          , max_queue_thread_count_(max_tasks)
+          , num_workers_(num_worker_threads)
+          , num_domains_(1)
+          , initialized_(false)
+        {
+            LOG_CUSTOM_MSG("Constructing scheduler with num threads "
+                << decnumber(num_worker_threads));
+            //
+            HPX_ASSERT(num_worker_threads != 0);
+        }
+
+        virtual ~shared_priority_scheduler()
+        {
+            LOG_CUSTOM_MSG(this->get_description()
+                << " - Deleting shared_priority_scheduler ");
+        }
+
+        static std::string get_scheduler_name()
+        {
+            return "shared_priority_scheduler";
+        }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-            std::uint64_t get_creation_time(bool reset)
-            {
-                std::uint64_t time = 0;
+        std::uint64_t get_creation_time(bool reset)
+        {
+            std::uint64_t time = 0;
 
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    time += high_priority_queues_[i]->get_creation_time(reset);
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+                time += high_priority_queues_[i]->get_creation_time(reset);
 
-                time += low_priority_queue_.get_creation_time(reset);
+            time += low_priority_queue_.get_creation_time(reset);
 
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    time += queues_[i]->get_creation_time(reset);
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+                time += queues_[i]->get_creation_time(reset);
 
-                return time;
-            }
+            return time;
+        }
 
-            std::uint64_t get_cleanup_time(bool reset)
-            {
-                std::uint64_t time = 0;
+        std::uint64_t get_cleanup_time(bool reset)
+        {
+            std::uint64_t time = 0;
 
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    time += high_priority_queues_[i]->get_cleanup_time(reset);
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+                time += high_priority_queues_[i]->get_cleanup_time(reset);
 
-                time += low_priority_queue_.get_cleanup_time(reset);
+            time += low_priority_queue_.get_cleanup_time(reset);
 
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    time += queues_[i]->get_cleanup_time(reset);
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+                time += queues_[i]->get_cleanup_time(reset);
 
-                return time;
-            }
+            return time;
+        }
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-            std::int64_t get_num_pending_misses(
-                std::size_t pool_queue_num, bool reset)
+        std::int64_t get_num_pending_misses(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+/*
+            std::int64_t num_pending_misses = 0;
+            if (pool_queue_num == std::size_t(-1))
             {
-                std::int64_t num_pending_misses = 0;
-                if (pool_queue_num == std::size_t(-1))
+                for (std::size_t i = 0; i != high_priority_queues_.size();
+                     ++i)
                 {
-                    for (std::size_t i = 0; i != high_priority_queues_.size();
-                         ++i)
-                    {
-                        num_pending_misses +=
-                            high_priority_queues_[i]->get_num_pending_misses(
-                                reset);
-                    }
-
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                    {
-                        num_pending_misses +=
-                            queues_[i]->get_num_pending_misses(reset);
-                    }
-
                     num_pending_misses +=
-                        low_priority_queue_.get_num_pending_misses(reset);
+                        high_priority_queues_[i]->get_num_pending_misses(
+                            reset);
+                }
 
-                    return num_pending_misses;
+                for (std::size_t i = 0; i != queues_.size(); ++i)
+                {
+                    num_pending_misses +=
+                        queues_[i]->get_num_pending_misses(reset);
                 }
 
                 num_pending_misses +=
-                    queues_[pool_queue_num]->get_num_pending_misses(reset);
+                    low_priority_queue_.get_num_pending_misses(reset);
 
-                //            num_pending_misses += high_priority_queue_.
-                //                get_num_pending_misses(reset);
-
-                if (pool_queue_num == 0)
-                {
-                    num_pending_misses +=
-                        low_priority_queue_.get_num_pending_misses(reset);
-                }
                 return num_pending_misses;
             }
 
-            std::int64_t get_num_pending_accesses(
-                std::size_t pool_queue_num, bool reset)
+            num_pending_misses +=
+                queues_[pool_queue_num]->get_num_pending_misses(reset);
+
+            //            num_pending_misses += high_priority_queue_.
+            //                get_num_pending_misses(reset);
+
+            if (pool_queue_num == 0)
             {
-                std::int64_t num_pending_accesses = 0;
-                if (pool_queue_num == std::size_t(-1))
-                {
-                    //                num_pending_accesses += high_priority_queue_.
-                    //                    get_num_pending_accesses(reset);
+                num_pending_misses +=
+                    low_priority_queue_.get_num_pending_misses(reset);
+            }
+            return num_pending_misses;
+            */
+        }
 
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                        num_pending_accesses +=
-                            queues_[i]->get_num_pending_accesses(reset);
+        std::int64_t get_num_pending_accesses(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+            /*
+            std::int64_t num_pending_accesses = 0;
+            if (pool_queue_num == std::size_t(-1))
+            {
+                //                num_pending_accesses += high_priority_queue_.
+                //                    get_num_pending_accesses(reset);
 
+                for (std::size_t i = 0; i != queues_.size(); ++i)
                     num_pending_accesses +=
-                        low_priority_queue_.get_num_pending_accesses(reset);
-
-                    return num_pending_accesses;
-                }
+                        queues_[i]->get_num_pending_accesses(reset);
 
                 num_pending_accesses +=
-                    queues_[pool_queue_num]->get_num_pending_accesses(reset);
+                    low_priority_queue_.get_num_pending_accesses(reset);
 
-                //            num_pending_accesses += high_priority_queue_.
-                //                get_num_pending_accesses(reset);
-
-                if (pool_queue_num == 0)
-                {
-                    num_pending_accesses +=
-                        low_priority_queue_.get_num_pending_accesses(reset);
-                }
                 return num_pending_accesses;
             }
 
-            std::int64_t get_num_stolen_from_pending(
-                std::size_t pool_queue_num, bool reset)
+            num_pending_accesses +=
+                queues_[pool_queue_num]->get_num_pending_accesses(reset);
+
+            //            num_pending_accesses += high_priority_queue_.
+            //                get_num_pending_accesses(reset);
+
+            if (pool_queue_num == 0)
             {
-                std::int64_t num_stolen_threads = 0;
-                if (pool_queue_num == std::size_t(-1))
-                {
-                    //                num_stolen_threads += high_priority_queue_.
-                    //                    get_num_stolen_from_pending(reset);
-
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                        num_stolen_threads +=
-                            queues_[i]->get_num_stolen_from_pending(reset);
-
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_from_pending(reset);
-
-                    return num_stolen_threads;
-                }
-
-                num_stolen_threads +=
-                    queues_[pool_queue_num]->get_num_stolen_from_pending(reset);
-
-                //            num_stolen_threads += high_priority_queue_.
-                //                get_num_stolen_from_pending(reset);
-
-                if (pool_queue_num == 0)
-                {
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_from_pending(reset);
-                }
-                return num_stolen_threads;
+                num_pending_accesses +=
+                    low_priority_queue_.get_num_pending_accesses(reset);
             }
+            return num_pending_accesses;
+            */
+        }
 
-            std::int64_t get_num_stolen_to_pending(
-                std::size_t pool_queue_num, bool reset)
-            {
-                std::int64_t num_stolen_threads = 0;
-                if (pool_queue_num == std::size_t(-1))
-                {
-                    //                num_stolen_threads += high_priority_queue_.
-                    //                    get_num_stolen_to_pending(reset);
+        std::int64_t get_num_stolen_from_pending(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+        }
 
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                        num_stolen_threads +=
-                            queues_[i]->get_num_stolen_to_pending(reset);
+        std::int64_t get_num_stolen_to_pending(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+        }
 
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_to_pending(reset);
+        std::int64_t get_num_stolen_from_staged(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+        }
 
-                    return num_stolen_threads;
-                }
-
-                num_stolen_threads +=
-                    queues_[pool_queue_num]->get_num_stolen_to_pending(reset);
-
-                //            num_stolen_threads += high_priority_queue_.
-                //                get_num_stolen_to_pending(reset);
-
-                if (pool_queue_num == 0)
-                {
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_to_pending(reset);
-                }
-                return num_stolen_threads;
-            }
-
-            std::int64_t get_num_stolen_from_staged(
-                std::size_t pool_queue_num, bool reset)
-            {
-                std::int64_t num_stolen_threads = 0;
-                if (pool_queue_num == std::size_t(-1))
-                {
-                    //                num_stolen_threads += high_priority_queue_.
-                    //                    get_num_stolen_from_staged(reset);
-
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                        num_stolen_threads +=
-                            queues_[i]->get_num_stolen_from_staged(reset);
-
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_from_staged(reset);
-
-                    return num_stolen_threads;
-                }
-
-                num_stolen_threads +=
-                    queues_[pool_queue_num]->get_num_stolen_from_staged(reset);
-
-                //            num_stolen_threads += high_priority_queue_.
-                //                get_num_stolen_from_staged(reset);
-
-                if (pool_queue_num == 0)
-                {
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_from_staged(reset);
-                }
-                return num_stolen_threads;
-            }
-
-            std::int64_t get_num_stolen_to_staged(
-                std::size_t pool_queue_num, bool reset)
-            {
-                std::int64_t num_stolen_threads = 0;
-                if (pool_queue_num == std::size_t(-1))
-                {
-                    //                num_stolen_threads += high_priority_queue_.
-                    //                    get_num_stolen_to_staged(reset);
-
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                        num_stolen_threads +=
-                            queues_[i]->get_num_stolen_to_staged(reset);
-
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_to_staged(reset);
-
-                    return num_stolen_threads;
-                }
-
-                num_stolen_threads +=
-                    queues_[pool_queue_num]->get_num_stolen_to_staged(reset);
-
-                //            num_stolen_threads += high_priority_queue_.
-                //                get_num_stolen_to_staged(reset);
-
-                if (pool_queue_num == 0)
-                {
-                    num_stolen_threads +=
-                        low_priority_queue_.get_num_stolen_to_staged(reset);
-                }
-                return num_stolen_threads;
-            }
+        std::int64_t get_num_stolen_to_staged(
+            std::size_t pool_queue_num, bool reset)
+        {
+            return 0;
+        }
 #endif
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        ///////////////////////////////////////////////////////////////////////
-        // Queries the current average thread wait time of the queues.
-        std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+    ///////////////////////////////////////////////////////////////////////
+    // Queries the current average thread wait time of the queues.
+    std::int64_t get_average_thread_wait_time(
+        std::size_t num_thread = std::size_t(-1)) const
+    {
+        // Return average thread wait time of one specific queue.
+        std::uint64_t wait_time = 0;
+        std::uint64_t count = 0;
+        if (std::size_t(-1) != num_thread)
         {
-            // Return average thread wait time of one specific queue.
-            std::uint64_t wait_time = 0;
-            std::uint64_t count = 0;
-            if (std::size_t(-1) != num_thread)
+            HPX_ASSERT(num_thread < queues_.size());
+
+            if (num_thread < high_priority_queues_.size())
             {
-                HPX_ASSERT(num_thread < queues_.size());
-
-                if (num_thread < high_priority_queues_.size())
-                {
-                    wait_time = high_priority_queues_[num_thread]->
-                        get_average_thread_wait_time();
-                    ++count;
-                }
-
-                if (queues_.size()-1 == num_thread)
-                {
-                    wait_time += low_priority_queue_.
-                        get_average_thread_wait_time();
-                    ++count;
-                }
-
-                wait_time += queues_[num_thread]->get_average_thread_wait_time();
-                return wait_time / (count + 1);
-            }
-
-            // Return the cumulative average thread wait time for all queues.
-            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-            {
-                wait_time += high_priority_queues_[i]->get_average_thread_wait_time();
+                wait_time = high_priority_queues_[num_thread]->
+                    get_average_thread_wait_time();
                 ++count;
             }
 
-            wait_time += low_priority_queue_.get_average_thread_wait_time();
-
-            for (std::size_t i = 0; i != queues_.size(); ++i)
+            if (queues_.size()-1 == num_thread)
             {
-                wait_time += queues_[i]->get_average_thread_wait_time();
+                wait_time += low_priority_queue_.
+                    get_average_thread_wait_time();
                 ++count;
             }
 
+            wait_time += queues_[num_thread]->get_average_thread_wait_time();
             return wait_time / (count + 1);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // Queries the current average task wait time of the queues.
-        std::int64_t get_average_task_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+        // Return the cumulative average thread wait time for all queues.
+        for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
         {
-            // Return average task wait time of one specific queue.
-            std::uint64_t wait_time = 0;
-            std::uint64_t count = 0;
-            if (std::size_t(-1) != num_thread)
+            wait_time += high_priority_queues_[i]->get_average_thread_wait_time();
+            ++count;
+        }
+
+        wait_time += low_priority_queue_.get_average_thread_wait_time();
+
+        for (std::size_t i = 0; i != queues_.size(); ++i)
+        {
+            wait_time += queues_[i]->get_average_thread_wait_time();
+            ++count;
+        }
+
+        return wait_time / (count + 1);
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    // Queries the current average task wait time of the queues.
+    std::int64_t get_average_task_wait_time(
+        std::size_t num_thread = std::size_t(-1)) const
+    {
+        // Return average task wait time of one specific queue.
+        std::uint64_t wait_time = 0;
+        std::uint64_t count = 0;
+        if (std::size_t(-1) != num_thread)
+        {
+            HPX_ASSERT(num_thread < queues_.size());
+
+            if (num_thread < high_priority_queues_.size())
             {
-                HPX_ASSERT(num_thread < queues_.size());
-
-                if (num_thread < high_priority_queues_.size())
-                {
-                    wait_time = high_priority_queues_[num_thread]->
-                        get_average_task_wait_time();
-                    ++count;
-                }
-
-                if (queues_.size()-1 == num_thread)
-                {
-                    wait_time += low_priority_queue_.
-                        get_average_task_wait_time();
-                    ++count;
-                }
-
-                wait_time += queues_[num_thread]->get_average_task_wait_time();
-                return wait_time / (count + 1);
-            }
-
-            // Return the cumulative average task wait time for all queues.
-            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-            {
-                wait_time += high_priority_queues_[i]->
+                wait_time = high_priority_queues_[num_thread]->
                     get_average_task_wait_time();
                 ++count;
             }
 
-            wait_time += low_priority_queue_.get_average_task_wait_time();
-
-            for (std::size_t i = 0; i != queues_.size(); ++i)
+            if (queues_.size()-1 == num_thread)
             {
-                wait_time += queues_[i]->get_average_task_wait_time();
+                wait_time += low_priority_queue_.
+                    get_average_task_wait_time();
                 ++count;
             }
 
+            wait_time += queues_[num_thread]->get_average_task_wait_time();
             return wait_time / (count + 1);
+        }
+
+        // Return the cumulative average task wait time for all queues.
+        for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
+        {
+            wait_time += high_priority_queues_[i]->
+                get_average_task_wait_time();
+            ++count;
+        }
+
+        wait_time += low_priority_queue_.get_average_task_wait_time();
+
+        for (std::size_t i = 0; i != queues_.size(); ++i)
+        {
+            wait_time += queues_[i]->get_average_task_wait_time();
+            ++count;
+        }
+
+        return wait_time / (count + 1);
+    }
+#endif
+
+        // ------------------------------------------------------------
+        void abort_all_suspended_threads()
+        {
+            LOG_CUSTOM_MSG("abort_all_suspended_threads");
+            for (std::size_t d=0; d<num_domains_; ++d) {
+                for (auto &queue : lp_queues_[d].queues_) {
+                     queue->abort_all_suspended_threads();
+                }
+
+                for (auto &queue : np_queues_[d].queues_) {
+                     queue->abort_all_suspended_threads();
+                }
+
+                for (auto &queue : hp_queues_[d].queues_) {
+                     queue->abort_all_suspended_threads();
+                }
+            }
+        }
+
+        // ------------------------------------------------------------
+        bool cleanup_terminated(bool delete_all)
+        {
+//            LOG_CUSTOM_MSG("cleanup_terminated with delete_all "
+//                << delete_all);
+            bool empty = true;
+            //
+            for (std::size_t d=0; d<num_domains_; ++d) {
+                for (auto &queue : lp_queues_[d].queues_) {
+                     empty = queue->cleanup_terminated(delete_all) && empty;
+                }
+
+                for (auto &queue : np_queues_[d].queues_) {
+                     empty = queue->cleanup_terminated(delete_all) && empty;
+                }
+
+                for (auto &queue : hp_queues_[d].queues_) {
+                     empty = queue->cleanup_terminated(delete_all) && empty;
+                }
+            }
+
+            return empty;
+        }
+
+        bool cleanup_terminated(std::size_t pool_queue_num, bool delete_all)
+        {
+            if (pool_queue_num == std::size_t(-1)) {
+                throw std::runtime_error("");
+            }
+            bool empty = true;
+
+            // find the numa domain from the local thread index
+            std::size_t domain_num = d_lookup_[pool_queue_num];
+
+            // cleanup the queues assigned to this thread
+            empty = hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
+                    cleanup_terminated(delete_all) && empty;
+            empty = np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
+                    cleanup_terminated(delete_all) && empty;
+            empty = lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
+                    cleanup_terminated(delete_all) && empty;
+            return empty;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // create a new thread and schedule it if the initial state
+        // is equal to pending
+        void create_thread(thread_init_data& data, thread_id_type* thrd,
+            thread_state_enum initial_state, error_code& ec) override
+        {
+            // safety check that task was created by this thread/scheduler
+            HPX_ASSERT(data.scheduler_base == this);
+            //
+            std::size_t pool_queue_num = std::size_t(data.schedulehint);
+            std::size_t domain_num = 0;
+            std::size_t q_index = std::size_t(-1);
+            //
+            LOG_CUSTOM_VAR(const char* const msgs[] =
+                {"HINT_NONE" COMMA "HINT....." COMMA "ERROR...." COMMA  "NORMAL..."});
+            LOG_CUSTOM_VAR(const char *msg = nullptr);
+            //
+            if (data.schedulehint == thread_schedule_hint_none || pool_queue_num == 32767)
+            {
+                LOG_CUSTOM_VAR(msg = msgs[0]);
+                std::size_t thread_num =
+                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                pool_queue_num = this->global_to_local_thread_index(thread_num);
+                if (pool_queue_num<num_workers_) {
+                    domain_num     = d_lookup_[pool_queue_num];
+                    q_index        = q_lookup_[pool_queue_num];
+                }
+                else {
+                    // this is a task being injected from a thread on another pool
+                    // so leave threadnum and domain unset
+                }
+            }
+            else if (pool_queue_num>=32768) {
+                LOG_CUSTOM_VAR(msg = msgs[1]);
+                domain_num = modulo((pool_queue_num - 32768), num_domains_);
+                // if the thread creating the new task is on the domain
+                // assigned to the new task - try to reuse the core as well
+                std::size_t thread_num =
+                    threads::detail::thread_num_tss_.get_worker_thread_num();
+                pool_queue_num = this->global_to_local_thread_index(thread_num);
+                if (d_lookup_[pool_queue_num]==domain_num) {
+                    q_index = q_lookup_[pool_queue_num];
+                }
+                else {
+                    q_index = counters_[domain_num];
+                }
+            }
+            else if (pool_queue_num>num_workers_) {
+                throw std::runtime_error("Bad thread number in create_thread");
+            }
+            else { // everything is ok
+                LOG_CUSTOM_VAR(msg = msgs[3]);
+                domain_num = d_lookup_[pool_queue_num];
+                q_index    = q_lookup_[pool_queue_num];
+            }
+
+            LOG_CUSTOM_MSG("create_thread " << msg << " "
+                           << "queue " << decnumber(pool_queue_num)
+                           << "domain " << decnumber(domain_num)
+                           << "qindex " << decnumber(q_index));
+
+            // create the thread using priority to select queue
+            if (data.priority == thread_priority_high ||
+                data.priority == thread_priority_high_recursive ||
+                data.priority == thread_priority_boost)
+            {
+                // boosted threads return to normal after being queued
+                if (data.priority == thread_priority_boost)
+                {
+                    data.priority = thread_priority_normal;
+                }
+
+                hp_queues_[domain_num].queues_[hp_lookup_[
+                    modulo(q_index, hp_queues_[domain_num].num_cores)]]->
+                    create_thread(data, thrd, initial_state, ec);
+
+                LOG_CUSTOM_MSG("create_thread thread_priority_high "
+                               << "queue " << decnumber(q_index)
+                               << "domain " << decnumber(domain_num)
+                               << "desc " << THREAD_DESC2(data, thrd)
+                               << "scheduler " << hexpointer(data.scheduler_base));
+                return;
+            }
+
+            if (data.priority == thread_priority_low)
+            {
+                lp_queues_[domain_num].queues_[lp_lookup_[
+                    modulo(q_index, lp_queues_[domain_num].num_cores)]]->
+                    create_thread(data, thrd, initial_state, ec);
+
+                LOG_CUSTOM_MSG("create_thread thread_priority_low "
+                               << "queue " << decnumber(q_index)
+                               << "domain " << decnumber(domain_num)
+                               << "desc " << THREAD_DESC2(data, thrd)
+                               << "scheduler " << hexpointer(data.scheduler_base));
+                return;
+            }
+
+            // normal priority
+            np_queues_[domain_num].queues_[np_lookup_[
+                modulo(q_index, np_queues_[domain_num].num_cores)]]->
+                create_thread(data, thrd, initial_state, ec);
+
+            LOG_CUSTOM_MSG2("create_thread thread_priority_normal "
+                            << "queue " << decnumber(q_index)
+                            << "domain " << decnumber(domain_num)
+                            << "desc " << THREAD_DESC2(data, thrd)
+                            << "scheduler " << hexpointer(data.scheduler_base));
+        }
+
+        /// Return the next thread to be executed, return false if none available
+        virtual bool get_next_thread(std::size_t pool_queue_num,
+            bool running, std::int64_t& idle_loop_count,
+            threads::thread_data*& thrd)
+        {
+//                LOG_CUSTOM_MSG("get_next_thread " << " queue "
+//                                                  << decnumber(pool_queue_num));
+            bool result = false;
+            if (pool_queue_num == std::size_t(-1)) {
+                throw std::runtime_error("");
+            }
+
+            // find the numa domain from the local thread index
+            std::size_t domain_num = d_lookup_[pool_queue_num];
+
+            // is there a high priority task, take first from our numa domain
+            // and then try to steal from others
+            for (std::size_t d=0; d<num_domains_; ++d) {
+                std::size_t dom = modulo((domain_num+d), num_domains_);
+                // set the preferred queue for this domain, if applicable
+                std::size_t q_index = q_lookup_[pool_queue_num];
+                // get next task, steal if from another domain
+                result = hp_queues_[dom].get_next_thread(q_index, thrd);
+                if (result) {
+                    spin_for_time(1000, "HP task");
+                    break;
+                }
+            }
+
+            // try a normal priority task
+            if (!result) {
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    std::size_t dom = modulo((domain_num+d), num_domains_);
+                    // set the preferred queue for this domain, if applicable
+                    std::size_t q_index = q_lookup_[pool_queue_num];
+                    // get next task, steal if from another domain
+                    result = np_queues_[dom].get_next_thread(q_index, thrd);
+                    if (result) {
+                        spin_for_time(1000, "NP task");
+                        break;
+                    }
+                }
+            }
+
+            // low priority task
+            if (!result) {
+#ifdef JB_LP_STEALING
+                for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
+                    std::size_t dom = d % num_domains_;
+                    // set the preferred queue for this domain, if applicable
+                    std::size_t q_index = (dom==domain_num) ?
+                                q_lookup_[pool_queue_num] : counters_[dom];
+
+                    result = lp_queues_[dom].get_next_thread(q_index, thrd);
+                    if (result)
+                        break;
+                }
+#else
+                // no cross domain stealing for LP queues
+                result = lp_queues_[domain_num].get_next_thread(0, thrd);
+                if (result) {
+                    spin_for_time(1000, "LP task");
+                }
+#endif
+            }
+            if (result)
+            {
+                HPX_ASSERT(thrd->get_scheduler_base() == this);
+                LOG_CUSTOM_MSG("got next thread "
+                               << "queue " << decnumber(pool_queue_num)
+                               << "domain " << decnumber(domain_num)
+                               << "desc " << THREAD_DESC(thrd));
+            }
+            return result;
+        }
+
+        /// Schedule the passed thread
+        void schedule_thread(threads::thread_data* thrd,
+            std::size_t pool_queue_num,
+            std::size_t /*fallback*/,
+            thread_priority priority = thread_priority_normal)
+        {
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+            std::size_t domain_num;
+            //
+            if (pool_queue_num == std::size_t(-1) || pool_queue_num == 32767)
+            {
+                std::size_t t = threads::detail::thread_num_tss_
+                                    .get_worker_thread_num();
+                pool_queue_num = this->global_to_local_thread_index(t);
+                domain_num     = d_lookup_[pool_queue_num];
+                LOG_CUSTOM_MSG("schedule_thread HINT_NONE"
+                               << " queue " << decnumber(pool_queue_num));
+            }
+            else if (pool_queue_num>=32768) {
+                domain_num     = pool_queue_num - 32768;
+                std::size_t t = threads::detail::thread_num_tss_
+                                    .get_worker_thread_num();
+                pool_queue_num = this->global_to_local_thread_index(t);
+                LOG_CUSTOM_MSG("schedule_thread HINT domain " << domain_num
+                               << " queue " << decnumber(pool_queue_num));
+            }
+            else if (pool_queue_num>num_workers_) {
+                throw std::runtime_error("Bad thread number in schedule thread");
+            }
+            else {
+                domain_num = d_lookup_[pool_queue_num];
+                LOG_CUSTOM_MSG("schedule_thread fallback domain " << domain_num
+                               << " queue " << decnumber(pool_queue_num));
+            }
+
+            LOG_CUSTOM_MSG("thread scheduled "
+                          << "queue " << decnumber(pool_queue_num)
+                          << "domain " << decnumber(domain_num)
+                          << "qindex " << decnumber(q_index));
+
+            if (priority == thread_priority_high ||
+                priority == thread_priority_high_recursive ||
+                priority == thread_priority_boost)
+            {
+                hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
+                    schedule_thread(thrd, false);
+            }
+            else if (priority == thread_priority_low)
+            {
+                lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
+                    schedule_thread(thrd, false);
+            }
+            else
+            {
+                np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
+                    schedule_thread(thrd, false);
+            }
+        }
+
+        /// Put task on the back of the queue
+        void schedule_thread_last(threads::thread_data* thrd,
+            std::size_t pool_queue_num,
+            std::size_t,
+            thread_priority priority = thread_priority_normal)
+        {
+
+            LOG_CUSTOM_MSG("schedule_thread last @@@ " << " queue "
+                                              << decnumber(pool_queue_num));
+
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+            std::size_t domain_num;
+            //
+            if (pool_queue_num == std::size_t(-1) || pool_queue_num == 32767)
+            {
+//                    std::cout << "Scheduler schedule_thread_last received pool_queue_num -1 \n";
+                std::size_t t = threads::detail::thread_num_tss_
+                                    .get_worker_thread_num();
+                pool_queue_num = this->global_to_local_thread_index(t);
+                domain_num     = d_lookup_[pool_queue_num];
+            }
+            else if (pool_queue_num>=32768) {
+                domain_num     = pool_queue_num - 32768;
+                pool_queue_num = std::size_t(-1);
+//                    std::cout << "Scheduler schedule_thread_last numa domain "
+//                              << std::dec << domain_num << std::endl;
+            }
+            else if (pool_queue_num>num_workers_) {
+                throw std::runtime_error("Bad thread number in schedule thread");
+            }
+            else {
+                domain_num = d_lookup_[pool_queue_num];
+            }
+
+            LOG_CUSTOM_MSG2("schedule_thread last (done) " << " queue "
+                                              << decnumber(pool_queue_num));
+
+            if (priority == thread_priority_high ||
+                priority == thread_priority_high_recursive ||
+                priority == thread_priority_boost)
+            {
+                hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
+                    schedule_thread(thrd, true);
+            }
+            else if (priority == thread_priority_low)
+            {
+                lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
+                    schedule_thread(thrd, true);
+            }
+            else
+            {
+                np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
+                    schedule_thread(thrd, true);
+            }
+        }
+
+        //---------------------------------------------------------------------
+        // Destroy the passed thread - as it has been terminated
+        //---------------------------------------------------------------------
+        void destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
+        {
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+            thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
+        }
+
+#ifdef _OLD_STYLE_FUNCTION
+        bool destroy_thread(threads::thread_data* thrd,
+                     std::int64_t& busy_count)
+        {
+            LOG_CUSTOM_MSG("destroy thread " << THREAD_DESC(thrd)
+                                             << " busy_count "
+                                             << decnumber(busy_count));
+
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+
+            for (std::size_t d=0; d<num_domains_; ++d) {
+                if (hp_queues_[d].destroy_thread(thrd,busy_count)) return true;
+                if (np_queues_[d].destroy_thread(thrd,busy_count)) return true;
+                if (lp_queues_[d].destroy_thread(thrd,busy_count)) return true;
+            }
+
+            // the thread has to belong to one of the queues, always
+            HPX_ASSERT(false);
+            return false;
         }
 #endif
 
-            ///////////////////////////////////////////////////////////////////////
-            void abort_all_suspended_threads()
-            {
-                LOG_CUSTOM_MSG("abort_all_suspended_threads");
-                low_priority_queue_.abort_all_suspended_threads();
+        ///////////////////////////////////////////////////////////////////////
+        // This returns the current length of the queues (work items and new
+        // items)
+        //---------------------------------------------------------------------
+        std::int64_t get_queue_length(
+            std::size_t pool_queue_num = std::size_t(-1)) const
+        {
+            LOG_CUSTOM_MSG("get_queue_length"
+                << "pool_queue_num " << decnumber(pool_queue_num));
 
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    queues_[i]->abort_all_suspended_threads();
-
-                for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                    high_priority_queues_[i]->abort_all_suspended_threads();
+            std::int64_t count = 0;
+            for (std::size_t d=0; d<num_domains_; ++d) {
+                count += hp_queues_[d].get_queue_length();
+                count += np_queues_[d].get_queue_length();
+                count += lp_queues_[d].get_queue_length();
             }
 
-            ///////////////////////////////////////////////////////////////////////
-            bool cleanup_terminated(bool delete_all)
-            {
-                bool empty = true;
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                {
-                    //LOG_CUSTOM_MSG(hexpointer(this) << "cleanup_terminated "
-                    //<< delete_all << " " << i);
-                    empty = queues_[i]->cleanup_terminated(delete_all) && empty;
-                }
-                if (!delete_all)
-                    return empty;
-
-                //LOG_CUSTOM_MSG(hexpointer(this)
-                //<< "high_priority_queue_ cleanup_terminated " << empty);
-                for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                {
-                    empty = high_priority_queues_[i]->cleanup_terminated(
-                                delete_all) &&
-                        empty;
-                }
-
-                //LOG_CUSTOM_MSG2(hexpointer(this)
-                //<< "low_priority_queue_ cleanup_terminated " << empty);
-                empty =
-                    low_priority_queue_.cleanup_terminated(delete_all) && empty;
-                return empty;
+            if (pool_queue_num != std::size_t(-1)) {
+                // find the numa domain from the local thread index
+                std::size_t domain = d_lookup_[pool_queue_num];
+                // get next task, steal if from another domain
+                std::int64_t result =
+                    hp_queues_[domain].queues_[hp_lookup_[pool_queue_num]]->get_queue_length();
+                if (result>0) return result;
+                result =
+                    np_queues_[domain].queues_[np_lookup_[pool_queue_num]]->get_queue_length();
+                if (result>0) return result;
+                return
+                    lp_queues_[domain].queues_[lp_lookup_[pool_queue_num]]->get_queue_length();
             }
+            return count;
+        }
 
-            bool cleanup_terminated(std::size_t num_threads, bool delete_all)
-            {
-                return cleanup_terminated(delete_all);
-            }
+        //---------------------------------------------------------------------
+        // Queries the current thread count of the queues.
+        //---------------------------------------------------------------------
+        std::int64_t get_thread_count(thread_state_enum state = unknown,
+            thread_priority priority = thread_priority_default,
+            std::size_t pool_queue_num = std::size_t(-1),
+            bool reset = false) const
+        {
+            LOG_CUSTOM_MSG("get_thread_count pool_queue_num "
+                << hexnumber(pool_queue_num));
 
-            ///////////////////////////////////////////////////////////////////////
-            // create a new thread and schedule it if the initial state is equal
-            // to pending
-            void create_thread(thread_init_data& data, thread_id_type* thrd,
-                thread_state_enum initial_state, bool run_now, error_code& ec,
-                std::size_t pool_queue_num,
-                std::size_t /*pool_queue_num_fallback*/)
-            {
-                HPX_ASSERT(data.scheduler_base == this);
+            std::int64_t count = 0;
 
-                if (pool_queue_num == std::size_t(-1))
-                {
-                    std::size_t t = threads::detail::thread_num_tss_
-                                        .get_worker_thread_num();
-                    pool_queue_num = this->global_to_local_thread_index(t);
-                }
-
-                // now create the thread
-                if (data.priority == thread_priority_high ||
-                    data.priority == thread_priority_high_recursive ||
-                    data.priority == thread_priority_boost)
-                {
-                    // boosted threads return to normal after being queued
-                    if (data.priority == thread_priority_boost)
-                    {
-                        data.priority = thread_priority_normal;
-                    }
-                    // if a non worker threads started this ...
-                    if (pool_queue_num >= queues_.size())
-                    {
-                        pool_queue_num = curr_hp_queue_++ % queues_.size();
-                    }
-                    //
-                    std::size_t hp_queue_num = hp_queue_lookup_[pool_queue_num];
-                    high_priority_queues_[hp_queue_num]->create_thread(
-                        data, thrd, initial_state, run_now, ec);
-                    LOG_CUSTOM_MSG("create_thread thread_priority_high "
-                        << THREAD_DESC2(data, thrd) << "hp_queue_num "
-                        << hexnumber(pool_queue_num) << "scheduler "
-                        << hexpointer(data.scheduler_base));
-                    return;
-                }
-
-                if (data.priority == thread_priority_low)
-                {
-                    low_priority_queue_.create_thread(
-                        data, thrd, initial_state, run_now, ec);
-                    LOG_CUSTOM_MSG("create_thread thread_priority_low "
-                        << THREAD_DESC2(data, thrd) << "pool_queue_num "
-                        << hexnumber(pool_queue_num) << "scheduler "
-                        << hexpointer(data.scheduler_base));
-                    return;
-                }
-
-                // if a non worker thread is creating this task
-                if (pool_queue_num >= queues_.size())
-                {
-                    pool_queue_num = curr_queue_++ % queues_.size();
-                }
+            // if a specific worker id was requested
+            if (pool_queue_num != std::size_t(-1)) {
+                std::size_t domain_num = d_lookup_[pool_queue_num];
                 //
-                queues_[pool_queue_num]->create_thread(
-                    data, thrd, initial_state, run_now, ec);
-                LOG_CUSTOM_MSG("create_thread thread_priority_normal "
-                    << THREAD_DESC2(data, thrd) << "pool_queue_num "
-                    << hexnumber(pool_queue_num) << "scheduler "
-                    << hexpointer(data.scheduler_base));
-            }
-
-            /// Return the next thread to be executed, return false if none available
-            virtual bool get_next_thread(std::size_t pool_queue_num,
-                bool running, std::int64_t& idle_loop_count,
-                threads::thread_data*& thrd)
-            {
-                // is there a high priority task to take from the queue assigned to us
-                std::size_t tq = hp_queue_lookup_[pool_queue_num];
-                auto stealing_queue = high_priority_queues_[tq];
-                bool result = stealing_queue->get_next_thread(thrd);
-
-                // if, not how about an HP task from somewhere else?
-                if (!result) {
-                    for (std::size_t i : hp_victim_queues_[pool_queue_num]) {
-                        stealing_queue = high_priority_queues_[i];
-                        if (stealing_queue->get_pending_queue_length() > 1) {
-                            result = stealing_queue->get_next_thread(
-                                thrd, false, true);
-                            if (result)
-                                break;
-                        }
-                    }
+                switch (priority) {
+                case thread_priority_default: {
+                    count += hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
+                        get_thread_count(state);
+                    count += np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
+                        get_thread_count(state);
+                    count += lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
+                        get_thread_count(state);
+                    LOG_CUSTOM_MSG("default get_thread_count pool_queue_num "
+                        << hexnumber(pool_queue_num) << decnumber(count));
+                    return count;
                 }
-
-                // cross-numa stealing - steal from the queues if they are 'full'
-                if (!result) {
-                    for (std::size_t i : hp_xnuma_queues_[pool_queue_num]) {
-                        stealing_queue = high_priority_queues_[i];
-                        if (stealing_queue->get_pending_queue_length() > 8) {
-                            result = stealing_queue->get_next_thread(
-                                thrd, false, true);
-                            if (result) {
-                                LOG_CUSTOM_MSG("xnuma steal");
-                                break;
-                            }
-                        }
-                    }
+                case thread_priority_low: {
+                    count += lp_queues_[domain_num].queues_[lp_lookup_[pool_queue_num]]->
+                        get_thread_count(state);
+                    LOG_CUSTOM_MSG("low get_thread_count pool_queue_num "
+                        << hexnumber(pool_queue_num) << decnumber(count));
+                    return count;
                 }
-
-                // counter for access queries
-                stealing_queue->increment_num_pending_accesses();
-                if (result)
-                {
-                    HPX_ASSERT(thrd->get_scheduler_base() == this);
-                    LOG_CUSTOM_MSG("get_next_thread high priority "
-                        << THREAD_DESC(thrd) << decnumber(idle_loop_count)
-                        << "pool_queue_num " << decnumber(pool_queue_num));
-                    return true;
+                case thread_priority_normal: {
+                    count += np_queues_[domain_num].queues_[np_lookup_[pool_queue_num]]->
+                        get_thread_count(state);
+                    LOG_CUSTOM_MSG("normal get_thread_count pool_queue_num "
+                        << hexnumber(pool_queue_num) << decnumber(count));
+                    return count;
                 }
-                // counter for high priority misses
-                stealing_queue->increment_num_pending_misses();
-
-                // try to get a task from the queue associated with the requested thread
-                std::size_t queues_size = queues_.size();
-                HPX_ASSERT(pool_queue_num < queues_size);
-                thread_queue_type* this_queue = queues_[pool_queue_num];
-                {
-                    bool result = this_queue->get_next_thread(thrd);
-
-                    // counter for access queries
-                    this_queue->increment_num_pending_accesses();
-                    if (result)
-                    {
-                        HPX_ASSERT(thrd->get_scheduler_base() == this);
-                        LOG_CUSTOM_MSG("get_next_thread normal "
-                            << THREAD_DESC(thrd) << decnumber(idle_loop_count)
-                            << "pool_queue_num " << decnumber(pool_queue_num));
-                        return true;
-                    }
-                    // counter for misses
-                    this_queue->increment_num_pending_misses();
-
-                    bool have_staged = this_queue->get_staged_queue_length(
-                                           std::memory_order_relaxed) != 0;
-
-                    // Give up, we should have work to convert.
-                    if (have_staged)
-                    {
-                        LOG_CUSTOM_MSG("get_next_thread have_staged"
-                            << "\" (unset) "
-                            << "\" " << hexpointer(thrd)
-                            << decnumber(idle_loop_count) << "pool_queue_num "
-                            << decnumber(pool_queue_num));
-                        return false;
-                    }
-                }
-
-                // if we didn't get a task from the requested thread queue
-                // try stealing from another
-                for (std::size_t idx : victim_queues_[pool_queue_num])
-                {
-                    HPX_ASSERT(idx != pool_queue_num);
-
-                    if (queues_[idx]->get_next_thread(thrd, false, true))
-                    {
-                        LOG_CUSTOM_MSG("get_next_thread stealing "
-                            << THREAD_DESC(thrd) << "pool_queue_num "
-                            << decnumber(pool_queue_num) << "victim thread "
-                            << decnumber(idx));
-                        queues_[idx]->increment_num_stolen_from_pending();
-                        this_queue->increment_num_stolen_to_pending();
-                        return true;
-                    }
-                }
-
-                // if all else failed, then try the low priority queue
-                result = low_priority_queue_.get_next_thread(thrd);
-                if (result)
-                {
-                    LOG_CUSTOM_MSG("get_next_thread low priority "
-                        << THREAD_DESC(thrd) << "pool_queue_num "
-                        << decnumber(pool_queue_num));
-                    return true;
-                }
-                // counter for low priority misses
-                low_priority_queue_.increment_num_pending_misses();
-
-                return result;
-            }
-
-            /// Schedule the passed thread
-            void schedule_thread(threads::thread_data* thrd,
-                std::size_t pool_queue_num,
-                std::size_t /*pool_queue_num_fallback*/,
-                thread_priority priority = thread_priority_normal)
-            {
-                HPX_ASSERT(thrd->get_scheduler_base() == this);
-
-                if (pool_queue_num == std::size_t(-1))
-                {
-                    std::size_t t = threads::detail::thread_num_tss_
-                                        .get_worker_thread_num();
-                    pool_queue_num = this->global_to_local_thread_index(t);
-                }
-
-                if (priority == thread_priority_high ||
-                    priority == thread_priority_high_recursive ||
-                    priority == thread_priority_boost)
-                {
-                    std::size_t hp_queue_num =
-                        curr_hp_queue_++ % high_priority_queues_.size();
-                    high_priority_queues_[hp_queue_num]->schedule_thread(thrd);
-                    LOG_CUSTOM_MSG("schedule_thread high priority "
-                        << THREAD_DESC(thrd) << "pool_queue_num "
-                        << decnumber(pool_queue_num));
-                }
-                else if (priority == thread_priority_low)
-                {
-                    low_priority_queue_.schedule_thread(thrd);
-                    LOG_CUSTOM_MSG("schedule_thread low priority "
-                        << THREAD_DESC(thrd) << "pool_queue_num "
-                        << decnumber(pool_queue_num));
-                }
-                else
-                {
-                    pool_queue_num = curr_queue_++ % queues_.size();
-                    queues_[pool_queue_num]->schedule_thread(thrd);
-                }
-            }
-
-            /// Put task on the back of the queue
-            void schedule_thread_last(threads::thread_data* thrd,
-                std::size_t num_queue,
-                std::size_t /*num_queue_fallback*/,
-                thread_priority priority = thread_priority_normal)
-            {
-                HPX_ASSERT(thrd->get_scheduler_base() == this);
-
-                if (priority == thread_priority_high ||
-                    priority == thread_priority_high_recursive ||
-                    priority == thread_priority_boost)
-                {
-                    LOG_CUSTOM_MSG("schedule_thread last thread_priority_high "
-                        << THREAD_DESC(thrd));
-                    std::size_t hp_queue_num =
-                        curr_hp_queue_++ % high_priority_queues_.size();
-                    high_priority_queues_[hp_queue_num]->schedule_thread(
-                        thrd, true);
-                }
-                else if (priority == thread_priority_low)
-                {
-                    LOG_CUSTOM_MSG("schedule_thread last thread_priority_low "
-                        << THREAD_DESC(thrd));
-                    low_priority_queue_.schedule_thread(thrd, true);
-                }
-                else
-                {
-                    num_queue = curr_queue_++ % queues_.size();
-                    LOG_CUSTOM_MSG(
-                        "schedule_thread last thread_priority_normal "
-                        << THREAD_DESC(thrd) << "num_queue "
-                        << decnumber(num_queue));
-                    queues_[num_queue]->schedule_thread(thrd, true);
-                }
-            }
-
-            /// Destroy the passed thread - as it has been terminated
-            void destroy_thread(
-                threads::thread_data* thrd, std::int64_t& busy_count)
-            {
-                LOG_CUSTOM_MSG("destroy thread " << THREAD_DESC(thrd)
-                                                 << " busy_count "
-                                                 << decnumber(busy_count));
-                HPX_ASSERT(thrd->get_scheduler_base() == this);
-
-                HPX_ASSERT(thrd->get_scheduler_base() == this);
-                thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
-            }
-
-            ///////////////////////////////////////////////////////////////////////
-            // This returns the current length of the queues (work items and new
-            // items)
-            std::int64_t get_queue_length(
-                std::size_t pool_queue_num = std::size_t(-1)) const
-            {
-                LOG_CUSTOM_MSG("get_queue_length"
-                    << "pool_queue_num " << decnumber(pool_queue_num));
-                // Return queue length of one specific queue.
-                std::int64_t count = 0;
-                if (std::size_t(-1) != pool_queue_num)
-                {
-                    HPX_ASSERT(pool_queue_num < queues_.size());
-
-                    auto high_priority_queue =
-                        high_priority_queues_[hp_queue_lookup_[pool_queue_num]];
-                    count = high_priority_queue->get_queue_length();
-
-                    if (pool_queue_num == queues_.size() - 1)
-                        count += low_priority_queue_.get_queue_length();
-
-                    return count + queues_[pool_queue_num]->get_queue_length();
-                }
-
-                // Cumulative queue lengths of all queues.
-                for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                {
-                    count += high_priority_queues_[i]->get_queue_length();
-                }
-
-                count += low_priority_queue_.get_queue_length();
-
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                    count += queues_[i]->get_queue_length();
-
-                return count;
-            }
-
-            ///////////////////////////////////////////////////////////////////////
-            // Queries the current thread count of the queues.
-            std::int64_t get_thread_count(thread_state_enum state = unknown,
-                thread_priority priority = thread_priority_default,
-                std::size_t pool_queue_num = std::size_t(-1),
-                bool reset = false) const
-            {
-                LOG_CUSTOM_MSG("get_thread_count pool_queue_num "
-                    << hexnumber(pool_queue_num));
-                // Return thread count of one specific queue.
-                std::int64_t count = 0;
-                if (std::size_t(-1) != pool_queue_num)
-                {
-                    HPX_ASSERT(pool_queue_num < queues_.size());
-
-                    switch (priority)
-                    {
-                    case thread_priority_default:
-                    {
-                        auto high_priority_queue = high_priority_queues_
-                            [hp_queue_lookup_[pool_queue_num]];
-                        count = high_priority_queue->get_thread_count(state);
-
-                        if (queues_.size() - 1 == pool_queue_num)
-                            count +=
-                                low_priority_queue_.get_thread_count(state);
-
-                        return count +
-                            queues_[pool_queue_num]->get_thread_count(state);
-                    }
-
-                    case thread_priority_low:
-                    {
-                        if (queues_.size() - 1 == pool_queue_num)
-                            return low_priority_queue_.get_thread_count(state);
-                        break;
-                    }
-
-                    case thread_priority_normal:
-                        return queues_[pool_queue_num]->get_thread_count(state);
-
-                    case thread_priority_boost:
-                    case thread_priority_high:
-                    case thread_priority_high_recursive:
-                    {
-                        return high_priority_queues_
-                            [hp_queue_lookup_[pool_queue_num]]
-                                ->get_thread_count(state);
-                        break;
-                    }
-
-                    default:
-                    case thread_priority_unknown:
-                    {
-                        HPX_THROW_EXCEPTION(bad_parameter,
-                            "shared_priority_scheduler::get_thread_count",
-                            "unknown thread priority value "
-                            "(thread_priority_unknown)");
-                        return 0;
-                    }
-                    }
-                    return 0;
-                }
-
-                // Return the cumulative count for all queues.
-                switch (priority)
-                {
-                case thread_priority_default:
-                {
-                    for (std::size_t i = 0; i != high_priority_queues_.size();
-                         ++i)
-                        count +=
-                            high_priority_queues_[i]->get_thread_count(state);
-
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                        count += queues_[i]->get_thread_count(state);
-
-                    break;
-                }
-
-                case thread_priority_low:
-                    return low_priority_queue_.get_thread_count(state);
-
-                case thread_priority_normal:
-                {
-                    for (std::size_t i = 0; i != queues_.size(); ++i)
-                        count += queues_[i]->get_thread_count(state);
-                    break;
-                }
-
                 case thread_priority_boost:
                 case thread_priority_high:
-                case thread_priority_high_recursive:
-                {
-                    for (std::size_t i = 0; i != high_priority_queues_.size();
-                         ++i)
-                        count +=
-                            high_priority_queues_[i]->get_thread_count(state);
-                    break;
+                case thread_priority_high_recursive: {
+                    count += hp_queues_[domain_num].queues_[hp_lookup_[pool_queue_num]]->
+                        get_thread_count(state);
+                    LOG_CUSTOM_MSG("high get_thread_count pool_queue_num "
+                        << hexnumber(pool_queue_num) << decnumber(count));
+                    return count;
                 }
-
                 default:
                 case thread_priority_unknown:
-                {
                     HPX_THROW_EXCEPTION(bad_parameter,
-                        "shared_priority_scheduler::get_thread_count",
-                        "unknown thread priority value "
-                        "(thread_priority_unknown)");
+                        "shared_priority_queue_scheduler::get_thread_count",
+                        "unknown thread priority (thread_priority_unknown)");
                     return 0;
                 }
+            }
+
+            switch (priority) {
+            case thread_priority_default: {
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    count += hp_queues_[d].get_thread_count(state);
+                    count += np_queues_[d].get_thread_count(state);
+                    count += lp_queues_[d].get_thread_count(state);
                 }
+//                    LOG_CUSTOM_MSG("default get_thread_count pool_queue_num "
+//                        << decnumber(pool_queue_num) << decnumber(count));
                 return count;
             }
-
-            ///////////////////////////////////////////////////////////////////////
-            // Enumerate matching threads from all queues
-            bool enumerate_threads(
-                util::function_nonser<bool(thread_id_type)> const& f,
-                thread_state_enum state = unknown) const
-            {
-                bool result = true;
-                for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                {
-                    result = result &&
-                        high_priority_queues_[i]->enumerate_threads(f, state);
+            case thread_priority_low: {
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    count += lp_queues_[d].get_thread_count(state);
                 }
-
-                result =
-                    result && low_priority_queue_.enumerate_threads(f, state);
-
-                for (std::size_t i = 0; i != queues_.size(); ++i)
-                {
-                    result = result && queues_[i]->enumerate_threads(f, state);
+                LOG_CUSTOM_MSG("low get_thread_count pool_queue_num "
+                    << decnumber(pool_queue_num) << decnumber(count));
+                return count;
+            }
+            case thread_priority_normal: {
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    count += np_queues_[d].get_thread_count(state);
                 }
-                return result;
+                LOG_CUSTOM_MSG("normal get_thread_count pool_queue_num "
+                    << decnumber(pool_queue_num) << decnumber(count));
+                return count;
+            }
+            case thread_priority_boost:
+            case thread_priority_high:
+            case thread_priority_high_recursive: {
+                for (std::size_t d=0; d<num_domains_; ++d) {
+                    count += hp_queues_[d].get_thread_count(state);
+                }
+                LOG_CUSTOM_MSG("high get_thread_count pool_queue_num "
+                    << decnumber(pool_queue_num) << decnumber(count));
+                return count;
+            }
+            default:
+            case thread_priority_unknown:
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "shared_priority_queue_scheduler::get_thread_count",
+                    "unknown thread priority (thread_priority_unknown)");
+                return 0;
             }
 
-            /// This is a function which gets called periodically by the thread
-            /// manager to allow for maintenance tasks to be executed in the
-            /// scheduler. Returns true if the OS thread calling this function
-            /// has to be terminated (i.e. no more work has to be done).
-            virtual bool wait_or_add_new(std::size_t pool_queue_num,
-                bool running, std::int64_t& idle_loop_count)
-            {
-                std::size_t added = 0;
-                bool result = true;
+            return count;
+        }
 
-                thread_queue_type* high_priority_queue =
-                    high_priority_queues_[hp_queue_lookup_[pool_queue_num]];
-                result = high_priority_queue->wait_or_add_new(
-                    running, idle_loop_count, added) &&
-                    result;
-                if (0 != added)
-                {
-                    return result;
-                }
+        ///////////////////////////////////////////////////////////////////////
+        // Enumerate matching threads from all queues
+        bool enumerate_threads(
+            util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const
+        {
+            bool result = true;
 
-                thread_queue_type* this_queue = queues_[pool_queue_num];
-                result = this_queue->wait_or_add_new(
-                             running, idle_loop_count, added) &&
-                    result;
-                if (0 != added)
-                {
-                    return result;
-                }
+            LOG_CUSTOM_MSG("enumerate_threads");
 
-                // try all the HP queues we might steal from
-                for (std::size_t idx : hp_victim_queues_[pool_queue_num])
-                {
-                    result = high_priority_queue->wait_or_add_new(running,
-                                 idle_loop_count, added,
-                                 high_priority_queues_[idx]) &&
-                        result;
-                    if (0 != added)
-                    {
-                        high_priority_queues_[idx]
-                            ->increment_num_stolen_from_staged(added);
-                        high_priority_queue->increment_num_stolen_to_staged(
-                            added);
-                        return result;
-                    }
-                }
-
-                // try all the normal queues we might steal from
-                for (std::size_t idx : victim_queues_[pool_queue_num])
-                {
-                    result = this_queue->wait_or_add_new(running,
-                                 idle_loop_count, added, queues_[idx]) &&
-                        result;
-                    if (0 != added)
-                    {
-                        queues_[idx]->increment_num_stolen_from_staged(added);
-                        this_queue->increment_num_stolen_to_staged(added);
-                        return result;
-                    }
-                }
-
-                result = low_priority_queue_.wait_or_add_new(
-                             running, idle_loop_count, added) &&
-                    result;
-                if (0 != added) {}
-
-                return result;
+            for (std::size_t d=0; d<num_domains_; ++d) {
+                result = result &&
+                    hp_queues_[d].enumerate_threads(f, state);
+                result = result &&
+                    np_queues_[d].enumerate_threads(f, state);
+                result = result &&
+                    lp_queues_[d].enumerate_threads(f, state);
             }
+            return result;
+        }
 
-            ///////////////////////////////////////////////////////////////////////
-            /* @TODO make sure on_start_thread is forwarded
-             * currently it does nothing in the thread queue - but might one day
-             * queues_[pool_queue_num]->on_start_thread(pool_queue_num);
-            */
-            void on_start_thread(std::size_t pool_queue_num)
+        ///////////////////////////////////////////////////////////////////////
+        /* @TODO make sure on_start_thread is forwarded
+         * currently it does nothing in the thread queue - but might one day
+         * queues_[pool_queue_num]->on_start_thread(pool_queue_num);
+        */
+        void on_start_thread(std::size_t pool_queue_num)
+        {
+            LOG_CUSTOM_MSG("start thread with local thread num "
+                << decnumber(pool_queue_num));
+
+            std::lock_guard<hpx::lcos::local::spinlock> lock(init_mutex);
+            if (!initialized_)
             {
-                LOG_CUSTOM_MSG("start thread with local thread num "
-                    << decnumber(pool_queue_num));
+                initialized_ = true;
                 //
-                // @TODO. move this to a proper init function
+                auto &rp = resource::get_partitioner();
+                auto const& topo = rp.get_topology();
+
+                // For each worker thread, count which each numa domain they
+                // belong to and build lists of useful indexes/refs
+                num_domains_ = 1;
+                std::array<std::size_t, HPX_MAX_NUMA_PER_NODE> q_counts_;
+                std::fill(d_lookup_.begin(), d_lookup_.end(), 0);
+                std::fill(q_lookup_.begin(), q_lookup_.end(), 0);
+                std::fill(q_counts_.begin(), q_counts_.end(), 0);
+                std::fill(counters_.begin(), counters_.end(), 0);
                 //
-                std::lock_guard<hpx::lcos::local::spinlock> lock(init_mutex);
-                if (!initialized_)
+                //std::srand(std::time(0));
+                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
                 {
-                    initialized_ = true;
-                    std::size_t num_queues = queues_.size();
-                    std::size_t   hpq_size = high_priority_queues_.size();
-                    std::size_t        qph = num_queues/hpq_size;
-                    std::vector<std::size_t> hp_queue_mapping_;
-                    // init hp queues with default zero queue/domain
-                    hp_queue_lookup_.resize(num_queues, 0);
-                    hp_queue_mapping_.resize(num_queues, 0);
-                    hp_victim_queues_.resize(num_queues);
-                    hp_xnuma_queues_.resize(num_queues);
-
-                    // assign queues for stealing according to numa domain
-                    for (std::size_t i = 0; i < num_queues; ++i)
-                    {
-                        // fill a vector with all thread ids except 'itself'
-                        // offset so that each queue steals in a staggered pattern
-                        // and don't all hit pu=0 first for example
-                        std::vector<std::size_t> thread_ids;
-                        for (std::size_t j=0; j<num_queues; ++j) {
-                            std::size_t pu = (i + j) % (int)num_queues;
-                            if (pu!=i) thread_ids.push_back(pu);
-                        }
-                        // get a list of all threads on the same numa domain
-                        std::vector<std::size_t> same = domain_threads(i, thread_ids,
-                            std::equal_to<std::size_t>());
-                        // get a list of all threads on other numa domains
-                        std::vector<std::size_t> diff = domain_threads(i, thread_ids,
-                            std::not_equal_to<std::size_t>());
-
-                        // always steal from queues on the same numa domain first
-                        victim_queues_[i] = same;
-                        // if we are not numa sensitive, steal from other domains
-//                        if (!numa_sensitive_) {
-                            victim_queues_[i].insert(victim_queues_[i].end(),
-                                diff.begin(), diff.end());
-//                        }
-
-                        // which HP queue do we use for this thread?
-                        double s = static_cast<double>(hpq_size-1);
-                        hp_victim_queues_[i].clear();
-                        hp_queue_lookup_[i] =
-                            static_cast<int>(i*(s+1)/(num_queues));
-                        hp_queue_mapping_[i] = hp_queue_lookup_[i] * qph;
-                    }
-
-                    // clean up mapping of HP queues to thread numbers
-                    auto last = std::unique(
-                        hp_queue_mapping_.begin(), hp_queue_mapping_.end());
-                    hp_queue_mapping_.erase(last, hp_queue_mapping_.end());
-                    //
-                    debug::output("hp_queue_lookup_ ", hp_queue_lookup_);
-                    debug::output("hp_queue_mapping_ ", hp_queue_mapping_);
-                    //
-                    for (std::size_t i = 0; i < num_queues; ++i)
-                    {
-                        auto temp_ = hp_queue_mapping_;
-                        // map i to hp queue num, and then to thread,
-                        // remove that thread from our list
-                        temp_.erase(
-                            std::remove(temp_.begin(), temp_.end(),
-                            hp_queue_mapping_[hp_queue_lookup_[i]]),
-                            temp_.end());
-
-                        // get a list of all HP queues on the same numa domain
-                        std::vector<std::size_t> same = domain_threads(
-                            hp_queue_mapping_[hp_queue_lookup_[i]], temp_,
-                            std::equal_to<std::size_t>());
-
-                        // get a list of all HP threads on other numa domains
-                        std::vector<std::size_t> diff = domain_threads(
-                            hp_queue_mapping_[hp_queue_lookup_[i]], temp_,
-                            std::not_equal_to<std::size_t>());
-
-                        if (same.size()>0) {
-                            //debug::output("same  ", same);
-                            std::rotate(same.begin(), same.begin() + i/qph % same.size(),
-                                same.end());
-                            // convert HP queue numbers to threads
-                            for (auto q : same) {
-                                hp_victim_queues_[i].push_back(hp_queue_lookup_[q]);
-                            }
-                        }
-
-                        if (diff.size()>0) {
-                            //debug::output("diff ", diff);
-                            std::rotate(diff.begin(), diff.begin() + i/qph % diff.size(),
-                                diff.end());
-                            // convert HP queue numbers to threads
-                            for (auto q : diff) {
-                                hp_xnuma_queues_[i].push_back(hp_queue_lookup_[q]);
-                            }
-                        }
-
-                        if (!numa_sensitive_) {
-                            // no numa check - merge queues into one
-                            // hp tasks can be stolen from any hp queue
-                            hp_victim_queues_[i].insert(hp_victim_queues_[i].end(),
-                                hp_xnuma_queues_[i].begin(), hp_xnuma_queues_[i].end());
-                            hp_xnuma_queues_[i].clear();
-                        }
-                    }
-
-                    for (std::size_t i=0; i<num_queues; ++i) {
-                        char buff[256];
-                        sprintf(buff, "%03i", (int)i);
-                        debug::output("victim_queue    " + std::string(buff) + " ",
-                            victim_queues_[i]);
-                        debug::output("hp_victim_queue " + std::string(buff) + " ",
-                            hp_victim_queues_[i]);
-                        debug::output("hp_xnuma_queues " + std::string(buff) + " ",
-                            hp_xnuma_queues_[i]);
-                    }
+                    std::size_t global_id = local_to_global_thread_index(local_id);
+                    std::size_t pu_num = rp.get_pu_num(global_id);
+                    std::size_t domain = topo.get_numa_node_number(pu_num);
+#ifdef DEBUG_FORCE_2_NUMA_DOMAINS
+                    domain = std::rand() % 2;
+#endif
+                    d_lookup_[local_id] = domain;
+                    num_domains_ = std::max(num_domains_, domain+1);
                 }
+                //
+                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
+                {
+                    q_lookup_[local_id] = q_counts_[d_lookup_[local_id]]++;
+                }
+
+                // create queue sets for each numa domain
+                for (std::size_t i=0; i<num_domains_; ++i) {
+                    // high priority
+                    int queues = std::max(q_counts_[i]/std::get<0>(cores_per_queue_),
+                                          std::size_t(1));
+                    hp_queues_[i].init(
+                        q_counts_[i], queues, max_queue_thread_count_);
+                    LOG_CUSTOM_MSG2("Created HP queue for numa " << i
+                                    << " cores " << q_counts_[i]
+                                    << " queues " << queues);
+                    // normal priority
+                    queues = std::max(q_counts_[i]/std::get<1>(cores_per_queue_),
+                                      std::size_t(1));
+                    np_queues_[i].init(
+                        q_counts_[i], queues, max_queue_thread_count_);
+                    LOG_CUSTOM_MSG2("Created NP queue for numa " << i
+                                    << " cores " << q_counts_[i]
+                                    << " queues " << queues);
+                    // low oriority
+                    queues = std::max(q_counts_[i]/std::get<2>(cores_per_queue_),
+                                      std::size_t(1));
+                    lp_queues_[i].init(
+                        q_counts_[i], queues, max_queue_thread_count_);
+                    LOG_CUSTOM_MSG2("Created LP queue for numa " << i
+                                    << " cores " << q_counts_[i]
+                                    << " queues " << queues);
+                }
+
+                // create worker_id to queue lookups for each queue type
+                for (std::size_t local_id=0; local_id!=num_workers_; ++local_id)
+                {
+                    hp_lookup_[local_id] = hp_queues_[d_lookup_[local_id]].
+                        get_queue_index(q_lookup_[local_id]);
+                    np_lookup_[local_id] = np_queues_[d_lookup_[local_id]].
+                        get_queue_index(q_lookup_[local_id]);
+                    lp_lookup_[local_id] = lp_queues_[d_lookup_[local_id]].
+                        get_queue_index(q_lookup_[local_id]);
+                }
+
+                debug::output("d_lookup_  ", &d_lookup_[0],  &d_lookup_[num_workers_]);
+                debug::output("q_lookup_  ", &q_lookup_[0],  &q_lookup_[num_workers_]);
+                debug::output("hp_lookup_ ", &hp_lookup_[0], &hp_lookup_[num_workers_]);
+                debug::output("np_lookup_ ", &np_lookup_[0], &np_lookup_[num_workers_]);
+                debug::output("lp_lookup_ ", &lp_lookup_[0], &lp_lookup_[num_workers_]);
+                debug::output("counters_  ", &counters_[0],  &counters_[num_domains_]);
+                debug::output("q_counts_  ", &q_counts_[0],  &q_counts_[num_domains_]);
             }
+        }
 
-            void on_stop_thread(std::size_t pool_queue_num)
-            {
-                //            high_priority_queue_.on_stop_thread(pool_queue_num);
-                if (pool_queue_num == queues_.size() - 1)
-                    low_priority_queue_.on_stop_thread(pool_queue_num);
+        void on_stop_thread(std::size_t pool_queue_num)
+        {
+            LOG_CUSTOM_MSG("on_stop_thread with local thread num "
+                << decnumber(pool_queue_num));
 
-                queues_[pool_queue_num]->on_stop_thread(pool_queue_num);
+            if (pool_queue_num>num_workers_) {
+                throw std::runtime_error("Bad thread number in schedule thread");
             }
+/*
+            // find the numa domain from the local thread index
+            std::size_t domain_num = d_lookup_[pool_queue_num];
 
-            void on_error(
-                std::size_t pool_queue_num, std::exception_ptr const& e)
-            {
-                //high_priority_queue_.on_error(pool_queue_num, e);
-                if (pool_queue_num == queues_.size() - 1)
-                    low_priority_queue_.on_error(pool_queue_num, e);
+            // set the preferred queue for this domain, if applicable
+            std::size_t q_index = pool_queue_num - q_offset_[domain_num];
 
-                queues_[pool_queue_num]->on_error(pool_queue_num, e);
-            }
+            bool result = hp_queues_[d].get_queue(q_index)->on_stop_thread(pool_queue_num);
 
-            void reset_thread_distribution()
-            {
-                curr_queue_.store(0);
-            }
+            queues_[pool_queue_num]->on_stop_thread(pool_queue_num);
+*/
+        }
 
-        protected:
-            std::size_t max_queue_thread_count_;
-            std::vector<thread_queue_type*> queues_;
-            std::vector<thread_queue_type*> high_priority_queues_;
-            thread_queue_type low_priority_queue_;
-            std::atomic<std::size_t> curr_queue_;
-            std::atomic<std::size_t> curr_hp_queue_;
-            std::size_t numa_sensitive_;
-            std::size_t numa_pinned_;
-            std::size_t threads_per_hp_queue_;
+        void on_error(
+            std::size_t pool_queue_num, std::exception_ptr const& e)
+        {
+            LOG_CUSTOM_MSG("on_error with local thread num "
+                << decnumber(pool_queue_num));
 
-            std::vector<std::vector<std::size_t>> victim_queues_;
-            std::vector<std::vector<std::size_t>> hp_victim_queues_;
-            std::vector<std::vector<std::size_t>> hp_xnuma_queues_;
-            std::vector<std::size_t> hp_queue_lookup_;
-            hpx::lcos::local::spinlock init_mutex;
-            bool initialized_;
-        };
-    }
-}
-}
+            if (pool_queue_num>num_workers_) {
+                throw std::runtime_error("Bad thread number in schedule thread");
+        }
+/*
+            if (pool_queue_num == queues_.size() - 1)
+                low_priority_queue_.on_error(pool_queue_num, e);
+
+            queues_[pool_queue_num]->on_error(pool_queue_num, e);
+*/
+        }
+
+        void reset_thread_distribution()
+        {
+            // curr_queue_.store(0);
+        }
+
+    protected:
+        typedef queue_holder<thread_queue_type> numa_queues;
+        //
+        std::array<numa_queues, HPX_MAX_NUMA_PER_NODE> np_queues_;
+        std::array<numa_queues, HPX_MAX_NUMA_PER_NODE> hp_queues_;
+        std::array<numa_queues, HPX_MAX_NUMA_PER_NODE> lp_queues_;
+        std::array<std::size_t, HPX_MAX_NUMA_PER_NODE> counters_;
+        // lookup domain from local worker index
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> d_lookup_;
+        // index of queue on domain from local worker index
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> hp_lookup_;
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> np_lookup_;
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> lp_lookup_;
+        // lookup sub domain queue index from local worker index
+        std::array<std::size_t, HPX_HAVE_MAX_CPU_COUNT> q_lookup_;
+        // number of cores per queue for HP, NP, LP queues
+        core_ratios cores_per_queue_;
+        // max storage size of any queue
+        std::size_t max_queue_thread_count_;
+        // number of worker threads assigned to this pool
+        std::size_t num_workers_;
+        // number of numa domains that the threads are occupying
+        std::size_t num_domains_;
+        // used to make sure the scheduler is only initialized once on a thread
+        bool        initialized_;
+        hpx::lcos::local::spinlock init_mutex;
+    };
+}}}
 
 #include <hpx/config/warnings_suffix.hpp>
 

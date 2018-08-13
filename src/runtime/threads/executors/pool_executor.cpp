@@ -19,24 +19,27 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         pool_executor::pool_executor(std::string const& pool_name)
-          : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
-          , stacksize_(thread_stacksize_default)
-          , priority_(thread_priority_default)
+            : scheduled_executor_base()
+            , pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
         {}
 
         pool_executor::pool_executor(std::string const& pool_name,
-            thread_stacksize stacksize)
-          : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
-          , stacksize_(stacksize)
-          , priority_(thread_priority_default)
-        {}
+                thread_stacksize stacksize)
+            : scheduled_executor_base()
+            , pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+        {
+            stacksize_ = stacksize;
+            priority_  = thread_priority_default;
+        }
 
         pool_executor::pool_executor(std::string const& pool_name,
-            thread_priority priority, thread_stacksize stacksize)
-          : pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
-          , stacksize_(stacksize)
-          , priority_(priority)
-        {}
+                thread_priority priority, thread_stacksize stacksize)
+            : scheduled_executor_base()
+            , pool_(hpx::threads::get_thread_manager().get_pool(pool_name))
+        {
+            stacksize_ = stacksize;
+            priority_  = priority;
+        }
 
         threads::thread_result_type
         pool_executor::thread_function_nullary(closure_type func)
@@ -63,9 +66,11 @@ namespace hpx { namespace threads { namespace executors
         // Depending on the subclass implementation, this may block in some
         // situations.
         void pool_executor::add(closure_type&& f,
+            threads::thread_schedule_hint schedulehint,
             util::thread_description const& desc,
-            threads::thread_state_enum initial_state, bool run_now,
-            threads::thread_stacksize stacksize, error_code& ec)
+            threads::thread_state_enum initial_state,
+            threads::thread_stacksize stacksize,
+            error_code& ec)
         {
             // create a new thread
             thread_init_data data(
@@ -77,15 +82,17 @@ namespace hpx { namespace threads { namespace executors
 
             if (stacksize == threads::thread_stacksize_default)
                 stacksize = stacksize_;
-            data.stacksize = threads::get_stack_size(stacksize);
-            data.priority = priority_;
+            //
+            data.stacksize    = threads::get_stack_size(stacksize);
+            data.priority     = priority_;
+            data.schedulehint = schedulehint;
 
             threads::thread_id_type id = threads::invalid_thread_id;
-            pool_.create_thread(data, id, initial_state, run_now, ec);
+            pool_.create_thread(data, id, initial_state, ec);
             if (ec)
                 return;
 
-            HPX_ASSERT(invalid_thread_id != id || !run_now);
+            HPX_ASSERT(invalid_thread_id != id);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -113,7 +120,7 @@ namespace hpx { namespace threads { namespace executors
             data.priority = priority_;
 
             threads::thread_id_type id = threads::invalid_thread_id;
-            pool_.create_thread(data, id, suspended, true, ec);
+            pool_.create_thread(data, id, suspended, ec);
             if (ec)
                 return;
 

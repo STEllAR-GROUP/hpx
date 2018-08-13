@@ -161,7 +161,7 @@ namespace hpx
         // before the thread function is executed
         error_code ec(lightweight);
         threads::get_thread_manager().register_thread(
-            data, id_, threads::pending, true, ec);
+            data, id_, threads::pending, ec);
         if (ec) {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
                 "Could not create thread");

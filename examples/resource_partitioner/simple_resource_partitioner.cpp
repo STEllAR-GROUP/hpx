@@ -1,3 +1,4 @@
+//  Copyright (c) 2017 John Biddiscombe
 //  Copyright (c) 2017 Shoshana Jakobovits
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,45 +29,33 @@
 #include "shared_priority_scheduler.hpp"
 #include "system_characteristics.hpp"
 
-namespace resource { namespace pools
-{
-    enum ids
-    {
-        DEFAULT = 0,
-        MPI = 1,
-        GPU = 2,
-        MATRIX = 3,
-    };
-}}
-
+// ------------------------------------------------------------------------
 static bool use_pools = false;
 static bool use_scheduler = false;
 static int pool_threads = 1;
 
+// ------------------------------------------------------------------------
 // this is our custom scheduler type
 using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<>;
 using namespace hpx::threads::policies;
 
-// Force an instantiation of the pool type templated on our custom scheduler
-// we need this to ensure that the pool has the generated member functions needed
-// by the linker for this pool type
-// template class hpx::threads::detail::scheduled_thread_pool<high_priority_sched>;
-
+// ------------------------------------------------------------------------
 // dummy function we will call using async
 void do_stuff(std::size_t n, bool printout)
 {
     if (printout)
-        hpx::cout << "[do stuff] " << n << "\n";
+        std::cout << "[do stuff] " << n << "\n";
     for (std::size_t i(0); i < n; ++i)
     {
         double f = std::sin(2 * M_PI * i / n);
         if (printout)
-            hpx::cout << "sin(" << i << ") = " << f << ", ";
+            std::cout << "sin(" << i << ") = " << f << ", ";
     }
     if (printout)
-        hpx::cout << "\n";
+        std::cout << "\n";
 }
 
+// ------------------------------------------------------------------------
 // this is called on an hpx thread after the runtime starts up
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -80,7 +69,7 @@ int hpx_main(boost::program_options::variables_map& vm)
               << "use_scheduler " << use_scheduler << "\n";
 
     std::size_t num_threads = hpx::get_num_worker_threads();
-    hpx::cout << "HPX using threads = " << num_threads << std::endl;
+    std::cout << "HPX using threads = " << num_threads << std::endl;
 
     std::size_t loop_count = num_threads * 1;
     std::size_t async_count = num_threads * 1;
@@ -97,7 +86,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // get executors
         hpx::threads::executors::pool_executor mpi_exec("mpi");
         mpi_executor = mpi_exec;
-        hpx::cout << "\n[hpx_main] got mpi executor " << std::endl;
+        std::cout << "\n[hpx_main] got mpi executor " << std::endl;
     }
     else
     {
@@ -160,12 +149,12 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " high priority i " << std::dec << i << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
@@ -176,13 +165,13 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " normal priority i " << std::dec << i
                           << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
@@ -193,12 +182,12 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " mpi pool i " << std::dec << i << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
@@ -217,19 +206,20 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::lock_guard<hpx::lcos::local::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
-                hpx::cout << std::hex << hpx::this_thread::get_id() << " "
+                std::cout << std::hex << hpx::this_thread::get_id() << " "
                           << std::hex << std::this_thread::get_id()
                           << " high priority mpi i " << std::dec << i
                           << std::endl;
             }
         });
-    hpx::cout << "thread set contains " << std::dec << thread_set.size()
+    std::cout << "thread set contains " << std::dec << thread_set.size()
               << std::endl;
     thread_set.clear();
 
     return hpx::finalize();
 }
 
+// ------------------------------------------------------------------------
 // the normal int main function that is called at startup and runs on an OS thread
 // the user must call hpx::init to start the hpx runtime which will execute hpx_main
 // on an hpx thread
@@ -284,7 +274,7 @@ int main(int argc, char* argv[])
 
             std::unique_ptr<high_priority_sched> scheduler(
                 new high_priority_sched(
-                    num_threads, 1, false, false, "shared-priority-scheduler"));
+                    num_threads, {4,4,64}, "shared-priority-scheduler"));
 
             auto mode = scheduler_mode(scheduler_mode::do_background_work |
                 scheduler_mode::delay_exit);
@@ -315,8 +305,8 @@ int main(int argc, char* argv[])
                 std::cout << "User defined scheduler creation callback "
                           << std::endl;
                 std::unique_ptr<high_priority_sched> scheduler(
-                    new high_priority_sched(num_threads, 1, false, false,
-                        "shared-priority-scheduler"));
+                    new high_priority_sched(
+                        num_threads, {4,4,64}, "shared-priority-scheduler"));
 
                 auto mode = scheduler_mode(scheduler_mode::delay_exit);
 

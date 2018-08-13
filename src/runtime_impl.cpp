@@ -357,7 +357,9 @@ namespace hpx
         threads::thread_init_data data(
             util::bind(&runtime_impl::run_helper, this, func,
                 std::ref(result_)),
-            "run_helper", 0, threads::thread_priority_normal, std::size_t(-1),
+            "run_helper", 0,
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(0),
             threads::get_stack_size(threads::thread_stacksize_large));
 
         this->runtime::starting();
@@ -791,7 +793,7 @@ namespace hpx
             thread_support_->register_thread(name, ec);
 
             // initialize coroutines context switcher
-            hpx::threads::coroutines::thread_startup(name);
+//             hpx::threads::coroutines::thread_startup(name);
 
             // register this thread with any possibly active Intel tool
             HPX_ITT_THREAD_SET_NAME(name);
@@ -853,7 +855,7 @@ namespace hpx
         }
 
         // initialize coroutines context switcher
-        hpx::threads::coroutines::thread_shutdown();
+//         hpx::threads::coroutines::thread_shutdown();
 
         // reset applier TSS
         applier_.deinit_tss();

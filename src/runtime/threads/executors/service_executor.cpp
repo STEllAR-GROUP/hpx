@@ -111,9 +111,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Depending on the subclass implementation, this may block in some
     // situations.
     void service_executor::add(closure_type&& f,
+        threads::thread_schedule_hint schedulehint,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state, bool run_now,
-        threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state,
+        threads::thread_stacksize stacksize,
+        error_code& ec)
     {
         ++task_count_;
 

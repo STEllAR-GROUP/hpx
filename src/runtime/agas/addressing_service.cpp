@@ -1419,8 +1419,9 @@ void addressing_service::route(
         threads::register_thread_nullary(
             util::deferred_call(
                 route_ptr, this, std::move(p), std::move(f), local_priority),
-            "addressing_service::route", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            "addressing_service::route", threads::pending,
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint_none,
             threads::thread_stacksize_default);
         return;
     }
@@ -1574,8 +1575,9 @@ void addressing_service::decref(
 
         threads::register_thread_nullary(
             util::deferred_call(decref_ptr, this, raw, credit, std::ref(throws)),
-            "addressing_service::decref", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            "addressing_service::decref", threads::pending,
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint_none,
             threads::thread_stacksize_default, ec);
 
         return;
@@ -1821,8 +1823,9 @@ void addressing_service::update_cache_entry(
         ) = &addressing_service::update_cache_entry;
         threads::register_thread_nullary(
             util::deferred_call(update_cache_entry_ptr, this, id, g, std::ref(throws)),
-            "addressing_service::update_cache_entry", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            "addressing_service::update_cache_entry", threads::pending,
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint_none,
             threads::thread_stacksize_default, ec);
     }
 

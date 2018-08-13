@@ -60,7 +60,9 @@ namespace hpx { namespace lcos { namespace detail
         // launch a new thread executing the given function
         threads::thread_id_type tid = p.apply(
             policy, threads::thread_priority_boost,
-            threads::thread_stacksize_current, ec);
+            threads::thread_stacksize_current,
+            threads::thread_schedule_hint_none,
+            ec);
         if (ec) return false;
 
         // wait for the task to run

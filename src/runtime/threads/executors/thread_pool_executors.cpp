@@ -155,9 +155,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add(closure_type && f,
+        threads::thread_schedule_hint schedulehint,
         util::thread_description const& desc,
         threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_stacksize stacksize,
+        error_code& ec)
     {
         // create a new thread
         thread_init_data data(util::bind(
@@ -170,7 +172,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(&scheduler_, data, id, initial_state, //-V601
-            run_now, ec);
+            ec);
         if (ec) {
             --tasks_scheduled_;
             return;
@@ -197,7 +199,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread( //-V601
-            &scheduler_, data, id, suspended, true, ec);
+            &scheduler_, data, id, suspended, ec);
         if (ec) return;
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
@@ -435,8 +437,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     util::one_shot(&thread_pool_executor::run),
                     this, virt_core, thread_num
                 ),
-                "thread_pool_executor thread", threads::pending, true,
-                threads::thread_priority_normal, thread_num,
+                "thread_pool_executor thread", threads::pending,
+                threads::thread_priority_normal,
+                threads::thread_schedule_hint(thread_num),
                 threads::thread_stacksize_default, ec);
         }
     }

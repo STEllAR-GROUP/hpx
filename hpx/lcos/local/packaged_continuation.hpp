@@ -679,7 +679,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         // simply forward this to executor
         return parallel::execution::then_execute(exec, std::forward<F>(f),
-            predecessor);
+            std::forward<Future>(predecessor));
     }
 }}}
 

@@ -22,7 +22,7 @@ namespace hpx { namespace threads { namespace detail
         policies::scheduler_base* scheduler, thread_init_data& data,
         threads::thread_id_type& id,
         thread_state_enum initial_state = pending,
-        bool run_now = true, error_code& ec = throws)
+        error_code& ec = throws)
     {
         // verify parameters
         switch (initial_state) {
@@ -86,19 +86,17 @@ namespace hpx { namespace threads { namespace detail
             data.priority = thread_priority_normal;
 
         // create the new thread
-        std::size_t num_thread = data.num_os_thread;
-        scheduler->create_thread(data, &id, initial_state, run_now, ec, num_thread);
+        scheduler->create_thread(data, &id, initial_state, ec);
 
         LTM_(info) << "register_thread(" << id << "): initial_state("
-                   << get_thread_state_name(initial_state) << "), "
-                   << "run_now(" << (run_now ? "true" : "false")
+                   << get_thread_state_name(initial_state)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                    << "), description(" << data.description
 #endif
                    << ")";
 
         // potentially wake up waiting thread
-        scheduler->do_some_work(num_thread);
+        scheduler->do_some_work(data.schedulehint);
     }
 }}}
 

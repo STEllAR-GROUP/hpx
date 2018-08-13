@@ -316,6 +316,12 @@ namespace hpx { namespace compute { namespace cuda
             create(std::move(p));
     }
 
+    target& get_default_target()
+    {
+        static target t;
+        return t;
+    }
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     ///////////////////////////////////////////////////////////////////////////
     void target::serialize(serialization::input_archive& ar,

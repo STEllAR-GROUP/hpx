@@ -297,10 +297,11 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread,
-            std::size_t num_thread_fallback = std::size_t(-1))
+            thread_state_enum initial_state, error_code& ec) override
         {
+            std::size_t num_thread = std::size_t(data.schedulehint);
+            std::size_t num_thread_fallback = std::size_t(-1);
+
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
 //             // try to figure out the NUMA node where the data lives
 //             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
@@ -332,8 +333,7 @@ namespace hpx { namespace threads { namespace policies
             num_thread = select_active_pu(l, num_thread, num_thread_fallback);
 
             HPX_ASSERT(num_thread < queue_size);
-            queues_[num_thread]->create_thread(data, id, initial_state,
-                run_now, ec);
+            queues_[num_thread]->create_thread(data, id, initial_state, ec);
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -353,13 +353,6 @@ namespace hpx { namespace threads { namespace policies
                 if (result)
                     return true;
                 q->increment_num_pending_misses();
-
-                bool have_staged =
-                    q->get_staged_queue_length(std::memory_order_relaxed) != 0;
-
-                // Give up, we should have work to convert.
-                if (have_staged)
-                    return false;
             }
 
             if (numa_sensitive_ != 0)
@@ -662,154 +655,6 @@ namespace hpx { namespace threads { namespace policies
             return wait_time / (count + 1);
         }
 #endif
-
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// has to be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count)
-        {
-            std::size_t queues_size = queues_.size();
-            HPX_ASSERT(num_thread < queues_.size());
-
-            std::size_t added = 0;
-            bool result = true;
-
-            result = queues_[num_thread]->wait_or_add_new(running,
-                idle_loop_count, added) && result;
-            if (0 != added) return result;
-
-            // Check if we have been disabled
-            if (!running)
-            {
-                return true;
-            }
-
-            if (numa_sensitive_ != 0)   // limited or no stealing across domains
-            {
-                auto const& rp = resource::get_partitioner();
-
-                // steal work items: first try to steal from other cores in
-                // the same NUMA node
-                std::size_t pu_number =
-                    rp.get_affinity_data().get_pu_num(num_thread);
-
-#if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_, pu_number)) //-V600 //-V111
-#endif
-                {
-                    mask_cref_type numa_domain_mask =
-                        numa_domain_masks_[num_thread];
-                    for (std::size_t i = 1; i != queues_size; ++i)
-                    {
-                        // FIXME: Do a better job here.
-                        std::size_t const idx = (i + num_thread) % queues_size;
-
-                        HPX_ASSERT(idx != num_thread);
-
-                        if (!test(numa_domain_mask,
-                                rp.get_affinity_data().get_pu_num(idx))) //-V600
-                        {
-                            continue;
-                        }
-
-                        result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
-                        if (0 != added)
-                        {
-                            queues_[idx]->increment_num_stolen_from_staged(added);
-                            queues_[num_thread]->increment_num_stolen_to_staged(added);
-                            return result;
-                        }
-                    }
-                }
-
-#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
-                // if nothing found, ask everybody else
-                if (test(steals_outside_numa_domain_, pu_number)) //-V600 //-V111
-                {
-                    threads::policies::detail::affinity_data const& affinity_data =
-                        rp.get_affinity_data();
-
-                    mask_cref_type numa_domain_mask =
-                        outside_numa_domain_masks_[num_thread];
-                    for (std::size_t i = 1; i != queues_size; ++i)
-                    {
-                        // FIXME: Do a better job here.
-                        std::size_t const idx = (i + num_thread) % queues_size;
-
-                        HPX_ASSERT(idx != num_thread);
-
-                        if (!test(numa_domain_mask,
-                                affinity_data.get_pu_num(idx))) //-V600
-                        {
-                            continue;
-                        }
-
-                        result = queues_[num_thread]->wait_or_add_new(running,
-                            idle_loop_count, added, queues_[idx]) && result;
-                        if (0 != added)
-                        {
-                            queues_[idx]->increment_num_stolen_from_staged(added);
-                            queues_[num_thread]->increment_num_stolen_to_staged(added);
-                            return result;
-                        }
-                    }
-                }
-#endif
-            }
-
-            else // not NUMA-sensitive
-            {
-                for (std::size_t i = 1; i != queues_size; ++i)
-                {
-                    // FIXME: Do a better job here.
-                    std::size_t const idx = (i + num_thread) % queues_size;
-
-                    HPX_ASSERT(idx != num_thread);
-
-                    result = queues_[num_thread]->wait_or_add_new(running,
-                        idle_loop_count, added, queues_[idx]) && result;
-                    if (0 != added)
-                    {
-                        queues_[idx]->increment_num_stolen_from_staged(added);
-                        queues_[num_thread]->increment_num_stolen_to_staged(added);
-                        return result;
-                    }
-                }
-            }
-
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            // no new work is available, are we deadlocked?
-            if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
-            {
-                bool suspended_only = true;
-
-                for (std::size_t i = 0; suspended_only && i != queues_.size(); ++i)
-                {
-                    suspended_only = queues_[i]->dump_suspended_threads(
-                        i, idle_loop_count, running);
-                }
-
-                if (HPX_UNLIKELY(suspended_only)) {
-                    if (running) {
-                        LTM_(error) //-V128
-                            << "queue(" << num_thread << "): "
-                            << "no new work available, are we deadlocked?";
-                    }
-                    else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
-                              << "  [TM] " //-V128
-                              << "queue(" << num_thread << "): "
-                              << "no new work available, are we deadlocked?\n";
-                    }
-                }
-            }
-#endif
-
-            return result;
-        }
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)

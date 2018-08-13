@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
             threads::register_thread_nullary(
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc, threads::pending, true, policy.priority());
+                desc, threads::pending, policy.priority());
         }
     };
 
@@ -43,8 +43,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
             threads::thread_id_type tid = threads::register_thread_nullary(
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc, threads::pending_do_not_schedule, true,
-                policy.priority(), get_worker_thread_num(),
+                desc, threads::pending_do_not_schedule,
+                policy.priority(), threads::thread_schedule_hint(get_worker_thread_num()),
                 threads::thread_stacksize_current);
 
             // make sure this thread is executed last
