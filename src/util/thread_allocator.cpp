@@ -155,7 +155,7 @@ namespace hpx { namespace util
 
             alloc_page *next;
             thread_local_allocator *allocator;
-            std::atomic<std::size_t> allocated_blocks;
+            std::size_t allocated_blocks;
         };
     }
 
@@ -199,21 +199,22 @@ namespace hpx { namespace util
         std::unique_lock<mutex_type> lk(mtx);
         while (true)
         {
-            for (detail::alloc_block* blk = pending_chain; blk != nullptr;
-                blk = blk->next_free)
-            {
-                --blk->page->allocated_blocks;
-            }
+            detail::alloc_block* blk = pending_chain;
             pending_chain = nullptr;
 
             {
                 hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(lk);
 
+                for (/**/; blk != nullptr; blk = blk->next_free)
+                {
+                    --blk->page->allocated_blocks;
+                }
+
                 detail::alloc_page** ppg = &pages;
                 for (detail::alloc_page* pg = pages; pg != nullptr; /**/)
                 {
                     detail::alloc_page* next = pg->next;
-                    if (!pg->allocated_blocks.load(std::memory_order_acquire))
+                    if (pg->allocated_blocks == 0)
                     {
                         *ppg = next;
                         delete pg;
