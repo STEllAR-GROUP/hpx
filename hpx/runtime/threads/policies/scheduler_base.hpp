@@ -491,7 +491,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         virtual void start_periodic_maintenance(
-            std::atomic<hpx::state>& global_state)
+            std::atomic<hpx::state>& /*global_state*/)
         {}
 
         virtual void reset_thread_distribution() {}

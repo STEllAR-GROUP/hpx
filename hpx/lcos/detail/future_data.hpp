@@ -301,7 +301,7 @@ namespace detail
                 "future_data_base::get_registered_name",
                 "this future does not support name registration");
         }
-        virtual void register_as(std::string const& name, bool manage_lifetime)
+        virtual void register_as(std::string const& /*name*/, bool /*manage_lifetime*/)
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "future_data_base::set_registered_name",
@@ -737,7 +737,7 @@ namespace detail
           : base_type(no_addref), started_(false)
         {}
 
-        virtual void execute_deferred(error_code& ec = throws)
+        virtual void execute_deferred(error_code& /*ec*/ = throws)
         {
             if (!started_test_and_set())
                 this->do_run();
@@ -815,9 +815,9 @@ namespace detail
         }
 
         // run in a separate thread
-        virtual threads::thread_id_type apply(launch policy,
-            threads::thread_priority priority,
-            threads::thread_stacksize stacksize, error_code& ec)
+        virtual threads::thread_id_type apply(launch /*policy*/,
+            threads::thread_priority /*priority*/,
+            threads::thread_stacksize /*stacksize*/, error_code& /*ec*/)
         {
             HPX_ASSERT(false);      // shouldn't ever be called
             return threads::invalid_thread_id;

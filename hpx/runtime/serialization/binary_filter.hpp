@@ -30,7 +30,7 @@ namespace hpx { namespace serialization
             std::size_t size, std::size_t buffer_size) = 0;
         virtual void load(void* dst, std::size_t dst_count) = 0;
 
-        template <class T> void serialize(T& ar, unsigned){}
+        template <class T> void serialize(T& /*ar*/, unsigned){}
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(binary_filter);
 
         virtual ~binary_filter() {}

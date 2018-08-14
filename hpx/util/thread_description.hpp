@@ -188,7 +188,7 @@ namespace hpx { namespace util
         {
         }
 
-        thread_description(char const* desc) noexcept
+        thread_description(char const* /*desc*/) noexcept
         {
         }
 
@@ -197,8 +197,8 @@ namespace hpx { namespace util
                 !std::is_same<F, thread_description>::value &&
                 !traits::is_action<F>::value
             >::type>
-        explicit thread_description(F const& f,
-            char const* altname = nullptr) noexcept
+        explicit thread_description(F const& /*f*/,
+            char const* /*altname*/ = nullptr) noexcept
         {
         }
 
@@ -207,7 +207,7 @@ namespace hpx { namespace util
                 traits::is_action<Action>::value
             >::type>
         explicit thread_description(Action,
-            char const* altname = nullptr) noexcept
+            char const* /*altname*/ = nullptr) noexcept
         {
         }
 

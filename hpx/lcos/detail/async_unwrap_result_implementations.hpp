@@ -72,7 +72,7 @@ namespace hpx { namespace detail
         Result& result, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        //typedef typename action_type::local_result_type result_type;
         typedef typename action_type::component_type component_type;
 
         // route launch policy through component
@@ -109,7 +109,7 @@ namespace hpx { namespace detail
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
-        typedef typename action_type::component_type component_type;
+        //typedef typename action_type::component_type component_type;
 
         std::pair<bool, components::pinned_ptr> r;
 

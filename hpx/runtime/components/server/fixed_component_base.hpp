@@ -208,12 +208,12 @@ namespace detail
         {
         }
 #else
-        static void* alloc(std::size_t count)
+        static void* alloc(std::size_t /*count*/)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
             return nullptr;
         }
-        static void free(void* p, std::size_t count)
+        static void free(void* /*p*/, std::size_t /*count*/)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
         }

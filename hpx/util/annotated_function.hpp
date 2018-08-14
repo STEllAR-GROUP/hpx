@@ -182,9 +182,9 @@ namespace hpx { namespace util
     {
         HPX_NON_COPYABLE(annotate_function);
 
-        explicit annotate_function(char const* name) {}
+        explicit annotate_function(char const* /*name*/) {}
         template <typename F>
-        explicit HPX_HOST_DEVICE annotate_function(F && f) {}
+        explicit HPX_HOST_DEVICE annotate_function(F && /*f*/) {}
 
         // add empty (but non-trivial) destructor to silence warnings
         HPX_HOST_DEVICE ~annotate_function() {}

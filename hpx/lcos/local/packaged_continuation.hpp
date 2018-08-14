@@ -308,7 +308,7 @@ namespace hpx { namespace lcos { namespace detail
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f,
-            threads::thread_priority priority,
+            threads::thread_priority /*priority*/,
             error_code& ec)
         {
             {
@@ -794,7 +794,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future>
     inline typename traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
-    unwrap_impl(Future && future, error_code& ec)
+    unwrap_impl(Future && future, error_code& /*ec*/)
     {
         typedef typename future_unwrap_result<Future>::result_type result_type;
 

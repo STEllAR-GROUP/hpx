@@ -136,7 +136,7 @@ namespace hpx { namespace detail
     {
         template <typename ...Ts>
         static lcos::future<Result>
-        call(naming::id_type const& id, naming::address && addr, Ts &&... vs)
+        call(naming::id_type const& /*id*/, naming::address && addr, Ts &&... vs)
         {
             try
             {
@@ -174,7 +174,7 @@ namespace hpx { namespace detail
     {
         template <typename ...Ts>
         static lcos::future<void>
-        call(naming::id_type const& id, naming::address && addr, Ts &&... vs)
+        call(naming::id_type const& /*id*/, naming::address && addr, Ts &&... vs)
         {
             try
             {
@@ -360,7 +360,7 @@ namespace hpx { namespace detail
         hpx::future<Result>& f, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        //typedef typename action_type::local_result_type result_type;
         typedef typename action_type::component_type component_type;
 
         // route launch policy through component

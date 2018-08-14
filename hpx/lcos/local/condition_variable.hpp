@@ -69,7 +69,7 @@ namespace hpx { namespace lcos { namespace local
 
         template <class Predicate>
         void wait(std::unique_lock<mutex>& lock, Predicate pred,
-            error_code& ec = throws)
+            error_code& /*ec*/ = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 

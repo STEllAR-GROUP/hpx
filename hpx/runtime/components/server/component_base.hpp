@@ -42,11 +42,11 @@ namespace hpx { namespace components
             HPX_EXPORT ~base_component();
 
             // Copy construction and copy assignment should not copy the gid_.
-            base_component(base_component const& rhs)
+            base_component(base_component const& /*rhs*/)
             {
             }
 
-            base_component& operator=(base_component const& rhs)
+            base_component& operator=(base_component const& /*rhs*/)
             {
                 return *this;
             }

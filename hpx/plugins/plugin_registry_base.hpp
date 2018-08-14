@@ -38,7 +38,7 @@ namespace hpx { namespace plugins
         ///         implemented in this module.
         virtual bool get_plugin_info(std::vector<std::string>& fillini) = 0;
 
-        virtual void init(int *argc, char ***argv, util::command_line_handling&)
+        virtual void init(int * /*argc*/, char *** /*argv*/, util::command_line_handling&)
         {
         }
     };
