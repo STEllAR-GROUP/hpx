@@ -138,7 +138,7 @@ namespace hpx { namespace resource { namespace detail
     }
 
     inline partitioner& create_partitioner(
-        std::nullptr_t /*f*/, int argc, char** argv,
+        std::nullptr_t f, int argc, char** argv,
         resource::partitioner_mode rpmode = resource::mode_default,
         hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
     {
@@ -156,7 +156,7 @@ namespace hpx { namespace resource { namespace detail
     }
 
     inline partitioner& create_partitioner(
-        std::nullptr_t /*f*/, int argc, char** argv,
+        std::nullptr_t f, int argc, char** argv,
         std::vector<std::string> const& cfg,
         resource::partitioner_mode rpmode = resource::mode_default,
         hpx::runtime_mode mode = hpx::runtime_mode_default, bool check = true)
@@ -174,7 +174,7 @@ namespace hpx { namespace resource { namespace detail
     }
 
     inline partitioner& create_partitioner(
-        std::nullptr_t /*f*/,
+        std::nullptr_t f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         resource::partitioner_mode rpmode = resource::mode_default,

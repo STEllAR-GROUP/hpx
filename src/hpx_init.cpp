@@ -283,18 +283,6 @@ namespace hpx { namespace detail
     }
 }}
 
-#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
-    (defined(__linux) || defined(__linux__) || defined(linux) || \
-    defined(__APPLE__))
-namespace hpx_start
-{
-    // Importing weak symbol from libhpx_wrap.a which may be shadowed by one present in
-    // hpx_main.hpp.
-    HPX_SYMBOL_EXPORT __attribute__((weak)) extern bool include_libhpx_wrap;
-}
-
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -599,20 +587,6 @@ namespace hpx
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)
                 {
-                #if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
-                (defined(__linux) || defined(__linux__) || defined(linux) || \
-                defined(__APPLE__))
-                    // make sure the runtime system is not initialized
-                    // after its activation from int main()
-                    if(hpx_start::include_libhpx_wrap)
-                    {
-                        std::cerr << "hpx is already initialized from main.\n"
-                            "Note: Delete hpx_main.hpp to initialize hpx system "
-                            "using hpx::init. Exiting...\n";
-                        return -1;
-                    }
-                    #endif
-
                     std::cerr << "hpx::init: can't initialize runtime system "
                         "more than once! Exiting...\n";
                     return -1;

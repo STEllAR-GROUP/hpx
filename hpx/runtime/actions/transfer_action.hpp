@@ -156,7 +156,7 @@ namespace hpx { namespace actions
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
         naming::address::component_type comptype,
-        std::size_t /*num_thread*/)
+        std::size_t num_thread)
     {
         naming::id_type target;
         if (naming::detail::has_credits(target_gid))

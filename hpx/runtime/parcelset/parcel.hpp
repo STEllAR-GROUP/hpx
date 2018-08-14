@@ -187,7 +187,7 @@ namespace hpx { namespace parcelset
     HPX_EXPORT std::string dump_parcel(parcel const& p);
 }}
 
-HPX_IS_BITWISE_SERIALIZABLE(hpx::parcelset::detail::parcel_data)
+HPX_IS_BITWISE_SERIALIZABLE(hpx::parcelset::detail::parcel_data);
 
 #include <hpx/config/warnings_suffix.hpp>
 

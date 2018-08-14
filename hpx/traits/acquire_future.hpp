@@ -102,7 +102,7 @@ namespace hpx { namespace traits
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(push_back)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(push_back);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Range>

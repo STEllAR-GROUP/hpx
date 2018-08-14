@@ -20,8 +20,6 @@ set(tests
     async_local_executor
     async_remote
     async_remote_client
-    async_unwrap_result
-    barrier
     broadcast
     broadcast_apply
     channel
@@ -29,6 +27,7 @@ set(tests
     client_then
     condition_variable
     counting_semaphore
+    barrier
     fold
     future
     future_ref
@@ -40,7 +39,6 @@ set(tests
     local_latch
     local_barrier
     local_dataflow
-    local_dataflow_boost_small_vector
     local_dataflow_executor
     local_dataflow_std_array
     local_event
@@ -59,7 +57,6 @@ set(tests
     sliding_semaphore
     split_future
     split_shared_future
-    sync_remote
     use_allocator
     wait_all_std_array
     wait_any_std_array
@@ -174,20 +171,14 @@ endforeach()
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
   set(compile_tests
+      fail_compile_mutex_move
+      fail_compile_spinlock_move
+      fail_compile_spinlock_no_backoff_move
      )
 
-  if(HPX_WITH_FAIL_COMPILE_TESTS)
-    set(fail_compile_tests
-        fail_compile_mutex_move
-        fail_compile_spinlock_move
-        fail_compile_spinlock_no_backoff_move
-       )
-    foreach(fail_compile_test ${fail_compile_tests})
-      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
-    endforeach()
-
-    set(compile_tests ${compile_tests} ${fail_compile_tests})
-  endif()
+  set(fail_compile_mutex_move_FLAGS FAILURE_EXPECTED)
+  set(fail_compile_spinlock_move_FLAGS FAILURE_EXPECTED)
+  set(fail_compile_spinlock_no_backoff_move_FLAGS FAILURE_EXPECTED)
 
   foreach(compile_test ${compile_tests})
     set(sources

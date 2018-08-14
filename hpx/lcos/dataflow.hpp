@@ -329,8 +329,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         /// Finish the dataflow when the traversal has finished
-        HPX_FORCEINLINE void operator()(
-            util::async_traverse_complete_tag, Futures futures)
+        void operator()(util::async_traverse_complete_tag, Futures futures)
         {
             finalize(policy_, std::move(futures));
         }

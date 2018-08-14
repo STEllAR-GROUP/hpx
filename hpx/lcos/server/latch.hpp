@@ -135,7 +135,7 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx_lcos_server_latch_wait_action)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    bool, std::ptrdiff_t, bool_std_ptrdiff)
+    bool, std::ptrdiff_t, bool_std_ptrdiff);
 
 #endif
 

@@ -123,20 +123,12 @@ add_hpx_test(
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests
+      fail_future_2667
       future_range_ambiguity_2032
       wait_all_std_array_2035
      )
 
-  if(HPX_WITH_FAIL_COMPILE_TESTS)
-    set(fail_compile_tests
-        fail_future_2667
-       )
-    foreach(fail_compile_test ${fail_compile_tests})
-      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
-    endforeach()
-
-    set(compile_tests ${compile_tests} ${fail_compile_tests})
-  endif()
+  set(fail_future_2667_FLAGS FAILURE_EXPECTED)
 
   foreach(compile_test ${compile_tests})
     set(sources

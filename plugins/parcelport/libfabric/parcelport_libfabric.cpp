@@ -92,7 +92,7 @@ namespace libfabric
     // --------------------------------------------------------------------
     parcelport::parcelport(util::runtime_configuration const& ini,
         util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
+        util::function_nonser<void()> const& on_stop_thread)
         : base_type(ini, locality(), on_start_thread, on_stop_thread)
         , stopped_(false)
         , completions_handled_(0)

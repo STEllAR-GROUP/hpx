@@ -64,7 +64,7 @@ double null_function(
     std::mt19937_64 prng(seed);
 
     std::uniform_real_distribution<double> v(0, 1.);
-    std::uniform_int_distribution<short> s(0, 1);
+    std::uniform_int_distribution<std::uint8_t> s(0, 1);
 
     double d = 0.;
 

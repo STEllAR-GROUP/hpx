@@ -101,7 +101,7 @@ namespace hpx { namespace lcos
         virtual void set_value (RemoteResult && result) = 0;
 
         virtual result_type get_value() = 0;
-        virtual result_type get_value(error_code& /*ec*/)
+        virtual result_type get_value(error_code& ec)
         {
             return get_value();
         }

@@ -14,17 +14,12 @@
 #ifdef HPX_HAVE_APEX
 #include "apex_api.hpp"
 #include <memory>
-#include <cstdint>
-#include <string>
 typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
-#else
-typedef void* apex_task_wrapper;
 #endif
 
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
-
     static void hpx_util_apex_init_startup(void)
     {
         apex::init(nullptr, hpx::get_locality_id(),
@@ -44,17 +39,12 @@ namespace hpx { namespace util
 
     HPX_EXPORT apex_task_wrapper apex_new_task(
                 thread_description const& description,
-                std::uint32_t parent_task_locality,
                 threads::thread_id_type const& parent_task);
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
                 thread_description const& description)
     {
-        if (wrapper == nullptr) {
-            threads::thread_id_type parent_task(nullptr);
-            // doesn't matter which locality we use, the parent is null
-            return apex_new_task(description, 0, parent_task);
-        } else if (description.kind() == thread_description::data_type_description) {
+        if (description.kind() == thread_description::data_type_description) {
             return apex::update_task(wrapper,
                 description.get_description());
         } else {
@@ -65,10 +55,6 @@ namespace hpx { namespace util
 
     inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper, char const* name)
     {
-        if (wrapper == nullptr) {
-            apex_task_wrapper parent_task(nullptr);
-            return apex::new_task(std::string(name), UINTMAX_MAX, parent_task);
-        }
         return apex::update_task(wrapper, name);
     }
 
@@ -136,23 +122,10 @@ namespace hpx { namespace util
     inline void apex_init() {}
     inline void apex_finalize() {}
 
-    inline apex_task_wrapper apex_new_task(
-                thread_description const& description,
-                std::uint32_t parent_task_locality,
-                threads::thread_id_type const& parent_task) {return nullptr;}
-
-    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
-                thread_description const& description) {return nullptr;}
-
-    inline apex_task_wrapper apex_update_task(apex_task_wrapper wrapper,
-                char const* name) {return nullptr;}
-
     struct apex_wrapper
     {
-        apex_wrapper(apex_task_wrapper data_ptr) {}
+        apex_wrapper(thread_description const& name) {}
         ~apex_wrapper() {}
-        void stop(void) {}
-        void yield(void) {}
     };
 
     struct apex_wrapper_init

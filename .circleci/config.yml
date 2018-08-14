@@ -69,7 +69,6 @@ jobs:
                 -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
                 -DHPX_WITH_TESTS_HEADERS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=Off \
-                -DHPX_HAVE_THREAD_LOCAL_STORAGE=On \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On
       - persist_to_workspace:
           root: /hpx/build
@@ -110,7 +109,6 @@ jobs:
               /hpx/source/tools/inspect/inspect_to_junit.py \
                   ./hpx_inspect_report.html \
                   /report/hpx_inspect.xml
-          when: always
       - store_artifacts:
           path: hpx_inspect_report.html
           destination: hpx_inspect_report.html
@@ -916,12 +914,10 @@ jobs:
       - run:
           name: Push Docker Image
           command: |
-              if [ "$CIRCLE_BRANCH" == "master" ]; then
-                  docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-                  docker push ${TARGET_IMAGE_NAME}
-              else
-                  echo "Skipping docker push on non-master branch"
-              fi
+              docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+              docker push ${TARGET_IMAGE_NAME}
+          filters:
+              branches: master
 
 workflows:
   version: 2

@@ -22,7 +22,6 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/lazy_enable_if.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -117,9 +116,15 @@ namespace hpx { namespace detail
         // distribution policy
         template <typename Policy_, typename DistPolicy, typename ...Ts>
         HPX_FORCEINLINE static
-        typename util::lazy_enable_if<
+        typename std::enable_if<
             traits::is_distribution_policy<DistPolicy>::value,
-            typename DistPolicy::template async_result<Action>
+            lcos::future<
+                typename traits::promise_local_result<
+                    typename hpx::traits::extract_action<
+                        Action
+                    >::remote_result_type
+                >::type
+            >
         >::type
         call(Policy_ && launch_policy, DistPolicy const& policy, Ts&&... ts)
         {
@@ -181,7 +186,12 @@ namespace hpx { namespace detail
     {
         template <typename DistPolicy, typename ...Ts>
         HPX_FORCEINLINE static
-        typename DistPolicy::template async_result<Action>::type
+        lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::traits::extract_action<
+                    Action
+                >::remote_result_type
+            >::type>
         call(DistPolicy const& policy, Ts&&... ts)
         {
             return async_action_dispatch<
@@ -203,11 +213,10 @@ namespace hpx { namespace detail
                 >::remote_result_type
             >::type result_type;
 
-        template <typename Policy, typename... Ts>
-        HPX_FORCEINLINE static auto call(
-            Policy&& launch_policy, Action const&, Ts&&... ts)
-        ->  decltype(async<Action>(
-                std::forward<Policy>(launch_policy), std::forward<Ts>(ts)...))
+        template <typename Policy, typename ...Ts>
+        HPX_FORCEINLINE static
+        lcos::future<result_type>
+        call(Policy && launch_policy, Action const&, Ts &&... ts)
         {
             static_assert(
                 traits::is_launch_policy<
@@ -288,8 +297,12 @@ namespace hpx { namespace detail
         template <
             typename Component, typename Signature, typename Derived,
             typename DistPolicy, typename ...Ts>
-        HPX_FORCEINLINE static
-            typename DistPolicy::template async_result<Derived>::type
+        HPX_FORCEINLINE static lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::traits::extract_action<
+                    Derived
+                >::remote_result_type
+            >::type>
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
             DistPolicy const& policy, Ts&&... vs)
         {
@@ -346,9 +359,14 @@ namespace hpx { namespace detail
         template <typename Policy_, typename Component, typename Signature,
             typename Derived, typename DistPolicy, typename ...Ts>
         HPX_FORCEINLINE static
-        typename util::lazy_enable_if<
+        typename std::enable_if<
             traits::is_distribution_policy<DistPolicy>::value,
-            typename DistPolicy::template async_result<Derived>
+            lcos::future<
+                typename traits::promise_local_result<
+                    typename traits::extract_action<
+                        Derived
+                    >::remote_result_type
+                >::type>
         >::type
         call(Policy_ && launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&,
@@ -359,8 +377,6 @@ namespace hpx { namespace detail
         }
     };
 }}
-
-#include <hpx/lcos/sync.hpp>
 
 #endif
 

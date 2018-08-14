@@ -167,8 +167,7 @@ std::uint32_t locality_namespace::allocate(
     )
 { // {{{ allocate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.allocate_.time_,
-        counter_data_.allocate_.enabled_
+        counter_data_.allocate_.time_
     );
     counter_data_.increment_allocate_count();
 
@@ -271,8 +270,7 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
     naming::gid_type locality)
 { // {{{ resolve_locality implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.resolve_locality_.time_,
-        counter_data_.resolve_locality_.enabled_
+        counter_data_.resolve_locality_.time_
     );
     counter_data_.increment_resolve_locality_count();
 
@@ -293,8 +291,7 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
 void locality_namespace::free(naming::gid_type locality)
 { // {{{ free implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.free_.time_,
-        counter_data_.free_.enabled_
+        counter_data_.free_.time_
     );
     counter_data_.increment_free_count();
 
@@ -366,8 +363,7 @@ void locality_namespace::free(naming::gid_type locality)
 std::vector<std::uint32_t> locality_namespace::localities()
 { // {{{ localities implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.localities_.time_,
-        counter_data_.localities_.enabled_
+        counter_data_.localities_.time_
     );
     counter_data_.increment_localities_count();
 
@@ -391,8 +387,7 @@ std::vector<std::uint32_t> locality_namespace::localities()
 std::uint32_t locality_namespace::get_num_localities()
 { // {{{ get_num_localities implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.num_localities_.time_,
-        counter_data_.num_localities_.enabled_
+        counter_data_.num_localities_.time_
     );
     counter_data_.increment_num_localities_count();
     std::lock_guard<mutex_type> l(mutex_);
@@ -493,37 +488,30 @@ naming::gid_type locality_namespace::statistics_counter(std::string name)
         case locality_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_count,
                 &counter_data_);
-            counter_data_.allocate_.enabled_ = true;
             break;
         case locality_ns_resolve_locality:
             get_data_func = util::bind_front(&cd::get_resolve_locality_count,
                 &counter_data_);
-            counter_data_.resolve_locality_.enabled_ = true;
             break;
         case locality_ns_free:
             get_data_func = util::bind_front(&cd::get_free_count,
                 &counter_data_);
-            counter_data_.free_.enabled_ = true;
             break;
         case locality_ns_localities:
             get_data_func = util::bind_front(&cd::get_localities_count,
                 &counter_data_);
-            counter_data_.localities_.enabled_ = true;
             break;
         case locality_ns_num_localities:
             get_data_func = util::bind_front(&cd::get_num_localities_count,
                 &counter_data_);
-            counter_data_.num_localities_.enabled_ = true;
             break;
         case locality_ns_num_threads:
             get_data_func = util::bind_front(&cd::get_num_threads_count,
                 &counter_data_);
-            counter_data_.num_threads_.enabled_ = true;
             break;
         case locality_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_count,
                 &counter_data_);
-            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -537,37 +525,30 @@ naming::gid_type locality_namespace::statistics_counter(std::string name)
         case locality_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_time,
                 &counter_data_);
-            counter_data_.allocate_.enabled_ = true;
             break;
         case locality_ns_resolve_locality:
             get_data_func = util::bind_front(&cd::get_resolve_locality_time,
                 &counter_data_);
-            counter_data_.resolve_locality_.enabled_ = true;
             break;
         case locality_ns_free:
             get_data_func = util::bind_front(&cd::get_free_time,
                 &counter_data_);
-            counter_data_.free_.enabled_ = true;
             break;
         case locality_ns_localities:
             get_data_func = util::bind_front(&cd::get_localities_time,
                 &counter_data_);
-            counter_data_.localities_.enabled_ = true;
             break;
         case locality_ns_num_localities:
             get_data_func = util::bind_front(&cd::get_num_localities_time,
                 &counter_data_);
-            counter_data_.num_localities_.enabled_ = true;
             break;
         case locality_ns_num_threads:
             get_data_func = util::bind_front(&cd::get_num_threads_time,
                 &counter_data_);
-            counter_data_.num_threads_.enabled_ = true;
             break;
         case locality_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
-            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -628,16 +609,6 @@ std::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
         util::get_and_reset_value(num_threads_.count_, reset);
 }
 
-void locality_namespace::counter_data::enable_all()
-{
-    allocate_.enabled_ = true;
-    resolve_locality_.enabled_ = true;
-    free_.enabled_ = true;
-    localities_.enabled_ = true;
-    num_localities_.enabled_ = true;
-    num_threads_.enabled_ = true;
-}
-
 // access execution time counters
 std::int64_t locality_namespace::counter_data::get_allocate_time(bool reset)
 {
@@ -682,50 +653,32 @@ std::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void locality_namespace::counter_data::increment_allocate_count()
 {
-    if (allocate_.enabled_)
-    {
-        ++allocate_.count_;
-    }
+    ++allocate_.count_;
 }
 
 void locality_namespace::counter_data::increment_resolve_locality_count()
 {
-    if (resolve_locality_.enabled_)
-    {
-        ++resolve_locality_.count_;
-    }
+    ++resolve_locality_.count_;
 }
 
 void locality_namespace::counter_data::increment_free_count()
 {
-    if (free_.enabled_)
-    {
-        ++free_.count_;
-    }
+    ++free_.count_;
 }
 
 void locality_namespace::counter_data::increment_localities_count()
 {
-    if (localities_.enabled_)
-    {
-        ++localities_.count_;
-    }
+    ++localities_.count_;
 }
 
 void locality_namespace::counter_data::increment_num_localities_count()
 {
-    if (num_localities_.enabled_)
-    {
-        ++num_localities_.count_;
-    }
+    ++num_localities_.count_;
 }
 
 void locality_namespace::counter_data::increment_num_threads_count()
 {
-    if (num_threads_.enabled_)
-    {
-        ++num_threads_.count_;
-    }
+    ++num_threads_.count_;
 }
 }}}
 

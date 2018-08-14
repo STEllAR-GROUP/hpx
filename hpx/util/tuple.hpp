@@ -1079,7 +1079,7 @@ namespace hpx { namespace serialization
     void serialize(
         Archive& ar
       , ::hpx::util::tuple<Ts...>& t
-      , unsigned int const /*version*/ = 0
+      , unsigned int const version = 0
     )
     {
         ar & t._impl;

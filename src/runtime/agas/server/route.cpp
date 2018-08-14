@@ -41,8 +41,7 @@ namespace hpx { namespace agas { namespace server
     void primary_namespace::route(parcelset::parcel && p)
     { // {{{ route implementation
         util::scoped_timer<std::atomic<std::int64_t> > update(
-            counter_data_.route_.time_,
-            counter_data_.route_.enabled_
+            counter_data_.route_.time_
         );
         counter_data_.increment_route_count();
 

@@ -72,15 +72,14 @@ struct HPX_EXPORT symbol_namespace
             api_counter_data()
               : count_(0)
               , time_(0)
-              , enabled_(false)
             {}
 
             std::atomic<std::int64_t> count_;
             std::atomic<std::int64_t> time_;
-            bool enabled_;
         };
 
-        counter_data() = default;
+        counter_data()
+        {}
 
     public:
         // access current counter values
@@ -104,8 +103,6 @@ struct HPX_EXPORT symbol_namespace
         void increment_unbind_count();
         void increment_iterate_names_count();
         void increment_on_event_count();
-
-        void enable_all();
 
     private:
         friend struct update_time_on_exit;

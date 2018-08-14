@@ -55,7 +55,7 @@ namespace hpx { namespace util
 
     namespace detail
     {
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex);
     }
 
     template <typename Lock>
@@ -83,7 +83,7 @@ namespace hpx { namespace util
     template <typename Lock, typename Enable>
     struct ignore_while_checking
     {
-        ignore_while_checking(void const* /*lock*/) {}
+        ignore_while_checking(void const* lock) {}
     };
 
     struct ignore_all_while_checking

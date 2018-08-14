@@ -32,7 +32,7 @@ namespace hpx { namespace serialization
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <typename T>),
-            (boost::shared_ptr<T>))
+            (boost::shared_ptr<T>));
 
     template <typename T>
     void load(input_archive& ar, std::shared_ptr<T>& ptr, unsigned)
@@ -47,7 +47,7 @@ namespace hpx { namespace serialization
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <typename T>),
-            (std::shared_ptr<T>))
+            (std::shared_ptr<T>));
 }}
 
 #endif

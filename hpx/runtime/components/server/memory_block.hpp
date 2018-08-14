@@ -246,19 +246,19 @@ namespace hpx { namespace components
         }
 
         template <typename T>
-        T& get_data()
+        T& get()
         {
             return *reinterpret_cast<T*>(get_ptr());
         }
 
         template <typename T>
-        T const& get_data() const
+        T const& get() const
         {
             return *reinterpret_cast<T const*>(get_ptr());
         }
 
         template <typename T>
-        void set_data (T const& val)
+        void set (T const& val)
         {
             if (!data_) {
                 std::ostringstream strm;
@@ -266,7 +266,7 @@ namespace hpx { namespace components
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "memory_block_data::set_data",
+                    "memory_block_data::set",
                     strm.str());
             }
             if (!data_->is_master())
@@ -276,7 +276,7 @@ namespace hpx { namespace components
                      << components::get_component_type_name(component_memory_block)
                      << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "memory_block_data::set_data",
+                    "memory_block_data::set",
                     strm.str());
             }
             *reinterpret_cast<T*>(data_->get_ptr()) = val;
@@ -438,7 +438,7 @@ namespace hpx { namespace components { namespace server { namespace detail
         HPX_DEFINE_COMPONENT_ACTION(memory_block, clone);
 
         // This component type requires valid id for its actions to be invoked
-        HPX_CONSTEXPR static bool is_target_valid(naming::id_type const& /*id*/)
+        HPX_CONSTEXPR static bool is_target_valid(naming::id_type const& id)
         {
             return true;
         }

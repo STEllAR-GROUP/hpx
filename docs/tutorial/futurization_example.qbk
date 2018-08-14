@@ -146,7 +146,7 @@ to global objects. Example 5 renames example 4's
 [^struct partition] to [^partition_data] and
 adds serialization support. Next we add the server side
 representation of the data in the structure [^partition_server].
-[^Partition_server] inherits from [^hpx::components::component_base]
+[^Partition_server] inherits from [^hpx::components::simple_component_base]
 which contains a server side component boilerplate.
 The boilerplate code allows a component's public members
 to be accessible anywhere on the

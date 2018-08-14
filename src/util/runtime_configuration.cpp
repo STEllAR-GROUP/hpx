@@ -195,10 +195,6 @@ namespace hpx { namespace util
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
             "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
-#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-            "max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:"
-            HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_BACKOFF_TIME_MAX)) "}",
-#endif
 
             /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
             /// then apply the test-failure value as default.

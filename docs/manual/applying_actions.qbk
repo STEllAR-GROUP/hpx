@@ -85,7 +85,7 @@ demonstrating this. The first snippet has to go into the header file:
     namespace app
     {
         struct some_component
-          : hpx::components::component_base<some_component>
+          : hpx::components::simple_component_base<some_component>
         {
             int some_member_function(std::string s)
             {
@@ -108,7 +108,7 @@ demonstrating this. The first snippet has to go into the header file:
 The next snippet belongs into a source file (e.g. the main application source
 file) in the simplest case:
 
-    typedef hpx::components::component<app::some_component> component_type;
+    typedef hpx::components::simple_component<app::some_component> component_type;
     typedef app::some_component some_component;
 
     HPX_REGISTER_COMPONENT(component_type, some_component);

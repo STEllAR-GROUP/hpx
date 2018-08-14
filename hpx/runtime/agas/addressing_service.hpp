@@ -153,7 +153,7 @@ public:
         state_.store(new_state);
     }
 
-    naming::gid_type const& get_local_locality(error_code& /*ec*/ = throws) const
+    naming::gid_type const& get_local_locality(error_code& ec = throws) const
     {
         return locality_;
     }

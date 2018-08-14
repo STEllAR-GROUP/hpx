@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,6 @@
 #include <hpx/compat/condition_variable.hpp>
 #include <hpx/compat/mutex.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -18,7 +17,6 @@
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
@@ -28,7 +26,6 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -81,10 +78,6 @@ namespace hpx { namespace threads { namespace policies
           : mode_(mode)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
-          , max_idle_backoff_time_(
-                hpx::util::safe_lexical_cast<double>(
-                    hpx::get_config_entry("hpx.max_idle_backoff_time",
-                        HPX_IDLE_BACKOFF_TIME_MAX)))
 #endif
           , suspend_mtxs_(num_threads)
           , suspend_conds_(num_threads)
@@ -131,13 +124,7 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
-
-            // Exponential backoff with a maximum sleep time.
-            std::chrono::milliseconds period(
-                std::lround((std::min)(max_idle_backoff_time_,
-                    std::pow(2.0, double(wait_count_)))));
-
-            ++wait_count_;
+            std::chrono::milliseconds period(++wait_count_);
 
             std::unique_lock<pu_mutex_type> l(mtx_);
             cond_.wait_for(l, period);
@@ -491,7 +478,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         virtual void start_periodic_maintenance(
-            std::atomic<hpx::state>& /*global_state*/)
+            std::atomic<hpx::state>& global_state)
         {}
 
         virtual void reset_thread_distribution() {}
@@ -504,7 +491,6 @@ namespace hpx { namespace threads { namespace policies
         pu_mutex_type mtx_;
         compat::condition_variable cond_;
         std::atomic<std::uint32_t> wait_count_;
-        double max_idle_backoff_time_;
 #endif
 
         // support for suspension of pus

@@ -308,7 +308,7 @@ namespace hpx { namespace lcos { namespace detail
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f,
-            threads::thread_priority /*priority*/,
+            threads::thread_priority priority,
             error_code& ec)
         {
             {
@@ -794,7 +794,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future>
     inline typename traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
-    unwrap_impl(Future && future, error_code& /*ec*/)
+    unwrap_impl(Future && future, error_code& ec)
     {
         typedef typename future_unwrap_result<Future>::result_type result_type;
 
@@ -808,28 +808,28 @@ namespace hpx { namespace lcos { namespace detail
         return p;
     }
 
-//     template <typename R>
-//     inline typename traits::detail::shared_state_ptr<
-//         typename future_unwrap_result<future<R>>::result_type>::type
-//     unwrap(future<R> && fut, error_code& ec)
-//     {
-//         if (fut.is_ready() && !fut.has_exception())
-//         {
-//             typedef typename traits::future_traits<future<R>>::type inner_type;
-//             inner_type f = fut.get();
-//
-//             // move the reference count into the returned intrusive_ptr
-//             typedef
-//                 typename traits::detail::shared_state_ptr_for<inner_type>::type
-//                     inner_shared_ptr_type;
-//             return inner_shared_ptr_type(
-//                 traits::future_access<inner_type>::detach_shared_state(
-//                     std::move(f)),
-//                 false);
-//         }
-//
-//         return unwrap_impl(std::move(fut), ec);
-//     }
+    template <typename R>
+    inline typename traits::detail::shared_state_ptr<
+        typename future_unwrap_result<future<R>>::result_type>::type
+    unwrap(future<R> && fut, error_code& ec)
+    {
+        if (fut.is_ready() && !fut.has_exception())
+        {
+            typedef typename traits::future_traits<future<R>>::type inner_type;
+            inner_type f = fut.get();
+
+            // move the reference count into the returned intrusive_ptr
+            typedef
+                typename traits::detail::shared_state_ptr_for<inner_type>::type
+                    inner_shared_ptr_type;
+            return inner_shared_ptr_type(
+                traits::future_access<inner_type>::detach_shared_state(
+                    std::move(f)),
+                false);
+        }
+
+        return unwrap_impl(std::move(fut), ec);
+    }
 
     template <typename Future>
     inline typename traits::detail::shared_state_ptr<
