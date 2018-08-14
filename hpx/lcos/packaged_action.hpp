@@ -189,7 +189,7 @@ namespace lcos {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         std::move(cont_id), std::move(addr_)),
-                    std::move(addr), id, priority, std::move(f),
+                    std::move(addr), id, priority, std::forward<Callback>(cb),
                     std::forward<Ts>(vs)...);
             }
             else
@@ -197,7 +197,8 @@ namespace lcos {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         std::move(cont_id), std::move(addr_)),
-                    id, priority, std::move(f), std::forward<Ts>(vs)...);
+                    id, priority, std::forward<Callback>(cb),
+                    std::forward<Ts>(vs)...);
             }
 
             this->shared_state_->mark_as_started();

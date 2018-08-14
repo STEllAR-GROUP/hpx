@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_task_policy
         ///
         HPX_CONSTEXPR sequenced_task_policy operator()(
-            task_policy_tag /*tag*/) const
+            task_policy_tag tag) const
         {
             return *this;
         }
@@ -395,7 +395,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_task_policy
         ///
         HPX_CONSTEXPR sequenced_task_policy operator()(
-            task_policy_tag /*tag*/) const
+            task_policy_tag tag) const
         {
             return sequenced_task_policy();
         }
@@ -702,7 +702,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_task_policy
         ///
         HPX_CONSTEXPR parallel_task_policy operator()(
-            task_policy_tag /*tag*/) const
+            task_policy_tag tag) const
         {
             return *this;
         }
@@ -1002,7 +1002,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_policy
         ///
         HPX_CONSTEXPR parallel_task_policy operator()(
-            task_policy_tag /*tag*/) const
+            task_policy_tag tag) const
         {
             return parallel_task_policy();
         }
@@ -1285,7 +1285,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_unsequenced_policy
         ///
         parallel_unsequenced_policy operator()(
-            task_policy_tag /*tag*/) const
+            task_policy_tag tag) const
         {
             return *this;
         }

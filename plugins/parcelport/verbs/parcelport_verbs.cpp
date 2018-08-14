@@ -321,7 +321,7 @@ namespace verbs
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread)
+            util::function_nonser<void()> const& on_stop_thread)
             : base_type(ini, here(ini), on_start_thread, on_stop_thread)
             , active_send_count_(0)
             , immediate_send_allowed_(true)

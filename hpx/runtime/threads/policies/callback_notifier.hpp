@@ -20,12 +20,12 @@ namespace hpx { namespace threads { namespace policies
 {
     class callback_notifier
     {
-    public:
         typedef util::function_nonser<
             void(std::size_t, char const*)> on_startstop_type;
         typedef util::function_nonser<
-            bool(std::size_t, std::exception_ptr const&)> on_error_type;
+            void(std::size_t, std::exception_ptr const&)> on_error_type;
 
+    public:
         callback_notifier(on_startstop_type const& start = on_startstop_type(),
             on_startstop_type const& stop = on_startstop_type(),
             on_error_type const& on_err = on_error_type())
@@ -42,13 +42,10 @@ namespace hpx { namespace threads { namespace policies
             if (on_stop_thread_)
                 on_stop_thread_(num_thread, "");
         }
-        bool on_error(std::size_t num_thread, std::exception_ptr const& e)
+        void on_error(std::size_t num_thread, std::exception_ptr const& e)
         {
             if (on_error_)
-            {
-                return on_error_(num_thread, e);
-            }
-            return true;
+                on_error_(num_thread, e);
         }
 
         // function to call for each created thread

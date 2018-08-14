@@ -7,7 +7,6 @@
 #define HPX_LCOS_CHANNEL_JUL_23_2016_0722PM
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
 #include <hpx/lcos/server/channel.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>

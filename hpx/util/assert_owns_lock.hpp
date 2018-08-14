@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace detail
 {
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(owns_lock)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(owns_lock);
 
     template <typename Lock>
     void assert_owns_lock(Lock const&, int)

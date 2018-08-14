@@ -42,7 +42,7 @@ namespace hpx { namespace serialization
         }
 
         template <class Archive>
-        void serialize_optimized(Archive& ar, unsigned int /*v*/, std::false_type)
+        void serialize_optimized(Archive& ar, unsigned int v, std::false_type)
         {
             for (std::size_t i = 0; i != m_element_count; ++i)
                 ar & m_t[i];

@@ -98,19 +98,19 @@ namespace hpx { namespace parcelset
         sent_future.get(); // wait for the parcel to be sent
     }
 
-    parcelhandler::parcelhandler(util::runtime_configuration& cfg,
-        threads::threadmanager* tm,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_start_thread,
-        util::function_nonser<void(std::size_t, char const*)> const&
-            on_stop_thread)
-      : tm_(tm)
-      , use_alternative_parcelports_(false)
-      , enable_parcel_handling_(true)
-      , load_message_handlers_(util::get_entry_as<int>(cfg,
-                                   "hpx.parcel.message_handlers", "0") != 0)
-      , count_routed_(0)
-      , write_handler_(&default_write_handler)
+    parcelhandler::parcelhandler(
+            util::runtime_configuration & cfg,
+            threads::threadmanager* tm,
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            util::function_nonser<void()> const& on_stop_thread)
+      : tm_(tm),
+        use_alternative_parcelports_(false),
+        enable_parcel_handling_(true),
+        load_message_handlers_(
+            util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", "0") != 0
+        ),
+        count_routed_(0),
+        write_handler_(&default_write_handler)
     {
         LPROGRESS_;
 

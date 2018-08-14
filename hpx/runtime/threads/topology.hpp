@@ -92,7 +92,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         std::size_t get_socket_number(std::size_t num_thread,
-            error_code& /*ec*/ = throws) const
+            error_code& ec = throws) const
         {
             return socket_numbers_[num_thread % num_of_pus_];
         }
@@ -104,7 +104,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         std::size_t get_numa_node_number(std::size_t num_thread,
-            error_code& /*ec*/ = throws) const
+            error_code& ec = throws) const
         {
             return numa_node_numbers_[num_thread % num_of_pus_];
         }
@@ -239,7 +239,7 @@ namespace hpx { namespace threads
         std::size_t get_number_of_socket_cores(std::size_t socket) const;
 
         std::size_t get_core_number(std::size_t num_thread,
-            error_code& /*ec*/ = throws) const
+            error_code& ec = throws) const
         {
             return core_numbers_[num_thread % num_of_pus_];
         }

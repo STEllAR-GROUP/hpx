@@ -18,7 +18,7 @@ namespace hpx { namespace util { namespace detail
     {
         template <typename T>
         static void _save_object(void* const* v,
-            serialization::output_archive& ar, unsigned /*version*/)
+            serialization::output_archive& ar, unsigned version)
         {
             ar << vtable::get<T>(v);
         }
@@ -26,7 +26,7 @@ namespace hpx { namespace util { namespace detail
 
         template <typename T>
         static void _load_object(void** v,
-            serialization::input_archive& ar, unsigned /*version*/)
+            serialization::input_archive& ar, unsigned version)
         {
             vtable::default_construct<T>(v);
             ar >> vtable::get<T>(v);

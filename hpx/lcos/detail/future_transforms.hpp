@@ -31,17 +31,10 @@ namespace lcos {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         bool async_visit_future(T&& current)
         {
-            // Check for state right away as the element might not be able to
-            // produce a shared state (even if it's ready).
-            if (current.is_ready())
-            {
-                return true;
-            }
-
             auto const& state =
                 traits::detail::get_shared_state(std::forward<T>(current));
 
-            if (state.get() == nullptr)
+            if ((state.get() == nullptr) || state->is_ready())
             {
                 return true;
             }

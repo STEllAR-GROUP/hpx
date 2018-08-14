@@ -8,6 +8,7 @@
 #define HPX_ACTIONS_MAY_14_2008_0924AM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/actions/action_invoke_no_more_than.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/lambda_to_action.hpp>

@@ -26,7 +26,7 @@ namespace hpx { namespace traits
             // by default we return the unchanged function
             template <typename Component, typename F>
             static threads::thread_function_type
-            call(wrap_int, naming::address_type /*lva*/, F && f)
+            call(wrap_int, naming::address_type lva, F && f)
             {
                 return std::forward<F>(f);
             }

@@ -122,7 +122,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
         {
             return 0;
         }
-        std::size_t set_thread_data(std::size_t /*val*/)
+        std::size_t set_thread_data(std::size_t val)
         {
             return 0;
         }

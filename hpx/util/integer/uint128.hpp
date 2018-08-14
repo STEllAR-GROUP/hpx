@@ -138,36 +138,36 @@ namespace hpx { namespace util { namespace integer
     // GLOBAL OPERATOR INLINES
 
     inline uint128 operator + (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) += b; }
+        return uint128 (a) += b; };
     inline uint128 operator - (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) -= b; }
+        return uint128 (a) -= b; };
     inline uint128 operator * (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) *= b; }
+        return uint128 (a) *= b; };
     inline uint128 operator / (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) /= b; }
+        return uint128 (a) /= b; };
     inline uint128 operator % (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) %= b; }
+        return uint128 (a) %= b; };
 
     inline uint128 operator >> (const uint128 & a, unsigned int n) throw () {
-        return uint128 (a) >>= n; }
+        return uint128 (a) >>= n; };
     inline uint128 operator << (const uint128 & a, unsigned int n) throw () {
-        return uint128 (a) <<= n; }
+        return uint128 (a) <<= n; };
 
     inline uint128 operator & (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) &= b; }
+        return uint128 (a) &= b; };
     inline uint128 operator | (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) |= b; }
+        return uint128 (a) |= b; };
     inline uint128 operator ^ (const uint128 & a, const uint128 & b) throw () {
-        return uint128 (a) ^= b; }
+        return uint128 (a) ^= b; };
 
     inline bool operator >  (const uint128 & a, const uint128 & b) throw () {
-        return   b < a; }
+        return   b < a; };
     inline bool operator <= (const uint128 & a, const uint128 & b) throw () {
-        return !(b < a); }
+        return !(b < a); };
     inline bool operator >= (const uint128 & a, const uint128 & b) throw () {
-        return !(a < b); }
+        return !(a < b); };
     inline bool operator != (const uint128 & a, const uint128 & b) throw () {
-        return !(a == b); }
+        return !(a == b); };
 }}}
 
 // MISC

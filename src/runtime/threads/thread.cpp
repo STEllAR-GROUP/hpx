@@ -15,7 +15,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/steady_clock.hpp>
@@ -80,12 +79,14 @@ namespace hpx
     {
         // If the thread is still running, we terminate the whole application
         // as we have no chance of reporting this error (we can't throw)
-        if (joinable())
-        {
+        if (joinable_locked()) {
             terminate("thread::~thread", "destroying running thread");
         }
-
-        HPX_ASSERT(id_ == threads::invalid_thread_id);
+        threads::thread_id_type id = threads::invalid_thread_id;
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            std::swap(id_, id);
+        }
     }
 
     void thread::swap(thread& rhs) noexcept

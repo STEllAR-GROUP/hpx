@@ -116,10 +116,8 @@ int main(int argc, char* argv[])
 
 int hpx_main(int argc, char **argv)
 {
-    using ElemType = std::tuple<int, char>;
-
     // these two vectors are sorted by the first value of each tuple
-    std::vector<ElemType> a1{
+    std::vector<std::tuple<int, char>> a1{
         std::make_tuple(1, 'a'),
         std::make_tuple(2, 'b'),
         std::make_tuple(3, 'a'),
@@ -128,15 +126,15 @@ int hpx_main(int argc, char **argv)
         std::make_tuple(5, 'a'),
         std::make_tuple(5, 'b')
     };
-    std::vector<ElemType> a2{
+    std::vector<std::tuple<int, char>> a2{
         std::make_tuple(0, 'c'),
         std::make_tuple(3, 'c'),
         std::make_tuple(4, 'c'),
         std::make_tuple(5, 'c')
     };
 
-    std::vector<ElemType> result(a1.size() + a2.size());
-    std::vector<ElemType> solution(a1.size() + a2.size());
+    std::vector<std::tuple<int, char>> result(a1.size() + a2.size());
+    std::vector<std::tuple<int, char>> solution(a1.size() + a2.size());
 
     // I expect a stable merge to order {3, 'a'} and {3, 'b'} before {3, 'c'}
     // because they come from the first sequence
@@ -145,7 +143,7 @@ int hpx_main(int argc, char **argv)
         a1.begin(), a1.end(),
         a2.begin(), a2.end(),
         result.begin(),
-        [](ElemType const& a, ElemType const& b)
+        [](auto const& a, auto const& b)
         {
             return std::get<0>(a) < std::get<0>(b);
         });
@@ -153,12 +151,16 @@ int hpx_main(int argc, char **argv)
         a1.begin(), a1.end(),
         a2.begin(), a2.end(),
         solution.begin(),
-        [](ElemType const& a, ElemType const& b)
+        [](auto const& a, auto const& b)
         {
             return std::get<0>(a) < std::get<0>(b);
         });
 
-    HPX_TEST(result == solution);
+    bool equality = std::equal(
+        result.begin(), result.end(),
+        solution.begin(), solution.end());
+
+    HPX_TEST(equality);
 
     // Expect {3, 'c'}, {3, 'a'}, {3, 'b'} in order.
     hpx::parallel::merge(
@@ -166,7 +168,7 @@ int hpx_main(int argc, char **argv)
         a2.begin(), a2.end(),
         a1.begin(), a1.end(),
         result.begin(),
-        [](ElemType const& a, ElemType const& b)
+        [](auto const& a, auto const& b)
         {
             return std::get<0>(a) < std::get<0>(b);
         });
@@ -174,12 +176,16 @@ int hpx_main(int argc, char **argv)
         a2.begin(), a2.end(),
         a1.begin(), a1.end(),
         solution.begin(),
-        [](ElemType const& a, ElemType const& b)
+        [](auto const& a, auto const& b)
         {
             return std::get<0>(a) < std::get<0>(b);
         });
 
-    HPX_TEST(result == solution);
+    equality = std::equal(
+        result.begin(), result.end(),
+        solution.begin(), solution.end());
+
+    HPX_TEST(equality);
 
     // Do moduler operation for avoiding overflow in ramdom_fill. (#2954)
     std::uniform_int_distribution<> dis(0,9999);

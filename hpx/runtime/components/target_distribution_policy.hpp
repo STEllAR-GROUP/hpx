@@ -119,16 +119,11 @@ namespace hpx { namespace components
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action>
-        struct async_result
-        {
-            using type = hpx::future<typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type>;
-        };
-
         template <typename Action, typename ...Ts>
-        HPX_FORCEINLINE typename async_result<Action>::type
+        HPX_FORCEINLINE hpx::future<
+            typename traits::promise_local_result<
+                typename hpx::traits::extract_action<Action>::remote_result_type
+            >::type>
         async(launch policy, Ts&&... vs) const
         {
             return hpx::detail::async_impl<Action>(policy,
@@ -139,7 +134,10 @@ namespace hpx { namespace components
         ///       this class
         ///
         template <typename Action, typename Callback, typename ...Ts>
-        HPX_FORCEINLINE typename async_result<Action>::type
+        HPX_FORCEINLINE hpx::future<
+            typename traits::promise_local_result<
+                typename hpx::traits::extract_action<Action>::remote_result_type
+            >::type>
         async_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::async_cb_impl<Action>(policy,

@@ -187,8 +187,7 @@ bool symbol_namespace::bind(
 { // {{{ bind implementation
     // parameters
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.bind_.time_,
-        counter_data_.bind_.enabled_
+        counter_data_.bind_.time_
     );
     counter_data_.increment_bind_count();
 
@@ -305,8 +304,7 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
 { // {{{ resolve implementation
     // parameters
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.resolve_.time_,
-        counter_data_.resolve_.enabled_
+        counter_data_.resolve_.time_
     );
     counter_data_.increment_resolve_count();
 
@@ -340,8 +338,7 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
 naming::gid_type symbol_namespace::unbind(std::string const& key)
 { // {{{ unbind implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.unbind_.time_,
-        counter_data_.unbind_.enabled_
+        counter_data_.unbind_.time_
     );
     counter_data_.increment_unbind_count();
 
@@ -375,8 +372,7 @@ symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
     std::string const& pattern)
 { // {{{ iterate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.iterate_names_.time_,
-        counter_data_.iterate_names_.enabled_
+        counter_data_.iterate_names_.time_
     );
     counter_data_.increment_iterate_names_count();
 
@@ -432,8 +428,7 @@ bool symbol_namespace::on_event(
     )
 { // {{{ on_event implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.on_event_.time_,
-        counter_data_.on_event_.enabled_
+        counter_data_.on_event_.time_
     );
     counter_data_.increment_on_event_count();
 
@@ -524,32 +519,26 @@ naming::gid_type symbol_namespace::statistics_counter(std::string const& name)
         case symbol_ns_bind:
             get_data_func = util::bind_front(&cd::get_bind_count,
                 &counter_data_);
-            counter_data_.bind_.enabled_ = true;
             break;
         case symbol_ns_resolve:
             get_data_func = util::bind_front(&cd::get_resolve_count,
                 &counter_data_);
-            counter_data_.resolve_.enabled_ = true;
             break;
         case symbol_ns_unbind:
             get_data_func = util::bind_front(&cd::get_unbind_count,
                 &counter_data_);
-            counter_data_.unbind_.enabled_ = true;
             break;
         case symbol_ns_iterate_names:
             get_data_func = util::bind_front(&cd::get_iterate_names_count,
                 &counter_data_);
-            counter_data_.iterate_names_.enabled_ = true;
             break;
         case symbol_ns_on_event:
             get_data_func = util::bind_front(&cd::get_on_event_count,
                 &counter_data_);
-            counter_data_.on_event_.enabled_ = true;
             break;
         case symbol_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_count,
                 &counter_data_);
-            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -563,32 +552,26 @@ naming::gid_type symbol_namespace::statistics_counter(std::string const& name)
         case symbol_ns_bind:
             get_data_func = util::bind_front(&cd::get_bind_time,
                 &counter_data_);
-            counter_data_.bind_.enabled_ = true;
             break;
         case symbol_ns_resolve:
             get_data_func = util::bind_front(&cd::get_resolve_time,
                 &counter_data_);
-            counter_data_.resolve_.enabled_ = true;
             break;
         case symbol_ns_unbind:
             get_data_func = util::bind_front(&cd::get_unbind_time,
                 &counter_data_);
-            counter_data_.unbind_.enabled_ = true;
             break;
         case symbol_ns_iterate_names:
             get_data_func = util::bind_front(&cd::get_iterate_names_time,
                 &counter_data_);
-            counter_data_.iterate_names_.enabled_ = true;
             break;
         case symbol_ns_on_event:
             get_data_func = util::bind_front(&cd::get_on_event_time,
                 &counter_data_);
-            counter_data_.on_event_.enabled_ = true;
             break;
         case symbol_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
-            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -642,15 +625,6 @@ std::int64_t symbol_namespace::counter_data::get_overall_count(bool reset)
         util::get_and_reset_value(on_event_.count_, reset);
 }
 
-void symbol_namespace::counter_data::enable_all()
-{
-    bind_.enabled_ = true;
-    resolve_.enabled_ = true;
-    unbind_.enabled_ = true;
-    iterate_names_.enabled_ = true;
-    on_event_.enabled_ = true;
-}
-
 // access execution time counters
 std::int64_t symbol_namespace::counter_data::get_bind_time(bool reset)
 {
@@ -689,42 +663,27 @@ std::int64_t symbol_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void symbol_namespace::counter_data::increment_bind_count()
 {
-    if (bind_.enabled_)
-    {
-        ++bind_.count_;
-    }
+    ++bind_.count_;
 }
 
 void symbol_namespace::counter_data::increment_resolve_count()
 {
-    if (resolve_.enabled_)
-    {
-        ++resolve_.count_;
-    }
+    ++resolve_.count_;
 }
 
 void symbol_namespace::counter_data::increment_unbind_count()
 {
-    if (unbind_.enabled_)
-    {
-        ++unbind_.count_;
-    }
+    ++unbind_.count_;
 }
 
 void symbol_namespace::counter_data::increment_iterate_names_count()
 {
-    if (iterate_names_.enabled_)
-    {
-        ++iterate_names_.count_;
-    }
+    ++iterate_names_.count_;
 }
 
 void symbol_namespace::counter_data::increment_on_event_count()
 {
-    if (on_event_.enabled_)
-    {
-        ++on_event_.count_;
-    }
+    ++on_event_.count_;
 }
 
 }}}

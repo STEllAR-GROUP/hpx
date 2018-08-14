@@ -92,7 +92,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface maximal_number_of_chunks()
@@ -139,7 +139,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(maximal_number_of_chunks);
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface reset_thread_distribution()
@@ -201,7 +201,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(reset_thread_distribution);
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface count_processing_units()
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(count_processing_units)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(count_processing_units);
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_begin_execution()
@@ -288,7 +288,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_begin_execution);
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_execution()
@@ -329,7 +329,7 @@ namespace hpx { namespace parallel { namespace execution
             }
         };
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_end_execution);
 
         /// \endcond
     }

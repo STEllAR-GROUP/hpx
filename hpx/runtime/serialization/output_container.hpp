@@ -57,7 +57,7 @@ namespace hpx { namespace serialization
                 return 1;
             }
 
-            static void push_back(serialization_chunk && /*chunk*/) {}
+            static void push_back(serialization_chunk && chunk) {}
 
             static void reset() {}
         };

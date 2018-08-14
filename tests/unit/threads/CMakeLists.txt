@@ -9,8 +9,6 @@ set(tests
     schedule_last
     set_thread_state
     stack_check
-    error_callback
-    start_stop_callbacks
     thread
     thread_affinity
     thread_id

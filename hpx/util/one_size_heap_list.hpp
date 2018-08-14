@@ -44,7 +44,6 @@ namespace hpx { namespace util
 #if defined(HPX_DEBUG)
             return std::make_shared<Heap>(name, counter, parameters);
 #else
-            (void)counter;
             return std::make_shared<Heap>(name, 0, parameters);
 #endif
         }

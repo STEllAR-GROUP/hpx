@@ -8,7 +8,6 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/runtime/config_entry.hpp>
 
-#include <iostream>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,10 +24,10 @@ int hpx_startup::user_main(int argc, char** argv)
 
     if (!unknown_command_line.empty())
     {
-        std::cerr << "hpx_startup::user_main: command line processing: "
-                     "unknown command line option(s): '"
-                  << unknown_command_line << "'\n";
-        return -1;
+        hpx::detail::report_exception_and_terminate(
+            HPX_GET_EXCEPTION(hpx::bad_parameter, "hpx_startup::user_main",
+                "unknown command line option(s): " + unknown_command_line)
+        );
     }
 
     return hpx_startup::user_main();

@@ -40,15 +40,13 @@ set(example_programs
     pingpong
     pipeline1
     print_to_console
-    potpourri
     quicksort
     receive_buffer
     safe_object
     shared_mutex
     sierpinski
     simple_future_continuation
-    simplest_hello_world_1
-    simplest_hello_world_2
+    simplest_hello_world
     timed_futures
     timed_wake
     use_main_thread
@@ -81,10 +79,8 @@ set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(partitioned_vector_spmd_foreach_FLAGS
     COMPONENT_DEPENDENCIES iostreams partitioned_vector)
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(simplest_hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(simplest_hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)

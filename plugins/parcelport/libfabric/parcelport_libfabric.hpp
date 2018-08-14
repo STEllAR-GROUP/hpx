@@ -150,7 +150,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread);
+            util::function_nonser<void()> const& on_stop_thread);
 
         // Start the handling of connections.
         bool do_run();

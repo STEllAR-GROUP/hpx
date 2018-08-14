@@ -36,6 +36,7 @@ namespace hpx { namespace util
     public:
         typedef util::function_nonser<void(std::size_t, char const*)>
             on_startstop_func_type;
+        typedef util::function_nonser<void()> on_stop_func_type;
 
         /// \brief Construct the io_service pool.
         /// \param pool_size
@@ -46,23 +47,22 @@ namespace hpx { namespace util
         explicit io_service_pool(std::size_t pool_size = 2,
             on_startstop_func_type const& on_start_thread =
                 util::function_nonser<void(std::size_t, char const*)>(),
-            on_startstop_func_type const& on_stop_thread =
-                on_startstop_func_type(),
+            on_stop_func_type const& on_stop_thread = on_stop_func_type(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(on_startstop_func_type const& on_start_thread,
-            on_startstop_func_type const& on_stop_thread =
-                on_startstop_func_type(),
+            on_stop_func_type const& on_stop_thread = on_stop_func_type(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(std::size_t pool_size,
-            char const* pool_name, char const* name_postfix = "");
+        explicit io_service_pool(on_startstop_func_type const& on_start_thread,
+            on_startstop_func_type const& on_stop_thread,
+            char const* pool_name = "", char const* name_postfix = "");
 
         ~io_service_pool();
 

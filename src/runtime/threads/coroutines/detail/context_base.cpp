@@ -26,9 +26,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
     // aren't fully defined in the header.
     HPX_EXPORT apex_task_wrapper rebind_base_apex(thread_id_type id) {
         if (id.get()->get_apex_data() == nullptr) {
-            return ::hpx::util::apex_new_task(
-                id.get()->get_description(),
-                id.get()->get_parent_locality_id(),
+            return ::hpx::util::apex_new_task(id.get()->get_description(),
                 id.get()->get_parent_thread_id());
         }
         return id.get()->get_apex_data();

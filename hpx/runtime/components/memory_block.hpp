@@ -182,13 +182,13 @@ namespace hpx { namespace components
 
         access_memory_block_proxy& operator=(target_type const& rhs)
         {
-            block_.template set_data<target_type>(rhs);
+            block_.template set<target_type>(rhs);
             return *this;
         }
 
         operator target_type const&() const
         {
-            return block_.template get_data<target_type>();
+            return block_.template get<target_type>();
         }
 
     private:

@@ -79,17 +79,16 @@ struct HPX_EXPORT component_namespace
         struct api_counter_data
         {
             api_counter_data()
-              : count_(0)
-              , time_(0)
-              , enabled_(false)
+                : count_(0)
+                , time_(0)
             {}
 
             std::atomic<std::int64_t> count_;
             std::atomic<std::int64_t> time_;
-            bool enabled_;
         };
 
-        counter_data() = default;
+        counter_data()
+        {}
 
     public:
         // access current counter values
@@ -119,8 +118,6 @@ struct HPX_EXPORT component_namespace
         void increment_iterate_types_count();
         void increment_get_component_type_name_count();
         void increment_num_localities_count();
-
-        void enable_all();
 
     private:
         friend struct component_namespace;

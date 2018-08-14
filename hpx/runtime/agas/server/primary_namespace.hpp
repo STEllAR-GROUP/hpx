@@ -157,15 +157,14 @@ struct HPX_EXPORT primary_namespace
             api_counter_data()
               : count_(0)
               , time_(0)
-              , enabled_(false)
             {}
 
             std::atomic<std::int64_t> count_;
             std::atomic<std::int64_t> time_;
-            bool enabled_;
         };
 
-        counter_data() = default;
+        counter_data()
+        {}
 
     public:
         // access current counter values
@@ -201,8 +200,6 @@ struct HPX_EXPORT primary_namespace
         void increment_allocate_count();
         void increment_begin_migration_count();
         void increment_end_migration_count();
-
-        void enable_all();
 
     private:
         friend struct primary_namespace;

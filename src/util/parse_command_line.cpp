@@ -304,11 +304,11 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
-    bool parse_commandline(util::section const& rtcfg,
+    bool parse_commandline(
+        util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
-        std::string const& arg0, std::vector<std::string> const& args,
-        boost::program_options::variables_map& vm, std::size_t node,
-        int error_mode, hpx::runtime_mode mode,
+        int argc, char** argv, boost::program_options::variables_map& vm,
+        std::size_t node, int error_mode, hpx::runtime_mode mode,
         boost::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
@@ -602,7 +602,7 @@ namespace hpx { namespace util
 
                 // parse command line, allow for unregistered options this point
                 parsed_options opts(detail::get_commandline_parser(
-                        command_line_parser(args)
+                        command_line_parser(argc, argv)
                             .options(desc_cmdline)
                             .positional(pd)
                             .style(unix_style)
@@ -625,7 +625,7 @@ namespace hpx { namespace util
             {
                 // parse command line, allow for unregistered options this point
                 parsed_options opts(detail::get_commandline_parser(
-                        command_line_parser(args)
+                        command_line_parser(argc, argv)
                             .options(desc_cmdline)
                             .style(unix_style)
                             .extra_parser(detail::option_parser(rtcfg, node)),
@@ -660,7 +660,7 @@ namespace hpx { namespace util
             notify(vm);
 
             detail::handle_generic_config_options(
-                arg0, vm, desc_cfgfile, rtcfg, node, error_mode);
+                argv[0], vm, desc_cfgfile, rtcfg, node, error_mode);
             detail::handle_config_options(
                 vm, desc_cfgfile, rtcfg, node, error_mode);
         }
@@ -676,19 +676,6 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        std::string extract_arg0(std::string const& cmdline)
-        {
-            std::string::size_type p = cmdline.find_first_of(" \t");
-            if (p != std::string::npos)
-            {
-                return cmdline.substr(0, p);
-            }
-            return cmdline;
-        }
-    }
-
     bool parse_commandline(
         util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
@@ -703,9 +690,15 @@ namespace hpx { namespace util
 #else
         std::vector<std::string> args = split_unix(cmdline);
 #endif
-        return parse_commandline(rtcfg, app_options,
-            detail::extract_arg0(cmdline), args, vm, node, error_mode, mode,
-            visible, unregistered_options);
+
+        boost::scoped_array<char*> argv(new char* [args.size()+1]);
+        for (std::size_t i = 0; i < args.size(); ++i)
+            argv[i] = const_cast<char*>(args[i].c_str());
+        argv[args.size()] = nullptr;
+
+        return parse_commandline(
+            rtcfg, app_options, static_cast<int>(args.size()), argv.get(), vm,
+            node, error_mode, mode, visible, unregistered_options);
     }
 
     ///////////////////////////////////////////////////////////////////////////

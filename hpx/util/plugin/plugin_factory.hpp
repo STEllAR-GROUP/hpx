@@ -123,7 +123,7 @@ namespace hpx { namespace util { namespace plugin {
         ///////////////////////////////////////////////////////////////////////
         inline void
         get_abstract_factory_names_static(get_plugins_list_type f,
-            std::vector<std::string>& names, error_code& /*ec*/ = throws)
+            std::vector<std::string>& names, error_code& ec = throws)
         {
             exported_plugins_type& e = *f();
 
