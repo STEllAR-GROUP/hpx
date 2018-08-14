@@ -593,7 +593,6 @@ hpx_option(HPX_WITH_APEX BOOL
   "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX)   # tell HPX that we use APEX
-  hpx_add_config_define(APEX_HAVE_HPX)   # tell APEX that we use HPX
   hpx_option(HPX_WITH_APEX_NO_UPDATE BOOL
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling")
 endif()
@@ -1565,7 +1564,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    v2.0.1
+    develop   # this should be set to a known good tag when HPX is released!
     ${_hpx_apex_no_update}
     VERBOSE)
 
