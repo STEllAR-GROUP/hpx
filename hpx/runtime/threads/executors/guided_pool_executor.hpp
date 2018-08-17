@@ -517,7 +517,7 @@ namespace hpx { namespace threads { namespace executors
                     hpx::launch::async,
                     pool_exec_.get_priority(),
                     pool_exec_.get_stacksize(),
-                    threads::thread_schedule_hint_none
+                    threads::thread_schedule_hint()
                 );
                 return p.get_future();
             }
