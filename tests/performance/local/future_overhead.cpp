@@ -41,6 +41,10 @@ using hpx::util::high_resolution_timer;
 using hpx::cout;
 using hpx::flush;
 
+#define CDASH_TIMING(name,time) \
+    cout << "<DartMeasurement name=\"" << name << "\" " \
+    << "type=\"numeric/double\"> " << time << " </DartMeasurement> \n";
+
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
@@ -93,6 +97,7 @@ void measure_action_futures(std::uint64_t count, bool csv)
             "invoked {1} futures (actions) in {2} seconds\n",
             count,
             duration) << flush;
+    CDASH_TIMING("FutureOverhead_Actions", duration)
 }
 
 void measure_function_futures_wait_each(std::uint64_t count, bool csv)
@@ -122,6 +127,7 @@ void measure_function_futures_wait_each(std::uint64_t count, bool csv)
             "invoked {1} futures (functions, wait_each) in {2} seconds\n",
             count,
             duration) << flush;
+    CDASH_TIMING("FutureOverhead_WaitEach", duration)
 }
 
 void measure_function_futures_wait_all(std::uint64_t count, bool csv)
@@ -151,6 +157,7 @@ void measure_function_futures_wait_all(std::uint64_t count, bool csv)
             "invoked {1} futures (functions, wait_all) in {2} seconds\n",
             count,
             duration) << flush;
+    CDASH_TIMING("FutureOverhead_FuturesWait", duration)
 }
 
 void measure_function_futures_thread_count(std::uint64_t count, bool csv)
@@ -186,6 +193,7 @@ void measure_function_futures_thread_count(std::uint64_t count, bool csv)
             "invoked {1} futures (functions, thread count) in {2} seconds\n",
             count,
             duration) << flush;
+    CDASH_TIMING("FutureOverhead_ThreadCount", duration)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
