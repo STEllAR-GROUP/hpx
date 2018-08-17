@@ -27,7 +27,7 @@ init:
   - cmd: git config --global core.autocrlf input
 
 install:
-  - ps: Start-FileDownload 'http://stellar-group.org/files/vcpkg-export-hpx-dependencies.7z' -FileName 'C:\projects\vcpkg-export-hpx-dependencies.7z' -Timeout 60000
+  - ps: appveyor DownloadFile 'http://stellar-group.org/files/vcpkg-export-hpx-dependencies.7z' -FileName 'C:\projects\vcpkg-export-hpx-dependencies.7z'
   - cmd: 7z x "C:\projects\vcpkg-export-hpx-dependencies.7z" -y -oC:\projects\vcpkg >NUL
 
 before_build:
