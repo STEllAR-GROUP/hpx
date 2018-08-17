@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 
 #include <hpx/lcos/dataflow.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/decay.hpp>
@@ -465,7 +466,7 @@ int main(int argc, char** argv)
     hpx::resource::partitioner rp(argc, argv);
 
     // declare the high priority scheduler type we'll use
-    using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<>;
+    using high_priority_sched = hpx::threads::policies::shared_priority_queue_scheduler<>;
     using namespace hpx::threads::policies;
     // setup the default pool with our custom priority scheduler
     rp.create_thread_pool(
