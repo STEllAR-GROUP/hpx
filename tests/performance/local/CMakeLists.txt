@@ -142,12 +142,14 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${benchmark}
+  add_hpx_executable(${benchmark}_test
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Local")
+
+  add_hpx_test("tests.performance.local" ${benchmark} ${${benchmark}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.${benchmark})
@@ -158,7 +160,8 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.local.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark}_test_exe)
+
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
