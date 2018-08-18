@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -20,7 +21,7 @@
 #include "sort_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-// this function times a sort and outputs the time for cDash to plot it
+// this function times a sort and outputs the time for CDash to plot it
 void sort_benchmark()
 {
     try {
@@ -38,8 +39,8 @@ void sort_benchmark()
         bool is_sorted = (verify_(c, std::less<double>(), elapsed, true)!=0);
         HPX_TEST(is_sorted);
         if (is_sorted) {
-            std::cout << "<DartMeasurement name=\"SortDoublesTime\" \n"
-                << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+            // CDash graph plotting
+            hpx::util::print_cdash_timing("SortDoublesTime", elapsed);
         }
     }
     catch (...) {
@@ -179,17 +180,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    // if benchmark is requested we run it even in debug mode
-    if (vm.count("benchmark")) {
-        sort_benchmark();
-    }
-    else {
-        test_sort1();
-        test_sort2();
-#ifndef HPX_DEBUG
-        sort_benchmark();
-#endif
-    }
+    test_sort1();
+    test_sort2();
+    sort_benchmark();
+
     return hpx::finalize();
 }
 
@@ -202,8 +196,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ("benchmark", "run a timing benchmark only");
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {

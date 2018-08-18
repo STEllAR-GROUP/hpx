@@ -16,6 +16,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/util/yield_while.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -40,10 +41,6 @@ using hpx::util::high_resolution_timer;
 
 using hpx::cout;
 using hpx::flush;
-
-#define CDASH_TIMING(name,time) \
-    cout << "<DartMeasurement name=\"" << name << "\" " \
-    << "type=\"numeric/double\"> " << time << " </DartMeasurement> \n";
 
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
@@ -97,7 +94,8 @@ void measure_action_futures(std::uint64_t count, bool csv)
             "invoked {1} futures (actions) in {2} seconds\n",
             count,
             duration) << flush;
-    CDASH_TIMING("FutureOverhead_Actions", duration)
+    // CDash graph plotting
+    hpx::util::print_cdash_timing("FutureOverheadActions", duration);
 }
 
 void measure_function_futures_wait_each(std::uint64_t count, bool csv)
@@ -127,7 +125,8 @@ void measure_function_futures_wait_each(std::uint64_t count, bool csv)
             "invoked {1} futures (functions, wait_each) in {2} seconds\n",
             count,
             duration) << flush;
-    CDASH_TIMING("FutureOverhead_WaitEach", duration)
+    // CDash graph plotting
+    hpx::util::print_cdash_timing("FutureOverheadWaitEach", duration);
 }
 
 void measure_function_futures_wait_all(std::uint64_t count, bool csv)
@@ -157,7 +156,8 @@ void measure_function_futures_wait_all(std::uint64_t count, bool csv)
             "invoked {1} futures (functions, wait_all) in {2} seconds\n",
             count,
             duration) << flush;
-    CDASH_TIMING("FutureOverhead_FuturesWait", duration)
+    // CDash graph plotting
+    hpx::util::print_cdash_timing("FutureOverheadFuturesWait", duration);
 }
 
 void measure_function_futures_thread_count(std::uint64_t count, bool csv)
@@ -193,7 +193,8 @@ void measure_function_futures_thread_count(std::uint64_t count, bool csv)
             "invoked {1} futures (functions, thread count) in {2} seconds\n",
             count,
             duration) << flush;
-    CDASH_TIMING("FutureOverhead_ThreadCount", duration)
+    // CDash graph plotting
+    hpx::util::print_cdash_timing("FutureOverheadThreadCount", duration);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
