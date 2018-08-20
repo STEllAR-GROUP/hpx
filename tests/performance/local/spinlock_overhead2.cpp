@@ -15,6 +15,7 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -271,6 +272,7 @@ int hpx_main(
                         k2,
                         k3
                     ) << flush;
+                hpx::util::print_cdash_timing("Spinlock2", duration);
             }
         }
     }

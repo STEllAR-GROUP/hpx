@@ -20,6 +20,7 @@
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
 #include <cstddef>
+#include <sstream>
 #include <iostream>
 #include <mutex>
 
@@ -204,6 +205,15 @@ inline int report_errors(std::ostream& stream = std::cerr)
                << std::endl;
         return 1;
     }
+}
+
+inline void print_cdash_timing(const char *name, double time)
+{
+    // use stringstream followed by single cout for better multithreaded output
+    std::stringstream temp;
+    temp << "<DartMeasurement name=\"" << name << "\" "
+         << "type=\"numeric/double\">" << time << "</DartMeasurement>";
+    std::cout << temp.str() << std::endl;
 }
 
 }} // hpx::util

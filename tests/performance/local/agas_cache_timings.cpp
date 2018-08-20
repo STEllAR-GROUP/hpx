@@ -16,6 +16,7 @@
 #include <hpx/util/cache/statistics/local_full_statistics.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/histogram.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/accumulators/accumulators.hpp>
@@ -242,9 +243,14 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     hpx::naming::gid_type first_key = hpx::detail::get_next_id();
 
+    hpx::util::high_resolution_timer t1;
+
     test_insert(cache, num_entries);
     test_get(cache, first_key);
     test_update(cache, first_key);
+
+    double elapsed = t1.elapsed();
+    hpx::util::print_cdash_timing("AGASCache", elapsed);
 
     return hpx::finalize();
 }

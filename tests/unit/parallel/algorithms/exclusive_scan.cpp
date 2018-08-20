@@ -46,8 +46,8 @@ void exclusive_scan_benchmark()
       bool ok = std::equal(std::begin(d), std::end(d), std::begin(e));
       HPX_TEST(ok);
       if (ok) {
-          std::cout << "<DartMeasurement name=\"ExclusiveScanTime\" \n"
-              << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+          // CDash graph plotting
+          hpx::util::print_cdash_timing("ExclusiveScanTime", elapsed);
       }
     }
     catch (...) {
@@ -161,16 +161,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    // if benchmark is requested we run it even in debug mode
-    if (vm.count("benchmark")) {
-        exclusive_scan_benchmark();
-    }
-    else {
-        exclusive_scan_test1();
-#ifndef HPX_DEBUG
-        exclusive_scan_benchmark();
-#endif
-    }
+    exclusive_scan_test1();
+    exclusive_scan_benchmark();
 
   return hpx::finalize();
 }
@@ -184,8 +176,8 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+        "the random number generator seed to use for this run");
+
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {
         "hpx.os_threads=all"
