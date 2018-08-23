@@ -37,6 +37,7 @@
 #include <boost/container/small_vector.hpp>
 #endif
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <exception>
@@ -226,29 +227,19 @@ namespace detail
 
         /// Return whether or not the data is available for this
         /// \a future.
-        bool is_ready() const
+        bool is_ready(std::memory_order order = std::memory_order_acquire) const
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            return is_ready_locked(l);
-        }
-
-        template <typename Lock>
-        bool is_ready_locked(Lock& l) const
-        {
-            HPX_ASSERT_OWNS_LOCK(l);
-            return (state_ & ready) != 0;
+            return (state_.load(order) & ready) != 0;
         }
 
         bool has_value() const
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            return state_ == value;
+            return state_.load(std::memory_order_acquire) == value;
         }
 
         bool has_exception() const
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            return state_ == exception;
+            return state_.load(std::memory_order_acquire) == exception;
         }
 
         virtual void execute_deferred(error_code& /*ec*/ = throws) {}
@@ -310,7 +301,7 @@ namespace detail
 
     protected:
         mutable mutex_type mtx_;
-        state state_;                               // current state
+        std::atomic<state> state_;                  // current state
         completed_callback_vector_type on_completed_;
         local::detail::condition_variable cond_;    // threads waiting in read
     };
@@ -357,7 +348,7 @@ namespace detail
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
             construct(value_ptr);
-            state_ = value;
+            state_.store(value, std::memory_order_relaxed);
         }
 
         template <typename ... Ts>
@@ -366,7 +357,7 @@ namespace detail
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
             construct(value_ptr, std::forward<Ts>(ts)...);
-            state_ = value;
+            state_.store(value, std::memory_order_relaxed);
         }
 
         future_data_base(init_no_addref no_addref, std::exception_ptr const& e)
@@ -375,7 +366,7 @@ namespace detail
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             ::new ((void*)exception_ptr) std::exception_ptr(e);
-            state_ = exception;
+            state_.store(exception, std::memory_order_relaxed);
         }
         future_data_base(init_no_addref no_addref, std::exception_ptr && e)
           : base_type(no_addref)
@@ -383,7 +374,7 @@ namespace detail
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             ::new ((void*)exception_ptr) std::exception_ptr(std::move(e));
-            state_ = exception;
+            state_.store(exception, std::memory_order_relaxed);
         }
 
         virtual ~future_data_base() noexcept
@@ -423,10 +414,28 @@ namespace detail
         template <typename ... Ts>
         void set_value(Ts&& ... ts)
         {
+            // Note: it is safe to access the data store as no other thread
+            //       should access it concurrently. There shouldn't be any
+            //       threads attempting to read the value as the state is still
+            //       empty. Also, there can be only one thread (this thread)
+            //       attempting to set the value by definition.
+
+            // set the data
+            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            construct(value_ptr, std::forward<Ts>(ts)...);
+
+            // At this point the lock needs to be acquired to safely access the
+            // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
-            // check whether the data has already been set
-            if (is_ready_locked(l)) {
+            // The value has been set, changing the state to 'value' at this
+            // point signals to all other threads that this future is ready.
+            state expected = empty;
+            if (!state_.compare_exchange_strong(
+                    expected, value, std::memory_order_release))
+            {
+                // this future should be 'empty' still (it can't be made ready
+                // more than once).
                 l.unlock();
                 HPX_THROW_EXCEPTION(promise_already_satisfied,
                     "future_data_base::set_value",
@@ -434,15 +443,9 @@ namespace detail
                 return;
             }
 
+            // handle all threads waiting for the future to become ready
             auto on_completed = std::move(on_completed_);
             on_completed_.clear();
-
-            // set the data
-            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
-            construct(value_ptr, std::forward<Ts>(ts)...);
-            state_ = value;
-
-            // handle all threads waiting for the future to become ready
 
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
@@ -466,10 +469,29 @@ namespace detail
 
         void set_exception(std::exception_ptr data) override
         {
+            // Note: it is safe to access the data store as no other thread
+            //       should access it concurrently. There shouldn't be any
+            //       threads attempting to read the value as the state is still
+            //       empty. Also, there can be only one thread (this thread)
+            //       attempting to set the value by definition.
+
+            // set the data
+            std::exception_ptr* exception_ptr =
+                reinterpret_cast<std::exception_ptr*>(&storage_);
+            ::new ((void*)exception_ptr) std::exception_ptr(std::move(data));
+
+            // At this point the lock needs to be acquired to safely access the
+            // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
-            // check whether the data has already been set
-            if (is_ready_locked(l)) {
+            // The value has been set, changing the state to 'exception' at this
+            // point signals to all other threads that this future is ready.
+            state expected = empty;
+            if (!state_.compare_exchange_strong(
+                    expected, exception, std::memory_order_release))
+            {
+                // this future should be 'empty' still (it can't be made ready
+                // more than once).
                 l.unlock();
                 HPX_THROW_EXCEPTION(promise_already_satisfied,
                     "future_data_base::set_exception",
@@ -477,16 +499,9 @@ namespace detail
                 return;
             }
 
+            // handle all threads waiting for the future to become ready
             auto on_completed = std::move(on_completed_);
             on_completed_.clear();
-
-            // set the data
-            std::exception_ptr* exception_ptr =
-                reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*)exception_ptr) std::exception_ptr(std::move(data));
-            state_ = exception;
-
-            // handle all threads waiting for the future to become ready
 
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
@@ -551,7 +566,7 @@ namespace detail
             // and no reader
 
             // release any stored data and callback functions
-            switch (state_) {
+            switch (state_.exchange(empty)) {
             case value:
             {
                 result_type* value_ptr =
@@ -569,13 +584,12 @@ namespace detail
             default: break;
             }
 
-            state_ = empty;
             on_completed_.clear();
         }
 
         std::exception_ptr get_exception_ptr() const override
         {
-            HPX_ASSERT(state_ == exception);
+            HPX_ASSERT(state_.load(std::memory_order_acquire) == exception);
             return *reinterpret_cast<std::exception_ptr const*>(&storage_);
         }
 
@@ -921,7 +935,7 @@ namespace detail
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
-                if (this->is_ready_locked(l))
+                if (this->is_ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {

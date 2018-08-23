@@ -8,6 +8,7 @@
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/reduce_by_key.hpp>
+#include <hpx/util/lightweight_test.hpp>
 //
 #include <random>
 #include <utility>
@@ -172,8 +173,8 @@ void test_reduce_by_key1(ExPolicy && policy, Tkey, Tval, bool benchmark, const O
     HPX_TEST(is_equal);
     if (is_equal) {
         if (benchmark) {
-            std::cout << "<DartMeasurement name=\"ReduceByKeyTime\" \n"
-                << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+            // CDash graph plotting
+            hpx::util::print_cdash_timing("ReduceByKeyTime", elapsed);
         }
     }
     else {
@@ -273,8 +274,8 @@ void test_reduce_by_key_const(ExPolicy && policy, Tkey, Tval, bool benchmark,
     HPX_TEST(is_equal);
     if (is_equal) {
         if (benchmark) {
-            std::cout << "<DartMeasurement name=\"ReduceByKeyTime\" \n"
-                << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+            // CDash graph plotting
+            hpx::util::print_cdash_timing("ReduceByKeyTime", elapsed);
         }
     }
     else {

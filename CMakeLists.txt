@@ -1321,6 +1321,7 @@ if(WIN32)
   hpx_add_config_cond_define(_CRT_NONSTDC_NO_WARNINGS)
   hpx_add_config_cond_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
   hpx_add_config_cond_define(_CRT_NON_CONFORMING_SWPRINTFS)
+  hpx_add_config_cond_define(_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING)
 
   ##############################################################################
   # Boost

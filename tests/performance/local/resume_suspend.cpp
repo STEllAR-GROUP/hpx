@@ -11,6 +11,7 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/yield_while.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/program_options.hpp>
 
@@ -49,6 +50,8 @@ int main(int argc, char ** argv)
         << "threads, resume [s], async [s], suspend [s]"
         << std::endl;
 
+    double suspend_time = 0;
+    double resume_time  = 0;
     hpx::util::high_resolution_timer timer;
 
     for (std::size_t i = 0; i < repetitions; ++i)
@@ -57,6 +60,7 @@ int main(int argc, char ** argv)
 
         hpx::resume();
         auto t_resume = timer.elapsed();
+        resume_time += t_resume;
 
         for (std::size_t thread = 0; thread < threads; ++thread)
         {
@@ -67,6 +71,7 @@ int main(int argc, char ** argv)
 
         hpx::suspend();
         auto t_suspend = timer.elapsed();
+        suspend_time += t_suspend;
 
         std::cout
             << threads << ", "
@@ -75,6 +80,9 @@ int main(int argc, char ** argv)
             << t_suspend
             << std::endl;
     }
+
+    hpx::util::print_cdash_timing("ResumeTime",  resume_time);
+    hpx::util::print_cdash_timing("SuspendTime", suspend_time);
 
     hpx::resume();
     hpx::async([]() { hpx::finalize(); });

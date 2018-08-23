@@ -8,6 +8,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/runtime/serialization/detail/preprocess.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -179,6 +180,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     hpx::util::format_to(hpx::cout, "{},{},{}\n",
         data_size, iterations, overall_time / concurrency) << hpx::flush;
+    hpx::util::print_cdash_timing("Serialization", overall_time / concurrency);
 
     return hpx::finalize();
 }

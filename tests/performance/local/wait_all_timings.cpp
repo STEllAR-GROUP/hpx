@@ -8,6 +8,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/program_options.hpp>
 
@@ -126,12 +127,15 @@ int hpx_main(boost::program_options::variables_map& vm)
         "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n",
         tasks_str, std::string("1"), delay_str,
         elapsed_seq, elapsed_seq / num_tasks) << hpx::endl;
+    hpx::util::print_cdash_timing("WaitAll", elapsed_seq / num_tasks);
+
     if (num_chunks != 1)
     {
         hpx::util::format_to(hpx::cout,
             "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n",
             tasks_str, chunks_str, delay_str,
             elapsed_chunks, elapsed_chunks / num_tasks) << hpx::endl;
+        hpx::util::print_cdash_timing("WaitAllChunks", elapsed_chunks / num_tasks);
     }
     return hpx::finalize();
 }
