@@ -321,7 +321,16 @@ namespace hpx { namespace util
                 "hpx.os_threads", rtcfg.get_entry("hpx.os_threads",
                     std::to_string(default_threads)));
 
-            if ("all" == threads_str)
+            if ("cores" == threads_str)
+            {
+                std::size_t cores = get_number_of_default_cores(env);
+                default_threads = cores;
+                if (batch_threads == std::size_t(-1))
+                    batch_threads = cores;
+                else
+                    default_threads = batch_threads;
+            }
+            else if ("all" == threads_str)
             {
                 if (batch_threads == std::size_t(-1))
                     batch_threads = thread::hardware_concurrency();
