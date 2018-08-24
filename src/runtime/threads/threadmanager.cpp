@@ -615,7 +615,7 @@ namespace hpx { namespace threads
         // fill the thread-lookup table
         for (auto& pool_iter : pools_)
         {
-            std::size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
+            std::size_t nt = rp.get_num_threads(pool_iter->get_pool_index());
             for (std::size_t i = 0; i < nt; i++)
             {
                 threads_lookup_.push_back(pool_iter->get_pool_id());
@@ -636,7 +636,7 @@ namespace hpx { namespace threads
         for (auto && pool_iter : pools_)
         {
             std::size_t num_threads_in_pool =
-                rp.get_num_threads(pool_iter->get_pool_name());
+                rp.get_num_threads(pool_iter->get_pool_index());
             pool_iter->init(num_threads_in_pool, threads_offset);
             threads_offset += num_threads_in_pool;
         }
