@@ -1,4 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2017-2018 John Biddiscombe
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -16,10 +17,124 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
+    // Holds core/queue ratios used by schedulers.
+    struct core_ratios
+    {
+        core_ratios(std::size_t high_priority, std::size_t normal_priority,
+            std::size_t low_priority)
+          : high_priority(high_priority), normal_priority(normal_priority),
+            low_priority(low_priority) {}
+
+        std::size_t high_priority;
+        std::size_t normal_priority;
+        std::size_t low_priority;
+    };
+
+    // ----------------------------------------------------------------
+    // Helper class to hold a set of queues.
+    // ----------------------------------------------------------------
+    template <typename QueueType>
+    struct queue_holder
+    {
+        void init(std::size_t cores,
+                  std::size_t queues,
+                  std::size_t max_tasks)
+        {
+            num_cores  = cores;
+            num_queues = queues;
+            scale      = num_cores==1 ? 0
+                         : static_cast<double>(num_queues-1)/(num_cores-1);
+            //
+            queues_.resize(num_queues);
+            for (std::size_t i = 0; i < num_queues; ++i) {
+                queues_[i] = new QueueType(max_tasks);
+            }
+        }
+
+        // ----------------------------------------------------------------
+        ~queue_holder()
+        {
+            for(auto &q : queues_) delete q;
+            queues_.clear();
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t get_queue_index(std::size_t id) const
+        {
+            return static_cast<std::size_t>(0.5 + id*scale);;
+        }
+
+        // ----------------------------------------------------------------
+        inline bool get_next_thread(std::size_t id, threads::thread_data*& thrd)
+        {
+            // loop over all queues and take one task,
+            // starting with the requested queue
+            // then stealing from any other one in the container
+            for (std::size_t i=0; i<num_queues; ++i) {
+                std::size_t q = (id + i) % num_queues;
+                if (queues_[q]->get_next_thread(thrd)) return true;
+            }
+            return false;
+        }
+
+        // ----------------------------------------------------------------
+        inline bool wait_or_add_new(std::size_t id, bool running,
+           std::int64_t& idle_loop_count, std::size_t& added)
+        {
+            // loop over all queues and take one task,
+            // starting with the requested queue
+            // then stealing from any other one in the container
+            bool result = true;
+            for (std::size_t i=0; i<num_queues; ++i) {
+                std::size_t q = (id + i) % num_queues;
+                result = queues_[q]->wait_or_add_new(running, idle_loop_count,
+                    added) && result;
+                if (0 != added) return result;
+            }
+            return result;
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t get_queue_length() const
+        {
+            std::size_t len = 0;
+            for (auto &q : queues_) len += q->get_queue_length();
+            return len;
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t get_thread_count(thread_state_enum state = unknown) const
+        {
+            std::size_t len = 0;
+            for (auto &q : queues_) len += q->get_thread_count(state);
+            return len;
+        }
+
+        // ----------------------------------------------------------------
+        bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
+            thread_state_enum state = unknown) const
+        {
+            bool result = true;
+            for (auto &q : queues_) result = result && q->enumerate_threads(f, state);
+            return result;
+        }
+
+        // ----------------------------------------------------------------
+        inline std::size_t size() const {
+            return num_queues;
+        }
+
+        // ----------------------------------------------------------------
+        std::size_t             num_cores;
+        std::size_t             num_queues;
+        double                  scale;
+        std::vector<QueueType*> queues_;
+    };
 
     struct add_new_tag {};
 

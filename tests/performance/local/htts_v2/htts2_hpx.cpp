@@ -159,7 +159,7 @@ struct hpx_driver : htts2::driver
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
               // Place in the target OS-thread's queue.
-              , hpx::threads::thread_schedule_hint(i) // Place in the target OS-thread's queue.
+              , hpx::threads::thread_schedule_hint(i)
             );
         }
 
