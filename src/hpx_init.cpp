@@ -290,7 +290,7 @@ namespace hpx_start
 {
     // Importing weak symbol from libhpx_wrap.a which may be shadowed by one present in
     // hpx_main.hpp.
-    HPX_SYMBOL_EXPORT __attribute__((weak)) extern bool include_libhpx_wrap;
+    HPX_SYMBOL_EXPORT __attribute__((weak)) bool include_libhpx_wrap = false;
 }
 
 #endif
@@ -611,7 +611,7 @@ namespace hpx
                             "using hpx::init. Exiting...\n";
                         return -1;
                     }
-                    #endif
+                #endif
 
                     std::cerr << "hpx::init: can't initialize runtime system "
                         "more than once! Exiting...\n";
