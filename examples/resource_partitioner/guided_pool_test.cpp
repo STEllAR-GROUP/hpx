@@ -27,7 +27,7 @@
 #include <string>
 #include <utility>
 //
-#include "shared_priority_scheduler.hpp"
+#include "shared_priority_queue_scheduler.hpp"
 #include "system_characteristics.hpp"
 
 static int pool_threads  = 0;
@@ -35,8 +35,9 @@ static int pool_threads  = 0;
 #define CUSTOM_POOL_NAME "Custom"
 
 // this is our custom scheduler type
-using high_priority_sched = hpx::threads::policies::shared_priority_scheduler<>;
-using namespace hpx::threads::policies;
+using high_priority_sched =
+    hpx::threads::policies::example::shared_priority_queue_scheduler<>;
+using hpx::threads::policies::scheduler_mode;
 
 // Force an instantiation of the pool type templated on our custom scheduler
 // we need this to ensure that the pool has the generated member functions needed

@@ -21,7 +21,7 @@
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/util/demangle_helper.hpp>
 //
-#include "shared_priority_scheduler.hpp"
+#include "shared_priority_queue_scheduler.hpp"
 
 // --------------------------------------------------------------------
 // custom executor async/then/when/dataflow specialization example
@@ -466,8 +466,9 @@ int main(int argc, char** argv)
     hpx::resource::partitioner rp(argc, argv);
 
     // declare the high priority scheduler type we'll use
-    using high_priority_sched = hpx::threads::policies::shared_priority_queue_scheduler<>;
-    using namespace hpx::threads::policies;
+    using high_priority_sched =
+        hpx::threads::policies::example::shared_priority_queue_scheduler<>;
+    using hpx::threads::policies::scheduler_mode;
     // setup the default pool with our custom priority scheduler
     rp.create_thread_pool(
         "custom",
