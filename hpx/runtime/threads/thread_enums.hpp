@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/detail/combined_tagged_state.hpp>
 
 #include <cstddef>
+#include <cstdint>
 
 namespace hpx { namespace threads
 {
@@ -142,6 +143,32 @@ namespace hpx { namespace threads
     /// Get the readable string representing the given stack size
     /// constant.
     HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_schedule_hint_mode
+    ///
+    /// The type of hint given when creating new tasks.
+    enum thread_schedule_hint_mode : std::int16_t
+    {
+        thread_schedule_hint_mode_none = 0,
+        thread_schedule_hint_mode_thread = 1,
+        thread_schedule_hint_mode_numa = 2,
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct thread_schedule_hint {
+        thread_schedule_hint() : mode(thread_schedule_hint_mode_none),
+            hint(-1) {}
+
+        thread_schedule_hint(std::int16_t thread_hint)
+            : mode(thread_schedule_hint_mode_thread), hint(thread_hint) {}
+
+        thread_schedule_hint(thread_schedule_hint_mode mode, std::int16_t hint)
+            : mode(mode), hint(hint) {}
+
+        thread_schedule_hint_mode mode;
+        std::int16_t hint;
+    };
 }}
 
 #endif

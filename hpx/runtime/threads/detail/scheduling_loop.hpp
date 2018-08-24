@@ -428,7 +428,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename SchedulingPolicy>
     thread_id_type create_background_thread(SchedulingPolicy& scheduler,
         scheduling_callbacks& callbacks, std::shared_ptr<bool>& background_running,
-        std::size_t num_thread, std::int64_t& idle_loop_count)
+        threads::thread_schedule_hint schedulehint, std::int64_t& idle_loop_count)
     {
         thread_id_type background_thread;
         background_running.reset(new bool(true));
@@ -454,15 +454,14 @@ namespace hpx { namespace threads { namespace detail
             hpx::util::thread_description("background_work"),
             0,
             thread_priority_high_recursive,
-            num_thread,
+            schedulehint,
             get_stack_size(thread_stacksize_large),
             &scheduler);
 
         // Create in suspended to prevent the thread from being scheduled
         // directly...
         scheduler.SchedulingPolicy::create_thread(background_init,
-            &background_thread, suspended, true, hpx::throws, num_thread,
-            num_thread);
+            &background_thread, suspended, true, hpx::throws);
         HPX_ASSERT(background_thread);
         scheduler.SchedulingPolicy::increment_background_thread_count();
         // We can now set the state to pending
@@ -519,7 +518,9 @@ namespace hpx { namespace threads { namespace detail
                             else
                             {
                                 next->get_scheduler_base()->schedule_thread(
-                                    next, num_thread, num_thread);
+                                    next,
+                                    threads::thread_schedule_hint(num_thread),
+                                    true);
                             }
                         }
                     }
@@ -593,7 +594,8 @@ namespace hpx { namespace threads { namespace detail
             !params.background_.empty())
         {
             background_thread = create_background_thread(scheduler, params,
-                background_running, num_thread, idle_loop_count);
+                background_running,
+                thread_schedule_hint(num_thread), idle_loop_count);
         }
 #endif
 
@@ -734,7 +736,7 @@ namespace hpx { namespace threads { namespace detail
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
                         scheduler.SchedulingPolicy::schedule_thread_last(thrd,
-                            num_thread, num_thread);
+                            threads::thread_schedule_hint(num_thread), true);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                     else if (HPX_UNLIKELY(state_val == pending_boost))
@@ -759,7 +761,9 @@ namespace hpx { namespace threads { namespace detail
                                 // schedule this thread again immediately with
                                 // boosted priority
                                 scheduler.SchedulingPolicy::schedule_thread(
-                                    thrd, num_thread, num_thread,
+                                    thrd,
+                                    threads::thread_schedule_hint(num_thread),
+                                    true,
                                     thread_priority_boost);
                                 scheduler.SchedulingPolicy::do_some_work(
                                     num_thread);
@@ -770,7 +774,8 @@ namespace hpx { namespace threads { namespace detail
                             // schedule this thread again immediately with
                             // boosted priority
                             scheduler.SchedulingPolicy::schedule_thread(
-                                thrd, num_thread, num_thread,
+                                thrd, threads::thread_schedule_hint(num_thread),
+                                true,
                                 thread_priority_boost);
                             scheduler.SchedulingPolicy::do_some_work(
                                 num_thread);
@@ -788,7 +793,8 @@ namespace hpx { namespace threads { namespace detail
                     // scheduler queue already but the state has not been reset
                     // yet
                     scheduler.SchedulingPolicy::schedule_thread(thrd,
-                        num_thread, num_thread);
+                        threads::thread_schedule_hint(num_thread), true,
+                        thrd->get_priority());
                 }
 
                 // Remove the mapping from thread_map_ if HPX thread is depleted
@@ -847,7 +853,11 @@ namespace hpx { namespace threads { namespace detail
                                     scheduler.SchedulingPolicy::
                                         decrement_background_thread_count();
                                     scheduler.SchedulingPolicy::schedule_thread(
-                                        background_thread.get(), num_thread, num_thread);
+                                        background_thread.get(),
+                                        threads::thread_schedule_hint(
+                                            num_thread),
+                                        true,
+                                        background_thread->get_priority());
                                     background_thread.reset();
                                     background_running.reset();
                                 }
@@ -891,7 +901,8 @@ namespace hpx { namespace threads { namespace detail
                     // avoid deadlock situations, if all background threads are
                     // blocked.
                     background_thread = create_background_thread(scheduler, params,
-                        background_running, num_thread, idle_loop_count);
+                        background_running,
+                        thread_schedule_hint(num_thread), idle_loop_count);
                 }
 #endif
 
@@ -931,7 +942,8 @@ namespace hpx { namespace threads { namespace detail
                     // avoid deadlock situations, if all background threads are
                     // blocked.
                     background_thread = create_background_thread(scheduler, params,
-                        background_running, num_thread, idle_loop_count);
+                        background_running,
+                        thread_schedule_hint(num_thread), idle_loop_count);
                 }
 
 #endif
@@ -959,7 +971,9 @@ namespace hpx { namespace threads { namespace detail
                         scheduler.SchedulingPolicy::
                             decrement_background_thread_count();
                         scheduler.SchedulingPolicy::schedule_thread(
-                            background_thread.get(), num_thread, num_thread);
+                            background_thread.get(),
+                            threads::thread_schedule_hint(num_thread), true,
+                            background_thread->get_priority());
                         background_thread.reset();
                         background_running.reset();
                     }

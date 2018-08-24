@@ -91,7 +91,7 @@ int hpx_main(variables_map& vm)
                   , "get_os_thread_num"
                   , pending
                   , thread_priority_normal
-                  , 0);
+                  , hpx::threads::thread_schedule_hint(0));
             }
 
             barr.wait(); // wait for all PX threads to enter the barrier
