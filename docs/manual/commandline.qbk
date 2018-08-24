@@ -63,8 +63,10 @@ described in the table below:
     [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
                                  instance of __hpx__ (default: 1)]]
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
-                                 for this __hpx__ locality (default: 1, using 'all' will
-                                 spawn one thread for each processing unit)]]
+                                 for this __hpx__ locality (default: 'cores')
+                                 valid entries are numeric values 1,2,3... or 'all' which will
+                                 spawn one thread per processing unit (includes all hyperthread 
+                                 cores), 'cores' will spawn one thread per core (no hyperthreads).
     [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__
                                  locality (default: 'all', i.e. the number of cores is based on
                                  the number of threads (`--hpx:threads`) assuming `--hpx:bind=compact`)]]
