@@ -121,7 +121,7 @@ namespace hpx { namespace util
 
     struct apex_wrapper_init
     {
-        apex_wrapper_init(int argc, char **argv)
+        apex_wrapper_init(int /*argc*/, char ** /*argv*/)
         {
             //apex::init(nullptr, hpx::get_locality_id(),
             //    hpx::get_initial_num_localities());
