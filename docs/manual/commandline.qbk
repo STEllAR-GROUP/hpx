@@ -65,7 +65,7 @@ described in the table below:
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 'cores')
                                  valid entries are numeric values 1,2,3... or 'all' which will
-                                 spawn one thread per processing unit (includes all hyperthread 
+                                 spawn one thread per processing unit (includes all hyperthread
                                  cores), 'cores' will spawn one thread per core (no hyperthreads).
     [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__
                                  locality (default: 'all', i.e. the number of cores is based on
@@ -416,11 +416,11 @@ processing unit (`pu:0`) should be used.
       worker thread will be bound to run on.]
 
 The difference between the four possible predefined distribution schemes (`compact`,
-`scatter`, `balanced` and 'numa-balanced') is best explained with an example. Imagine that we have a system with 4
+`scatter`, `balanced` and `numa-balanced`) is best explained with an example. Imagine that we have a system with 4
 cores and 4 hardware threads per core on 2 sockets. If we place 8 threads the assignments produced by the `compact`,
-`scatter`, `balanced` and 'numa-balanced' types are shown in the figure below. Notice that `compact` does not fully
+`scatter`, `balanced` and `numa-balanced` types are shown in the figure below. Notice that `compact` does not fully
 utilize all the cores in the system. For this reason it is recommended that applications are run using
-the `scatter` or `balanced'/'numa-balanced` options in most cases.
+the `scatter` or `balanced`/`numa-balanced` options in most cases.
 
 [fig affinities.png..Schematic of thread affinity type distributions..commandline.affinities]
 

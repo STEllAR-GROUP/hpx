@@ -261,9 +261,9 @@ tricky to get right (the continuation needs to take the future as an argument).
 
 [note __hpx__ programs accept command line arguments. The most important one is
 `--hpx:threads=N` to set the number of OS-threads used by __hpx__. __hpx__ uses
-all available processing units by default. Play around with the example above
-and see what difference the number of threads makes on the `sort` function. See
-__launching__ for more details on how and what options you can pass to __hpx__.]
+on thread per core by default. Play around with the example above and see what
+difference the number of threads makes on the `sort` function. See __launching__
+for more details on how and what options you can pass to __hpx__.]
 
 [tip The example above used the construction `hpx::when_all(...).then(...)`. For
 convenience and performance it is a good idea to replace uses of
