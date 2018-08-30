@@ -355,6 +355,8 @@ namespace hpx { namespace util
                 threads_str = vm["hpx:threads"].as<std::string>();
                 if ("all" == threads_str)
                 {
+                    default_threads = thread::hardware_concurrency();
+                    batch_threads = env.retrieve_number_of_threads();
                     if (batch_threads == std::size_t(-1))
                     {
                         batch_threads = thread::hardware_concurrency();
