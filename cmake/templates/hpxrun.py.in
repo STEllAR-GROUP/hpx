@@ -112,9 +112,7 @@ def build_cmd(options, args):
         cmd += select_parcelport(options.parcelport)
 
     # set number of threads
-    if options.threads == -1:
-        cmd += ['--hpx:threads=all']
-    else:
+    if options.threads >= -1:
         cmd += ['--hpx:threads=' + str(options.threads)]
 
     # set number of localities
