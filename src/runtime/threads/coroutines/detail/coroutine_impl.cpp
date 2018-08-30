@@ -91,8 +91,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(result_last.first == thread_state_enum::terminated);
-
-                    this->reset();
                 }
 
                 // return value to other side of the fence
@@ -101,9 +99,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             catch (...) {
                 status = super_type::ctx_exited_abnormally;
                 tinfo = std::current_exception();
-                this->reset();
             }
 
+            this->reset();
             this->do_return(status, std::move(tinfo));
         } while (this->m_state == super_type::ctx_running);
 
