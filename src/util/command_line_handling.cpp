@@ -289,6 +289,27 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
+        std::size_t get_number_of_default_cores(util::batch_environment& env)
+        {
+            threads::topology& top = threads::create_topology();
+
+            std::size_t batch_threads = env.retrieve_number_of_threads();
+            std::size_t num_cores = top.get_number_of_cores();
+            if(batch_threads == std::size_t(-1))
+                return num_cores;
+
+            // assuming we assign the first N cores ...
+            std::size_t core = 0;
+            for(; core < num_cores; ++core)
+            {
+                batch_threads -= top.get_number_of_core_pus(core);
+                if(batch_threads == 0) break;
+            }
+
+            return core + 1;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_threads(util::manage_config& cfgmap,
             util::runtime_configuration const& rtcfg,
             boost::program_options::variables_map& vm,
@@ -300,7 +321,16 @@ namespace hpx { namespace util
                 "hpx.os_threads", rtcfg.get_entry("hpx.os_threads",
                     std::to_string(default_threads)));
 
-            if ("all" == threads_str)
+            if ("cores" == threads_str)
+            {
+                std::size_t cores = get_number_of_default_cores(env);
+                default_threads = cores;
+                if (batch_threads == std::size_t(-1))
+                    batch_threads = cores;
+                else
+                    default_threads = batch_threads;
+            }
+            else if ("all" == threads_str)
             {
                 if (batch_threads == std::size_t(-1))
                     batch_threads = thread::hardware_concurrency();
@@ -325,11 +355,19 @@ namespace hpx { namespace util
                 threads_str = vm["hpx:threads"].as<std::string>();
                 if ("all" == threads_str)
                 {
+                    default_threads = thread::hardware_concurrency();
+                    batch_threads = env.retrieve_number_of_threads();
                     if (batch_threads == std::size_t(-1))
                     {
                         batch_threads = thread::hardware_concurrency();
                     }
                     threads = batch_threads; //-V101
+                }
+                else if ("cores" == threads_str)
+                {
+                    std::size_t cores = get_number_of_default_cores(env);
+                    default_threads = cores;
+                    threads         = cores;
                 }
                 else
                 {
@@ -385,27 +423,6 @@ namespace hpx { namespace util
                     threads, batch_threads);
             }
             return threads;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        std::size_t get_number_of_default_cores(util::batch_environment& env)
-        {
-            threads::topology& top = threads::create_topology();
-
-            std::size_t batch_threads = env.retrieve_number_of_threads();
-            std::size_t num_cores = top.get_number_of_cores();
-            if(batch_threads == std::size_t(-1))
-                return num_cores;
-
-            // assuming we assign the first N cores ...
-            std::size_t core = 0;
-            for(; core < num_cores; ++core)
-            {
-                batch_threads -= top.get_number_of_core_pus(core);
-                if(batch_threads == 0) break;
-            }
-
-            return core + 1;
         }
 
         std::size_t handle_num_cores(util::manage_config& cfgmap,

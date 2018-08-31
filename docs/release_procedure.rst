@@ -200,7 +200,7 @@ the lines as they are completed to avoid confusion.
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu,
     stellar@cct.lsu.edu, allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
     xpress@crest.iu.edu, Sonia Sachs, our list of external collaborators,
-    isocpp.org, reddit.com, HPC Wire, Inside HPC, and a CCT press release.
+    isocpp.org, reddit.com, HPC Wire, Inside HPC, Heise Online, and a CCT press release.
 
 #.  Beer and pizza.
 
