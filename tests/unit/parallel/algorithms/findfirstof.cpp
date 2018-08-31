@@ -50,6 +50,34 @@ void test_find_first_of(ExPolicy policy, IteratorTag)
 
     HPX_TEST(index == iterator(test_index));
 }
+template <typename ExPolicy, typename IteratorTag>
+void test_find_first_of_proj(ExPolicy policy, IteratorTag)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    int find_first_of_pos = dis(gen);
+    int random_sub_seq_pos = dist(gen);
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), (gen() % 32768) + 19);
+    std::size_t h[] = {1+65536, 7+65536, 18+65536, 3+65536};
+    c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
+
+    iterator index =
+        hpx::parallel::find_first_of(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(h), std::end(h),
+            std::equal_to<std::size_t>(),
+        [](std::size_t x){ return x % 65536;});
+
+    base_iterator test_index = std::begin(c) + find_first_of_pos;
+
+    HPX_TEST(index == iterator(test_index));
+}
 
 template <typename ExPolicy, typename IteratorTag>
 void test_find_first_of_async(ExPolicy p, IteratorTag)
@@ -76,6 +104,32 @@ void test_find_first_of_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(f.get() == iterator(test_index));
 }
+template <typename ExPolicy, typename IteratorTag>
+void test_find_first_of_async_proj(ExPolicy p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    int find_first_of_pos = dis(gen);
+    int random_sub_seq_pos = dist(gen);
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c),( gen() % 32768)  + 19);
+    std::size_t h[] = {1+65536, 7+65536, 18+65536, 3+65536};
+    c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
+
+    hpx::future<iterator> f =
+        hpx::parallel::find_first_of(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(h), std::end(h),
+            std::equal_to<std::size_t>(),
+        [](std::size_t x){ return x % 65536;});
+    f.wait();
+
+    // create iterator at position of value to be found
+    base_iterator test_index = std::begin(c) + find_first_of_pos;
+
+    HPX_TEST(f.get() == iterator(test_index));
+}
 
 template <typename IteratorTag>
 void test_find_first_of()
@@ -84,17 +138,29 @@ void test_find_first_of()
     test_find_first_of(execution::seq, IteratorTag());
     test_find_first_of(execution::par, IteratorTag());
     test_find_first_of(execution::par_unseq, IteratorTag());
+    test_find_first_of_proj(execution::seq, IteratorTag());
+    test_find_first_of_proj(execution::par, IteratorTag());
+    test_find_first_of_proj(execution::par_unseq, IteratorTag());
 
     test_find_first_of_async(execution::seq(execution::task), IteratorTag());
     test_find_first_of_async(execution::par(execution::task), IteratorTag());
+    test_find_first_of_async_proj(execution::seq(execution::task), IteratorTag());
+    test_find_first_of_async_proj(execution::par(execution::task), IteratorTag());
 
 #if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
     test_find_first_of(execution_policy(execution::seq), IteratorTag());
     test_find_first_of(execution_policy(execution::par), IteratorTag());
     test_find_first_of(execution_policy(execution::par_unseq), IteratorTag());
+    test_find_first_of_proj(execution_policy(execution::seq), IteratorTag());
+    test_find_first_of_proj(execution_policy(execution::par), IteratorTag());
+    test_find_first_of_proj(execution_policy(execution::par_unseq), IteratorTag());
 
     test_find_first_of(execution_policy(execution::seq(execution::task)), IteratorTag());
     test_find_first_of(execution_policy(execution::par(execution::task)), IteratorTag());
+    test_find_first_of_proj(
+        execution_policy(execution::seq(execution::task)), IteratorTag());
+    test_find_first_of_proj(
+        execution_policy(execution::par(execution::task)), IteratorTag());
 #endif
 }
 
