@@ -767,10 +767,10 @@ namespace hpx { namespace parallel { inline namespace v1
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename Pred, typename Proj>
+                typename Pred, typename Proj1, typename Proj2>
             static InIter1
             sequential(ExPolicy, InIter1 first, InIter1 last, InIter2 s_first,
-                InIter2 s_last, Pred && op, Proj && proj)
+                InIter2 s_last, Pred && op, Proj1 && proj1, Proj2 && proj2)
             {
                 if (first == last)
                     return last;
@@ -780,9 +780,10 @@ namespace hpx { namespace parallel { inline namespace v1
                     for (InIter2 iter = s_first; iter != s_last; ++iter)
                     {
                         if (hpx::util::invoke(
-                                util::compare_projected<Pred, Proj>(
+                                util::compare_projected<Pred, Proj1, Proj2>(
                                     std::forward<Pred>(op),
-                                    std::forward<Proj>(proj)),
+                                    std::forward<Proj1>(proj1),
+                                    std::forward<Proj2>(proj2)),
                                 *first, *iter))
                             return first;
                     }
@@ -791,12 +792,13 @@ namespace hpx { namespace parallel { inline namespace v1
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred,
-            typename Proj>
+            typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
             parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                FwdIter2 s_first, FwdIter2 s_last, Pred && op, Proj && proj)
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op, Proj1 && proj1,
+                Proj2 && proj2)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<FwdIter>::reference reference;
@@ -819,14 +821,15 @@ namespace hpx { namespace parallel { inline namespace v1
                     call_with_index(
                         std::forward<ExPolicy>(policy), first, count, 1,
                         [s_first, s_last, tok, HPX_CAPTURE_FORWARD(op),
-                        HPX_CAPTURE_FORWARD(proj)](
+                            HPX_CAPTURE_FORWARD(proj1),
+                            HPX_CAPTURE_FORWARD(proj2)](
                             FwdIter it, std::size_t part_size,
                             std::size_t base_idx
                         ) mutable -> void
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, &s_first, &s_last, &op, &proj](
+                                [&tok, &s_first, &s_last, &op, &proj1, &proj2](
                                     reference v, std::size_t i
                                 ) -> void
                                 {
@@ -835,9 +838,10 @@ namespace hpx { namespace parallel { inline namespace v1
                                     {
                                         if (hpx::util::invoke(
                                                 util::compare_projected<Pred,
-                                                    Proj>(
+                                                    Proj1, Proj2>(
                                                     std::forward<Pred>(op),
-                                                    std::forward<Proj>(proj)),
+                                                    std::forward<Proj1>(proj1),
+                                                    std::forward<Proj2>(proj2)),
                                                 v, *iter))
                                             tok.cancel(i);
                                     }
@@ -883,10 +887,12 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     overload of \a equal requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
-    /// \tparam Proj        The type of an optional projection function. This
+    /// \tparam Proj1       The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity and is applied
-    ///                     to the elements of type dereferenced \a FwdIter1
-    ///                     and dereferenced \a FwdIter2.
+    ///                     to the elements of type dereferenced \a FwdIter1.
+    /// \tparam Proj2       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of type dereferenced \a FwdIter2.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -912,9 +918,8 @@ namespace hpx { namespace parallel { inline namespace v1
     ///                     to \a Type1 and \a Type2 respectively.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements of type
-    ///                     dereferenced \a FwdIter1 and dereferenced \a FwdIter2
-    ///                     as a projection operation before the function \a f
-    ///                     is invoked.
+    ///                     dereferenced \a FwdIter1 as a projection operation
+    ///                     before the function \a op is invoked.
     ///
     /// The comparison operations in the parallel \a find_first_of algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -945,13 +950,15 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to,
-        typename Proj = util::projection_identity>
+        typename Proj1 = util::projection_identity,
+        typename Proj2 = util::projection_identity>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
     >::type
     find_first_of(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 s_first, FwdIter2 s_last, Pred && op = Pred(), Proj && proj = Proj())
+        FwdIter2 s_first, FwdIter2 s_last, Pred && op = Pred(),
+        Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
     {
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
         static_assert(
@@ -977,7 +984,7 @@ namespace hpx { namespace parallel { inline namespace v1
         return detail::find_first_of<FwdIter1>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, s_first, s_last, std::forward<Pred>(op),
-            std::forward<Proj>(proj));
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 }}}
 

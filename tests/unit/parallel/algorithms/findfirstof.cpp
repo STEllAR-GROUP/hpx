@@ -72,7 +72,8 @@ void test_find_first_of_proj(ExPolicy policy, IteratorTag)
         hpx::parallel::find_first_of(policy, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(h), std::end(h),
             std::equal_to<std::size_t>(),
-        [](std::size_t x){ return x % 65536;});
+        [](std::size_t x){ return x % 65536;},
+        [](std::size_t x) { return x % 65536; });
 
     base_iterator test_index = std::begin(c) + find_first_of_pos;
 
@@ -122,7 +123,8 @@ void test_find_first_of_async_proj(ExPolicy p, IteratorTag)
         hpx::parallel::find_first_of(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(h), std::end(h),
             std::equal_to<std::size_t>(),
-        [](std::size_t x){ return x % 65536;});
+        [](std::size_t x){ return x % 65536;},
+        [](std::size_t x) { return x % 65536; });
     f.wait();
 
     // create iterator at position of value to be found
