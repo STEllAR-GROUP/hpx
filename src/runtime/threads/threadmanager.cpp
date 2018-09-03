@@ -578,6 +578,34 @@ namespace hpx { namespace threads
 #endif
                 break;
             }
+
+            case resource::shared_priority:
+            {
+#if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+                // instantiate the scheduler
+                typedef hpx::threads::policies::shared_priority_queue_scheduler<>
+                    local_sched_type;
+                hpx::threads::policies::core_ratios ratios(4, 4, 64);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(num_threads_in_pool, ratios,
+                        "core-shared_priority_queue_scheduler"));
+
+                // instantiate the pool
+                std::unique_ptr<thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<
+                            local_sched_type
+                        >(std::move(sched),
+                        notifier_, i, name.c_str(), scheduler_mode,
+                        thread_offset));
+                pools_.push_back(std::move(pool));
+#else
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:queuing=shared-priority "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=shared-priority'.");
+#endif
+                break;
+            }
             }
 
             // update the thread_offset for the next pool
@@ -587,7 +615,7 @@ namespace hpx { namespace threads
         // fill the thread-lookup table
         for (auto& pool_iter : pools_)
         {
-            std::size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
+            std::size_t nt = rp.get_num_threads(pool_iter->get_pool_index());
             for (std::size_t i = 0; i < nt; i++)
             {
                 threads_lookup_.push_back(pool_iter->get_pool_id());
@@ -608,7 +636,7 @@ namespace hpx { namespace threads
         for (auto && pool_iter : pools_)
         {
             std::size_t num_threads_in_pool =
-                rp.get_num_threads(pool_iter->get_pool_name());
+                rp.get_num_threads(pool_iter->get_pool_index());
             pool_iter->init(num_threads_in_pool, threads_offset);
             threads_offset += num_threads_in_pool;
         }

@@ -154,6 +154,9 @@ namespace hpx { namespace resource { namespace detail
         case resource::abp_priority_lifo:
             sched = "abp_priority_lifo";
             break;
+        case resource::shared_priority:
+            sched = "shared_priority";
+            break;
         }
 
         os << "\"" << sched << "\" is running on PUs : \n";
@@ -434,6 +437,10 @@ namespace hpx { namespace resource { namespace detail
         else if (0 == std::string("abp-priority-lifo").find(cfg_.queuing_))
         {
             default_scheduler = scheduling_policy::abp_priority_lifo;
+        }
+        else if (0 == std::string("shared-priority").find(cfg_.queuing_))
+        {
+            default_scheduler = scheduling_policy::shared_priority;
         }
         else
         {
