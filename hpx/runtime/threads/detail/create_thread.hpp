@@ -86,8 +86,7 @@ namespace hpx { namespace threads { namespace detail
             data.priority = thread_priority_normal;
 
         // create the new thread
-        std::size_t num_thread = data.num_os_thread;
-        scheduler->create_thread(data, &id, initial_state, run_now, ec, num_thread);
+        scheduler->create_thread(data, &id, initial_state, run_now, ec);
 
         LTM_(info) << "register_thread(" << id << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
@@ -97,8 +96,9 @@ namespace hpx { namespace threads { namespace detail
 #endif
                    << ")";
 
-        // potentially wake up waiting thread
-        scheduler->do_some_work(num_thread);
+        // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
+        // thread.
+        scheduler->do_some_work(data.schedulehint.hint);
     }
 }}}
 

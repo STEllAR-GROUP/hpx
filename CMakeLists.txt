@@ -443,6 +443,13 @@ hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 
+set(HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT "4")
+hpx_option(HPX_WITH_MAX_NUMA_DOMAIN_COUNT STRING
+  "HPX applications will not run on machines with more NUMA domains (default: ${HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT})"
+  ${HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT}
+  CATEGORY "Thread Manager" ADVANCED)
+hpx_add_config_define(HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_COUNT})
+
 set(HPX_MORE_THAN_64_THREADS_DEFAULT OFF)
 if(HPX_WITH_MAX_CPU_COUNT GREATER 64)
   set(HPX_MORE_THAN_64_THREADS_DEFAULT ON)
@@ -630,7 +637,7 @@ endif()
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static, shared-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -655,6 +662,10 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "STATIC" OR _all)
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_WITH_STATIC_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "SHARED-PRIORITY" OR _all)
+    hpx_add_config_define(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+    set(HPX_WITH_SHARED_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
   endif()
   unset(_all)
 endforeach()

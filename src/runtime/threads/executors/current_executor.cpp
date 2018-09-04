@@ -54,8 +54,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     void current_executor::add(
         closure_type&& f, util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         // create a new thread
         thread_init_data data(util::bind(
