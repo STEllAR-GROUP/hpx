@@ -80,6 +80,8 @@ if(HPX_WITH_PARCELPORT_MPI)
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
       DEPENDENCIES
         ${_mpi_libraries}
+      COMPILE_DEFINITIONS
+        "${MPI_CXX_COMPILE_DEFINITIONS}"
       FOLDER "Core/Plugins/Parcelport/MPI")
   endmacro()
 else()

@@ -25,7 +25,7 @@ macro(add_parcelport name)
   set(name "parcelport_${name}")
   set(options STATIC)
   set(one_value_args FOLDER)
-  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS COMPILE_DEFINITIONS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(${${name}_STATIC})
@@ -65,6 +65,7 @@ macro(add_parcelport name)
       CACHE INTERNAL "" FORCE)
 
     hpx_libraries(${${name}_DEPENDENCIES})
+    hpx_add_target_compile_definition("${${name}_COMPILE_DEFINITIONS}")
 
   else()
     hpx_debug("adding parcelport plugin: ${name}")
@@ -77,6 +78,7 @@ macro(add_parcelport name)
         LINK_FLAGS ${${name}_LINK_FLAGS}
         DEPENDENCIES ${${name}_DEPENDENCIES})
 
+    set_property(TARGET ${name} PROPERTY COMPILE_DEFINITIONS "${${name}_COMPILE_DEFINITIONS}")
     add_hpx_pseudo_dependencies(plugins.parcelport.${name_short} ${name}_lib)
     add_hpx_pseudo_dependencies(core plugins.parcelport.${name_short})
   endif()
