@@ -66,7 +66,7 @@ described in the table below:
                                  for this __hpx__ locality (default: 'cores')
                                  valid entries are numeric values 1,2,3... or 'all' which will
                                  spawn one thread per processing unit (includes all hyperthread
-                                 cores), 'cores' will spawn one thread per core (no hyperthreads).
+                                 cores), 'cores' will spawn one thread per core (no hyperthreads).]]
     [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__
                                  locality (default: 'all', i.e. the number of cores is based on
                                  the number of threads (`--hpx:threads`) assuming `--hpx:bind=compact`)]]
