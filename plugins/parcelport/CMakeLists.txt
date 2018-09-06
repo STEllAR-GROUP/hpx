@@ -64,6 +64,10 @@ macro(add_parcelport name)
       ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES}
       CACHE INTERNAL "" FORCE)
 
+    set_source_files_properties(${${name}_SOURCES}
+      PROPERTIES COMPILE_FLAGS
+      "${${name}_COMPILE_FLAGS}")
+
     hpx_libraries(${${name}_DEPENDENCIES})
 
   else()
