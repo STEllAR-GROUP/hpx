@@ -11,6 +11,7 @@ if(HPX_HAVE_CXX11_STD_RANDOM)
       ${example_programs}
       rnd_future_reduce)
   set(rnd_future_reduce_FLAGS DEPENDENCIES iostreams_component)
+  set(rnd_future_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
 
 foreach(example_program ${example_programs})
@@ -35,5 +36,13 @@ foreach(example_program ${example_programs})
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.future_reduce.${example_program}
                               ${example_program}_exe)
-endforeach()
 
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_example_test("future_reduce" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_pseudo_target(tests.examples.future_reduce.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.future_reduce
+                                tests.examples.future_reduce.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.future_reduce.${example_program}
+                                ${example_program}_exe)
+  endif()
+endforeach()

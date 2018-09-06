@@ -10,6 +10,8 @@ set(examples
     template_function_accumulator
    )
 
+# TODO: Add non-interactive version that can be tested.
+
 # for all targets specified above
 foreach(example ${examples})
   set(client_sources ${example}_client.cpp)
@@ -41,4 +43,3 @@ foreach(example ${examples})
   add_hpx_pseudo_dependencies(examples.accumulators.${example}
                               ${example}_client_exe)
 endforeach()
-

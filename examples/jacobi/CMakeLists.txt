@@ -29,3 +29,5 @@ add_hpx_pseudo_dependencies(examples.jacobi
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.jacobi.jacobi_simple
                             jacobi_exe)
+
+# TODO: Fix example. Not added to unit tests until fixed.

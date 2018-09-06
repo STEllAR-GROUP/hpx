@@ -10,6 +10,8 @@ set(examples
     simple_central_tuplespace
    )
 
+set(simple_central_tuplespace_PARAMETERS THREADS_PER_LOCALITY 4)
+
 # for all targets specified above
 foreach(example ${examples})
   set(sources ${example}_client.cpp)
@@ -32,5 +34,13 @@ foreach(example ${examples})
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.tuplespace.${example}
                               ${example}_client_exe)
-endforeach()
 
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_example_test("tuplespace" ${example}_client ${${example}_PARAMETERS})
+    add_hpx_pseudo_target(tests.examples.tuplespace.${example})
+    add_hpx_pseudo_dependencies(tests.examples.tuplespace
+                                tests.examples.tuplespace.${example})
+    add_hpx_pseudo_dependencies(tests.examples.tuplespace.${example}
+                                ${example}_client_exe)
+  endif()
+endforeach()

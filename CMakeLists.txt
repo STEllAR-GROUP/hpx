@@ -266,6 +266,7 @@ hpx_option(HPX_WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default:
 hpx_option(HPX_WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_WITH_TESTS_EXAMPLES BOOL "Add HPX examples as tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
@@ -1798,12 +1799,6 @@ endif()
 add_hpx_pseudo_target(core)
 add_subdirectory(src)
 
-if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples)
-  include_directories(examples)
-  add_subdirectory(examples)
-endif()
-
 ###############################################################################
 # Tests
 ###############################################################################
@@ -1821,6 +1816,12 @@ if(HPX_WITH_TESTS)
 
   include_directories(tests)
   add_subdirectory(tests)
+endif()
+
+if(HPX_WITH_EXAMPLES)
+  add_hpx_pseudo_target(examples)
+  include_directories(examples)
+  add_subdirectory(examples)
 endif()
 
 if(HPX_WITH_RUNTIME)

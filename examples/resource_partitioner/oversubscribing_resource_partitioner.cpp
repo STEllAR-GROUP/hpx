@@ -79,6 +79,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t num_threads = hpx::get_num_worker_threads();
     hpx::cout << "HPX using threads = " << num_threads << std::endl;
 
+    if (num_threads == 1)
+    {
+        HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            "hpx_main",
+            "the oversubscribing_resource_partitioner example requires at "
+            "least 2 worker threads (1 given)");
+    }
+
     std::size_t loop_count = num_threads * 1;
     std::size_t async_count = num_threads * 1;
 

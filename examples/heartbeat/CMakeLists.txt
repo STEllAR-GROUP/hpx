@@ -40,3 +40,4 @@ add_hpx_executable(heartbeat_console
 # add pseudo-target dependencies
 add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_console_exe)
 
+# TODO: Add non-interactive version that can be tested.
