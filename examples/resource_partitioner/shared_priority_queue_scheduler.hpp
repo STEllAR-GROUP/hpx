@@ -267,7 +267,7 @@ namespace example {
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         std::int64_t get_num_pending_misses(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_misses = 0;
 
@@ -311,7 +311,7 @@ namespace example {
         }
 
         std::int64_t get_num_pending_accesses(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_accesses = 0;
 
@@ -355,7 +355,7 @@ namespace example {
         }
 
         std::int64_t get_num_stolen_from_pending(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -399,7 +399,7 @@ namespace example {
         }
 
         std::int64_t get_num_stolen_to_pending(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -443,7 +443,7 @@ namespace example {
         }
 
         std::int64_t get_num_stolen_from_staged(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -487,7 +487,7 @@ namespace example {
         }
 
         std::int64_t get_num_stolen_to_staged(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -535,7 +535,7 @@ namespace example {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average thread wait time of the queues.
         std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average thread wait time of one specific queue.
             std::uint64_t wait_time = 0;
@@ -586,7 +586,7 @@ namespace example {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average task wait time of the queues.
         std::int64_t get_average_task_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average task wait time of one specific queue.
             std::uint64_t wait_time = 0;
@@ -636,7 +636,7 @@ namespace example {
 #endif
 
         // ------------------------------------------------------------
-        void abort_all_suspended_threads()
+        void abort_all_suspended_threads() override
         {
             LOG_CUSTOM_MSG("abort_all_suspended_threads");
             for (std::size_t d = 0; d < num_domains_; ++d) {
@@ -655,7 +655,7 @@ namespace example {
         }
 
         // ------------------------------------------------------------
-        bool cleanup_terminated(bool delete_all)
+        bool cleanup_terminated(bool delete_all) override
         {
 //            LOG_CUSTOM_MSG("cleanup_terminated with delete_all "
 //                << delete_all);
@@ -678,7 +678,7 @@ namespace example {
             return empty;
         }
 
-        bool cleanup_terminated(std::size_t thread_num, bool delete_all)
+        bool cleanup_terminated(std::size_t thread_num, bool delete_all) override
         {
             if (thread_num == std::size_t(-1)) {
                 HPX_THROW_EXCEPTION(bad_parameter,
@@ -832,7 +832,7 @@ namespace example {
         /// Return the next thread to be executed, return false if none available
         virtual bool get_next_thread(std::size_t thread_num,
             bool running, std::int64_t& idle_loop_count,
-            threads::thread_data*& thrd)
+            threads::thread_data*& thrd) override
         {
 //                LOG_CUSTOM_MSG("get_next_thread " << " queue "
 //                                                  << decnumber(thread_num));
@@ -907,7 +907,7 @@ namespace example {
         void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback,
-            thread_priority priority = thread_priority_normal)
+            thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -1009,7 +1009,7 @@ namespace example {
         void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback,
-            thread_priority priority = thread_priority_normal)
+            thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -1110,7 +1110,8 @@ namespace example {
         //---------------------------------------------------------------------
         // Destroy the passed thread - as it has been terminated
         //---------------------------------------------------------------------
-        void destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
+        void destroy_thread(
+            threads::thread_data* thrd, std::int64_t& busy_count) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
             thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
@@ -1121,7 +1122,7 @@ namespace example {
         // items)
         //---------------------------------------------------------------------
         std::int64_t get_queue_length(
-            std::size_t thread_num = std::size_t(-1)) const
+            std::size_t thread_num = std::size_t(-1)) const override
         {
             LOG_CUSTOM_MSG("get_queue_length"
                 << "thread_num " << decnumber(thread_num));
@@ -1158,7 +1159,7 @@ namespace example {
         std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t thread_num = std::size_t(-1),
-            bool reset = false) const
+            bool reset = false) const override
         {
             LOG_CUSTOM_MSG("get_thread_count thread_num "
                 << hexnumber(thread_num));
@@ -1263,7 +1264,7 @@ namespace example {
         // Enumerate matching threads from all queues
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const
+            thread_state_enum state = unknown) const override
         {
             bool result = true;
 
@@ -1285,7 +1286,7 @@ namespace example {
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t thread_num,
-            bool running, std::int64_t& idle_loop_count)
+            bool running, std::int64_t& idle_loop_count) override
         {
             std::size_t added = 0;
             bool result = true;
@@ -1351,7 +1352,7 @@ namespace example {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t thread_num)
+        void on_start_thread(std::size_t thread_num) override
         {
             LOG_CUSTOM_MSG("start thread with local thread num "
                 << decnumber(thread_num));
@@ -1455,7 +1456,7 @@ namespace example {
                 on_start_thread(thread_num);
         }
 
-        void on_stop_thread(std::size_t thread_num)
+        void on_stop_thread(std::size_t thread_num) override
         {
             LOG_CUSTOM_MSG("on_stop_thread with local thread num "
                 << decnumber(thread_num));
@@ -1481,7 +1482,7 @@ namespace example {
         }
 
         void on_error(
-            std::size_t thread_num, std::exception_ptr const& e)
+            std::size_t thread_num, std::exception_ptr const& e) override
         {
             LOG_CUSTOM_MSG("on_error with local thread num "
                 << decnumber(thread_num));
@@ -1506,7 +1507,7 @@ namespace example {
                 on_error(thread_num, e);
         }
 
-        void reset_thread_distribution() {}
+        void reset_thread_distribution() override {}
 
     protected:
         typedef queue_holder<thread_queue_type> numa_queues;
