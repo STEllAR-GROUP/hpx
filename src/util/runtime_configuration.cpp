@@ -237,12 +237,18 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.threadpools]",
+#if defined(HPX_HAVE_IO_POOL)
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
+#endif
+#if defined(HPX_HAVE_NETWORKING)
             "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
+#endif
+#if defined(HPX_HAVE_TIMER_POOL)
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
+#endif
 
             "[hpx.thread_queue]",
             "min_tasks_to_steal_pending = "
