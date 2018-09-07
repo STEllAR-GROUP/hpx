@@ -516,8 +516,9 @@ namespace hpx { namespace threads
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            int ret = hwloc_get_area_membind_nodeset(topo,
-                reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
+            int ret =
+                hwloc_get_area_membind(topo, reinterpret_cast<void const*>(lva),
+                    1, nodeset, &policy, HWLOC_MEMBIND_BYNODESET);
 
             if (-1 != ret)
             {
@@ -837,7 +838,7 @@ namespace hpx { namespace threads
     {
         hwloc_bitmap_t cpuset  = mask_to_bitmap(mask, HWLOC_OBJ_PU);
         hwloc_bitmap_t nodeset = hwloc_bitmap_alloc();
-        hwloc_cpuset_to_nodeset_strict(topo, cpuset, nodeset);
+        hwloc_cpuset_to_nodeset(topo, cpuset, nodeset);
         hwloc_bitmap_free(cpuset);
         return std::make_shared<hpx::threads::hpx_hwloc_bitmap_wrapper>(nodeset);
     }
@@ -1231,8 +1232,8 @@ namespace hpx { namespace threads
         hwloc_bitmap_ptr bitmap,
         hpx_hwloc_membind_policy policy, int flags) const
     {
-        return hwloc_alloc_membind_nodeset(topo, len, bitmap->get_bmp(),
-            (hwloc_membind_policy_t)(policy), flags);
+        return hwloc_alloc_membind(topo, len, bitmap->get_bmp(),
+            (hwloc_membind_policy_t)(policy), flags | HWLOC_MEMBIND_BYNODESET);
     }
 
     bool topology::set_area_membind_nodeset(
@@ -1241,8 +1242,10 @@ namespace hpx { namespace threads
 #if !defined(__APPLE__)
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
-        int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
-        if (ret<0) {
+        int ret = hwloc_set_area_membind(
+            topo, addr, len, ns, policy, HWLOC_MEMBIND_BYNODESET);
+        if (ret < 0)
+        {
             std::string msg = std::strerror(errno);
             if (errno == ENOSYS) msg = "the action is not supported";
             if (errno == EXDEV)  msg = "the binding cannot be enforced";
@@ -1272,12 +1275,14 @@ namespace hpx { namespace threads
         hwloc_membind_policy_t policy;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset->get_bmp());
 
-        if (hwloc_get_area_membind_nodeset(topo, addr, len, ns, &policy, 0)==-1) {
-            HPX_THROW_EXCEPTION(kernel_error
-              , "hpx::threads::topology::get_area_membind_nodeset"
-              , "hwloc_get_area_membind_nodeset failed");
+        if (hwloc_get_area_membind(
+                topo, addr, len, ns, &policy, HWLOC_MEMBIND_BYNODESET) == -1)
+        {
+            HPX_THROW_EXCEPTION(kernel_error,
+                "hpx::threads::topology::get_area_membind_nodeset",
+                "hwloc_get_area_membind_nodeset failed");
             return -1;
-            std::cout << "error in  " ;
+            std::cout << "error in  ";
         }
         return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
     }
