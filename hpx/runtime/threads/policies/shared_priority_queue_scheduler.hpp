@@ -1253,7 +1253,10 @@ namespace policies {
                 on_error(thread_num, e);
         }
 
-        void reset_thread_distribution() override {}
+        void reset_thread_distribution() override
+        {
+            std::fill(counters_.begin(), counters_.end(), 0);
+        }
 
     protected:
         typedef queue_holder<thread_queue_type> numa_queues;
