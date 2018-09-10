@@ -137,7 +137,7 @@ namespace hpx { namespace plugins
             hpx::util::function_nonser<void(std::size_t, char const*)> const&
                 on_start_thread,
             hpx::util::function_nonser<void(std::size_t, char const*)> const&
-                on_stop_thread)
+                on_stop_thread) override
         {
             return new Parcelport(cfg, on_start_thread, on_stop_thread);
         }
