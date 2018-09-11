@@ -65,9 +65,8 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename R, typename F, typename Tuple, std::size_t ...Is>
-        HPX_HOST_DEVICE
-        inline R
-        invoke_fused_impl(F&&f, Tuple&& t, pack_c<std::size_t, Is...>)
+        HPX_CONSTEXPR HPX_HOST_DEVICE
+        R invoke_fused_impl(F&&f, Tuple&& t, pack_c<std::size_t, Is...>)
         {
             using util::get;
             return util::invoke_r<R>(std::forward<F>(f),
@@ -93,7 +92,7 @@ namespace hpx { namespace util
     ///
     /// \note This function is similar to `std::apply` (C++17)
     template <typename F, typename Tuple>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
+    HPX_CONSTEXPR HPX_HOST_DEVICE
     typename detail::invoke_fused_result<F, Tuple>::type
     invoke_fused(F&& f, Tuple&& t)
     {
@@ -109,7 +108,7 @@ namespace hpx { namespace util
     /// \tparam R The result type of the function when it's called
     ///           with the content of the given sequenced type.
     template <typename R, typename F, typename Tuple>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
+    HPX_CONSTEXPR HPX_HOST_DEVICE
     R invoke_fused_r(F&& f, Tuple&& t)
     {
         return detail::invoke_fused_impl<R>(
@@ -123,9 +122,9 @@ namespace hpx { namespace util
         struct invoke_fused
         {
             template <typename F, typename Tuple>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
+            HPX_CONSTEXPR HPX_HOST_DEVICE
             typename util::detail::invoke_fused_result<F, Tuple>::type
-            operator()(F&& f, Tuple&& args)
+            operator()(F&& f, Tuple&& args) const
             {
                 typedef typename util::detail::invoke_fused_result<F, Tuple>::type R;
 
@@ -139,8 +138,8 @@ namespace hpx { namespace util
         struct invoke_fused_r
         {
             template <typename F, typename Tuple>
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-            R operator()(F&& f, Tuple&& args)
+            HPX_CONSTEXPR HPX_HOST_DEVICE
+            R operator()(F&& f, Tuple&& args) const
             {
                 return hpx::util::void_guard<R>(), util::invoke_fused_r<R>(
                     std::forward<F>(f),
