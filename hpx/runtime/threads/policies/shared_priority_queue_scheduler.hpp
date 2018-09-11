@@ -139,7 +139,7 @@ namespace policies {
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         std::int64_t get_num_pending_misses(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_misses = 0;
 
@@ -183,7 +183,7 @@ namespace policies {
         }
 
         std::int64_t get_num_pending_accesses(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_pending_accesses = 0;
 
@@ -227,7 +227,7 @@ namespace policies {
         }
 
         std::int64_t get_num_stolen_from_pending(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -271,7 +271,7 @@ namespace policies {
         }
 
         std::int64_t get_num_stolen_to_pending(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -315,7 +315,7 @@ namespace policies {
         }
 
         std::int64_t get_num_stolen_from_staged(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -359,7 +359,7 @@ namespace policies {
         }
 
         std::int64_t get_num_stolen_to_staged(
-            std::size_t num_thread, bool reset)
+            std::size_t num_thread, bool reset) override
         {
             std::int64_t num_stolen_threads = 0;
 
@@ -407,7 +407,7 @@ namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average thread wait time of the queues.
         std::int64_t get_average_thread_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average thread wait time of one specific queue.
             std::uint64_t wait_time = 0;
@@ -458,7 +458,7 @@ namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average task wait time of the queues.
         std::int64_t get_average_task_wait_time(
-            std::size_t num_thread = std::size_t(-1)) const
+            std::size_t num_thread = std::size_t(-1)) const override
         {
             // Return average task wait time of one specific queue.
             std::uint64_t wait_time = 0;
@@ -508,7 +508,7 @@ namespace policies {
 #endif
 
         // ------------------------------------------------------------
-        void abort_all_suspended_threads()
+        void abort_all_suspended_threads() override
         {
             for (std::size_t d = 0; d < num_domains_; ++d) {
                 for (auto &queue : lp_queues_[d].queues_) {
@@ -526,7 +526,7 @@ namespace policies {
         }
 
         // ------------------------------------------------------------
-        bool cleanup_terminated(bool delete_all)
+        bool cleanup_terminated(bool delete_all) override
         {
             bool empty = true;
 
@@ -547,7 +547,8 @@ namespace policies {
             return empty;
         }
 
-        bool cleanup_terminated(std::size_t thread_num, bool delete_all)
+        bool cleanup_terminated(
+            std::size_t thread_num, bool delete_all) override
         {
             if (thread_num == std::size_t(-1)) {
                 HPX_THROW_EXCEPTION(bad_parameter,
@@ -673,7 +674,7 @@ namespace policies {
         /// Return the next thread to be executed, return false if none available
         virtual bool get_next_thread(std::size_t thread_num,
             bool running, std::int64_t& idle_loop_count,
-            threads::thread_data*& thrd)
+            threads::thread_data*& thrd) override
         {
             bool result = false;
 
@@ -734,7 +735,7 @@ namespace policies {
         void schedule_thread(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback,
-            thread_priority priority = thread_priority_normal)
+            thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -824,7 +825,7 @@ namespace policies {
         void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback,
-            thread_priority priority = thread_priority_normal)
+            thread_priority priority = thread_priority_normal) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
 
@@ -913,7 +914,8 @@ namespace policies {
         //---------------------------------------------------------------------
         // Destroy the passed thread - as it has been terminated
         //---------------------------------------------------------------------
-        void destroy_thread(threads::thread_data* thrd, std::int64_t& busy_count)
+        void destroy_thread(
+            threads::thread_data* thrd, std::int64_t& busy_count) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
             thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
@@ -924,7 +926,7 @@ namespace policies {
         // items)
         //---------------------------------------------------------------------
         std::int64_t get_queue_length(
-            std::size_t thread_num = std::size_t(-1)) const
+            std::size_t thread_num = std::size_t(-1)) const override
         {
             std::int64_t count = 0;
             for (std::size_t d=0; d<num_domains_; ++d) {
@@ -958,7 +960,7 @@ namespace policies {
         std::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t thread_num = std::size_t(-1),
-            bool reset = false) const
+            bool reset = false) const override
         {
             std::int64_t count = 0;
 
@@ -1046,7 +1048,7 @@ namespace policies {
         // Enumerate matching threads from all queues
         bool enumerate_threads(
             util::function_nonser<bool(thread_id_type)> const& f,
-            thread_state_enum state = unknown) const
+            thread_state_enum state = unknown) const override
         {
             bool result = true;
 
@@ -1066,7 +1068,7 @@ namespace policies {
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t thread_num,
-            bool running, std::int64_t& idle_loop_count)
+            bool running, std::int64_t& idle_loop_count) override
         {
             std::size_t added = 0;
             bool result = true;
@@ -1125,7 +1127,7 @@ namespace policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t thread_num)
+        void on_start_thread(std::size_t thread_num) override
         {
             std::unique_lock<hpx::lcos::local::spinlock> lock(init_mutex);
             if (!initialized_)
@@ -1206,7 +1208,7 @@ namespace policies {
                 on_start_thread(thread_num);
         }
 
-        void on_stop_thread(std::size_t thread_num)
+        void on_stop_thread(std::size_t thread_num) override
         {
             if (thread_num>num_workers_) {
                 HPX_THROW_EXCEPTION(bad_parameter,
@@ -1229,7 +1231,7 @@ namespace policies {
         }
 
         void on_error(
-            std::size_t thread_num, std::exception_ptr const& e)
+            std::size_t thread_num, std::exception_ptr const& e) override
         {
             if (thread_num>num_workers_) {
                 HPX_THROW_EXCEPTION(bad_parameter,
@@ -1251,7 +1253,10 @@ namespace policies {
                 on_error(thread_num, e);
         }
 
-        void reset_thread_distribution() {}
+        void reset_thread_distribution() override
+        {
+            std::fill(counters_.begin(), counters_.end(), 0);
+        }
 
     protected:
         typedef queue_holder<thread_queue_type> numa_queues;
