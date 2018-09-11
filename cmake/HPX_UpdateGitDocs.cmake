@@ -31,122 +31,77 @@ else()
   endif()
 endif()
 
-if(HPX_SPHINX_DOCS) # Sphinx docs
-  set(SPHINX_DOCS_UNSTABLE_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/unstable")
-  set(SPHINX_DOCS_VERSIONED_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/${HPX_VERSION}")
+# We copy the documentation files from DOCS_SOURCE
+set(DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
 
-  # first delete all html files
-  file(REMOVE_RECURSE "${SPHINX_DOCS_UNSTABLE_DEST}")
-  file(REMOVE_RECURSE "${SPHINX_DOCS_VERSIONED_DEST}")
-
-  # copy all documentation files to target branch
-  set(SPHINX_DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/sphinx/html")
+# If a branch name has been set, we copy files to a corresponding directory
+message("HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\"")
+if(HPX_WITH_GIT_BRANCH)
+    message("Updating branch directory")
+  set(DOCS_BRANCH_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/branches/${HPX_WITH_GIT_BRANCH}")
+  file(REMOVE_RECURSE "${DOCS_BRANCH_DEST}")
   file(
-    COPY "${SPHINX_DOCS_SOURCE}"
-    DESTINATION "${SPHINX_DOCS_UNSTABLE_DEST}"
+    COPY "${DOCS_SOURCE}"
+    DESTINATION "${DOCS_BRANCH_DEST}"
     PATTERN "*.buildinfo" EXCLUDE)
+endif()
+
+# If a tag name has been set, we copy files to a corresponding directory
+message("HPX_WITH_GIT_TAG=\"${HPX_WITH_GIT_TAG}\"")
+if(HPX_WITH_GIT_TAG)
+    message("Updating tag directory")
+  set(DOCS_TAG_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/tags/${HPX_WITH_GIT_TAG}")
+  file(REMOVE_RECURSE "${DOCS_TAG_DEST}")
   file(
-    COPY "${SPHINX_DOCS_SOURCE}"
-    DESTINATION "${SPHINX_DOCS_VERSIONED_DEST}"
+    COPY "${DOCS_SOURCE}"
+    DESTINATION "${DOCS_TAG_DEST}"
     PATTERN "*.buildinfo" EXCLUDE)
 
-  # add all newly generated file
-  execute_process(
-    COMMAND "${GIT_EXECUTABLE}" add *
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx"
-    RESULT_VARIABLE git_add_result)
-  if(NOT "${git_add_result}" EQUAL "0")
-    message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
+  # If a tag name has been set and it is a suitable version number, we also copy
+  # files to the "latest" directory. The regex only matches full version numbers
+  # with three numerical components (X.Y.Z). It does not match release
+  # candidates or other non-version tag names.
+  if("${HPX_WITH_GIT_TAG}" MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+    message("Updating latest directory")
+    set(DOCS_LATEST_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/latest")
+    file(REMOVE_RECURSE "${DOCS_LATEST_DEST}")
+    file(
+      COPY "${DOCS_SOURCE}"
+      DESTINATION "${DOCS_LATEST_DEST}"
+      PATTERN "*.buildinfo" EXCLUDE)
   endif()
+endif()
 
-  # check if there are changes to commit
+# add all newly generated files
+execute_process(
+  COMMAND "${GIT_EXECUTABLE}" add *
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx"
+  RESULT_VARIABLE git_add_result)
+if(NOT "${git_add_result}" EQUAL "0")
+  message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
+endif()
+
+# check if there are changes to commit
+execute_process(
+  COMMAND "${GIT_EXECUTABLE}" diff-index --quiet HEAD
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
+  RESULT_VARIABLE git_diff_index_result)
+if(NOT "${git_diff_index_result}" EQUAL "0")
+  # commit changes
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" diff-index --quiet HEAD
+    COMMAND "${GIT_EXECUTABLE}" commit -am "Updating Sphinx docs"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
-    RESULT_VARIABLE git_diff_index_result)
-  if(NOT "${git_diff_index_result}" EQUAL "0")
-    # commit changes
-    execute_process(
-      COMMAND "${GIT_EXECUTABLE}" commit -am "Updating Sphinx docs"
-      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
-      RESULT_VARIABLE git_commit_result)
-    if(NOT "${git_commit_result}" EQUAL "0")
-      message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
-    endif()
-
-    # push everything up to github
-    execute_process(
-      COMMAND "${GIT_EXECUTABLE}" push
-      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
-      RESULT_VARIABLE git_push_result)
-    if(NOT "${git_push_result}" EQUAL "0")
-      message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
-   endif()
-  endif()
-else() # Boostbook docs
-  # first delete all html files
-  file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/gh-pages/docs/html/hpx")
-
-  # copy all documentation files to target branch
-  file(
-    COPY "${HPX_SOURCE_DIR}/docs/html"
-    DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs")
-
-  set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
-
-  string(REPLACE "\"" "" doc_dir "${doc_dir}")
-
-  # Copy all documentation related files
-  file(
-    COPY "${doc_dir}/docs"
-    DESTINATION "${CMAKE_BINARY_DIR}/gh-pages"
-    PATTERN "*code*" EXCLUDE
-    PATTERN "*src*" EXCLUDE
-    PATTERN "*images*" EXCLUDE)
-
-  # copy all source files the docs depend upon
-  if(HPX_DOCUMENTATION_FILES)
-    string(REPLACE " " ";" HPX_DOCUMENTATION_FILES_LIST "${HPX_DOCUMENTATION_FILES}")
-    foreach(file ${HPX_DOCUMENTATION_FILES_LIST})
-      string(REPLACE "\"" "" file ${file})
-      get_filename_component(dest "${file}" PATH)
-      string(REPLACE "${HPX_SOURCE_DIR}/" "" dest ${dest})
-      file(COPY "${file}"
-        DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs/html/code/${dest}")
-    endforeach()
+    RESULT_VARIABLE git_commit_result)
+  if(NOT "${git_commit_result}" EQUAL "0")
+    message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
   endif()
 
-  # add all newly generated file
+  # push everything up to github
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" add *
+    COMMAND "${GIT_EXECUTABLE}" push
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
-    RESULT_VARIABLE git_add_result)
-  if(NOT "${git_add_result}" EQUAL "0")
-    message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
-  endif()
-
-  # check if there are changes to commit
-  execute_process(
-    COMMAND "${GIT_EXECUTABLE}" diff-index --quiet HEAD
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
-    RESULT_VARIABLE git_diff_index_result)
-  if(NOT "${git_diff_index_result}" EQUAL "0")
-    # commit changes
-    execute_process(
-      COMMAND "${GIT_EXECUTABLE}" commit -am "Updating docs"
-      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
-      RESULT_VARIABLE git_commit_result)
-    if(NOT "${git_commit_result}" EQUAL "0")
-      message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
-    endif()
-
-    # push everything up to github
-    execute_process(
-      COMMAND "${GIT_EXECUTABLE}" push
-      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
-      RESULT_VARIABLE git_push_result)
-    if(NOT "${git_push_result}" EQUAL "0")
-      message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
-   endif()
-  endif()
+    RESULT_VARIABLE git_push_result)
+  if(NOT "${git_push_result}" EQUAL "0")
+    message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
+ endif()
 endif()

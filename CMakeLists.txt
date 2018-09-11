@@ -211,14 +211,6 @@ hpx_option(HPX_WITH_DOCUMENTATION BOOL
   "Build the HPX documentation (default OFF)."
   OFF CATEGORY "Build Targets")
 
-hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
-  "The HPX documentation should be built as a single page HTML (default OFF)."
-  OFF CATEGORY "Build Targets")
-
-hpx_option(HPX_WITH_DOCUMENTATION_SPHINX BOOL
-  "Build the HPX documentation using sphinx (default OFF)."
-  OFF CATEGORY "Build Targets")
-
 if(MSVC)
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
     "Force creating pseudo targets and pseudo dependencies (default OFF)."
@@ -1781,7 +1773,7 @@ if(HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 ################################################################################
-# Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
+# Documentation toolchain (Sphinx, Doxygen, Breathe)
 ################################################################################
 hpx_include(Documentation)
 
@@ -1833,7 +1825,7 @@ if(HPX_WITH_RUNTIME)
   add_subdirectory(runtime)
 endif()
 
-if(HPX_WITH_DOCUMENTATION OR HPX_WITH_DOCUMENTATION_SPHINX)
+if(HPX_WITH_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
@@ -1994,39 +1986,13 @@ install(
 if(HPX_WITH_DOCUMENTATION)
   # Install HPX documentation files
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/html
-    COMPONENT docs
-    OPTIONAL
-    FILES_MATCHING PATTERN "*.html"
-    PATTERN "*.pdf"
-    PATTERN ".git" EXCLUDE
-    PATTERN "*code*" EXCLUDE
-    PATTERN "*src*" EXCLUDE
-    PATTERN "*images*" EXCLUDE)
-
-  install(
     FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
     DESTINATION share/hpx-${HPX_VERSION}/
     COMPONENT docs)
 
   install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/src/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
-    COMPONENT docs
-    FILES_MATCHING PATTERN "*.css"
-    PATTERN ".git" EXCLUDE)
-
-  install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/images/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
-    COMPONENT docs
-    FILES_MATCHING PATTERN "*.png"
-    PATTERN ".git" EXCLUDE)
-
-  install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/sphinx/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/sphinx
+    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs"
+    DESTINATION share/hpx-${HPX_VERSION}/docs
     COMPONENT docs
     PATTERN ".git" EXCLUDE)
 endif()

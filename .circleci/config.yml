@@ -23,6 +23,13 @@ gh_pages_filter: &gh_pages_filter
       branches:
         ignore: gh-pages
 
+docs_push_filter: &docs_push_filter
+    filters:
+      branches:
+        only:
+          - master
+          - release
+
 core_dependency: &core_dependency
     requires:
       - core
@@ -82,6 +89,8 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
+                -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
+                -DHPX_WITH_GIT_TAG="${CIRCLE_TAG}" \
                 -DHPX_WITH_TOOLS=On \
                 -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
                 -DHPX_WITH_TESTS_HEADERS=On \
@@ -151,12 +160,20 @@ jobs:
 
   docs_push:
     <<: *defaults
+    environment:
+      # This is the public key of GitHub. If it changes it needs to be changed
+      # manually here. It can be retrieved with ssh-keyscan -H github.com.
+      GITHUB_PUBLIC_KEY: "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
     steps:
       - attach_workspace:
           at: /hpx
       - run:
           name: Pushing Sphinx Documentation
           command: |
+              mkdir -p ~/.ssh
+              echo $GITHUB_PUBLIC_KEY >> ~/.ssh/known_hosts
+              git config --global user.name "StellarBot"
+              git config --global user.email "stellar@cct.lsu.edu"
               ninja git_docs
 
   core:
@@ -931,7 +948,7 @@ workflows:
       - docs_push:
           requires:
             - docs
-          <<: *gh_pages_filter
+          <<: *docs_push_filter
       - core:
           requires:
             - configure
