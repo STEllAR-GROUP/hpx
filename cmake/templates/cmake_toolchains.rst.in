@@ -1,0 +1,26 @@
+..
+   Copyright (C) 2018 Mikael Simberg
+   Copyright (C) 2014 Thomas Heller
+
+   Distributed under the Boost Software License, Version 1.0. (See accompanying
+   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+..
+   This file has been automatically generated using the CMake tool.
+   Do not edit manually.
+
+.. _cmake_toolchains:
+
+|cmake| toolchains shipped with |hpx|
+=====================================
+
+In order to compile HPX for various platforms, we provide a variety of toolchain
+files that take care of setting up various |cmake| variables like compilers etc.
+They are located in the ``cmake/toolchains`` directory:
+
+@HPX_CMAKE_TOOLCHAINS_LIST_RST@
+
+To use them pass the ``-DCMAKE_TOOLCHAIN_FILE=<toolchain>`` argument to the
+cmake invocation.
+
+@HPX_CMAKE_TOOLCHAINS_RST@

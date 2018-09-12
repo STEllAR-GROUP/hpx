@@ -8,16 +8,19 @@
 
 namespace hpx { namespace threads { namespace policies
 {
+    /// This enumeration describes the possible modes of a scheduler.
     enum scheduler_mode
     {
         nothing_special = 0,            ///< As the name suggests, this option
             ///< can be used to disable all other options.
+            ///<
         do_background_work = 0x1,       ///< The scheduler will periodically
             ///< call a provided callback function from a special HPX thread
             ///< to enable performing background-work, for instance driving
-            ///< networking progress or garbage-collect AGAS
+            ///< networking progress or garbage-collect AGAS.
         reduce_thread_priority = 0x02,  ///< The kernel priority of the
             ///< os-thread driving the scheduler will be reduced below normal.
+            ///<
         delay_exit = 0x04,              ///< The scheduler will wait for some
             ///< unspecified amount of time before exiting the scheduling loop
             ///< while being terminated to make sure no other work is being
@@ -26,7 +29,7 @@ namespace hpx { namespace threads { namespace policies
             ///< to act as 'embedded' schedulers. In this case it needs to
             ///< periodically invoke a provided callback into the outer scheduler
             ///< more frequently than normal. This option enables this behavior.
-        enable_elasticity = 0x10,        ///< This options allows for the
+        enable_elasticity = 0x10,        ///< This option allows for the
             ///< scheduler to dynamically increase and reduce the number of
             ///< processing units it runs on. Setting this value not succeed for
             ///< schedulers that do not support this functionality.

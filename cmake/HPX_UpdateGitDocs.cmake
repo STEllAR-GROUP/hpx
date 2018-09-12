@@ -31,42 +31,28 @@ else()
   endif()
 endif()
 
+set(SPHINX_DOCS_UNSTABLE_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/unstable")
+set(SPHINX_DOCS_VERSIONED_DEST "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx/${HPX_VERSION}")
+
 # first delete all html files
-file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/gh-pages/docs/html/hpx")
+file(REMOVE_RECURSE "${SPHINX_DOCS_UNSTABLE_DEST}")
+file(REMOVE_RECURSE "${SPHINX_DOCS_VERSIONED_DEST}")
 
 # copy all documentation files to target branch
+set(SPHINX_DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
 file(
-    COPY "${HPX_SOURCE_DIR}/docs/html"
-  DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs")
-
-set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
-
-string(REPLACE "\"" "" doc_dir "${doc_dir}")
-
-# Copy all documentation related files
+  COPY "${SPHINX_DOCS_SOURCE}"
+  DESTINATION "${SPHINX_DOCS_UNSTABLE_DEST}"
+  PATTERN "*.buildinfo" EXCLUDE)
 file(
-  COPY "${doc_dir}/docs"
-  DESTINATION "${CMAKE_BINARY_DIR}/gh-pages"
-  PATTERN "*code*" EXCLUDE
-  PATTERN "*src*" EXCLUDE
-  PATTERN "*images*" EXCLUDE)
+  COPY "${SPHINX_DOCS_SOURCE}"
+  DESTINATION "${SPHINX_DOCS_VERSIONED_DEST}"
+  PATTERN "*.buildinfo" EXCLUDE)
 
-# copy all source files the docs depend upon
-if(HPX_DOCUMENTATION_FILES)
-  string(REPLACE " " ";" HPX_DOCUMENTATION_FILES_LIST "${HPX_DOCUMENTATION_FILES}")
-  foreach(file ${HPX_DOCUMENTATION_FILES_LIST})
-    string(REPLACE "\"" "" file ${file})
-    get_filename_component(dest "${file}" PATH)
-    string(REPLACE "${HPX_SOURCE_DIR}/" "" dest ${dest})
-    file(COPY "${file}"
-      DESTINATION "${CMAKE_BINARY_DIR}/gh-pages/docs/html/code/${dest}")
-  endforeach()
-endif()
-
-# add all newly generated file
+# add all newly generated files
 execute_process(
   COMMAND "${GIT_EXECUTABLE}" add *
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages/docs/sphinx"
   RESULT_VARIABLE git_add_result)
 if(NOT "${git_add_result}" EQUAL "0")
   message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
@@ -80,7 +66,7 @@ execute_process(
 if(NOT "${git_diff_index_result}" EQUAL "0")
   # commit changes
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" commit -am "Updating docs"
+    COMMAND "${GIT_EXECUTABLE}" commit -am "Updating Sphinx docs"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/gh-pages"
     RESULT_VARIABLE git_commit_result)
   if(NOT "${git_commit_result}" EQUAL "0")
