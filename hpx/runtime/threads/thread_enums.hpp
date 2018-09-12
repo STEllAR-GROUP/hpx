@@ -156,15 +156,22 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct thread_schedule_hint {
-        thread_schedule_hint() : mode(thread_schedule_hint_mode_none),
-            hint(-1) {}
+    struct thread_schedule_hint
+    {
+        thread_schedule_hint()
+          : mode(thread_schedule_hint_mode_none)
+          , hint(-1)
+        {}
 
         thread_schedule_hint(std::int16_t thread_hint)
-            : mode(thread_schedule_hint_mode_thread), hint(thread_hint) {}
+          : mode(thread_schedule_hint_mode_thread)
+          , hint(thread_hint)
+        {}
 
         thread_schedule_hint(thread_schedule_hint_mode mode, std::int16_t hint)
-            : mode(mode), hint(hint) {}
+          : mode(mode)
+          , hint(hint)
+        {}
 
         thread_schedule_hint_mode mode;
         std::int16_t hint;

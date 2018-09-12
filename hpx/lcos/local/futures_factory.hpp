@@ -24,6 +24,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <type_traits>
 #include <utility>
@@ -104,14 +105,16 @@ namespace hpx { namespace lcos { namespace local
                 typedef typename Base::future_base_type future_base_type;
                 future_base_type this_(this);
 
-                if (policy == launch::fork) {
+                if (policy == launch::fork)
+                {
                     return threads::register_thread_nullary(
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         util::thread_description(f_, "task_object::apply"),
                         threads::pending_do_not_schedule, true,
                         threads::thread_priority_boost,
-                        threads::thread_schedule_hint(get_worker_thread_num()),
+                        threads::thread_schedule_hint(
+                            static_cast<std::int16_t>(get_worker_thread_num())),
                         stacksize, ec);
                 }
 
