@@ -703,9 +703,11 @@ namespace hpx { namespace threads { namespace detail
         thread_state_ex_enum new_state_ex, thread_priority priority,
         error_code& ec)
     {
-        return detail::set_thread_state(id, new_state, //-V107
+        return detail::set_thread_state(id, new_state,    //-V107
             new_state_ex, priority,
-            thread_schedule_hint(get_worker_thread_num()), ec);
+            thread_schedule_hint(
+                static_cast<std::int16_t>(get_worker_thread_num())),
+            ec);
     }
 
     template <typename Scheduler>
@@ -716,7 +718,9 @@ namespace hpx { namespace threads { namespace detail
     {
         return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,
             newstate_ex, priority,
-            thread_schedule_hint(get_worker_thread_num()), nullptr, ec);
+            thread_schedule_hint(
+                static_cast<std::int16_t>(get_worker_thread_num())),
+            nullptr, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

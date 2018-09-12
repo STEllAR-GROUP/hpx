@@ -433,13 +433,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             ++curr_punits_;
             register_thread_nullary(
-                util::bind(
-                    util::one_shot(&thread_pool_executor::run),
-                    this, virt_core, thread_num
-                ),
+                util::bind(util::one_shot(&thread_pool_executor::run), this,
+                    virt_core, thread_num),
                 "thread_pool_executor thread", threads::pending, true,
                 threads::thread_priority_normal,
-                threads::thread_schedule_hint(thread_num),
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(thread_num)),
                 threads::thread_stacksize_default, ec);
         }
     }
