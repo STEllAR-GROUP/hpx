@@ -241,6 +241,16 @@ else()
   endif()
 endif()
 
+# Default unnamed config (not Debug/Release/etc) are in this var
+get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
+add_compile_options(${_temp_flags})
+
+# Could potentially use CMAKE_CONFIGURATION_TYPES in case a user defined config exists
+foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
+  get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
+  add_compile_options($<$<CONFIG:${_config}>:${_temp_flags}>)
+endforeach()
+
 #if(HPX_WITH_STATIC_LINKING)
 #  add_dependencies(hpx static_component_data_hpp)
 #endif()
