@@ -161,7 +161,8 @@ jobs:
       - run:
           name: Pushing Sphinx Documentation
           command: |
-              echo $GITHUB_KEY >> ~/.ssh/known_hosts
+              mkdir -p ~/.ssh
+              echo $GITHUB_PUBLIC_KEY >> ~/.ssh/known_hosts
               git config --global user.name "StellarBot"
               git config --global user.email "stellar@cct.lsu.edu"
               ninja git_docs
