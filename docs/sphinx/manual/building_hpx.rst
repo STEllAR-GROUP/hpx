@@ -1222,7 +1222,7 @@ How to install |hpx| on Fedora distributions
 
    This section of the manual is based off of our collaborators Patrick Diehl's
    blog post `Installing HPX on Fedora 22
-   <http://diehlpk.github.io/2015/08/04/hpx-fedora.html>`.
+   <http://diehlpk.github.io/2015/08/04/hpx-fedora.html>`_.
 
 * Install all packages for minimal installation:
 
