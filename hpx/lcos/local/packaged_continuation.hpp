@@ -43,7 +43,8 @@ namespace hpx { namespace lcos { namespace detail
     struct transfer_result
     {
         template <typename Source, typename Destination>
-        void apply(Source && src, Destination& dest, std::false_type) const
+        HPX_FORCEINLINE void apply(
+            Source&& src, Destination& dest, std::false_type) const
         {
             try {
                 dest.set_value(src.get());
@@ -54,7 +55,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Source, typename Destination>
-        void apply(Source && src, Destination& dest, std::true_type) const
+        HPX_FORCEINLINE void apply(
+            Source&& src, Destination& dest, std::true_type) const
         {
             try {
                 src.get();
@@ -66,7 +68,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename SourceState, typename DestinationState>
-        void operator()(SourceState && src, DestinationState const& dest) const
+        HPX_FORCEINLINE void operator()(
+            SourceState&& src, DestinationState const& dest) const
         {
             typedef std::is_void<
                 typename traits::future_traits<Future>::type
