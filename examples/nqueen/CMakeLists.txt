@@ -19,3 +19,4 @@ add_hpx_executable(nqueen_client
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.nqueen nqueen_client_exe)
 
+# TODO: Add non-interactive version that can be tested.

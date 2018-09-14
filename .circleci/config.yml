@@ -148,6 +148,23 @@ jobs:
           paths:
             - ./build
 
+  tests.examples:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ctest -T test --no-compress-output --output-on-failure -R tests.examples
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.examples
+      - store_artifacts:
+          path: tests.examples
+
   tests.unit.actions:
     <<: *defaults
     steps:
@@ -883,6 +900,9 @@ workflows:
           requires:
             - configure
           <<: *gh_pages_filter
+      - tests.examples:
+          requires:
+            - examples
       - tests.unit.actions:
           <<: *core_dependency
       - tests.unit.agas:
@@ -958,6 +978,7 @@ workflows:
             - inspect
             - clang_tidy
             - core
+            - tests.examples
             - tests.unit.actions
             - tests.unit.agas
             - tests.unit.build

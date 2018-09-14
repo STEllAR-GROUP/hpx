@@ -23,6 +23,8 @@ macro(add_hpx_test category name)
 
   if(TARGET ${${name}_EXECUTABLE}_test_exe)
     set(_exe "$<TARGET_FILE:${${name}_EXECUTABLE}_test_exe>")
+  elseif(TARGET ${${name}_EXECUTABLE}_exe)
+    set(_exe "$<TARGET_FILE:${${name}_EXECUTABLE}_exe>")
   else()
     set(_exe "${${name}_EXECUTABLE}")
   endif()
@@ -135,4 +137,9 @@ endmacro()
 macro(add_hpx_regression_test category name)
   add_hpx_test("tests.regressions.${category}" ${name} ${ARGN})
 endmacro()
+
+macro(add_hpx_example_test category name)
+  add_hpx_test("tests.examples.${category}" ${name} ${ARGN})
+endmacro()
+
 

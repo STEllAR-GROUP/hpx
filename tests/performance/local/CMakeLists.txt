@@ -187,13 +187,13 @@ foreach(benchmark ${benchmarks})
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe
+  set_target_properties(openmp_homogeneous_timed_task_spawn_test_exe
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe
+  set_target_properties(openmp_homogeneous_timed_task_spawn_test_exe
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_parallel_region_exe
+  set_target_properties(openmp_parallel_region_test_exe
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_parallel_region_exe
+  set_target_properties(openmp_parallel_region_test_exe
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 

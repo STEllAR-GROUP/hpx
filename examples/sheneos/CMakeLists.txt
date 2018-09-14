@@ -37,6 +37,8 @@ if(HPX_WITH_EXAMPLES_HDF5)
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.sheneos sheneos_test_exe)
 
+  # TODO: Fix example. Not added to unit tests until fixed.
+
   if(HPX_WITH_FORTRAN)
     if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
       add_hpx_executable(sheneos_compare

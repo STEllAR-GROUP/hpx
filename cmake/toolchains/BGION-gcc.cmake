@@ -75,6 +75,7 @@ set(HPX_WITH_TESTS                ON  CACHE BOOL "Testing enabled by default")
 set(HPX_WITH_TESTS_BENCHMARKS     ON  CACHE BOOL "Testing enabled by default")
 set(HPX_WITH_TESTS_REGRESSIONS    ON  CACHE BOOL "Testing enabled by default")
 set(HPX_WITH_TESTS_UNIT           ON  CACHE BOOL "Testing enabled by default")
+set(HPX_WITH_TESTS_EXAMPLES       ON  CACHE BOOL "Testing enabled by default")
 set(HPX_WITH_TESTS_EXTERNAL_BUILD OFF CACHE BOOL "Turn off build of cmake build tests")
 set(DART_TESTING_TIMEOUT           45  CACHE STRING "Life is too short")
 
