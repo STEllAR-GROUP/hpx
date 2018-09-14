@@ -67,13 +67,13 @@ namespace hpx { namespace util
                 (~0x0ull & ~(tag_mask << tag_mask_shift));
 
             HPX_CONSTEXPR HPX_FORCEINLINE static T* extract_ptr(
-                volatile compressed_ptr_type const& i) noexcept
+                compressed_ptr_type const& i) noexcept
             {
                 return reinterpret_cast<T*>(i & ptr_mask);
             }
 
             HPX_CONSTEXPR HPX_FORCEINLINE static tag_type extract_tag(
-                volatile compressed_ptr_type const& i) noexcept
+                compressed_ptr_type const& i) noexcept
             {
                 return static_cast<tag_type>((i >> tag_mask_shift) & tag_mask);
             }
@@ -106,13 +106,13 @@ namespace hpx { namespace util
                 ptr = pack_ptr(p, t);
             }
 
-            HPX_CONSTEXPR bool operator==(
-                volatile compressed_ptr const& p) const noexcept
+            HPX_CONSTEXPR bool operator==(compressed_ptr const& p) const
+                noexcept
             {
                 return ptr == p.ptr;
             }
-            HPX_FORCEINLINE bool operator!=(
-                volatile compressed_ptr const& p) const noexcept
+            HPX_FORCEINLINE bool operator!=(compressed_ptr const& p) const
+                noexcept
             {
                 return ptr != p.ptr;
             }
