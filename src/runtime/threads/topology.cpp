@@ -60,72 +60,72 @@ namespace hpx { namespace threads { namespace detail
         return top.get_number_of_pus();
     }
 
-        void write_to_log(char const* valuename, std::size_t value)
-        {
+    void write_to_log(char const* valuename, std::size_t value)
+    {
         LTM_(debug) << "topology: "
-                        << valuename << ": " << value; //-V128
-        }
+                    << valuename << ": " << value; //-V128
+    }
 
-        void write_to_log_mask(char const* valuename, mask_cref_type value)
-        {
+    void write_to_log_mask(char const* valuename, mask_cref_type value)
+    {
         LTM_(debug) << "topology: " << valuename
-                        << ": " HPX_CPU_MASK_PREFIX
+                    << ": " HPX_CPU_MASK_PREFIX
+                    << std::hex << value;
+    }
+
+    void write_to_log(char const* valuename,
+        std::vector<std::size_t> const& values)
+    {
+        LTM_(debug) << "topology: "
+                    << valuename << "s, size: " //-V128
+                    << values.size();
+
+        std::size_t i = 0;
+        for (std::size_t value : values)
+        {
+            LTM_(debug) << "topology: " << valuename //-V128
+                        << "(" << i++ << "): " << value;
+        }
+    }
+
+    void write_to_log_mask(char const* valuename,
+        std::vector<mask_type> const& values)
+    {
+        LTM_(debug) << "topology: "
+                    << valuename << "s, size: " //-V128
+                    << values.size();
+
+        std::size_t i = 0;
+        for (mask_cref_type value : values)
+        {
+            LTM_(debug) << "topology: " << valuename //-V128
+                        << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
                         << std::hex << value;
         }
+    }
 
-        void write_to_log(char const* valuename,
-            std::vector<std::size_t> const& values)
-        {
-        LTM_(debug) << "topology: "
-                        << valuename << "s, size: " //-V128
-                        << values.size();
+    std::size_t get_index(hwloc_obj_t obj)
+    {
+        // on Windows logical_index is always -1
+        if (obj->logical_index == ~0x0u)
+            return static_cast<std::size_t>(obj->os_index);
 
-            std::size_t i = 0;
-            for (std::size_t value : values)
-            {
-            LTM_(debug) << "topology: " << valuename //-V128
-                            << "(" << i++ << "): " << value;
-            }
-        }
+        return static_cast<std::size_t>(obj->logical_index);
+    }
 
-        void write_to_log_mask(char const* valuename,
-            std::vector<mask_type> const& values)
-        {
-        LTM_(debug) << "topology: "
-                        << valuename << "s, size: " //-V128
-                        << values.size();
-
-            std::size_t i = 0;
-            for (mask_cref_type value : values)
-            {
-            LTM_(debug) << "topology: " << valuename //-V128
-                            << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
-                            << std::hex << value;
-            }
-        }
-
-        std::size_t get_index(hwloc_obj_t obj)
-        {
-            // on Windows logical_index is always -1
-            if (obj->logical_index == ~0x0u)
-                return static_cast<std::size_t>(obj->os_index);
-
-            return static_cast<std::size_t>(obj->logical_index);
-        }
-
-        hwloc_obj_t adjust_node_obj(hwloc_obj_t node) noexcept
-        {
+    hwloc_obj_t adjust_node_obj(hwloc_obj_t node) noexcept
+    {
 #if HWLOC_API_VERSION >= 0x00020000
-            // www.open-mpi.org/projects/hwloc/doc/hwloc-v2.0.0-letter.pdf:
-            // Starting with hwloc v2.0, NUMA nodes are not in the main tree
-            // anymore. They are attached under objects as Memory Children
-            // on the side of normal children.
-            while (hwloc_obj_type_is_memory(node->type))
-                  node = node->parent;
-            HPX_ASSERT(node);
+        // www.open-mpi.org/projects/hwloc/doc/hwloc-v2.0.0-letter.pdf:
+        // Starting with hwloc v2.0, NUMA nodes are not in the main tree
+        // anymore. They are attached under objects as Memory Children
+        // on the side of normal children.
+        while (hwloc_obj_type_is_memory(node->type))
+                node = node->parent;
+        HPX_ASSERT(node);
 #endif
-            return node;
-        }
+        return node;
+    }
 }}}
 
 namespace hpx { namespace threads
@@ -1338,7 +1338,7 @@ namespace hpx { namespace threads
             return -1;
         }
         threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
-        return threads::find_first(mask);
+        return static_cast<int>(threads::find_first(mask));
 #else
         return 0;
 #endif

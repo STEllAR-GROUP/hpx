@@ -519,7 +519,8 @@ namespace hpx { namespace threads { namespace detail
                             {
                                 next->get_scheduler_base()->schedule_thread(
                                     next,
-                                    threads::thread_schedule_hint(num_thread),
+                                    threads::thread_schedule_hint(
+                                        static_cast<std::int16_t>(num_thread)),
                                     true);
                             }
                         }
@@ -593,9 +594,10 @@ namespace hpx { namespace threads { namespace detail
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
         {
-            background_thread = create_background_thread(scheduler, params,
-                background_running,
-                thread_schedule_hint(num_thread), idle_loop_count);
+            background_thread =
+                create_background_thread(scheduler, params, background_running,
+                    thread_schedule_hint(static_cast<std::int16_t>(num_thread)),
+                    idle_loop_count);
         }
 #endif
 
@@ -736,7 +738,9 @@ namespace hpx { namespace threads { namespace detail
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
                         scheduler.SchedulingPolicy::schedule_thread_last(thrd,
-                            threads::thread_schedule_hint(num_thread), true);
+                            threads::thread_schedule_hint(
+                                static_cast<std::int16_t>(num_thread)),
+                            true);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                     else if (HPX_UNLIKELY(state_val == pending_boost))
@@ -762,7 +766,8 @@ namespace hpx { namespace threads { namespace detail
                                 // boosted priority
                                 scheduler.SchedulingPolicy::schedule_thread(
                                     thrd,
-                                    threads::thread_schedule_hint(num_thread),
+                                    threads::thread_schedule_hint(
+                                        static_cast<std::int16_t>(num_thread)),
                                     true,
                                     thread_priority_boost);
                                 scheduler.SchedulingPolicy::do_some_work(
@@ -773,10 +778,10 @@ namespace hpx { namespace threads { namespace detail
                         {
                             // schedule this thread again immediately with
                             // boosted priority
-                            scheduler.SchedulingPolicy::schedule_thread(
-                                thrd, threads::thread_schedule_hint(num_thread),
-                                true,
-                                thread_priority_boost);
+                            scheduler.SchedulingPolicy::schedule_thread(thrd,
+                                threads::thread_schedule_hint(
+                                    static_cast<std::int16_t>(num_thread)),
+                                true, thread_priority_boost);
                             scheduler.SchedulingPolicy::do_some_work(
                                 num_thread);
                         }
@@ -793,8 +798,9 @@ namespace hpx { namespace threads { namespace detail
                     // scheduler queue already but the state has not been reset
                     // yet
                     scheduler.SchedulingPolicy::schedule_thread(thrd,
-                        threads::thread_schedule_hint(num_thread), true,
-                        thrd->get_priority());
+                        threads::thread_schedule_hint(
+                            static_cast<std::int16_t>(num_thread)),
+                        true, thrd->get_priority());
                 }
 
                 // Remove the mapping from thread_map_ if HPX thread is depleted
@@ -855,7 +861,8 @@ namespace hpx { namespace threads { namespace detail
                                     scheduler.SchedulingPolicy::schedule_thread(
                                         background_thread.get(),
                                         threads::thread_schedule_hint(
-                                            num_thread),
+                                            static_cast<std::int16_t>(
+                                                num_thread)),
                                         true,
                                         background_thread->get_priority());
                                     background_thread.reset();
@@ -900,9 +907,11 @@ namespace hpx { namespace threads { namespace detail
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
-                    background_thread = create_background_thread(scheduler, params,
-                        background_running,
-                        thread_schedule_hint(num_thread), idle_loop_count);
+                    background_thread = create_background_thread(scheduler,
+                        params, background_running,
+                        thread_schedule_hint(
+                            static_cast<std::int16_t>(num_thread)),
+                        idle_loop_count);
                 }
 #endif
 
@@ -941,9 +950,11 @@ namespace hpx { namespace threads { namespace detail
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
-                    background_thread = create_background_thread(scheduler, params,
-                        background_running,
-                        thread_schedule_hint(num_thread), idle_loop_count);
+                    background_thread = create_background_thread(scheduler,
+                        params, background_running,
+                        thread_schedule_hint(
+                            static_cast<std::int16_t>(num_thread)),
+                        idle_loop_count);
                 }
 
 #endif
@@ -972,8 +983,9 @@ namespace hpx { namespace threads { namespace detail
                             decrement_background_thread_count();
                         scheduler.SchedulingPolicy::schedule_thread(
                             background_thread.get(),
-                            threads::thread_schedule_hint(num_thread), true,
-                            background_thread->get_priority());
+                            threads::thread_schedule_hint(
+                                static_cast<std::int16_t>(num_thread)),
+                            true, background_thread->get_priority());
                         background_thread.reset();
                         background_running.reset();
                     }
