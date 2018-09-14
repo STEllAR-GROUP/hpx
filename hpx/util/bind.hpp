@@ -66,7 +66,7 @@ namespace hpx { namespace util
             typedef T& type;
 
             template <typename Us>
-            static HPX_HOST_DEVICE HPX_FORCEINLINE
+            static HPX_CONSTEXPR HPX_HOST_DEVICE
             type call(T& t, Us&& /*unbound*/)
             {
                 return t;
@@ -79,7 +79,7 @@ namespace hpx { namespace util
             typedef T&& type;
 
             template <typename Us>
-            static HPX_HOST_DEVICE HPX_FORCEINLINE
+            static HPX_CONSTEXPR HPX_HOST_DEVICE
             type call(T& t, Us&& /*unbound*/)
             {
                 return std::forward<T>(t);
@@ -113,7 +113,7 @@ namespace hpx { namespace util
             >::type&& type;
 
             template <typename T>
-            static HPX_HOST_DEVICE HPX_FORCEINLINE
+            static HPX_CONSTEXPR HPX_HOST_DEVICE
             type call(T&& /*t*/, Us&& unbound)
             {
                 return util::get<I>(std::forward<Us>(unbound));
@@ -141,7 +141,7 @@ namespace hpx { namespace util
                 T&, Us
             >::type type;
 
-            static HPX_HOST_DEVICE HPX_FORCEINLINE
+            static HPX_CONSTEXPR HPX_HOST_DEVICE
             type call(T& t, Us&& unbound)
             {
                 return util::invoke_fused(t, std::forward<Us>(unbound));
@@ -149,7 +149,7 @@ namespace hpx { namespace util
         };
 
         template <typename F, typename T, typename Us>
-        HPX_HOST_DEVICE HPX_FORCEINLINE
+        HPX_CONSTEXPR HPX_HOST_DEVICE
         typename bind_eval_impl<F, T, Us>::type
         bind_eval(T& t, Us&& unbound)
         {
@@ -220,7 +220,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename Us, std::size_t ...Is>
-        HPX_HOST_DEVICE
+        HPX_CONSTEXPR HPX_HOST_DEVICE
         typename std::enable_if<
             !detail::is_simple_bind<Ts>::value,
             typename invoke_bound_result<F, Ts, Us>::type
@@ -233,7 +233,7 @@ namespace hpx { namespace util
         }
 
         template <typename F, typename Ts, typename Us, std::size_t ...Is>
-        HPX_HOST_DEVICE
+        HPX_CONSTEXPR HPX_HOST_DEVICE
         typename std::enable_if<
             detail::is_simple_bind<Ts>::value,
             typename invoke_bound_result<F, Ts, Us>::type
@@ -264,7 +264,7 @@ namespace hpx { namespace util
                 typename std::enable_if<
                     !std::is_same<typename std::decay<F_>::type, bound>::value
                 >::type>
-            explicit bound(F_&& f, Ts_&&... vs)
+            HPX_CONSTEXPR explicit bound(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
               , _args(std::forward<Ts_>(vs)...)
             {}
@@ -287,7 +287,7 @@ namespace hpx { namespace util
             bound& operator=(bound const&) = delete;
 
             template <typename ...Us>
-            HPX_HOST_DEVICE inline
+            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
             typename invoke_bound_result<
                 typename std::decay<F>::type,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>,
@@ -300,7 +300,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            HPX_HOST_DEVICE inline
+            HPX_CONSTEXPR HPX_HOST_DEVICE
             typename invoke_bound_result<
                 typename std::decay<F>::type const,
                 util::tuple<typename util::decay_unwrap<Ts>::type...> const,
@@ -359,7 +359,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ...Ts>
-    typename std::enable_if<
+    HPX_CONSTEXPR typename std::enable_if<
         !traits::is_action<typename util::decay<F>::type>::value
       , detail::bound<
             typename std::decay<F>::type,
@@ -384,20 +384,20 @@ namespace hpx { namespace util
         public:
 #           if !defined(HPX_DISABLE_ASSERTS)
             // default constructor is needed for serialization
-            one_shot_wrapper()
+            HPX_CONSTEXPR one_shot_wrapper()
               : _called(false)
             {}
 
-            explicit one_shot_wrapper(F const& f)
+            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
               : _f(f)
               , _called(false)
             {}
-            explicit one_shot_wrapper(F&& f)
+            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
               : _f(std::move(f))
               , _called(false)
             {}
 
-            one_shot_wrapper(one_shot_wrapper&& other)
+            HPX_CXX14_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
               , _called(other._called)
             {
@@ -412,17 +412,17 @@ namespace hpx { namespace util
             }
 #           else
             // default constructor is needed for serialization
-            one_shot_wrapper()
+            HPX_CONSTEXPR one_shot_wrapper()
             {}
 
-            explicit one_shot_wrapper(F const& f)
+            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
               : _f(f)
             {}
-            explicit one_shot_wrapper(F&& f)
+            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
               : _f(std::move(f))
             {}
 
-            one_shot_wrapper(one_shot_wrapper&& other)
+            HPX_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
             {}
 
@@ -431,7 +431,7 @@ namespace hpx { namespace util
 #           endif
 
             template <typename ...Ts>
-            HPX_HOST_DEVICE inline
+            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
             typename util::invoke_result<F, Ts...>::type
             operator()(Ts&&... vs)
             {
@@ -480,7 +480,7 @@ namespace hpx { namespace util
     }
 
     template <typename F>
-    inline detail::one_shot_wrapper<typename util::decay<F>::type>
+    HPX_CONSTEXPR detail::one_shot_wrapper<typename util::decay<F>::type>
     one_shot(F&& f)
     {
         typedef

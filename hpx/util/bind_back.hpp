@@ -63,7 +63,7 @@ namespace hpx { namespace util
         {};
 
         template <typename F, std::size_t ...Is, typename Ts, typename ...Us>
-        HPX_HOST_DEVICE
+        HPX_CONSTEXPR HPX_HOST_DEVICE
         typename invoke_bound_back_result<F&&, Ts&&, Us...>::type
         bound_back_impl(F&& f, pack_c<std::size_t, Is...>, Ts&& bound,
             Us&&... unbound)
@@ -84,7 +84,7 @@ namespace hpx { namespace util
                 typename std::enable_if<
                     !std::is_same<typename std::decay<F_>::type, bound_back>::value
                 >::type>
-            explicit bound_back(F_&& f, Ts_&&... vs)
+            HPX_CONSTEXPR explicit bound_back(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
               , _args(std::forward<Ts_>(vs)...)
             {}
@@ -93,12 +93,12 @@ namespace hpx { namespace util
             bound_back(bound_back const&) = default;
             bound_back(bound_back&&) = default;
 #else
-            HPX_HOST_DEVICE bound_back(bound_back const& other)
+            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back const& other)
               : _f(other._f)
               , _args(other._args)
             {}
 
-            HPX_HOST_DEVICE bound_back(bound_back&& other)
+            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {}
@@ -107,7 +107,7 @@ namespace hpx { namespace util
             bound_back& operator=(bound_back const&) = delete;
 
             template <typename ...Us>
-            HPX_HOST_DEVICE inline
+            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
             typename invoke_bound_back_result<
                 typename std::decay<F>::type&,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>&,
@@ -120,7 +120,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            HPX_HOST_DEVICE inline
+            HPX_CONSTEXPR HPX_HOST_DEVICE
             typename invoke_bound_back_result<
                 typename std::decay<F>::type const&,
                 util::tuple<typename util::decay_unwrap<Ts>::type...> const&,
@@ -133,7 +133,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            HPX_HOST_DEVICE inline
+            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
             typename invoke_bound_back_result<
                 typename std::decay<F>::type&&,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>&&,
@@ -146,7 +146,7 @@ namespace hpx { namespace util
             }
 
             template <typename ...Us>
-            HPX_HOST_DEVICE inline
+            HPX_CONSTEXPR HPX_HOST_DEVICE
             typename invoke_bound_back_result<
                 typename std::decay<F>::type const&&,
                 util::tuple<typename util::decay_unwrap<Ts>::type...> const&&,
@@ -204,7 +204,7 @@ namespace hpx { namespace util
     }
 
     template <typename F, typename ...Ts>
-    detail::bound_back<
+    HPX_CONSTEXPR detail::bound_back<
         typename std::decay<F>::type,
         typename std::decay<Ts>::type...>
     bind_back(F&& f, Ts&&... vs) {
