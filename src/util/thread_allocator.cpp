@@ -61,15 +61,10 @@ namespace hpx { namespace util
             using tag_type = std::uint16_t;
 
         private:
-            union cast_unit
-            {
-                compressed_ptr_type value;
-                tag_type tag[4];
-            };
-
-            HPX_STATIC_CONSTEXPR int tag_index = 3;
+            HPX_STATIC_CONSTEXPR compressed_ptr_type tag_mask = 0xffffull;
+            HPX_STATIC_CONSTEXPR compressed_ptr_type tag_mask_shift = 48;
             HPX_STATIC_CONSTEXPR compressed_ptr_type ptr_mask =
-                0xffffffffffffUL;   // (1L << 48L) - 1
+                (~0x0ull & ~(tag_mask << tag_mask_shift));
 
             HPX_CONSTEXPR HPX_FORCEINLINE static T* extract_ptr(
                 volatile compressed_ptr_type const& i) noexcept
@@ -80,18 +75,15 @@ namespace hpx { namespace util
             HPX_CONSTEXPR HPX_FORCEINLINE static tag_type extract_tag(
                 volatile compressed_ptr_type const& i) noexcept
             {
-                cast_unit cu;
-                cu.value = i;
-                return cu.tag[tag_index];
+                return static_cast<tag_type>((i >> tag_mask_shift) & tag_mask);
             }
 
             HPX_CONSTEXPR HPX_FORCEINLINE static compressed_ptr_type pack_ptr(
                 T* ptr, tag_type tag) noexcept
             {
-                cast_unit ret;
-                ret.value = compressed_ptr_type(ptr);
-                ret.tag[tag_index] = tag;
-                return ret.value;
+                return static_cast<compressed_ptr_type>(
+                    (reinterpret_cast<compressed_ptr_type>(ptr) & ptr_mask) |
+                    ((tag & tag_mask) << tag_mask_shift));
             }
 
         public:
