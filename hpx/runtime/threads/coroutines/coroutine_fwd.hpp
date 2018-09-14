@@ -38,7 +38,8 @@ namespace hpx { namespace threads
     {
         namespace detail
         {
-            class coroutine_self;
+            template <typename T = void> class coroutine_self_impl;
+            using coroutine_self = coroutine_self_impl<>;
 
             class coroutine_impl;
         }

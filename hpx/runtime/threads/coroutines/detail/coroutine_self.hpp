@@ -47,16 +47,17 @@
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    class coroutine_self
+    template <typename T>
+    class coroutine_self_impl
     {
     public:
-        HPX_NON_COPYABLE(coroutine_self);
+        HPX_NON_COPYABLE(coroutine_self_impl);
 
     private:
         // store the current this and write it to the TSS on exit
         struct reset_self_on_exit
         {
-            reset_self_on_exit(coroutine_self* self)
+            reset_self_on_exit(coroutine_self_impl* self)
               : self_(self)
             {
                 set_self(self->next_self_);
@@ -67,7 +68,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
                 set_self(self_);
             }
 
-            coroutine_self* self_;
+            coroutine_self_impl* self_;
         };
 
     public:
@@ -157,8 +158,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
 #endif
         }
 
-        explicit coroutine_self(impl_type * pimpl,
-                coroutine_self* next_self = nullptr)
+        explicit coroutine_self_impl(impl_type * pimpl,
+                coroutine_self_impl* next_self = nullptr)
           : m_pimpl(pimpl), next_self_(next_self)
         {}
 
@@ -193,11 +194,24 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return m_pimpl->get_continuation_recursion_count();
         }
 
+    private:
+        static HPX_NATIVE_TLS coroutine_self_impl* self_;
+
     public:
-        static HPX_EXPORT void set_self(coroutine_self* self);
-        static HPX_EXPORT coroutine_self* get_self();
-        static HPX_EXPORT void init_self();
-        static HPX_EXPORT void reset_self();
+        static HPX_FORCEINLINE HPX_CXX14_CONSTEXPR void set_self(
+            coroutine_self_impl* self) noexcept
+        {
+            self_ = self;
+        }
+
+        static HPX_FORCEINLINE HPX_CXX14_CONSTEXPR coroutine_self_impl*
+        get_self() noexcept
+        {
+            return self_;
+        }
+
+        static HPX_CXX14_CONSTEXPR void init_self() noexcept {}
+        static HPX_CXX14_CONSTEXPR void reset_self() noexcept {}
 
 #if defined(HPX_HAVE_APEX)
         apex_task_wrapper get_apex_data(void) const
@@ -220,8 +234,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail
             return m_pimpl;
         }
         impl_ptr m_pimpl;
-        coroutine_self* next_self_;
+        coroutine_self_impl* next_self_;
     };
+
+    template <typename T>
+    HPX_NATIVE_TLS coroutine_self_impl<T>*
+        coroutine_self_impl<T>::self_ = nullptr;
 }}}}
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_SELF_HPP*/

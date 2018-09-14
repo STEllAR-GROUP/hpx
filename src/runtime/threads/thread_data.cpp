@@ -105,7 +105,8 @@ namespace hpx { namespace threads
     thread_self& get_self()
     {
         thread_self* p = get_self_ptr();
-        if (HPX_UNLIKELY(!p)) {
+        if (HPX_UNLIKELY(p == nullptr))
+        {
             HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self",
                 "null thread id encountered (is this executed on a HPX-thread?)");
         }
@@ -135,7 +136,7 @@ namespace hpx { namespace threads
     {
         thread_self* p = thread_self::get_self();
 
-        if (HPX_UNLIKELY(!p))
+        if (HPX_UNLIKELY(p == nullptr))
         {
             HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked",
                 "null thread id encountered (is this executed on a HPX-thread?)");
@@ -151,10 +152,10 @@ namespace hpx { namespace threads
     thread_id_type get_self_id()
     {
         thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return threads::invalid_thread_id;
+        if (HPX_LIKELY(nullptr != self))
+            return self->get_thread_id();
 
-        return self->get_thread_id();
+        return threads::invalid_thread_id;
     }
 
     std::size_t get_self_stacksize()
@@ -182,25 +183,25 @@ namespace hpx { namespace threads
     thread_id_type get_parent_id()
     {
         thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return threads::invalid_thread_id;
-        return self->get_thread_id()->get_parent_thread_id();
+        if (HPX_LIKELY(nullptr != self))
+            return self->get_thread_id()->get_parent_thread_id();
+        return threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()
     {
         thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return 0;
-        return self->get_thread_id()->get_parent_thread_phase();
+        if (HPX_LIKELY(nullptr != self))
+            return self->get_thread_id()->get_parent_thread_phase();
+        return 0;
     }
 
     std::uint32_t get_parent_locality_id()
     {
         thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return naming::invalid_locality_id;
-        return self->get_thread_id()->get_parent_locality_id();
+        if (HPX_LIKELY(nullptr != self))
+            return self->get_thread_id()->get_parent_locality_id();
+        return naming::invalid_locality_id;
     }
 #endif
 
@@ -210,9 +211,9 @@ namespace hpx { namespace threads
         return 0;
 #else
         thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return 0;
-        return self->get_thread_id()->get_component_id();
+        if (HPX_LIKELY(nullptr != self))
+            return self->get_thread_id()->get_component_id();
+        return 0;
 #endif
     }
 
@@ -220,16 +221,16 @@ namespace hpx { namespace threads
     apex_task_wrapper get_self_apex_data()
     {
         thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return nullptr;
-        return self->get_apex_data();
+        if (HPX_LIKELY(nullptr != self))
+            return self->get_apex_data();
+        return nullptr;
     }
     void set_self_apex_data(apex_task_wrapper data)
     {
         thread_self* self = get_self_ptr();
-        if (nullptr == self)
-            return;
-        self->set_apex_data(data);
+        if (HPX_LIKELY(nullptr != self))
+            self->set_apex_data(data);
+        return;
     }
 #endif
 }}

@@ -87,6 +87,8 @@ namespace hpx { namespace lcos { namespace detail
         ~future_data_base()
     {}
 
+    static util::unused_type unused_;
+
     util::unused_type* future_data_base<traits::detail::future_data_void>::
         get_result_void(void const* storage, error_code& ec)
     {
@@ -102,6 +104,11 @@ namespace hpx { namespace lcos { namespace detail
         //   concurrency)
 
         state s = state_.load(std::memory_order_relaxed);
+        if (s == value)
+        {
+            return &unused_;
+        }
+
         if (s == empty)
         {
             // the value has already been moved out of this future
@@ -127,11 +134,9 @@ namespace hpx { namespace lcos { namespace detail
             else {
                 ec = make_error_code(*exception_ptr);
             }
-            return nullptr;
         }
 
-        static util::unused_type unused_;
-        return &unused_;
+        return nullptr;
     }
 
     // deferred execution of a given continuation

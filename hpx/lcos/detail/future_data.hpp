@@ -401,9 +401,9 @@ namespace detail
         ///               error description if <code>&ec == &throws</code>.
         virtual result_type* get_result(error_code& ec = throws)
         {
-            if (!get_result_void(ec))
-                return nullptr;
-            return reinterpret_cast<result_type*>(&storage_);
+            if (get_result_void(ec) != nullptr)
+                return reinterpret_cast<result_type*>(&storage_);
+            return nullptr;
         }
 
         util::unused_type* get_result_void(error_code& ec = throws) override

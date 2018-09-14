@@ -382,7 +382,7 @@ namespace hpx { namespace util
             sizeof(detail::alloc_block_header);
 
         detail::alloc_block* blk = nullptr;
-        if (size <= MAX_BLOCK_SIZE)
+        if (HPX_LIKELY(size <= MAX_BLOCK_SIZE))
         {
             thread_local_allocator* allocator =
                 &thread_local_allocator::get_tls_allocator();
@@ -391,7 +391,7 @@ namespace hpx { namespace util
             std::size_t i = block_chain[size / BLOCK_ALIGNMENT];
 
             blk = allocator->chain[i];
-            if (blk != nullptr)
+            if (HPX_LIKELY(blk != nullptr))
             {
                 allocator->chain[i] = blk->next_free;
                 blk->set_size(static_cast<std::int16_t>(size));
