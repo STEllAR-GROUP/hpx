@@ -13,7 +13,9 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <random>
+#include <vector>
 
 using hpx::util::thread_alloc;
 using hpx::util::thread_free;

@@ -280,7 +280,7 @@ namespace detail
         /// immediately.
         void set_on_completed(completed_callback_type data_sink) override;
 
-        virtual void wait(error_code& ec = throws);
+        virtual state wait(error_code& ec = throws);
 
         virtual future_status wait_until(
             util::steady_clock::time_point const& abs_time, error_code& ec = throws);
@@ -777,11 +777,11 @@ namespace detail
         }
 
         // wait support
-        virtual void wait(error_code& ec = throws)
+        virtual base_type::state wait(error_code& ec = throws)
         {
             if (!started_test_and_set())
                 this->do_run();
-            this->future_data<Result>::wait(ec);
+            return this->future_data<Result>::wait(ec);
         }
 
         virtual future_status

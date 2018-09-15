@@ -13,6 +13,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <mutex>
@@ -66,7 +67,7 @@ namespace hpx { namespace util
             HPX_STATIC_CONSTEXPR compressed_ptr_type ptr_mask =
                 (~0x0ull & ~(tag_mask << tag_mask_shift));
 
-            HPX_CONSTEXPR HPX_FORCEINLINE static T* extract_ptr(
+            HPX_FORCEINLINE static T* extract_ptr(
                 compressed_ptr_type const& i) noexcept
             {
                 return reinterpret_cast<T*>(i & ptr_mask);
@@ -78,21 +79,21 @@ namespace hpx { namespace util
                 return static_cast<tag_type>((i >> tag_mask_shift) & tag_mask);
             }
 
-            HPX_CONSTEXPR HPX_FORCEINLINE static compressed_ptr_type pack_ptr(
-                T* ptr, tag_type tag) noexcept
+            HPX_FORCEINLINE static compressed_ptr_type pack_ptr(
+                T* ptr_, tag_type tag) noexcept
             {
                 return static_cast<compressed_ptr_type>(
-                    (reinterpret_cast<compressed_ptr_type>(ptr) & ptr_mask) |
+                    (reinterpret_cast<compressed_ptr_type>(ptr_) & ptr_mask) |
                     ((tag & tag_mask) << tag_mask_shift));
             }
 
         public:
             HPX_CONSTEXPR HPX_FORCEINLINE compressed_ptr() noexcept
-              : ptr(pack_ptr(nullptr, 0))
+              : ptr_(pack_ptr(nullptr, 0))
             {}
             HPX_CONSTEXPR HPX_FORCEINLINE explicit compressed_ptr(
                     T* p, tag_type t = 0) noexcept
-              : ptr(pack_ptr(p, t))
+              : ptr_(pack_ptr(p, t))
             {}
 
             compressed_ptr(compressed_ptr const& p) = delete;
@@ -103,36 +104,36 @@ namespace hpx { namespace util
 
             HPX_CONSTEXPR HPX_FORCEINLINE void set(T* p, tag_type t)
             {
-                ptr = pack_ptr(p, t);
+                ptr_ = pack_ptr(p, t);
             }
 
             HPX_CONSTEXPR bool operator==(compressed_ptr const& p) const
                 noexcept
             {
-                return ptr == p.ptr;
+                return ptr_ == p.ptr_;
             }
             HPX_FORCEINLINE bool operator!=(compressed_ptr const& p) const
                 noexcept
             {
-                return ptr != p.ptr;
+                return ptr_ != p.ptr_;
             }
 
             HPX_CONSTEXPR HPX_FORCEINLINE T* get_ptr() const noexcept
             {
-                return extract_ptr(ptr);
+                return extract_ptr(ptr_);
             }
             HPX_CONSTEXPR HPX_FORCEINLINE void set_ptr(T* p) noexcept
             {
-                ptr = pack_ptr(p, get_tag());
+                ptr_ = pack_ptr(p, get_tag());
             }
 
             HPX_CONSTEXPR HPX_FORCEINLINE tag_type get_tag() const noexcept
             {
-                return extract_tag(ptr);
+                return extract_tag(ptr_);
             }
             HPX_CONSTEXPR HPX_FORCEINLINE void set_tag(tag_type t) noexcept
             {
-                ptr = pack_ptr(get_ptr(), t);
+                ptr_ = pack_ptr(get_ptr(), t);
             }
 
             HPX_CONSTEXPR HPX_FORCEINLINE explicit operator bool() const noexcept
@@ -142,11 +143,11 @@ namespace hpx { namespace util
 
             HPX_CONSTEXPR HPX_FORCEINLINE T& operator*() noexcept
             {
-                return get_ptr();
+                return *get_ptr();
             }
             HPX_CONSTEXPR HPX_FORCEINLINE T const& operator*() const noexcept
             {
-                return get_ptr();
+                return *get_ptr();
             }
             HPX_CONSTEXPR HPX_FORCEINLINE T* operator->() noexcept
             {
@@ -154,7 +155,7 @@ namespace hpx { namespace util
             }
 
         protected:
-            compressed_ptr_type ptr;
+            compressed_ptr_type ptr_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -192,7 +193,7 @@ namespace hpx { namespace util
               , next_free(nullptr)
             {}
 
-            HPX_CONSTEXPR alloc_block* next(std::size_t block_size) noexcept
+            alloc_block* next(std::size_t block_size) noexcept
             {
                 return reinterpret_cast<detail::alloc_block*>(
                     reinterpret_cast<char*>(this) + block_size);
@@ -226,7 +227,7 @@ namespace hpx { namespace util
         thread_local_allocator& operator=(thread_local_allocator const&) = delete;
         thread_local_allocator& operator=(thread_local_allocator&&) = delete;
 
-        static thread_local_allocator& get_tls_allocator();
+        HPX_FORCEINLINE static thread_local_allocator& get_tls_allocator();
         void process_pending_requests(bool forceall = false);
 
     private:
@@ -266,13 +267,12 @@ namespace hpx { namespace util
             alloc_page(alloc_page &&) = delete;
             alloc_page& operator=(alloc_page &&) = delete;
 
-            HPX_CONSTEXPR HPX_FORCEINLINE alloc_block* get() noexcept
+            HPX_FORCEINLINE alloc_block* get() noexcept
             {
                 return reinterpret_cast<alloc_block*>(&data);
             }
 
-            HPX_CONSTEXPR HPX_FORCEINLINE alloc_block const* get() const
-                noexcept
+            HPX_FORCEINLINE alloc_block const* get() const noexcept
             {
                 return reinterpret_cast<alloc_block const*>(&data);
             }
@@ -291,7 +291,8 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_local_allocator& thread_local_allocator::get_tls_allocator()
+    HPX_FORCEINLINE thread_local_allocator&
+        thread_local_allocator::get_tls_allocator()
     {
         static HPX_NATIVE_TLS thread_local_allocator ctx{};
         return ctx;

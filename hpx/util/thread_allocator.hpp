@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <memory>
 #include <type_traits>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 

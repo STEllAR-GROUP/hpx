@@ -93,7 +93,7 @@ namespace hpx { namespace lcos { namespace detail
         get_result_void(void const* storage, error_code& ec)
     {
         // yields control if needed
-        wait(ec);
+        state s = wait(ec);
         if (ec) return nullptr;
 
         // No locking is required. Once a future has been made ready, which
@@ -103,7 +103,13 @@ namespace hpx { namespace lcos { namespace detail
         // - there are multiple readers only (shared_future, lock hurts
         //   concurrency)
 
-        state s = state_.load(std::memory_order_relaxed);
+        // Avoid retrieving state twice. If wait() returns 'empty' then this
+        // thread was suspended, in this case we need to load it again.
+        if (s == empty)
+        {
+            s = state_.load(std::memory_order_relaxed);
+        }
+
         if (s == value)
         {
             return &unused_;
@@ -268,22 +274,25 @@ namespace hpx { namespace lcos { namespace detail
         }
     }
 
-    void future_data_base<traits::detail::future_data_void>::
-        wait(error_code& ec)
+    future_data_base<traits::detail::future_data_void>::state
+    future_data_base<traits::detail::future_data_void>::wait(error_code& ec)
     {
         // block if this entry is empty
-        if (state_.load(std::memory_order_acquire) == empty)
+        state s = state_.load(std::memory_order_acquire);
+        if (s == empty)
         {
             std::unique_lock<mutex_type> l(mtx_);
-            if (state_.load(std::memory_order_relaxed) == empty)
+            s = state_.load(std::memory_order_relaxed);
+            if (s == empty)
             {
                 cond_.wait(l, "future_data_base::wait", ec);
-                if (ec) return;
+                if (ec) return s;
             }
         }
 
         if (&ec != &throws)
             ec = make_success_code();
+        return s;
     }
 
     future_status future_data_base<traits::detail::future_data_void>::
