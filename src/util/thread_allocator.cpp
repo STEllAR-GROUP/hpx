@@ -24,7 +24,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     HPX_CONSTEXPR std::size_t NUM_CHAINS = 12;
     HPX_CONSTEXPR std::size_t BLOCK_ALIGNMENT = 8;
-    HPX_CONSTEXPR std::size_t PENDING_THRESHOLD = 100;
+    HPX_CONSTEXPR long PENDING_THRESHOLD = 100;
     HPX_CONSTEXPR std::size_t PAGE_SIZE = 16384;
 
     HPX_CONSTEXPR std::int16_t MAX_BLOCK_SIZE = 640;
@@ -272,7 +272,8 @@ namespace hpx { namespace util
                 return reinterpret_cast<alloc_block*>(&data);
             }
 
-            HPX_FORCEINLINE alloc_block const* get() const noexcept
+            HPX_FORCEINLINE alloc_block const* get() const
+                noexcept
             {
                 return reinterpret_cast<alloc_block const*>(&data);
             }
