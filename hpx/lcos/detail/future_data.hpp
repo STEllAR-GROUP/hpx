@@ -777,7 +777,7 @@ namespace detail
         }
 
         // wait support
-        virtual base_type::state wait(error_code& ec = throws)
+        virtual typename base_type::state wait(error_code& ec = throws)
         {
             if (!started_test_and_set())
                 this->do_run();
