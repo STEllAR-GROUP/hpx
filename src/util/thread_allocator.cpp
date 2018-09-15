@@ -22,12 +22,12 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CONSTEXPR std::size_t NUM_CHAINS = 12;
+    HPX_CONSTEXPR std::size_t NUM_CHAINS = 16;
     HPX_CONSTEXPR std::size_t BLOCK_ALIGNMENT = 8;
-    HPX_CONSTEXPR long PENDING_THRESHOLD = 100;
+    HPX_CONSTEXPR long PENDING_THRESHOLD = 1000;
     HPX_CONSTEXPR std::size_t PAGE_SIZE = 16384;
 
-    HPX_CONSTEXPR std::int16_t MAX_BLOCK_SIZE = 640;
+    HPX_CONSTEXPR std::int16_t MAX_BLOCK_SIZE = 896;
 
     HPX_CONSTEXPR std::int8_t block_chain[] =
     {
@@ -44,11 +44,15 @@ namespace hpx { namespace util
          9,  9,  9,  9,  9,  9,  9,  9,     // 512 bytes
         10, 10, 10, 10, 10, 10, 10, 10,     // 576 bytes
         11, 11, 11, 11, 11, 11, 11, 11,     // 640 bytes
+        12, 12, 12, 12, 12, 12, 12, 12,     // 704 bytes
+        13, 13, 13, 13, 13, 13, 13, 13,     // 768 bytes
+        14, 14, 14, 14, 14, 14, 14, 14,     // 832 bytes
+        15, 15, 15, 15, 15, 15, 15, 15,     // 896 bytes
     };
 
     HPX_CONSTEXPR std::int16_t chain_block_size[NUM_CHAINS] =
     {
-        32, 64, 96, 128, 192, 256, 320, 384, 448, 512, 576, 640
+        32, 64, 96, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896
     };
 
     ///////////////////////////////////////////////////////////////////////////

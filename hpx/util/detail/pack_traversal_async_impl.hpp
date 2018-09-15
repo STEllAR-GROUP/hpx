@@ -14,6 +14,7 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/thread_allocator.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/intrusive_ptr.hpp>
