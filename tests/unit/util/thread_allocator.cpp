@@ -40,7 +40,7 @@ int* test_malloc_no_free(
 
     for (std::size_t i = 0; i != num_ints; ++i)
     {
-        HPX_TEST_EQ(p[i], num_alloc);
+        HPX_TEST_EQ(p[i], static_cast<int>(num_alloc));
     }
 
     return p;
@@ -192,9 +192,15 @@ int main(int argc, char* argv[])
     std::random_device rd;
     std::mt19937 g(rd());
 
-    test_allocator("std::allocator", std::allocator<int>{}, g);
-    test_allocator(
-        "hpx::util::thread_allocator", hpx::util::thread_allocator<int>{}, g);
+    {
+        std::allocator<int> alloc;
+        test_allocator("std::allocator", alloc, g);
+    }
+
+    {
+        hpx::util::thread_allocator<int> alloc;
+        test_allocator("hpx::util::thread_allocator", alloc, g);
+    }
 
     return hpx::util::report_errors();
 }

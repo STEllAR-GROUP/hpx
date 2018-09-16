@@ -42,7 +42,7 @@ namespace hpx { namespace util
             typedef thread_allocator<U> other;
         };
 
-        typedef std::false_type is_always_equal;
+        typedef std::true_type is_always_equal;
         typedef std::true_type propagate_on_container_move_assignment;
 
         thread_allocator() = default;

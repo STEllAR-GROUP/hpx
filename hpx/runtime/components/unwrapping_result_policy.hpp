@@ -36,18 +36,10 @@ namespace hpx { namespace components
           : id_(id)
         {}
 
-        /// Create a new \a unwrapping_result_policy representing the
-        /// target locality
-        ///
-        /// \param client  [in] The client side representation of the target
-        ///                object
-        ///
         template <typename Client, typename Stub>
-        unwrapping_result_policy operator()(
-            client_base<Client, Stub> const& client) const
-        {
-            return unwrapping_result_policy(client.get_id());
-        }
+        unwrapping_result_policy(client_base<Client, Stub> const& client)
+          : id_(client.get_id())
+        {}
 
         template <typename Action>
         struct async_result
