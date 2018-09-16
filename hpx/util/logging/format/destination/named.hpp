@@ -17,10 +17,6 @@
 #ifndef JT28092007_destination_named_HPP_DEFINED
 #define JT28092007_destination_named_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4355)
@@ -34,6 +30,7 @@
 #include <map>
 #include <memory>
 #include <sstream>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -41,29 +38,24 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
 
 namespace detail {
-    template<class lock_resource, class destination_base> struct named_context {
-        typedef typename use_default<lock_resource,
-            hpx::util::logging::lock_resource_finder::tss_with_cache<> >
-            ::type lock_resource_type;
+    template<class destination_base> struct named_context {
         typedef typename use_default<destination_base, base<> >
             ::type  destination_base_type;
-        typedef ::hpx::util::logging::array::shared_ptr_holder<destination_base_type,
-            hpx::util::logging::threading::no_mutex > array;
-        typedef hold_string_type string_type;
+        typedef ::hpx::util::logging::array::shared_ptr_holder<destination_base_type >
+            array;
 
         struct write_info {
             array destinations;
-            typedef std::map<string_type, destination_base_type* > coll;
+            typedef std::map<std::string, destination_base_type* > coll;
             coll name_to_destination;
-            string_type format_string;
+            std::string format_string;
 
             typedef std::vector< destination_base_type* > step_array;
             step_array write_steps;
         };
-        typedef typename lock_resource_type::template finder<write_info>::type data;
-        data m_data;
+        write_info m_info;
 
-        template<class destination_type> void add(const string_type & name,
+        template<class destination_type> void add(const std::string & name,
             destination_type dest) {
             // care about if generic or not
             typedef hpx::util::logging::manipulator::is_generic is_generic;
@@ -72,48 +64,44 @@ namespace detail {
             compute_write_steps();
         }
 
-        void del(const string_type & name) {
+        void del(const std::string & name) {
             {
-            typename data::write info(m_data);
-            destination_base_type * p = info->name_to_destination[name];
-            info->name_to_destination.erase(name);
-            info->destinations.del(p);
+            destination_base_type * p = m_info.name_to_destination[name];
+            m_info.name_to_destination.erase(name);
+            m_info.destinations.del(p);
             }
             compute_write_steps();
         }
 
-        void configure(const string_type & name,
-            const string_type & configure_str) {
-            typename data::write info(m_data);
-            destination_base_type * p = info->name_to_destination[name];
+        void configure(const std::string & name,
+            const std::string & configure_str) {
+            destination_base_type * p = m_info.name_to_destination[name];
             if ( p)
                 p->configure(configure_str);
         }
 
-        void format_string(const string_type & str) {
-            { typename data::write info(m_data);
-              info->format_string = str;
+        void format_string(const std::string & str) {
+            {
+              m_info.format_string = str;
             }
             compute_write_steps();
         }
 
-        template<class msg_type> void write(msg_type & msg) const {
-            typename data::read info(m_data);
+        void write(const msg_type & msg) const {
             for ( typename write_info::step_array::const_iterator b =
-                info->write_steps.begin(), e = info->write_steps.end(); b != e ; ++b)
+                m_info.write_steps.begin(), e = m_info.write_steps.end(); b != e ; ++b)
                 (**b)(msg);
         }
 
     private:
         // non-generic
-        template<class destination_type> void add_impl(const string_type & name,
+        template<class destination_type> void add_impl(const std::string & name,
             destination_type dest, const std::false_type& ) {
-            typename data::write info(m_data);
-            destination_base_type * p = info->destinations.append(dest);
-            info->name_to_destination[name] = p;
+            destination_base_type * p = m_info.destinations.append(dest);
+            m_info.name_to_destination[name] = p;
         }
         // generic manipulator
-        template<class destination_type> void add_impl(const string_type & name,
+        template<class destination_type> void add_impl(const std::string & name,
             destination_type dest, const std::true_type& ) {
             typedef hpx::util::logging::manipulator::detail
                 ::generic_holder<destination_type,destination_base_type> holder;
@@ -124,11 +112,10 @@ namespace detail {
         // for instance, the user might have first set the string and
         // later added the formatters
         void compute_write_steps() {
-            typename data::write info(m_data);
-            info->write_steps.clear();
+            m_info.write_steps.clear();
 
-            std::basic_istringstream<char_type> in(info->format_string);
-            string_type word;
+            std::istringstream in(m_info.format_string);
+            std::string word;
             while ( in >> word) {
                 if ( word[0] == '+')
                     word.erase( word.begin());
@@ -136,9 +123,9 @@ namespace detail {
                     // ignore this word
                     continue;
 
-                if ( info->name_to_destination.find(word) !=
-                    info->name_to_destination.end())
-                    info->write_steps.push_back( info->
+                if ( m_info.name_to_destination.find(word) !=
+                    m_info.name_to_destination.end())
+                    m_info.write_steps.push_back( m_info.
                         name_to_destination.find(word)->second);
             }
         }
@@ -203,12 +190,11 @@ In the above example, I know that the available destinations are @c out_file,
 #include <hpx/util/logging/format/destination/named.hpp>
 @endcode
 */
-template<class destination_base = default_, class lock_resource = default_ >
+template<class destination_base = default_ >
 struct named_t : is_generic, non_const_context<detail
-    ::named_context<lock_resource,destination_base> > {
-    typedef non_const_context< detail::named_context<lock_resource,destination_base>
+    ::named_context<destination_base> > {
+    typedef non_const_context< detail::named_context<destination_base>
     > non_const_context_base;
-    typedef hold_string_type string_type;
 
     /**
         @brief constructs the named destination
@@ -217,30 +203,30 @@ struct named_t : is_generic, non_const_context<detail
         @param set [optional] named settings - see named_settings class,
         and @ref dealing_with_flags
     */
-    named_t(const string_type & format_string = string_type() ) {
+    named_t(const std::string & format_string = std::string() ) {
         non_const_context_base::context().format_string( format_string);
     }
-    template<class msg_type> void operator()(const msg_type & msg) const { //-V659
+    void operator()(const msg_type & msg) const { //-V659
         non_const_context_base::context().write(msg);
     }
 
 
-    named_t & string(const string_type & str) {
+    named_t & string(const std::string & str) {
         non_const_context_base::context().format_string(str);
         return *this;
     }
 
-    template<class destination> named_t & add(const string_type & name,
+    template<class destination> named_t & add(const std::string & name,
         destination dest) {
         non_const_context_base::context().add(name, dest);
         return *this;
     }
 
-    void del(const string_type & name) {
+    void del(const std::string & name) {
         non_const_context_base::context().del(name);
     }
 
-    void configure_inner(const string_type & name, const string_type & configure_str) {
+    void configure_inner(const std::string & name, const std::string & configure_str) {
         non_const_context_base::context().configure(name, configure_str);
     }
 
@@ -263,4 +249,3 @@ typedef named_t<> named;
 #endif
 
 #endif
-

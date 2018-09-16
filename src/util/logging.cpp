@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
+#include <hpx/util/logging.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/logging/format/named_write.hpp>
 #include <hpx/util/logging/format/destination/defaults.hpp>
 #include <hpx/util/init_logging.hpp>
@@ -46,7 +46,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    typedef logging::writer::named_write<> logger_writer_type;
+    typedef logging::writer::named_write logger_writer_type;
 
     namespace detail
     {

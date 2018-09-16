@@ -117,8 +117,6 @@ if(MSVC)
 else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
-hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})

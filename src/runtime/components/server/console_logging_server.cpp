@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>
@@ -16,9 +17,6 @@
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
-
-#include <hpx/util/logging/format/named_write_fwd.hpp>
-#include <hpx/util/logging/format_fwd.hpp>
 
 #include <cstddef>
 #include <mutex>
