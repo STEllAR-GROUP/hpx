@@ -22,6 +22,7 @@ set(tests
     partitioned_vector_inclusive_scan
     partitioned_vector_inclusive_scan2
     partitioned_vector_exclusive_scan
+    partitioned_vector_exclusive_scan2
     partitioned_vector_transform_scan
     partitioned_vector_transform_scan2
     partitioned_vector_reduce
