@@ -30,7 +30,7 @@ template <typename Allocator>
 int* test_malloc_no_free(
     Allocator& a, std::size_t num_ints, std::size_t num_alloc)
 {
-    int* p = reinterpret_cast<int*>(a.allocate(sizeof(int) * num_ints));
+    int* p = reinterpret_cast<int*>(a.allocate(num_ints));
     HPX_TEST(p != nullptr || num_ints == 0);
 
     for (std::size_t i = 0; i != num_ints; ++i)
