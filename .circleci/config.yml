@@ -956,6 +956,7 @@ workflows:
       - tests.examples:
           requires:
             - examples
+          <<: *gh_pages_filter
       - tests.unit.actions:
           <<: *core_dependency
       - tests.unit.agas:
