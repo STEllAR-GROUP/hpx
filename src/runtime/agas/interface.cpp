@@ -22,17 +22,10 @@
 
 namespace hpx { namespace agas
 {
-// request the reference to the AGAS client only once
-naming::resolver_client& get_agas_client()
-{
-    static naming::resolver_client& client = naming::get_agas_client();
-    return client;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 bool is_console()
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.is_console();
 }
 
@@ -44,7 +37,7 @@ bool register_name(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.register_name(name, gid);
 }
 
@@ -63,7 +56,7 @@ lcos::future<bool> register_name(
   , naming::id_type const& id
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.register_name_async(name, id);
 }
 
@@ -74,7 +67,7 @@ naming::id_type unregister_name(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.unregister_name(name);
 }
 
@@ -82,7 +75,7 @@ lcos::future<naming::id_type> unregister_name(
     std::string const& name
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.unregister_name_async(name);
 }
 
@@ -91,7 +84,7 @@ lcos::future<naming::id_type> resolve_name(
     std::string const& name
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.resolve_name_async(name);
 }
 
@@ -101,7 +94,7 @@ naming::id_type resolve_name(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.resolve_name(name, ec);
 }
 
@@ -110,7 +103,7 @@ naming::id_type resolve_name(
 //     components::component_type type
 //     )
 // {
-//     naming::resolver_client& agas_ = get_agas_client();
+//     naming::resolver_client& agas_ = naming::get_agas_client();
 //     return agas_.get_localities_async();
 // }
 //
@@ -119,7 +112,7 @@ naming::id_type resolve_name(
 //   , error_code& ec
 //     )
 // {
-//     naming::resolver_client& agas_ = get_agas_client();
+//     naming::resolver_client& agas_ = naming::get_agas_client();
 //     return agas_.get_localities(type, ec);
 // }
 
@@ -127,7 +120,7 @@ lcos::future<std::uint32_t> get_num_localities(
     components::component_type type
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_localities_async();
 }
 
@@ -137,13 +130,13 @@ std::uint32_t get_num_localities(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_localities(type, ec);
 }
 
 lcos::future<std::vector<std::uint32_t> > get_num_threads()
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads_async();
 }
 
@@ -152,13 +145,13 @@ std::vector<std::uint32_t> get_num_threads(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads(ec);
 }
 
 lcos::future<std::uint32_t> get_num_overall_threads()
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads_async();
 }
 
@@ -167,7 +160,7 @@ std::uint32_t get_num_overall_threads(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads(ec);
 }
 
@@ -177,7 +170,7 @@ std::uint32_t get_num_overall_threads(
 //   , error_code& ec
 //     )
 // {
-//     return get_agas_client().is_local_address(gid, ec);
+//     return naming::get_agas_client().is_local_address(gid, ec);
 // }
 //
 // bool is_local_address(
@@ -186,7 +179,7 @@ std::uint32_t get_num_overall_threads(
 //   , error_code& ec
 //     )
 // {
-//     return get_agas_client().is_local_address(gid, addr, ec);
+//     return naming::get_agas_client().is_local_address(gid, addr, ec);
 // }
 //
 // inline naming::gid_type const& convert_to_gid(naming::id_type const& id)
@@ -209,7 +202,7 @@ std::uint32_t get_num_overall_threads(
 //     std::transform(ids.begin(), ids.end(), std::back_inserter(gids), convert_to_gid);
 //
 //     addrs.resize(count);
-//     return get_agas_client().is_local_address(gids.data(),
+//     return naming::get_agas_client().is_local_address(gids.data(),
 //            addrs.data(), count, locals, ec);
 // }
 
@@ -218,7 +211,7 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    return get_agas_client().is_local_address_cached(gid, ec);
+    return naming::get_agas_client().is_local_address_cached(gid, ec);
 }
 
 bool is_local_address_cached(
@@ -227,14 +220,14 @@ bool is_local_address_cached(
   , error_code& ec
     )
 {
-    return get_agas_client().is_local_address_cached(gid, addr, ec);
+    return naming::get_agas_client().is_local_address_cached(gid, addr, ec);
 }
 
 bool is_local_lva_encoded_address(
     naming::gid_type const& gid
     )
 {
-    return get_agas_client().is_local_lva_encoded_address(gid.get_msb());
+    return naming::get_agas_client().is_local_lva_encoded_address(gid.get_msb());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -242,7 +235,7 @@ hpx::future<naming::address> resolve(
     naming::id_type const& id
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.resolve_async(id);
 }
 
@@ -252,7 +245,7 @@ naming::address resolve(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.resolve_async(id).get(ec);
 }
 
@@ -262,7 +255,7 @@ hpx::future<bool> bind(
   , std::uint32_t locality_id
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.bind_async(gid, addr, locality_id);
 }
 
@@ -274,7 +267,7 @@ bool bind(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.bind_async(gid, addr, locality_id).get(ec);
 }
 
@@ -284,7 +277,7 @@ hpx::future<bool> bind(
   , naming::gid_type const& locality_
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.bind_async(gid, addr, locality_);
 }
 
@@ -296,7 +289,7 @@ bool bind(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.bind_async(gid, addr, locality_).get(ec);
 }
 
@@ -305,7 +298,7 @@ hpx::future<naming::address> unbind(
   , std::uint64_t count
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.unbind_range_async(id);
 }
 
@@ -316,7 +309,7 @@ naming::address unbind(
   , error_code& ec
     )
 {
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.unbind_range_async(id).get(ec);
 }
 
@@ -325,14 +318,14 @@ void garbage_collect_non_blocking(
     error_code& ec
     )
 {
-    get_agas_client().garbage_collect_non_blocking(ec);
+    naming::get_agas_client().garbage_collect_non_blocking(ec);
 }
 
 void garbage_collect(
     error_code& ec
     )
 {
-    get_agas_client().garbage_collect(ec);
+    naming::get_agas_client().garbage_collect(ec);
 }
 
 /// \brief Invoke an asynchronous garbage collection step on the given target
@@ -379,7 +372,7 @@ naming::id_type get_console_locality(
         return naming::invalid_id;
 
     naming::gid_type console;
-    get_agas_client().get_console_locality(console, ec);
+    naming::get_agas_client().get_console_locality(console, ec);
     if (ec) return naming::invalid_id;
 
     return naming::id_type(console, naming::id_type::unmanaged);
@@ -391,7 +384,7 @@ std::uint32_t get_locality_id(error_code& ec)
     if (rt == nullptr || rt->get_state() == state_invalid)
         return naming::invalid_locality_id;
 
-    naming::gid_type l = get_agas_client().get_local_locality(ec);
+    naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
     return l ? naming::get_locality_id_from_gid(l) : naming::invalid_locality_id;
 }
 
@@ -409,7 +402,7 @@ naming::gid_type get_next_id(
         return naming::invalid_gid;
     }
 
-    naming::resolver_client& agas_ = get_agas_client();
+    naming::resolver_client& agas_ = naming::get_agas_client();
     naming::gid_type lower_bound, upper_bound;
     agas_.get_id_range(count, lower_bound, upper_bound, ec);
     if (ec) return naming::invalid_gid;
@@ -424,7 +417,7 @@ void decref(
   , error_code& ec
   )
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     resolver.decref(gid, credits, ec);
 }
 
@@ -437,7 +430,7 @@ hpx::future<std::int64_t> incref(
 {
     HPX_ASSERT(!naming::detail::is_locked(gid));
 
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
 
     if (keep_alive_)
         return resolver.incref_async(gid, credits, keep_alive_);
@@ -456,7 +449,7 @@ std::int64_t incref(
 {
     HPX_ASSERT(!naming::detail::is_locked(gid));
 
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
 
     if (keep_alive_)
         return resolver.incref_async(gid, credits, keep_alive_).get();
@@ -469,7 +462,7 @@ std::int64_t incref(
 hpx::future<naming::id_type> get_colocation_id(
     naming::id_type const& id)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.get_colocation_id_async(id);
 }
 
@@ -485,7 +478,7 @@ naming::id_type get_colocation_id(
 hpx::future<hpx::id_type> on_symbol_namespace_event(
     std::string const& name, bool call_for_past_events)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.on_symbol_namespace_event(name, call_for_past_events);
 }
 
@@ -493,20 +486,20 @@ hpx::future<hpx::id_type> on_symbol_namespace_event(
 std::pair<naming::id_type, naming::address>
     begin_migration(naming::id_type const& id)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.begin_migration(id);
 }
 
 bool end_migration(naming::id_type const& id)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.end_migration(id);
 }
 
 hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
     util::unique_function_nonser<std::pair<bool, hpx::future<void> >()> && f)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.mark_as_migrated(gid, std::move(f));
 }
 
@@ -514,20 +507,20 @@ std::pair<bool, components::pinned_ptr>
     was_object_migrated(naming::gid_type const& gid,
         util::unique_function_nonser<components::pinned_ptr()> && f)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.was_object_migrated(gid, std::move(f));
 }
 
 void unmark_as_migrated(naming::gid_type const& gid)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.unmark_as_migrated(gid);
 }
 
 hpx::future<symbol_namespace::iterate_names_return_type> find_symbols(
     std::string const& pattern)
 {
-    naming::resolver_client& resolver = get_agas_client();
+    naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.iterate_ids(pattern);
 }
 
