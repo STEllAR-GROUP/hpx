@@ -286,7 +286,21 @@ namespace hpx { namespace threads { namespace policies
         {
             typedef std::atomic<hpx::state> state_type;
             for (state_type& state : states_)
+            {
                 state.store(s);
+            }
+        }
+
+        void set_all_states_at_least(hpx::state s)
+        {
+            typedef std::atomic<hpx::state> state_type;
+            for (state_type& state : states_)
+            {
+                if (state < s)
+                {
+                    state.store(s);
+                }
+            }
         }
 
         // return whether all states are at least at the given one

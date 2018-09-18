@@ -141,7 +141,7 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::report_error(
         std::size_t num, std::exception_ptr const& e)
     {
-        sched_->Scheduler::set_all_states(state_terminating);
+        sched_->Scheduler::set_all_states_at_least(state_terminating);
         this->thread_pool_base::report_error(num, e);
         sched_->Scheduler::on_error(num, e);
     }
@@ -183,7 +183,7 @@ namespace hpx { namespace threads { namespace detail
             resume_internal(blocking, throws);
 
             // set state to stopping
-            sched_->Scheduler::set_all_states(state_stopping);
+            sched_->Scheduler::set_all_states_at_least(state_stopping);
 
             // make sure we're not waiting
             sched_->Scheduler::do_some_work(std::size_t(-1));
@@ -1726,9 +1726,16 @@ namespace hpx { namespace threads { namespace detail
         // inform the scheduler to stop the virtual core
         hpx::state oldstate = state.exchange(state_stopping);
 
+        if (oldstate == state_terminating)
+        {
+            // If thread was terminating we change the state back. A clean
+            // shutdown may not be possible in this case.
+            state.store(oldstate);
+        }
+
         HPX_ASSERT(oldstate == state_starting ||
             oldstate == state_running || oldstate == state_stopping ||
-            oldstate == state_stopped);
+            oldstate == state_stopped || oldstate == state_terminating);
 
         resource::get_partitioner().unassign_pu(id_.name(), virt_core);
         compat::thread t;
