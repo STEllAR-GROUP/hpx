@@ -516,7 +516,7 @@ namespace hpx { namespace resource { namespace detail
         {
             if (initial_thread_pools_[i].assigned_pus_.empty())
             {
-                return false;
+                return true;
             }
             for (auto assigned_pus : initial_thread_pools_[i].assigned_pus_)
             {
