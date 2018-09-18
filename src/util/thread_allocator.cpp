@@ -8,6 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/atomic_count.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_allocator.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
@@ -311,6 +312,7 @@ namespace hpx { namespace util
             detail::alloc_block* blk = nullptr;
 
             {
+                hpx::util::ignore_all_while_checking il;
                 std::unique_lock<mutex_type> lk(mtx);
                 blk = pending_chain;
                 pending_chain = nullptr;
@@ -331,6 +333,7 @@ namespace hpx { namespace util
 
     void thread_local_allocator::cleanup()
     {
+        hpx::util::ignore_all_while_checking il;
         std::unique_lock<mutex_type> lk(mtx);
         while (true)
         {
@@ -473,6 +476,7 @@ namespace hpx { namespace util
 
             if (allocator != current)
             {
+                hpx::util::ignore_all_while_checking il;
                 std::unique_lock<thread_local_allocator::mutex_type> lk(
                     allocator->mtx);
 
