@@ -106,7 +106,7 @@ namespace hpx { namespace util
             compressed_ptr(compressed_ptr && p) = delete;
             compressed_ptr& operator=(compressed_ptr && p) = delete;
 
-            HPX_CONSTEXPR HPX_FORCEINLINE void set(T* p, tag_type t)
+            HPX_CXX14_CONSTEXPR HPX_FORCEINLINE void set(T* p, tag_type t)
             {
                 ptr_ = pack_ptr(p, t);
             }
@@ -126,7 +126,7 @@ namespace hpx { namespace util
             {
                 return extract_ptr(ptr_);
             }
-            HPX_CONSTEXPR HPX_FORCEINLINE void set_ptr(T* p) noexcept
+            HPX_CXX14_CONSTEXPR HPX_FORCEINLINE void set_ptr(T* p) noexcept
             {
                 ptr_ = pack_ptr(p, get_tag());
             }
@@ -135,7 +135,7 @@ namespace hpx { namespace util
             {
                 return extract_tag(ptr_);
             }
-            HPX_CONSTEXPR HPX_FORCEINLINE void set_tag(tag_type t) noexcept
+            HPX_CXX14_CONSTEXPR HPX_FORCEINLINE void set_tag(tag_type t) noexcept
             {
                 ptr_ = pack_ptr(get_ptr(), t);
             }
@@ -145,7 +145,7 @@ namespace hpx { namespace util
                 return get_ptr() != nullptr;
             }
 
-            HPX_CONSTEXPR HPX_FORCEINLINE T& operator*() noexcept
+            HPX_FORCEINLINE T& operator*() noexcept
             {
                 return *get_ptr();
             }
@@ -172,16 +172,16 @@ namespace hpx { namespace util
               : page(p, size)
             {}
 
-            HPX_CONSTEXPR HPX_FORCEINLINE alloc_page* get_ptr() noexcept
+            HPX_FORCEINLINE alloc_page* get_ptr() noexcept
             {
                 return page.get_ptr();
             }
 
-            HPX_CONSTEXPR HPX_FORCEINLINE std::int16_t get_size() const noexcept
+            HPX_FORCEINLINE std::int16_t get_size() const noexcept
             {
                 return page.get_tag();
             }
-            HPX_CONSTEXPR HPX_FORCEINLINE void set_size(std::int16_t s) noexcept
+            HPX_FORCEINLINE void set_size(std::int16_t s) noexcept
             {
                 page.set_tag(s);
             }
@@ -446,7 +446,7 @@ namespace hpx { namespace util
             new (blk) detail::alloc_block(nullptr, MAX_BLOCK_SIZE + 1);
         }
 
-        return static_cast<detail::alloc_block_header*>(blk) + 1;
+        return reinterpret_cast<detail::alloc_block_header*>(blk) + 1;
     }
 
     void thread_free(void* addr)
