@@ -17,13 +17,10 @@
 #ifndef JT28092007_formatter_time_strf_HPP_DEFINED
 #define JT28092007_formatter_time_strf_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // is_generic
+#include <string>
 #include <stdio.h>
 #include <time.h>
 
@@ -50,12 +47,12 @@ template<class convert = do_convert_format::prepend> struct time_strf_t : is_gen
         @param format the time format , strftime-like
         @param localtime if true, use localtime, otherwise global time
     */
-    time_strf_t(const hold_string_type & format, bool localtime)
+    time_strf_t(const std::string & format, bool localtime)
         : m_format (format), m_localtime (localtime)
     {}
 
-    template<class msg_type> void operator()(msg_type & msg) const {
-        char_type buffer[64];
+    void operator()(msg_type & msg) const {
+        char buffer[64];
         ::time_t t = ::time (nullptr);
         ::tm t_details = m_localtime ? *localtime( &t) : *gmtime( &t);
         if (0 != strftime (buffer, sizeof (buffer), m_format.c_str (), &t_details))
@@ -67,7 +64,7 @@ template<class convert = do_convert_format::prepend> struct time_strf_t : is_gen
     }
 
 private:
-    hold_string_type m_format;
+    std::string m_format;
     bool m_localtime;
 
 };
@@ -83,4 +80,3 @@ typedef time_strf_t<> time_strf;
 }}}}
 
 #endif
-

@@ -17,10 +17,6 @@
 #ifndef JT28092007_fwd_HPP_DEFINED
 #define JT28092007_fwd_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/config.hpp>
 
 #include <time.h>
@@ -30,25 +26,8 @@
 #include <hpx/util/logging/detail/util.hpp>
 #include <hpx/util/logging/detail/macros.hpp>
 
-#include <hpx/util/logging/detail/ts/ts.hpp>
-#include <hpx/util/logging/detail/ts/ts_resource.hpp>
-
-#include <hpx/util/logging/defaults.hpp>
-
 // minimize inclusion of STL headers in our headers!!!
 #include <string>
-
-/* The following HPX_LOG_STR("this " "and that") still doesn't work.
-#define HPX_LOG_HOLDER2(x) x, L ## x
-#define HPX_LOG_HOLDER(x) HPX_LOG_HOLDER2(x)
-#define HPX_LOG_STR(x) \
-(const ::hpx::util::logging::char_type*)ansi_unicode_char_holder \
-( HPX_LOG_HOLDER(x) )
-*/
-#define HPX_LOG_STR(x) \
- static_cast<const ::hpx::util::logging::char_type*> \
-     (::hpx::util::logging::ansi_unicode_char_holder ( x, L ## x ))
-
 
 /*
     Important: we define here only the things that are needed by ALL OF THE LIBRARY.
@@ -59,19 +38,12 @@
 */
 
 namespace hpx { namespace util { namespace logging {
-    // see our types
-    typedef types<override>::char_type char_type;
-    typedef types<override>::hold_string_type hold_string_type;
-    typedef types<override>::filter_type filter_type;
-    typedef types<override>::mutex mutex;
-    typedef types<override>::level_holder_type level_holder_type;
 
-    namespace writer {}
+namespace optimize {
+    struct cache_string_one_str ;
+}
 
-    /*
-        just in case you're doing a typo - "write" instead of "writer"
-    */
-    namespace write = writer;
+typedef optimize::cache_string_one_str msg_type;
 
 /**
 @page dealing_with_flags Dealing with flags.
@@ -130,4 +102,3 @@ namespace detail {
 
 
 #endif
-

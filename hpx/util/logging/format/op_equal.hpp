@@ -16,10 +16,6 @@
 #ifndef JT28092007_op_equal_HPP_DEFINED
 #define JT28092007_op_equal_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <vector>
 #include <typeinfo>
@@ -78,4 +74,3 @@ namespace op_equal {
 }}}}
 
 #endif
-
