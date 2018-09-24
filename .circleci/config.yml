@@ -872,7 +872,7 @@ jobs:
       - run:
           name: Push Docker Image
           command: |
-              if [ "$CIRCLE_BRANCH" == "master" ]; then
+              if [ -z "$CIRCLE_PR_NUMBER" ] && [ "$CIRCLE_BRANCH" == "master" ]; then
                   docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
                   docker push ${TARGET_IMAGE_NAME}
               else
