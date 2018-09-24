@@ -48,7 +48,7 @@ namespace util {
     ///        /// The asynchronous overload this is called when the
     ///        /// synchronous overload returned false.
     ///        /// In addition to the current visited element the overload is
-    ///        /// called with a contnuation callable object which resumes the
+    ///        /// called with a continuation callable object which resumes the
     ///        /// traversal when it's called later.
     ///        /// The continuation next may be stored and called later or
     ///        /// dropped completely to abort the traversal early.
@@ -59,7 +59,7 @@ namespace util {
     ///
     ///        /// The overload is called when the traversal was finished.
     ///        /// As argument the whole pack is passed over which we
-    ///        /// traversed asynchrnously.
+    ///        /// traversed asynchronously.
     ///        template <typename T>
     ///        void operator()(async_traverse_complete_tag, T&& pack)
     ///        {
@@ -81,7 +81,7 @@ namespace util {
     ///                  the given visitor object.
     ///
     /// See `traverse_pack` for a detailed description about the
-    /// traversal behaviour and capabilities.
+    /// traversal behavior and capabilities.
     ///
     template <typename Visitor, typename... T>
     auto traverse_pack_async(Visitor&& visitor, T&&... pack)
@@ -90,6 +90,75 @@ namespace util {
     {
         return detail::apply_pack_transform_async(
             std::forward<Visitor>(visitor), std::forward<T>(pack)...);
+    }
+
+    /// Traverses the pack with the given visitor in an asynchronous way.
+    ///
+    /// This function works in the same way as `traverse_pack`,
+    /// however, we are able to suspend and continue the traversal at
+    /// later time.
+    /// Thus we require a visitor callable object which provides three
+    /// `operator()` overloads as depicted by the code sample below:
+    ///    ```cpp
+    ///    struct my_async_visitor
+    ///    {
+    ///        /// The synchronous overload is called for each object,
+    ///        /// it may return false to suspend the current control.
+    ///        /// In that case the overload below is called.
+    ///        template <typename T>
+    ///        bool operator()(async_traverse_visit_tag, T&& element)
+    ///        {
+    ///            return true;
+    ///        }
+    ///
+    ///        /// The asynchronous overload this is called when the
+    ///        /// synchronous overload returned false.
+    ///        /// In addition to the current visited element the overload is
+    ///        /// called with a continuation callable object which resumes the
+    ///        /// traversal when it's called later.
+    ///        /// The continuation next may be stored and called later or
+    ///        /// dropped completely to abort the traversal early.
+    ///        template <typename T, typename N>
+    ///        void operator()(async_traverse_detach_tag, T&& element, N&& next)
+    ///        {
+    ///        }
+    ///
+    ///        /// The overload is called when the traversal was finished.
+    ///        /// As argument the whole pack is passed over which we
+    ///        /// traversed asynchronously.
+    ///        template <typename T>
+    ///        void operator()(async_traverse_complete_tag, T&& pack)
+    ///        {
+    ///        }
+    ///    };
+    ///    ```
+    ///
+    /// \param   visitor A visitor object which provides the three `operator()`
+    ///                  overloads that were described above.
+    ///                  Additionally the visitor must be compatible
+    ///                  for referencing it from a `boost::intrusive_ptr`.
+    ///                  The visitor should must have a virtual destructor!
+    ///
+    /// \param   pack    The arbitrary parameter pack which is traversed
+    ///                  asynchronously. Nested objects inside containers and
+    ///                  tuple like types are traversed recursively.
+    /// \param  alloc    Allocator instance to use to create the traversal
+    ///                  frame.
+    ///
+    /// \returns         A boost::intrusive_ptr that references an instance of
+    ///                  the given visitor object.
+    ///
+    /// See `traverse_pack` for a detailed description about the
+    /// traversal behavior and capabilities.
+    ///
+    template <typename Allocator, typename Visitor, typename... T>
+    auto traverse_pack_async_allocator(Allocator const& alloc,
+            Visitor&& visitor, T&&... pack)
+    -> decltype(detail::apply_pack_transform_async_allocator(
+            alloc, std::forward<Visitor>(visitor), std::forward<T>(pack)...))
+    {
+        return detail::apply_pack_transform_async_allocator(
+            alloc, std::forward<Visitor>(visitor), std::forward<T>(pack)...);
     }
 }    // end namespace util
 }    // end namespace hpx

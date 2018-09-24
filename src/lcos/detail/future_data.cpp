@@ -87,11 +87,13 @@ namespace hpx { namespace lcos { namespace detail
         ~future_data_base()
     {}
 
+    static util::unused_type unused_;
+
     util::unused_type* future_data_base<traits::detail::future_data_void>::
         get_result_void(void const* storage, error_code& ec)
     {
         // yields control if needed
-        wait(ec);
+        state s = wait(ec);
         if (ec) return nullptr;
 
         // No locking is required. Once a future has been made ready, which
@@ -101,7 +103,18 @@ namespace hpx { namespace lcos { namespace detail
         // - there are multiple readers only (shared_future, lock hurts
         //   concurrency)
 
-        state s = state_.load(std::memory_order_relaxed);
+        // Avoid retrieving state twice. If wait() returns 'empty' then this
+        // thread was suspended, in this case we need to load it again.
+        if (s == empty)
+        {
+            s = state_.load(std::memory_order_relaxed);
+        }
+
+        if (s == value)
+        {
+            return &unused_;
+        }
+
         if (s == empty)
         {
             // the value has already been moved out of this future
@@ -127,11 +140,9 @@ namespace hpx { namespace lcos { namespace detail
             else {
                 ec = make_error_code(*exception_ptr);
             }
-            return nullptr;
         }
 
-        static util::unused_type unused_;
-        return &unused_;
+        return nullptr;
     }
 
     // deferred execution of a given continuation
@@ -176,14 +187,14 @@ namespace hpx { namespace lcos { namespace detail
     {
         // We need to run the completion on a new thread if we are on a
         // non HPX thread.
-        bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-        recurse_asynchronously =
+        bool recurse_asynchronously =
             !this_thread::has_sufficient_stack_space();
 #else
         handle_continuation_recursion_count cnt;
-        recurse_asynchronously = recurse_asynchronously ||
-            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+        bool recurse_asynchronously =
+            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
+            (hpx::threads::get_self_ptr() == nullptr);
 #endif
         if (!recurse_asynchronously)
         {
@@ -263,22 +274,25 @@ namespace hpx { namespace lcos { namespace detail
         }
     }
 
-    void future_data_base<traits::detail::future_data_void>::
-        wait(error_code& ec)
+    future_data_base<traits::detail::future_data_void>::state
+    future_data_base<traits::detail::future_data_void>::wait(error_code& ec)
     {
         // block if this entry is empty
-        if (state_.load(std::memory_order_acquire) == empty)
+        state s = state_.load(std::memory_order_acquire);
+        if (s == empty)
         {
             std::unique_lock<mutex_type> l(mtx_);
-            if (state_.load(std::memory_order_relaxed) == empty)
+            s = state_.load(std::memory_order_relaxed);
+            if (s == empty)
             {
                 cond_.wait(l, "future_data_base::wait", ec);
-                if (ec) return;
+                if (ec) return s;
             }
         }
 
         if (&ec != &throws)
             ec = make_success_code();
+        return s;
     }
 
     future_status future_data_base<traits::detail::future_data_void>::

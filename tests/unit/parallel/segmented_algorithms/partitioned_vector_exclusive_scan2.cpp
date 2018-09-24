@@ -350,7 +350,7 @@ void exclusive_scan_tests(std::vector<hpx::id_type>& localities)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    exclusive_scan_tests<long long>(localities);
+    exclusive_scan_tests<double>(localities);
 
     return hpx::util::report_errors();
 }
