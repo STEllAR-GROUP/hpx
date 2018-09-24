@@ -1839,6 +1839,12 @@ endif()
 add_plugin_modules()
 
 ################################################################################
+# Prepare the Build Directory
+################################################################################
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/share)
+
+
+################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
 generate_config_defines_header(${CMAKE_BINARY_DIR})
