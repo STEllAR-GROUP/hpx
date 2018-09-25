@@ -216,35 +216,64 @@ namespace hpx { namespace threads { namespace policies
 
                 if (!allow_fallback)
                 {
-                    // Try indefinitely if fallback is not allowed
-                    hpx::util::yield_while([this, states_size, &l, &num_thread]()
+                    // Try indefinitely as long as at least one thread is
+                    // available for scheduling. Increase allowed state if no
+                    // threads are available for scheduling.
+                    auto max_allowed_state = state_suspended;
+
+                    hpx::util::yield_while([this, states_size, &l, &num_thread,
+                                               &max_allowed_state]() {
+                        int num_allowed_threads = 0;
+
+                        for (std::size_t offset = 0; offset < states_size;
+                             ++offset)
                         {
-                            for (std::size_t offset = 0; offset < states_size;
-                                ++offset)
+                            std::size_t num_thread_local =
+                                (num_thread + offset) % states_size;
+
+                            l = std::unique_lock<pu_mutex_type>(
+                                pu_mtxs_[num_thread_local], std::try_to_lock);
+
+                            if (l.owns_lock())
                             {
-                                std::size_t num_thread_local =
-                                    (num_thread + offset) % states_size;
-
-                                l = std::unique_lock<pu_mutex_type>(
-                                    pu_mtxs_[num_thread_local],
-                                    std::try_to_lock);
-
-                                if (l.owns_lock())
+                                if (states_[num_thread_local] <=
+                                    max_allowed_state)
                                 {
-                                    if (states_[num_thread_local] <=
-                                        state_suspended)
-                                    {
-                                        num_thread = num_thread_local;
-                                        return false;
-                                    }
-
-                                    l.unlock();
+                                    num_thread = num_thread_local;
+                                    return false;
                                 }
+
+                                l.unlock();
                             }
 
-                            // Yield after trying all pus, then try again
-                            return true;
-                        });
+                            if (states_[num_thread_local] <= max_allowed_state)
+                            {
+                                ++num_allowed_threads;
+                            }
+                        }
+
+                        if (0 == num_allowed_threads)
+                        {
+                            if (max_allowed_state <= state_suspended)
+                            {
+                                max_allowed_state = state_sleeping;
+                            }
+                            else if (max_allowed_state <= state_sleeping)
+                            {
+                                max_allowed_state = state_stopping;
+                            }
+                            else
+                            {
+                                // All threads are terminating or stopped.
+                                // Just return num_thread to avoid infinite
+                                // loop.
+                                return false;
+                            }
+                        }
+
+                        // Yield after trying all pus, then try again
+                        return true;
+                    });
 
                     return num_thread;
                 }
@@ -286,7 +315,21 @@ namespace hpx { namespace threads { namespace policies
         {
             typedef std::atomic<hpx::state> state_type;
             for (state_type& state : states_)
+            {
                 state.store(s);
+            }
+        }
+
+        void set_all_states_at_least(hpx::state s)
+        {
+            typedef std::atomic<hpx::state> state_type;
+            for (state_type& state : states_)
+            {
+                if (state < s)
+                {
+                    state.store(s);
+                }
+            }
         }
 
         // return whether all states are at least at the given one

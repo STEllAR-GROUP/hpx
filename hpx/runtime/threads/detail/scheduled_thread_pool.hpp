@@ -156,7 +156,7 @@ namespace hpx { namespace threads { namespace detail
 
         std::size_t get_os_thread_count() const
         {
-            return threads_.size();
+            return thread_count_;
         }
 
         std::size_t get_active_os_thread_count() const

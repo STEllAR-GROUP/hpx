@@ -358,6 +358,11 @@ namespace hpx { namespace threads { namespace policies
                     return false;
             }
 
+            if (!running)
+            {
+                return false;
+            }
+
             if (numa_sensitive_ != 0)
             {
                 auto const& rp = resource::get_partitioner();

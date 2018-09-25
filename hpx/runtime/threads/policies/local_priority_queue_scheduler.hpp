@@ -569,6 +569,11 @@ namespace hpx { namespace threads { namespace policies
                     return false;
             }
 
+            if (!running)
+            {
+                return false;
+            }
+
             for (std::size_t idx: victim_threads_[num_thread])
             {
                 HPX_ASSERT(idx != num_thread);
