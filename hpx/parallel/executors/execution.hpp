@@ -22,7 +22,6 @@
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/executor_traits.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/deferred_call.hpp>

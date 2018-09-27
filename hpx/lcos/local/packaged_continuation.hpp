@@ -18,6 +18,7 @@
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
 #include <hpx/traits/v1/is_executor.hpp>
 #endif
+#include <hpx/util/allocator_deleter.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
