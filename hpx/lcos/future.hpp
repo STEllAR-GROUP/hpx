@@ -39,6 +39,7 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/steady_clock.hpp>
+#include <hpx/util/thread_allocator.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #if defined(HPX_HAVE_AWAIT)
@@ -1479,16 +1480,31 @@ namespace hpx { namespace lcos
     >::type
     make_ready_future(T&& init)
     {
-        typedef typename hpx::util::decay_unwrap<T>::type result_type;
-        typedef lcos::detail::future_data<result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
+        using result_type = typename hpx::util::decay_unwrap<T>::type;
 
-        boost::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, std::forward<T>(init)),
-            false);
+        using base_allocator =
+            util::thread_allocator<detail::future_data_refcnt_base>;
+        using shared_state = typename traits::detail::shared_state_allocator<
+                lcos::detail::future_data<result_type>, base_allocator
+            >::type;
+
+        using allocator = typename std::allocator_traits<base_allocator>::
+            template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<allocator>>;
+
+        allocator alloc{};
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<allocator>{alloc});
+        traits::construct(
+            alloc, p.get(), init_no_addref{}, alloc, std::forward<T>(init));
 
         return hpx::traits::future_access<future<result_type>>::create(
-            std::move(p));
+            p.release(), false);
     }
 
     // Extension (see wg21.link/P0319)
@@ -1499,17 +1515,32 @@ namespace hpx { namespace lcos
     >::type
     make_ready_future()
     {
-        typedef typename hpx::util::decay_unwrap<T>::type result_type;
-        typedef lcos::detail::future_data<result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
-        typedef typename shared_state::default_construct default_construct;
+        using result_type = typename hpx::util::decay_unwrap<T>::type;
 
-        boost::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, default_construct{}),
-            false);
+        using base_allocator =
+            util::thread_allocator<detail::future_data_refcnt_base>;
+        using shared_state = typename traits::detail::shared_state_allocator<
+                lcos::detail::future_data<result_type>, base_allocator
+            >::type;
+
+        using allocator = typename std::allocator_traits<base_allocator>::
+            template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+        using default_construct = typename shared_state::default_construct;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<allocator>>;
+
+        allocator alloc{};
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<allocator>{alloc});
+        traits::construct(
+            alloc, p.get(), init_no_addref{}, default_construct{}, alloc);
 
         return hpx::traits::future_access<future<result_type>>::create(
-            std::move(p));
+            p.release(), false);
     }
 
     // Extension (see wg21.link/P0319)
@@ -1520,17 +1551,31 @@ namespace hpx { namespace lcos
     >::type
     make_ready_future(T1&& t1, Ts&&... ts)
     {
-        typedef typename hpx::util::decay_unwrap<T>::type result_type;
-        typedef lcos::detail::future_data<result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
+        using result_type = T;
 
-        boost::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{},
-                std::forward<T1>(t1), std::forward<Ts>(ts)...),
-            false);
+        using base_allocator =
+            util::thread_allocator<detail::future_data_refcnt_base>;
+        using shared_state = typename traits::detail::shared_state_allocator<
+                lcos::detail::future_data<result_type>, base_allocator
+            >::type;
+
+        using allocator = typename std::allocator_traits<base_allocator>::
+            template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<allocator>>;
+
+        allocator alloc{};
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<allocator>{alloc});
+        traits::construct(alloc, p.get(), init_no_addref{}, alloc,
+            std::forward<T1>(t1), std::forward<Ts>(ts)...);
 
         return hpx::traits::future_access<future<result_type>>::create(
-            std::move(p));
+            p.release(), false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1598,13 +1643,29 @@ namespace hpx { namespace lcos
     // extension: create a pre-initialized future object
     inline future<void> make_ready_future()
     {
-        typedef lcos::detail::future_data<void> shared_state;
-        typedef shared_state::init_no_addref init_no_addref;
+        using base_allocator =
+            util::thread_allocator<detail::future_data_refcnt_base>;
+        using shared_state = typename traits::detail::shared_state_allocator<
+                lcos::detail::future_data<void>, base_allocator
+            >::type;
 
-        boost::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, hpx::util::unused), false);
+        using allocator = typename std::allocator_traits<base_allocator>::
+            template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<allocator>;
 
-        return hpx::traits::future_access<future<void> >::create(std::move(p));
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<allocator>>;
+
+        allocator alloc{};
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<allocator>{alloc});
+        traits::construct(
+            alloc, p.get(), init_no_addref{}, alloc, util::unused);
+
+        return hpx::traits::future_access<future<void>>::create(
+            p.release(), false);
     }
 
     // Extension (see wg21.link/P0319)

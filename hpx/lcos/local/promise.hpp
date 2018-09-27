@@ -12,6 +12,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/util/thread_allocator.hpp>
 #include <hpx/util/unused.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -31,19 +32,6 @@ namespace hpx { namespace lcos { namespace local
         {
             typedef SharedState shared_state_type;
             typedef typename shared_state_type::init_no_addref init_no_addref;
-
-            template <typename Allocator>
-            struct deleter
-            {
-                template <typename SharedState_>
-                void operator()(SharedState_* state)
-                {
-                    typedef std::allocator_traits<Allocator> traits;
-                    traits::deallocate(alloc_, state, 1);
-                }
-
-                Allocator& alloc_;
-            };
 
         public:
             promise_base()
@@ -66,12 +54,13 @@ namespace hpx { namespace lcos { namespace local
                     other_allocator;
                 typedef std::allocator_traits<other_allocator> traits;
                 typedef std::unique_ptr<
-                        allocator_shared_state_type, deleter<other_allocator>
+                        allocator_shared_state_type,
+                        util::allocator_deleter<other_allocator>
                     > unique_pointer;
 
                 other_allocator alloc(a);
                 unique_pointer p (traits::allocate(alloc, 1),
-                    deleter<other_allocator>{alloc});
+                    util::allocator_deleter<other_allocator>{alloc});
 
                 traits::construct(alloc, p.get(), init_no_addref{}, alloc);
                 shared_state_.reset(p.release(), false);

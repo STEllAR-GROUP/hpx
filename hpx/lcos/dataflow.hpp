@@ -32,6 +32,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
+#include <hpx/util/thread_allocator.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -50,6 +51,7 @@
 #include <exception>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -356,7 +358,8 @@ namespace hpx { namespace lcos { namespace detail
 
         // Construct the dataflow_frame and traverse
         // the arguments asynchronously
-        boost::intrusive_ptr<Frame> p = util::traverse_pack_async(
+        boost::intrusive_ptr<Frame> p = util::traverse_pack_async_allocator(
+            util::thread_allocator<>{},
             util::async_traverse_in_place_tag<Frame>{},
             std::move(data), std::forward<Ts>(ts)...);
 

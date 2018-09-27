@@ -21,10 +21,12 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind_front.hpp>
 #include <hpx/util/protect.hpp>
+#include <hpx/util/thread_allocator.hpp>
 
 #include <boost/asio/error.hpp>
 
 #include <exception>
+#include <memory>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -234,6 +236,7 @@ namespace lcos {
         // use this instance its member function \a apply needs to be directly
         // called.
         packaged_action()
+          : base_type(std::allocator_arg, util::thread_allocator<>{})
         {
         }
 

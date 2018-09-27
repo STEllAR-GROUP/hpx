@@ -31,6 +31,7 @@
 
 #include <exception>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -42,7 +43,8 @@ namespace hpx { namespace lcos { namespace detail
     struct transfer_result
     {
         template <typename Source, typename Destination>
-        void apply(Source && src, Destination& dest, std::false_type) const
+        HPX_FORCEINLINE void apply(
+            Source&& src, Destination& dest, std::false_type) const
         {
             try {
                 dest.set_value(src.get());
@@ -53,7 +55,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Source, typename Destination>
-        void apply(Source && src, Destination& dest, std::true_type) const
+        HPX_FORCEINLINE void apply(
+            Source&& src, Destination& dest, std::true_type) const
         {
             try {
                 src.get();
@@ -65,7 +68,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename SourceState, typename DestinationState>
-        void operator()(SourceState && src, DestinationState const& dest) const
+        HPX_FORCEINLINE void operator()(
+            SourceState&& src, DestinationState const& dest) const
         {
             typedef std::is_void<
                 typename traits::future_traits<Future>::type
@@ -174,8 +178,7 @@ namespace hpx { namespace lcos { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename ContResult>
-    class continuation
-      : public future_data<ContResult>
+    class continuation : public detail::future_data<ContResult>
     {
     private:
         typedef future_data<ContResult> base_type;
@@ -615,6 +618,60 @@ namespace hpx { namespace lcos { namespace detail
         typename util::decay<F>::type f_;
     };
 
+    template <typename Allocator, typename Future, typename F,
+        typename ContResult>
+    class continuation_allocator : public continuation<Future, F, ContResult>
+    {
+        typedef continuation<Future, F, ContResult> base_type;
+
+        typedef typename
+                std::allocator_traits<Allocator>::template
+                    rebind_alloc<continuation_allocator>
+            other_allocator;
+
+    public:
+        typedef typename base_type::init_no_addref init_no_addref;
+
+        template <typename Func>
+        continuation_allocator(other_allocator const& alloc, Func && f)
+          : base_type(std::forward<Func>(f))
+          , alloc_(alloc)
+        {}
+
+        template <typename Func>
+        continuation_allocator(init_no_addref no_addref,
+                other_allocator const& alloc, Func && f)
+          : base_type(no_addref, std::forward<Func>(f))
+          , alloc_(alloc)
+        {}
+
+    private:
+        void destroy() override
+        {
+            typedef std::allocator_traits<other_allocator> traits;
+
+            other_allocator alloc(alloc_);
+            traits::destroy(alloc, this);
+            traits::deallocate(alloc, this, 1);
+        }
+
+        other_allocator alloc_;
+    };
+}}}
+
+namespace hpx { namespace traits { namespace detail
+{
+    template <typename Future, typename F, typename ContResult, typename Allocator>
+    struct shared_state_allocator<
+        lcos::detail::continuation<Future, F, ContResult>, Allocator>
+    {
+        typedef lcos::detail::continuation_allocator<
+            Allocator, Future, F, ContResult> type;
+    };
+}}}
+
+namespace hpx { namespace lcos { namespace detail
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename ContResult, typename Future, typename Policy, typename F>
     inline typename traits::detail::shared_state_ptr<
@@ -622,16 +679,37 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, Policy && policy, F && f)
     {
-        typedef typename continuation_result<ContResult>::type result_type;
-        typedef detail::continuation<Future, F, result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
+        using result_type = typename continuation_result<ContResult>::type;
+
+        using base_allocator =
+            util::thread_allocator<detail::future_data_refcnt_base>;
+        using shared_state = typename traits::detail::shared_state_allocator<
+                detail::continuation<Future, F, result_type>, base_allocator
+            >::type;
+
+        using allocator = typename std::allocator_traits<base_allocator>::
+            template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<allocator>>;
+
+        allocator alloc{};
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<allocator>{alloc});
+        traits::construct(
+            alloc, p.get(), init_no_addref{}, alloc, std::forward<F>(f));
 
         // create a continuation
-        typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
-        static_cast<shared_state*>(p.get())->attach(
+        typename hpx::traits::detail::shared_state_ptr<result_type>::type r(
+            p.release(), false);
+
+        static_cast<shared_state*>(r.get())->attach(
             future, std::forward<Policy>(policy));
-        return p;
+
+        return r;
     }
 
 #if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)

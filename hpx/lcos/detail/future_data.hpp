@@ -24,6 +24,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/steady_clock.hpp>
+#include <hpx/util/thread_allocator.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -279,7 +280,7 @@ namespace detail
         /// immediately.
         void set_on_completed(completed_callback_type data_sink) override;
 
-        virtual void wait(error_code& ec = throws);
+        virtual state wait(error_code& ec = throws);
 
         virtual future_status wait_until(
             util::steady_clock::time_point const& abs_time, error_code& ec = throws);
@@ -400,9 +401,9 @@ namespace detail
         ///               error description if <code>&ec == &throws</code>.
         virtual result_type* get_result(error_code& ec = throws)
         {
-            if (!get_result_void(ec))
-                return nullptr;
-            return reinterpret_cast<result_type*>(&storage_);
+            if (get_result_void(ec) != nullptr)
+                return reinterpret_cast<result_type*>(&storage_);
+            return nullptr;
         }
 
         util::unused_type* get_result_void(error_code& ec = throws) override
@@ -648,26 +649,35 @@ namespace detail
                     rebind_alloc<future_data_allocator>
             other_allocator;
 
+        typedef typename future_data_base<Result>::default_construct
+            default_construct;
+
         future_data_allocator(other_allocator const& alloc)
           : future_data<Result>()
           , alloc_(alloc)
         {}
-        future_data_allocator(init_no_addref no_addref,
-                other_allocator const& alloc)
-          : future_data<Result>(no_addref)
-          , alloc_(alloc)
-        {}
+
         template <typename... T>
-        future_data_allocator(init_no_addref no_addref, T&&... ts,
-                other_allocator const& alloc)
+        future_data_allocator(init_no_addref no_addref,
+                other_allocator const& alloc, T&&... ts)
           : future_data<Result>(no_addref, std::forward<T>(ts)...)
           , alloc_(alloc)
         {}
+
+        template <typename... T>
+        future_data_allocator(init_no_addref no_addref,
+                default_construct defctr,
+                other_allocator const& alloc, T&&... ts)
+          : future_data<Result>(no_addref, defctr, std::forward<T>(ts)...)
+          , alloc_(alloc)
+        {}
+
         future_data_allocator(init_no_addref no_addref,
                 std::exception_ptr const& e, other_allocator const& alloc)
           : future_data<Result>(no_addref, e)
           , alloc_(alloc)
         {}
+
         future_data_allocator(init_no_addref no_addref,
                 std::exception_ptr && e, other_allocator const& alloc)
           : future_data<Result>(no_addref, std::move(e))
@@ -767,11 +777,11 @@ namespace detail
         }
 
         // wait support
-        virtual void wait(error_code& ec = throws)
+        virtual typename base_type::state wait(error_code& ec = throws)
         {
             if (!started_test_and_set())
                 this->do_run();
-            this->future_data<Result>::wait(ec);
+            return this->future_data<Result>::wait(ec);
         }
 
         virtual future_status

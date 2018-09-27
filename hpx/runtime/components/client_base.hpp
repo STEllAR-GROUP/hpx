@@ -90,10 +90,10 @@ namespace hpx { namespace traits
 
             template <typename SharedState>
             HPX_FORCEINLINE static Derived
-            create(SharedState* shared_state)
+            create(SharedState* shared_state, bool addref = true)
             {
                 return Derived(future<id_type>(
-                    boost::intrusive_ptr<SharedState>(shared_state)));
+                    boost::intrusive_ptr<SharedState>(shared_state, addref)));
             }
 
             HPX_FORCEINLINE static
