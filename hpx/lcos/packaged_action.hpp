@@ -25,6 +25,7 @@
 #include <boost/asio/error.hpp>
 
 #include <exception>
+#include <memory>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -237,7 +238,12 @@ namespace lcos {
         {
         }
 
-        ///////////////////////////////////////////////////////////////////////
+        template <typename Allocator>
+        packaged_action(std::allocator_arg_t, Allocator const& alloc)
+          : base_type(std::allocator_arg, alloc)
+        {
+        }
+
         template <typename... Ts>
         void apply(naming::id_type const& id, Ts&&... vs)
         {
