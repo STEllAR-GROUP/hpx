@@ -48,9 +48,6 @@ if(HPX_WITH_PAPI)
   include_directories(${PAPI_INCLUDE_DIR})
 endif()
 
-# make sure #including 'hpx/config/autolink.hpp' does not cause errors
-hpx_add_compile_flag(-DHPX_AUTOLINK_LIB_NAME=hpx)
-
 # for each of the found headers, generate a test executable
 foreach(header ${headers})
 
@@ -97,6 +94,9 @@ foreach(header ${headers})
         SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
         SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
         FOLDER "Tests/Headers/${header_dir}")
+
+      # make sure #including 'hpx/config/autolink.hpp' does not cause errors
+      target_compile_definitions("${test_name}_lib" PUBLIC -DHPX_AUTOLINK_LIB_NAME=hpx)
 
       # add a custom target for this example
       add_hpx_pseudo_target(tests.headers.${test_name})
