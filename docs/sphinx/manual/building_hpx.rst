@@ -484,6 +484,8 @@ influence the build process. The build process consists of the following parts:
   * ``hpx``: The core |hpx| library (always enabled).
   * ``hpx_init``: The |hpx| initialization library that applications need to
     link against to define the |hpx| entry points (disabled for static builds).
+  * ``hpx_wrap``: The |hpx| static library used to determine the runtime
+    behavior of |hpx| code and respective entry points for ``hpx_main.h``
   * ``iostreams_component``: The component used for (distributed) IO (always
     enabled).
   * ``component_storage_component``: The component needed for migration to
@@ -1269,3 +1271,25 @@ How to install |hpx| on Fedora distributions
 .. include:: ../../generated/cmake_toolchains.rst
 
 .. include:: ../../generated/cmake_variables.rst
+
+.. _arch_installation
+
+How to install |hpx| on Arch distributions
+------------------------------------------
+
+* Install all packages for minimal installation:
+
+  .. code-block:: bash
+
+     sudo pacman -S gcc clang cmake boost hwloc gperftools
+
+* For building the docs you will need to further install the following:
+
+  .. code-block:: bash
+
+     sudo pacman -S doxygen python-pip
+  
+     pip install --user sphinx sphinx_rtd_theme breathe
+
+The rest of the installation steps are same as provided with fedora
+or Unix variants.
