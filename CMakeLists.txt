@@ -178,6 +178,21 @@ hpx_option(HPX_WITH_MALLOC
   ${DEFAULT_MALLOC}
   STRINGS "system;tcmalloc;jemalloc;tbbmalloc;custom")
 
+# On some systems jemalloc requires an explicit prefix for the API functions
+# (i.e. 'malloc' is called 'je_malloc', etc.)
+if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
+  if(MSVC)
+    set(HPX_WITH_JEMALLOC_PREFIX_DEFAULT "je_")
+  else()
+    set(HPX_WITH_JEMALLOC_PREFIX_DEFAULT "")
+  endif()
+  hpx_option(HPX_WITH_JEMALLOC_PREFIX
+    STRING
+    "Optional naming prefix for jemalloc API functions"
+    ${HPX_WITH_JEMALLOC_PREFIX_DEFAULT}
+    ADVANCED)
+endif()
+
 # Logging configuration
 hpx_option(HPX_WITH_LOGGING BOOL
   "Build HPX with logging enabled (default: ON)."
@@ -1537,6 +1552,12 @@ include(HPX_SetupAllocator)
 
 # convey selected allocator type to the build configuration
 hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
+if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
+  hpx_add_config_define(HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX})
+  if(NOT ("${HPX_WITH_JEMALLOC_PREFIX}" STREQUAL ""))
+    hpx_add_config_define(HPX_HAVE_INTERNAL_ALLOCATOR)
+  endif()
+endif()
 
 find_package(Hwloc)
 if(NOT HWLOC_FOUND)
