@@ -41,6 +41,8 @@ if(HPX_WITH_PARCELPORT_MPI)
   endif()
 
   macro(add_parcelport_mpi_module)
+    # find MPI again to re-populate variables in this context
+    find_package(MPI)
     hpx_debug("add_parcelport_mpi_module")
     if(MPI_CXX_INCLUDE_PATH)
       include_directories(${MPI_CXX_INCLUDE_PATH})
@@ -78,6 +80,8 @@ if(HPX_WITH_PARCELPORT_MPI)
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
+      COMPILE_FLAGS
+        ${MPI_CXX_COMPILE_FLAGS}
       DEPENDENCIES
         ${_mpi_libraries}
       FOLDER "Core/Plugins/Parcelport/MPI")
