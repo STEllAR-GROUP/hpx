@@ -84,6 +84,8 @@ set(tests
     reduce_
     reduce_by_key
     remove
+    remove1
+    remove2
     remove_if
     remove_copy
     remove_copy_if
