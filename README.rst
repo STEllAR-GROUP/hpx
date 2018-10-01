@@ -121,8 +121,22 @@ Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
 Linux
 -----
 
-1)  Before starting to build HPX, please read about the
-    `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_.
+1)  Before starting to build HPX, you will need to install dependencies. A
+    minimal dependecy list installation commands for HPX for different distros
+    are as follows:
+    (For more info see `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_)
+
+    Debian::
+
+      sudo apt install cmake libboost-all-dev hwloc google-perftools
+
+    Fedora::
+
+      sudo dnf install cmake boost-devel hwloc gperftools-devel
+
+    Arch::
+
+      sudo pacman -S cmake boost hwloc gperftools
 
 2) Clone the master HPX git repository (or a stable tag)::
 
@@ -148,7 +162,7 @@ Linux
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.99
+            ~/downloads/hpx_1.2.0
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -177,8 +191,12 @@ for more information about building HPX on a Linux system.
 OS X (Mac)
 ----------
 
-1)  Before starting to build HPX, please read about the
-    `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_.
+1)  Before starting to build HPX, you will need to install dependencies. A
+    minimal dependecy list installation commands for HPX for different distros
+    are as follows
+    (For more info see `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_)::
+
+      brew install cmake boost hwloc google-perftools
 
 2) Clone the master HPX git repository (or a stable tag)::
 
@@ -204,7 +222,7 @@ OS X (Mac)
       cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
             -DBOOST_ROOT=~/packages/boost \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.99
+            ~/downloads/hpx_1.2.0
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
