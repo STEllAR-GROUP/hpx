@@ -184,7 +184,7 @@ if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
   if(MSVC)
     set(HPX_WITH_JEMALLOC_PREFIX_DEFAULT "je_")
   else()
-    set(HPX_WITH_JEMALLOC_PREFIX_DEFAULT "")
+    set(HPX_WITH_JEMALLOC_PREFIX_DEFAULT "<none>")
   endif()
   hpx_option(HPX_WITH_JEMALLOC_PREFIX
     STRING
@@ -1553,8 +1553,9 @@ include(HPX_SetupAllocator)
 # convey selected allocator type to the build configuration
 hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
 if(${HPX_WITH_MALLOC} STREQUAL "jemalloc")
-  hpx_add_config_define(HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX})
-  if(NOT ("${HPX_WITH_JEMALLOC_PREFIX}" STREQUAL ""))
+  if(NOT ("${HPX_WITH_JEMALLOC_PREFIX}" STREQUAL "<none>") AND
+     NOT ("${HPX_WITH_JEMALLOC_PREFIX}x" STREQUAL "x"))
+    hpx_add_config_define(HPX_HAVE_JEMALLOC_PREFIX ${HPX_WITH_JEMALLOC_PREFIX})
     hpx_add_config_define(HPX_HAVE_INTERNAL_ALLOCATOR)
   endif()
 endif()
