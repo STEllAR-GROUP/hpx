@@ -10,6 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <chrono>
 #include <mutex>
 #include <vector>
 #include <utility>
@@ -100,6 +101,12 @@ void test_tss_with_custom_cleanup()
 {
     hpx::thread t(&tss_thread_with_custom_cleanup);
     t.join();
+
+    // make sure the custom cleanup can run first (this is necessary as the TSS
+    // cleanup runs after the exit callbacks of a thread, which in this case
+    // might cause the t.join() above to return before the TSS was actually
+    // cleaned up.
+    hpx::this_thread::sleep_for(std::chrono::microseconds(100));
 
     HPX_TEST(tss_cleanup_called);
 }
