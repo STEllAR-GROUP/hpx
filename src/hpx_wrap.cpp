@@ -61,16 +61,17 @@ namespace hpx_start
     // main entry point of the HPX runtime system
     int hpx_entry(int argc, char* argv[])
     {
-        #if defined(__linux) || defined(__linux__) || defined(linux)
+#if defined(__linux) || defined(__linux__) || defined(linux)
         // Call to the main() function
         int return_value = __real_main(argc, argv);
-        #else /* APPLE */
+#else /* APPLE */
         // call to the main() function
         int return_value = main(argc, argv);
-        #endif
+#endif
 
-        //Finalizing the HPX runtime
-        return hpx::finalize(return_value);
+        // Finalizing the HPX runtime
+        hpx::finalize();
+        return return_value;
     }
 }
 
@@ -81,10 +82,10 @@ namespace hpx_start
 // the hpx_main() as the entry point.
 extern "C" int initialize_main(int argc, char** argv)
 {
-    #if defined(__APPLE__)
+#if defined(__APPLE__)
     if(hpx_start::include_libhpx_wrap)
     {
-    #endif
+#endif
         // Configuring HPX system before runtime
         std::vector<std::string> const cfg = {
             "hpx.commandline.allow_unknown!=1",
@@ -99,10 +100,10 @@ extern "C" int initialize_main(int argc, char** argv)
         // Initialize the HPX runtime system
         return hpx::init(start_function, argc, argv,
             cfg, hpx::runtime_mode_console);
-    #if defined(__APPLE__)
+#if defined(__APPLE__)
     }
     return main(argc, argv);
-    #endif
+#endif
 }
 
 #if defined(__linux) || defined(__linux__) || defined(linux)
