@@ -47,7 +47,7 @@ namespace hpx { namespace debug
 
 #include <typeinfo>
 
-namespace hpx { namespace util
+namespace hpx { namespace debug
 {
     template <typename T>
     struct demangle_helper
@@ -81,7 +81,7 @@ namespace hpx { namespace debug
     template <typename T=void>
     inline std::string print_type(const char *delim="")
     {
-        return std::string(debug::type_id<T>::typeid_.type_id());;
+        return std::string(debug::type_id<T>::typeid_.type_id());
     }
 
     template <>
