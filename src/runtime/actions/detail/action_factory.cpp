@@ -123,7 +123,7 @@ namespace hpx { namespace actions { namespace detail
     }
 
     base_action* action_registry::create(
-        std::uint32_t id, bool with_continuation, std::string const* name)
+        std::uint32_t id, std::string const* name)
     {
         action_registry& this_ = instance();
 
@@ -157,7 +157,7 @@ namespace hpx { namespace actions { namespace detail
                 "action_registry::create", msg);
             return nullptr;
         }
-        return ctor(with_continuation);
+        return ctor();
     }
 
     action_registry& action_registry::instance()

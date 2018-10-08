@@ -17,6 +17,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <algorithm>
+#include <deque>
 #include <iterator>
 #include <list>
 #include <memory>

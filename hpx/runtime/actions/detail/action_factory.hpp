@@ -25,7 +25,7 @@ namespace hpx { namespace actions { namespace detail
         HPX_NON_COPYABLE(action_registry);
 
     public:
-        typedef base_action* (*ctor_t)(bool);
+        typedef base_action* (*ctor_t)();
         typedef std::unordered_map<std::string, ctor_t> typename_to_ctor_t;
         typedef std::unordered_map<std::string, std::uint32_t> typename_to_id_t;
         typedef std::vector<ctor_t> cache_t;
@@ -42,8 +42,8 @@ namespace hpx { namespace actions { namespace detail
         HPX_EXPORT std::vector<std::string> get_unassigned_typenames() const;
 
         HPX_EXPORT static std::uint32_t get_id(std::string const& type_name);
-        HPX_EXPORT static base_action* create(
-            std::uint32_t id, bool, std::string const* name = nullptr);
+        HPX_EXPORT static base_action* create(std::uint32_t id,
+            std::string const* name = nullptr);
 
         HPX_EXPORT static action_registry& instance();
 
@@ -64,7 +64,7 @@ namespace hpx { namespace actions { namespace detail
 
     public:
         register_action();
-        static base_action* create(bool);
+        static base_action* create();
         register_action& instantiate();
 
         static register_action instance;
@@ -82,11 +82,8 @@ namespace hpx { namespace actions { namespace detail
     }
 
     template <typename Action>
-    base_action* register_action<Action>::create(bool has_continuation)
+    base_action* register_action<Action>::create()
     {
-        if (has_continuation)
-            return new transfer_continuation_action<Action>{};
-
         return new transfer_action<Action>{};
     }
 

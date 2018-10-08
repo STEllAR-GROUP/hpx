@@ -11,7 +11,6 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
@@ -45,16 +44,13 @@ namespace hpx { namespace parcelset {
             {
                 static_assert(traits::is_action<Action>::value,
                     "We need an action to construct a parcel");
-                return parcel(
-                    std::move(dest),
+                return parcel(std::move(dest),
                     std::move(addr),
                     std::unique_ptr<actions::base_action>(
-                        new actions::transfer_continuation_action<Action>(
+                        new actions::transfer_action<Action>(
+                            actions::base_action::ctor_continuation<true>(),
                             std::forward<Continuation>(cont),
-                            std::forward<Args>(args)...
-                        )
-                    )
-                );
+                            std::forward<Args>(args)...)));
             }
 
             template <typename Action, typename... Args>
@@ -67,15 +63,12 @@ namespace hpx { namespace parcelset {
             {
                 static_assert(traits::is_action<Action>::value,
                     "We need an action to construct a parcel");
-                return parcel(
-                    std::move(dest),
+                return parcel(std::move(dest),
                     std::move(addr),
                     std::unique_ptr<actions::base_action>(
                         new actions::transfer_action<Action>(
-                            std::forward<Args>(args)...
-                        )
-                    )
-                );
+                            actions::base_action::ctor_continuation<false>(),
+                            std::forward<Args>(args)...)));
             }
         };
 
