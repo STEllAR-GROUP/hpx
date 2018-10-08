@@ -607,7 +607,6 @@ namespace hpx { namespace parallel { inline namespace v1
                                             t, *first2))
                                     {
                                         difference_type local_count = 1;
-                                        FwdIter2 needle = first2;
                                         FwdIter mid = curr;
 
                                         for (difference_type len = 0;
