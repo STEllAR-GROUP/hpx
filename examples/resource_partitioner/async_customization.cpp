@@ -1,3 +1,8 @@
+//  Copyright (c) 2017-2018 John Biddiscombe
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
@@ -22,6 +27,14 @@
 #include <hpx/util/demangle_helper.hpp>
 //
 #include "shared_priority_queue_scheduler.hpp"
+//
+#include <cstddef>
+#include <cstddef>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 // --------------------------------------------------------------------
 // custom executor async/then/when/dataflow specialization example
@@ -305,7 +318,7 @@ int test(Executor &exec)
     auto fa = async(exec, [](int a, double b, const char *c)
     {
         std::cout << "Inside async " << c << std::endl;
-        return 2.1415f;
+        return float(a*b) + 2.1415f;
     }, 1, 2.2, "Hello");
     fa.get();
     std::cout << std::endl;
@@ -316,7 +329,7 @@ int test(Executor &exec)
     future<int> f = make_ready_future(5);
     //
     future<std::string> ft = f.then(exec,
-        [](future<int> && f)
+        [](future<int> && /*f*/)
         {
             std::cout << "Inside .then()" << std::endl;
             return std::string("then");
@@ -330,7 +343,7 @@ int test(Executor &exec)
     auto fs = make_ready_future(5).share();
     //
     future<std::string> fts = fs.then(exec,
-        [](shared_future<int> && f)
+        [](shared_future<int> && /*f*/)
         {
             std::cout << "Inside .then(shared)" << std::endl;
             return std::string("then(shared)");
@@ -438,7 +451,9 @@ namespace hpx { namespace threads { namespace executors
       int operator()(const util::tuple<future<int>, future<double>> &) const {
           return 0;
       }
-      int operator()(const util::tuple<future<long unsigned int>, shared_future<float>> &) const {
+      int operator()(const util::tuple<future<long unsigned int>,
+                     shared_future<float>> &) const
+      {
           return 0;
       }
     };
@@ -486,7 +501,9 @@ int main(int argc, char** argv)
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
               new hpx::threads::detail::scheduled_thread_pool<high_priority_sched>(
-                  std::move(scheduler), notifier, pool_index, pool_name, mode, thread_offset));
+                  std::move(scheduler), notifier, pool_index, pool_name,
+                  mode, thread_offset)
+            );
             return pool;
             });
 

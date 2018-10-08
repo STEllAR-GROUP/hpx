@@ -1,8 +1,7 @@
-//  Copyright (c) 2017 John Biddiscombe
+//  Copyright (c) 2017-2018 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -177,16 +176,24 @@ int hpx_main(boost::program_options::variables_map& vm)
     // ------------------------------------------------------------------------
     using namespace hpx::traits;
     static_assert(
-        has_sync_execute_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::false_type(),
+        has_sync_execute_member<
+                hpx::threads::executors::guided_pool_executor<hint_type2>
+            >::value == std::false_type(),
         "check has_sync_execute_member<Executor>::value");
     static_assert(
-        has_async_execute_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::true_type(),
+        has_async_execute_member<
+                hpx::threads::executors::guided_pool_executor<hint_type2>
+            >::value == std::true_type(),
         "check has_async_execute_member<Executor>::value");
     static_assert(
-        has_then_execute_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::true_type(),
+        has_then_execute_member<
+                hpx::threads::executors::guided_pool_executor<hint_type2>
+            >::value == std::true_type(),
         "has_then_execute_member<executor>::value");
     static_assert(
-        has_post_member<hpx::threads::executors::guided_pool_executor<hint_type2>>::value == std::false_type(),
+        has_post_member<
+                hpx::threads::executors::guided_pool_executor<hint_type2>
+            >::value == std::false_type(),
         "has_post_member<executor>::value");
 
     // ------------------------------------------------------------------------
@@ -285,7 +292,8 @@ int main(int argc, char* argv[])
             {
                 if (count < pool_threads)
                 {
-                    std::cout << "Added pu " << count++ << " to " CUSTOM_POOL_NAME " pool\n";
+                    std::cout << "Added pu " << count++
+                              << " to " CUSTOM_POOL_NAME " pool\n";
                     rp.add_resource(p, CUSTOM_POOL_NAME);
                 }
             }
