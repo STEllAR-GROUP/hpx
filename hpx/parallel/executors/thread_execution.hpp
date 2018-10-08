@@ -125,7 +125,8 @@ namespace hpx { namespace threads
     template <typename Executor, typename F, typename Hint, typename ... Ts>
     HPX_FORCEINLINE
     typename std::enable_if<
-        hpx::traits::is_threads_executor<Executor>::value
+        hpx::traits::is_threads_executor<Executor>::value &&
+        std::is_same<Hint, hpx::threads::thread_schedule_hint>::value
     >::type
     post(Executor && exec, F && f, Ts &&... ts, Hint && hint)
     {
