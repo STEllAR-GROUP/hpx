@@ -53,6 +53,11 @@ namespace hpx { namespace actions
             direct_action = 1 ///< The action needs to be executed directly
         };
 
+        template <bool HasContinuation>
+        struct ctor_continuation
+        {
+        };
+
         /// Destructor
         virtual ~base_action();
 
@@ -68,22 +73,6 @@ namespace hpx { namespace actions
         /// to be executed in a new thread or directly.
         virtual action_type get_action_type() const = 0;
 
-        virtual bool has_continuation() const = 0;
-
-        /// The \a get_thread_function constructs a proper thread function for
-        /// a \a thread, encapsulating the functionality and the arguments
-        /// of the action it is called for.
-        ///
-        /// \param lva    [in] This is the local virtual address of the
-        ///               component the action has to be invoked on.
-        ///
-        /// \returns      This function returns a proper thread function usable
-        ///               for a \a thread.
-        virtual threads::thread_function_type
-            get_thread_function(naming::id_type&& target,
-                naming::address_type lva,
-                naming::address::component_type comptype) = 0;
-
         /// return the id of the locality of the parent thread
         virtual std::uint32_t get_parent_locality_id() const = 0;
 
@@ -92,12 +81,6 @@ namespace hpx { namespace actions
 
         /// Return the thread phase of the parent thread
         virtual std::uint64_t get_parent_thread_phase() const = 0;
-
-        /// Return the thread priority this action has to be executed with
-        virtual threads::thread_priority get_thread_priority() const = 0;
-
-        /// Return the thread stacksize this action has to be executed with
-        virtual threads::thread_stacksize get_thread_stacksize() const = 0;
 
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
@@ -146,8 +129,7 @@ namespace hpx { namespace actions
     {
         base_action_data() = default;
 
-        base_action_data(threads::thread_priority priority,
-                threads::thread_stacksize stacksize);
+        base_action_data(threads::thread_priority priority);
 
         /// Return the locality of the parent thread
         std::uint32_t get_parent_locality_id() const override;
@@ -157,13 +139,6 @@ namespace hpx { namespace actions
 
         /// Return the phase of the parent thread
         std::uint64_t get_parent_thread_phase() const override;
-
-        /// Return the thread priority this action has to be executed with
-        threads::thread_priority get_thread_priority() const override;
-
-        /// Return the thread stacksize this action has to be executed with
-        threads::thread_stacksize get_thread_stacksize() const override;
-
     private:
         static std::uint32_t get_locality_id();
 
@@ -174,7 +149,6 @@ namespace hpx { namespace actions
 
     protected:
         threads::thread_priority priority_;
-        threads::thread_stacksize stacksize_;
 
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         std::uint32_t parent_locality_;

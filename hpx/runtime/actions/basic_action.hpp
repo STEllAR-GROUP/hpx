@@ -19,7 +19,6 @@
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -861,16 +860,27 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_1(action)                                         \
     HPX_REGISTER_ACTION_2(action, action)                                     \
 /**/
+#if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+    namespace hpx { namespace actions {                                       \
+            template struct HPX_ALWAYS_EXPORT transfer_action<action>;        \
+        }                                                                     \
+    }                                                                         \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
-    namespace hpx { namespace actions {                                       \
-        template struct HPX_ALWAYS_EXPORT transfer_action< action>;           \
-        template struct HPX_ALWAYS_EXPORT                                     \
-            transfer_continuation_action< action>;                            \
-    }}                                                                        \
 /**/
+#else
+#define HPX_REGISTER_ACTION_2(action, actionname)                             \
+    HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+    namespace hpx { namespace actions {                                       \
+            template struct transfer_action<action>;                          \
+        }                                                                     \
+    }                                                                         \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
+    HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                        \
+/**/
+#endif
 
 #if defined(HPX_MSVC) || defined(HPX_MINGW)
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
@@ -879,8 +889,6 @@ namespace hpx { namespace serialization
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                        \
     namespace hpx { namespace actions {                                       \
         extern template struct HPX_ALWAYS_IMPORT transfer_action< action>;    \
-        extern template struct HPX_ALWAYS_IMPORT                              \
-            transfer_continuation_action< action>;                            \
     }}                                                                        \
 /**/
 #endif
@@ -967,20 +975,21 @@ namespace hpx { namespace serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_HAS_PRIORITY(action, priority)                             \
-    namespace hpx { namespace traits                                          \
-    {                                                                         \
-        template <>                                                           \
-        struct action_priority< action>                                       \
-        {                                                                     \
-            enum { value = priority };                                        \
-        };                                                                    \
-        /* make sure the action is not executed directly */                   \
-        template <>                                                           \
-        struct has_decorates_action< action>                                  \
-          : std::true_type                                                    \
-        {};                                                                   \
-    }}                                                                        \
-/**/
+    namespace hpx { namespace traits {                                        \
+            template <>                                                       \
+            struct action_priority<action>                                    \
+            {                                                                 \
+                HPX_STATIC_CONSTEXPR threads::thread_priority value =         \
+                    priority;                                                 \
+            };                                                                \
+            /* make sure the action is not executed directly */               \
+            template <>                                                       \
+            struct has_decorates_action<action> : std::true_type              \
+            {                                                                 \
+            };                                                                \
+        }                                                                     \
+    }                                                                         \
+    /**/
 
 #define HPX_ACTION_HAS_LOW_PRIORITY(action)                                   \
     HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_low)             \

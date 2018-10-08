@@ -45,8 +45,7 @@ namespace hpx { namespace parcelset
         {
         public:
             parcel_data();
-            parcel_data(naming::gid_type&& dest, naming::address&& addr,
-                bool has_continuation);
+            parcel_data(naming::gid_type&& dest, naming::address&& addr);
             parcel_data(parcel_data && rhs);
             parcel_data& operator=(parcel_data && rhs);
             template <typename Archive>
@@ -61,8 +60,6 @@ namespace hpx { namespace parcelset
             naming::gid_type source_id_;
             naming::gid_type dest_;
             naming::address addr_;
-
-            bool has_continuation_;
         };
     }
 
@@ -127,8 +124,6 @@ namespace hpx { namespace parcelset
         void set_start_time(double time);
 
         double creation_time() const;
-
-        threads::thread_priority get_thread_priority() const;
 
 #if defined(HPX_HAVE_PARCEL_PROFILING)
         naming::gid_type const parcel_id() const;

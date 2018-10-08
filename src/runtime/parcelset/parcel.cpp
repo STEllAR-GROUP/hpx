@@ -38,38 +38,41 @@ namespace hpx { namespace parcelset
 {
     namespace detail
     {
-        parcel_data::parcel_data() :
+    parcel_data::parcel_data()
+      :
 #if defined(HPX_HAVE_PARCEL_PROFILING)
-            start_time_(0),
-            creation_time_(util::high_resolution_timer::now()),
+      start_time_(0)
+      , creation_time_(util::high_resolution_timer::now())
+      ,
 #endif
-            source_id_(naming::invalid_gid),
-            dest_(naming::invalid_gid),
-            has_continuation_(false)
+      source_id_(naming::invalid_gid)
+      , dest_(naming::invalid_gid)
         {}
 
-        parcel_data::parcel_data(naming::gid_type&& dest, naming::address&& addr,
-            bool has_continuation) :
+        parcel_data::parcel_data(
+            naming::gid_type&& dest, naming::address&& addr)
+          :
 #if defined(HPX_HAVE_PARCEL_PROFILING)
-            start_time_(0),
-            creation_time_(util::high_resolution_timer::now()),
+          start_time_(0)
+          , creation_time_(util::high_resolution_timer::now())
+          ,
 #endif
-            source_id_(naming::invalid_gid),
-            dest_(std::move(dest)),
-            addr_(std::move(addr)),
-            has_continuation_(has_continuation)
+          source_id_(naming::invalid_gid)
+          , dest_(std::move(dest))
+          , addr_(std::move(addr))
         {}
 
-        parcel_data::parcel_data(parcel_data && rhs) :
+        parcel_data::parcel_data(parcel_data&& rhs)
+          :
 #if defined(HPX_HAVE_PARCEL_PROFILING)
-            parcel_id_(std::move(rhs.parcel_id_)),
-            start_time_(rhs.start_time_),
-            creation_time_(rhs.creation_time_),
+          parcel_id_(std::move(rhs.parcel_id_))
+          , start_time_(rhs.start_time_)
+          , creation_time_(rhs.creation_time_)
+          ,
 #endif
-            source_id_(std::move(rhs.source_id_)),
-            dest_(std::move(rhs.dest_)),
-            addr_(std::move(rhs.addr_)),
-            has_continuation_(rhs.has_continuation_)
+          source_id_(std::move(rhs.source_id_))
+          , dest_(std::move(rhs.dest_))
+          , addr_(std::move(rhs.addr_))
         {
 #if defined(HPX_HAVE_PARCEL_PROFILING)
             rhs.parcel_id_ = naming::invalid_gid;
@@ -91,7 +94,6 @@ namespace hpx { namespace parcelset
             source_id_ = std::move(rhs.source_id_);
             dest_ = std::move(rhs.dest_);
             addr_ = std::move(rhs.addr_);
-            has_continuation_ = rhs.has_continuation_;
 
 #if defined(HPX_HAVE_PARCEL_PROFILING)
             rhs.parcel_id_ = naming::invalid_gid;
@@ -115,8 +117,6 @@ namespace hpx { namespace parcelset
             ar & source_id_;
             ar & dest_;
             ar & addr_;
-
-            ar & has_continuation_;
         }
 
         template void parcel_data::serialize(
@@ -165,14 +165,13 @@ namespace hpx { namespace parcelset
     parcel::~parcel()
     {}
 
-    parcel::parcel(
-        naming::gid_type&& dest,
+    parcel::parcel(naming::gid_type&& dest,
         naming::address&& addr,
-        std::unique_ptr<actions::base_action> act
-    )
-      : data_(std::move(dest), std::move(addr), act->has_continuation()),
-        action_(std::move(act)),
-        size_(0)
+        std::unique_ptr<actions::base_action>
+            act)
+      : data_(std::move(dest), std::move(addr))
+      , action_(std::move(act))
+      , size_(0)
     {
 //             HPX_ASSERT(is_valid());
     }
@@ -281,11 +280,6 @@ namespace hpx { namespace parcelset
 #else
         return 0.0;
 #endif
-    }
-
-    threads::thread_priority parcel::get_thread_priority() const
-    {
-        return action_->get_thread_priority();
     }
 
 #if defined(HPX_HAVE_PARCEL_PROFILING)
@@ -493,11 +487,11 @@ namespace hpx { namespace parcelset
         ar >> id;
 
 #if !defined(HPX_DEBUG)
-        action_.reset(action_registry::create(id, data_.has_continuation_));
+        action_.reset(action_registry::create(id));
 #else
         std::string name;
         ar >> name;
-        action_.reset(action_registry::create(id, data_.has_continuation_, &name));
+        action_.reset(action_registry::create(id, &name));
 #endif
     }
 

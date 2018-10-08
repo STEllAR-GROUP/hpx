@@ -145,9 +145,6 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     HPX_TEST_EQ(outact->get_parent_locality_id(), inact->get_parent_locality_id());
     HPX_TEST_EQ(outact->get_parent_thread_id(), inact->get_parent_thread_id());
     HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
-    HPX_TEST_EQ(int(outact->get_thread_priority()), int(inact->get_thread_priority()));
-    HPX_TEST_EQ(int(outact->get_thread_stacksize()), int(inact->get_thread_stacksize()));
-    HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
 
     //// invoke action encapsulated in inp
     //naming::address const* inaddrs = pin.get_destination_addrs();

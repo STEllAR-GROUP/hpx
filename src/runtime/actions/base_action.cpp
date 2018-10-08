@@ -26,32 +26,27 @@ namespace hpx { namespace actions { namespace detail
           , parent_id_(static_cast<std::uint64_t>(0))
           , parent_phase_(0)
           , priority_(static_cast<threads::thread_priority>(0))
-          , stacksize_(static_cast<threads::thread_stacksize>(0))
         {}
 
         action_serialization_data(std::uint32_t parent_locality,
-                threads::thread_id_type parent_id,
-                std::uint64_t parent_phase,
-                threads::thread_priority priority,
-                threads::thread_stacksize stacksize)
+            threads::thread_id_type parent_id,
+            std::uint64_t parent_phase,
+            threads::thread_priority priority)
           : parent_locality_(parent_locality)
           , parent_id_(reinterpret_cast<std::uint64_t>(parent_id.get()))
           , parent_phase_(parent_phase)
           , priority_(priority)
-          , stacksize_(stacksize)
         {}
 
         std::uint32_t parent_locality_;
         std::uint64_t parent_id_;
         std::uint64_t parent_phase_;
         threads::thread_priority priority_;
-        threads::thread_stacksize stacksize_;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar & parent_id_ & parent_phase_ & parent_locality_
-               & priority_ & stacksize_;
+            ar& parent_id_& parent_phase_& parent_locality_& priority_;
         }
     };
 }}}
@@ -67,10 +62,8 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    base_action_data::base_action_data(threads::thread_priority priority,
-            threads::thread_stacksize stacksize)
+    base_action_data::base_action_data(threads::thread_priority priority)
       : priority_(priority)
-      , stacksize_(stacksize)
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
       , parent_locality_(base_action_data::get_locality_id())
       , parent_id_(threads::get_parent_id())
@@ -96,7 +89,6 @@ namespace hpx { namespace actions
         parent_phase_ = data.parent_phase_;
 #endif
         priority_ = data.priority_;
-        stacksize_ = data.stacksize_;
     }
 
     // saving ...
@@ -110,8 +102,8 @@ namespace hpx { namespace actions
         threads::thread_id_type parent_id_;
         std::uint64_t parent_phase_ = 0;
 #endif
-        detail::action_serialization_data data(parent_locality_,
-            parent_id_, parent_phase_, priority_, stacksize_);
+        detail::action_serialization_data data(
+            parent_locality_, parent_id_, parent_phase_, priority_);
         ar << data;
     }
 
@@ -160,16 +152,4 @@ namespace hpx { namespace actions
         return parent_phase_;
     }
 #endif
-
-    /// Return the thread priority this action has to be executed with
-    threads::thread_priority base_action_data::get_thread_priority() const
-    {
-        return priority_;
-    }
-
-    /// Return the thread stacksize this action has to be executed with
-    threads::thread_stacksize base_action_data::get_thread_stacksize() const
-    {
-        return stacksize_;
-    }
 }}

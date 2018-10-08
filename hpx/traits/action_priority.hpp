@@ -15,7 +15,8 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_priority
     {
-        enum { value = threads::thread_priority_default };
+        HPX_STATIC_CONSTEXPR threads::thread_priority value =
+            threads::thread_priority_default;
     };
 }}
 
