@@ -1268,10 +1268,6 @@ How to install |hpx| on Fedora distributions
      sudo echo /opt/hpx/lib > /etc/ld.so.conf.d/hpx.conf
      sudo ldconfig
 
-.. include:: ../../generated/cmake_toolchains.rst
-
-.. include:: ../../generated/cmake_variables.rst
-
 .. _arch_installation
 
 How to install |hpx| on Arch distributions
@@ -1283,7 +1279,7 @@ How to install |hpx| on Arch distributions
 
      sudo pacman -S gcc clang cmake boost hwloc gperftools
 
-* For building the docs you will need to further install the following:
+* For building the documentation you will need to further install the following:
 
   .. code-block:: bash
 
@@ -1291,5 +1287,9 @@ How to install |hpx| on Arch distributions
   
      pip install --user sphinx sphinx_rtd_theme breathe
 
-The rest of the installation steps are same as provided with fedora
+The rest of the installation steps are same as provided with Fedora
 or Unix variants.
+
+.. include:: ../../generated/cmake_toolchains.rst
+
+.. include:: ../../generated/cmake_variables.rst
