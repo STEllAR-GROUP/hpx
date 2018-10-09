@@ -6,7 +6,7 @@
 // Simple test verifying basic resource_partitioner functionality.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/include/apply.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -39,7 +39,7 @@ int hpx_main(int argc, char* argv[])
     // Schedule some dummy work
     for (std::size_t i = 0; i < 100000; ++i)
     {
-        hpx::async([](){});
+        hpx::apply([](){});
     }
 
     // Start shutdown

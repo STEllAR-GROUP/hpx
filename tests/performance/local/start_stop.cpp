@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
     hpx::stop();
 
     std::cout
-        << "threads, resume [s], async [s], suspend [s]"
+        << "threads, resume [s], apply [s], suspend [s]"
         << std::endl;
 
     double start_time = 0;
@@ -62,10 +62,10 @@ int main(int argc, char ** argv)
 
         for (std::size_t thread = 0; thread < threads; ++thread)
         {
-            hpx::async([](){});
+            hpx::apply([](){});
         }
 
-        auto t_async = timer.elapsed();
+        auto t_apply = timer.elapsed();
 
         hpx::stop();
         auto t_stop = timer.elapsed();
@@ -74,7 +74,7 @@ int main(int argc, char ** argv)
         std::cout
             << threads << ", "
             << t_start << ", "
-            << t_async << ", "
+            << t_apply << ", "
             << t_stop
             << std::endl;
     }

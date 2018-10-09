@@ -8,7 +8,6 @@
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/include/apply.hpp>
-#include <hpx/include/async.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -44,11 +43,11 @@ void test_scheduler(int argc, char* argv[],
     {
         hpx::resume();
 
-        hpx::async([]()
+        hpx::apply([]()
             {
                 for (std::size_t i = 0; i < 10000; ++i)
                 {
-                    hpx::async([](){});
+                    hpx::apply([](){});
                 }
             });
 

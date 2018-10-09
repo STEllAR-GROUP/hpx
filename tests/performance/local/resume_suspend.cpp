@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
     std::uint64_t threads = hpx::resource::get_num_threads("default");
 
     std::cout
-        << "threads, resume [s], async [s], suspend [s]"
+        << "threads, resume [s], apply [s], suspend [s]"
         << std::endl;
 
     double suspend_time = 0;
@@ -64,10 +64,10 @@ int main(int argc, char ** argv)
 
         for (std::size_t thread = 0; thread < threads; ++thread)
         {
-            hpx::async([](){});
+            hpx::apply([](){});
         }
 
-        auto t_async = timer.elapsed();
+        auto t_apply = timer.elapsed();
 
         hpx::suspend();
         auto t_suspend = timer.elapsed();
@@ -76,7 +76,7 @@ int main(int argc, char ** argv)
         std::cout
             << threads << ", "
             << t_resume << ", "
-            << t_async << ", "
+            << t_apply << ", "
             << t_suspend
             << std::endl;
     }
@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
     hpx::util::print_cdash_timing("SuspendTime", suspend_time);
 
     hpx::resume();
-    hpx::async([]() { hpx::finalize(); });
+    hpx::apply([]() { hpx::finalize(); });
     hpx::stop();
 }
 
