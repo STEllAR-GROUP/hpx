@@ -20,9 +20,9 @@ set(oversubscribing_resource_partitioner_PARAMETERS
     THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
 set(simple_resource_partitioner_PARAMETERS
     THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
-set(simplest_resource_partitioner_1_PARAMETERS 
+set(simplest_resource_partitioner_1_PARAMETERS
     THREADS_PER_LOCALITY 4)
-set(simplest_resource_partitioner_2_PARAMETERS 
+set(simplest_resource_partitioner_2_PARAMETERS
     THREADS_PER_LOCALITY 4)
 set(guided_pool_test_PARAMETERS
     THREADS_PER_LOCALITY 4)

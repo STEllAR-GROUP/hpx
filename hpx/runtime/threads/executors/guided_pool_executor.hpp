@@ -15,7 +15,7 @@
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/pack_traversal.hpp>
-#include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -99,7 +99,8 @@ namespace hpx { namespace threads { namespace executors
 #endif
 
 #ifdef GUIDED_EXECUTOR_DEBUG
-            std::cout << "pre_execution_async_domain_schedule : domain " << domain << std::endl;
+            std::cout << "pre_execution_async_domain_schedule : domain "
+                      << domain << std::endl;
 #endif
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
@@ -154,7 +155,8 @@ namespace hpx { namespace threads { namespace executors
 #endif
 
 #ifdef GUIDED_EXECUTOR_DEBUG
-            std::cout << "pre_execution_then_domain_schedule : domain " << domain << std::endl;
+            std::cout << "pre_execution_then_domain_schedule : domain "
+                      << domain << std::endl;
 #endif
             // now we must forward the task+hint on to the correct dispatch function
             typedef typename
@@ -234,15 +236,15 @@ namespace hpx { namespace threads { namespace executors
                 result_type;
 
             std::cout << "async_execute : Function    : "
-                      << debug::print_type<F>() << "\n"
+                      << util::debug::print_type<F>() << "\n"
                       << "async_execute : Arguments   : "
-                      << debug::print_type<Ts...>(" | ") << "\n"
+                      << util::debug::print_type<Ts...>(" | ") << "\n"
                       << "async_execute : Result      : "
-                      << debug::print_type<result_type>() << "\n"
+                      << util::debug::print_type<result_type>() << "\n"
                       << "async_execute : Numa Hint   : "
-                      << debug::print_type<pool_numa_hint<Tag>>() << "\n"
+                      << util::debug::print_type<pool_numa_hint<Tag>>() << "\n"
                       << "async_execute : Hint   : "
-                      << debug::print_type<H>() << "\n";
+                      << util::debug::print_type<H>() << "\n";
 #endif
 
             // hold onto the function until all futures have become ready
@@ -278,16 +280,16 @@ namespace hpx { namespace threads { namespace executors
                     F, Future, Ts...>::type result_type;
 
             std::cout << "then_execute : Function     : "
-                      << debug::print_type<F>() << "\n"
+                      << util::debug::print_type<F>() << "\n"
                       << "then_execute : Predecessor  : "
-                      << debug::print_type<Future>() << "\n"
+                      << util::debug::print_type<Future>() << "\n"
                       << "then_execute : Future       : "
-                      << debug::print_type<typename
+                      << util::debug::print_type<typename
                          traits::future_traits<Future>::result_type>() << "\n"
                       << "then_execute : Arguments    : "
-                      << debug::print_type<Ts...>(" | ") << "\n"
+                      << util::debug::print_type<Ts...>(" | ") << "\n"
                       << "then_execute : Result       : "
-                      << debug::print_type<result_type>() << "\n";
+                      << util::debug::print_type<result_type>() << "\n";
 #endif
 
             // Note 1 : The Ts &&... args are not actually used in a continuation since
@@ -351,15 +353,17 @@ namespace hpx { namespace threads { namespace executors
                     result_type;
 
             std::cout << "when_all(fut) : Predecessor : "
-                      << debug::print_type<OuterFuture<util::tuple<InnerFutures...>>>()
+                      << util::debug::print_type<
+                         OuterFuture<util::tuple<InnerFutures...>>>()
                       << "\n"
                       << "when_all(fut) : unwrapped   : "
-                      << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ")
+                      << util::debug::print_type<
+                         decltype(unwrapped_futures_tuple)>(" | ")
                       << "\n"
                       << "then_execute  : Arguments   : "
-                      << debug::print_type<Ts...>(" | ") << "\n"
+                      << util::debug::print_type<Ts...>(" | ") << "\n"
                       << "when_all(fut) : Result      : "
-                      << debug::print_type<result_type>() << "\n";
+                      << util::debug::print_type<result_type>() << "\n";
 #endif
 
             // Please see notes for previous then_execute function above
@@ -419,13 +423,14 @@ namespace hpx { namespace threads { namespace executors
 
 #ifdef GUIDED_EXECUTOR_DEBUG
             std::cout << "dataflow      : Predecessor : "
-                      << debug::print_type<util::tuple<InnerFutures...>>()
+                      << util::debug::print_type<util::tuple<InnerFutures...>>()
                       << "\n"
                       << "dataflow      : unwrapped   : "
-                      << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ")
+                      << util::debug::print_type<
+                         decltype(unwrapped_futures_tuple)>(" | ")
                       << "\n"
                       << "dataflow-frame: Result      : "
-                      << debug::print_type<Result>() << "\n";
+                      << util::debug::print_type<Result>() << "\n";
 
             std::cout << "dataflow hint returning " << domain << "\n";
 #endif

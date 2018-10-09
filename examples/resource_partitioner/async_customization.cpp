@@ -24,7 +24,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/pack_traversal.hpp>
-#include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 //
 #include "shared_priority_queue_scheduler.hpp"
 //
@@ -94,12 +94,13 @@ struct test_async_executor
         typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
             result_type;
 
+        using namespace hpx::util::debug;
         std::cout << "async_execute : Function    : "
-                  << debug::print_type<F>() << "\n";
+                  << print_type<F>() << "\n";
         std::cout << "async_execute : Arguments   : "
-                  << debug::print_type<Ts...>(" | ") << "\n";
+                  << print_type<Ts...>(" | ") << "\n";
         std::cout << "async_execute : Result      : "
-                  << debug::print_type<result_type>() << "\n";
+                  << print_type<result_type>() << "\n";
 
         // forward the task execution on to the real internal executor
         lcos::local::futures_factory<result_type()> p(
@@ -133,17 +134,18 @@ struct test_async_executor
         typedef typename util::detail::invoke_deferred_result<
                 F, Future, Ts...>::type result_type;
 
+        using namespace hpx::util::debug;
         std::cout << "then_execute : Function     : "
-                  << debug::print_type<F>() << "\n";
+                  << print_type<F>() << "\n";
         std::cout << "then_execute : Predecessor  : "
-                  << debug::print_type<Future>() << "\n";
+                  << print_type<Future>() << "\n";
         std::cout << "then_execute : Future       : "
-                  << debug::print_type<typename
-                     traits::future_traits<Future>::result_type>() << "\n";
+                  << print_type<typename traits::future_traits<Future>::result_type>()
+                  << "\n";
         std::cout << "then_execute : Arguments    : "
-                  << debug::print_type<Ts...>(" | ") << "\n";
+                  << print_type<Ts...>(" | ") << "\n";
         std::cout << "then_execute : Result       : "
-                  << debug::print_type<result_type>() << "\n";
+                  << print_type<result_type>() << "\n";
 
         // forward the task on to the 'real' underlying executor
         lcos::local::futures_factory<result_type()> p(
@@ -194,21 +196,22 @@ struct test_async_executor
             predecessor_value
         );
 
+        using namespace hpx::util::debug;
         std::cout << "when_all(fut) : Predecessor : "
-                  << debug::print_type<OuterFuture<util::tuple<InnerFutures...>>>()
+                  << print_type<OuterFuture<util::tuple<InnerFutures...>>>()
                   << "\n";
         std::cout << "when_all(fut) : unwrapped   : "
-                  << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
+                  << print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
         std::cout << "when_all(fut) : Arguments   : "
-                  << debug::print_type<Ts...>(" | ") << "\n";
+                  << print_type<Ts...>(" | ") << "\n";
         std::cout << "when_all(fut) : Result      : "
-                  << debug::print_type<result_type>() << "\n";
+                  << print_type<result_type>() << "\n";
 
         // invoke a function with the unwrapped tuple future types to demonstrate
         // that we can access them
         std::cout << "when_all(fut) : tuple       : ";
         util::invoke_fused([](const auto & ...ts) {
-            std::cout << debug::print_type<decltype(ts)...>(" | ") << "\n";
+            std::cout << print_type<decltype(ts)...>(" | ") << "\n";
         }, unwrapped_futures_tuple);
 
         // forward the task execution on to the real internal executor
@@ -257,19 +260,20 @@ struct test_async_executor
             predecessor
         );
 
+        using namespace hpx::util::debug;
         std::cout << "dataflow      : Predecessor : "
-                  << debug::print_type<util::tuple<InnerFutures...>>()
+                  << print_type<util::tuple<InnerFutures...>>()
                   << "\n";
         std::cout << "dataflow      : unwrapped   : "
-                  << debug::print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
+                  << print_type<decltype(unwrapped_futures_tuple)>(" | ") << "\n";
         std::cout << "dataflow-frame: Result      : "
-                  << debug::print_type<Result>() << "\n";
+                  << print_type<Result>() << "\n";
 
         // invoke a function with the unwrapped tuple future types to demonstrate
         // that we can access them
         std::cout << "dataflow      : tuple       : ";
         util::invoke_fused([](const auto & ...ts) {
-            std::cout << debug::print_type<decltype(ts)...>(" | ") << "\n";
+            std::cout << print_type<decltype(ts)...>(" | ") << "\n";
         }, unwrapped_futures_tuple);
 
         // forward the task execution on to the real internal executor
