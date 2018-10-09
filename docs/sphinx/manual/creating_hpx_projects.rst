@@ -343,3 +343,145 @@ to the section on :ref:`comps`.
    your project after all libraries you want to link against have been added.
    Please also consult the CMake documentation `here
    <https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling>`_.
+
+.. _makefile:
+
+Using HPX with Makefile
+=======================
+
+A basic project building with |hpx| is through creating makefiles. The process
+of creating one can get complex depending upon the use of cmake parameter
+``HPX_WITH_HPX_MAIN`` (which defaults to ON).
+
+How to build |hpx| applications with makefile
+---------------------------------------------
+
+If |hpx| is installed correctly, you should be able to build and run a simple
+hello world program. It prints ``Hello World!`` on the :term:`locality` you
+run it on.
+
+.. literalinclude:: ../../examples/quickstart/simplest_hello_world_1.cpp
+   :language: c++
+
+Copy the content of this program into a file called hello_world.cpp.
+
+Now in the directory where you put hello_world.cpp, create a Makefile.
+Add the following code:
+
+.. code-block:: makefile
+   
+   CXX=(CXX)  # Add your favourite compiler here or let makefile choose default.
+
+   CXXFLAGS=-O3 -std=c++17
+
+   BOOST_ROOT=/path/to/boost
+   HWLOC_ROOT=/path/to/hwloc
+   TCMALLOC_ROOT=/path/to/tcmalloc
+   HPX_ROOT=/path/to/hpx
+
+   INCLUDE_DIRECTIVES=$(HPX_ROOT)/include $(BOOST_ROOT)/include $(HWLOC_ROOT)/include
+
+   LIBRARY_DIRECTIVES=-L$(HPX_ROOT)/lib $(HPX_ROOT)/lib/libhpx_init.a $(HPX_ROOT)/lib/libhpx.so $(BOOST_ROOT)/lib/libboost_atomic-mt.so $(BOOST_ROOT)/lib/libboost_filesystem-mt.so $(BOOST_ROOT)/lib/libboost_program_options-mt.so $(BOOST_ROOT)/lib/libboost_regex-mt.so $(BOOST_ROOT)/lib/libboost_system-mt.so -lpthread $(TCMALLOC_ROOT)/libtcmalloc_minimal.so $(HWLOC_ROOT)/libhwloc.so -ldl -lrt
+
+   LINK_FLAGS=$(HPX_ROOT)/lib/libhpx_wrap.a -Wl,-wrap=main  # should be left empty for HPX_WITH_HPX_MAIN=OFF
+
+   hello_world: hello_world.o
+      $(CXX) $(CXXFLAGS) -o hello_world hello_world.o $(LIBRARY_DIRECTIVES) $(LINK_FLAGS)
+
+   hello_world.o:
+      $(CXX) $(CXXFLAGS) -c -o hello_world.o hello_world.cpp $(INCLUDE_DIRECTIVES)
+
+.. important::
+   
+   ``LINK_FLAGS`` should be left empty if HPX_WITH_HPX_MAIN is set to OFF.
+   Boost in the above example is build with ``--layout=tagged``. Actual boost
+   flags may vary on your build of boost.
+
+To build the program, type:
+
+.. code-block:: bash
+
+   make
+
+A successfull build should result in hello_world binary. To test, type:
+
+.. code-block:: bash
+
+   ./hello_world
+
+How to build |hpx| components with makefile
+-------------------------------------------
+
+Let's try a more complex example involving an |hpx| component. An |hpx|
+component is a class which exposes |hpx| actions. |hpx| components are compiled
+into dynamically loaded modules called component libraries. Here's the source
+code:
+
+**hello_world_component.cpp**
+
+.. literalinclude:: ../../examples/hello_world_component/hello_world_component.cpp
+   :language: c++
+   :lines: 7-29
+
+**hello_world_component.hpp**
+
+.. literalinclude:: ../../examples/hello_world_component/hello_world_component.hpp
+   :language: c++
+   :lines: 7-54
+
+**hello_world_client.cpp**
+
+.. literalinclude:: ../../examples/hello_world_component/hello_world_client.cpp
+   :language: c++
+
+Now in the directory, create a Makefile. Add the following code:
+
+.. code-block:: makefile
+   
+   CXX=(CXX)  # Add your favourite compiler here or let makefile choose default.
+
+   CXXFLAGS=-O3 -std=c++17
+
+   BOOST_ROOT=/path/to/boost
+   HWLOC_ROOT=/path/to/hwloc
+   TCMALLOC_ROOT=/path/to/tcmalloc
+   HPX_ROOT=/path/to/hpx
+
+   INCLUDE_DIRECTIVES=$(HPX_ROOT)/include $(BOOST_ROOT)/include $(HWLOC_ROOT)/include
+
+   LIBRARY_DIRECTIVES=-L$(HPX_ROOT)/lib $(HPX_ROOT)/lib/libhpx_init.a $(HPX_ROOT)/lib/libhpx.so $(BOOST_ROOT)/lib/libboost_atomic-mt.so $(BOOST_ROOT)/lib/libboost_filesystem-mt.so $(BOOST_ROOT)/lib/libboost_program_options-mt.so $(BOOST_ROOT)/lib/libboost_regex-mt.so $(BOOST_ROOT)/lib/libboost_system-mt.so -lpthread $(TCMALLOC_ROOT)/libtcmalloc_minimal.so $(HWLOC_ROOT)/libhwloc.so -ldl -lrt
+
+   LINK_FLAGS=$(HPX_ROOT)/lib/libhpx_wrap.a -Wl,-wrap=main  # should be left empty for HPX_WITH_HPX_MAIN=OFF
+
+   hello_world_client: libhpx_hello_world hello_world_client.o
+     $(CXX) $(CXXFLAGS) -o hello_world_client $(LIBRARY_DIRECTIVES) libhpx_hello_world $(LINK_FLAGS)
+
+   hello_world_client.o: hello_world_client.cpp
+     $(CXX) $(CXXFLAGS) -o hello_world_client.o hello_world_client.cpp $(INCLUDE_DIRECTIVES)
+
+   libhpx_hello_world: hello_world_component.o
+     $(CXX) $(CXXFLAGS) -o libhpx_hello_world hello_world_component.o $(LIBRARY_DIRECTIVES)
+
+   hello_world_component.o: hello_world_component.cpp
+     $(CXX) $(CXXFLAGS) -c -o hello_world_component.o hello_world_component.cpp $(INCLUDE_DIRECTIVES)
+
+To build the program, type:
+
+.. code-block:: bash
+
+   make
+
+A successfull build should result in hello_world binary. To test, type:
+
+.. code-block:: bash
+
+   ./hello_world
+
+.. note::
+   
+   Due to high variations in CMake flags and library dependencies, it is
+   recommended to build |hpx| applications and components with pkg-config
+   or CMakeLists.txt. Writing Makefile may result in broken builds if
+   due care is not taken.
+   pkg-config files and CMake systems are configured with CMake build of
+   |hpx|. Hence, they are stable and provides with better support overall.
