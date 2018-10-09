@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_DEMANGLE_HELPER_OCT_28_2011_0410PM)
-#define HPX_UTIL_DEMANGLE_HELPER_OCT_28_2011_0410PM
+#if !defined(HPX_UTIL_DEBUG_DEMANGLE_HELPER_OCT_28_2011_0410PM)
+#define HPX_UTIL_DEBUG_DEMANGLE_HELPER_OCT_28_2011_0410PM
 
 #include <hpx/config.hpp>
 #include <string>
@@ -15,7 +15,7 @@
 #include <cxxabi.h>
 #include <stdlib.h>
 
-namespace hpx { namespace debug
+namespace hpx { namespace util { namespace debug
 {
     // --------------------------------------------------------------------
     // demangle an arbitrary c++ type using gnu utility
@@ -41,13 +41,14 @@ namespace hpx { namespace debug
     private:
         char* demangled_;
     };
-}}
+
+}}}
 
 #else
 
 #include <typeinfo>
 
-namespace hpx { namespace debug
+namespace hpx { namespace util { namespace debug
 {
     template <typename T>
     struct demangle_helper
@@ -57,12 +58,12 @@ namespace hpx { namespace debug
             return typeid(T).name();
         }
     };
-}}
+}}}
 
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace debug
+namespace hpx { namespace util { namespace debug
 {
     template <typename T>
     struct type_id
@@ -81,7 +82,7 @@ namespace hpx { namespace debug
     template <typename T=void>
     inline std::string print_type(const char *delim="")
     {
-        return std::string(debug::type_id<T>::typeid_.type_id());
+        return std::string(hpx::util::debug::type_id<T>::typeid_.type_id());
     }
 
     template <>
@@ -94,10 +95,9 @@ namespace hpx { namespace debug
     inline typename std::enable_if<sizeof...(Args)!=0, std::string>::type
     print_type(const char *delim="")
     {
-        std::string temp(debug::type_id<T>::typeid_.type_id());
+        std::string temp(hpx::util::debug::type_id<T>::typeid_.type_id());
         return temp + delim + print_type<Args...>(delim);
     }
-}}
+}}}
 
 #endif
-

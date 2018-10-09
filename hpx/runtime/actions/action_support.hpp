@@ -23,6 +23,7 @@
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/debug/demangle_helper.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/util/itt_notify.hpp>
 #endif
@@ -72,7 +73,7 @@ namespace hpx { namespace actions
             static_assert(
                 traits::needs_automatic_registration<Action>::value,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
-            return debug::type_id<Action>::typeid_.type_id();
+            return util::debug::type_id<Action>::typeid_.type_id();
         }
 #endif
 
