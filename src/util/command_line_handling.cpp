@@ -640,7 +640,7 @@ namespace hpx { namespace util
         //  - num_localities > 1
         expect_connections =
             cfgmap.get_value<int>("hpx.expect_connecting_localities",
-                num_localities_ > 1 ? 0 : 1) ? true : false;
+                num_localities_ > 1 ? 1 : 0) ? true : false;
 
         if (vm.count("hpx:expect-connecting-localities"))
             expect_connections = true;
