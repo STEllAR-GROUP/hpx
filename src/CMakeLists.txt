@@ -243,13 +243,13 @@ endif()
 
 # Default unnamed config (not Debug/Release/etc) are in this var
 get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
-target_compile_options(hpx PUBLIC ${_temp_flags})
+target_compile_options(hpx PUBLIC $<BUILD_INTERFACE:${_temp_flags}>)
 # message("Adding ${_temp_flags}")
 
 # Could potentially use CMAKE_CONFIGURATION_TYPES in case a user defined config exists
 foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
   get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
-  target_compile_options(hpx PUBLIC $<$<CONFIG:${_config}>:${_temp_flags}>)
+  target_compile_options(hpx PUBLIC $<BUILD_INTERFACE:$<$<CONFIG:${_config}>:${_temp_flags}>>)
   # message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
 endforeach()
 
