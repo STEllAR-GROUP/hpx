@@ -241,16 +241,24 @@ else()
   endif()
 endif()
 
+# this is a dummy target that we add compile flags to
+# all tests will depend on this target and inherit the flags
+# but user code linking against hpx will not
+add_library(hpx_test_flags INTERFACE)
+
 # Default unnamed config (not Debug/Release/etc) are in this var
 get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
-target_compile_options(hpx PRIVATE ${_temp_flags}>)
+target_compile_options(hpx PRIVATE ${_temp_flags})
+target_compile_options(hpx_test_flags INTERFACE ${_temp_flags})
+
 # message("Adding ${_temp_flags}")
 
 # Could potentially use CMAKE_CONFIGURATION_TYPES in case a user defined config exists
 foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
   get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
   target_compile_options(hpx PRIVATE $<$<CONFIG:${_config}>:${_temp_flags}>)
-  # message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
+  target_compile_options(hpx_test_flags INTERFACE $<$<CONFIG:${_config}>:${_temp_flags}>)
+#  message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
 endforeach()
 
 #if(HPX_WITH_STATIC_LINKING)
@@ -389,6 +397,7 @@ foreach(_keyword PUBLIC;PRIVATE)
     GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_${_keyword})
   foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
     target_compile_options(hpx ${_keyword} ${_flag})
+    target_compile_options(hpx_test_flags INTERFACE ${_flag})
     if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
       target_compile_options(hpx_wrap ${_keyword} ${_flag})
     endif()
