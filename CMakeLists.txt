@@ -226,10 +226,6 @@ hpx_option(HPX_WITH_DOCUMENTATION BOOL
   "Build the HPX documentation (default OFF)."
   OFF CATEGORY "Build Targets")
 
-hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
-  "The HPX documentation should be built as a single page HTML (default OFF)."
-  OFF CATEGORY "Build Targets")
-
 if(MSVC)
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
     "Force creating pseudo targets and pseudo dependencies (default OFF)."
@@ -241,8 +237,8 @@ else()
 endif()
 
 hpx_option(HPX_WITH_DYNAMIC_HPX_MAIN BOOL
-  "Enable dynamic overload of system 'main()` (Linux only, default: ON)"
-  ON ADVANCED CATEGORY "Utility")
+  "Enable dynamic overload of system ``main()`` (Linux only, default: ON)"
+  ON ADVANCED)
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   hpx_add_config_cond_define(HPX_HAVE_DYNAMIC_HPX_MAIN 1)
 endif()
@@ -1799,7 +1795,7 @@ if(HPX_WITH_COMPRESSION_ZLIB)
 endif()
 
 ################################################################################
-# Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
+# Documentation toolchain (Sphinx, Doxygen, Breathe)
 ################################################################################
 hpx_include(Documentation)
 
@@ -2018,34 +2014,14 @@ install(
 if(HPX_WITH_DOCUMENTATION)
   # Install HPX documentation files
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs
-    COMPONENT docs
-    OPTIONAL
-    FILES_MATCHING PATTERN "*.html"
-    PATTERN "*.pdf"
-    PATTERN ".git" EXCLUDE
-    PATTERN "*code*" EXCLUDE
-    PATTERN "*src*" EXCLUDE
-    PATTERN "*images*" EXCLUDE)
-
-  install(
     FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
     DESTINATION share/hpx-${HPX_VERSION}/
     COMPONENT docs)
 
   install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/src/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
+    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs"
+    DESTINATION share/hpx-${HPX_VERSION}/docs
     COMPONENT docs
-    FILES_MATCHING PATTERN "*.css"
-    PATTERN ".git" EXCLUDE)
-
-  install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/images/"
-    DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
-    COMPONENT docs
-    FILES_MATCHING PATTERN "*.png"
     PATTERN ".git" EXCLUDE)
 endif()
 
