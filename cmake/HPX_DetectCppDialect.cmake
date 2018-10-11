@@ -160,7 +160,7 @@ macro(hpx_detect_cpp_dialect)
   endif(MSVC)
 
   if(CXX_FLAG)
-    hpx_add_target_compile_option(${CXX_FLAG})
+    hpx_add_target_compile_option(${CXX_FLAG} PUBLIC)
   endif()
 
 endmacro()

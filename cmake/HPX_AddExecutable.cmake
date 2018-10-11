@@ -169,7 +169,7 @@ macro(add_hpx_executable name)
     FOLDER ${${name}_FOLDER}
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
     LINK_FLAGS ${${name}_LINK_FLAGS}
-    DEPENDENCIES ${${name}_DEPENDENCIES} hpx_test_flags
+    DEPENDENCIES ${${name}_DEPENDENCIES}
     COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
     HPX_PREFIX ${${name}_HPX_PREFIX}
     ${_target_flags}

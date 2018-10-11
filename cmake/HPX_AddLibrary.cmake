@@ -167,6 +167,7 @@ macro(add_hpx_library name)
     endif()
   endif()
 
+  # get public and private compile options that hpx needs
   if(${${name}_NOLIBS})
     set(_target_flags ${_target_flags} NOLIBS)
   endif()
