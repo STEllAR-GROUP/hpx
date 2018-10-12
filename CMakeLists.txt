@@ -1334,8 +1334,8 @@ if(WIN32)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
-  add_definitions(-D_WINDOWS PUBLIC)
-  add_definitions(-D_WIN32 PUBLIC)
+  add_definitions(-D_WINDOWS)
+  add_definitions(-D_WIN32)
   hpx_add_config_cond_define(_WIN32_WINNT 0x0601)
   hpx_add_config_cond_define(_SCL_SECURE_NO_WARNINGS)
   hpx_add_config_cond_define(_CRT_SECURE_NO_WARNINGS)
