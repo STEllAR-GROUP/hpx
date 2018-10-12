@@ -241,16 +241,24 @@ else()
   endif()
 endif()
 
+# this is a dummy target that we add compile flags to
+# all tests will depend on this target and inherit the flags
+# but user code linking against hpx will not
+add_library(hpx_internal_flags INTERFACE)
+
 # Default unnamed config (not Debug/Release/etc) are in this var
 get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
-target_compile_options(hpx PUBLIC ${_temp_flags})
+target_compile_options(hpx PRIVATE ${_temp_flags})
+target_compile_options(hpx_internal_flags INTERFACE ${_temp_flags})
+
 # message("Adding ${_temp_flags}")
 
 # Could potentially use CMAKE_CONFIGURATION_TYPES in case a user defined config exists
 foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
   get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
-  target_compile_options(hpx PUBLIC $<$<CONFIG:${_config}>:${_temp_flags}>)
-  # message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
+  target_compile_options(hpx PRIVATE $<$<CONFIG:${_config}>:${_temp_flags}>)
+  target_compile_options(hpx_internal_flags INTERFACE $<$<CONFIG:${_config}>:${_temp_flags}>)
+#  message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
 endforeach()
 
 #if(HPX_WITH_STATIC_LINKING)
@@ -337,16 +345,6 @@ if(NOT HPX_WITH_STATIC_LINKING)
   set(hpx_targets ${hpx_targets} hpx_init)
 endif()
 
-get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
-  GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
-foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
-  target_compile_definitions(hpx INTERFACE ${_flag})
-  target_compile_definitions(hpx PUBLIC ${_flag})
-  if(NOT HPX_WITH_STATIC_LINKING)
-    target_compile_definitions(hpx_init PUBLIC ${_flag})
-  endif()
-endforeach()
-
 ################################################################################
 # libhpx_wrap
 
@@ -382,32 +380,31 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
 
 endif()
 
-get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
-  GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
-foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
-  target_compile_definitions(hpx INTERFACE ${_flag})
-  target_compile_definitions(hpx PUBLIC ${_flag})
-  if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
-    target_compile_definitions(hpx_wrap INTERFACE ${_flag})
-    target_compile_definitions(hpx_wrap PUBLIC ${_flag})
-  endif()
-  if(NOT HPX_WITH_STATIC_LINKING)
-    target_compile_definitions(hpx_init PUBLIC ${_flag})
-  endif()
-endforeach()
+foreach(_keyword PUBLIC;PRIVATE)
+  get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
+    GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS_${_keyword})
+  foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
+    target_compile_definitions(hpx ${_keyword} ${_flag})
+    if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+      target_compile_definitions(hpx_wrap ${_keyword} ${_flag})
+    endif()
+    if(NOT HPX_WITH_STATIC_LINKING)
+      target_compile_definitions(hpx_init ${_keyword} ${_flag})
+    endif()
+  endforeach()
 
-get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
-  GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
-foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
-  target_compile_options(hpx INTERFACE ${_flag})
-  target_compile_options(hpx PUBLIC ${_flag})
-  if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
-    target_compile_options(hpx_wrap INTERFACE ${_flag})
-    target_compile_options(hpx_wrap PUBLIC ${_flag})
-  endif()
-  if(NOT HPX_WITH_STATIC_LINKING)
-    target_compile_options(hpx_init PUBLIC ${_flag})
-  endif()
+  get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
+    GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_${_keyword})
+  foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
+    target_compile_options(hpx ${_keyword} ${_flag})
+    target_compile_options(hpx_internal_flags INTERFACE ${_flag})
+    if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+      target_compile_options(hpx_wrap ${_keyword} ${_flag})
+    endif()
+    if(NOT HPX_WITH_STATIC_LINKING)
+      target_compile_options(hpx_init ${_keyword} ${_flag})
+    endif()
+  endforeach()
 endforeach()
 
 set(_optional)
