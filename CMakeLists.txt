@@ -1094,11 +1094,11 @@ if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
     endif()
 
     if(MSVC14 AND CMAKE_CL_64)
-      hpx_add_target_compile_option(-await PUBLIC)
+      hpx_add_target_compile_option(-await)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      hpx_add_target_compile_option(-Xclang -fcoroutines-ts PUBLIC)
+      hpx_add_target_compile_option(-Xclang -fcoroutines-ts)
     endif()
   endif()
 endif()
@@ -1111,11 +1111,11 @@ endif()
 # optimization flags is not handled here and is left to the responsibility of
 # the user to avoid conflicts in the resulting binaries
 
-hpx_add_target_compile_definition(_DEBUG PUBLIC CONFIGURATIONS Debug)
-hpx_add_target_compile_definition(DEBUG PUBLIC CONFIGURATIONS Debug)
-hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS PUBLIC
+hpx_add_target_compile_definition(_DEBUG CONFIGURATIONS Debug)
+hpx_add_target_compile_definition(DEBUG CONFIGURATIONS Debug)
+hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS PUBLIC
+hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
 
 # Make sure we compile in proper C++xx mode (MSVC uses it automatically)
@@ -1158,8 +1158,8 @@ if(HPX_WITH_CUDA)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-lcudadevrt)
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-rdc=true)
   else()
-    hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE PUBLIC)
-    hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR} PUBLIC)
+    hpx_add_target_compile_option(-DBOOST_THREAD_USES_MOVE)
+    hpx_add_target_compile_option(--cuda-path=${CUDA_TOOLKIT_ROOT_DIR})
     hpx_libraries(cudart)
     hpx_library_dir(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
     link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
@@ -1272,31 +1272,31 @@ if(WIN32)
   if(MSVC)
     enable_language(ASM_MASM)
 
-    hpx_add_target_compile_option(-Ox PUBLIC CONFIGURATIONS Release)
+    hpx_add_target_compile_option(-Ox CONFIGURATIONS Release)
 
     # even VS2017 has an ICE when compiling with -Ob2
-    hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
+    hpx_add_target_compile_option(-Ob1 CONFIGURATIONS Release)
 
     if(NOT HPX_WITH_AWAIT)
       # /RTC1 is incompatible with /await
-      hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
+      hpx_add_target_compile_option(/RTC1 CONFIGURATIONS Debug)
     else()
-      hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
+      hpx_remove_target_compile_option(/RTC1 CONFIGURATIONS Debug)
     endif()
 
     # VS2012 and above has a special flag for improving the debug experience by
     # adding more symbol information to the build (-d2Zi)
-    hpx_add_target_compile_option(-d2Zi+ PUBLIC CONFIGURATIONS RelWithDebInfo)
+    hpx_add_target_compile_option(-d2Zi+ CONFIGURATIONS RelWithDebInfo)
 
     # VS2013 and above know how to do link time constant data segment folding
     # VS2013 update 2 and above know how to remove debug information for
     #     non-referenced functions and data (-Zc:inline)
-    hpx_add_target_compile_option(-Zc:inline PUBLIC)
-    hpx_add_target_compile_option(-Gw PUBLIC
+    hpx_add_target_compile_option(-Zc:inline)
+    hpx_add_target_compile_option(-Gw
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-    hpx_add_target_compile_option(-Zo PUBLIC CONFIGURATIONS RelWithDebInfo)
+    hpx_add_target_compile_option(-Zo CONFIGURATIONS RelWithDebInfo)
     if(HPX_WITH_DATAPAR_VC)
-      hpx_add_target_compile_option(-std:c++latest PUBLIC)
+      hpx_add_target_compile_option(-std:c++latest)
       hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
 
@@ -1317,12 +1317,12 @@ if(WIN32)
 
       # Update 3 allows to flag rvalue misuses and enforces strict string const-
       # qualification conformance
-      hpx_add_target_compile_option(-Zc:rvalueCast PUBLIC)
-      hpx_add_target_compile_option(-Zc:strictStrings PUBLIC)
+      hpx_add_target_compile_option(-Zc:rvalueCast)
+      hpx_add_target_compile_option(-Zc:strictStrings)
     endif()
 
     # Runtime type information
-    hpx_add_target_compile_option(-GR PUBLIC)
+    hpx_add_target_compile_option(-GR)
     # Multiprocessor build
     hpx_add_target_compile_option(-MP)
     # Increase the maximum size of object file sections
