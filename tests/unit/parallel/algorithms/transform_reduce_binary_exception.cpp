@@ -104,20 +104,6 @@ void test_transform_reduce_binary_exception()
 
     test_transform_reduce_binary_exception_async(
             execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_reduce_binary_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_reduce_binary_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_transform_reduce_binary_exception(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_reduce_binary_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_reduce_binary_exception_test()

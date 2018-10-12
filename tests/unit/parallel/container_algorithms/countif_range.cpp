@@ -112,16 +112,6 @@ void test_count()
                      IteratorTag(), DataType());
     test_count_async(execution::par(execution::task),
                      IteratorTag(), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count(execution_policy(execution::seq), IteratorTag(), DataType());
-    test_count(execution_policy(execution::par), IteratorTag(), DataType());
-    test_count(execution_policy(execution::par_unseq),
-               IteratorTag(), DataType());
-
-    test_unique(execution_policy(execution::seq(execution::task)), DataType());
-    test_unique(execution_policy(execution::par(execution::task)), DataType());
-#endif
 }
 
 void count_test()

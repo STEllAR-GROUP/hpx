@@ -25,17 +25,6 @@ void test_destroy()
         IteratorTag());
     test_destroy_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_destroy(execution_policy(execution::seq), IteratorTag());
-    test_destroy(execution_policy(execution::par), IteratorTag());
-    test_destroy(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_destroy(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_destroy(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void destroy_test()
@@ -58,16 +47,6 @@ void test_destroy_exception()
 
     test_destroy_exception_async(execution::seq(execution::task), IteratorTag());
     test_destroy_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_destroy_exception(execution_policy(execution::seq), IteratorTag());
-    test_destroy_exception(execution_policy(execution::par), IteratorTag());
-
-    test_destroy_exception(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_destroy_exception(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void destroy_exception_test()
@@ -90,16 +69,6 @@ void test_destroy_bad_alloc()
 
     test_destroy_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_destroy_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_destroy_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_destroy_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_destroy_bad_alloc(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_destroy_bad_alloc(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void destroy_bad_alloc_test()

@@ -103,17 +103,6 @@ void test_minmax_element()
 
     test_minmax_element_async(execution::seq(execution::task), IteratorTag());
     test_minmax_element_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_minmax_element(execution_policy(execution::seq), IteratorTag());
-    test_minmax_element(execution_policy(execution::par), IteratorTag());
-    test_minmax_element(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_minmax_element(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_minmax_element(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void minmax_element_test()
@@ -270,18 +259,6 @@ void test_minmax_element_exception()
         IteratorTag());
     test_minmax_element_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_minmax_element_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_minmax_element_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_minmax_element_exception(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_minmax_element_exception(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void minmax_element_exception_test()
@@ -434,18 +411,6 @@ void test_minmax_element_bad_alloc()
         IteratorTag());
     test_minmax_element_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_minmax_element_bad_alloc(execution_policy(execution::seq),
-        IteratorTag());
-    test_minmax_element_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-
-    test_minmax_element_bad_alloc(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_minmax_element_bad_alloc(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void minmax_element_bad_alloc_test()

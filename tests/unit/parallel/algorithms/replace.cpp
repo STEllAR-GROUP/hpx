@@ -92,17 +92,6 @@ void test_replace()
 
     test_replace_async(execution::seq(execution::task), IteratorTag());
     test_replace_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace(execution_policy(execution::seq), IteratorTag());
-    test_replace(execution_policy(execution::par), IteratorTag());
-    test_replace(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_replace(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_replace(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void replace_test()
@@ -197,16 +186,6 @@ void test_replace_exception()
 
     test_replace_exception_async(execution::seq(execution::task), IteratorTag());
     test_replace_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace_exception(execution_policy(execution::seq), IteratorTag());
-    test_replace_exception(execution_policy(execution::par), IteratorTag());
-
-    test_replace_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_replace_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void replace_exception_test()
@@ -299,16 +278,6 @@ void test_replace_bad_alloc()
 
     test_replace_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_replace_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_replace_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_replace_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_replace_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_replace_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void replace_bad_alloc_test()

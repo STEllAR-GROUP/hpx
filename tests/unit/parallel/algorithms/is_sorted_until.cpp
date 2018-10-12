@@ -81,21 +81,6 @@ void test_sorted_until1()
         //calls sequential and gets future
     test_sorted_until1_async(execution::par(execution::task), IteratorTag());
         //calls parallel and gets future
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_sorted_until1(execution_policy(execution::seq), IteratorTag());
-    //calls sequential and gets iter
-    test_sorted_until1(execution_policy(execution::par), IteratorTag());
-    //calls parallel and gets iter
-    test_sorted_until1(execution_policy(execution::par_unseq), IteratorTag());
-    //calls parallel and gets iter
-    test_sorted_until1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    //calls sequential and gets iter
-    test_sorted_until1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-    //calls parallel and gets iter
-#endif
 }
 
 void sorted_until_test1()
@@ -177,16 +162,6 @@ void test_sorted_until2()
 
     test_sorted_until2_async(execution::seq(execution::task), IteratorTag());
     test_sorted_until2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_sorted_until2(execution_policy(execution::seq), IteratorTag());
-    test_sorted_until2(execution_policy(execution::par), IteratorTag());
-    test_sorted_until2(execution_policy(execution::par_unseq), IteratorTag());
-    test_sorted_until2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_sorted_until2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void sorted_until_test2()
@@ -277,16 +252,6 @@ void test_sorted_until3()
 
     test_sorted_until3_async(execution::seq(execution::task), IteratorTag());
     test_sorted_until3_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_sorted_until3(execution_policy(execution::seq), IteratorTag());
-    test_sorted_until3(execution_policy(execution::par), IteratorTag());
-    test_sorted_until3(execution_policy(execution::par_unseq), IteratorTag());
-    test_sorted_until3(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_sorted_until3(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void sorted_until_test3()
@@ -384,14 +349,6 @@ void test_sorted_until_exception()
         IteratorTag());
     test_sorted_until_async_exception(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_sorted_until_exception(execution_policy(execution::par), IteratorTag());
-    test_sorted_until_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_sorted_until_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void sorted_until_exception_test()
@@ -495,15 +452,6 @@ void test_sorted_until_bad_alloc()
         IteratorTag());
     test_sorted_until_async_bad_alloc(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_sorted_until_bad_alloc(execution_policy(execution::par), IteratorTag());
-    test_sorted_until_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_sorted_until_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_sorted_until_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void sorted_until_bad_alloc_test()

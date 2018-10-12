@@ -118,59 +118,6 @@ void define_task_block_test2()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-#if defined(HPX_HAVE_CXX14_LAMBDAS)
-void define_task_block_test3()
-{
-    std::string s("test");
-
-    bool parent_flag = false;
-    bool task1_flag = false;
-    bool task2_flag = false;
-    bool task21_flag = false;
-    bool task3_flag = false;
-
-    define_task_block(hpx::parallel::execution_policy(par),
-        [&](auto& trh)
-        {
-            parent_flag = true;
-
-            trh.run([&]() {
-                task1_flag = true;
-                hpx::cout << "task1: " << s << hpx::endl;
-            });
-
-            trh.run([&]() {
-                task2_flag = true;
-                hpx::cout << "task2" << hpx::endl;
-
-                define_task_block(par, [&](task_block<>& trh) {
-                    trh.run([&]() {
-                        task21_flag = true;
-                        hpx::cout << "task2.1" << hpx::endl;
-                    });
-                });
-            });
-
-            int i = 0, j = 10, k = 20;
-            trh.run([=, &task3_flag]() {
-                task3_flag = true;
-                hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
-            });
-
-            hpx::cout << "parent" << hpx::endl;
-        });
-
-    HPX_TEST(parent_flag);
-    HPX_TEST(task1_flag);
-    HPX_TEST(task2_flag);
-    HPX_TEST(task21_flag);
-    HPX_TEST(task3_flag);
-}
-#endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 void define_task_block_exceptions_test1()
 {
     try {
@@ -296,11 +243,6 @@ int hpx_main()
 {
     define_task_block_test1();
     define_task_block_test2();
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-#if defined(HPX_HAVE_CXX14_LAMBDAS)
-    define_task_block_test3();
-#endif
-#endif
 
     define_task_block_exceptions_test1();
     define_task_block_exceptions_test2();

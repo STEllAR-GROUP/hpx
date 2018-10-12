@@ -78,15 +78,6 @@ void adjacent_difference_test()
 
     test_adjacent_difference_async(execution::seq(execution::task));
     test_adjacent_difference_async(execution::par(execution::task));
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_adjacent_difference(execution_policy(execution::seq));
-    test_adjacent_difference(execution_policy(execution::par));
-    test_adjacent_difference(execution_policy(execution::par_unseq));
-
-    test_adjacent_difference(execution_policy(execution::seq(execution::task)));
-    test_adjacent_difference(execution_policy(execution::par(execution::task)));
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)

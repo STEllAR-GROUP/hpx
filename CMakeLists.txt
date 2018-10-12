@@ -925,14 +925,6 @@ hpx_option(HPX_WITH_VIM_YCM BOOL
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
-# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.99
-hpx_option(HPX_WITH_GENERIC_EXECUTION_POLICY BOOL
-    "Enable the generic execution policy (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_GENERIC_EXECUTION_POLICY)
-  hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-endif()
-
 # HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY: introduced in V1.0.0
 hpx_option(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY BOOL
     "Enable old style ..._sync/..._async functions in API (default: OFF)"

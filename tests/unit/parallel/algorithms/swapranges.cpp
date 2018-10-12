@@ -102,17 +102,6 @@ void test_swap_ranges()
 
     test_swap_ranges_async(execution::seq(execution::task), IteratorTag());
     test_swap_ranges_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_swap_ranges(execution_policy(execution::seq), IteratorTag());
-    test_swap_ranges(execution_policy(execution::par), IteratorTag());
-    test_swap_ranges(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_swap_ranges(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_swap_ranges(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void swap_ranges_test()
@@ -213,16 +202,6 @@ void test_swap_ranges_exception()
         IteratorTag());
     test_swap_ranges_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_swap_ranges_exception(execution_policy(execution::seq), IteratorTag());
-    test_swap_ranges_exception(execution_policy(execution::par), IteratorTag());
-
-    test_swap_ranges_exception(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_swap_ranges_exception(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void swap_ranges_exception_test()
@@ -321,16 +300,6 @@ void test_swap_ranges_bad_alloc()
         IteratorTag());
     test_swap_ranges_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_swap_ranges_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_swap_ranges_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_swap_ranges_bad_alloc(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_swap_ranges_bad_alloc(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void swap_ranges_bad_alloc_test()

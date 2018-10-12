@@ -85,15 +85,6 @@ void test_reduce1()
 
     test_reduce1_async(execution::seq(execution::task), IteratorTag());
     test_reduce1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce1(execution_policy(execution::seq), IteratorTag());
-    test_reduce1(execution_policy(execution::par), IteratorTag());
-    test_reduce1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_reduce1(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce1(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void reduce_test1()
@@ -159,15 +150,6 @@ void test_reduce2()
 
     test_reduce2_async(execution::seq(execution::task), IteratorTag());
     test_reduce2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce2(execution_policy(execution::seq), IteratorTag());
-    test_reduce2(execution_policy(execution::par), IteratorTag());
-    test_reduce2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_reduce2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce2(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void reduce_test2()
@@ -231,15 +213,6 @@ void test_reduce3()
 
     test_reduce3_async(execution::seq(execution::task), IteratorTag());
     test_reduce3_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce3(execution_policy(execution::seq), IteratorTag());
-    test_reduce3(execution_policy(execution::par), IteratorTag());
-    test_reduce3(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_reduce3(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_reduce3(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void reduce_test3()
@@ -336,16 +309,6 @@ void test_reduce_exception()
 
     test_reduce_exception_async(execution::seq(execution::task), IteratorTag());
     test_reduce_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce_exception(execution_policy(execution::seq), IteratorTag());
-    test_reduce_exception(execution_policy(execution::par), IteratorTag());
-
-    test_reduce_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_reduce_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void reduce_exception_test()
@@ -440,16 +403,6 @@ void test_reduce_bad_alloc()
 
     test_reduce_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_reduce_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_reduce_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_reduce_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_reduce_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_reduce_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void reduce_bad_alloc_test()

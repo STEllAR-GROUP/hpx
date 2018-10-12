@@ -148,22 +148,6 @@ void test_find_first_of()
     test_find_first_of_async(execution::par(execution::task), IteratorTag());
     test_find_first_of_async_proj(execution::seq(execution::task), IteratorTag());
     test_find_first_of_async_proj(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_first_of(execution_policy(execution::seq), IteratorTag());
-    test_find_first_of(execution_policy(execution::par), IteratorTag());
-    test_find_first_of(execution_policy(execution::par_unseq), IteratorTag());
-    test_find_first_of_proj(execution_policy(execution::seq), IteratorTag());
-    test_find_first_of_proj(execution_policy(execution::par), IteratorTag());
-    test_find_first_of_proj(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find_first_of(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_first_of(execution_policy(execution::par(execution::task)), IteratorTag());
-    test_find_first_of_proj(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_first_of_proj(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_first_of_test()
@@ -266,16 +250,6 @@ void test_find_first_of_exception()
 
     test_find_first_of_exception_async(execution::seq(execution::task), IteratorTag());
     test_find_first_of_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_first_of_exception(execution_policy(execution::seq), IteratorTag());
-    test_find_first_of_exception(execution_policy(execution::par), IteratorTag());
-
-    test_find_first_of_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_find_first_of_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void find_first_of_exception_test()
@@ -377,16 +351,6 @@ void test_find_first_of_bad_alloc()
 
     test_find_first_of_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_find_first_of_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_first_of_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_find_first_of_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_find_first_of_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_find_first_of_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void find_first_of_bad_alloc_test()

@@ -82,15 +82,6 @@ void test_fill_n()
 
     test_fill_n_async(execution::seq(execution::task), IteratorTag());
     test_fill_n_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_fill_n(execution_policy(execution::seq), IteratorTag());
-    test_fill_n(execution_policy(execution::par), IteratorTag());
-    test_fill_n(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_fill_n(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_fill_n(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void fill_n_test()
@@ -187,16 +178,6 @@ void test_fill_n_exception()
 
     test_fill_n_exception_async(execution::seq(execution::task), IteratorTag());
     test_fill_n_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_fill_n_exception(execution_policy(execution::seq), IteratorTag());
-    test_fill_n_exception(execution_policy(execution::par), IteratorTag());
-
-    test_fill_n_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_fill_n_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void fill_n_exception_test()
@@ -289,16 +270,6 @@ void test_fill_n_bad_alloc()
 
     test_fill_n_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_fill_n_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_fill_n_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_fill_n_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_fill_n_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_fill_n_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void fill_n_bad_alloc_test()

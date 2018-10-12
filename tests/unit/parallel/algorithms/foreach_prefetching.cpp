@@ -23,15 +23,6 @@ void test_for_each_prefetching()
     test_for_each_prefetching(execution::par, IteratorTag());
     test_for_each_prefetching(execution::par_unseq, IteratorTag());
     test_for_each_prefetching_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_prefetching(execution_policy(execution::par),
-        IteratorTag());
-    test_for_each_prefetching(execution_policy(execution::par_unseq),
-        IteratorTag());
-    test_for_each_prefetching(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void for_each_prefetching_test()
@@ -51,14 +42,6 @@ void test_for_each_prefetching_exception()
     test_for_each_prefetching_exception(execution::par, IteratorTag());
     test_for_each_prefetching_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_prefetching_exception(execution_policy(execution::par),
-        IteratorTag());
-    test_for_each_prefetching_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void for_each_prefetching_exception_test()
@@ -78,14 +61,6 @@ void test_for_each_prefetching_bad_alloc()
     test_for_each_prefetching_bad_alloc(execution::par, IteratorTag());
     test_for_each_prefetching_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_for_each_prefetching_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-    test_for_each_prefetching_bad_alloc(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void for_each_prefetching_bad_alloc_test()

@@ -129,17 +129,6 @@ void test_exclusive_scan1()
 
     test_exclusive_scan1_async(execution::seq(execution::task), IteratorTag());
     test_exclusive_scan1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_exclusive_scan1(execution_policy(execution::seq), IteratorTag());
-    test_exclusive_scan1(execution_policy(execution::par), IteratorTag());
-    test_exclusive_scan1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_exclusive_scan1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_exclusive_scan1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void exclusive_scan_test1()
