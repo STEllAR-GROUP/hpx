@@ -1304,7 +1304,7 @@ if(WIN32)
     hpx_add_target_compile_option(-EHsc)
     if(MSVC14)
       # assume conforming (throwing) operator new implementations
-      hpx_add_target_compile_option(-Zc:throwingNew)
+      hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
 
       # enable faster linking (requires VS2015 Update1)
       # disabled for now as this flag crashes debugger
@@ -1324,9 +1324,9 @@ if(WIN32)
     # Runtime type information
     hpx_add_target_compile_option(-GR PUBLIC)
     # Multiprocessor build
-    hpx_add_target_compile_option(-MP)
+    hpx_add_target_compile_option(-MP PUBLIC)
     # Increase the maximum size of object file sections
-    hpx_add_target_compile_option(-bigobj)
+    hpx_add_target_compile_option(-bigobj PUBLIC)
   endif()
 
   hpx_libraries(psapi shlwapi)
