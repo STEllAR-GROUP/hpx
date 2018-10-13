@@ -39,13 +39,6 @@ namespace hpx { namespace components { namespace process
         {
             return terminate().get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void terminate_sync()
-        {
-            return terminate(launch::sync);
-        }
-#endif
 
         hpx::future<int> wait_for_exit()
         {
@@ -57,13 +50,6 @@ namespace hpx { namespace components { namespace process
         {
             return wait_for_exit().get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        int wait_for_exit_sync()
-        {
-            return wait_for_exit(launch::sync);
-        }
-#endif
     };
 }}}
 
