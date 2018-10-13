@@ -45,27 +45,6 @@ namespace hpx { namespace components
 
         future<std::size_t> size() const;
         std::size_t size(launch::sync_policy) const;
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        naming::id_type migrate_to_here_sync(std::vector<char> const& v,
-            naming::id_type const& id, naming::address const& addr)
-        {
-            return migrate_to_here_sync(launch::sync, v, id, addr);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        std::vector<char> migrate_from_here_sync(naming::gid_type const& gid)
-        {
-            return migrate_from_here(launch::sync, gid);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        std::size_t size_sync() const
-        {
-            return size(launch::sync);
-        }
-#endif
     };
 }}
 

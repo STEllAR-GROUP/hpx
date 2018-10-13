@@ -173,15 +173,6 @@ void test_copy_if()
     test_copy_if_async(execution::seq(execution::task));
     test_copy_if_async(execution::par(execution::task));
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if(execution_policy(execution::seq));
-    test_copy_if(execution_policy(execution::par));
-    test_copy_if(execution_policy(execution::par_unseq));
-
-    test_copy_if(execution_policy(execution::seq(execution::task)));
-    test_copy_if(execution_policy(execution::par(execution::task)));
-#endif
-
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_copy_if_outiter(execution::seq);
     test_copy_if_outiter(execution::par);
@@ -189,15 +180,6 @@ void test_copy_if()
 
     test_copy_if_outiter_async(execution::seq(execution::task));
     test_copy_if_outiter_async(execution::par(execution::task));
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if_outiter(execution_policy(execution::seq));
-    test_copy_if_outiter(execution_policy(execution::par));
-    test_copy_if_outiter(execution_policy(execution::par_unseq));
-
-    test_copy_if_outiter(execution_policy(execution::seq(execution::task)));
-    test_copy_if_outiter(execution_policy(execution::par(execution::task)));
-#endif
 #endif
 }
 

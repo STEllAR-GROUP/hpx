@@ -146,24 +146,6 @@ void test_find_end1()
     test_find_end1_async(execution::par(execution::task), IteratorTag());
     test_find_end1_async_proj(execution::seq(execution::task), IteratorTag());
     test_find_end1_async_proj(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_end1(execution_policy(execution::seq), IteratorTag());
-    test_find_end1(execution_policy(execution::par), IteratorTag());
-    test_find_end1(execution_policy(execution::par_unseq), IteratorTag());
-    test_find_end1_proj(execution_policy(execution::seq), IteratorTag());
-    test_find_end1_proj(execution_policy(execution::par), IteratorTag());
-    test_find_end1_proj(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find_end1(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end1(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-    test_find_end1_proj(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end1_proj(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_end_test1()
@@ -308,24 +290,6 @@ void test_find_end2()
     test_find_end2_async(execution::par(execution::task), IteratorTag());
     test_find_end2_async_proj(execution::seq(execution::task), IteratorTag());
     test_find_end2_async_proj(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_end2(execution_policy(execution::seq), IteratorTag());
-    test_find_end2(execution_policy(execution::par), IteratorTag());
-    test_find_end2(execution_policy(execution::par_unseq), IteratorTag());
-    test_find_end2_proj(execution_policy(execution::seq), IteratorTag());
-    test_find_end2_proj(execution_policy(execution::par), IteratorTag());
-    test_find_end2_proj(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find_end2(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end2(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-    test_find_end2_proj(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end2_proj(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_end_test2()
@@ -470,24 +434,6 @@ void test_find_end3()
     test_find_end3_async(execution::par(execution::task), IteratorTag());
     test_find_end3_async_proj(execution::seq(execution::task), IteratorTag());
     test_find_end3_async_proj(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_end3(execution_policy(execution::seq), IteratorTag());
-    test_find_end3(execution_policy(execution::par), IteratorTag());
-    test_find_end3(execution_policy(execution::par_unseq), IteratorTag());
-    test_find_end3_proj(execution_policy(execution::seq), IteratorTag());
-    test_find_end3_proj(execution_policy(execution::par), IteratorTag());
-    test_find_end3_proj(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find_end3(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end3(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-    test_find_end3_proj(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end3_proj(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_end_test3()
@@ -626,24 +572,6 @@ void test_find_end4()
     test_find_end4_async(execution::par(execution::task), IteratorTag());
     test_find_end4_async_proj(execution::seq(execution::task), IteratorTag());
     test_find_end4_async_proj(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_end4(execution_policy(execution::seq), IteratorTag());
-    test_find_end4(execution_policy(execution::par), IteratorTag());
-    test_find_end4(execution_policy(execution::par_unseq), IteratorTag());
-    test_find_end4_proj(execution_policy(execution::seq), IteratorTag());
-    test_find_end4_proj(execution_policy(execution::par), IteratorTag());
-    test_find_end4_proj(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find_end4(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end4(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-    test_find_end4_proj(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end4_proj(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_end_test4()
@@ -754,15 +682,6 @@ void test_find_end_exception()
         execution::seq(execution::task), IteratorTag());
     test_find_end_exception_async(
         execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_end_exception(execution_policy(execution::seq), IteratorTag());
-
-    test_find_end_exception(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end_exception(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_end_exception_test()
@@ -864,16 +783,6 @@ void test_find_end_bad_alloc()
         execution::seq(execution::task), IteratorTag());
     test_find_end_bad_alloc_async(
         execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_end_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_find_end_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_find_end_bad_alloc(
-        execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_end_bad_alloc(
-        execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_end_bad_alloc_test()

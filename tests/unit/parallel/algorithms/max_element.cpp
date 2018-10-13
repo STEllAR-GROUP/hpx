@@ -94,17 +94,6 @@ void test_max_element()
 
     test_max_element_async(execution::seq(execution::task), IteratorTag());
     test_max_element_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_max_element(execution_policy(execution::seq), IteratorTag());
-    test_max_element(execution_policy(execution::par), IteratorTag());
-    test_max_element(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_max_element(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_max_element(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void max_element_test()
@@ -257,16 +246,6 @@ void test_max_element_exception()
         IteratorTag());
     test_max_element_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_max_element_exception(execution_policy(execution::seq), IteratorTag());
-    test_max_element_exception(execution_policy(execution::par), IteratorTag());
-
-    test_max_element_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_max_element_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void max_element_exception_test()
@@ -415,16 +394,6 @@ void test_max_element_bad_alloc()
         IteratorTag());
     test_max_element_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_max_element_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_max_element_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_max_element_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_max_element_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void max_element_bad_alloc_test()

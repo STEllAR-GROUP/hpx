@@ -150,17 +150,6 @@ void test_includes1()
 
     test_includes1_async(execution::seq(execution::task), IteratorTag());
     test_includes1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_includes1(execution_policy(execution::seq), IteratorTag());
-    test_includes1(execution_policy(execution::par), IteratorTag());
-    test_includes1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_includes1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_includes1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void includes_test1()
@@ -302,17 +291,6 @@ void test_includes2()
 
     test_includes2_async(execution::seq(execution::task), IteratorTag());
     test_includes2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_includes2(execution_policy(execution::seq), IteratorTag());
-    test_includes2(execution_policy(execution::par), IteratorTag());
-    test_includes2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_includes2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_includes2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void includes_test2()
@@ -443,16 +421,6 @@ void test_includes_exception()
         IteratorTag());
     test_includes_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_includes_exception(execution_policy(execution::seq), IteratorTag());
-    test_includes_exception(execution_policy(execution::par), IteratorTag());
-
-    test_includes_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_includes_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void includes_exception_test()
@@ -581,16 +549,6 @@ void test_includes_bad_alloc()
         IteratorTag());
     test_includes_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_includes_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_includes_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_includes_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_includes_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void includes_bad_alloc_test()

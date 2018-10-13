@@ -522,13 +522,6 @@ namespace hpx
         {
             return get_value(pos, erase).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        T get_value_sync(Key const& pos, bool erase) const
-        {
-            return get_value(launch::sync, pos, erase);
-        }
-#endif
 
         /// Return the element at the position \a pos in the
         /// partition_unordered_map container.
@@ -557,13 +550,6 @@ namespace hpx
         {
             return get_values(keys).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        std::vector<T> get_values_sync(std::vector<Key> const& keys) const
-        {
-            return get_values(launch::sync, keys);
-        }
-#endif
 
         /// Return the element at the position \a pos in the
         /// partition_unordered_map container.
@@ -590,14 +576,6 @@ namespace hpx
         {
             set_value(pos, std::forward<T_>(val)).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        template <typename T_>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void set_value_sync(Key const& pos, T_ && val)
-        {
-            set_value(launch::sync, pos, std::forward<T_>(val));
-        }
-#endif
 
         /// Copy the value of \a val in the element at position
         /// \a pos in the partition_unordered_map component.
@@ -626,14 +604,6 @@ namespace hpx
         {
             set_values(keys, vals).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        void set_values_sync(std::vector<Key> const& keys,
-            std::vector<T> const& vals)
-        {
-            set_values(launch::sync, keys, vals);
-        }
-#endif
 
         /// Copy the value of \a val in the element at position
         /// \a pos in the partition_unordered_map component.
@@ -662,13 +632,6 @@ namespace hpx
         {
             return erase(key).get();
         }
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        std::size_t erase_sync(Key const& key)
-        {
-            return erase(launch::sync, key);
-        }
-#endif
 
         /// Erase all values with the given key from the partition_unordered_map
         /// container.

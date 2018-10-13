@@ -925,30 +925,6 @@ hpx_option(HPX_WITH_VIM_YCM BOOL
 ################################################################################
 # Backwards compatibility options (edit for each release)
 
-# HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY: introduced in V0.9.99
-hpx_option(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY BOOL
-    "Enable backwards compatibility for hpx::lcos::local::dataflow() functions"
-    OFF ADVANCED)
-if(HPX_WITH_LOCAL_DATAFLOW_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_LOCAL_DATAFLOW_COMPATIBILITY)
-endif()
-
-# HPX_WITH_GENERIC_EXECUTION_POLICY: introduced in V0.9.99
-hpx_option(HPX_WITH_GENERIC_EXECUTION_POLICY BOOL
-    "Enable the generic execution policy (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_GENERIC_EXECUTION_POLICY)
-  hpx_add_config_define(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-endif()
-
-# HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY BOOL
-    "Enable old style ..._sync/..._async functions in API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_ASYNC_FUNCTION_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-endif()
-
 # HPX_WITH_QUEUE_COMPATIBILITY: introduced in V1.1.0
 hpx_option(HPX_WITH_QUEUE_COMPATIBILITY BOOL
     "Enable old style queue components in API (default: OFF)"

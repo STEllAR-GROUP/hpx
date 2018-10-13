@@ -244,17 +244,6 @@ void test_merge()
     test_merge_async(execution::seq(execution::task), DataType());
     test_merge_async(execution::par(execution::task), DataType());
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_merge(execution_policy(execution::seq), DataType());
-    test_merge(execution_policy(execution::par), DataType());
-    test_merge(execution_policy(execution::par_unseq), DataType());
-
-    test_merge(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_merge(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
-
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_merge_outiter(execution::seq, DataType());
     test_merge_outiter(execution::par, DataType());
@@ -262,17 +251,6 @@ void test_merge()
 
     test_merge_outiter_async(execution::seq(execution::task), DataType());
     test_merge_outiter_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_merge_outiter(execution_policy(execution::seq), DataType());
-    test_merge_outiter(execution_policy(execution::par), DataType());
-    test_merge_outiter(execution_policy(execution::par_unseq), DataType());
-
-    test_merge_outiter(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_merge_outiter(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 #endif
 }
 
