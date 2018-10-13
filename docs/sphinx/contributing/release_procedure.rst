@@ -45,8 +45,8 @@ are completed to avoid confusion.
 
      * Update grant information
 
-   * ``docs/releases/whats_new_$VERSION.qbk``
-   * ``docs/people.qbk``
+   * ``docs/sphinx/releases/whats_new_$VERSION.rst``
+   * ``docs/sphinx/about_hpx/people.rst``
 
      *   Update collaborators
      *   Update grant information
@@ -72,10 +72,6 @@ are completed to avoid confusion.
 
 #. Checkout the release branch, and replace the ``-trunk`` tag in
    ``hpx/config/version.hpp`` with ``-rc1``.
-
-#. Change logo for release documentation by removing ``_draft`` suffix in
-   ``docs/CMakeLists.txt`` in the ``set(image...`` call. Update logo size
-   accordingly in the call to ``hpx_quickbook_to_html``.
 
 #. Remove the examples and benchmarks that will not go into the release from the
    release branch.
