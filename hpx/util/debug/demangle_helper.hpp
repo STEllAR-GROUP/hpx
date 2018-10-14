@@ -11,6 +11,7 @@
 #include <string>
 #include <type_traits>
 #include <typeinfo>
+#include <cstdlib>
 
 // --------------------------------------------------------------------
 // Always present regardless of compiler : used by serialization code
@@ -31,6 +32,7 @@ namespace hpx { namespace util { namespace debug
 
 #include <cxxabi.h>
 #include <stdlib.h>
+#include <memory>
 
 // --------------------------------------------------------------------
 // if available : demangle an arbitrary c++ type using gnu utility
@@ -41,22 +43,16 @@ namespace hpx { namespace util { namespace debug
     class cxxabi_demangle_helper
     {
     public:
-        cxxabi_demangle_helper()
-          : demangled_(abi::__cxa_demangle(typeid(T).name(), 0, 0, 0))
-        {}
-
-        ~cxxabi_demangle_helper()
-        {
-            free(demangled_);
-        }
+        cxxabi_demangle_helper() :
+            demangled_ {abi::__cxa_demangle(typeid(T).name(), 0, 0, 0), std::free} {}
 
         char const* type_id() const
         {
-            return demangled_ ? demangled_ : typeid(T).name();
+            return demangled_ ? demangled_.get() : typeid(T).name();
         }
 
     private:
-        char* demangled_;
+        std::unique_ptr<char, void(*)(void*)> demangled_;
     };
 
 }}}
