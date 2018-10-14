@@ -70,9 +70,11 @@ rst_prolog += '''
 .. |stellar| replace:: STE||AR
 .. _stellar: https://stellar-group.org
 .. |stellar_list| replace:: hpx-users@stellar.cct.lsu.edu
-.. _stellar_list: email:hpx-users@stellar.cct.lsu.edu
+.. _stellar_list: mailto:hpx-users@stellar.cct.lsu.edu
 .. |stellar_irc| replace:: #ste||ar at Freenode
 .. _stellar_irc: irc://irc.freenode.net:6667/#ste||ar
+.. |cpplang_slack| replace:: Cpplang Slack
+.. _cpplang_slack: https://cpplang.slack.com
 .. |stellar_hpx_download| replace:: |hpx| Downloads
 .. _stellar_hpx_download: https://stellar-group.org/downloads/
 .. |hpx_github| replace:: Github
