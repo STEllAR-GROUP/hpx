@@ -7,7 +7,7 @@
 defaults: &defaults
     working_directory: /hpx/build
     docker:
-      - image: stellargroup/build_env:debian_clang
+      - image: stellargroup/build_env:ubuntu
 
 convert_xml: &convert_xml
     name: Converting XML
