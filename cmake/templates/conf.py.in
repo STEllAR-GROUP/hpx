@@ -81,6 +81,8 @@ rst_prolog += '''
 .. _hpx_github: https://github.com/STEllAR-GROUP/hpx/
 .. |hpx_github_issues| replace:: |hpx| Issues
 .. _hpx_github_issues: https://github.com/STEllAR-GROUP/hpx/issues
+.. |hpx_stackoverflow| replace:: StackOverflow |hpx| questions
+.. _hpx_stackoverflow: https://stackoverflow.com/questions/tagged/hpx>
 .. |hpx_buildbot| replace:: |hpx| Buildbot Website
 .. _hpx_buildbot: https://rostam.cct.lsu.edu/
 .. |pycicle| replace:: pycicle
