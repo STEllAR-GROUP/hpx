@@ -54,30 +54,26 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V1.1) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-1.1.0/html/index.html>`_.
-In publications this release of HPX can be cited as: |zenodo_doi|.
+The documentation for the latest release of HPX can always be found `here
+<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/index.html>`_. In
+publications this release of HPX can be cited as: |zenodo_doi|.
 
 .. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1206917.svg
      :target: https://doi.org/10.5281/zenodo.1206917
 
-Additionally, we regularly upload the current status of the documentation
-(which is being worked on as we speak)
-`here <http://stellar-group.github.io/hpx/docs/html/>`_. We also have a
-single-page version of the documentation
-`here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
+Additionally, we regularly upload the current status of the documentation `here
+<https://stellar-group.github.io/hpx/docs/sphinx/branches/master/html/index.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V1.1) which can be
-`downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
+which can be downloaded `here <https://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
-our `contiguous integration results website <http://rostam.cct.lsu.edu/console>`_.
+our `continuous integration results website <http://rostam.cct.lsu.edu/console>`_.
 While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
-The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_ contiguous
+The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_ continuous
 integration service tracks the current build status for the master branch:
 |circleci_status|
 
@@ -95,11 +91,11 @@ toolchain: |appveyor_status|.
 
 In any case, if you happen to run into problems we very much encourage and appreciate
 any issue reports through the `issue tracker for this Github project
-<http://github.com/STEllAR-GROUP/hpx/issues>`_.
+<https://github.com/STEllAR-GROUP/hpx/issues>`_.
 
 Also, if you have any questions feel free to ask it over at
-`StackOverflow <http://stackoverflow.com>`_
-and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
+`StackOverflow <https://stackoverflow.com>`_
+and tag the question with `hpx <https://stackoverflow.com/questions/tagged/hpx>`_.
 
 For a full list of support options please see our
 `Support page <https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md>`_.
@@ -116,7 +112,7 @@ will behave toward each other.
 
 All of HPX is distributed under the Boost Software License,
 Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
-`here <http://www.boost.org/LICENSE_1_0.txt>`_).
+`here <https://www.boost.org/LICENSE_1_0.txt>`_).
 
 Linux
 -----
@@ -124,7 +120,7 @@ Linux
 1)  Before starting to build HPX, you will need to install dependencies. A
     minimal dependecy list installation commands for HPX for different distros
     are as follows:
-    (For more info see `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_)
+    (For more info see `prerequisites <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#prerequisites>`_)
 
     Debian::
 
@@ -185,7 +181,8 @@ Linux
 
    to build and install the examples.
 
-Please refer `here <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.unix_installation>`_
+Please refer `here
+<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#how-to-install-hpx-on-unix-variants>`_
 for more information about building HPX on a Linux system.
 
 OS X (Mac)
@@ -194,7 +191,7 @@ OS X (Mac)
 1)  Before starting to build HPX, you will need to install dependencies. A
     minimal dependecy list installation commands for HPX for different distros
     are as follows
-    (For more info see `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_)::
+    (For more info see `prerequisites <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#prerequisites>`_)
 
       brew install cmake boost hwloc google-perftools
 
@@ -246,13 +243,14 @@ OS X (Mac)
    to build and install the examples.
 
 For more information and additional options, please see the corresponding
-`documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.macos_installation>`_.
+`documentation
+<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#how-to-install-hpx-on-os-x-mac>`_.
 
 Windows
 -------
 
 1)  Before starting to build HPX, please read about the
-    `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_.
+    `prerequisites <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#prerequisites>`_.
 
 2) Clone the master HPX git repository (or a stable tag). You can use
    TortoiseGIT, or the git client that Cygwin provides. The git repository can
@@ -289,8 +287,8 @@ Windows
 
 10) Build the INSTALL target.
 
-For more information, please see the corresponding
-`section in the documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.windows_installation>`_
+For more information, please see the corresponding `section in the documentation
+<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#how-to-install-hpx-on-windows>`_
 
 BlueGene/Q
 ----------
@@ -298,7 +296,7 @@ BlueGene/Q
 So far we only support BGClang for compiling HPX on the BlueGene/Q.
 
 1)  Before starting to build HPX, please read about the
-    `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_.
+    `prerequisites <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#prerequisites>`_.
 
 2) Check if BGClang is available on your installation. If not obtain and install a copy
    from the `BGClang trac page <https://trac.alcf.anl.gov/projects/llvm-bgq>`_
@@ -360,7 +358,7 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
    to build and install the examples.
 
 You can find more details about using HPX on a BlueGene/Q system
-`here <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.bgq_installation>`_.
+`here <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#how-to-install-hpx-on-bluegene-q>`_.
 
 Intel(R) Xeon/Phi
 -----------------
@@ -377,7 +375,7 @@ CMake in the following way::
          /path/to/hpx
 
 For more detailed information about building HPX for the Xeon/Phi please refer to
-the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/building_hpx/build_recipes.html#hpx.manual.build_system.building_hpx.build_recipes.intel_mic_installation>`_.
+the `documentation <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html#how-to-install-hpx-on-the-xeon-phi>`_.
 
 
 ******************
