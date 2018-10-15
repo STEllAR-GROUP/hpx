@@ -22,9 +22,6 @@
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
-#endif
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
@@ -387,15 +384,6 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, Policy && policy, F && f);
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-    template <typename ContResult, typename Future, typename Executor,
-        typename F>
-    inline typename hpx::traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation_exec_v1(Future const& future, Executor& exec, F && f);
-#endif
-
     // create non-unwrapping continuations
     template <typename ContResult, typename Future, typename Executor,
         typename F>
@@ -466,43 +454,6 @@ namespace hpx { namespace lcos { namespace detail
         }
     };
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-    // parallel executors v1
-    template <typename Future, typename Executor>
-    struct future_then_dispatch<Future, Executor,
-        typename std::enable_if<
-            traits::is_executor<Executor>::value
-        >::type>
-    {
-        template <typename Executor_, typename F>
-        HPX_FORCEINLINE
-        static typename hpx::traits::future_then_result<Future, F>::type
-        call(Future && fut, Executor_ && exec, F && f)
-        {
-            using result_type =
-                typename hpx::traits::future_then_result<Future, F>::result_type;
-            using continuation_result_type =
-                typename hpx::util::invoke_result<F, Future>::type;
-
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                detail::make_continuation_exec_v1<continuation_result_type>(
-                    std::move(fut), std::forward<Executor_>(exec),
-                    std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(
-                std::move(p));
-        }
-
-        template <typename Allocator, typename Executor_, typename F>
-        HPX_FORCEINLINE
-        static typename hpx::traits::future_then_result<Future, F>::type
-        call_alloc(Allocator const&, Future && fut, Executor_ && exec, F && f)
-        {
-            return call(std::forward<Future>(fut),
-                std::forward<Executor_>(exec), std::forward<F>(f));
-        }
-    };
-#endif
-
     // The overload for future::then taking an executor simply forwards to the
     // corresponding executor customization point.
     //
@@ -542,9 +493,6 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future, typename FD>
     struct future_then_dispatch<Future, FD, typename std::enable_if<
         !traits::is_launch_policy<FD>::value &&
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        !traits::is_executor<FD>::value &&
-#endif
         !(
             traits::is_one_way_executor<FD>::value ||
             traits::is_two_way_executor<FD>::value ||
@@ -1076,10 +1024,6 @@ namespace hpx { namespace lcos
         typename util::lazy_enable_if<
             !hpx::traits::is_launch_policy<
                 typename std::decay<F>::type>::value &&
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            !hpx::traits::is_executor<
-                typename std::decay<F>::type>::value &&
-#endif
             !hpx::traits::is_one_way_executor<
                 typename std::decay<F>::type>::value &&
             !hpx::traits::is_two_way_executor<
@@ -1108,21 +1052,6 @@ namespace hpx { namespace lcos
             return base_type::then(std::move(*this),
                 std::forward<Policy>(policy), std::forward<F>(f), ec);
         }
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        template <typename Executor, typename F>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        typename util::lazy_enable_if<
-            hpx::traits::is_executor<Executor>::value
-          , hpx::traits::future_then_result<future, F>
-        >::type
-        then(Executor && exec, F && f, error_code& ec = throws)
-        {
-            invalidate on_exit(*this);
-            return base_type::then(std::move(*this),
-                exec, std::forward<F>(f), ec);
-        }
-#endif
 
         template <typename Executor, typename F>
         typename util::lazy_enable_if<
@@ -1424,10 +1353,6 @@ namespace hpx { namespace lcos
                 typename std::decay<F>::type>::value &&
             !hpx::traits::is_threads_executor<
                 typename std::decay<F>::type>::value &&
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            !hpx::traits::is_executor<
-                typename std::decay<F>::type>::value &&
-#endif
             !hpx::traits::is_one_way_executor<
                 typename std::decay<F>::type>::value &&
             !hpx::traits::is_two_way_executor<
@@ -1460,20 +1385,6 @@ namespace hpx { namespace lcos
             return base_type::then(shared_future(*this),
                 sched, std::forward<F>(f), ec);
         }
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        template <typename Executor, typename F>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        typename util::lazy_enable_if<
-            hpx::traits::is_executor<Executor>::value
-          , hpx::traits::future_then_result<shared_future, F>
-        >::type
-        then(Executor && exec, F && f, error_code& ec = throws) const
-        {
-            return base_type::then(shared_future(*this),
-                exec, std::forward<F>(f), ec);
-        }
-#endif
 
         template <typename Executor, typename F>
         typename util::lazy_enable_if<

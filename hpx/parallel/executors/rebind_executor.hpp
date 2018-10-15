@@ -72,45 +72,4 @@ namespace hpx { namespace parallel { namespace execution
     };
 }}}
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-
-#include <type_traits>
-
-namespace hpx { namespace parallel { inline namespace v1
-{
-    ///////////////////////////////////////////////////////////////////////////
-    /// Function invocations executed by a group of sequential execution agents
-    /// execute in sequential order.
-    using sequential_execution_tag =
-        parallel::execution::sequenced_execution_tag;
-
-    /// Function invocations executed by a group of parallel execution agents
-    /// execute in unordered fashion. Any such invocations executing in the
-    /// same thread are indeterminately sequenced with respect to each other.
-    ///
-    /// \note \a parallel_execution_tag is weaker than
-    ///       \a sequential_execution_tag.
-    using parallel_execution_tag =
-        parallel::execution::parallel_execution_tag;
-
-    /// Function invocations executed by a group of vector execution agents are
-    /// permitted to execute in unordered fashion when executed in different
-    /// threads, and un-sequenced with respect to one another when executed in
-    /// the same thread.
-    ///
-    /// \note \a vector_execution_tag is weaker than
-    ///       \a parallel_execution_tag.
-    using vector_execution_tag =
-        parallel::execution::unsequenced_execution_tag;
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Rebind the type of executor used by an execution policy. The execution
-    // category of Executor shall not be weaker than that of ExecutionPolicy.
-    template <typename ExecutionPolicy, typename Executor, typename Parameters>
-    using rebind_executor = parallel::execution::
-        rebind_executor<ExecutionPolicy, Executor, Parameters>;
-}}}
-#endif
-
 #endif

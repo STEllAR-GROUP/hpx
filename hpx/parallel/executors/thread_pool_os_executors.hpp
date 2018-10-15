@@ -70,31 +70,4 @@ namespace hpx { namespace parallel { namespace execution
 #endif
 }}}
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/v1/thread_executor_traits.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-// Compatibility layer
-namespace hpx { namespace parallel { inline namespace v3
-{
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-    using local_queue_os_executor =
-        threads::executors::local_queue_os_executor;
-#endif
-
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-    using static_queue_os_executor =
-        threads::executors::static_queue_os_executor;
-#endif
-
-    using local_priority_queue_os_executor =
-        threads::executors::local_priority_queue_os_executor;
-
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    using static_priority_queue_os_executor =
-        threads::executors::static_priority_queue_os_executor;
-#endif
-}}}
-#endif
-
 #endif

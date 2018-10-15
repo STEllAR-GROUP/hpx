@@ -22,13 +22,4 @@ namespace hpx { namespace parallel { namespace execution
     using default_executor = threads::executors::default_executor;
 }}}
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/v1/thread_executor_traits.hpp>
-
-namespace hpx { namespace parallel { inline namespace v3
-{
-    using default_executor = execution::default_executor;
-}}}
-#endif
-
 #endif

@@ -257,47 +257,4 @@ namespace hpx { namespace parallel { namespace execution
     /// \endcond
 }}}
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-
-#include <hpx/traits/v1/is_executor.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-
-namespace hpx { namespace parallel { inline namespace v3
-{
-    /// \cond NOINTERNAL
-
-    // this must be a type distinct from parallel::execution::parallel_executor
-    // to avoid ambiguities
-    struct parallel_executor
-      : parallel::execution::parallel_executor
-    {
-        HPX_CONSTEXPR parallel_executor(
-                launch l = hpx::detail::async_policy{},
-                std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : parallel::execution::parallel_executor(l, spread, tasks)
-        {}
-
-        template <typename F, typename S, typename ... Ts>
-        std::vector<hpx::future<
-            typename v3::detail::bulk_async_execute_result<F, S, Ts...>::type
-        > >
-        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
-        {
-            using base_type = parallel::execution::parallel_executor;
-            return base_type::bulk_async_execute(std::forward<F>(f), shape,
-                std::forward<Ts>(ts)...);
-        }
-    };
-
-    namespace detail
-    {
-        template <>
-        struct is_executor<parallel_executor>
-          : std::true_type
-        {};
-    }
-    /// \endcond
-}}}
-#endif
-
 #endif

@@ -99,14 +99,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor>::value ||
                 hpx::traits::is_executor_any<Executor>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -245,14 +239,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor_>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor_>::value ||
                 hpx::traits::is_executor_any<Executor_>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor_>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor_>::value || "
                 "hpx::traits::is_executor_any<Executor_>::value");
 
@@ -396,14 +384,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor>::value ||
                 hpx::traits::is_executor_any<Executor>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -538,14 +520,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor_>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor_>::value ||
                 hpx::traits::is_executor_any<Executor_>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor_>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor_>::value || "
                 "hpx::traits::is_executor_any<Executor_>::value");
 
@@ -691,14 +667,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor>::value ||
                 hpx::traits::is_executor_any<Executor>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -826,14 +796,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor>::value ||
                 hpx::traits::is_executor_any<Executor>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -966,14 +930,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor_>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor_>::value ||
                 hpx::traits::is_executor_any<Executor_>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor_>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor_>::value || "
                 "hpx::traits::is_executor_any<Executor_>::value");
 
@@ -1115,14 +1073,8 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1
         on(Executor_ && exec) const
         {
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<Executor_>::value ||
-#endif
                 hpx::traits::is_threads_executor<Executor_>::value ||
                 hpx::traits::is_executor_any<Executor_>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor_>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor_>::value || "
                 "hpx::traits::is_executor_any<Executor_>::value");
 
