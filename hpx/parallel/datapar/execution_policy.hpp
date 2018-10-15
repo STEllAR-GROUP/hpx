@@ -1338,38 +1338,5 @@ namespace hpx { namespace parallel { namespace execution
     }
 }}}
 
-#if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
-///////////////////////////////////////////////////////////////////////////////
-// Compatibility layer for changes introduced by C++17
-namespace hpx { namespace parallel { inline namespace v1
-{
-    ///////////////////////////////////////////////////////////////////////////
-    using dataseq_task_execution_policy = execution::dataseq_task_policy;
-    using dataseq_execution_policy = execution::dataseq_policy;
-
-    template <typename Executor, typename Parameters>
-    using dataseq_task_execution_policy_shim =
-        execution::dataseq_task_policy_shim<Executor, Parameters>;
-    template <typename Executor, typename Parameters>
-    using dataseq_execution_policy_shim =
-        execution::dataseq_policy_shim<Executor, Parameters>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    using datapar_task_execution_policy = execution::datapar_task_policy;
-    using datapar_execution_policy = execution::datapar_policy;
-
-    template <typename Executor, typename Parameters>
-    using datapar_task_execution_policy_shim =
-        execution::datapar_task_policy_shim<Executor, Parameters>;
-    template <typename Executor, typename Parameters>
-    using datapar_execution_policy_shim =
-        execution::datapar_policy_shim<Executor, Parameters>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_STATIC_CONSTEXPR dataseq_execution_policy dataseq_execution;
-    HPX_STATIC_CONSTEXPR datapar_execution_policy datapar_execution;
-}}}
-#endif
-
 #endif
 #endif
