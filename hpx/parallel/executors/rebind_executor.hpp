@@ -12,6 +12,8 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace parallel { namespace execution
 {
     ///////////////////////////////////////////////////////////////////////////
