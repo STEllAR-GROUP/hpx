@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/traits/v1/is_executor.hpp>    // backwards compatibility
 
 #include <type_traits>
 

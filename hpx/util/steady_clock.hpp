@@ -12,10 +12,6 @@
 
 #include <hpx/config.hpp>
 
-#if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
-#  include <boost/chrono/chrono.hpp>
-#endif
-
 #include <chrono>
 
 namespace hpx { namespace util
@@ -36,18 +32,6 @@ namespace hpx { namespace util
           : _abs_time(std::chrono::time_point_cast<value_type::duration>(
                 steady_clock::now() + (abs_time - Clock::now())))
         {}
-
-#if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
-        template <typename Clock, typename Duration>
-        steady_time_point(boost::chrono::time_point<Clock, Duration> const& abs_time)
-        {
-            std::chrono::nanoseconds duration(
-                boost::chrono::duration_cast<boost::chrono::nanoseconds>(
-                    abs_time - Clock::now()).count());
-
-            _abs_time = steady_clock::now() + duration;
-        }
-#endif
 
         value_type const& value() const noexcept
         {
@@ -74,20 +58,6 @@ namespace hpx { namespace util
             if (_rel_time < rel_time)
                 ++_rel_time;
         }
-
-#if HPX_HAVE_BOOST_CHRONO_COMPATIBILITY
-        template <typename Rep, typename Period>
-        steady_duration(boost::chrono::duration<Rep, Period> const& rel_time)
-        {
-            std::chrono::nanoseconds duration(
-                boost::chrono::duration_cast<boost::chrono::nanoseconds>(
-                    rel_time).count());
-
-            _rel_time = std::chrono::duration_cast<value_type>(duration);
-            if (_rel_time < duration)
-                ++_rel_time;
-        }
-#endif
 
         value_type const& value() const noexcept
         {

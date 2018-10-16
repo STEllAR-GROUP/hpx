@@ -34,7 +34,7 @@ if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
   set(__boost_need_thread ON)
 endif()
 
-if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY OR __boost_need_thread)
+if(__boost_need_thread)
   set(__boost_libraries ${__boost_libraries} chrono)
 endif()
 

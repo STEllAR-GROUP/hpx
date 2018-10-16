@@ -958,38 +958,6 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
-    "Enable support for boost::chrono (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
-endif()
-
-# HPX_WITH_EXECUTOR_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_EXECUTOR_COMPATIBILITY BOOL
-    "Enable old (pre-concurrency TS) executor API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_EXECUTOR_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-endif()
-
-# HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
-    "Enable old execution policy names in API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
-endif()
-
-# HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
-    "Enable old overloads for transform_reduce and inner_product (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
-endif()
-
 # HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
 hpx_option(HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY BOOL
     "Enable old overloads for inclusive_scan (default: ON)"

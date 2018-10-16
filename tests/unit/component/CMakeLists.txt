@@ -52,12 +52,6 @@ if(HPX_WITH_NETWORKING)
 )
 endif()
 
-if(HPX_WITH_EXECUTOR_COMPATIBILITY)
-  set(tests ${tests}
-      distribution_policy_executor_v1
-     )
-endif()
-
 set(action_invoke_no_more_than_PARAMETERS
     THREADS_PER_LOCALITY 4)
 set(action_invoke_no_more_than_FLAGS
@@ -131,11 +125,6 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Unit/Components")
-  string(FIND ${test} "_v1" _is_v1_test)
-
-  if(NOT (_is_v1_test EQUAL -1))
-    set(folder_name "Tests/Unit/Components/V1")
-  endif()
 
   # add example executable
   add_hpx_executable(${test}_test

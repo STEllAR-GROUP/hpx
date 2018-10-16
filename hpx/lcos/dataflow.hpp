@@ -36,10 +36,6 @@
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-#endif
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 
@@ -267,21 +263,6 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        // handle executors through their executor_traits
-        template <typename Executor>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG) HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::is_executor<Executor>::value
-        >::type
-        finalize(Executor& exec, Futures&& futures)
-        {
-            boost::intrusive_ptr<dataflow_frame> this_(this);
-            parallel::executor_traits<Executor>::apply_execute(exec,
-                &dataflow_frame::done, std::move(this_), std::move(futures));
-        }
-#endif
-
         // The overload for hpx::dataflow taking an executor simply forwards
         // to the corresponding executor customization point.
         //
@@ -441,9 +422,6 @@ namespace hpx { namespace lcos { namespace detail
     // threads::executor
     template <typename Executor>
     struct dataflow_dispatch<Executor, typename std::enable_if<
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            traits::is_executor<Executor>::value ||
-#endif
             traits::is_one_way_executor<Executor>::value ||
             traits::is_two_way_executor<Executor>::value ||
             traits::is_threads_executor<Executor>::value
@@ -472,9 +450,6 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch<FD, typename std::enable_if<
         !traits::is_launch_policy<FD>::value &&
         !(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            traits::is_executor<FD>::value ||
-#endif
             traits::is_one_way_executor<FD>::value ||
             traits::is_two_way_executor<FD>::value ||
             traits::is_threads_executor<FD>::value)
