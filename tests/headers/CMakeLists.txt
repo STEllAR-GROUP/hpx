@@ -35,7 +35,9 @@ endif()
 # add the MPI include path here, because for the main library, it's only
 # added for the plugin.
 if(HPX_WITH_PARCELPORT_MPI)
+  set(MPI_CXX_SKIP_MPICXX TRUE)
   find_package(MPI)
+
   if(MPI_CXX_INCLUDE_PATH)
     include_directories(${MPI_CXX_INCLUDE_PATH})
   endif()
