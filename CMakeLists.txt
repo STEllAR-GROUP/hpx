@@ -1637,6 +1637,14 @@ if(HPX_WITH_VIM_YCM)
   SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
+if(HPX_WITH_PARCELPORT_MPI)
+  if(CMAKE_VERSION VERSION_LESS 3.10)
+    find_package(MPI)
+  else()
+    find_package(MPI COMPONENTS CXX)
+  endif()
+endif()
+
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors
 # with incompatible options with the currently selected platform.
