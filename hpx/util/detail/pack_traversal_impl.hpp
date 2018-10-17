@@ -902,7 +902,7 @@ namespace util {
             auto traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().match(
                     std::declval<container_category_of_t<
-                        typename std::decay<T>::type>>(),
+                        typename hpx::util::decay_unwrap<T>::type>>(),
                     std::declval<T>()));
 
             /// \copybrief traverse
@@ -910,14 +910,14 @@ namespace util {
             auto try_traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().try_match(
                     std::declval<container_category_of_t<
-                        typename std::decay<T>::type>>(),
+                        typename hpx::util::decay_unwrap<T>::type>>(),
                     std::declval<T>()))
             {
                 // We use tag dispatching here, to categorize the type T whether
                 // it satisfies the container or tuple like requirements.
                 // Then we can choose the underlying implementation accordingly.
                 return try_match(
-                    container_category_of_t<typename std::decay<T>::type>{},
+                    container_category_of_t<typename hpx::util::decay_unwrap<T>::type>{},
                     std::forward<T>(element));
             }
 
