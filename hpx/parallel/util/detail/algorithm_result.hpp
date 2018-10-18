@@ -34,7 +34,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         template <typename T_>
         static type get(T_ && t)
         {
-            return t;
+            return std::forward<T_>(t);
         }
 
         template <typename T_>
