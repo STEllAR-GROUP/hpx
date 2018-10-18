@@ -19,6 +19,7 @@
 #endif
 
 #include <hpx/config.hpp>
+#include <hpx/util/fibhash.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 
@@ -32,7 +33,7 @@ namespace hpx { namespace util
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail
     {
-        template <typename Tag>
+        template <typename Tag, std::size_t N>
         struct itt_spinlock_init
         {
             itt_spinlock_init();
@@ -41,20 +42,20 @@ namespace hpx { namespace util
     }
 #endif
 
-    template <typename Tag>
+    template <typename Tag, std::size_t N = 128>
     class spinlock_pool
     {
     private:
-        static boost::detail::spinlock pool_[ 41 ];
+        static boost::detail::spinlock pool_[N];
 #if HPX_HAVE_ITTNOTIFY != 0
-        static detail::itt_spinlock_init<Tag> init_;
+        static detail::itt_spinlock_init<Tag, N> init_;
 #endif
 
     public:
 
         static boost::detail::spinlock & spinlock_for( void const * pv )
         {
-            std::size_t i = reinterpret_cast< std::size_t >( pv ) % 41;
+            std::size_t i = fibhash<N>(reinterpret_cast< std::size_t >(pv));
             return pool_[ i ];
         }
 
@@ -95,60 +96,36 @@ namespace hpx { namespace util
         };
     };
 
-    template <typename Tag>
-    boost::detail::spinlock spinlock_pool<Tag>::pool_[ 41 ] =
-    {
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT, BOOST_DETAIL_SPINLOCK_INIT,
-        BOOST_DETAIL_SPINLOCK_INIT
-    };
+    template <typename Tag, std::size_t N>
+    boost::detail::spinlock spinlock_pool<Tag, N>::pool_[ N ];
 
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail
     {
-        template <typename Tag>
-        itt_spinlock_init<Tag>::itt_spinlock_init()
+        template <typename Tag, std::size_t N>
+        itt_spinlock_init<Tag, N>::itt_spinlock_init()
         {
-            for (int i = 0; i < 41; ++i)
+            for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_CREATE(&spinlock_pool<Tag>::pool_[i],
+                HPX_ITT_SYNC_CREATE(&spinlock_pool<Tag, N>::pool_[i],
                     "boost::detail::spinlock", 0);
-                HPX_ITT_SYNC_RENAME(&spinlock_pool<Tag>::pool_[i],
+                HPX_ITT_SYNC_RENAME(&spinlock_pool<Tag, N>::pool_[i],
                     "boost::detail::spinlock");
             }
         }
 
-        template <typename Tag>
-        itt_spinlock_init<Tag>::~itt_spinlock_init()
+        template <typename Tag, std::size_t N>
+        itt_spinlock_init<Tag, N>::~itt_spinlock_init()
         {
-            for (int i = 0; i < 41; ++i)
+            for (int i = 0; i < N; ++i)
             {
-                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag>::pool_[i]);
+                HPX_ITT_SYNC_DESTROY(&spinlock_pool<Tag, N>::pool_[i]);
             }
         }
     }
 
-    template <typename Tag>
-    util::detail::itt_spinlock_init<Tag>
-        spinlock_pool<Tag>::init_ = util::detail::itt_spinlock_init<Tag>();
+    template <typename Tag, std::size_t N>
+    util::detail::itt_spinlock_init<Tag, N> spinlock_pool<Tag, N>::init_;
 #endif
 
 }} // namespace hpx::util
