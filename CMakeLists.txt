@@ -15,6 +15,10 @@
 # We require at least CMake V3.3.2
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
+if (HPX_WITH_CUDA AND CMAKE_VERSION VERSION_LESS 3.9)
+  message(FATAL_ERROR "CUDA support requires at least CMake 3.9.")
+endif()
+
 # Overrides must go before the project() statement, otherwise they are ignored.
 
 ################################################################################
