@@ -112,14 +112,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -260,14 +254,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -420,14 +408,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -564,14 +546,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -726,14 +702,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -868,14 +838,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -1022,14 +986,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -1164,14 +1122,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -1493,51 +1445,5 @@ namespace hpx { namespace parallel { namespace execution
         /// \endcond
     }
 }}}
-
-#if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
-///////////////////////////////////////////////////////////////////////////////
-// Compatibility layer for changes introduced by C++17
-namespace hpx { namespace parallel { inline namespace v1
-{
-    ///////////////////////////////////////////////////////////////////////////
-    using sequential_task_execution_policy =
-        parallel::execution::sequenced_task_policy;
-    using sequential_execution_policy =
-        parallel::execution::sequenced_policy;
-
-    template <typename Executor, typename Parameters>
-    using sequential_task_execution_policy_shim =
-        parallel::execution::sequenced_task_policy_shim<Executor, Parameters>;
-    template <typename Executor, typename Parameters>
-    using sequential_execution_policy_shim =
-        parallel::execution::sequenced_policy_shim<Executor, Parameters>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    using parallel_task_execution_policy =
-        parallel::execution::parallel_task_policy;
-    using parallel_execution_policy =
-        parallel::execution::parallel_policy;
-
-    template <typename Executor, typename Parameters>
-    using parallel_task_execution_policy_shim =
-        parallel::execution::parallel_task_policy_shim<Executor, Parameters>;
-    template <typename Executor, typename Parameters>
-    using parallel_execution_policy_shim =
-        parallel::execution::parallel_policy_shim<Executor, Parameters>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    using parallel_vector_execution_policy =
-        parallel::execution::parallel_unsequenced_policy;
-
-    using task_execution_policy_tag = parallel::execution::task_policy_tag;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_STATIC_CONSTEXPR sequential_execution_policy seq;
-    HPX_STATIC_CONSTEXPR parallel_execution_policy par;
-    HPX_STATIC_CONSTEXPR parallel_vector_execution_policy par_vec;
-
-    HPX_STATIC_CONSTEXPR task_execution_policy_tag task;
-}}}
-#endif
 
 #endif

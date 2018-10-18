@@ -28,29 +28,6 @@ set(tests
     timed_thread_pool_executors
    )
 
-if(HPX_WITH_EXECUTOR_COMPATIBILITY)
-  set(tests ${tests}
-      bulk_async_v1
-      created_executor_v1
-      minimal_async_executor_v1
-      minimal_sync_executor_v1
-      minimal_timed_async_executor_v1
-      minimal_timed_sync_executor_v1
-      parallel_executor_v1
-      parallel_fork_executor_v1
-      sequential_executor_v1
-      service_executors_v1
-      shared_parallel_executor_v1
-      this_thread_executors_v1
-      thread_pool_attached_executors_v1
-      thread_pool_executors_v1
-#      thread_pool_os_executors_v1
-      timed_parallel_executor_v1
-      timed_this_thread_executors_v1
-      timed_thread_pool_executors_v1
-     )
-endif()
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -60,11 +37,6 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Unit/Parallel/Executors")
-  string(FIND ${test} "_v1" _is_v1_test)
-
-  if(NOT (_is_v1_test EQUAL -1))
-    set(folder_name "Tests/Unit/Parallel/Executors/V1")
-  endif()
 
   # add example executable
   add_hpx_executable(${test}_test

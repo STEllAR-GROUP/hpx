@@ -790,120 +790,15 @@ Parallel algorithms
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/include/parallel_for_loop.hpp>``
 
-.. _executors:
-
-Executors and executor traits
-=============================
-
-The existing Version 1 of the Parallelism TS (|cpp11_n4104|_) exposes parallel
-execution to the programmer in the form of standard algorithms that accept
-execution policies. A companion executor facility both provides a suitable
-substrate for implementing these algorithms in a standard way and provide a
-mechanism for exercising programmatic control over where parallel work should be
-executed.
-
-The algorithms and execution policies specified by the Parallelism TS are
-designed to permit implementation on the broadest range of platforms. In
-addition to preemptive thread pools common on some platforms, implementations of
-these algorithms may want to take advantage of a number of mechanisms for
-parallel execution, including cooperative fibers, GPU threads, and SIMD vector
-units, among others. This diversity of possible execution resources strongly
-suggests that a suitable abstraction encapsulating the details of how work is
-created across diverse platforms would be of significant value to parallel
-algorithm implementations. Suitably defined executors provide just such a
-facility.
-
-An executor is an object responsible for creating execution agents on which work
-is performed, thus abstracting the (potentially platform-specific) mechanisms
-for launching work. To accommodate the goals of the Parallelism TS, whose
-algorithms aim to support the broadest range of possible platforms, the
-requirements that all executors are expected to fulfill are small. They are also
-consistent with a broad range of execution semantics, including preemptive
-threads, cooperative fibers, GPU threads, and SIMD vector units, among others.
-
-The executors implemented by |hpx| are aligned with the interfaces proposed by
-|cpp11_n4406|_ (Parallel Algorithms Need Executors).
-
-Executors are modular components for requisitioning execution agents. During
-parallel algorithm execution, execution policies generate execution agents by
-requesting their creation from an associated executor. Rather than focusing on
-asynchronous task queuing, our complementary treatment of executors casts them
-as modular components for invoking functions over the points of an index space.
-We believe that executors may be conceived of as allocators for execution agents
-and our interface's design reflects this analogy. The process of requesting
-agents from an executor is mediated via the
-:cpp:class:`hpx::parallel::executor_traits` API, which is analogous to the
-interaction between containers and allocator_traits.
-
-With ``executor_traits`` clients manipulate all types of executors uniformly::
-
-    executor_traits<my_executor_t>::execute(my_executor,
-        [](size_t i){ // perform task i },
-        range(0, n));
-
-This call synchronously creates a group of invocations of the given function,
-where each individual invocation within the group is identified by a unique
-integer ``i`` in ``[0, n)`` Other functions in the interface exist to create
-groups of invocations asynchronously and support the special case of creating a
-singleton group, resulting in four different combinations.
-
-Though this interface appears to require executor authors to implement four
-different basic operations, there is really only one requirement:
-``async_execute()``. In practice, the other operations may be defined in terms
-of this single basic primitive. However, some executors will naturally
-specialize all four operations for maximum efficiency.
-
-For maximum implementation flexibility, ``executor_traits`` does not require
-executors to implement a particular exception reporting mechanism. Executors may
-choose whether or not to report exceptions, and if so, in what manner they are
-communicated back to the caller. However, all executors in |hpx| report
-exceptions in a manner consistent with the behavior of execution policies
-described by the Parallelism TS, where multiple exceptions are collected into an
-__exception_list__. This list is reported through ``async_execute()`` s returned
-future, or thrown directly by ``execute()``.
-
-.. note::
-
-   Please note that the executor interface as described above has now been
-   deprecated. It has been replaced by separate executor customization points,
-   one for each of the exposed functions. Please see __cpp20_p0443__ for more
-   details. The old interface based on ``executor_traits`` will be supported for
-   some time, you might have to enable the ``HPX_WITH_EXECUTOR_COMPATIBILITY``
-   configuration setting, however.
-
-In |hpx| we have implemented the following executor types:
-
-* :cpp:class:`hpx::parallel::execution::sequenced_executor`: creates groups of
-  sequential execution agents which execute in the calling thread. The
-  sequential order is given by the lexicographical order of indices in the index
-  space.
-* :cpp:class:`hpx::parallel::execution::parallel_executor`: creates groups of
-  parallel execution agents which execute in threads implicitly created by the
-  executor. This executor uses a given launch policy.
-* :cpp:class:`hpx::parallel::execution::service_executor`: creates groups of
-  parallel execution agents which execute in one of the kernel threads
-  associated with a given pool category (I/O, :term:`parcel`, or timer pool, or
-  on the main thread of the application).
-* :cpp:class:`hpx::parallel::execution::local_priority_queue_executor`,
-  :cpp:class:`hpx::parallel::execution::local_queue_executor`,
-  :cpp:class:`hpx::parallel::execution::static_priority_queue_executor` create
-  executors on top of the corresponding |hpx| schedulers.
-* :cpp:class:`hpx::parallel::execution::distribution_policy_executor` creates
-  executors using any of the existing distribution policies (like
-  :cpp:class:`hpx::components::colocating_distribution_policy` et.al.).
-
 .. _executor_parameters:
 
 Executor parameters and executor parameter traits
 -------------------------------------------------
 
-Executors as described in the previous section add a powerful customization
-capability to any facility which exposes management of parallel execution.
-However, sometimes it is necessary to be able to customize certain parameters of
-the execution as well. In |hpx| we introduce the notion of execution parameters
-and execution parameter traits. At this point, the only parameter which can be
-customized is the size of the chunks of work executed on a single |hpx|-thread
-(such as the number of loop iterations combined to run as a single task).
+In |hpx| we introduce the notion of execution parameters and execution parameter
+traits. At this point, the only parameter which can be customized is the size of
+the chunks of work executed on a single |hpx|-thread (such as the number of loop
+iterations combined to run as a single task).
 
 An executor parameter object is responsible for exposing the calculation of the
 size of the chunks scheduled. It abstracts the (potential platform-specific)

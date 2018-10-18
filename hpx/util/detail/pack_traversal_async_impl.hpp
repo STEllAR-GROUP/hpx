@@ -22,6 +22,7 @@
 #include <atomic>
 #include <cstddef>
 #include <exception>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -362,6 +363,12 @@ namespace util {
             return Range{std::begin(element), std::end(element)};
         }
 
+        template <typename T, typename Range = dynamic_async_range_of_t<T>>
+        Range make_dynamic_async_range(std::reference_wrapper<T> ref_element)
+        {
+            return Range{std::begin(ref_element.get()), std::end(ref_element.get())};
+        }
+
         /// Represents a particular point in a asynchronous traversal hierarchy
         template <typename Frame, typename... Hierarchy>
         class async_traversal_point
@@ -483,7 +490,7 @@ namespace util {
             void async_traverse_one(Current&& current)
             {
                 using ElementType =
-                    typename std::decay<decltype(*current)>::type;
+                    typename hpx::util::decay_unwrap<decltype(*current)>::type;
                 return async_traverse_one_impl(
                     container_category_of_t<ElementType>{},
                     std::forward<Current>(current));

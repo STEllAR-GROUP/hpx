@@ -146,37 +146,4 @@ namespace hpx { namespace parallel { namespace execution
     /// \endcond
 }}}
 
-#if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
-///////////////////////////////////////////////////////////////////////////////
-// Compatibility layer for changes introduced by C++17
-namespace hpx { namespace parallel { inline namespace v1
-{
-    /// \cond NOINTERNAL
-    template <typename T>
-    using is_execution_policy =
-        execution::is_execution_policy<T>;
-
-    template <typename T>
-    using is_parallel_execution_policy =
-        execution::is_parallel_execution_policy<T>;
-
-    template <typename T>
-    using is_sequenced_execution_policy =
-        execution::is_sequenced_execution_policy<T>;
-
-    template <typename T>
-    using is_async_execution_policy =
-        execution::is_async_execution_policy<T>;
-
-    template <typename T>
-    using is_rebound_execution_policy =
-        execution::is_rebound_execution_policy<T>;
-
-    template <typename T>
-    using is_vectorpack_execution_policy =
-        execution::is_vectorpack_execution_policy<T>;
-    /// \endcond
-}}}
-#endif
-
 #endif

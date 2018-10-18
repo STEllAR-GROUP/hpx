@@ -333,10 +333,12 @@ if(HPX_WITH_CUDA)
     string(APPEND HPX_CUDA_CLANG_FLAGS " --cuda-gpu-arch=${arch}")
   endforeach()
   string(REGEX REPLACE ";" " " HPX_WITH_CUDA_ARCH_INFO "${HPX_WITH_CUDA_ARCH}")
-else()
-  set(HPX_TLL_PUBLIC "PUBLIC")      # keywords for target_link_libraries
-  set(HPX_TLL_PRIVATE "PRIVATE")
+  # keywords for target_link_libraries (cuda)
+  set(CUDA_LINK_LIBRARIES_KEYWORD "PRIVATE")
 endif()
+# keywords for target_link_libraries (hpx)
+set(HPX_TLL_PUBLIC "PUBLIC")
+set(HPX_TLL_PRIVATE "PRIVATE")
 if(HPX_WITH_CUDA_CLANG AND NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   hpx_error("To use Cuda Clang, please select Clang as your default C++ compiler")
 endif()
@@ -954,38 +956,6 @@ hpx_option(HPX_WITH_TUPLE_RVALUE_SWAP BOOL
   ON CATEGORY "Utility" ADVANCED)
 if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
-endif()
-
-# HPX_WITH_BOOST_CHRONO_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_BOOST_CHRONO_COMPATIBILITY BOOL
-    "Enable support for boost::chrono (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_BOOST_CHRONO_COMPATIBILITY)
-endif()
-
-# HPX_WITH_EXECUTOR_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_EXECUTOR_COMPATIBILITY BOOL
-    "Enable old (pre-concurrency TS) executor API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_EXECUTOR_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-endif()
-
-# HPX_WITH_EXECUTION_POLICY_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY BOOL
-    "Enable old execution policy names in API (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_EXECUTION_POLICY_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
-endif()
-
-# HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY: introduced in V1.0.0
-hpx_option(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY BOOL
-    "Enable old overloads for transform_reduce and inner_product (default: OFF)"
-    OFF ADVANCED)
-if(HPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_TRANSFORM_REDUCE_COMPATIBILITY)
 endif()
 
 # HPX_WITH_INCLUSIVE_SCAN_COMPATIBILITY: introduced in V1.1.0
