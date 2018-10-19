@@ -24,7 +24,6 @@ void print_system_characteristics()
     hpx::runtime* rt = hpx::get_runtime_ptr();
     hpx::util::runtime_configuration cfg = rt->get_config();
     const hpx::threads::topology& topo = rt->get_topology();
-    hpx::threads::threadmanager& thrd_manager = rt->get_thread_manager();
 
     // -------------------------------------- //
     //      print runtime characteristics     //
@@ -34,13 +33,13 @@ void print_system_characteristics()
     //! -------------------------------------- runtime
     std::cout << "[Runtime], instance number " << rt->get_instance_number()
               << "\n"
-              << "called by thread named     " << rt->get_thread_name()
+              << "called by thread named     " << hpx::get_thread_name()
               << "\n\n";
 
     //! -------------------------------------- thread_manager
     std::cout << "[Thread manager]\n"
               << "worker thread number  : " << std::dec
-              << thrd_manager.get_worker_thread_num() << "\n\n";
+              << hpx::get_worker_thread_num() << "\n\n";
 
     //! -------------------------------------- runtime_configuration
     std::cout << "[Runtime configuration]\n"

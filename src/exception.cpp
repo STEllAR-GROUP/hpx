@@ -613,7 +613,7 @@ namespace hpx
             thread_info = true;
         }
 
-        std::string thread_name = runtime::get_thread_name();
+        std::string thread_name = hpx::get_thread_name();
         if (!thread_info)
             strm << thread_prefix;
         else

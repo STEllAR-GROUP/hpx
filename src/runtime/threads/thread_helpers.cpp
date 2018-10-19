@@ -25,7 +25,6 @@
 #endif
 #include <hpx/util/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <atomic>
@@ -76,7 +75,7 @@ namespace hpx { namespace threads
     {
         auto tid = get_self_id();
         auto pool = tid->get_scheduler_base()->get_parent_pool();
-        auto num_thread = pool->get_worker_thread_num() + pool->get_thread_offset();
+        auto num_thread = hpx::get_worker_thread_num() + pool->get_thread_offset();
         auto pu_num = hpx::resource::get_partitioner().get_pu_num(num_thread);
         return hpx::threads::get_topology().get_numa_node_number(pu_num);
     }
@@ -206,10 +205,7 @@ namespace hpx { namespace threads
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    struct continuation_recursion_count_tag {};
-    static util::thread_specific_ptr<
-            std::size_t, continuation_recursion_count_tag
-        > continuation_recursion_count;
+    static HPX_NATIVE_TLS std::size_t continuation_recursion_count(0);
 
     std::size_t& get_continuation_recursion_count()
     {
@@ -217,15 +213,12 @@ namespace hpx { namespace threads
         if (self_ptr)
             return self_ptr->get_continuation_recursion_count();
 
-        if (nullptr == continuation_recursion_count.get())
-            continuation_recursion_count.reset(new std::size_t(0));
-
-        return *continuation_recursion_count.get();
+        return continuation_recursion_count;
     }
 
     void reset_continuation_recursion_count()
     {
-        continuation_recursion_count.reset(nullptr);
+        continuation_recursion_count = 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -7,35 +7,14 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/coroutines/detail/coroutine_self.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <cstddef>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail
 {
-    struct tls_tag {};
-
-    static util::thread_specific_ptr<coroutine_self*, tls_tag> self_;
-
-    void coroutine_self::set_self(coroutine_self* self)
+    coroutine_self*& coroutine_self::local_self()
     {
-        HPX_ASSERT(nullptr != self_.get());
-        *self_ = self;
-    }
-
-    coroutine_self* coroutine_self::get_self()
-    {
-        return (nullptr == self_.get()) ? nullptr : *self_;
-    }
-
-    void coroutine_self::init_self()
-    {
-        HPX_ASSERT(nullptr == self_.get());
-        self_.reset(new coroutine_self*(nullptr));
-    }
-
-    void coroutine_self::reset_self()
-    {
-        self_.reset(nullptr);
+        HPX_NATIVE_TLS coroutine_self* local_self_ = nullptr;
+        return local_self_;
     }
 }}}}

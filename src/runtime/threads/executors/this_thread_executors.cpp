@@ -14,10 +14,11 @@
 #  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -431,7 +432,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
         thread_num_ = thread_num;
-        orig_thread_num_ = threads::detail::thread_num_tss_.get_worker_thread_num();
+        orig_thread_num_ = hpx::get_worker_thread_num();
 
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_initialized;

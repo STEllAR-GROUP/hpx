@@ -165,7 +165,6 @@ namespace hpx { namespace threads
 
     public:
         /// \cond NOINTERNAL
-        std::size_t get_worker_thread_num() const;
         virtual std::size_t get_os_thread_count() const = 0;
 
         virtual compat::thread& get_os_thread_handle(
