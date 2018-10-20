@@ -89,9 +89,8 @@ namespace hpx { namespace threads
                 F, Future, Ts...
             >::type result_type;
 
-        auto func = hpx::util::bind_back(
-            hpx::util::one_shot(std::forward<F>(f)),
-            std::forward<Ts>(ts)...);
+        auto func = hpx::util::one_shot(hpx::util::bind_back(
+            std::forward<F>(f), std::forward<Ts>(ts)...));
 
         typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
             hpx::lcos::detail::make_continuation_exec<result_type>(

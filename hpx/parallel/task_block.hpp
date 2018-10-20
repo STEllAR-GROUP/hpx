@@ -194,9 +194,8 @@ namespace hpx { namespace parallel { inline namespace v2
             return
                 result::get(
                     hpx::dataflow(
-                        hpx::util::bind_back(
-                            hpx::util::one_shot(&task_block::on_ready),
-                            std::move(errors)),
+                        hpx::util::one_shot(hpx::util::bind_back(
+                            &task_block::on_ready, std::move(errors))),
                         std::move(tasks)
                     ));
         }

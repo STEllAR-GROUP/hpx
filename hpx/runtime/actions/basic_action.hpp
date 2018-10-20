@@ -298,15 +298,15 @@ namespace hpx { namespace actions
                 target.get_management_type() == naming::id_type::unmanaged)
             {
                 return traits::action_decorate_function<Derived>::call(lva,
-                    util::bind(util::one_shot(
-                        typename Derived::thread_function()),
-                        lva, comptype, std::forward<Ts>(vs)...));
+                    util::one_shot(util::bind(
+                        typename Derived::thread_function(),
+                        lva, comptype, std::forward<Ts>(vs)...)));
             }
 
             return traits::action_decorate_function<Derived>::call(lva,
-                util::bind(util::one_shot(
-                    typename Derived::thread_function(target)),
-                    lva, comptype, std::forward<Ts>(vs)...));
+                util::one_shot(util::bind(
+                    typename Derived::thread_function(target),
+                    lva, comptype, std::forward<Ts>(vs)...)));
         }
 
         // This static construct_thread_function allows to construct

@@ -98,12 +98,12 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, std::false_type)
         {
-            return util::bind(
-                util::one_shot(&action_decorate_function::thread_function),
+            return util::one_shot(util::bind(
+                &action_decorate_function::thread_function,
                 util::placeholders::_1,
                 traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
-            );
+            ));
         }
 
         // If the action returns a future we wait on the semaphore as well,
@@ -120,12 +120,12 @@ namespace hpx { namespace actions { namespace detail
         static threads::thread_function_type
         call(naming::address::address_type lva, F && f, std::true_type)
         {
-            return util::bind(
-                util::one_shot(&action_decorate_function::thread_function_future),
+            return util::one_shot(util::bind(
+                &action_decorate_function::thread_function_future,
                 util::placeholders::_1,
                 traits::action_decorate_function<action_wrapper>::call(
                     lva, std::forward<F>(f))
-            );
+            ));
         }
 
         ///////////////////////////////////////////////////////////////////////

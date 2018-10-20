@@ -19,7 +19,6 @@
 #include <hpx/traits/is_placeholder.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <cstddef>
@@ -272,17 +271,17 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>
     typename std::enable_if<
-        traits::is_action<typename util::decay<Action>::type>::value
+        traits::is_action<typename std::decay<Action>::type>::value
       , detail::bound_action<
-            typename util::decay<Action>::type
-          , util::tuple<typename util::decay<Ts>::type...>
+            typename std::decay<Action>::type
+          , util::tuple<typename std::decay<Ts>::type...>
         >
     >::type
     bind(Ts&&... vs)
     {
         typedef detail::bound_action<
-            typename util::decay<Action>::type,
-            util::tuple<typename util::decay<Ts>::type...>
+            typename std::decay<Action>::type,
+            util::tuple<typename std::decay<Ts>::type...>
         > result_type;
 
         return result_type(Action(),
@@ -294,7 +293,7 @@ namespace hpx { namespace util
       , typename ...Ts>
     detail::bound_action<
         Derived
-      , util::tuple<typename util::decay<Ts>::type...>
+      , util::tuple<typename std::decay<Ts>::type...>
     >
     bind(
         hpx::actions::basic_action<Component, Signature, Derived> action,
@@ -302,7 +301,7 @@ namespace hpx { namespace util
     {
         typedef detail::bound_action<
             Derived,
-            util::tuple<typename util::decay<Ts>::type...>
+            util::tuple<typename std::decay<Ts>::type...>
         > result_type;
 
         return result_type(static_cast<Derived const&>(action),

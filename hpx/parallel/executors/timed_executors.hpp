@@ -63,11 +63,11 @@ namespace hpx { namespace parallel { namespace execution
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(sequenced_executor(),
-                    hpx::util::bind(
-                        hpx::util::one_shot(sync_execute_at_helper()),
+                    hpx::util::one_shot(hpx::util::bind(
+                        sync_execute_at_helper(),
                         hpx::util::placeholders::_1, std::ref(exec),
                         hpx::util::deferred_call(
-                            std::forward<F>(f), std::forward<Ts>(ts)...)),
+                            std::forward<F>(f), std::forward<Ts>(ts)...))),
                     predecessor).get();
             }
 
@@ -171,11 +171,11 @@ namespace hpx { namespace parallel { namespace execution
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(sequenced_executor(),
-                    hpx::util::bind(
-                        hpx::util::one_shot(async_execute_at_helper()),
+                    hpx::util::one_shot(hpx::util::bind(
+                        async_execute_at_helper(),
                         hpx::util::placeholders::_1, std::forward<Executor>(exec),
                         hpx::util::deferred_call(
-                            std::forward<F>(f), std::forward<Ts>(ts)...)),
+                            std::forward<F>(f), std::forward<Ts>(ts)...))),
                     predecessor);
             }
 
@@ -270,11 +270,11 @@ namespace hpx { namespace parallel { namespace execution
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 execution::then_execute(sequenced_executor(),
-                    hpx::util::bind(
-                        hpx::util::one_shot(post_at_helper()),
+                    hpx::util::one_shot(hpx::util::bind(
+                        post_at_helper(),
                         hpx::util::placeholders::_1, std::forward<Executor>(exec),
                         hpx::util::deferred_call(std::forward<F>(f),
-                            std::forward<Ts>(ts)...)),
+                            std::forward<Ts>(ts)...))),
                     predecessor);
             }
 

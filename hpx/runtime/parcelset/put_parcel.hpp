@@ -130,26 +130,24 @@ namespace hpx { namespace parcelset {
                 {
                     split_gid.then(
                         hpx::launch::sync,
-                        hpx::util::bind(
-                            hpx::util::one_shot(
-                                [is_continuation, dest]
-                                (hpx::future<naming::gid_type> f,
-                                 typename util::decay<PutParcel>::type&& pp_,
-                                 naming::address&& addr_,
-                                 typename util::decay<Args>::type&&... args_)
-                                {
-                                    HPX_UNUSED(dest);
-                                    pp_(detail::create_parcel::call(
-                                        is_continuation,
-                                        f.get(), std::move(addr_),
-                                        std::move(args_)...
-                                    ));
-                                }
-                            ),
+                        hpx::util::one_shot(hpx::util::bind(
+                            [is_continuation, dest]
+                            (hpx::future<naming::gid_type> f,
+                             typename util::decay<PutParcel>::type&& pp_,
+                             naming::address&& addr_,
+                             typename util::decay<Args>::type&&... args_)
+                            {
+                                HPX_UNUSED(dest);
+                                pp_(detail::create_parcel::call(
+                                    is_continuation,
+                                    f.get(), std::move(addr_),
+                                    std::move(args_)...
+                                ));
+                            },
                             hpx::util::placeholders::_1,
                             std::forward<PutParcel>(pp), std::move(addr),
                             std::forward<Args>(args)...
-                        )
+                        ))
                     );
                 }
             }

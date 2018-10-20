@@ -102,10 +102,10 @@ namespace hpx { namespace detail
             }
 
             // defer invocation otherwise
-            return c.then(util::bind(
-                util::one_shot(sync_action_client_dispatch<Action>()),
+            return c.then(util::one_shot(util::bind(
+                sync_action_client_dispatch<Action>(),
                 std::forward<Policy_>(launch_policy), c, std::forward<Ts>(ts)...
-            )).get();
+            ))).get();
         }
     };
 
