@@ -153,8 +153,8 @@ namespace hpx
     void thread::start_thread(util::unique_function_nonser<void()>&& func)
     {
         threads::thread_init_data data(
-            util::bind(util::one_shot(&thread::thread_function_nullary),
-                std::move(func)),
+            util::one_shot(util::bind(&thread::thread_function_nullary,
+                std::move(func))),
             "thread::thread_function_nullary");
 
         // create the new thread, note that id_ is guaranteed to be valid

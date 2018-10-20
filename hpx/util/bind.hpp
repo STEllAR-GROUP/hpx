@@ -18,6 +18,7 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
+#include <hpx/util/one_shot.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -87,7 +88,7 @@ namespace hpx { namespace util
         >
         {
             typedef typename util::tuple_element<
-                I, typename util::decay<Us>::type
+                I, typename std::decay<Us>::type
             >::type&& type;
 
             template <typename T>
@@ -309,105 +310,12 @@ namespace hpx { namespace util
             typename std::decay<F>::type _f;
             util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename F>
-        class one_shot_wrapper;
-
-        template <typename F, typename ...Ts>
-        class bound<one_shot_wrapper<F>, Ts...>
-        {
-        public:
-            bound() {} // needed for serialization
-
-            template <typename F_, typename ...Ts_, typename =
-                typename std::enable_if<
-                    !std::is_same<typename std::decay<F_>::type, bound>::value
-                >::type>
-            HPX_CONSTEXPR explicit bound(F_&& f, Ts_&&... vs)
-              : _f(std::forward<F_>(f))
-              , _args(std::forward<Ts_>(vs)...)
-            {}
-
-#if !defined(__NVCC__) && !defined(__CUDACC__)
-            bound(bound const&) = default;
-            bound(bound&&) = default;
-#else
-            HPX_HOST_DEVICE bound(bound const& other)
-              : _f(other._f)
-              , _args(other._args)
-            {}
-
-            HPX_HOST_DEVICE bound(bound&& other)
-              : _f(std::move(other._f))
-              , _args(std::move(other._args))
-            {}
-#endif
-
-            bound& operator=(bound const&) = delete;
-
-            template <typename ...Us>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
-            typename invoke_bound_result<
-                one_shot_wrapper<F>&&,
-                util::tuple<typename util::decay_unwrap<Ts>::type...>&&,
-                util::tuple<Us&&...>
-            >::type operator()(Us&&... vs)
-            {
-                return detail::bound_impl(std::move(_f), std::move(_args),
-                    util::forward_as_tuple(std::forward<Us>(vs)...),
-                    typename detail::make_index_pack<sizeof...(Ts)>::type());
-            }
-
-            template <typename Archive>
-            void serialize(Archive& ar, unsigned int const /*version*/)
-            {
-                ar & _f;
-                ar & _args;
-            }
-
-            std::size_t get_function_address() const
-            {
-                return traits::get_function_address<
-                        one_shot_wrapper<F>
-                    >::call(_f);
-            }
-
-            char const* get_function_annotation() const
-            {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation<
-                        one_shot_wrapper<F>
-                    >::call(_f);
-#else
-                return nullptr;
-#endif
-            }
-
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            util::itt::string_handle get_function_annotation_itt() const
-            {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation_itt<
-                        one_shot_wrapper<F>
-                    >::call(_f);
-#else
-                static util::itt::string_handle sh("bound");
-                return sh;
-#endif
-            }
-#endif
-
-        private:
-            one_shot_wrapper<F> _f;
-            util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ...Ts>
     HPX_CONSTEXPR typename std::enable_if<
-        !traits::is_action<typename util::decay<F>::type>::value
+        !traits::is_action<typename std::decay<F>::type>::value
       , detail::bound<
             typename std::decay<F>::type,
             typename std::decay<Ts>::type...>
@@ -420,121 +328,6 @@ namespace hpx { namespace util
         > result_type;
 
         return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename F>
-        class one_shot_wrapper //-V690
-        {
-        public:
-#           if !defined(HPX_DISABLE_ASSERTS)
-            // default constructor is needed for serialization
-            HPX_CONSTEXPR one_shot_wrapper()
-              : _called(false)
-            {}
-
-            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
-              : _f(f)
-              , _called(false)
-            {}
-            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
-              : _f(std::move(f))
-              , _called(false)
-            {}
-
-            HPX_CXX14_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
-              : _f(std::move(other._f))
-              , _called(other._called)
-            {
-                other._called = true;
-            }
-
-            void check_call()
-            {
-                HPX_ASSERT(!_called);
-
-                _called = true;
-            }
-#           else
-            // default constructor is needed for serialization
-            HPX_CONSTEXPR one_shot_wrapper()
-            {}
-
-            HPX_CONSTEXPR explicit one_shot_wrapper(F const& f)
-              : _f(f)
-            {}
-            HPX_CONSTEXPR explicit one_shot_wrapper(F&& f)
-              : _f(std::move(f))
-            {}
-
-            HPX_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
-              : _f(std::move(other._f))
-            {}
-
-            void check_call()
-            {}
-#           endif
-
-            template <typename ...Ts>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
-            typename util::invoke_result<F, Ts...>::type
-            operator()(Ts&&... vs)
-            {
-                check_call();
-                return util::invoke(std::move(_f), std::forward<Ts>(vs)...);
-            }
-
-            template <typename Archive>
-            void serialize(Archive& ar, unsigned int const /*version*/)
-            {
-                ar & _f;
-            }
-
-            std::size_t get_function_address() const
-            {
-                return traits::get_function_address<F>::call(_f);
-            }
-
-            char const* get_function_annotation() const
-            {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation<F>::call(_f);
-#else
-                return nullptr;
-#endif
-            }
-
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            util::itt::string_handle get_function_annotation_itt() const
-            {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation_itt<F>::call(_f);
-#else
-                static util::itt::string_handle sh("one_shot_wrapper");
-                return sh;
-#endif
-            }
-#endif
-
-        public: // exposition-only
-            F _f;
-#           if !defined(HPX_DISABLE_ASSERTS)
-            bool _called;
-#           endif
-        };
-    }
-
-    template <typename F>
-    HPX_CONSTEXPR detail::one_shot_wrapper<typename util::decay<F>::type>
-    one_shot(F&& f)
-    {
-        typedef
-            detail::one_shot_wrapper<typename util::decay<F>::type>
-            result_type;
-
-        return result_type(std::forward<F>(f));
     }
 }}
 
@@ -565,16 +358,6 @@ namespace hpx { namespace traits
         }
     };
 
-    template <typename F>
-    struct get_function_address<util::detail::one_shot_wrapper<F> >
-    {
-        static std::size_t
-            call(util::detail::one_shot_wrapper<F> const& f) noexcept
-        {
-            return f.get_function_address();
-        }
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ...Ts>
     struct get_function_annotation<util::detail::bound<F, Ts...> >
@@ -586,32 +369,12 @@ namespace hpx { namespace traits
         }
     };
 
-    template <typename F>
-    struct get_function_annotation<util::detail::one_shot_wrapper<F> >
-    {
-        static char const*
-            call(util::detail::one_shot_wrapper<F> const& f) noexcept
-        {
-            return f.get_function_annotation();
-        }
-    };
-
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename F, typename ...Ts>
     struct get_function_annotation_itt<util::detail::bound<F, Ts...> >
     {
         static util::itt::string_handle
             call(util::detail::bound<F, Ts...> const& f) noexcept
-        {
-            return f.get_function_annotation_itt();
-        }
-    };
-
-    template <typename F>
-    struct get_function_annotation_itt<util::detail::one_shot_wrapper<F> >
-    {
-        static util::itt::string_handle
-            call(util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }
@@ -631,15 +394,6 @@ namespace hpx { namespace serialization
       , unsigned int const version = 0)
     {
         bound.serialize(ar, version);
-    }
-
-    template <typename Archive, typename F>
-    void serialize(
-        Archive& ar
-      , ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper
-      , unsigned int const version = 0)
-    {
-        one_shot_wrapper.serialize(ar, version);
     }
 
     // serialization of placeholders is trivial, just provide empty functions

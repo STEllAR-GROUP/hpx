@@ -804,10 +804,10 @@ hpx::future<bool> addressing_service::bind_range_async(
 
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&addressing_service::bind_postproc),
+        util::one_shot(util::bind(
+            &addressing_service::bind_postproc,
             this, _1, id, g
-        ));
+        )));
 }
 
 hpx::future<naming::address> addressing_service::unbind_range_async(
@@ -1289,10 +1289,10 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&addressing_service::resolve_full_postproc),
+        util::one_shot(util::bind(
+            &addressing_service::resolve_full_postproc,
             this, _1, gid
-        ));
+        )));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1553,10 +1553,10 @@ lcos::future<std::int64_t> addressing_service::incref_async(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&addressing_service::synchronize_with_async_incref),
+        util::one_shot(util::bind(
+            &addressing_service::synchronize_with_async_incref,
             this, _1, keep_alive, pending_decrefs
-        ));
+        )));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1675,10 +1675,10 @@ lcos::future<bool> addressing_service::register_name_async(
     {
         return f.then(
             hpx::launch::sync,
-            util::bind_back(
-                util::one_shot(&correct_credit_on_failure),
+            util::one_shot(util::bind_back(
+                &correct_credit_on_failure,
                 id, std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit
-            ));
+            )));
     }
 
     return f;
@@ -1757,9 +1757,9 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
-        util::bind(
-            util::one_shot(&detail::on_register_event), _1, std::move(result_f)
-        ));
+        util::one_shot(util::bind(
+            &detail::on_register_event, _1, std::move(result_f)
+        )));
 }
 
 // Return all matching entries in the symbol namespace
