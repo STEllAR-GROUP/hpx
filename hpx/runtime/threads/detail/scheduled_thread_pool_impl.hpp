@@ -355,7 +355,7 @@ namespace hpx { namespace threads { namespace detail
 
         return hpx::async(
             hpx::util::bind(&scheduled_thread_pool::resume_internal, this, true,
-                std::move(throws)));
+                std::ref(throws)));
     }
 
     template <typename Scheduler>
@@ -438,7 +438,7 @@ namespace hpx { namespace threads { namespace detail
 
         return hpx::async(
             hpx::util::bind(&scheduled_thread_pool::suspend_internal, this,
-                std::move(throws)));
+                std::ref(throws)));
     }
 
     template <typename Scheduler>
@@ -1836,7 +1836,7 @@ namespace hpx { namespace threads { namespace detail
         return hpx::async(
             hpx::util::bind(
                 &scheduled_thread_pool::suspend_processing_unit_internal, this,
-                virt_core, std::move(throws)));
+                virt_core, std::ref(throws)));
     }
 
     template <typename Scheduler>
@@ -1938,7 +1938,7 @@ namespace hpx { namespace threads { namespace detail
         return hpx::async(
             hpx::util::bind(
                 &scheduled_thread_pool::resume_processing_unit_internal, this,
-                virt_core, std::move(throws)));
+                virt_core, std::ref(throws)));
     }
 
     template <typename Scheduler>
