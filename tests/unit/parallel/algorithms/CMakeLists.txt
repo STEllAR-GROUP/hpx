@@ -87,6 +87,7 @@ set(tests
     remove1
     remove2
     remove_if
+    remove_if1
     remove_copy
     remove_copy_if
     replace
