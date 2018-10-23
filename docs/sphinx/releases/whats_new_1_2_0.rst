@@ -42,6 +42,10 @@ Here are some of the main highlights and changes for this release:
 * All command line options can now be passed alongside configuration options
   when initializing |hpx|. This means that some options that were previously
   only available on the command line can now be set as configuration options.
+* HPXMP is a portable, scalable, and flexible application programming interface
+  using the OpenMP specification that supports multi-platform shared memory
+  multiprocessing programming in C and C++. HPXMP can be enabled within |hpx| by
+  setting ``DHPX_WITH_HPXMP=ON`` during |cmake|_ configuration.
 * Two new performance counters were added for measuring the time spent doing
   background work. ``/threads/time/background-work-duration`` returns the time
   spent doing background on a given thread or locality, while
