@@ -22,11 +22,30 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 }
 
 .wy-side-nav-search {
-    background-color: #000000;
+    background-color: #10155e;
 }
 
 .wy-nav-top {
-    background-color: #000000;
+    background-color: #10155e;
+}
+
+.wy-nav-side {
+    background-color: #10155e;
+}
+
+.wy-menu-vertical header, .wy-menu-vertical p.caption
+{
+    color: #ffffff;
+}
+
+.wy-menu-vertical a:hover
+{
+    background-color: #0b1250;
+}
+
+.wy-menu-vertical li.current a
+{
+    color: #404040;
 }
 
 h1, h2, h3, h4 {
