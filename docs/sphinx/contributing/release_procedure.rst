@@ -51,6 +51,12 @@ are completed to avoid confusion.
      *   Update collaborators
      *   Update grant information
 
+#. Change the APEX release branch to be the most current release tag available
+   in the ``git_external`` APEX section of the main ``CMakeLists.txt``. Please
+   contact the maintainers at the `APEX repository
+   <http://github.com/khuck/xpress-apex>`_ to generate a new release to
+   synchronize with the HPX relelase.
+
 #. If there have been any commits to the release branch since the last release
    create a tag from the old release branch before deleting the old release
    branch in the next step.
