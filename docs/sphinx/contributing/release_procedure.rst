@@ -126,6 +126,9 @@ are completed to avoid confusion.
 #. Checkout the release branch, and replace the ``-rcN`` tag in
    ``hpx/config/version.hpp`` with an empty string.
 
+#. Add a new entry to the RPM changelog (``cmake/packaging/rpm/Changelog.txt``)
+   with the new version number and a link to the corresponding changelog.
+
 #. Add the release date to the caption of the current "What's New" section in
    the docs, and change the value of ``HPX_VERSION_DATE`` in
    ``hpx/config/version.hpp``.
