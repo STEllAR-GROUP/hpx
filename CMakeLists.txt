@@ -1974,6 +1974,18 @@ if(HPX_WITH_VIM_YCM)
 endif()
 
 ################################################################################
+# Add rpm packaging
+
+hpx_option(HPX_WITH_RPM
+  BOOL
+  "Enable or disable the generation of rpm packages"
+OFF ADVANCED)
+
+if(HPX_WITH_RPM)
+add_subdirectory(cmake/packaging/rpm)
+endif()
+
+################################################################################
 # print overall configuration summary
 include(HPX_PrintSummary)
 

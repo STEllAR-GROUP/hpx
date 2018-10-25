@@ -106,6 +106,9 @@ for this project. Please refer to this document if you would like to know more
 about the expectations for members of our community, with regard to how they
 will behave toward each other.
 
+Please find the project's gpg key, which is used to sign HPX releases
+[here](http://hkps.pool.sks-keyservers.net/pks/lookup?search=Ste%7C%7Car+group&fingerprint=on&op=index).
+
 Citing
 ======
 
