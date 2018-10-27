@@ -70,11 +70,13 @@ def run_none(cmd, localities, verbose):
 def run_mpi(cmd, localities, verbose):
     mpiexec = '@MPIEXEC@'
     if mpiexec == '':
+        mpiexec = '@MPIEXEC_EXECUTABLE@'
+    if mpiexec == '':
         msg = 'mpiexec not available on this platform. '
         msg += 'Please rerun CMake with HPX_PARCELPORT_MPI=True.'
         print(msg, sys.stderr)
         sys.exit(1)
-    exec_cmd = ['@MPIEXEC@', '@MPIEXEC_NUMPROC_FLAG@', str(localities)] + cmd
+    exec_cmd = [mpiexec, '@MPIEXEC_NUMPROC_FLAG@', str(localities)] + cmd
     if verbose:
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
