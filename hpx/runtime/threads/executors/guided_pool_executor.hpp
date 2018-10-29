@@ -70,6 +70,11 @@ namespace hpx { namespace threads { namespace executors
     };
 
     // --------------------------------------------------------------------
+    // For C++11 compatibility
+    template <bool B, typename T = void>
+    using enable_if_t = typename std::enable_if<B, T>::type;
+
+    // --------------------------------------------------------------------
     // Template type for a numa domain scheduling hint
     template <typename... Args>
     struct HPX_EXPORT pool_numa_hint {};
@@ -268,7 +273,7 @@ namespace hpx { namespace threads { namespace executors
         template <typename F,
                   typename Future,
                   typename ... Ts,
-                  typename = typename std::enable_if_t<traits::is_future<Future>::value>
+                  typename = enable_if_t<traits::is_future<Future>::value>
                   >
         auto
         then_execute(F && f, Future && predecessor, Ts &&... ts)
@@ -326,9 +331,9 @@ namespace hpx { namespace threads { namespace executors
                   template <typename> typename  OuterFuture,
                   typename ... InnerFutures,
                   typename ... Ts,
-                  typename = typename std::enable_if_t<is_future_of_tuple_of_futures<
+                  typename = enable_if_t<is_future_of_tuple_of_futures<
                     OuterFuture<util::tuple<InnerFutures...>>>::value>,
-                  typename = typename std::enable_if_t<is_tuple_of_futures<
+                  typename = enable_if_t<is_tuple_of_futures<
                     util::tuple<InnerFutures...>>::value>
                   >
         auto
@@ -394,7 +399,7 @@ namespace hpx { namespace threads { namespace executors
                   typename DataFlowFrame,
                   typename Result,
                   typename ... InnerFutures,
-                  typename = typename std::enable_if_t<
+                  typename = enable_if_t<
                       is_tuple_of_futures<util::tuple<InnerFutures...>>::value>
                   >
         auto
@@ -534,7 +539,7 @@ namespace hpx { namespace threads { namespace executors
         template <typename F,
                   typename Future,
                   typename ... Ts,
-                  typename = typename std::enable_if_t<traits::is_future<Future>::value>
+                  typename = enable_if_t<traits::is_future<Future>::value>
                   >
         auto
         then_execute(F && f, Future && predecessor, Ts &&... ts)

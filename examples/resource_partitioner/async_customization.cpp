@@ -67,6 +67,11 @@ struct test_async_executor
     {};
 
     // --------------------------------------------------------------------
+    // For C++11 compatibility
+    template <bool B, typename T = void>
+    using enable_if_t = typename std::enable_if<B, T>::type;
+
+    // --------------------------------------------------------------------
     // function that returns a const ref to the contents of a future
     // without calling .get() on the future so that we can use the value
     // and then pass the original future on to the intended destination.
@@ -124,7 +129,7 @@ struct test_async_executor
     template <typename F,
               typename Future,
               typename ... Ts,
-              typename = typename std::enable_if_t<traits::is_future<
+              typename = enable_if_t<traits::is_future<
               typename std::remove_reference<Future>::type>::value>>
     auto
     then_execute(F && f, Future&& predecessor, Ts &&... ts)
@@ -171,9 +176,9 @@ struct test_async_executor
               template <typename> typename  OuterFuture,
               typename ... InnerFutures,
               typename ... Ts,
-              typename = typename std::enable_if_t<is_future_of_tuple_of_futures<
+              typename = enable_if_t<is_future_of_tuple_of_futures<
                 OuterFuture<util::tuple<InnerFutures...>>>::value>,
-              typename = typename std::enable_if_t<is_tuple_of_futures<
+              typename = enable_if_t<is_tuple_of_futures<
                 util::tuple<InnerFutures...>>::value>
               >
     auto
@@ -240,7 +245,7 @@ struct test_async_executor
               typename DataFlowFrame,
               typename Result,
               typename ... InnerFutures,
-              typename = typename std::enable_if_t<
+              typename = enable_if_t<
                   is_tuple_of_futures<util::tuple<InnerFutures...>>::value>
               >
     auto
