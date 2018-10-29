@@ -7,15 +7,21 @@ add_subdirectory(components)
 
 set(tests
     async_deferred_1523
-    component_action_move_semantics
     make_continuation_1615
     missing_include_2958
     plain_action_1330
     plain_action_1550
+   )
+
+#only add multi locality tests if networking is enabled
+if (HPX_WITH_NETWORKING)
+  set(tests ${tests}
+    component_action_move_semantics
     plain_action_move_semantics
     return_future_2847
     return_non_default_constructible_2847
-   )
+  )
+endif()
 
 set(plain_action_1330_FLAGS
     DEPENDENCIES iostreams_component)
