@@ -203,7 +203,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
     |icpc|_                2014 or newer       2014
     |clang|_               3.8 or newer        3.8
     **Build System**
-    |cmake|_               3.9.0               3.3.2
+    |cmake|_               3.9.0               3.3.2    Cuda support 3.9
     **Required Libraries**
     |boost_libraries|_     1.62.0 or newer     1.58.0
     |hwloc|_               2.0.1 or newer      1.2 (Xeon Phi: 1.6)
