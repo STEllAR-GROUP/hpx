@@ -8,7 +8,6 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
-#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/util/logging.hpp>
@@ -38,18 +37,7 @@ namespace hpx { namespace components { namespace server
             // The object is local, we can destroy it locally...
             if (!r.first)
             {
-                // Special case: component_memory_block.
-                if (addr.type_ == components::component_memory_block) {
-                    // free the memory block
-                    components::server::memory_block::destroy(
-                        reinterpret_cast<components::server::memory_block*>(
-                            addr.address_));
-
-                    LRT_(info) << "successfully destroyed memory block " << gid;
-
-                    return;
-                }
-                else if (naming::refers_to_virtual_memory(gid))
+                if (naming::refers_to_virtual_memory(gid))
                 {
                     // simply delete the memory
                     delete [] reinterpret_cast<std::uint8_t*>(gid.get_lsb());

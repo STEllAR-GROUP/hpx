@@ -43,37 +43,34 @@ namespace hpx { namespace components
         // Pseudo-component for direct access to local virtual memory.
         component_memory = 2,
 
-        // Generic memory blocks.
-        component_memory_block = 3,
-
         // Base component for LCOs that do not produce a value.
-        component_base_lco = 4,
+        component_base_lco = 3,
 
         // Base component for LCOs that produce values.
-        component_base_lco_with_value_unmanaged = 5,
+        component_base_lco_with_value_unmanaged = 4,
 
         // (Managed) base component for LCOs that produce values.
-        component_base_lco_with_value = 6,
+        component_base_lco_with_value = 5,
 
         // Synchronization latch, barrier, and flex_barrier LCOs.
-        component_latch = ((7 << 10) | component_base_lco_with_value),
-        component_barrier = ((8 << 10) | component_base_lco),
-        component_flex_barrier = ((9 << 10) | component_base_lco),
+        component_latch = ((6 << 10) | component_base_lco_with_value),
+        component_barrier = ((7 << 10) | component_base_lco),
+        component_flex_barrier = ((8 << 10) | component_base_lco),
 
         // An LCO representing a value which may not have been computed yet.
-        component_promise = ((10 << 10) | component_base_lco_with_value),
+        component_promise = ((9 << 10) | component_base_lco_with_value),
 
         // AGAS locality services.
-        component_agas_locality_namespace = 11,
+        component_agas_locality_namespace = 10,
 
         // AGAS primary address resolution services.
-        component_agas_primary_namespace = 12,
+        component_agas_primary_namespace = 11,
 
         // AGAS global type system.
-        component_agas_component_namespace = 13,
+        component_agas_component_namespace = 12,
 
         // AGAS symbolic naming services.
-        component_agas_symbol_namespace = 14,
+        component_agas_symbol_namespace = 13,
 
         component_last,
         component_first_dynamic = component_last,
