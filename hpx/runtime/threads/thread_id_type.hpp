@@ -138,9 +138,6 @@ namespace std {
 template <>
 struct hash<::hpx::threads::thread_id_type>
 {
-    typedef ::hpx::threads::thread_id_type argument_type;
-    typedef std::size_t result_type;
-
     std::size_t operator()(::hpx::threads::thread_id_type const& v) const
         noexcept
     {
