@@ -32,6 +32,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -198,15 +199,12 @@ namespace hpx
         void rethrow_exception() override;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Connection>
-        bool register_error_sink(F sink, Connection& conn,
-            bool unregister_default = true)
+        template <typename F>
+        components::server::console_error_dispatcher::sink_type
+        set_error_sink(F&& sink)
         {
-            if (unregister_default)
-                default_error_sink_.disconnect();
-
             return components::server::get_error_dispatcher().
-                register_error_sink(sink, conn);
+                set_error_sink(std::forward<F>(sink));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -367,7 +365,7 @@ namespace hpx
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
         applier::applier applier_;
-        boost::signals2::scoped_connection default_error_sink_;
+        std::size_t default_error_sink_id_;
 
         compat::mutex mtx_;
         std::exception_ptr exception_;
