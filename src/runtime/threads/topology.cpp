@@ -21,11 +21,11 @@
 #include <hpx/runtime/threads/topology.hpp>
 
 #include <boost/io/ios_state.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -477,7 +477,7 @@ namespace hpx { namespace threads
                 // Strict binding not supported or failed, try weak binding.
                 if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
-                    boost::scoped_ptr<char> buffer(new char [1024]);
+                    std::unique_ptr<char> buffer(new char [1024]);
 
                     hwloc_bitmap_snprintf(buffer.get(), 1024, cpuset);
                     hwloc_bitmap_free(cpuset);
