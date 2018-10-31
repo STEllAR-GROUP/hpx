@@ -24,17 +24,6 @@ void test_inclusive_scan1()
 
     test_inclusive_scan1_async(execution::seq(execution::task), IteratorTag());
     test_inclusive_scan1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inclusive_scan1(execution_policy(execution::seq), IteratorTag());
-    test_inclusive_scan1(execution_policy(execution::par), IteratorTag());
-    test_inclusive_scan1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_inclusive_scan1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_inclusive_scan1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void inclusive_scan_test1()
@@ -58,17 +47,6 @@ void test_inclusive_scan2()
 
     test_inclusive_scan2_async(execution::seq(execution::task), IteratorTag());
     test_inclusive_scan2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inclusive_scan2(execution_policy(execution::seq), IteratorTag());
-    test_inclusive_scan2(execution_policy(execution::par), IteratorTag());
-    test_inclusive_scan2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_inclusive_scan2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_inclusive_scan2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void inclusive_scan_test2()
@@ -92,17 +70,6 @@ void test_inclusive_scan3()
 
     test_inclusive_scan3_async(execution::seq(execution::task), IteratorTag());
     test_inclusive_scan3_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inclusive_scan3(execution_policy(execution::seq), IteratorTag());
-    test_inclusive_scan3(execution_policy(execution::par), IteratorTag());
-    test_inclusive_scan3(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_inclusive_scan3(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_inclusive_scan3(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void inclusive_scan_test3()
@@ -130,16 +97,6 @@ void test_inclusive_scan_exception()
         IteratorTag());
     test_inclusive_scan_exception_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inclusive_scan_exception(execution_policy(execution::seq), IteratorTag());
-    test_inclusive_scan_exception(execution_policy(execution::par), IteratorTag());
-
-    test_inclusive_scan_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_inclusive_scan_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void inclusive_scan_exception_test()
@@ -167,16 +124,6 @@ void test_inclusive_scan_bad_alloc()
         IteratorTag());
     test_inclusive_scan_bad_alloc_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_inclusive_scan_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_inclusive_scan_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_inclusive_scan_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_inclusive_scan_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void inclusive_scan_bad_alloc_test()
@@ -212,23 +159,15 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    // if benchmark is requested we run it even in debug mode
-    if (vm.count("benchmark")) {
-        inclusive_scan_benchmark();
-    }
-    else {
-        inclusive_scan_test1();
-        inclusive_scan_test2();
-        inclusive_scan_test3();
+    inclusive_scan_test1();
+    inclusive_scan_test2();
+    inclusive_scan_test3();
 
-        inclusive_scan_exception_test();
-        inclusive_scan_bad_alloc_test();
+    inclusive_scan_exception_test();
+    inclusive_scan_bad_alloc_test();
 
-        inclusive_scan_validate();
-#ifndef HPX_DEBUG
-        inclusive_scan_benchmark();
-#endif
-    }
+    inclusive_scan_validate();
+    inclusive_scan_benchmark();
 
     return hpx::finalize();
 }
@@ -242,8 +181,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ("benchmark", "run a timing benchmark only");
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {

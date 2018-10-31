@@ -364,8 +364,8 @@ namespace util {
                 // Check whether the second argument of the container was
                 // the used allocator.
                 typename std::enable_if<std::uses_allocator<
-                    Base<OldType, OldAllocator>, OldAllocator>::value>::type* =
-                    nullptr,
+                        Base<OldType, OldAllocator>, OldAllocator>::value
+                    >::type* = nullptr,
                 typename NewAllocator = typename std::allocator_traits<
                     OldAllocator>::template rebind_alloc<NewType>>
             auto rebind_container(
@@ -376,6 +376,22 @@ namespace util {
                 // allocating the mapped type.
                 return Base<NewType, NewAllocator>(
                     NewAllocator(container.get_allocator()));
+            }
+
+            // support types like boost::container::small_vector
+            // Note: small_vector's allocator support is not 100% conforming
+            template <typename NewType,
+                template <class, std::size_t, class> class Base,
+                typename OldType, std::size_t Size, typename OldAllocator,
+                typename NewAllocator = typename std::allocator_traits<
+                    OldAllocator>::template rebind_alloc<NewType>>
+            auto rebind_container(
+                Base<OldType, Size, OldAllocator> const& container)
+                -> Base<NewType, Size, NewAllocator>
+            {
+                // Create a new version of the container with a new allocator
+                // instance
+                return Base<NewType, Size, NewAllocator>();
             }
 
             /// Returns the default iterators of the container in case
@@ -519,7 +535,7 @@ namespace util {
                     "method!");
 
                 // Create the new container, which is capable of holding
-                // the remappped types.
+                // the re-mappped types.
                 auto remapped =
                     rebind_container<mapped_type_from_t<T, M>>(container);
 
@@ -702,7 +718,7 @@ namespace util {
             }
         }    // end namespace tuple_like_remapping
 
-        /// Base class for making strategy dependent behaviour available
+        /// Base class for making strategy dependent behavior available
         /// to the mapping_helper class.
         template <typename Strategy>
         struct mapping_strategy_base
@@ -886,7 +902,7 @@ namespace util {
             auto traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().match(
                     std::declval<container_category_of_t<
-                        typename std::decay<T>::type>>(),
+                        typename hpx::util::decay_unwrap<T>::type>>(),
                     std::declval<T>()));
 
             /// \copybrief traverse
@@ -894,14 +910,14 @@ namespace util {
             auto try_traverse(Strategy, T&& element)
                 -> decltype(std::declval<mapping_helper>().try_match(
                     std::declval<container_category_of_t<
-                        typename std::decay<T>::type>>(),
+                        typename hpx::util::decay_unwrap<T>::type>>(),
                     std::declval<T>()))
             {
                 // We use tag dispatching here, to categorize the type T whether
                 // it satisfies the container or tuple like requirements.
                 // Then we can choose the underlying implementation accordingly.
                 return try_match(
-                    container_category_of_t<typename std::decay<T>::type>{},
+                    container_category_of_t<typename hpx::util::decay_unwrap<T>::type>{},
                     std::forward<T>(element));
             }
 

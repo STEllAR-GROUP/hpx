@@ -63,8 +63,7 @@ public:
       , lsb_(lsb)
     {}
 
-    ~fixed_component_base()
-    {}
+    ~fixed_component_base() = default;
 
     /// \brief finalize() will be called just before the instance gets
     ///        destructed
@@ -164,11 +163,14 @@ public:
         }
     }
 
-    // Pinning functionality
-    void pin() {}
-    void unpin() {}
-    std::uint32_t pin_count() const { return 0; }
-
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+    HPX_CXX14_CONSTEXPR static void mark_as_migrated()
+    {
+    }
+    HPX_CXX14_CONSTEXPR static void on_migrated()
+    {
+    }
+#else
     void mark_as_migrated()
     {
         // If this assertion is triggered then this component instance is being
@@ -184,6 +186,7 @@ public:
         // migration.
         HPX_ASSERT(false);
     }
+#endif
 
 private:
     mutable naming::gid_type gid_;
@@ -196,15 +199,25 @@ namespace detail
     ///////////////////////////////////////////////////////////////////////
     struct fixed_heap
     {
-        static void* alloc(std::size_t count)
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+        HPX_CONSTEXPR static void* alloc(std::size_t count)
+        {
+            return nullptr;
+        }
+        HPX_CXX14_CONSTEXPR static void free(void* p, std::size_t count)
+        {
+        }
+#else
+        static void* alloc(std::size_t /*count*/)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
             return nullptr;
         }
-        static void free(void* p, std::size_t count)
+        static void free(void* /*p*/, std::size_t /*count*/)
         {
             HPX_ASSERT(false);        // this shouldn't ever be called
         }
+#endif
     };
 }
 
@@ -218,6 +231,16 @@ class fixed_component : public Component
     typedef component_type derived_type;
     typedef detail::fixed_heap heap_type;
 
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
+    HPX_CONSTEXPR static Component* create(std::size_t count)
+    {
+        return nullptr;
+    }
+
+    HPX_CXX14_CONSTEXPR static void destroy(Component* p, std::size_t count = 1)
+    {
+    }
+#else
     /// \brief  The function \a create is used for allocation and
     ///         initialization of instances of the derived components.
     static Component* create(std::size_t count)
@@ -232,6 +255,7 @@ class fixed_component : public Component
     {
         HPX_ASSERT(false);        // this shouldn't ever be called
     }
+#endif
 };
 
 }}

@@ -26,7 +26,7 @@ set(Boost_ADDITIONAL_VERSIONS
 set(__boost_libraries)
 if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
    HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
-  set(__boost_libraries ${__boost_libraries} log log_setup)
+  set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
 endif()
 
 if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
@@ -34,7 +34,7 @@ if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
   set(__boost_need_thread ON)
 endif()
 
-if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY OR __boost_need_thread)
+if(__boost_need_thread)
   set(__boost_libraries ${__boost_libraries} chrono)
 endif()
 
@@ -117,14 +117,13 @@ if(MSVC)
 else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
-hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 if((NOT MSVC) OR HPX_WITH_BOOST_ALL_DYNAMIC_LINK OR HPX_WITH_VCPKG)
   hpx_libraries(${Boost_LIBRARIES})
+  hpx_library_dir(${Boost_LIBRARY_DIRS})
 else()
   hpx_library_dir(${Boost_LIBRARY_DIRS})
 endif()

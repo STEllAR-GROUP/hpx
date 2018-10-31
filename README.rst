@@ -54,12 +54,12 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V1.0) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-1.0.0/html/index.html>`_.
-In publications, this release of HPX can be cited as: |zenodo_doi|.
+The documentation for the latest release of HPX (currently V1.1) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-1.1.0/html/index.html>`_.
+In publications this release of HPX can be cited as: |zenodo_doi|.
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.556772.svg
-     :target: https://doi.org/10.5281/zenodo.556772
+.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1206917.svg
+     :target: https://doi.org/10.5281/zenodo.1206917
 
 Additionally, we regularly upload the current status of the documentation
 (which is being worked on as we speak)
@@ -67,8 +67,8 @@ Additionally, we regularly upload the current status of the documentation
 single-page version of the documentation
 `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
-If you plan to use HPX we suggest starting with the latest released version
-(currently HPX V1.0) which can be
+If you plan to use HPX we suggest to start with the latest released version
+(currently HPX V1.1) which can be
 `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
@@ -121,8 +121,22 @@ Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
 Linux
 -----
 
-1)  Before starting to build HPX, please read about the
-    `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_.
+1)  Before starting to build HPX, you will need to install dependencies. A
+    minimal dependecy list installation commands for HPX for different distros
+    are as follows:
+    (For more info see `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_)
+
+    Debian::
+
+      sudo apt install cmake libboost-all-dev hwloc google-perftools
+
+    Fedora::
+
+      sudo dnf install cmake boost-devel hwloc gperftools-devel
+
+    Arch::
+
+      sudo pacman -S cmake boost hwloc gperftools
 
 2) Clone the master HPX git repository (or a stable tag)::
 
@@ -148,7 +162,7 @@ Linux
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.99
+            ~/downloads/hpx_1.2.0
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -177,8 +191,12 @@ for more information about building HPX on a Linux system.
 OS X (Mac)
 ----------
 
-1)  Before starting to build HPX, please read about the
-    `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_.
+1)  Before starting to build HPX, you will need to install dependencies. A
+    minimal dependecy list installation commands for HPX for different distros
+    are as follows
+    (For more info see `prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/manual/build_system/prerequisites.html>`_)::
+
+      brew install cmake boost hwloc google-perftools
 
 2) Clone the master HPX git repository (or a stable tag)::
 
@@ -204,7 +222,7 @@ OS X (Mac)
       cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
             -DBOOST_ROOT=~/packages/boost \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.99
+            ~/downloads/hpx_1.2.0
 
 5) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
@@ -371,9 +389,9 @@ and Technology (CCT) at Louisiana State University, and the Department of
 Computer Science 3 - Computer Architecture at the University of Erlangen
 Nuremberg who fund and support our work.
 
-We would also like to thank the following
-organizations for granting us allocations of their compute resources:
-LSU HPC, LONI, XSEDE, NERSC, and the Gauss Center for Supercomputing.
+We would also like to thank the following organizations for granting us
+allocations of their compute resources: LSU HPC, LONI, XSEDE, NERSC, CSCS/ETHZ,
+and the Gauss Center for Supercomputing.
 
 HPX is currently funded by
 

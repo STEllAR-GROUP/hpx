@@ -74,12 +74,12 @@ void print_results(
         std::cout << "OS-threads,Tasks,Delay (iterations),"
                      "Total Walltime (seconds),Walltime per Task (seconds)\n";
 
-    std::string const cores_str = hpx::util::format("%lu,", cores);
-    std::string const tasks_str = hpx::util::format("%lu,", tasks);
-    std::string const delay_str = hpx::util::format("%lu,", delay);
+    std::string const cores_str = hpx::util::format("{},", cores);
+    std::string const tasks_str = hpx::util::format("{},", tasks);
+    std::string const delay_str = hpx::util::format("{},", delay);
 
     hpx::util::format_to(std::cout,
-        "%-21s %-21s %-21s %10.12s, %10.12s\n",
+        "{:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
         cores_str, tasks_str, delay_str,
         walltime, walltime / tasks);
 }

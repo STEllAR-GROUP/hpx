@@ -17,42 +17,40 @@
 #ifndef JT28092007_spacer_HPP_DEFINED
 #define JT28092007_spacer_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>    // is_generic
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
 
+#include <cstddef>
+#include <string>
 #include <type_traits>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
 namespace detail {
 
-    template<class original_formatter, class msg_type,
-    class string_type> inline void spacer_write_with_convert(msg_type & msg,
-        const original_formatter & fmt, const string_type & prefix,
-        const string_type & suffix, const do_convert_format::prepend*) {
+    template<class original_formatter>
+        inline void spacer_write_with_convert(optimize::cache_string_one_str & msg,
+        const original_formatter & fmt, const std::string & prefix,
+        const std::string & suffix, const do_convert_format::prepend*) {
         // prepend
         do_convert_format::prepend::write(suffix, msg);
         fmt(msg);
         do_convert_format::prepend::write(prefix, msg);
     }
-    template<class original_formatter, class msg_type,
-    class string_type> inline void spacer_write_with_convert(msg_type & msg,
-        const original_formatter & fmt, const string_type & prefix,
-        const string_type & suffix, const do_convert_format::append*) {
+    template<class original_formatter>
+        inline void spacer_write_with_convert(optimize::cache_string_one_str & msg,
+        const original_formatter & fmt, const std::string & prefix,
+        const std::string & suffix, const do_convert_format::append*) {
         // append
         do_convert_format::append::write(prefix, msg);
         fmt(msg);
         do_convert_format::append::write(suffix, msg);
     }
-    template<class original_formatter, class msg_type, class string_type,
-    class convert> inline
-        void spacer_write_with_convert(msg_type & msg, const original_formatter & fmt,
-            const string_type & prefix, const string_type & suffix, const convert*) {
+    template<class original_formatter, class convert>
+        inline void spacer_write_with_convert(optimize::cache_string_one_str & msg,
+            const original_formatter & fmt, const std::string & prefix,
+            const std::string & suffix, const convert*) {
         // custom conversion - prefix before suffix
         convert::write(prefix, msg);
         fmt(msg);
@@ -62,10 +60,10 @@ namespace detail {
     // note: pass original_formatter here
     // - so that original_formatter::operator() gets called,
     // not the spacer_t's operator()
-    template<class original_formatter, class convert, class msg_type,
-    class string_type> inline void spacer_write(msg_type & msg,
-        const original_formatter & fmt, const string_type & prefix,
-        const string_type & suffix) {
+    template<class original_formatter, class convert>
+        inline void spacer_write(optimize::cache_string_one_str & msg,
+        const original_formatter & fmt, const std::string & prefix,
+        const std::string & suffix) {
         spacer_write_with_convert(msg, fmt, prefix, suffix, 0);
     }
 }
@@ -109,9 +107,8 @@ template<class convert, class original_formatter,
     // "fixed" formatter - it has a msg_type typedef
     typedef typename original_formatter::param param;
     typedef original_formatter spacer_base;
-    typedef hold_string_type string_type;
 
-    spacer_t(const original_formatter & fmt, const char_type * format_str)
+    spacer_t(const original_formatter & fmt, const char * format_str)
         : spacer_base(fmt) {
         parse_format( format_str);
     }
@@ -121,10 +118,10 @@ template<class convert, class original_formatter,
             *this, m_prefix, m_suffix);
     }
 private:
-    void parse_format(const string_type & format_str) {
-        typedef typename string_type::size_type size_type;
+    void parse_format(const std::string & format_str) {
+        typedef std::size_t size_type;
         size_type msg_idx = format_str.find('%');
-        if ( msg_idx != string_type::npos) {
+        if ( msg_idx != std::string::npos) {
             m_prefix = format_str.substr(0, msg_idx);
             m_suffix = format_str.substr( msg_idx + 1);
         }
@@ -134,7 +131,7 @@ private:
     }
 
 private:
-    string_type m_prefix, m_suffix;
+    std::string m_prefix, m_suffix;
 };
 
 // specialize for generic formatters
@@ -142,21 +139,20 @@ template<class convert, class original_formatter>
 struct spacer_t<convert,original_formatter,true> : original_formatter {
     // generic formatter
     typedef original_formatter spacer_base;
-    typedef hold_string_type string_type;
 
-    spacer_t(const original_formatter & fmt, const char_type * format_str)
+    spacer_t(const original_formatter & fmt, const char * format_str)
         : spacer_base(fmt) {
         parse_format( format_str);
     }
 
-    template<class msg_type> void operator()(msg_type & msg) const {
+    void operator()(msg_type & msg) const {
         detail::spacer_write<spacer_base,convert>(msg, *this, m_prefix, m_suffix);
     }
 private:
-    void parse_format(const string_type & format_str) {
-        typedef typename string_type::size_type size_type;
+    void parse_format(const std::string & format_str) {
+        typedef std::size_t size_type;
         size_type msg_idx = format_str.find('%');
-        if ( msg_idx != string_type::npos) {
+        if ( msg_idx != std::string::npos) {
             m_prefix = format_str.substr(0, msg_idx);
             m_suffix = format_str.substr( msg_idx + 1);
         }
@@ -166,7 +162,7 @@ private:
     }
 
 private:
-    hold_string_type m_prefix, m_suffix;
+    std::string m_prefix, m_suffix;
 };
 
 
@@ -194,7 +190,7 @@ namespace detail {
 */
 template<class original_formatter>
 typename detail::find_spacer<original_formatter>
-::type spacer(const original_formatter & fmt, const char_type* format_str) {
+::type spacer(const original_formatter & fmt, const char* format_str) {
     typedef typename detail::find_spacer<original_formatter>::type spacer_type;
     return spacer_type(fmt, format_str);
 }
@@ -202,4 +198,3 @@ typename detail::find_spacer<original_formatter>
 }}}}
 
 #endif
-

@@ -9,7 +9,7 @@ def hpx_application_copts():
     """Shorthand for needed HPX application compile options
         Returns the needed HPX application compile options.
     """
-    return ["-DHPX_APPLICATION_EXPORTS", "-DHPX_ENABLE_ASSERT_HANDLER"]          
+    return ["-DHPX_APPLICATION_EXPORTS", "-DHPX_ENABLE_ASSERT_HANDLER"]
 
 def hpx_copts():
     """Shorthand for needed HPX compile options
@@ -21,7 +21,7 @@ def hpx_link_opts():
     """Shorthand for needed HPX link options
         Returns the needed HPX link options.
     """
-    return "@CXX_FLAG@ -L@HPX_CONF_PREFIX@ @HPX_PKG_LIBRARY_DIR@ @HPX_PKG_LIBRARIES_BAZEL@".replace("  ", " ").replace(hpx_path(), "hpx").replace(boost_path(), "boost").split(" ")
+    return "@CXX_FLAG@ -L@HPX_CONF_PREFIX@ @HPX_PKG_LIBRARY_DIR@ @HPX_PKG_LIBRARIES_BAZEL@ @HPX_PKG_LINK_LIBRARIES@ @HPX_LINKER_FLAGS@".replace("  ", " ").replace(hpx_path(), "hpx").replace(boost_path(), "boost").split(" ")
 
 def hpx_path():
     """Shorthand for the HPX path

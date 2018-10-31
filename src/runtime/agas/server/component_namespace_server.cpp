@@ -75,11 +75,11 @@ void component_namespace::register_counter_types(
         if (detail::component_namespace_services[i].target_ ==
              detail::counter_target_count)
             help = hpx::util::format(
-                "returns the number of invocations of the AGAS service '%s'",
+                "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
         else
             help = hpx::util::format(
-                "returns the overall execution time of the AGAS service '%s'",
+                "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
 
         performance_counters::install_counter_type(
@@ -175,7 +175,8 @@ components::component_type component_namespace::bind_prefix(
     )
 { // {{{ bind_prefix implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.bind_prefix_.time_
+        counter_data_.bind_prefix_.time_,
+        counter_data_.bind_prefix_.enabled_
     );
     counter_data_.increment_bind_prefix_count();
 
@@ -222,7 +223,7 @@ components::component_type component_namespace::bind_prefix(
               , "component_namespace::bind_prefix"
               , hpx::util::format(
                     "component id is already registered for the given "
-                    "locality, key(%1%), prefix(%2%), ctype(%3%)",
+                    "locality, key({1}), prefix({2}), ctype({3})",
                     key, prefix, cit->second));
             return components::component_invalid;
         }
@@ -233,8 +234,8 @@ components::component_type component_namespace::bind_prefix(
         // convey the fact that another locality already registered this
         // component type.
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
-            "ctype(%3%), response(no_success)",
+            "component_namespace::bind_prefix, key({1}), prefix({2}), "
+            "ctype({3}), response(no_success)",
             key, prefix, cit->second);
 
         return cit->second;
@@ -259,7 +260,7 @@ components::component_type component_namespace::bind_prefix(
     fit->second.insert(prefix);
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::bind_prefix, key(%1%), prefix(%2%), ctype(%3%)",
+        "component_namespace::bind_prefix, key({1}), prefix({2}), ctype({3})",
         key, prefix, cit->second);
 
     return cit->second;
@@ -270,7 +271,8 @@ components::component_type component_namespace::bind_name(
     )
 { // {{{ bind_name implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.bind_name_.time_
+        counter_data_.bind_name_.time_,
+        counter_data_.bind_name_.enabled_
     );
     counter_data_.increment_bind_name_count();
 
@@ -301,7 +303,7 @@ components::component_type component_namespace::bind_name(
     }
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::bind_name, key(%1%), ctype(%2%)",
+        "component_namespace::bind_name, key({1}), ctype({2})",
         key, it->second);
 
     return it->second;
@@ -312,7 +314,8 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
     )
 { // {{{ resolve_id implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.resolve_id_.time_
+        counter_data_.resolve_id_.time_,
+        counter_data_.resolve_id_.enabled_
     );
     counter_data_.increment_resolve_id_count();
 
@@ -331,7 +334,7 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
     if (it == end || it->second.empty())
     {
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::resolve_id, key(%1%), localities(0)",
+            "component_namespace::resolve_id, key({1}), localities(0)",
             key);
 
         return std::vector<std::uint32_t>();
@@ -349,7 +352,7 @@ std::vector<std::uint32_t> component_namespace::resolve_id(
             p.push_back(*pit);
 
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::resolve_id, key(%1%), localities(%2%)",
+            "component_namespace::resolve_id, key({1}), localities({2})",
             key, prefixes.size());
 
         return p;
@@ -361,7 +364,8 @@ bool component_namespace::unbind(
     )
 { // {{{ unbind implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.unbind_name_.time_
+        counter_data_.unbind_name_.time_,
+        counter_data_.unbind_name_.enabled_
     );
     counter_data_.increment_unbind_name_count();
 
@@ -373,7 +377,7 @@ bool component_namespace::unbind(
     if (it == component_ids_.left.end())
     {
         LAGAS_(info) <<hpx::util::format(
-            "component_namespace::unbind, key(%1%), response(no_success)",
+            "component_namespace::unbind, key({1}), response(no_success)",
             key);
 
        return false;
@@ -385,7 +389,7 @@ bool component_namespace::unbind(
     component_ids_.left.erase(it);
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::unbind, key(%1%)",
+        "component_namespace::unbind, key({1})",
         key);
 
     return true;
@@ -397,7 +401,8 @@ void component_namespace::iterate_types(
     )
 { // {{{ iterate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.iterate_types_.time_
+        counter_data_.iterate_types_.time_,
+        counter_data_.iterate_types_.enabled_
     );
     counter_data_.increment_iterate_types_count();
 
@@ -431,7 +436,8 @@ std::string component_namespace::get_component_type_name(
     )
 { // {{{ get_component_type_name implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.get_component_type_name_.time_
+        counter_data_.get_component_type_name_.time_,
+        counter_data_.get_component_type_name_.enabled_
     );
     counter_data_.increment_get_component_type_name_count();
 
@@ -457,7 +463,7 @@ std::string component_namespace::get_component_type_name(
     {
         LAGAS_(info) << hpx::util::format(
             "component_namespace::get_component_typename, "
-            "key(%1%/%2%), response(no_success)",
+            "key({1}/{2}), response(no_success)",
             int(components::get_derived_type(t)),
             int(components::get_base_type(t)));
 
@@ -465,7 +471,7 @@ std::string component_namespace::get_component_type_name(
     }
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::get_component_typename, key(%1%/%2%), response(%3%)",
+        "component_namespace::get_component_typename, key({1}/{2}), response({3})",
         int(components::get_derived_type(t)),
         int(components::get_base_type(t)),
         result);
@@ -478,7 +484,8 @@ std::uint32_t component_namespace::get_num_localities(
     )
 { // {{{ get_num_localities implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.num_localities_.time_
+        counter_data_.num_localities_.time_,
+        counter_data_.num_localities_.enabled_
     );
     counter_data_.increment_num_localities_count();
 
@@ -494,7 +501,7 @@ std::uint32_t component_namespace::get_num_localities(
     if (it == end)
     {
         LAGAS_(info) << hpx::util::format(
-            "component_namespace::get_num_localities, key(%1%), localities(0)",
+            "component_namespace::get_num_localities, key({1}), localities(0)",
             key);
 
         return std::uint32_t(0);
@@ -503,7 +510,7 @@ std::uint32_t component_namespace::get_num_localities(
     std::uint32_t num_localities = static_cast<std::uint32_t>(it->second.size());
 
     LAGAS_(info) << hpx::util::format(
-        "component_namespace::get_num_localities, key(%1%), localities(%2%)",
+        "component_namespace::get_num_localities, key({1}), localities({2})",
         key, num_localities);
 
     return num_localities;
@@ -560,34 +567,42 @@ naming::gid_type component_namespace::statistics_counter(
         case component_ns_bind_prefix:
             get_data_func = util::bind_front(&cd::get_bind_prefix_count,
                 &counter_data_);
+            counter_data_.bind_prefix_.enabled_ = true;
             break;
         case component_ns_bind_name:
             get_data_func = util::bind_front(&cd::get_bind_name_count,
                 &counter_data_);
+            counter_data_.bind_name_.enabled_ = true;
             break;
         case component_ns_resolve_id:
             get_data_func = util::bind_front(&cd::get_resolve_id_count,
                 &counter_data_);
+            counter_data_.resolve_id_.enabled_ = true;
             break;
         case component_ns_unbind_name:
             get_data_func = util::bind_front(&cd::get_unbind_name_count,
                 &counter_data_);
+            counter_data_.unbind_name_.enabled_ = true;
             break;
         case component_ns_iterate_types:
             get_data_func = util::bind_front(&cd::get_iterate_types_count,
                 &counter_data_);
+            counter_data_.iterate_types_.enabled_ = true;
             break;
         case component_ns_get_component_type_name:
             get_data_func = util::bind_front(&cd::get_component_type_name_count,
                 &counter_data_);
+            counter_data_.get_component_type_name_.enabled_ = true;
             break;
         case component_ns_num_localities:
             get_data_func = util::bind_front(&cd::get_num_localities_count,
                 &counter_data_);
+            counter_data_.num_localities_.enabled_ = true;
             break;
         case component_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_count,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -602,34 +617,42 @@ naming::gid_type component_namespace::statistics_counter(
         case component_ns_bind_prefix:
             get_data_func = util::bind_front(&cd::get_bind_prefix_time,
                 &counter_data_);
+            counter_data_.bind_prefix_.enabled_ = true;
             break;
         case component_ns_bind_name:
             get_data_func = util::bind_front(&cd::get_bind_name_time,
                 &counter_data_);
+            counter_data_.bind_name_.enabled_ = true;
             break;
         case component_ns_resolve_id:
             get_data_func = util::bind_front(&cd::get_resolve_id_time,
                 &counter_data_);
+            counter_data_.resolve_id_.enabled_ = true;
             break;
         case component_ns_unbind_name:
             get_data_func = util::bind_front(&cd::get_unbind_name_time,
                 &counter_data_);
+            counter_data_.unbind_name_.enabled_ = true;
             break;
         case component_ns_iterate_types:
             get_data_func = util::bind_front(&cd::get_iterate_types_time,
                 &counter_data_);
+            counter_data_.iterate_types_.enabled_ = true;
             break;
         case component_ns_get_component_type_name:
             get_data_func = util::bind_front(&cd::get_component_type_name_time,
                 &counter_data_);
+            counter_data_.get_component_type_name_.enabled_ = true;
             break;
         case component_ns_num_localities:
             get_data_func = util::bind_front(&cd::get_num_localities_time,
                 &counter_data_);
+            counter_data_.num_localities_.enabled_ = true;
             break;
         case component_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -701,6 +724,17 @@ std::int64_t component_namespace::counter_data::get_overall_count(bool reset)
         util::get_and_reset_value(num_localities_.count_, reset);
 }
 
+void component_namespace::counter_data::enable_all()
+{
+    bind_prefix_.enabled_ = true;
+    bind_name_.enabled_ = true;
+    resolve_id_.enabled_ = true;
+    unbind_name_.enabled_ = true;
+    iterate_types_.enabled_ = true;
+    get_component_type_name_.enabled_ = true;
+    num_localities_.enabled_ = true;
+}
+
 // access execution time counters
 std::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
 {
@@ -752,37 +786,58 @@ std::int64_t component_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void component_namespace::counter_data::increment_bind_prefix_count()
 {
-    ++bind_prefix_.count_;
+    if (bind_prefix_.enabled_)
+    {
+        ++bind_prefix_.count_;
+    }
 }
 
 void component_namespace::counter_data::increment_bind_name_count()
 {
-    ++bind_name_.count_;
+    if (bind_name_.enabled_)
+    {
+        ++bind_name_.count_;
+    }
 }
 
 void component_namespace::counter_data::increment_resolve_id_count()
 {
-    ++resolve_id_.count_;
+    if (resolve_id_.enabled_)
+    {
+        ++resolve_id_.count_;
+    }
 }
 
 void component_namespace::counter_data::increment_unbind_name_count()
 {
-    ++unbind_name_.count_;
+    if (unbind_name_.enabled_)
+    {
+        ++unbind_name_.count_;
+    }
 }
 
 void component_namespace::counter_data::increment_iterate_types_count()
 {
-    ++iterate_types_.count_;
+    if (iterate_types_.enabled_)
+    {
+        ++iterate_types_.count_;
+    }
 }
 
 void component_namespace::counter_data::increment_get_component_type_name_count()
 {
-    ++get_component_type_name_.count_;
+    if (get_component_type_name_.enabled_)
+    {
+        ++get_component_type_name_.count_;
+    }
 }
 
 void component_namespace::counter_data::increment_num_localities_count()
 {
-    ++num_localities_.count_;
+    if (num_localities_.enabled_)
+    {
+        ++num_localities_.count_;
+    }
 }
 
 }}}

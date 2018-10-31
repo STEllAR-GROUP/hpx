@@ -17,10 +17,6 @@
 #ifndef JT28092007_destination_defaults_HPP_DEFINED
 #define JT28092007_destination_defaults_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/config.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
@@ -36,8 +32,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
 template<class convert_dest = do_convert_destination > struct cout_t : is_generic,
 hpx::util::logging::op_equal::always_equal {
-
-    template<class msg_type> void operator()(const msg_type & msg) const {
+    void operator()(const msg_type & msg) const {
         convert_dest::write(msg, std::cout);
     }
 };
@@ -48,8 +43,7 @@ hpx::util::logging::op_equal::always_equal {
 */
 template<class convert_dest = do_convert_destination > struct cerr_t : is_generic,
 hpx::util::logging::op_equal::always_equal {
-
-    template<class msg_type> void operator()(const msg_type & msg) const {
+    void operator()(const msg_type & msg) const {
         convert_dest::write(msg, std::cerr);
     }
 };
@@ -64,8 +58,8 @@ hpx::util::logging::op_equal::always_equal {
     before the stream is deleted.
 */
 template<class convert_dest = do_convert_destination > struct stream_t : is_generic,
-non_const_context< std::basic_ostream<hpx::util::logging::char_type> * > {
-    typedef std::basic_ostream<char_type> stream_type;
+non_const_context< std::ostream * > {
+    typedef std::ostream stream_type;
     typedef non_const_context< stream_type* > non_const_context_base;
 
     stream_t(stream_type * s) : non_const_context_base(s) {
@@ -73,7 +67,7 @@ non_const_context< std::basic_ostream<hpx::util::logging::char_type> * > {
     stream_t(stream_type & s) : non_const_context_base(&s) {
     }
 
-    template<class msg_type> void operator()(const msg_type & msg) const {
+    void operator()(const msg_type & msg) const {
         if ( non_const_context_base::context() )
             convert_dest::write(msg, *non_const_context_base::context());
     }
@@ -104,8 +98,7 @@ non_const_context< std::basic_ostream<hpx::util::logging::char_type> * > {
 */
 template<class convert_dest = do_convert_destination > struct dbg_window_t : is_generic,
 hpx::util::logging::op_equal::always_equal {
-
-    template<class msg_type> void operator()(const msg_type & msg) const {
+    void operator()(const msg_type & msg) const {
 #ifdef HPX_WINDOWS
     ::OutputDebugStringA( convert_dest::do_convert(msg, into<const char*>() ) );
 #else
@@ -144,4 +137,3 @@ typedef dbg_window_t<> dbg_window;
 }}}}
 
 #endif
-

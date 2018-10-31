@@ -12,12 +12,17 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+std::uniform_int_distribution<> dis(2,101);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_find(ExPolicy policy, IteratorTag)
 {
@@ -30,7 +35,7 @@ void test_find(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     //fill vector with random values about 1
-    std::fill(std::begin(c), std::end(c), (std::rand()%100)+2);
+    std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size()/2) = 1;
 
     iterator index = hpx::parallel::find(policy,
@@ -49,7 +54,7 @@ void test_find_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     //fill vector with random values above 1
-    std::fill(std::begin(c), std::end(c), (std::rand()%100) + 2);
+    std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size()/2) = 1;
 
     hpx::future<iterator> f =
@@ -74,15 +79,6 @@ void test_find()
 
     test_find_async(execution::seq(execution::task), IteratorTag());
     test_find_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find(execution_policy(execution::seq), IteratorTag());
-    test_find(execution_policy(execution::par), IteratorTag());
-    test_find(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_test()
@@ -106,7 +102,7 @@ void test_find_exception(ExPolicy policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), gen()+1);
     c[c.size()/2]=0;
 
     bool caught_exception = false;
@@ -138,7 +134,7 @@ void test_find_exception_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), gen()+1);
     c[c.size()/2] = 0;
 
     bool caught_exception = false;
@@ -181,14 +177,6 @@ void test_find_exception()
 
     test_find_exception_async(execution::seq(execution::task), IteratorTag());
     test_find_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_exception(execution_policy(execution::seq), IteratorTag());
-    test_find_exception(execution_policy(execution::par), IteratorTag());
-
-    test_find_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_exception(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_exception_test()
@@ -213,7 +201,7 @@ void test_find_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(100007);
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), gen()+1);
     c[c.size()/2]=0;
 
     bool caught_bad_alloc = false;
@@ -244,7 +232,7 @@ void test_find_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand()+1);
+    std::iota(std::begin(c), std::end(c), gen()+1);
     c[c.size()/2] = 0;
 
     bool caught_bad_alloc = false;
@@ -286,14 +274,6 @@ void test_find_bad_alloc()
 
     test_find_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_find_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_find_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_find_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_bad_alloc_test()
@@ -308,12 +288,11 @@ void find_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     find_test();
     find_exception_test();

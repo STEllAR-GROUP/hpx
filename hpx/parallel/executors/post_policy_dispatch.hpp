@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail
             threads::register_thread_nullary(
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
-                desc, threads::pending, true, policy.priority());
+                desc, threads::pending, false, policy.priority());
         }
     };
 

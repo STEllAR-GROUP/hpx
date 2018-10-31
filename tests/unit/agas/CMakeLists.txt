@@ -6,24 +6,78 @@
 add_subdirectory(components)
 
 set(tests
-    credit_exhaustion
     find_clients_from_prefix
     find_ids_from_prefix
     get_colocation_id
     gid_type
     local_address_rebind
     local_embedded_ref_to_local_object
-    local_embedded_ref_to_remote_object
-    remote_embedded_ref_to_local_object
-    remote_embedded_ref_to_remote_object
     refcnted_symbol_to_local_object
-    refcnted_symbol_to_remote_object
     scoped_ref_to_local_object
-    scoped_ref_to_remote_object
     split_credit
     uncounted_symbol_to_local_object
-    uncounted_symbol_to_remote_object
    )
+
+if(HPX_WITH_NETWORKING)
+    set(tests ${tests}
+        credit_exhaustion
+        local_embedded_ref_to_remote_object
+        remote_embedded_ref_to_local_object
+        remote_embedded_ref_to_remote_object
+        refcnted_symbol_to_remote_object
+        scoped_ref_to_remote_object
+        uncounted_symbol_to_remote_object
+       )
+
+  set(credit_exhaustion_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(credit_exhaustion_PARAMETERS
+      LOCALITIES 2
+      THREADS_PER_LOCALITY 2)
+
+  set(local_embedded_ref_to_remote_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(local_embedded_ref_to_remote_object_PARAMETERS
+      LOCALITIES 2
+      THREADS_PER_LOCALITY 2)
+
+  set(remote_embedded_ref_to_local_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(remote_embedded_ref_to_local_object_PARAMETERS
+      LOCALITIES 2
+      THREADS_PER_LOCALITY 2)
+
+  set(remote_embedded_ref_to_remote_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(remote_embedded_ref_to_remote_object_PARAMETERS
+      LOCALITIES 2
+      THREADS_PER_LOCALITY 2)
+
+  set(scoped_ref_to_remote_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(scoped_ref_to_remote_object_PARAMETERS
+      LOCALITIES 2
+      THREADS_PER_LOCALITY 2)
+
+  set(refcnted_symbol_to_remote_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(refcnted_symbol_to_remote_object_PARAMETERS
+      LOCALITIES 2
+      THREADS_PER_LOCALITY 2)
+
+  set(uncounted_symbol_to_remote_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(uncounted_symbol_to_remote_object_PARAMETERS
+      LOCALITIES 2
+      THREADS_PER_LOCALITY 2)
+endif()
 
 set(find_ids_from_prefix_PARAMETERS LOCALITIES 2)
 set(find_clients_from_prefix_PARAMETERS LOCALITIES 2)
@@ -42,39 +96,11 @@ set(scoped_ref_to_local_object_FLAGS
 set(scoped_ref_to_local_object_PARAMETERS
     THREADS_PER_LOCALITY 4)
 
-set(scoped_ref_to_remote_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(scoped_ref_to_remote_object_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
 set(local_embedded_ref_to_local_object_FLAGS
     DEPENDENCIES simple_refcnt_checker_component
                  managed_refcnt_checker_component)
 set(local_embedded_ref_to_local_object_PARAMETERS
     THREADS_PER_LOCALITY 4)
-
-set(local_embedded_ref_to_remote_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(local_embedded_ref_to_remote_object_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
-set(remote_embedded_ref_to_local_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(remote_embedded_ref_to_local_object_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
-set(remote_embedded_ref_to_remote_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(remote_embedded_ref_to_remote_object_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
 
 set(refcnted_symbol_to_local_object_FLAGS
     DEPENDENCIES simple_refcnt_checker_component
@@ -82,32 +108,11 @@ set(refcnted_symbol_to_local_object_FLAGS
 set(refcnted_symbol_to_local_object_PARAMETERS
     THREADS_PER_LOCALITY 4)
 
-set(refcnted_symbol_to_remote_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(refcnted_symbol_to_remote_object_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
 set(uncounted_symbol_to_local_object_FLAGS
     DEPENDENCIES simple_refcnt_checker_component
                  managed_refcnt_checker_component)
 set(uncounted_symbol_to_local_object_PARAMETERS
     THREADS_PER_LOCALITY 4)
-
-set(uncounted_symbol_to_remote_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(uncounted_symbol_to_remote_object_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
-set(credit_exhaustion_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(credit_exhaustion_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
 
 set(split_credit_FLAGS
     DEPENDENCIES simple_refcnt_checker_component

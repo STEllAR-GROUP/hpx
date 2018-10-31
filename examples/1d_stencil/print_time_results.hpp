@@ -30,13 +30,13 @@ void print_time_results(
                 "Points_per_Partition,Partitions,Time_Steps\n"
              << std::flush;
 
-    std::string const locs_str = hpx::util::format("%u,", num_localities);
-    std::string const threads_str = hpx::util::format("%lu,", num_os_threads);
-    std::string const nx_str = hpx::util::format("%lu,", nx);
-    std::string const np_str = hpx::util::format("%lu,", np);
-    std::string const nt_str = hpx::util::format("%lu ", nt);
+    std::string const locs_str = hpx::util::format("{},", num_localities);
+    std::string const threads_str = hpx::util::format("{},", num_os_threads);
+    std::string const nx_str = hpx::util::format("{},", nx);
+    std::string const np_str = hpx::util::format("{},", np);
+    std::string const nt_str = hpx::util::format("{} ", nt);
 
-    hpx::util::format_to(std::cout, "%-6s %-6s %.14g, %-21s %-21s %-21s\n",
+    hpx::util::format_to(std::cout, "{:-6} {:-6} {:.14g}, {:-21} {:-21} {:-21}\n",
         locs_str, threads_str, elapsed / 1e9, nx_str, np_str,
         nt_str) << std::flush;
 }
@@ -56,12 +56,12 @@ void print_time_results(
                 "Points_per_Partition,Partitions,Time_Steps\n"
              << std::flush;
 
-    std::string const threads_str = hpx::util::format("%lu,", num_os_threads);
-    std::string const nx_str = hpx::util::format("%lu,", nx);
-    std::string const np_str = hpx::util::format("%lu,", np);
-    std::string const nt_str = hpx::util::format("%lu ", nt);
+    std::string const threads_str = hpx::util::format("{},", num_os_threads);
+    std::string const nx_str = hpx::util::format("{},", nx);
+    std::string const np_str = hpx::util::format("{},", np);
+    std::string const nt_str = hpx::util::format("{} ", nt);
 
-    hpx::util::format_to(std::cout, "%-21s %.14g, %-21s %-21s %-21s\n",
+    hpx::util::format_to(std::cout, "{:-21} {:.14g}, {:-21} {:-21} {:-21}\n",
         threads_str, elapsed / 1e9, nx_str, np_str,
         nt_str) << std::flush;
 }
@@ -79,11 +79,11 @@ void print_time_results(
                 "Grid_Points,Time_Steps\n"
              << std::flush;
 
-    std::string const threads_str = hpx::util::format("%lu,", num_os_threads);
-    std::string const nx_str = hpx::util::format("%lu,", nx);
-    std::string const nt_str = hpx::util::format("%lu ", nt);
+    std::string const threads_str = hpx::util::format("{},", num_os_threads);
+    std::string const nx_str = hpx::util::format("{},", nx);
+    std::string const nt_str = hpx::util::format("{} ", nt);
 
-    hpx::util::format_to(std::cout, "%-21s %10.12s, %-21s %-21s\n",
+    hpx::util::format_to(std::cout, "{:-21} {:10.12}, {:-21} {:-21}\n",
         threads_str, elapsed / 1e9, nx_str, nt_str) << std::flush;
 }
 

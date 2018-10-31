@@ -17,10 +17,6 @@
 #ifndef JT28092007_destination_file_HPP_DEFINED
 #define JT28092007_destination_file_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
 #pragma warning(disable: 4355)
@@ -78,12 +74,12 @@ namespace detail {
     struct file_info {
         file_info(const std::string& name_, file_settings const& settings_)
             : name(name_),
-//               out( new std::basic_ofstream<char_type>
+//               out( new std::ofstream
 //                   ( name_.c_str(), open_flags(settings_) )),
               settings(settings_) {}
 
         void open() {
-            out.reset( new std::basic_ofstream<char_type>( name.c_str(),
+            out.reset( new std::ofstream( name.c_str(),
                 open_flags(settings) ) );
         }
 
@@ -92,7 +88,7 @@ namespace detail {
         }
 
         std::string name;
-        std::shared_ptr< std::basic_ofstream<char_type> > out;
+        std::shared_ptr< std::ofstream > out;
         file_settings settings;
     };
 }
@@ -117,7 +113,6 @@ struct file_t : is_generic, non_const_context<detail::file_info>
       : non_const_context_base(file_name,set)
     {}
 
-    template <class msg_type>
     void operator()(const msg_type & msg) const
     {
         std::lock_guard<mutex_type> l(mtx_);
@@ -136,7 +131,7 @@ struct file_t : is_generic, non_const_context<detail::file_info>
     /** configure through script
         right now, you can only specify the file name
     */
-    void configure(const hold_string_type & str) {
+    void configure(const std::string & str) {
         // configure - the file name, for now
         non_const_context_base::context().close();
         non_const_context_base::context().name.assign( str.begin(), str.end() );
@@ -161,4 +156,3 @@ typedef file_t<> file;
 #endif
 
 #endif
-

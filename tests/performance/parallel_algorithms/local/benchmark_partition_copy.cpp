@@ -141,7 +141,7 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
             first, last, dest_true, dest_false, pred);
 
     std::cout << "\n-------------- Benchmark Result --------------" << std::endl;
-    auto fmt = "partition_copy (%1%) : %2%(sec)";
+    auto fmt = "partition_copy ({1}) : {2}(sec)";
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;

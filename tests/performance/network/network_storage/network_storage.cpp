@@ -410,7 +410,6 @@ HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
 //HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
-//HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 
 // and these in a cpp
 HPX_REGISTER_ACTION(CopyToStorage_action);
@@ -674,8 +673,8 @@ void test_write(
         std::cout << "Aggregate BW Write   : " << writeBW   << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
         char const* msg = "CSVData, write, network, "
-            "%1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, "
-            "IOPS/s, %6%, BW(MB/s), %7%, ";
+            "{1}, ranks, {2}, threads, {3}, Memory, {4}, IOPsize, {5}, "
+            "IOPS/s, {6}, BW(MB/s), {7}, ";
         if (!options.warmup) {
             hpx::util::format_to(std::cout, msg,
                 options.network,
@@ -891,9 +890,9 @@ void test_read(
         std::cout << "IOPs/s (local)       : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Read    : " << readBW << " MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, read, network, %1%, ranks, "
-            "%2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, "
-            "BW(MB/s), %7%, ";
+        char const* msg = "CSVData, read, network, {1}, ranks, "
+            "{2}, threads, {3}, Memory, {4}, IOPsize, {5}, IOPS/s, {6}, "
+            "BW(MB/s), {7}, ";
         hpx::util::format_to(std::cout, msg, options.network, nranks,
             options.threads, readMB, options.transfer_size_B,
             IOPs_s, readBW) << std::endl;
@@ -923,8 +922,8 @@ int hpx_main(boost::program_options::variables_map& vm)
       return 1;
     }
 
-    char const* msg = "hello world from OS-thread %1% on locality "
-        "%2% rank %3% hostname %4%";
+    char const* msg = "hello world from OS-thread {1} on locality "
+        "{2} rank {3} hostname {4}";
     hpx::util::format_to(std::cout, msg, current, hpx::get_locality_id(),
         rank, name.c_str()) << std::endl;
     //

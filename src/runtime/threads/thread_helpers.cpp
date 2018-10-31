@@ -45,8 +45,8 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        return  detail::set_thread_state(id, state, stateex,
-            priority, std::size_t(-1), ec);
+        return detail::set_thread_state(id, state, stateex,
+            priority, thread_schedule_hint(), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ namespace hpx { namespace threads
         thread_priority priority, error_code& ec)
     {
         return detail::set_thread_state_timed(*id->get_scheduler_base(), abs_time, id,
-            state, stateex, priority, std::size_t(-1), timer_started, ec);
+            state, stateex, priority, thread_schedule_hint(), timer_started, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -502,7 +502,7 @@ namespace hpx { namespace this_thread
             if (nextid && nextid->get_scheduler_base() != id->get_scheduler_base())
             {
                 nextid->get_scheduler_base()->schedule_thread(
-                    nextid.get(), std::size_t(-1));
+                    nextid.get(), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(state,
                     threads::invalid_thread_id));
             }
@@ -571,7 +571,7 @@ namespace hpx { namespace this_thread
             if (nextid && nextid->get_scheduler_base() != id->get_scheduler_base())
             {
                 nextid->get_scheduler_base()->schedule_thread(
-                    nextid.get(), std::size_t(-1));
+                    nextid.get(), threads::thread_schedule_hint());
                 statex = self.yield(
                     threads::thread_result_type(threads::suspended,
                         threads::invalid_thread_id));

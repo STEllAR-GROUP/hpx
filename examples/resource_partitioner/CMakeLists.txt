@@ -6,10 +6,19 @@
 set(example_programs
   oversubscribing_resource_partitioner
   simple_resource_partitioner
+  simplest_resource_partitioner_1
+  simplest_resource_partitioner_2
 )
 
 set(oversubscribing_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 set(simple_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
+
+set(oversubscribing_resource_partitioner_PARAMETERS
+    THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
+set(simple_resource_partitioner_PARAMETERS
+    THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
+set(simplest_resource_partitioner_1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(simplest_resource_partitioner_2_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(example_program ${example_programs})
   set(sources
@@ -37,5 +46,13 @@ foreach(example_program ${example_programs})
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.resource_partitioner.${example_program}
                               ${example_program}_exe)
-endforeach()
 
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_example_test("resource_partitioner" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_pseudo_target(tests.examples.resource_partitioner.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.resource_partitioner
+                                tests.examples.resource_partitioner.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.resource_partitioner.${example_program}
+                                ${example_program}_exe)
+  endif()
+endforeach()

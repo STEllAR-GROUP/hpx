@@ -41,8 +41,8 @@ public:
         {
             HPX_THROW_EXCEPTION(kernel_error,
                 "process::on_CreateProcess_error",
-                hpx::util::format("format message failed with %x (while "
-                    "retrieving message for %x)", GetLastError(), hr));
+                hpx::util::format("format message failed with {:x} (while "
+                    "retrieving message for {:x})", GetLastError(), hr));
             return;
         }
 

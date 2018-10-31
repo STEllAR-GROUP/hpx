@@ -239,18 +239,6 @@ hpx_add_config_define_namespace(
     NAMESPACE parcelport)
 
 #------------------------------------------------------------------------------
-# Hardware checks
-#------------------------------------------------------------------------------
-if (HPX_PARCELPORT_LIBFABRIC_INTERFACE MATCHES "roq")
-  message(WARNING
-    "The roq interface on BGQ IO nodes does not support immediate data, disabling it")
-  hpx_add_config_define_namespace(
-      DEFINE HPX_PARCELPORT_LIBFABRIC_IMM_UNSUPPORTED
-      VALUE  1
-      NAMESPACE parcelport)
-endif()
-
-#------------------------------------------------------------------------------
 # Define the ParcelPort registration macro
 #------------------------------------------------------------------------------
 include(HPX_AddLibrary)

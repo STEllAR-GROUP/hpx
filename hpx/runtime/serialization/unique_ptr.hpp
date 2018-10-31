@@ -26,7 +26,7 @@ namespace hpx { namespace serialization
         detail::serialize_pointer_untracked(ar, ptr);
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <typename T>), (std::unique_ptr<T>));
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <typename T>), (std::unique_ptr<T>))
 }}
 
 #endif

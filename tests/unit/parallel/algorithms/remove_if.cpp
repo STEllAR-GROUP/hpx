@@ -21,7 +21,6 @@ void remove_test()
     std::cout << "--- remove_test ---" << std::endl;
     test_remove<std::random_access_iterator_tag>(true);
     test_remove<std::bidirectional_iterator_tag>(true);
-    test_remove<std::forward_iterator_tag>(true);
 }
 
 void remove_exception_test()
@@ -29,7 +28,6 @@ void remove_exception_test()
     std::cout << "--- remove_exception_test ---" << std::endl;
     test_remove_exception<std::random_access_iterator_tag>(true);
     test_remove_exception<std::bidirectional_iterator_tag>(true);
-    test_remove_exception<std::forward_iterator_tag>(true);
 }
 
 void remove_bad_alloc_test()
@@ -37,7 +35,6 @@ void remove_bad_alloc_test()
     std::cout << "--- remove_bad_alloc_test ---" << std::endl;
     test_remove_bad_alloc<std::random_access_iterator_tag>(true);
     test_remove_bad_alloc<std::bidirectional_iterator_tag>(true);
-    test_remove_bad_alloc<std::forward_iterator_tag>(true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

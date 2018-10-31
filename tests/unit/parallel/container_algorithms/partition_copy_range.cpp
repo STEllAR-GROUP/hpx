@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -107,10 +107,10 @@ void test_partition_copy(ExPolicy policy, DataType)
     HPX_UNUSED(solution);
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 
@@ -151,10 +151,10 @@ void test_partition_copy_async(ExPolicy policy, DataType)
     HPX_UNUSED(solution);
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 
@@ -194,10 +194,10 @@ void test_partition_copy_outiter(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 
@@ -237,10 +237,10 @@ void test_partition_copy_outiter_async(ExPolicy policy, DataType)
 
     HPX_TEST(get<0>(result) == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), std::end(d_true_res),
         std::begin(d_true_sol), std::end(d_true_sol));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), std::end(d_false_res),
         std::begin(d_false_sol), std::end(d_false_sol));
 
@@ -261,17 +261,6 @@ void test_partition_copy()
     test_partition_copy_async(execution::seq(execution::task), DataType());
     test_partition_copy_async(execution::par(execution::task), DataType());
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partition_copy(execution_policy(execution::seq), DataType());
-    test_partition_copy(execution_policy(execution::par), DataType());
-    test_partition_copy(execution_policy(execution::par_unseq), DataType());
-
-    test_partition_copy(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_partition_copy(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
-
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     test_partition_copy_outiter(execution::seq, DataType());
     test_partition_copy_outiter(execution::par, DataType());
@@ -279,17 +268,6 @@ void test_partition_copy()
 
     test_partition_copy_outiter_async(execution::seq(execution::task), DataType());
     test_partition_copy_outiter_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partition_copy_outiter(execution_policy(execution::seq), DataType());
-    test_partition_copy_outiter(execution_policy(execution::par), DataType());
-    test_partition_copy_outiter(execution_policy(execution::par_unseq), DataType());
-
-    test_partition_copy_outiter(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_partition_copy_outiter(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 #endif
 }
 

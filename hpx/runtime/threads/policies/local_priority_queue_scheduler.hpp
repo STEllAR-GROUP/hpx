@@ -163,6 +163,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const override { return numa_sensitive_ != 0; }
+        virtual bool has_thread_stealing() const override { return true; }
 
         static std::string get_scheduler_name()
         {
@@ -470,10 +471,12 @@ namespace hpx { namespace threads { namespace policies
         // create a new thread and schedule it if the initial state is equal to
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread,
-            std::size_t num_thread_fallback = std::size_t(-1)) override
+            thread_state_enum initial_state, bool run_now, error_code& ec) override
         {
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread =
+                data.schedulehint.mode == thread_schedule_hint_mode_thread ?
+                data.schedulehint.hint : std::size_t(-1);
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
 //             // try to figure out the NUMA node where the data lives
 //             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
@@ -495,13 +498,8 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
             }
 
-            if (num_thread_fallback != std::size_t(-1))
-            {
-                num_thread_fallback %= queue_size;
-            }
-
             std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread);
 
             // now create the thread
             if (data.priority == thread_priority_high_recursive ||
@@ -571,6 +569,11 @@ namespace hpx { namespace threads { namespace policies
                     return false;
             }
 
+            if (!running)
+            {
+                return false;
+            }
+
             for (std::size_t idx: victim_threads_[num_thread])
             {
                 HPX_ASSERT(idx != num_thread);
@@ -601,10 +604,21 @@ namespace hpx { namespace threads { namespace policies
 
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd,
-            std::size_t num_thread,
-            std::size_t num_thread_fallback = std::size_t(-1),
+            threads::thread_schedule_hint schedulehint,
+            bool allow_fallback = false,
             thread_priority priority = thread_priority_normal) override
         {
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread = std::size_t(-1);
+            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            {
+                num_thread = schedulehint.hint;
+            }
+            else
+            {
+                allow_fallback = false;
+            }
+
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
@@ -616,13 +630,8 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
             }
 
-            if (num_thread_fallback != std::size_t(-1))
-            {
-                num_thread_fallback %= queue_size;
-            }
-
             std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread, allow_fallback);
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||
@@ -643,10 +652,21 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void schedule_thread_last(threads::thread_data* thrd,
-            std::size_t num_thread,
-            std::size_t num_thread_fallback = std::size_t(-1),
+            threads::thread_schedule_hint schedulehint,
+            bool allow_fallback = false,
             thread_priority priority = thread_priority_normal) override
         {
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread = std::size_t(-1);
+            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            {
+                num_thread = schedulehint.hint;
+            }
+            else
+            {
+                allow_fallback = false;
+            }
+
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
@@ -658,13 +678,8 @@ namespace hpx { namespace threads { namespace policies
                 num_thread %= queue_size;
             }
 
-            if (num_thread_fallback != std::size_t(-1))
-            {
-                num_thread_fallback %= queue_size;
-            }
-
             std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, num_thread_fallback);
+            num_thread = select_active_pu(l, num_thread, allow_fallback);
 
             if (priority == thread_priority_high_recursive ||
                 priority == thread_priority_high ||

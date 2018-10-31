@@ -178,13 +178,13 @@ namespace hpx { namespace util
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
-            "os_threads = all",
+            "os_threads = cores",
             "cores = all",
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
             "scheduler = local-priority-fifo",
-            "affinity = pu",
+            "affinity = core",
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
@@ -195,6 +195,10 @@ namespace hpx { namespace util
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_LOOP_COUNT_MAX)) "}",
             "max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_BUSY_LOOP_COUNT_MAX)) "}",
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+            "max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:"
+            HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_IDLE_BACKOFF_TIME_MAX)) "}",
+#endif
 
             /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
             /// then apply the test-failure value as default.
@@ -233,12 +237,18 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.threadpools]",
+#if defined(HPX_HAVE_IO_POOL)
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
+#endif
+#if defined(HPX_HAVE_NETWORKING)
             "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
+#endif
+#if defined(HPX_HAVE_TIMER_POOL)
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
+#endif
 
             "[hpx.thread_queue]",
             "min_tasks_to_steal_pending = "
@@ -340,7 +350,7 @@ namespace hpx { namespace util
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 
         // don't overload user overrides
-        this->parse("<static defaults>", lines, false, false);
+        this->parse("<static defaults>", lines, false, false, false);
 
         need_to_call_pre_initialize = false;
     }

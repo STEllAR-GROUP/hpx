@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_copy(ExPolicy policy, IteratorTag)
 {
@@ -30,7 +34,7 @@ void test_copy(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
     hpx::parallel::copy(policy,
         iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
@@ -52,7 +56,7 @@ void test_copy_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     auto f =
         hpx::parallel::copy(p,
@@ -83,7 +87,7 @@ void test_copy_outiter(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(0);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
     hpx::parallel::copy(policy,
         iterator(std::begin(c)), iterator(std::end(c)), std::back_inserter(d));
 
@@ -105,7 +109,7 @@ void test_copy_outiter_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(0);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     auto f =
         hpx::parallel::copy(p,
@@ -135,15 +139,6 @@ void test_copy()
     test_copy_async(execution::seq(execution::task), IteratorTag());
     test_copy_async(execution::par(execution::task), IteratorTag());
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy(execution_policy(execution::seq), IteratorTag());
-    test_copy(execution_policy(execution::par), IteratorTag());
-    test_copy(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_copy(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
-
 #if defined(HPX_HAVE_ALGORITHM_INPUT_ITERATOR_SUPPORT)
     //assure output iterator will work
     test_copy_outiter(execution::seq, IteratorTag());
@@ -152,15 +147,6 @@ void test_copy()
 
     test_copy_outiter_async(execution::seq(execution::task), IteratorTag());
     test_copy_outiter_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_outiter(execution_policy(execution::seq), IteratorTag());
-    test_copy_outiter(execution_policy(execution::par), IteratorTag());
-    test_copy_outiter(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_copy_outiter(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy_outiter(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 #endif
 }
 
@@ -187,7 +173,7 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     try {
@@ -219,7 +205,7 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -261,14 +247,6 @@ void test_copy_exception()
 
     test_copy_exception_async(execution::seq(execution::task), IteratorTag());
     test_copy_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_exception(execution_policy(execution::seq), IteratorTag());
-    test_copy_exception(execution_policy(execution::par), IteratorTag());
-
-    test_copy_exception(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy_exception(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void copy_exception_test()
@@ -294,7 +272,7 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     try {
@@ -325,7 +303,7 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -366,14 +344,6 @@ void test_copy_bad_alloc()
 
     test_copy_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_copy_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_copy_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_copy_bad_alloc(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_copy_bad_alloc(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void copy_bad_alloc_test()
@@ -387,12 +357,11 @@ void copy_bad_alloc_test()
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     copy_test();
     copy_exception_test();

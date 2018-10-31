@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -132,7 +132,7 @@ void test_unique_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
         std::begin(dest_sol),
         pred);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<1>(result).base(),
         std::begin(dest_sol), solution);
 
@@ -165,7 +165,7 @@ void test_unique_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred,
         std::begin(dest_sol),
         pred);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<1>(result).base(),
         std::begin(dest_sol), solution);
 
@@ -337,7 +337,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag,
         auto solution = std::unique_copy(std::begin(c), std::end(c),
             std::begin(dest_sol));
 
-        bool equality = std::equal(
+        bool equality = test::equal(
             std::begin(dest_res), get<1>(result).base(),
             std::begin(dest_sol), solution);
 
@@ -384,7 +384,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag,
         auto solution = std::unique_copy(std::begin(c), std::end(c),
             std::begin(dest_sol));
 
-        bool equality = std::equal(
+        bool equality = test::equal(
             std::begin(dest_res), get<1>(result).base(),
             std::begin(dest_sol), solution);
 

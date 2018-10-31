@@ -38,7 +38,8 @@ namespace hpx { namespace threads { namespace detail
     inline thread_state set_thread_state(
         thread_id_type const& id, thread_state_enum new_state,
         thread_state_ex_enum new_state_ex, thread_priority priority,
-        std::size_t thread_num = std::size_t(-1), error_code& ec = throws);
+        thread_schedule_hint schedulehint = thread_schedule_hint(),
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     inline thread_result_type set_active_state(
@@ -73,7 +74,7 @@ namespace hpx { namespace threads { namespace detail
         // just retry, set_state will create new thread if target is still active
         error_code ec(lightweight);      // do not throw
         detail::set_thread_state(thrd, newstate, newstate_ex, priority,
-            std::size_t(-1), ec);
+            thread_schedule_hint(), ec);
 
         return thread_result_type(terminated, invalid_thread_id);
     }
@@ -82,7 +83,7 @@ namespace hpx { namespace threads { namespace detail
     inline thread_state set_thread_state(
         thread_id_type const& thrd, thread_state_enum new_state,
         thread_state_ex_enum new_state_ex, thread_priority priority,
-        std::size_t thread_num, error_code& ec)
+        thread_schedule_hint schedulehint, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id, "threads::detail::set_thread_state",
@@ -227,9 +228,12 @@ namespace hpx { namespace threads { namespace detail
         if (new_state == pending) {
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
+
             thrd->get_scheduler_base()->schedule_thread(thrd.get(),
-                thread_num, priority);
-            thrd->get_scheduler_base()->do_some_work(thread_num);
+                schedulehint, false, thrd.get()->get_priority());
+            // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
+            // a thread.
+            thrd->get_scheduler_base()->do_some_work(schedulehint.hint);
         }
 
         if (&ec != &throws)
@@ -267,7 +271,7 @@ namespace hpx { namespace threads { namespace detail
         {
             error_code ec(lightweight);    // do not throw
             detail::set_thread_state(timer_id, pending, my_statex,
-                thread_priority_boost, std::size_t(-1), ec);
+                thread_priority_boost, thread_schedule_hint(), ec);
         }
 
         return thread_result_type(terminated, invalid_thread_id);
@@ -320,12 +324,12 @@ namespace hpx { namespace threads { namespace detail
                 if (ec.value() == boost::system::errc::operation_canceled)
                 {
                     detail::set_thread_state(wake_id, pending, wait_abort,
-                        priority, std::size_t(-1), throws);
+                        priority, thread_schedule_hint(), throws);
                 }
                 else
                 {
                     detail::set_thread_state(wake_id, pending, wait_timeout,
-                        priority, std::size_t(-1), throws);
+                        priority, thread_schedule_hint(), throws);
                 }
             });
 
@@ -360,7 +364,7 @@ namespace hpx { namespace threads { namespace detail
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_time_point const& abs_time, thread_id_type const& thrd,
         thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, std::size_t thread_num,
+        thread_priority priority, thread_schedule_hint schedulehint,
         std::atomic<bool>* started, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd)) {
@@ -376,7 +380,7 @@ namespace hpx { namespace threads { namespace detail
             util::bind(&at_timer<SchedulingPolicy>,
                 std::ref(scheduler), abs_time.value(), thrd, newstate, newstate_ex,
                 priority, started),
-            "at_timer (expire at)", 0, priority, thread_num);
+                "at_timer (expire at)", 0, priority, schedulehint);
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, pending, true, ec); //-V601
@@ -389,7 +393,8 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<bool>* started, error_code& ec)
     {
         return set_thread_state_timed(scheduler, abs_time, id, pending,
-            wait_timeout, thread_priority_normal, std::size_t(-1), started, ec);
+            wait_timeout, thread_priority_normal,
+            thread_schedule_hint(), started, ec);
     }
 
     /// Set a timer to set the state of the given \a thread to the given
@@ -398,11 +403,11 @@ namespace hpx { namespace threads { namespace detail
     thread_id_type set_thread_state_timed(SchedulingPolicy& scheduler,
         util::steady_duration const& rel_time, thread_id_type const& thrd,
         thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-        thread_priority priority, std::size_t thread_num,
+        thread_priority priority, thread_schedule_hint schedulehint,
         std::atomic<bool>& started, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
-            newstate, newstate_ex, priority, thread_num, started, ec);
+            newstate, newstate_ex, priority, schedulehint, started, ec);
     }
 
     template <typename SchedulingPolicy>
@@ -411,7 +416,8 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<bool>* started, error_code& ec)
     {
         return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
-            pending, wait_timeout, thread_priority_normal, std::size_t(-1), started, ec);
+            pending, wait_timeout, thread_priority_normal,
+            thread_schedule_hint(), started, ec);
     }
 }}}
 

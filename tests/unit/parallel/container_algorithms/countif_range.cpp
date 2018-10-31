@@ -66,7 +66,7 @@ void test_count(ExPolicy policy, IteratorTag, DataType)
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
-    auto countif_lambda = [](const auto & ele){return ele == 10;};
+    auto countif_lambda = [](const DataType& ele){return ele == 10;};
 
     auto result = hpx::parallel::count_if(policy, c, countif_lambda);
     auto expected = std::count_if(std::begin(c), std::end(c), countif_lambda);
@@ -84,7 +84,7 @@ void test_count_async(ExPolicy policy, IteratorTag, DataType)
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
-    auto countif_lambda = [](const auto & ele){return ele == 10;};
+    auto countif_lambda = [](const DataType& ele){return ele == 10;};
 
     auto f = hpx::parallel::count_if(policy, c, countif_lambda);
     auto result = f.get();
@@ -112,16 +112,6 @@ void test_count()
                      IteratorTag(), DataType());
     test_count_async(execution::par(execution::task),
                      IteratorTag(), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_count(execution_policy(execution::seq), IteratorTag(), DataType());
-    test_count(execution_policy(execution::par), IteratorTag(), DataType());
-    test_count(execution_policy(execution::par_unseq),
-               IteratorTag(), DataType());
-
-    test_unique(execution_policy(execution::seq(execution::task)), DataType());
-    test_unique(execution_policy(execution::par(execution::task)), DataType());
-#endif
 }
 
 void count_test()

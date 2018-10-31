@@ -19,10 +19,6 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-#endif
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 
@@ -54,29 +50,6 @@ namespace hpx { namespace detail
             return false;
         }
     };
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-    // parallel::executor
-    template <typename Executor>
-    struct apply_dispatch<Executor,
-        typename std::enable_if<
-            traits::is_executor<Executor>::value
-        >::type>
-    {
-        template <typename F, typename ...Ts>
-        HPX_FORCEINLINE static
-        typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            bool
-        >::type
-        call(Executor& exec, F&& f, Ts&&... ts)
-        {
-            parallel::executor_traits<Executor>::apply_execute(exec,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
-            return false;
-        }
-    };
-#endif
 
     // The overload for hpx::apply taking an executor simply forwards to the
     // corresponding executor customization point.

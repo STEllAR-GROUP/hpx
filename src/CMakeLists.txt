@@ -1,12 +1,13 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
+# Copyright (c)      2018 Nikunj Gupta
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_subdirectory(components)
 
-foreach(lib "hpx")
+foreach(lib "hpx" "hpx_init")
   set(${lib}_SOURCES "" CACHE INTERNAL "Sources for lib${lib}." FORCE)
 
   if(MSVC)
@@ -20,7 +21,8 @@ endforeach()
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp")
+  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp|hpx_wrap.cpp"
+  APPEND)
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/pre_main.cpp"
   APPEND)
@@ -44,21 +46,27 @@ add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/compat/*.cpp"
   APPEND)
 
+# libhpx_wrap sources
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+  add_hpx_library_sources (hpx_wrap
+      GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_wrap.cpp")
+endif()
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_*.cpp"
-  EXCLUDE "hpx_init[.]cpp")
+  EXCLUDE "hpx_init[.]cpp|hpx_wrap.cpp")
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/util/lightweight_test.cpp"
   APPEND)
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/main.cpp" APPEND)
 
-set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
+add_hpx_library_sources(hpx_external GLOB APPEND)
 
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
+    enable_language(ASM)
     set(switch_to_fiber_source
       "${PROJECT_SOURCE_DIR}/src/runtime/threads/coroutines/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
@@ -92,7 +100,8 @@ endif()
 # libhpx headers
 add_hpx_library_headers(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/*.hpp"
-  EXCLUDE ".*hpx_main.*[.]hpp")
+  EXCLUDE ".*hpx_main.*[.]hpp"
+  APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/runtime/*.hpp"
   APPEND)
@@ -138,6 +147,8 @@ endif()
 add_hpx_library_headers(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/hpx_main*.hpp")
 
+add_hpx_library_headers(hpx_external GLOB APPEND)
+
 ################################################################################
 # make source groups
 add_hpx_source_group(
@@ -147,7 +158,7 @@ add_hpx_source_group(
 
 add_hpx_source_group(
   NAME hpx CLASS "External Source Files"
-  ROOT "${PROJECT_SOURCE_DIR}/external"
+  ROOT "${PROJECT_SOURCE_DIR}"
   TARGETS ${hpx_external_SOURCES})
 
 add_hpx_source_group(
@@ -155,6 +166,14 @@ add_hpx_source_group(
   CLASS "Header Files"
   ROOT "${PROJECT_SOURCE_DIR}/hpx"
   TARGETS ${hpx_HEADERS})
+
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+  add_hpx_source_group(
+    NAME hpx_wrap
+    CLASS "Source Files"
+    ROOT "${PROECT_SOURCE_DIR}/src"
+    TARGETS "${hpx_wrap_SOURCES}")
+endif()
 
 add_hpx_source_group(
   NAME hpx_init
@@ -221,6 +240,26 @@ else()
       ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
   endif()
 endif()
+
+# this is a dummy target that we add compile flags to
+# all tests will depend on this target and inherit the flags
+# but user code linking against hpx will not
+add_library(hpx_internal_flags INTERFACE)
+
+# Default unnamed config (not Debug/Release/etc) are in this var
+get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
+target_compile_options(hpx PRIVATE ${_temp_flags})
+target_compile_options(hpx_internal_flags INTERFACE ${_temp_flags})
+
+# message("Adding ${_temp_flags}")
+
+# Could potentially use CMAKE_CONFIGURATION_TYPES in case a user defined config exists
+foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
+  get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
+  target_compile_options(hpx PRIVATE $<$<CONFIG:${_config}>:${_temp_flags}>)
+  target_compile_options(hpx_internal_flags INTERFACE $<$<CONFIG:${_config}>:${_temp_flags}>)
+#  message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
+endforeach()
 
 #if(HPX_WITH_STATIC_LINKING)
 #  add_dependencies(hpx static_component_data_hpp)
@@ -306,24 +345,66 @@ if(NOT HPX_WITH_STATIC_LINKING)
   set(hpx_targets ${hpx_targets} hpx_init)
 endif()
 
-get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
-  GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS)
-foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
-  target_compile_definitions(hpx INTERFACE ${_flag})
-  target_compile_definitions(hpx PUBLIC ${_flag})
-  if(NOT HPX_WITH_STATIC_LINKING)
-    target_compile_definitions(hpx_init PUBLIC ${_flag})
-  endif()
-endforeach()
+################################################################################
+# libhpx_wrap
 
-get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
-  GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS)
-foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
-  target_compile_options(hpx INTERFACE ${_flag})
-  target_compile_options(hpx PUBLIC ${_flag})
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   if(NOT HPX_WITH_STATIC_LINKING)
-    target_compile_options(hpx_init PUBLIC ${_flag})
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    if(HPX_WITH_DEFAULT_TARGETS)
+      if(HPX_WITH_CUDA)
+        cuda_add_library(hpx_wrap STATIC
+          ${hpx_wrap_SOURCES})
+      else()
+        add_library(hpx_wrap STATIC
+          ${hpx_wrap_SOURCES})
+      endif()
+    else()
+      if(HPX_WITH_CUDA)
+        cuda_add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
+          ${hpx_wrap_SOURCES})
+      else()
+        add_library(hpx_wrap STATIC EXCLUDE_FROM_ALL
+          ${hpx_wrap_SOURCES})
+      endif()
+    endif()
+
+    set_property(TARGET hpx_wrap APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      "HPX_APPLICATION_EXPORTS"
+      "HPX_ENABLE_ASSERT_HANDLER")
+
+    set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
+    set(hpx_targets ${hpx_targets} hpx_wrap)
   endif()
+
+endif()
+
+foreach(_keyword PUBLIC;PRIVATE)
+  get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
+    GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS_${_keyword})
+  foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
+    target_compile_definitions(hpx ${_keyword} ${_flag})
+    if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+      target_compile_definitions(hpx_wrap ${_keyword} ${_flag})
+    endif()
+    if(NOT HPX_WITH_STATIC_LINKING)
+      target_compile_definitions(hpx_init ${_keyword} ${_flag})
+    endif()
+  endforeach()
+
+  get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
+    GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_${_keyword})
+  foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
+    target_compile_options(hpx ${_keyword} ${_flag})
+    target_compile_options(hpx_internal_flags INTERFACE ${_flag})
+    if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+      target_compile_options(hpx_wrap ${_keyword} ${_flag})
+    endif()
+    if(NOT HPX_WITH_STATIC_LINKING)
+      target_compile_options(hpx_init ${_keyword} ${_flag})
+    endif()
+  endforeach()
 endforeach()
 
 set(_optional)

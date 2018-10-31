@@ -85,8 +85,9 @@ struct hpx_driver : htts2::driver
               , nullptr // No HPX-thread name.
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
-              , target_osthread // Place in the target OS-thread's queue.
-                );
+              // Place in the target OS-thread's queue.
+              , hpx::threads::thread_schedule_hint(target_osthread)
+            );
         }
 
         for (std::uint64_t i = 0; i < this->tasks_; ++i)
@@ -99,8 +100,9 @@ struct hpx_driver : htts2::driver
               , hpx::threads::pending
               , false // Do not run immediately.
               , hpx::threads::thread_priority_normal
-              , target_osthread // Place in the target OS-thread's queue.
-                );
+              // Place in the target OS-thread's queue.
+              , hpx::threads::thread_schedule_hint(target_osthread)
+            );
         }
     }
 
@@ -156,8 +158,9 @@ struct hpx_driver : htts2::driver
               , nullptr // No HPX-thread name.
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
-              , i // Place in the target OS-thread's queue.
-                );
+              // Place in the target OS-thread's queue.
+              , hpx::threads::thread_schedule_hint(i)
+            );
         }
 
         stage_tasks(this_osthread);
@@ -206,7 +209,7 @@ struct hpx_driver : htts2::driver
                 << "Total Walltime [nanoseconds]"
                 << "\n";
 
-        hpx::util::format_to(std::cout, "%lu,%lu,%lu,%.14g\n",
+        hpx::util::format_to(std::cout, "{},{},{},{:.14g}\n",
             this->osthreads_,
             this->tasks_,
             this->payload_duration_,

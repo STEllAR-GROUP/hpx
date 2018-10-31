@@ -294,6 +294,7 @@ namespace hpx { namespace threads
             std::string name = rp.get_pool_name(i);
             resource::scheduling_policy sched_type = rp.which_scheduler(name);
             std::size_t num_threads_in_pool = rp.get_num_threads(i);
+            policies::scheduler_mode scheduler_mode = rp.get_scheduler_mode(i);
 
             // make sure the first thread-pool that gets instantiated is the default one
             if (i == 0)
@@ -347,11 +348,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier_, i, name.c_str(),
-                        policies::scheduler_mode(policies::do_background_work |
-                            policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                        notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -390,11 +387,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier_, i, name.c_str(),
-                        policies::scheduler_mode(policies::do_background_work |
-                            policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                        notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -427,11 +420,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier_, i, name.c_str(),
-                        policies::scheduler_mode(policies::do_background_work |
-                            policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                        notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -463,10 +452,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier_, i, name.c_str(),
-                        policies::scheduler_mode(policies::do_background_work |
-                            policies::reduce_thread_priority |
-                            policies::delay_exit),
+                        notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -508,10 +494,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier_, i, name.c_str(),
-                        policies::scheduler_mode(policies::do_background_work |
-                            policies::reduce_thread_priority |
-                            policies::delay_exit),
+                        notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
 
@@ -548,11 +531,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier_, i, name.c_str(),
-                        policies::scheduler_mode(policies::do_background_work |
-                            policies::reduce_thread_priority |
-                            policies::delay_exit |
-                            policies::enable_suspension),
+                        notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
 #else
@@ -588,10 +567,7 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<
                             local_sched_type
                         >(std::move(sched),
-                        notifier_, i, name.c_str(),
-                        policies::scheduler_mode(policies::do_background_work |
-                            policies::reduce_thread_priority |
-                            policies::delay_exit),
+                        notifier_, i, name.c_str(), scheduler_mode,
                         thread_offset));
                 pools_.push_back(std::move(pool));
 #else
@@ -599,6 +575,34 @@ namespace hpx { namespace threads
                     "Command line option --hpx:queuing=abp-priority-lifo "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
+#endif
+                break;
+            }
+
+            case resource::shared_priority:
+            {
+#if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+                // instantiate the scheduler
+                typedef hpx::threads::policies::shared_priority_queue_scheduler<>
+                    local_sched_type;
+                hpx::threads::policies::core_ratios ratios(4, 4, 64);
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(num_threads_in_pool, ratios,
+                        "core-shared_priority_queue_scheduler"));
+
+                // instantiate the pool
+                std::unique_ptr<thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<
+                            local_sched_type
+                        >(std::move(sched),
+                        notifier_, i, name.c_str(), scheduler_mode,
+                        thread_offset));
+                pools_.push_back(std::move(pool));
+#else
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:queuing=shared-priority "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=shared-priority'.");
 #endif
                 break;
             }
@@ -611,7 +615,7 @@ namespace hpx { namespace threads
         // fill the thread-lookup table
         for (auto& pool_iter : pools_)
         {
-            std::size_t nt = rp.get_num_threads(pool_iter->get_pool_name());
+            std::size_t nt = rp.get_num_threads(pool_iter->get_pool_index());
             for (std::size_t i = 0; i < nt; i++)
             {
                 threads_lookup_.push_back(pool_iter->get_pool_id());
@@ -632,7 +636,7 @@ namespace hpx { namespace threads
         for (auto && pool_iter : pools_)
         {
             std::size_t num_threads_in_pool =
-                rp.get_num_threads(pool_iter->get_pool_name());
+                rp.get_num_threads(pool_iter->get_pool_index());
             pool_iter->init(num_threads_in_pool, threads_offset);
             threads_offset += num_threads_in_pool;
         }
@@ -847,6 +851,24 @@ namespace hpx { namespace threads
             result += pool_iter->get_cumulative_duration(all_threads, reset);
         return result;
     }
+
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+    std::int64_t threadmanager::get_background_work_duration(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result += pool_iter->get_background_work_duration(all_threads, reset);
+        return result;
+    }
+
+    std::int64_t threadmanager::get_background_overhead(bool reset)
+    {
+        std::int64_t result = 0;
+        for (auto const& pool_iter : pools_)
+            result += pool_iter->get_background_overhead(all_threads, reset);
+        return result;
+    }
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     std::int64_t threadmanager::avg_idle_rate(bool reset)
@@ -1098,15 +1120,38 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        thread_pool_base& pool = default_pool();
+        using performance_counters::detail::create_raw_counter;
 
+        thread_pool_base& pool = default_pool();
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
         {
-            // overall counter
-            using performance_counters::detail::create_raw_counter;
+            // counter for default pool
             util::function_nonser<std::int64_t()> f = util::bind_back(
                 &thread_pool_base::get_scheduler_utilization, &pool);
             return create_raw_counter(info, std::move(f), ec);
+        }
+        else if (paths.instancename_ == "pool")
+        {
+            if (paths.instanceindex_ < 0)
+            {
+                // counter for default pool
+                util::function_nonser<std::int64_t()> f = util::bind_back(
+                    &thread_pool_base::get_scheduler_utilization, &pool);
+                return create_raw_counter(info, std::move(f), ec);
+            }
+            else if (std::size_t(paths.instanceindex_) <
+                hpx::resource::get_num_thread_pools())
+            {
+                // counter specific for given pool
+                thread_pool_base& pool_instance =
+                    hpx::resource::get_thread_pool(paths.instanceindex_);
+
+                util::function_nonser<std::int64_t()> f =
+                    util::bind_back(
+                        &thread_pool_base::get_scheduler_utilization,
+                            &pool_instance);
+                return create_raw_counter(info, std::move(f), ec);
+            }
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "scheduler_utilization_creator",
@@ -1494,6 +1539,30 @@ namespace hpx { namespace threads
                 "ns"},
 #endif
 #endif
+
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+            {"/threads/time/background-work-duration",
+                performance_counters::counter_raw,
+                "returns the overall time spent running background work",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_work_duration,
+                    &thread_pool_base::get_background_work_duration),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "ns"},
+            {"/threads/background-overhead",
+                performance_counters::counter_raw,
+                "returns the overall background overhead",
+                HPX_PERFORMANCE_COUNTER_V1,
+                util::bind_front(
+                    &threadmanager::locality_pool_thread_counter_creator, this,
+                    &threadmanager::get_background_overhead,
+                    &thread_pool_base::get_background_overhead),
+                &performance_counters::locality_pool_thread_counter_discoverer,
+                "0.1%"},
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+
             {"/threads/time/overall", performance_counters::counter_raw,
                 "returns the overall time spent running the scheduler on a "
                 "core",
@@ -1779,11 +1848,7 @@ namespace hpx { namespace threads
 
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    fs.push_back(pool_iter->suspend());
-                }
+                fs.push_back(pool_iter->suspend());
             }
 
             hpx::wait_all(fs);
@@ -1792,11 +1857,7 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    pool_iter->suspend_direct();
-                }
+                pool_iter->suspend_direct();
             }
         }
     }
@@ -1809,11 +1870,7 @@ namespace hpx { namespace threads
 
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    fs.push_back(pool_iter->resume());
-                }
+                fs.push_back(pool_iter->resume());
             }
             hpx::wait_all(fs);
         }
@@ -1821,11 +1878,7 @@ namespace hpx { namespace threads
         {
             for (auto& pool_iter : pools_)
             {
-                if (pool_iter->get_scheduler_mode() &
-                        policies::enable_suspension)
-                {
-                    pool_iter->resume_direct();
-                }
+                pool_iter->resume_direct();
             }
         }
     }

@@ -158,8 +158,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                     "affinity_data::affinity_data",
                     hpx::util::format(
                         "The number of OS threads requested "
-                        "(%1%) does not match the number of threads to "
-                        "bind (%2%)", num_threads_, num_initialized));
+                        "({1}) does not match the number of threads to "
+                        "bind ({2})", num_threads_, num_initialized));
             }
         }
         else if (pu_offset == std::size_t(-1))
@@ -240,7 +240,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return topo.get_machine_affinity_mask();
     }
 
-    mask_type affinity_data::get_used_pus_mask(std::size_t pu_num) const
+    mask_type affinity_data::get_used_pus_mask(threads::topology const& topo,
+        std::size_t pu_num) const
     {
         mask_type ret = mask_type();
         threads::resize(ret, hardware_concurrency());
@@ -252,13 +253,16 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             return ret;
         }
 
-        for(mask_cref_type pu_mask : affinity_masks_)
-            ret |= pu_mask;
+        for (std::size_t thread_num = 0; thread_num < num_threads_; ++thread_num)
+        {
+            ret |= get_pu_mask(topo, thread_num);
+        }
 
         return ret;
     }
 
-    std::size_t affinity_data::get_thread_occupancy(std::size_t pu_num) const
+    std::size_t affinity_data::get_thread_occupancy(
+        threads::topology const& topo, std::size_t pu_num) const
     {
         std::size_t count = 0;
         if (threads::test(no_affinity_, pu_num))
@@ -272,8 +276,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             threads::resize(pu_mask, hardware_concurrency());
             threads::set(pu_mask, pu_num);
 
-            for (mask_cref_type affinity_mask : affinity_masks_)
+            for (std::size_t num_thread = 0; num_thread < num_threads_; ++num_thread)
             {
+                mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);
                 if (threads::any(pu_mask & affinity_mask))
                     ++count;
             }

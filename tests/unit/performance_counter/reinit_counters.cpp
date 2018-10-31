@@ -56,7 +56,7 @@ public:
 
     void reinit(bool reset) override
     {
-        value_count_ = std::rand();
+        value_count_ = std::rand() % 100;
     }
 
 private:
@@ -143,7 +143,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     {
         hpx::performance_counters::performance_counter c("/test/reinit-values");
 
-        c.reinit();
+        c.reinit(hpx::launch::sync);
 
         auto values = c.get_counter_values_array(hpx::launch::sync, false);
 

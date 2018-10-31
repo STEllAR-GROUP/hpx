@@ -61,9 +61,9 @@ namespace hpx { namespace agas
 
         virtual void register_counter_types() {}
 
-        virtual void register_server_instance(std::uint32_t locality_id) {}
+        virtual void register_server_instance(std::uint32_t /*locality_id*/) {}
 
-        virtual void unregister_server_instance(error_code& ec) {}
+        virtual void unregister_server_instance(error_code& /*ec*/) {}
     };
 }}
 

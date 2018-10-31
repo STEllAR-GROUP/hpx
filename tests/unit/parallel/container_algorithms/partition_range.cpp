@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -117,7 +117,7 @@ void test_partition(ExPolicy policy, DataType)
     std::sort(std::begin(c), std::end(c));
     std::sort(std::begin(c_org), std::end(c_org));
 
-    bool unchanged = std::equal(
+    bool unchanged = test::equal(
         std::begin(c), std::end(c),
         std::begin(c_org), std::end(c_org));
 
@@ -161,7 +161,7 @@ void test_partition_async(ExPolicy policy, DataType)
     std::sort(std::begin(c), std::end(c));
     std::sort(std::begin(c_org), std::end(c_org));
 
-    bool unchanged = std::equal(
+    bool unchanged = test::equal(
         std::begin(c), std::end(c),
         std::begin(c_org), std::end(c_org));
 
@@ -179,17 +179,6 @@ void test_partition()
 
     test_partition_async(execution::seq(execution::task), DataType());
     test_partition_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partition(execution_policy(execution::seq), DataType());
-    test_partition(execution_policy(execution::par), DataType());
-    test_partition(execution_policy(execution::par_unseq), DataType());
-
-    test_partition(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_partition(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 }
 
 void test_partition()

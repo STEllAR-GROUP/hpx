@@ -17,7 +17,9 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/throw_exception.hpp>
+#include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind_back.hpp>
@@ -39,7 +41,7 @@ namespace hpx
             void operator()(Component* p)
             {
                 id_ = naming::invalid_id;       // release component
-                p->unpin();
+                traits::component_pin_support<Component>::unpin(p);
             }
 
             naming::id_type id_;                // holds component alive
@@ -54,7 +56,8 @@ namespace hpx
             template <typename Component>
             void operator()(Component* p)
             {
-                bool was_migrated = p->unpin();
+                bool was_migrated =
+                    traits::component_pin_support<Component>::unpin(p);
 
                 if (was_migrated)
                 {
@@ -93,7 +96,8 @@ namespace hpx
             Component* p = get_lva<Component>::call(addr.address_);
             std::shared_ptr<Component> ptr(p, Deleter(id));
 
-            ptr->pin();     // the shared_ptr pins the component
+            // the shared_ptr pins the component
+            traits::component_pin_support<Component>::pin(ptr.get());
             return ptr;
         }
 
@@ -150,8 +154,10 @@ namespace hpx
     get_ptr(naming::id_type const& id)
     {
         hpx::future<naming::address> f = agas::resolve(id);
-        return f.then(util::bind_back(
-            &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>, id));
+        return f.then(hpx::launch::sync,
+            util::bind_back(
+                &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>,
+                id));
     }
 
     /// \brief Returns a future referring to the pointer to the
@@ -282,46 +288,6 @@ namespace hpx
 
         return get_ptr<component_type>(p, c.get_id(), ec);
     }
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    /// \brief Returns the pointer to the underlying memory of a component
-    ///
-    /// The function hpx::get_ptr_sync can be used to extract the pointer to
-    /// the underlying memory of a given component.
-    ///
-    /// \param id  [in] The global id of the component for which the pointer
-    ///            to the underlying memory should be retrieved.
-    /// \param ec  [in,out] this represents the error status on exit, if this
-    ///            is pre-initialized to \a hpx#throws the function will throw
-    ///            on error instead.
-    ///
-    /// \tparam    The only template parameter has to be the type of the
-    ///            server side component.
-    ///
-    /// \returns   This function returns the pointer to the underlying memory
-    ///            for the component instance with the given \a id.
-    ///
-    /// \note      This function will successfully return the requested result
-    ///            only if the given component is currently located on the
-    ///            requesting locality. Otherwise the function will raise and
-    ///            error.
-    ///
-    /// \note      As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///            function doesn't throw but returns the result code using the
-    ///            parameter \a ec. Otherwise it throws an instance of
-    ///            hpx::exception.
-    ///
-    /// \note     This functions is deprecated, it will be removed in a future
-    ///           version of HPX.
-    ///
-    template <typename Component>
-    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-    std::shared_ptr<Component>
-    get_ptr_sync(naming::id_type const& id, error_code& ec = throws)
-    {
-        return get_ptr(launch::sync, id, ec);
-    }
-#endif
 }
 
 #endif

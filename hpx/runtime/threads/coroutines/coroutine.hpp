@@ -39,6 +39,9 @@
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_id_type.hpp>
 #include <hpx/util/assert.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -97,9 +100,13 @@ namespace hpx { namespace threads { namespace coroutines
         }
 
 #if defined(HPX_HAVE_APEX)
-        void** get_apex_data() const
+        apex_task_wrapper get_apex_data() const
         {
             return impl_.get_apex_data();
+        }
+        void set_apex_data(apex_task_wrapper data)
+        {
+            return impl_.set_apex_data(data);
         }
 #endif
 

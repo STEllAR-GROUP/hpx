@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,9 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 _gen(seed);
+
 struct throw_always
 {
     template <typename T>
@@ -45,9 +48,11 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-      : val(rand_no),
-        name(name_list[std::rand() % name_list.size()])
-    {}
+      : val(rand_no)
+    {
+        std::uniform_int_distribution<> dis(0,name_list.size()-1);
+        name = name_list[dis(_gen)];
+    }
 
     bool operator<(user_defined_type const& t) const
     {
@@ -95,7 +100,7 @@ struct random_fill
 {
     random_fill() = default;
     random_fill(int rand_base, int range)
-      : gen(std::rand()),
+      : gen(_gen()),
         dist(rand_base - range / 2, rand_base + range / 2)
     {}
 
@@ -142,7 +147,7 @@ void test_merge(ExPolicy policy, IteratorTag, DataType, Comp comp,
         std::begin(dest_sol),
         comp);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<2>(result).base(),
         std::begin(dest_sol), solution);
 
@@ -183,7 +188,7 @@ void test_merge_async(ExPolicy policy, IteratorTag, DataType, Comp comp,
         std::begin(dest_sol),
         comp);
 
-    bool equality = std::equal(
+    bool equality = test::equal(
         std::begin(dest_res), get<2>(result).base(),
         std::begin(dest_sol), solution);
 
@@ -383,7 +388,7 @@ void test_merge_etc(ExPolicy policy, IteratorTag,
             std::begin(src2), std::end(src2),
             std::begin(dest_sol));
 
-        bool equality = std::equal(
+        bool equality = test::equal(
             std::begin(dest_res), get<2>(result).base(),
             std::begin(dest_sol), solution);
 
@@ -445,7 +450,7 @@ void test_merge_etc(ExPolicy policy, IteratorTag,
             std::begin(src2), std::end(src2),
             std::begin(dest_sol));
 
-        bool equality = std::equal(
+        bool equality = test::equal(
             std::begin(dest_res), get<2>(result).base(),
             std::begin(dest_sol), solution);
 
@@ -525,7 +530,7 @@ void test_merge()
 {
     using namespace hpx::parallel;
 
-    int rand_base = std::rand();
+    int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_merge(execution::seq, IteratorTag(), int(),

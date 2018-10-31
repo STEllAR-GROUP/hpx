@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2018 Taeguk Kwon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,9 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+int seed = std::random_device{}();
+std::mt19937 _gen(seed);
+
 struct throw_always
 {
     template <typename T>
@@ -43,9 +46,11 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-        : val(rand_no),
-        name(name_list[std::rand() % name_list.size()])
-    {}
+        : val(rand_no)
+    {
+        std::uniform_int_distribution<> dis(0,name_list.size()-1);
+        name = name_list[dis(_gen)];
+    }
 
     bool operator<(int rand_base) const
     {
@@ -77,7 +82,7 @@ const std::vector<std::string> user_defined_type::name_list{
 struct random_fill
 {
     random_fill(int rand_base, int range)
-        : gen(std::rand()),
+        : gen(_gen()),
         dist(rand_base - range / 2, rand_base + range / 2)
     {}
 
@@ -120,10 +125,10 @@ void test_partition_copy(ExPolicy policy, IteratorTag, DataType, Pred pred,
 
     HPX_TEST(get<0>(result).base() == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), get<1>(result).base(),
         std::begin(d_true_sol), get<0>(solution));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), get<2>(result).base(),
         std::begin(d_false_sol), get<1>(solution));
 
@@ -161,10 +166,10 @@ void test_partition_copy_async(ExPolicy policy, IteratorTag, DataType, Pred pred
 
     HPX_TEST(get<0>(result).base() == std::end(c));
 
-    bool equality_true = std::equal(
+    bool equality_true = test::equal(
         std::begin(d_true_res), get<1>(result).base(),
         std::begin(d_true_sol), get<0>(solution));
-    bool equality_false = std::equal(
+    bool equality_false = test::equal(
         std::begin(d_false_res), get<2>(result).base(),
         std::begin(d_false_sol), get<1>(solution));
 
@@ -185,7 +190,7 @@ void test_partition_copy_exception(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_exception = false;
     try {
@@ -216,7 +221,7 @@ void test_partition_copy_exception_async(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -255,7 +260,7 @@ void test_partition_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_bad_alloc = false;
     try {
@@ -285,7 +290,7 @@ void test_partition_copy_bad_alloc_async(ExPolicy policy, IteratorTag)
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d_true(size), d_false(size);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    std::iota(std::begin(c), std::end(c), _gen());
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -316,7 +321,7 @@ void test_partition_copy()
 {
     using namespace hpx::parallel;
 
-    int rand_base = std::rand();
+    int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_partition_copy(execution::seq, IteratorTag(), int(),

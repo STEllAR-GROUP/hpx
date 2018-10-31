@@ -17,15 +17,12 @@
 #ifndef JT28092007_formatter_time_HPP_DEFINED
 #define JT28092007_formatter_time_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // is_generic
 #include <hpx/util/logging/detail/time_format_holder.hpp>
 
+#include <string>
 #include <time.h>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
@@ -62,10 +59,10 @@ template<class convert = do_convert_format::prepend> struct time_t
     /**
         constructs a time object
     */
-    time_t(const hold_string_type & format) : non_const_context_base(format) {}
+    time_t(const std::string & format) : non_const_context_base(format) {}
 
-    template<class msg_type> void write_time(msg_type & msg, ::time_t val) const {
-        char_type buffer[64];
+    void write_time(msg_type & msg, ::time_t val) const {
+        char buffer[64];
 
         tm details = *localtime( &val);
         non_const_context_base::context().write_time( buffer,
@@ -75,7 +72,7 @@ template<class convert = do_convert_format::prepend> struct time_t
         convert::write(buffer, msg);
     }
 
-    template<class msg_type> void operator()(msg_type & msg) const {
+    void operator()(msg_type & msg) const {
         ::time_t val = ::time(nullptr);
         write_time(msg, val);
     }
@@ -89,7 +86,7 @@ template<class convert = do_convert_format::prepend> struct time_t
 
         the string = the time format
     */
-    void configure(const hold_string_type & str) {
+    void configure(const std::string & str) {
         non_const_context_base::context().set_format(str);
     }
 
@@ -106,4 +103,3 @@ typedef time_t<> time;
 }}}}
 
 #endif
-

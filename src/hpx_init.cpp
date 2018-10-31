@@ -30,7 +30,6 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/format.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/query_counters.hpp>
 
@@ -183,7 +182,7 @@ namespace hpx { namespace detail
               << '\n';
 
         strm << "version:  ";        // 0xMMmmrrrr
-        hpx::util::format_to(strm, "%d.%d.%d\n",
+        hpx::util::format_to(strm, "{}.{}.{}\n",
             info.version_ / 0x1000000,
             info.version_ / 0x10000 % 0x100,
             info.version_ % 0x10000);
@@ -252,7 +251,7 @@ namespace hpx { namespace detail
     void list_component_type(std::string const& name,
         components::component_type ctype)
     {
-        print(hpx::util::format("%1%, %|40t|%2%",
+        print(hpx::util::format("{1:-40}, {2}",
             name, components::get_component_type_name(ctype)));
     }
 
@@ -283,6 +282,18 @@ namespace hpx { namespace detail
         }
     }
 }}
+
+#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
+    (defined(__linux) || defined(__linux__) || defined(linux) || \
+    defined(__APPLE__))
+namespace hpx_start
+{
+    // Importing weak symbol from libhpx_wrap.a which may be shadowed by one present in
+    // hpx_main.hpp.
+    HPX_SYMBOL_EXPORT __attribute__((weak)) bool include_libhpx_wrap = false;
+}
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -588,6 +599,20 @@ namespace hpx
                 // make sure the runtime system is not active yet
                 if (get_runtime_ptr() != nullptr)
                 {
+                #if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
+                (defined(__linux) || defined(__linux__) || defined(linux) || \
+                defined(__APPLE__))
+                    // make sure the runtime system is not initialized
+                    // after its activation from int main()
+                    if(hpx_start::include_libhpx_wrap)
+                    {
+                        std::cerr << "hpx is already initialized from main.\n"
+                            "Note: Delete hpx_main.hpp to initialize hpx system "
+                            "using hpx::init. Exiting...\n";
+                        return -1;
+                    }
+                #endif
+
                     std::cerr << "hpx::init: can't initialize runtime system "
                         "more than once! Exiting...\n";
                     return -1;
@@ -603,11 +628,6 @@ namespace hpx
                 // Setup all internal parameters of the resource_partitioner
                 rp.configure_pools();
 
-                // initialize logging
-                util::command_line_handling& cms = rp.get_command_line_switches();
-                util::detail::init_logging(
-                    cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
-
                 util::apex_wrapper_init apex(argc, argv);
 
                 // Initialize and start the HPX runtime.
@@ -615,6 +635,8 @@ namespace hpx
 
                 // Build and configure this runtime instance.
                 typedef hpx::runtime_impl runtime_type;
+
+                util::command_line_handling& cms = rp.get_command_line_switches();
                 std::unique_ptr<hpx::runtime> rt(new runtime_type(cms.rtcfg_));
 
                 result = rp.parse_result();

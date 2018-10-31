@@ -22,7 +22,7 @@
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT memory
+    class memory
     {
     public:
         typedef memory type_holder;
@@ -39,12 +39,11 @@ namespace hpx { namespace components { namespace server
         typedef util::integer::uint128 uint128_t;
 
         // constructor
-        memory()
-        {}
+        memory() = default;
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize() {}
+        HPX_CXX14_CONSTEXPR static void finalize() {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -123,7 +122,10 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, load128);
 
         // This component type requires valid id for its actions to be invoked
-        static bool is_target_valid(naming::id_type const& id) { return true; }
+        HPX_CONSTEXPR static bool is_target_valid(naming::id_type const&)
+        {
+            return true;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////

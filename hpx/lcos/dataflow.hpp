@@ -18,6 +18,7 @@
 #include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -29,15 +30,12 @@
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
 #include <hpx/util/tuple.hpp>
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-#endif
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
 
@@ -49,6 +47,7 @@
 #include <exception>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -203,7 +202,38 @@ namespace hpx { namespace lcos { namespace detail
         HPX_FORCEINLINE
         void finalize(hpx::detail::sync_policy, Futures&& futures)
         {
-            done(std::move(futures));
+            // We need to run the completion on a new thread if we are on a
+            // non HPX thread.
+            bool recurse_asynchronously = hpx::threads::get_self_ptr() == nullptr;
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            recurse_asynchronously =
+                !this_thread::has_sufficient_stack_space();
+#else
+            struct handle_continuation_recursion_count
+            {
+                handle_continuation_recursion_count()
+                  : count_(threads::get_continuation_recursion_count())
+                {
+                    ++count_;
+                }
+                ~handle_continuation_recursion_count()
+                {
+                    --count_;
+                }
+
+                std::size_t& count_;
+            } cnt;
+            recurse_asynchronously = recurse_asynchronously ||
+                cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+#endif
+            if (!recurse_asynchronously)
+            {
+                done(std::move(futures));
+            }
+            else
+            {
+                finalize(hpx::launch::async, std::move(futures));
+            }
         }
 
         void finalize(hpx::detail::fork_policy policy, Futures&& futures)
@@ -232,21 +262,6 @@ namespace hpx { namespace lcos { namespace detail
                 finalize(launch::async, std::move(futures));
             }
         }
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-        // handle executors through their executor_traits
-        template <typename Executor>
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG) HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::is_executor<Executor>::value
-        >::type
-        finalize(Executor& exec, Futures&& futures)
-        {
-            boost::intrusive_ptr<dataflow_frame> this_(this);
-            parallel::executor_traits<Executor>::apply_execute(exec,
-                &dataflow_frame::done, std::move(this_), std::move(futures));
-        }
-#endif
 
         // The overload for hpx::dataflow taking an executor simply forwards
         // to the corresponding executor customization point.
@@ -297,7 +312,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         /// Finish the dataflow when the traversal has finished
-        void operator()(util::async_traverse_complete_tag, Futures futures)
+        HPX_FORCEINLINE void operator()(
+            util::async_traverse_complete_tag, Futures futures)
         {
             finalize(policy_, std::move(futures));
         }
@@ -332,6 +348,30 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Allocator, typename Policy, typename Func, typename ...Ts,
+        typename Frame = dataflow_frame<
+            typename std::decay<Policy>::type,
+            typename std::decay<Func>::type,
+            util::tuple<typename std::decay<Ts>::type...>>>
+    typename Frame::type create_dataflow_alloc(
+        Allocator const& alloc, Policy && policy, Func && func, Ts &&... ts)
+    {
+        // Create the data which is used to construct the dataflow_frame
+        auto data = Frame::construct_from(
+            std::forward<Policy>(policy), std::forward<Func>(func));
+
+        // Construct the dataflow_frame and traverse
+        // the arguments asynchronously
+        boost::intrusive_ptr<Frame> p = util::traverse_pack_async_allocator(
+            alloc, util::async_traverse_in_place_tag<Frame>{},
+            std::move(data), std::forward<Ts>(ts)...);
+
+        using traits::future_access;
+        return future_access<typename Frame::type>::create(std::move(p));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename FD, typename Enable = void>
     struct dataflow_dispatch;
 
@@ -342,7 +382,7 @@ namespace hpx { namespace lcos { namespace detail
         >::type>
     {
         template <
-            typename Policy_,
+            typename Allocator, typename Policy_,
             typename Component, typename Signature, typename Derived,
             typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
@@ -350,16 +390,17 @@ namespace hpx { namespace lcos { namespace detail
                 typename hpx::actions::basic_action<
                     Component, Signature, Derived>::remote_result_type
             >::type>
-        call(Policy_ && policy,
+        call(Allocator const& alloc, Policy_ && policy,
             hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         {
-            return detail::create_dataflow(
+            return detail::create_dataflow_alloc(alloc,
                 std::forward<Policy_>(policy), Derived{},
                 id, traits::acquire_future_disp()(std::forward<Ts>(ts))...);
         }
 
-        template <typename Policy_, typename F, typename ...Ts>
+        template <typename Allocator, typename Policy_, typename F,
+            typename ...Ts>
         HPX_FORCEINLINE static typename std::enable_if<
             !traits::is_action<typename std::decay<F>::type>::value,
             lcos::future<
@@ -368,9 +409,10 @@ namespace hpx { namespace lcos { namespace detail
                     util::tuple<typename traits::acquire_future<Ts>::type...>
                 >::type>
         >::type
-        call(Policy_ && policy, F && f, Ts &&... ts)
+        call(Allocator const& alloc, Policy_ && policy, F && f,
+            Ts &&... ts)
         {
-            return detail::create_dataflow(
+            return detail::create_dataflow_alloc(alloc,
                 std::forward<Policy_>(policy), std::forward<F>(f),
                 traits::acquire_future_disp()(std::forward<Ts>(ts))...);
         }
@@ -380,15 +422,13 @@ namespace hpx { namespace lcos { namespace detail
     // threads::executor
     template <typename Executor>
     struct dataflow_dispatch<Executor, typename std::enable_if<
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            traits::is_executor<Executor>::value ||
-#endif
             traits::is_one_way_executor<Executor>::value ||
             traits::is_two_way_executor<Executor>::value ||
             traits::is_threads_executor<Executor>::value
         >::type>
     {
-        template <typename Executor_, typename F, typename ...Ts>
+        template <typename Allocator, typename Executor_, typename F,
+            typename ...Ts>
         HPX_FORCEINLINE static typename std::enable_if<
             !traits::is_action<typename std::decay<F>::type>::value,
             lcos::future<
@@ -397,9 +437,9 @@ namespace hpx { namespace lcos { namespace detail
                     util::tuple<typename traits::acquire_future<Ts>::type...>
                 >::type>
         >::type
-        call(Executor_ && exec, F && f, Ts &&... ts)
+        call(Allocator const& alloc, Executor_ && exec, F && f, Ts &&... ts)
         {
-            return detail::create_dataflow(
+            return detail::create_dataflow_alloc(alloc,
                 std::forward<Executor_>(exec), std::forward<F>(f),
                 traits::acquire_future_disp()(std::forward<Ts>(ts))...);
         }
@@ -410,39 +450,39 @@ namespace hpx { namespace lcos { namespace detail
     struct dataflow_dispatch<FD, typename std::enable_if<
         !traits::is_launch_policy<FD>::value &&
         !(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-            traits::is_executor<FD>::value ||
-#endif
             traits::is_one_way_executor<FD>::value ||
             traits::is_two_way_executor<FD>::value ||
             traits::is_threads_executor<FD>::value)
         >::type>
     {
         template <
-            typename Component, typename Signature, typename Derived,
-            typename ...Ts>
+            typename Allocator, typename Component, typename Signature,
+            typename Derived, typename ...Ts>
         HPX_FORCEINLINE static auto
-        call(hpx::actions::basic_action<Component, Signature, Derived> const& act,
+        call(Allocator const& alloc,
+            hpx::actions::basic_action<Component, Signature, Derived> const& act,
             naming::id_type const& id, Ts &&... ts)
         ->  decltype(dataflow_dispatch<launch>::call(
-                launch::async, act, id, std::forward<Ts>(ts)...))
+                alloc, launch::async, act, id, std::forward<Ts>(ts)...))
         {
             return dataflow_dispatch<launch>::call(
-                launch::async, act, id, std::forward<Ts>(ts)...);
+                alloc, launch::async, act, id, std::forward<Ts>(ts)...);
         }
 
         template <
-            typename F, typename ...Ts,
+            typename Allocator, typename F, typename ...Ts,
             typename Enable = typename std::enable_if<
                 !traits::is_action<typename std::decay<F>::type>::value
             >::type>
         HPX_FORCEINLINE static auto
-        call(F && f, Ts &&... ts)
+        call(Allocator const& alloc, F && f, Ts &&... ts)
         ->  decltype(dataflow_dispatch<launch>::call(
-                launch::async, std::forward<F>(f), std::forward<Ts>(ts)...))
+                alloc, launch::async, std::forward<F>(f),
+                std::forward<Ts>(ts)...))
         {
             return dataflow_dispatch<launch>::call(
-                launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
+                alloc, launch::async, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
     };
 
@@ -450,14 +490,15 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Action, typename T0, typename Enable = void>
     struct dataflow_action_dispatch
     {
-        template <typename ...Ts>
+        template <typename Allocator, typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::traits::extract_action<Action>::remote_result_type
             >::type>
-        call(naming::id_type const& id, Ts &&... ts)
+        call(Allocator const& alloc, naming::id_type const& id,
+            Ts &&... ts)
         {
-            return dataflow_dispatch<Action>::call(
+            return dataflow_dispatch<Action>::call(alloc,
                 Action(), id, std::forward<Ts>(ts)...);
         }
     };
@@ -467,16 +508,17 @@ namespace hpx { namespace lcos { namespace detail
             traits::is_launch_policy<typename std::decay<Policy>::type>::value
         >::type>
     {
-        template <typename ...Ts>
+        template <typename Allocator, typename ...Ts>
         HPX_FORCEINLINE static lcos::future<
             typename traits::promise_local_result<
                 typename hpx::traits::extract_action<Action>::remote_result_type
             >::type>
-        call(Policy && policy, naming::id_type const& id, Ts &&... ts)
+        call(Allocator const& alloc, Policy && policy,
+            naming::id_type const& id, Ts &&... ts)
         {
-            return dataflow_dispatch<typename std::decay<Policy>::type>::call(
-                std::forward<Policy>(policy), Action(), id,
-                std::forward<Ts>(ts)...);
+            return dataflow_dispatch<typename std::decay<Policy>::type>::
+                call(alloc, std::forward<Policy>(policy), Action(), id,
+                    std::forward<Ts>(ts)...);
         }
     };
 }}}
@@ -489,11 +531,25 @@ namespace hpx
     auto dataflow(F && f, Ts &&... ts)
     ->  decltype(
             lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::call(
-                std::forward<F>(f), std::forward<Ts>(ts)...
+                hpx::util::internal_allocator<>{}, std::forward<F>(f),
+                std::forward<Ts>(ts)...
         ))
     {
         return lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
-            call(std::forward<F>(f), std::forward<Ts>(ts)...);
+            call(hpx::util::internal_allocator<>{}, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+    }
+
+    template <typename Allocator, typename F, typename ...Ts>
+    HPX_FORCEINLINE
+    auto dataflow_alloc(Allocator const& alloc, F && f, Ts &&... ts)
+    ->  decltype(
+            lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
+                call(alloc, std::forward<F>(f), std::forward<Ts>(ts)...
+        ))
+    {
+        return lcos::detail::dataflow_dispatch<typename std::decay<F>::type>::
+            call(alloc, std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 
     template <
@@ -503,10 +559,25 @@ namespace hpx
     HPX_FORCEINLINE
     auto dataflow(T0 && t0, Ts &&... ts)
     ->  decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            std::forward<T0>(t0), std::forward<Ts>(ts)...))
+            hpx::util::internal_allocator<>{}, std::forward<T0>(t0),
+            std::forward<Ts>(ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            std::forward<T0>(t0), std::forward<Ts>(ts)...);
+            hpx::util::internal_allocator<>{}, std::forward<T0>(t0),
+            std::forward<Ts>(ts)...);
+    }
+
+    template <
+        typename Action, typename Allocator, typename T0, typename ...Ts,
+        typename Enable = typename std::enable_if<
+            traits::is_action<Action>::value>::type>
+    HPX_FORCEINLINE
+    auto dataflow_alloc(Allocator const& alloc, T0 && t0, Ts &&... ts)
+    ->  decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
+            alloc, std::forward<T0>(t0), std::forward<Ts>(ts)...))
+    {
+        return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
+            alloc, std::forward<T0>(t0), std::forward<Ts>(ts)...);
     }
 }
 

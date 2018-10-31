@@ -75,15 +75,4 @@ namespace hpx { namespace parallel { namespace execution
     /// \endcond
 }}}
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-
-#include <hpx/traits/v1/is_executor_parameters.hpp>
-
-namespace hpx { namespace parallel { inline namespace v3
-{
-    using dynamic_chunk_size = execution::dynamic_chunk_size;
-}}}
-
-#endif
-
 #endif

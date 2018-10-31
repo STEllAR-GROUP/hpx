@@ -106,7 +106,7 @@ namespace hpx { namespace components { namespace server
         /// \param self [in] The HPX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the
         ///             component instance.
-        void finalize() {}
+        HPX_CXX14_CONSTEXPR static void finalize() {}
 
         void delete_function_lists();
         void tidy();
@@ -243,7 +243,7 @@ namespace hpx { namespace components { namespace server
         void stopped();
         void notify_waiting_main();
 
-        bool was_stopped() const { return stopped_; }
+        bool was_stopped() const { return stop_called_; }
 
         void add_pre_startup_function(startup_function_type f)
         {
@@ -365,7 +365,8 @@ namespace hpx { namespace components { namespace server
         compat::mutex mtx_;
         compat::condition_variable wait_condition_;
         compat::condition_variable stop_condition_;
-        bool stopped_;
+        bool stop_called_;
+        bool stop_done_;
         bool terminated_;
         bool dijkstra_color_;   // false: white, true: black
         std::atomic<bool> shutdown_all_invoked_;

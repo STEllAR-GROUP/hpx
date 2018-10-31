@@ -17,12 +17,7 @@
 #ifndef JT28092007_level_HPP_DEFINED
 #define JT28092007_level_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <hpx/util/logging/detail/tss/tss.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -63,7 +58,7 @@ namespace level {
     };
 
     /**
-        @brief Filter - holds the level, in a non-thread-safe way.
+        @brief Filter - holds the level.
 
         Holds the level, and tells you if a specific level is enabled.
         It does this in a non-thread-safe way.
@@ -72,42 +67,14 @@ namespace level {
         it can take a bit to propagate
         between threads. Most of the time, this should be acceptable.
     */
-    struct holder_no_ts {
-        holder_no_ts(type default_level = enable_all) : m_level(default_level) {}
+    struct holder {
+        holder(type default_level = enable_all) : m_level(default_level) {}
         bool is_enabled(type level) const { return level >= m_level; }
         void set_enabled(type level) {
             m_level = level;
         }
     private:
         type m_level;
-    };
-
-
-    /**
-        @brief Filter - holds the level, in a thread-safe way.
-
-        Holds the level, and tells you if a specific level is enabled.
-        It does this in a thread-safe way.
-
-        However, it manages it rather ineffiently - always locking before asking.
-    */
-    struct holder_ts {
-        typedef hpx::util::logging::threading::scoped_lock scoped_lock;
-        typedef hpx::util::logging::threading::mutex mutex;
-
-        holder_ts(type default_level = enable_all)
-            : m_level(default_level) {}
-        bool is_enabled(type level) const {
-            scoped_lock lk(m_cs);
-            return level >= m_level;
-        }
-        void set_enabled(type level) {
-            scoped_lock lk(m_cs);
-            m_level = level;
-        }
-    private:
-        type m_level;
-        mutable mutex m_cs;
     };
 
     /**
@@ -121,59 +88,8 @@ namespace level {
             return fix_level >= level;
         }
     };
-
-
-
-
-#ifndef HPX_HAVE_LOG_NO_TSS
-
-    /**
-        @brief Filter - holds the level, in a thread-safe way, using TLS.
-
-        Uses TLS (Thread Local Storage) to find out if a level is enabled or not.
-        It caches the current "is_enabled" on each thread.
-        Then, at a given period, it retrieves the real "level".
-    */
-    template<int default_cache_secs = 5> struct holder_tss_with_cache {
-        typedef locker::tss_resource_with_cache<type, default_cache_secs> data;
-
-        holder_tss_with_cache(int cache_secs = default_cache_secs,
-            type default_level = enable_all) : m_level(default_level, cache_secs) {}
-        bool is_enabled(type test_level) const {
-            typename data::read cur_level(m_level);
-            return test_level >= cur_level.use();
-        }
-        void set_enabled(type level) {
-            typename data::write cur_level(m_level);
-            cur_level.use() = level;
-        }
-    private:
-        data m_level;
-    };
-
-    struct holder_tss_once_init {
-        typedef locker::tss_resource_once_init<type> data;
-
-        holder_tss_once_init(type default_level = enable_all) : m_level(default_level) {}
-        bool is_enabled(type test_level) const {
-            data::read cur_level(m_level);
-            return test_level >= cur_level.use();
-        }
-        void set_enabled(type level) {
-            data::write cur_level(m_level);
-            cur_level.use() = level;
-        }
-    private:
-        data m_level;
-    };
-#endif
-
-
-
-    typedef hpx::util::logging::level_holder_type holder;
 } // namespace level
 
 }}}
 
 #endif
-

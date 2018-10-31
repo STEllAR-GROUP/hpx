@@ -21,7 +21,7 @@ namespace hpx { namespace traits
         typedef typename traits::action_continuation<Action>::type
             continuation_type;
 
-        static bool call(continuation_type& cont)
+        static bool call(continuation_type& /*cont*/)
         {
             // by default we do nothing
             return false; // continuation has not been modified

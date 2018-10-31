@@ -32,9 +32,9 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 105500
+#if BOOST_VERSION < 105800
 // Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than 1.55.0
+#error HPX cannot be compiled with a Boost version earlier than 1.58.0
 #endif
 
 #include <hpx/util/detail/pp/cat.hpp>
@@ -367,6 +367,14 @@
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
 #  define HPX_BUSY_LOOP_COUNT_MAX 2000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Maximum sleep time for idle backoff in milliseconds.
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+#  if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
+#    define HPX_IDLE_BACKOFF_TIME_MAX 1000
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

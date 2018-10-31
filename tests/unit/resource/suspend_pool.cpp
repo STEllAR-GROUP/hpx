@@ -52,7 +52,7 @@ int hpx_main(int argc, char* argv[])
         // Suspend and resume pool with future
         hpx::util::high_resolution_timer t;
 
-        while (t.elapsed() < 5)
+        while (t.elapsed() < 2)
         {
             std::vector<hpx::future<void>> fs;
 
@@ -76,7 +76,7 @@ int hpx_main(int argc, char* argv[])
         hpx::lcos::local::counting_semaphore sem;
         hpx::util::high_resolution_timer t;
 
-        while (t.elapsed() < 5)
+        while (t.elapsed() < 2)
         {
             std::vector<hpx::future<void>> fs;
 
@@ -109,7 +109,7 @@ int hpx_main(int argc, char* argv[])
         // Suspend pool with some threads already suspended
         hpx::util::high_resolution_timer t;
 
-        while (t.elapsed() < 5)
+        while (t.elapsed() < 2)
         {
             for (std::size_t thread_num = 0;
                 thread_num < worker_pool_threads - 1; ++thread_num)
@@ -137,8 +137,8 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-template <typename Scheduler>
-void test_scheduler(int argc, char* argv[])
+void test_scheduler(int argc, char* argv[],
+    hpx::resource::scheduling_policy scheduler)
 {
     std::vector<std::string> cfg =
     {
@@ -147,29 +147,7 @@ void test_scheduler(int argc, char* argv[])
 
     hpx::resource::partitioner rp(argc, argv, std::move(cfg));
 
-    rp.create_thread_pool("worker",
-        [](hpx::threads::policies::callback_notifier& notifier,
-            std::size_t num_threads, std::size_t thread_offset,
-            std::size_t pool_index, std::string const& pool_name)
-        -> std::unique_ptr<hpx::threads::thread_pool_base>
-        {
-            typename Scheduler::init_parameter_type init(num_threads);
-            std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
-
-            auto mode = hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::do_background_work |
-                hpx::threads::policies::reduce_thread_priority |
-                hpx::threads::policies::delay_exit |
-                hpx::threads::policies::enable_elasticity |
-                hpx::threads::policies::enable_suspension);
-
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
-                    std::move(scheduler), notifier, pool_index, pool_name, mode,
-                    thread_offset));
-
-            return pool;
-        });
+    rp.create_thread_pool("worker", scheduler);
 
     int const worker_pool_threads = 3;
     int worker_pool_threads_added = 0;
@@ -194,9 +172,32 @@ void test_scheduler(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    test_scheduler<hpx::threads::policies::local_queue_scheduler<>>(argc, argv);
-    test_scheduler<hpx::threads::policies::local_priority_queue_scheduler<>>(argc,
-        argv);
+    std::vector<hpx::resource::scheduling_policy> schedulers =
+        {
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+            hpx::resource::scheduling_policy::local,
+            hpx::resource::scheduling_policy::local_priority_fifo,
+            hpx::resource::scheduling_policy::local_priority_lifo,
+#endif
+#if defined(HPX_HAVE_ABP_SCHEDULER)
+            hpx::resource::scheduling_policy::abp_priority_fifo,
+            hpx::resource::scheduling_policy::abp_priority_lifo,
+#endif
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+            hpx::resource::scheduling_policy::static_,
+#endif
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+            hpx::resource::scheduling_policy::static_priority,
+#endif
+#if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+            hpx::resource::scheduling_policy::shared_priority,
+#endif
+        };
+
+    for (auto const scheduler : schedulers)
+    {
+        test_scheduler(argc, argv, scheduler);
+    }
 
     return hpx::util::report_errors();
 }

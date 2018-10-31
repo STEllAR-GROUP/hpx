@@ -84,7 +84,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
 
-    char const* fmt = "elapsed time: %1% [s]\n";
+    char const* fmt = "elapsed time: {1} [s]\n";
     hpx::util::format_to(std::cout, fmt, t.elapsed());
 
     return hpx::finalize(); // Handles HPX shutdown

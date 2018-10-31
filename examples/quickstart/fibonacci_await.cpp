@@ -187,8 +187,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 //      double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_serial(%1%) == %2%,"
-            "elapsed time:,%3%,[s]\n";
+        char const* fmt = "fibonacci_serial({1}) == {2},"
+            "elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
         executed_one = true;
@@ -208,8 +208,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 //      double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_await(%1%) == %2%,"
-            "elapsed time:,%3%,[s]\n";
+        char const* fmt = "fibonacci_await({1}) == {2},"
+            "elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d / max_runs);
 
         executed_one = true;

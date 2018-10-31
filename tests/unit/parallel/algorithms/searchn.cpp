@@ -83,16 +83,6 @@ void test_search_n1()
 
     test_search_n1_async(execution::seq(execution::task), IteratorTag());
     test_search_n1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_search_n1(execution_policy(execution::seq), IteratorTag());
-    test_search_n1(execution_policy(execution::par), IteratorTag());
-    test_search_n1(execution_policy(execution::par_unseq), IteratorTag());
-    test_search_n1(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_search_n1(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void search_n_test1()
@@ -170,17 +160,6 @@ void test_search_n2()
 
     test_search_n2_async(execution::seq(execution::task), IteratorTag());
     test_search_n2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_search_n2(execution_policy(execution::seq), IteratorTag());
-    test_search_n2(execution_policy(execution::par), IteratorTag());
-    test_search_n2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_search_n2(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_search_n2(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void search_n_test2()
@@ -256,17 +235,6 @@ void test_search_n3()
 
     test_search_n3_async(execution::seq(execution::task), IteratorTag());
     test_search_n3_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_search_n3(execution_policy(execution::seq), IteratorTag());
-    test_search_n3(execution_policy(execution::par), IteratorTag());
-    test_search_n3(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_search_n3(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_search_n3(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void search_n_test3()
@@ -346,17 +314,6 @@ void test_search_n4()
 
     test_search_n4_async(execution::seq(execution::task), IteratorTag());
     test_search_n4_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_search_n4(execution_policy(execution::seq), IteratorTag());
-    test_search_n4(execution_policy(execution::par), IteratorTag());
-    test_search_n4(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_search_n4(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_search_n4(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void search_n_test4()
@@ -442,16 +399,6 @@ void test_search_n5()
 
     test_search_n5_async(execution::seq(execution::task), IteratorTag());
     test_search_n5_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_search_n5(execution_policy(execution::seq), IteratorTag());
-    test_search_n5(execution_policy(execution::par), IteratorTag());
-    test_search_n5(execution_policy(execution::par_unseq), IteratorTag());
-    test_search_n5(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_search_n5(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void search_n_test5()
@@ -555,14 +502,6 @@ void test_search_n_exception()
         IteratorTag());
     test_search_n_async_exception(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_search_n_exception(execution_policy(execution::par), IteratorTag());
-    test_search_n_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_search_n_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void search_n_exception_test()
@@ -661,15 +600,6 @@ void test_search_n_bad_alloc()
         IteratorTag());
     test_search_n_async_bad_alloc(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_search_n_bad_alloc(execution_policy(execution::par), IteratorTag());
-    test_search_n_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_search_n_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_search_n_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void search_n_bad_alloc_test()

@@ -8,6 +8,8 @@
 set(subdirs
     throttle)
 
+# TODO: Add non-interactive version that can be tested.
+
 # for all targets specified above
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
@@ -47,4 +49,3 @@ add_hpx_pseudo_dependencies(examples.throttle examples.throttle.spin)
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.throttle.spin spin_exe)
-

@@ -41,7 +41,8 @@ namespace hpx { namespace agas { namespace server
     void primary_namespace::route(parcelset::parcel && p)
     { // {{{ route implementation
         util::scoped_timer<std::atomic<std::int64_t> > update(
-            counter_data_.route_.time_
+            counter_data_.route_.time_,
+            counter_data_.route_.enabled_
         );
         counter_data_.increment_route_count();
 
@@ -59,7 +60,10 @@ namespace hpx { namespace agas { namespace server
             std::unique_lock<mutex_type> l(mutex_);
 
             // wait for any migration to be completed
-            wait_for_migration_locked(l, gid, ec);
+            if (naming::detail::is_migratable(gid))
+            {
+                wait_for_migration_locked(l, gid, ec);
+            }
 
             cache_address = resolve_gid_locked(l, gid, ec);
 
@@ -70,7 +74,7 @@ namespace hpx { namespace agas { namespace server
                 HPX_THROWS_IF(ec, no_success,
                     "primary_namespace::route",
                     hpx::util::format(
-                        "can't route parcel to unknown gid: %s",
+                        "can't route parcel to unknown gid: {}",
                         gid));
 
                 return;

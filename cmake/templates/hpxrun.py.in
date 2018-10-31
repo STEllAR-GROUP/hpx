@@ -54,11 +54,16 @@ def subproc(cmd):
 # Run with no run wrapper
 # This is just starting "localities" processes on the local node
 def run_none(cmd, localities, verbose):
-    for locality in range(localities):
-        exec_cmd = cmd + ['--hpx:node=' + str(locality)]
-        if verbose:
-            print('Executing command: ' + ' '.join(exec_cmd))
-        subproc(exec_cmd)
+    if localities > 1:
+        for locality in range(localities):
+            exec_cmd = cmd + ['--hpx:node=' + str(locality)]
+            if verbose:
+                print('Executing command: ' + ' '.join(exec_cmd))
+            subproc(exec_cmd)
+    else:
+         if verbose:
+             print('Executing command: ' + ' '.join(cmd))
+         subproc(cmd)
 
 # Run with mpiexec
 # This is executing mpiexec with the "-np" option set to the number of localities
@@ -109,11 +114,14 @@ def build_cmd(options, args):
     # set number of threads
     if options.threads == -1:
         cmd += ['--hpx:threads=all']
-    else:
+    if options.threads == -2:
+        cmd += ['--hpx:threads=cores']
+    if options.threads >= 1:
         cmd += ['--hpx:threads=' + str(options.threads)]
 
     # set number of localities
-    cmd += ['--hpx:localities=' + str(options.localities)]
+    if options.localities > 1:
+        cmd += ['--hpx:localities=' + str(options.localities)]
 
     # Append the remaining args
     for arg in args:
@@ -135,7 +143,7 @@ def check_options(parser, options, args):
         print('Can not start less than one locality', sys.stderr)
         sys.exit(1)
 
-    if options.threads < 1 and options.threads != -1:
+    if options.threads < 1 and options.threads != -1 and options.threads != -2:
         print('Can not start less than one thread per locality', sys.stderr)
         sys.exit(1)
 

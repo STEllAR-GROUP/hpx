@@ -221,9 +221,9 @@ namespace lcos {
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        void set_value(error_code& ec = throws)
+        void set_value()
         {
-            base_type::set_value(hpx::util::unused, ec);
+            base_type::set_value(hpx::util::unused);
         }
 
         // Effects: atomically stores the exception pointer p in the shared

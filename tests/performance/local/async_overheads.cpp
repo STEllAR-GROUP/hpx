@@ -5,6 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include "worker_timed.hpp"
 
@@ -87,6 +88,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                   << (end - start) / 1e9 << " [s], ("
                   << seqential_time_per_task << " [s])"
                   << std::endl;
+        hpx::util::print_cdash_timing("AsyncSequential", seqential_time_per_task);
     }
 
     double hierarchical_time_per_task = 0;
@@ -104,12 +106,16 @@ int hpx_main(boost::program_options::variables_map& vm)
                   << (end - start) / 1e9 << " [s], ("
                   << hierarchical_time_per_task << " [s])"
                   << std::endl;
+        hpx::util::print_cdash_timing("AsyncHierarchical", hierarchical_time_per_task);
     }
 
     std::cout
         << "Ratio (speedup): "
         << seqential_time_per_task / hierarchical_time_per_task
         << std::endl;
+
+    hpx::util::print_cdash_timing("AsyncSpeedup",
+        seqential_time_per_task/hierarchical_time_per_task);
 
     return hpx::finalize();
 }

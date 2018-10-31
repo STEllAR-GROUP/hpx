@@ -27,13 +27,13 @@ namespace hpx { namespace parallel { namespace execution
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(post);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(sync_execute);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(async_execute);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(then_execute);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_sync_execute);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_async_execute);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_then_execute);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(post)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(sync_execute)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(async_execute)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(then_execute)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_sync_execute)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_async_execute)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_then_execute)
     }
 
     template <typename T, typename Enable = void>

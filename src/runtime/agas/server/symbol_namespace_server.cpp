@@ -81,11 +81,11 @@ void symbol_namespace::register_counter_types(
         if (detail::symbol_namespace_services[i].target_
             == detail::counter_target_count)
             help = hpx::util::format(
-                "returns the number of invocations of the AGAS service '%s'",
+                "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
         else
             help = hpx::util::format(
-                "returns the overall execution time of the AGAS service '%s'",
+                "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
 
         performance_counters::install_counter_type(
@@ -187,7 +187,8 @@ bool symbol_namespace::bind(
 { // {{{ bind implementation
     // parameters
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.bind_.time_
+        counter_data_.bind_.time_,
+        counter_data_.bind_.enabled_
     );
     counter_data_.increment_bind_count();
 
@@ -208,8 +209,8 @@ bool symbol_namespace::bind(
         if (raw_gid == gid)
         {
             LAGAS_(info) << hpx::util::format(
-                "symbol_namespace::bind, key(%1%), gid(%2%), old_credit(%3%), "
-                "new_credit(%4%)",
+                "symbol_namespace::bind, key({1}), gid({2}), old_credit({3}), "
+                "new_credit({4})",
                 key, gid,
                 naming::detail::get_credit_from_gid(*(it->second)),
                 naming::detail::get_credit_from_gid(*(it->second)) + credits);
@@ -224,7 +225,7 @@ bool symbol_namespace::bind(
         {
             naming::detail::add_credit_to_gid(gid, credits);
             LAGAS_(info) << hpx::util::format(
-                "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)",
+                "symbol_namespace::bind, key({1}), gid({2}), response(no_success)",
                 key, gid);
         }
 
@@ -294,7 +295,7 @@ bool symbol_namespace::bind(
     l.unlock();
 
     LAGAS_(info) << hpx::util::format(
-        "symbol_namespace::bind, key(%1%), gid(%2%)",
+        "symbol_namespace::bind, key({1}), gid({2})",
         key, gid);
 
     return true;
@@ -304,7 +305,8 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
 { // {{{ resolve implementation
     // parameters
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.resolve_.time_
+        counter_data_.resolve_.time_,
+        counter_data_.resolve_.enabled_
     );
     counter_data_.increment_resolve_count();
 
@@ -316,7 +318,7 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
     if (it == end)
     {
         LAGAS_(info) << hpx::util::format(
-            "symbol_namespace::resolve, key(%1%), response(no_success)",
+            "symbol_namespace::resolve, key({1}), response(no_success)",
             key);
 
         return naming::invalid_gid;
@@ -329,7 +331,7 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
     naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid).get();
 
     LAGAS_(info) << hpx::util::format(
-        "symbol_namespace::resolve, key(%1%), gid(%2%)",
+        "symbol_namespace::resolve, key({1}), gid({2})",
         key, gid);
 
     return gid;
@@ -338,7 +340,8 @@ naming::gid_type symbol_namespace::resolve(std::string const& key)
 naming::gid_type symbol_namespace::unbind(std::string const& key)
 { // {{{ unbind implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.unbind_.time_
+        counter_data_.unbind_.time_,
+        counter_data_.unbind_.enabled_
     );
     counter_data_.increment_unbind_count();
 
@@ -350,7 +353,7 @@ naming::gid_type symbol_namespace::unbind(std::string const& key)
     if (it == end)
     {
         LAGAS_(info) << hpx::util::format(
-            "symbol_namespace::unbind, key(%1%), response(no_success)",
+            "symbol_namespace::unbind, key({1}), response(no_success)",
             key);
 
         return naming::invalid_gid;
@@ -361,7 +364,7 @@ naming::gid_type symbol_namespace::unbind(std::string const& key)
     gids_.erase(it);
 
     LAGAS_(info) << hpx::util::format(
-        "symbol_namespace::unbind, key(%1%), gid(%2%)",
+        "symbol_namespace::unbind, key({1}), gid({2})",
         key, gid);
 
     return gid;
@@ -372,7 +375,8 @@ symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
     std::string const& pattern)
 { // {{{ iterate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.iterate_names_.time_
+        counter_data_.iterate_names_.time_,
+        counter_data_.iterate_names_.enabled_
     );
     counter_data_.increment_iterate_names_count();
 
@@ -428,7 +432,8 @@ bool symbol_namespace::on_event(
     )
 { // {{{ on_event implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.on_event_.time_
+        counter_data_.on_event_.time_,
+        counter_data_.on_event_.enabled_
     );
     counter_data_.increment_on_event_count();
 
@@ -519,26 +524,32 @@ naming::gid_type symbol_namespace::statistics_counter(std::string const& name)
         case symbol_ns_bind:
             get_data_func = util::bind_front(&cd::get_bind_count,
                 &counter_data_);
+            counter_data_.bind_.enabled_ = true;
             break;
         case symbol_ns_resolve:
             get_data_func = util::bind_front(&cd::get_resolve_count,
                 &counter_data_);
+            counter_data_.resolve_.enabled_ = true;
             break;
         case symbol_ns_unbind:
             get_data_func = util::bind_front(&cd::get_unbind_count,
                 &counter_data_);
+            counter_data_.unbind_.enabled_ = true;
             break;
         case symbol_ns_iterate_names:
             get_data_func = util::bind_front(&cd::get_iterate_names_count,
                 &counter_data_);
+            counter_data_.iterate_names_.enabled_ = true;
             break;
         case symbol_ns_on_event:
             get_data_func = util::bind_front(&cd::get_on_event_count,
                 &counter_data_);
+            counter_data_.on_event_.enabled_ = true;
             break;
         case symbol_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_count,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -552,26 +563,32 @@ naming::gid_type symbol_namespace::statistics_counter(std::string const& name)
         case symbol_ns_bind:
             get_data_func = util::bind_front(&cd::get_bind_time,
                 &counter_data_);
+            counter_data_.bind_.enabled_ = true;
             break;
         case symbol_ns_resolve:
             get_data_func = util::bind_front(&cd::get_resolve_time,
                 &counter_data_);
+            counter_data_.resolve_.enabled_ = true;
             break;
         case symbol_ns_unbind:
             get_data_func = util::bind_front(&cd::get_unbind_time,
                 &counter_data_);
+            counter_data_.unbind_.enabled_ = true;
             break;
         case symbol_ns_iterate_names:
             get_data_func = util::bind_front(&cd::get_iterate_names_time,
                 &counter_data_);
+            counter_data_.iterate_names_.enabled_ = true;
             break;
         case symbol_ns_on_event:
             get_data_func = util::bind_front(&cd::get_on_event_time,
                 &counter_data_);
+            counter_data_.on_event_.enabled_ = true;
             break;
         case symbol_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -625,6 +642,15 @@ std::int64_t symbol_namespace::counter_data::get_overall_count(bool reset)
         util::get_and_reset_value(on_event_.count_, reset);
 }
 
+void symbol_namespace::counter_data::enable_all()
+{
+    bind_.enabled_ = true;
+    resolve_.enabled_ = true;
+    unbind_.enabled_ = true;
+    iterate_names_.enabled_ = true;
+    on_event_.enabled_ = true;
+}
+
 // access execution time counters
 std::int64_t symbol_namespace::counter_data::get_bind_time(bool reset)
 {
@@ -663,27 +689,42 @@ std::int64_t symbol_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void symbol_namespace::counter_data::increment_bind_count()
 {
-    ++bind_.count_;
+    if (bind_.enabled_)
+    {
+        ++bind_.count_;
+    }
 }
 
 void symbol_namespace::counter_data::increment_resolve_count()
 {
-    ++resolve_.count_;
+    if (resolve_.enabled_)
+    {
+        ++resolve_.count_;
+    }
 }
 
 void symbol_namespace::counter_data::increment_unbind_count()
 {
-    ++unbind_.count_;
+    if (unbind_.enabled_)
+    {
+        ++unbind_.count_;
+    }
 }
 
 void symbol_namespace::counter_data::increment_iterate_names_count()
 {
-    ++iterate_names_.count_;
+    if (iterate_names_.enabled_)
+    {
+        ++iterate_names_.count_;
+    }
 }
 
 void symbol_namespace::counter_data::increment_on_event_count()
 {
-    ++on_event_.count_;
+    if (on_event_.enabled_)
+    {
+        ++on_event_.count_;
+    }
 }
 
 }}}

@@ -12,17 +12,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
-#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -35,11 +36,11 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
@@ -359,8 +360,8 @@ namespace hpx { namespace actions
                 Policy const& policy, IdOrPolicy const& id_or_policy,
                 error_code& ec, Ts&&... vs)
             {
-                return hpx::async<basic_action>(policy, id_or_policy,
-                    std::forward<Ts>(vs)...).get(ec);
+                return hpx::sync<basic_action>(policy, id_or_policy,
+                    std::forward<Ts>(vs)...);
             }
         };
 

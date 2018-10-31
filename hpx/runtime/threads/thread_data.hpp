@@ -24,6 +24,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/thread_description.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -110,9 +113,10 @@ namespace hpx { namespace threads
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will be retrieved
         ///                 by using the function \a threadmanager#get_state.
-        thread_state get_state() const
+        thread_state get_state(
+            std::memory_order order = std::memory_order_acquire) const
         {
-            return current_state_.load(std::memory_order_acquire);
+            return current_state_.load(order);
         }
 
         /// The set_state function changes the state of this thread instance.
@@ -128,10 +132,11 @@ namespace hpx { namespace threads
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
         thread_state set_state(thread_state_enum state,
-            thread_state_ex_enum state_ex = wait_unknown)
+            thread_state_ex_enum state_ex = wait_unknown,
+            std::memory_order load_order = std::memory_order_acquire,
+            std::memory_order exchange_order = std::memory_order_seq_cst)
         {
-            thread_state prev_state =
-                current_state_.load(std::memory_order_acquire);
+            thread_state prev_state = current_state_.load(load_order);
 
             for (;;) {
                 thread_state tmp = prev_state;
@@ -145,7 +150,7 @@ namespace hpx { namespace threads
                     state_ex = tmp.state_ex();
 
                 if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
-                        thread_state(state, state_ex, tag))))
+                        thread_state(state, state_ex, tag), exchange_order)))
                 {
                     return prev_state;
                 }
@@ -155,7 +160,8 @@ namespace hpx { namespace threads
         }
 
         bool set_state_tagged(thread_state_enum newstate,
-            thread_state& prev_state, thread_state& new_tagged_state)
+            thread_state& prev_state, thread_state& new_tagged_state,
+            std::memory_order exchange_order = std::memory_order_seq_cst)
         {
             thread_state tmp = prev_state;
             thread_state_ex_enum state_ex = tmp.state_ex();
@@ -163,8 +169,11 @@ namespace hpx { namespace threads
             new_tagged_state = thread_state(newstate, state_ex,
                 prev_state.tag() + 1);
 
-            if (!current_state_.compare_exchange_strong(tmp, new_tagged_state))
+            if (!current_state_.compare_exchange_strong(
+                    tmp, new_tagged_state, exchange_order))
+            {
                 return false;
+            }
 
             prev_state = tmp;
             return true;
@@ -191,7 +200,9 @@ namespace hpx { namespace threads
         ///
         /// \returns This function returns \a true if the state has been
         ///          changed successfully
-        bool restore_state(thread_state new_state, thread_state old_state)
+        bool restore_state(thread_state new_state, thread_state old_state,
+            std::memory_order load_order = std::memory_order_relaxed,
+            std::memory_order load_exchange = std::memory_order_seq_cst)
         {
             // ABA prevention for state only (not for state_ex)
             std::int64_t tag = old_state.tag();
@@ -200,16 +211,18 @@ namespace hpx { namespace threads
 
             // ignore the state_ex while compare-exchanging
             thread_state_ex_enum state_ex =
-                current_state_.load(std::memory_order_relaxed).state_ex();
+                current_state_.load(load_order).state_ex();
 
             thread_state old_tmp(old_state.state(), state_ex, old_state.tag());
             thread_state new_tmp(new_state.state(), state_ex, tag);
 
-            return current_state_.compare_exchange_strong(old_tmp, new_tmp);
+            return current_state_.compare_exchange_strong(
+                old_tmp, new_tmp, load_exchange);
         }
 
         bool restore_state(thread_state_enum new_state,
-            thread_state_ex_enum state_ex, thread_state old_state)
+            thread_state_ex_enum state_ex, thread_state old_state,
+            std::memory_order load_exchange = std::memory_order_seq_cst)
         {
             // ABA prevention for state only (not for state_ex)
             std::int64_t tag = old_state.tag();
@@ -217,7 +230,7 @@ namespace hpx { namespace threads
                 ++tag;
 
             return current_state_.compare_exchange_strong(old_state,
-                thread_state(new_state, state_ex, tag));
+                thread_state(new_state, state_ex, tag), load_exchange);
         }
 
     private:
@@ -526,9 +539,13 @@ namespace hpx { namespace threads
         }
 
 #if defined(HPX_HAVE_APEX)
-        void** get_apex_data() const
+        apex_task_wrapper get_apex_data() const
         {
             return coroutine_.get_apex_data();
+        }
+        void set_apex_data(apex_task_wrapper data)
+        {
+            return coroutine_.set_apex_data(data);
         }
 #endif
 
@@ -599,6 +616,9 @@ namespace hpx { namespace threads
             if (0 == parent_locality_id_)
                 parent_locality_id_ = get_locality_id();
 #endif
+#if defined(HPX_HAVE_APEX)
+            set_apex_data(init_data.apex_data);
+#endif
             HPX_ASSERT(init_data.stacksize != 0);
             HPX_ASSERT(coroutine_.is_ready());
         }
@@ -653,6 +673,9 @@ namespace hpx { namespace threads
             }
             if (0 == parent_locality_id_)
                 parent_locality_id_ = get_locality_id();
+#endif
+#if defined(HPX_HAVE_APEX)
+            set_apex_data(init_data.apex_data);
 #endif
         }
 

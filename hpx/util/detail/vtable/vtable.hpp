@@ -52,8 +52,9 @@ namespace hpx { namespace util { namespace detail
             if (sizeof(T) <= function_storage_size)
             {
                 return *reinterpret_cast<T*>(v);
+            } else {
+                return **reinterpret_cast<T**>(v);
             }
-            return **reinterpret_cast<T**>(v);
         }
 
         template <typename T>
@@ -62,8 +63,9 @@ namespace hpx { namespace util { namespace detail
             if (sizeof(T) <= function_storage_size)
             {
                 return *reinterpret_cast<T const*>(v);
+            } else {
+                return **reinterpret_cast<T* const*>(v);
             }
-            return **reinterpret_cast<T* const*>(v);
         }
 
         template <typename T>

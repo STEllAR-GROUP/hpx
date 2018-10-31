@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/exception_fwd.hpp>
-#include <hpx/lcos_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -49,28 +49,6 @@ HPX_API_EXPORT bool register_name(
   , error_code& ec = throws
     );
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline bool register_name_sync(
-    std::string const& name
-  , naming::gid_type const& gid
-  , error_code& ec = throws
-    )
-{
-    return register_name(launch::sync, name, gid, ec);
-}
-
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline bool register_name_sync(
-    std::string const& name
-  , naming::id_type const& id
-  , error_code& ec = throws
-    )
-{
-    return register_name(launch::sync, name, id, ec);
-}
-#endif
-
 HPX_API_EXPORT lcos::future<bool> register_name(
     std::string const& name
   , naming::id_type const& id
@@ -82,27 +60,6 @@ HPX_API_EXPORT naming::id_type unregister_name(
   , std::string const& name
   , error_code& ec = throws
     );
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline bool unregister_name_sync(
-    std::string const& name
-  , naming::id_type& id
-  , error_code& ec = throws
-    )
-{
-    return unregister_name(launch::sync, name, id, ec);
-}
-
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline naming::id_type unregister_name_sync(
-    std::string const& name
-  , error_code& ec = throws
-    )
-{
-    return unregister_name(launch::sync, name, gid, ec);
-}
-#endif
 
 HPX_API_EXPORT lcos::future<naming::id_type> unregister_name(
     std::string const& name
@@ -118,37 +75,6 @@ HPX_API_EXPORT naming::id_type resolve_name(
 HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
     std::string const& name
     );
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline bool resolve_name_sync(
-    std::string const& name
-  , naming::gid_type& gid
-  , error_code& ec = throws
-    )
-{
-    return resolve_name(launch::sync, name, gid, ec);
-}
-
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline bool resolve_name_sync(
-    std::string const& name
-  , naming::id_type& id
-  , error_code& ec = throws
-    )
-{
-    return resolve_name(launch::sync, name, id, ec);
-}
-
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline naming::id_type resolve_name_sync(
-    std::string const& name
-  , error_code& ec = throws
-    )
-{
-    return resolve_name(launch::sync, name, ec);
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // HPX_API_EXPORT lcos::future<std::vector<naming::id_type> > get_localities(
@@ -187,26 +113,6 @@ inline std::uint32_t get_num_localities(
         components::component_invalid, ec);
 }
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline std::uint32_t get_num_localities_sync(
-    components::component_type type
-  , error_code& ec = throws
-    )
-{
-    return hpx::agas::get_num_localities(launch::sync, type, ec);
-}
-
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline std::uint32_t get_num_localities_sync(
-    error_code& ec = throws
-    )
-{
-    return hpx::agas::get_num_localities(launch::sync,
-        components::component_invalid, ec);
-}
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT lcos::future<std::vector<std::uint32_t> > get_num_threads();
 
@@ -215,16 +121,6 @@ HPX_API_EXPORT std::vector<std::uint32_t> get_num_threads(
   , error_code& ec = throws
     );
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline std::vector<std::uint32_t> get_num_threads_sync(
-    error_code& ec = throws
-    )
-{
-    return get_num_threads(launch::sync, ec);
-}
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT lcos::future<std::uint32_t> get_num_overall_threads();
 
@@ -232,16 +128,6 @@ HPX_API_EXPORT std::uint32_t get_num_overall_threads(
     launch::sync_policy
   , error_code& ec = throws
     );
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline std::uint32_t get_num_overall_threads_sync(
-    error_code& ec = throws
-    )
-{
-    return get_num_overall_threads(launch::sync, ec);
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT std::uint32_t get_locality_id(error_code& ec = throws);
@@ -298,17 +184,6 @@ HPX_API_EXPORT naming::address resolve(
   , error_code& ec = throws
     );
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline naming::address resolve_sync(
-    naming::id_type const& id
-  , error_code& ec = throws
-    )
-{
-    return resolve(launch::sync, id, ec);
-}
-#endif
-
 HPX_API_EXPORT hpx::future<bool> bind(
     naming::gid_type const& gid
   , naming::address const& addr
@@ -323,19 +198,6 @@ HPX_API_EXPORT bool bind(
   , error_code& ec = throws
     );
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline bool bind_sync(
-    naming::gid_type const& gid
-  , naming::address const& addr
-  , std::uint32_t locality_id
-  , error_code& ec = throws
-    )
-{
-    return bind(launch::sync, gid, addr, locality_id, ec);
-}
-#endif
-
 HPX_API_EXPORT hpx::future<bool> bind(
     naming::gid_type const& gid
   , naming::address const& addr
@@ -349,19 +211,6 @@ HPX_API_EXPORT bool bind(
   , naming::gid_type const& locality_
   , error_code& ec = throws
     );
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline bool bind_sync(
-    naming::gid_type const& gid
-  , naming::address const& addr
-  , naming::gid_type const& locality_
-  , error_code& ec = throws
-    )
-{
-    return bind(launch::sync, gid, addr, locality_, ec);
-}
-#endif
 
 HPX_API_EXPORT hpx::future<naming::address> unbind(
     naming::gid_type const& gid
@@ -374,18 +223,6 @@ HPX_API_EXPORT naming::address unbind(
   , std::uint64_t count = 1
   , error_code& ec = throws
     );
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline naming::address unbind_sync(
-    naming::gid_type const& gid
-  , std::uint64_t count = 1
-  , error_code& ec = throws
-    )
-{
-    return unbind(launch::sync, gid, count, ec);
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT void garbage_collect_non_blocking(
@@ -445,18 +282,6 @@ HPX_API_EXPORT std::int64_t incref(
   , error_code& ec = throws
     );
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline hpx::future<std::int64_t> incref_async(
-    naming::gid_type const& gid
-  , std::int64_t credits
-  , naming::id_type const& keep_alive = naming::invalid_id
-  )
-{
-    return incref(gid, credits, keep_alive);
-}
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<naming::id_type> get_colocation_id(
     naming::id_type const& id);
@@ -465,16 +290,6 @@ HPX_API_EXPORT naming::id_type get_colocation_id(
     launch::sync_policy
   , naming::id_type const& id
   , error_code& ec = throws);
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-inline naming::id_type get_colocation_id_sync(
-    naming::id_type const& id
-  , error_code& ec = throws)
-{
-    return get_colocation_id(launch::sync, id, ec);
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(

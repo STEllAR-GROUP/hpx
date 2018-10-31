@@ -8,9 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/parallel/executors/v1/executor_information_traits.hpp>
-#endif
 #include <hpx/parallel/executors/execution_information.hpp>
 #include <hpx/parallel/executors/thread_execution_information.hpp>
 

@@ -125,15 +125,6 @@ namespace hpx
         connect_to(symbolic_name).get();
     }
 
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
-    partitioned_vector<T, Data>::connect_to_sync(std::string const& symbolic_name)
-    {
-        connect_to(launch::sync, symbolic_name);
-    }
-    #endif
-
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector<T, Data>::register_as(std::string const& symbolic_name)
@@ -161,15 +152,6 @@ namespace hpx
     {
         register_as(symbolic_name).get();
     }
-
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
-    partitioned_vector<T, Data>::register_as_sync(std::string const& symbolic_name)
-    {
-        register_as(launch::sync, symbolic_name);
-    }
-    #endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data /*= std::vector<T> */>

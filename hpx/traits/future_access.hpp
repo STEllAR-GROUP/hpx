@@ -151,10 +151,10 @@ namespace hpx { namespace traits
 
         template <typename SharedState>
         static lcos::future<R>
-        create(SharedState* shared_state)
+        create(SharedState* shared_state, bool addref = true)
         {
             return lcos::future<R>(
-                boost::intrusive_ptr<SharedState>(shared_state));
+                boost::intrusive_ptr<SharedState>(shared_state, addref));
         }
 
         HPX_FORCEINLINE static
@@ -164,14 +164,12 @@ namespace hpx { namespace traits
             return f.shared_state_;
         }
 
-#if BOOST_VERSION >= 105600
         HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<R>::type::element_type*
         detach_shared_state(lcos::future<R> && f)
         {
             return f.shared_state_.detach();
         }
-#endif
     };
 
     template <typename R>
@@ -210,10 +208,10 @@ namespace hpx { namespace traits
 
         template <typename SharedState>
         static lcos::shared_future<R>
-        create(SharedState* shared_state)
+        create(SharedState* shared_state, bool addref = true)
         {
             return lcos::shared_future<R>(
-                boost::intrusive_ptr<SharedState>(shared_state));
+                boost::intrusive_ptr<SharedState>(shared_state, addref));
         }
 
         HPX_FORCEINLINE static
@@ -223,14 +221,12 @@ namespace hpx { namespace traits
             return f.shared_state_;
         }
 
-#if BOOST_VERSION >= 105600
         HPX_FORCEINLINE static
         typename traits::detail::shared_state_ptr<R>::type::element_type*
         detach_shared_state(lcos::shared_future<R> const& f)
         {
             return f.shared_state_.get();
         }
-#endif
     };
 
     ///////////////////////////////////////////////////////////////////////////

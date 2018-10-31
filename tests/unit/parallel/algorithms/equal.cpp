@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy, typename IteratorTag>
 void test_equal1(ExPolicy policy, IteratorTag)
 {
@@ -31,7 +35,7 @@ void test_equal1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -48,7 +52,8 @@ void test_equal1(ExPolicy policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()]; //-V104
+        std::uniform_int_distribution<> dis(0,c1.size()-1);
+        ++c1[dis(gen)]; //-V104
         bool result = hpx::parallel::equal(policy,
             iterator(std::begin(c1)), iterator(std::end(c1)),
             std::begin(c2));
@@ -70,7 +75,7 @@ void test_equal1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -89,7 +94,8 @@ void test_equal1_async(ExPolicy p, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()]; //-V104
+        std::uniform_int_distribution<> dis(0,c1.size()-1);
+        ++c1[dis(gen)]; //-V104
 
         hpx::future<bool> result =
             hpx::parallel::equal(p,
@@ -116,15 +122,6 @@ void test_equal1()
 
     test_equal1_async(execution::seq(execution::task), IteratorTag());
     test_equal1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal1(execution_policy(execution::seq), IteratorTag());
-    test_equal1(execution_policy(execution::par), IteratorTag());
-    test_equal1(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_equal1(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_equal1(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void equal_test1()
@@ -150,7 +147,7 @@ void test_equal2(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -167,7 +164,8 @@ void test_equal2(ExPolicy policy, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()]; //-V104
+        std::uniform_int_distribution<> dis(0,c1.size()-1);
+        ++c1[dis(gen)]; //-V104
         bool result = hpx::parallel::equal(policy,
             iterator(std::begin(c1)), iterator(std::end(c1)),
             std::begin(c2), std::equal_to<std::size_t>());
@@ -189,7 +187,7 @@ void test_equal2_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -208,7 +206,8 @@ void test_equal2_async(ExPolicy p, IteratorTag)
     }
 
     {
-        ++c1[std::rand() % c1.size()]; //-V104
+        std::uniform_int_distribution<> dis(0,c1.size()-1);
+        ++c1[dis(gen)]; //-V104
 
         hpx::future<bool> result =
             hpx::parallel::equal(p,
@@ -235,15 +234,6 @@ void test_equal2()
 
     test_equal2_async(execution::seq(execution::task), IteratorTag());
     test_equal2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal2(execution_policy(execution::seq), IteratorTag());
-    test_equal2(execution_policy(execution::par), IteratorTag());
-    test_equal2(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_equal2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_equal2(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void equal_test2()
@@ -269,7 +259,7 @@ void test_equal_exception(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -304,7 +294,7 @@ void test_equal_exception_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -348,16 +338,6 @@ void test_equal_exception()
 
     test_equal_exception_async(execution::seq(execution::task), IteratorTag());
     test_equal_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal_exception(execution_policy(execution::seq), IteratorTag());
-    test_equal_exception(execution_policy(execution::par), IteratorTag());
-
-    test_equal_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_equal_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void equal_exception_test()
@@ -383,7 +363,7 @@ void test_equal_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -417,7 +397,7 @@ void test_equal_bad_alloc_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
-    std::size_t first_value = std::rand(); //-V101
+    std::size_t first_value = gen(); //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -460,16 +440,6 @@ void test_equal_bad_alloc()
 
     test_equal_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_equal_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_equal_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_equal_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_equal_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_equal_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void equal_bad_alloc_test()
@@ -484,12 +454,11 @@ void equal_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     equal_test1();
     equal_test2();

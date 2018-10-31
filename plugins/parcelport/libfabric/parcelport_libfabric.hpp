@@ -150,7 +150,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread);
+            util::function_nonser<void(std::size_t, char const*)> const& on_stop_thread);
 
         // Start the handling of connections.
         bool do_run();
@@ -237,7 +237,7 @@ struct plugin_config_data<hpx::parcelset::policies::libfabric::parcelport> {
             boost::log::keywords::format =
                 (
                     boost::log::expressions::stream
-                    // << hpx::util::format("%05d", expr::attr< unsigned int >("LineID"))
+                    // << hpx::util::format("{:05}", expr::attr< unsigned int >("LineID"))
                     << boost::log::expressions::attr< unsigned int >("LineID")
                     << ": <" << boost::log::trivial::severity
                     << "> " << boost::log::expressions::smessage

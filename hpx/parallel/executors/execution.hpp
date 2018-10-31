@@ -22,7 +22,6 @@
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/executor_traits.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_back.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -1093,7 +1092,7 @@ namespace hpx { namespace parallel { namespace execution
                     typename hpx::util::detail::make_index_pack<
                         sizeof...(Ts)
                     >::type(), args_);
-            };
+            }
         };
 
         template <typename Result, typename Executor, typename F,
@@ -1269,7 +1268,7 @@ namespace hpx { namespace parallel { namespace execution
                     typename hpx::util::detail::make_index_pack<
                         sizeof...(Ts)
                     >::type(), args_);
-            };
+            }
         };
 
         template <typename Result, typename Executor, typename F,
@@ -1350,6 +1349,7 @@ namespace hpx { namespace parallel { namespace execution
                         ->  result_future_type
                         {
                             return hpx::dataflow(
+                                hpx::launch::sync,
                                 hpx::util::functional::unwrap{},
                                 func(std::move(predecessor)));
                         });

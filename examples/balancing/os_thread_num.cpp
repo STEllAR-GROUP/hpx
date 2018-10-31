@@ -91,7 +91,7 @@ int hpx_main(variables_map& vm)
                   , "get_os_thread_num"
                   , pending
                   , thread_priority_normal
-                  , 0);
+                  , hpx::threads::thread_schedule_hint(0));
             }
 
             barr.wait(); // wait for all PX threads to enter the barrier
@@ -113,12 +113,12 @@ int hpx_main(variables_map& vm)
         {
             if (csv)
                 hpx::util::format_to(cout,
-                    "%1%,%2%\n",
+                    "{1},{2}\n",
                     result.second,
                     result.first) << flush;
             else
                 hpx::util::format_to(cout,
-                    "OS-thread %1% ran %2% PX-threads\n",
+                    "OS-thread {1} ran {2} PX-threads\n",
                     result.second,
                     result.first) << flush;
         }

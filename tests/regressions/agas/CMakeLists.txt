@@ -8,10 +8,15 @@ set(tests
     duplicate_id_registration_1596
     pass_by_value_id_type_action
     send_gid_keep_component_1624
-    register_with_basename_1804
    )
 
-set(register_with_basename_1804_PARAMETERS LOCALITIES 2)
+if(HPX_WITH_NETWORKING)
+    set(tests ${tests}
+        register_with_basename_1804
+       )
+
+  set(register_with_basename_1804_PARAMETERS LOCALITIES 2)
+endif()
 
 foreach(test ${tests})
   set(sources

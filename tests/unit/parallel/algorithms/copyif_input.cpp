@@ -12,12 +12,16 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 template <typename ExPolicy>
 void test_copy_if(ExPolicy policy)
 {
@@ -31,7 +35,7 @@ void test_copy_if(ExPolicy policy)
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
     auto middle = std::begin(c) + c.size()/2;
-    std::iota(std::begin(c), middle, std::rand());
+    std::iota(std::begin(c), middle, gen());
     std::fill(middle, std::end(c), -1);
 
     hpx::parallel::copy_if(policy,
@@ -66,7 +70,7 @@ void test_copy_if_async(ExPolicy p)
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
     auto middle = std::begin(c) + c.size()/2;
-    std::iota(std::begin(c), middle, std::rand());
+    std::iota(std::begin(c), middle, gen());
     std::fill(middle, std::end(c), -1);
 
     auto f =
@@ -107,7 +111,7 @@ void test_copy_if_outiter(ExPolicy policy)
     std::vector<int> c(10007);
     std::vector<int> d(0);
     auto middle = std::begin(c) + c.size()/2;
-    std::iota(std::begin(c), middle, std::rand());
+    std::iota(std::begin(c), middle, gen());
     std::fill(middle, std::end(c), -1);
 
     hpx::parallel::copy_if(policy,
@@ -133,7 +137,7 @@ void test_copy_if_outiter_async(ExPolicy p)
     std::vector<int> c(10007);
     std::vector<int> d(0);
     auto middle = std::begin(c) + c.size()/2;
-    std::iota(std::begin(c), middle, std::rand());
+    std::iota(std::begin(c), middle, gen());
     std::fill(middle, std::end(c), -1);
 
     auto f =
@@ -162,40 +166,21 @@ void test_copy_if()
     test_copy_if_async(execution::seq(execution::task));
     test_copy_if_async(execution::par(execution::task));
 
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if(execution_policy(execution::seq));
-    test_copy_if(execution_policy(execution::par));
-    test_copy_if(execution_policy(execution::par_unseq));
-
-    test_copy_if(execution_policy(execution::seq(execution::task)));
-    test_copy_if(execution_policy(execution::par(execution::task)));
-#endif
-
     test_copy_if_outiter(execution::seq);
     test_copy_if_outiter(execution::par);
     test_copy_if_outiter(execution::par_unseq);
 
     test_copy_if_outiter_async(execution::seq(execution::task));
     test_copy_if_outiter_async(execution::par(execution::task));
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_copy_if_outiter(execution_policy(execution::seq));
-    test_copy_if_outiter(execution_policy(execution::par));
-    test_copy_if_outiter(execution_policy(execution::par_unseq));
-
-    test_copy_if_outiter(execution_policy(execution::seq(execution::task)));
-    test_copy_if_outiter(execution_policy(execution::par(execution::task)));
-#endif
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     test_copy_if();
     return hpx::finalize();

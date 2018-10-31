@@ -76,7 +76,10 @@ namespace hpx
       : boost::system::system_error(make_error_code(e, plain))
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        LERR_(error) << "created exception: " << this->what();
+        if (e != success)
+        {
+            LERR_(error) << "created exception: " << this->what();
+        }
     }
 
     /// Construct a hpx::exception from a boost#system_error.
@@ -101,7 +104,10 @@ namespace hpx
       : boost::system::system_error(make_system_error_code(e, mode), msg)
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        LERR_(error) << "created exception: " << this->what();
+        if (e != success)
+        {
+            LERR_(error) << "created exception: " << this->what();
+        }
     }
 
     /// Construct a hpx::exception from a \a hpx::error and an error message.
@@ -119,7 +125,10 @@ namespace hpx
       : boost::system::system_error(make_system_error_code(e, mode), msg)
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        LERR_(error) << "created exception: " << this->what();
+        if (e != success)
+        {
+            LERR_(error) << "created exception: " << this->what();
+        }
     }
 
     /// Destruct a hpx::exception
@@ -209,10 +218,13 @@ namespace hpx { namespace detail
 
         std::sort(env.begin(), env.end());
 
-        std::string retval = hpx::util::format("%d entries:\n", env.size());
+        std::string retval = hpx::util::format("{} entries:\n", env.size());
         for (std::string const& s : env)
         {
-            retval += "  " + s + "\n";
+            if (retval.find("DOCKER") == std::string::npos)
+            {
+                retval += "  " + s + "\n";
+            }
         }
         return retval;
     }
@@ -603,7 +615,10 @@ namespace hpx
         std::size_t const* thread_id =
             xi.get<hpx::detail::throw_thread_id>();
         if (thread_id && *thread_id)
-            hpx::util::format_to(strm, "{thread-id}: %016x\n", *thread_id);
+        {
+            strm << "{thread-id}: ";
+            hpx::util::format_to(strm, "{:016x}\n", *thread_id);
+        }
 
         std::string const* thread_description =
             xi.get<hpx::detail::throw_thread_name>();

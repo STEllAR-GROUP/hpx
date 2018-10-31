@@ -173,9 +173,11 @@ if __name__ == '__main__':
         cmd = [options.launcher]
 
       cmd += [ name
-             , '-t' + str(threads_per_node)
-             , '-l' + str(nodes)
-             , '-' + str(node)]
+             , '-t' + str(threads_per_node)]
+
+      if nodes > 1:
+          cmd += [ '-l' + str(nodes)
+                 , '-' + str(node)]
 
       if options.args:
         cmd += [options.args]

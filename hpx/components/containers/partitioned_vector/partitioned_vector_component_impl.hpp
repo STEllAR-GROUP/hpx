@@ -403,15 +403,6 @@ namespace hpx
         return get_value(pos).get();
     }
 
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT T
-    partitioned_vector_partition<T, Data>::get_value_sync(std::size_t pos) const
-    {
-        return get_value(launch::sync, pos);
-    }
-    #endif
-
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<T>
     partitioned_vector_partition<T, Data>::get_value(std::size_t pos) const
@@ -428,16 +419,6 @@ namespace hpx
     {
         return get_values(pos).get();
     }
-
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT std::vector<T>
-    partitioned_vector_partition<T, Data>::get_values_sync(
-        std::vector<std::size_t> const& pos) const
-    {
-        return get_values(launch::sync, pos);
-    }
-    #endif
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<std::vector<T>>
@@ -465,15 +446,6 @@ namespace hpx
         set_value(pos, val).get();
     }
 
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
-    partitioned_vector_partition<T, Data>::set_value_sync(std::size_t pos, T_&& val)
-    {
-        set_value(launch::sync, pos, std::forward<T_>(val));
-    }
-    #endif
-
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::set_value(std::size_t pos, T&& val)
@@ -500,16 +472,6 @@ namespace hpx
         set_values(pos, val).get();
     }
 
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
-    partitioned_vector_partition<T, Data>::set_values_sync(
-        std::vector<std::size_t> const& pos, std::vector<T> const& val)
-    {
-        set_values(launch::sync, pos, val);
-    }
-    #endif
-
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::set_values(
@@ -529,16 +491,6 @@ namespace hpx
         return get_copied_data().get();
     }
 
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-        typename partitioned_vector_partition<T, Data>::server_type::data_type
-        partitioned_vector_partition<T, Data>::get_copied_data_sync() const
-    {
-        return get_copied_data(launch::sync);
-    }
-    #endif
-
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<
         typename partitioned_vector_partition<T, Data>::server_type::data_type>
@@ -556,16 +508,6 @@ namespace hpx
     {
         set_data(std::move(other)).get();
     }
-
-    #if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-    template <typename T, typename Data /*= std::vector<T> */>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
-    partitioned_vector_partition<T, Data>::set_data_sync(
-        typename server_type::data_type&& other) const
-    {
-        set_data(launch::sync, std::move(other));
-    }
-    #endif
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>

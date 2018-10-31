@@ -371,8 +371,6 @@ void test_legacy_requirements(FutureProvider&& futurize)
     using hpx::async;
 
     {
-        std::atomic<std::size_t> count(0);
-
         // Sync wait, single future, void return.
         {
             unwrap(async(null_thread));

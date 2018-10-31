@@ -64,7 +64,7 @@ double null_function(
     std::mt19937_64 prng(seed);
 
     std::uniform_real_distribution<double> v(0, 1.);
-    std::uniform_int_distribution<std::uint8_t> s(0, 1);
+    std::uniform_int_distribution<short> s(0, 1);
 
     double d = 0.;
 
@@ -156,7 +156,7 @@ int hpx_main(
             d += null_act(here, 0, children, 1, max_depth, delay_iterations);
 
             if (verbose)
-                hpx::util::format_to(std::cout, "%016u : %f\n", i, d)
+                hpx::util::format_to(std::cout, "{:016u} : {}\n", i, d)
                     << std::flush;
         }
     }

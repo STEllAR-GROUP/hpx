@@ -456,7 +456,7 @@ namespace hpx { namespace lcos { namespace local
                 return buffer_.push(std::move(t), l);
             }
 
-            std::size_t close(bool force_delete_entries = false)
+            std::size_t close(bool /*force_delete_entries*/ = false)
             {
                 std::unique_lock<mutex_type> l(mtx_);
 

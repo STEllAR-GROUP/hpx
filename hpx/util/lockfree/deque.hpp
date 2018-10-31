@@ -352,9 +352,9 @@ struct deque
     bool push_right(T const& data)
     {
         // Allocate the new node which we will be inserting.
-        node* n = alloc_node(0, 0, data);
+        node* n = alloc_node(nullptr, nullptr, data);
 
-        if (n == 0)
+        if (n == nullptr)
             return false;
 
         // Loop until we insert successfully.
@@ -365,7 +365,7 @@ struct deque
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
-            if (lrs.get_right_ptr() == 0)
+            if (lrs.get_right_ptr() == nullptr)
             {
                 // If the deque is empty, we simply install a new anchor which
                 // points to the new node as both its leftmost and rightmost

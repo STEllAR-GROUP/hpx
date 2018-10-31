@@ -53,7 +53,7 @@ namespace hpx { namespace serialization
     template <typename Archive>
     void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
-    HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr);
+    HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr)
 }}
 
 #endif

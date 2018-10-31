@@ -42,11 +42,11 @@ namespace hpx { namespace components
             HPX_EXPORT ~base_component();
 
             // Copy construction and copy assignment should not copy the gid_.
-            base_component(base_component const& rhs)
+            base_component(base_component const& /*rhs*/)
             {
             }
 
-            base_component& operator=(base_component const& rhs)
+            base_component& operator=(base_component const& /*rhs*/)
             {
                 return *this;
             }
@@ -75,18 +75,6 @@ namespace hpx { namespace components
             HPX_EXPORT naming::id_type get_id(naming::gid_type gid) const;
             HPX_EXPORT naming::id_type get_unmanaged_id(
                 naming::gid_type const& gid) const;
-
-            // Pinning functionality
-            HPX_CXX14_CONSTEXPR static void pin()
-            {
-            }
-            HPX_CXX14_CONSTEXPR static void unpin()
-            {
-            }
-            HPX_CONSTEXPR static std::uint32_t pin_count()
-            {
-                return 0;
-            }
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
             HPX_CXX14_CONSTEXPR static void mark_as_migrated()
@@ -119,9 +107,13 @@ namespace hpx { namespace components
             // with the AGAS service
             //
             // Returns he global id (GID) assigned to this instance of a component
+            HPX_EXPORT naming::gid_type get_base_gid_dynamic(
+                naming::gid_type const& assign_gid, naming::address const& addr,
+                naming::gid_type (*f)(naming::gid_type) = nullptr) const;
+
             HPX_EXPORT naming::gid_type get_base_gid(
-                naming::gid_type const& assign_gid,
-                naming::address const& addr) const;
+                naming::address const& addr,
+                naming::gid_type (*f)(naming::gid_type) = nullptr) const;
 
         protected:
             mutable naming::gid_type gid_;
@@ -200,7 +192,8 @@ namespace hpx { namespace components
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
-            return this->detail::base_component::get_base_gid(assign_gid,
+            HPX_ASSERT(!assign_gid);        // migration is not supported here
+            return this->detail::base_component::get_base_gid(
                 static_cast<Component const&>(*this).get_current_address());
         }
     };

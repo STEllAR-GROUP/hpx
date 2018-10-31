@@ -117,9 +117,9 @@ namespace hpx { namespace resource
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        compat::mutex& partitioner_mtx()
+        compat::recursive_mutex& partitioner_mtx()
         {
-            static compat::mutex mtx;
+            static compat::recursive_mutex mtx;
             return mtx;
         }
 
@@ -131,7 +131,7 @@ namespace hpx { namespace resource
 
         std::unique_ptr<detail::partitioner>& get_partitioner()
         {
-            std::lock_guard<compat::mutex> l(partitioner_mtx());
+            std::lock_guard<compat::recursive_mutex> l(partitioner_mtx());
             std::unique_ptr<detail::partitioner>& part = partitioner_ref();
             if (!part)
                 part.reset(new detail::partitioner);
@@ -242,9 +242,10 @@ namespace hpx { namespace resource
 
     ///////////////////////////////////////////////////////////////////////////
     void partitioner::create_thread_pool(std::string const& name,
-        scheduling_policy sched /*= scheduling_policy::unspecified*/)
+        scheduling_policy sched /*= scheduling_policy::unspecified*/,
+        hpx::threads::policies::scheduler_mode mode)
     {
-        partitioner_.create_thread_pool(name, sched);
+        partitioner_.create_thread_pool(name, sched, mode);
     }
 
     void partitioner::create_thread_pool(

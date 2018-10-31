@@ -59,7 +59,7 @@ namespace hpx { namespace components
                 util::one_shot(&locking_hook::thread_function),
                 get_lva<this_component_type>::call(lva),
                 util::placeholders::_1,
-                traits::action_decorate_function<base_type>::call(
+                traits::component_decorate_function<base_type>::call(
                     lva, std::forward<F>(f)));
         }
 

@@ -9,6 +9,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include "action_invoke_no_more_than.hpp"
+
 #include <atomic>
 #include <chrono>
 #include <cstddef>

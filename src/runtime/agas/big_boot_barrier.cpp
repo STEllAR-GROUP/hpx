@@ -467,7 +467,7 @@ void register_worker(registration_header const& header)
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
             , hpx::util::format(
-                "worker node (%s) can't suggest locality_id zero, "
+                "worker node ({}) can't suggest locality_id zero, "
                 "this is reserved for the console",
                 header.endpoints));
         return;
@@ -478,7 +478,7 @@ void register_worker(registration_header const& header)
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
             , hpx::util::format(
-                "attempt to register locality %s more than once",
+                "attempt to register locality {} more than once",
                 header.endpoints));
         return;
     }
@@ -599,7 +599,7 @@ void notify_worker(notification_header const& header)
     agas_client.set_local_locality(header.prefix);
     agas_client.register_console(header.agas_endpoints);
     cfg.parse("assigned locality",
-        hpx::util::format("hpx.locality!=%1%",
+        hpx::util::format("hpx.locality!={1}",
             naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service

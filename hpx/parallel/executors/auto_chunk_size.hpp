@@ -110,16 +110,4 @@ namespace hpx { namespace parallel { namespace execution
     /// \endcond
 }}}
 
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-
-#include <hpx/parallel/executors/v1/executor_parameter_traits.hpp>
-#include <hpx/traits/v1/is_executor_parameters.hpp>
-
-namespace hpx { namespace parallel { inline namespace v3
-{
-    using auto_chunk_size = execution::auto_chunk_size;
-}}}
-
-#endif
-
 #endif

@@ -166,15 +166,12 @@ namespace hpx { namespace util { namespace detail
         return microsecs_;
     }
 
-    void interval_timer::slow_down(std::int64_t max_interval)
+    void interval_timer::change_interval(std::int64_t new_interval)
     {
+        HPX_ASSERT(new_interval > 0);
+
         std::lock_guard<mutex_type> l(mtx_);
-        microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
-    }
-    void interval_timer::speed_up(std::int64_t min_interval)
-    {
-        std::lock_guard<mutex_type> l(mtx_);
-        microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
+        microsecs_ = new_interval;
     }
 
     threads::thread_result_type interval_timer::evaluate(
@@ -249,7 +246,8 @@ namespace hpx { namespace util { namespace detail
                 util::bind_front(&interval_timer::evaluate,
                     this->shared_from_this()),
                 description_.c_str(), threads::suspended, true,
-                threads::thread_priority_boost, std::size_t(-1),
+                threads::thread_priority_boost,
+                threads::thread_schedule_hint(),
                 threads::thread_stacksize_default, ec);
         }
 
@@ -326,23 +324,13 @@ namespace hpx { namespace util
         return timer_->get_interval();
     }
 
-    void interval_timer::slow_down(std::int64_t max_interval)
+    void interval_timer::change_interval(std::int64_t new_interval)
     {
-        return timer_->slow_down(max_interval);
+        return timer_->change_interval(new_interval);
     }
 
-    void interval_timer::speed_up(std::int64_t min_interval)
+    void interval_timer::change_interval(util::steady_duration const& new_interval)
     {
-        return timer_->speed_up(min_interval);
-    }
-
-    void interval_timer::slow_down(util::steady_duration const& max_interval)
-    {
-        return timer_->slow_down(max_interval.value().count() / 1000);
-    }
-
-    void interval_timer::speed_up(util::steady_duration const& min_interval)
-    {
-        return timer_->speed_up(min_interval.value().count() / 1000);
+        return timer_->change_interval(new_interval.value().count() / 1000);
     }
 }}

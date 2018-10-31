@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2018 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,10 +16,12 @@
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
+#include <hpx/traits/action_select_direct_execution.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_config_data.hpp>
+#include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
@@ -40,10 +42,6 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-#include <hpx/traits/v1/is_executor.hpp>
-#include <hpx/traits/v1/is_executor_parameters.hpp>
-#endif
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_future.hpp>

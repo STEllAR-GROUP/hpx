@@ -35,12 +35,12 @@ namespace hpx { namespace parallel { namespace execution
     struct sequenced_executor
     {
         /// \cond NOINTERNAL
-        bool operator==(sequenced_executor const& rhs) const noexcept
+        bool operator==(sequenced_executor const& /*rhs*/) const noexcept
         {
             return true;
         }
 
-        bool operator!=(sequenced_executor const& rhs) const noexcept
+        bool operator!=(sequenced_executor const& /*rhs*/) const noexcept
         {
             return false;
         }
@@ -168,59 +168,5 @@ namespace hpx { namespace parallel { namespace execution
     {};
     /// \endcond
 }}}
-
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-
-#include <hpx/traits/v1/is_executor.hpp>
-#include <hpx/parallel/executors/v1/executor_traits.hpp>
-
-namespace hpx { namespace parallel { inline namespace v3
-{
-    /// \cond NOINTERNAL
-
-    // this must be a type distinct from parallel::execution::sequenced_executor
-    // to avoid ambiguities
-    struct sequential_executor
-      : parallel::execution::sequenced_executor
-    {
-        using base_type = parallel::execution::sequenced_executor;
-
-        template <typename F, typename ... Ts>
-        static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-        execute(F && f, Ts &&... ts)
-        {
-            return base_type::sync_execute(std::forward<F>(f),
-                std::forward<Ts>(ts)...);
-        }
-
-        template <typename F, typename S, typename ... Ts>
-        std::vector<hpx::future<
-            typename v3::detail::bulk_async_execute_result<F, S, Ts...>::type
-        > >
-        bulk_async_execute(F && f, S const& shape, Ts &&... ts)
-        {
-            return base_type::bulk_async_execute(std::forward<F>(f), shape,
-                std::forward<Ts>(ts)...);
-        }
-
-        template <typename F, typename S, typename ... Ts>
-        static typename v3::detail::bulk_execute_result<F, S, Ts...>::type
-        bulk_execute(F && f, S const& shape, Ts &&... ts)
-        {
-            return base_type::bulk_sync_execute(std::forward<F>(f), shape,
-                std::forward<Ts>(ts)...);
-        }
-    };
-
-    namespace detail
-    {
-        template <>
-        struct is_executor<sequential_executor>
-          : std::true_type
-        {};
-    }
-    /// \endcond
-}}}
-#endif
 
 #endif

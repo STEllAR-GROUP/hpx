@@ -18,7 +18,7 @@ namespace hpx { namespace traits
     namespace detail
     {
         HPX_HAS_XXX_TRAIT_DEF(serialized_with_id);
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(hpx_serialization_get_name);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(hpx_serialization_get_name)
     } // namespace detail
 
     template <typename T>

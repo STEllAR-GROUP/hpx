@@ -22,6 +22,12 @@ endif()
 
 set(transpose_serial_vector_FLAGS DEPENDENCIES partitioned_vector_component)
 
+set(transpose_smp_PARAMETERS THREADS_PER_LOCALITY 4)
+set(transpose_smp_block_PARAMETERS THREADS_PER_LOCALITY 4)
+set(transpose_block_PARAMETERS THREADS_PER_LOCALITY 4)
+set(transpose_block_numa_PARAMETERS THREADS_PER_LOCALITY 4
+    "--transpose-threads=4" "--transpose-numa-domains=1")
+
 foreach(example_program ${example_programs})
 
   set(sources ${example_program}.cpp)
@@ -44,4 +50,13 @@ foreach(example_program ${example_programs})
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.transpose.${example_program}
                               ${example_program}_exe)
+
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_example_test("transpose" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_pseudo_target(tests.examples.transpose.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.transpose
+                                tests.examples.transpose.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.transpose.${example_program}
+                                ${example_program}_exe)
+  endif()
 endforeach()

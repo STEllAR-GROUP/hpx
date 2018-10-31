@@ -60,72 +60,72 @@ namespace hpx { namespace threads { namespace detail
         return top.get_number_of_pus();
     }
 
-        void write_to_log(char const* valuename, std::size_t value)
-        {
+    void write_to_log(char const* valuename, std::size_t value)
+    {
         LTM_(debug) << "topology: "
-                        << valuename << ": " << value; //-V128
-        }
+                    << valuename << ": " << value; //-V128
+    }
 
-        void write_to_log_mask(char const* valuename, mask_cref_type value)
-        {
+    void write_to_log_mask(char const* valuename, mask_cref_type value)
+    {
         LTM_(debug) << "topology: " << valuename
-                        << ": " HPX_CPU_MASK_PREFIX
+                    << ": " HPX_CPU_MASK_PREFIX
+                    << std::hex << value;
+    }
+
+    void write_to_log(char const* valuename,
+        std::vector<std::size_t> const& values)
+    {
+        LTM_(debug) << "topology: "
+                    << valuename << "s, size: " //-V128
+                    << values.size();
+
+        std::size_t i = 0;
+        for (std::size_t value : values)
+        {
+            LTM_(debug) << "topology: " << valuename //-V128
+                        << "(" << i++ << "): " << value;
+        }
+    }
+
+    void write_to_log_mask(char const* valuename,
+        std::vector<mask_type> const& values)
+    {
+        LTM_(debug) << "topology: "
+                    << valuename << "s, size: " //-V128
+                    << values.size();
+
+        std::size_t i = 0;
+        for (mask_cref_type value : values)
+        {
+            LTM_(debug) << "topology: " << valuename //-V128
+                        << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
                         << std::hex << value;
         }
+    }
 
-        void write_to_log(char const* valuename,
-            std::vector<std::size_t> const& values)
-        {
-        LTM_(debug) << "topology: "
-                        << valuename << "s, size: " //-V128
-                        << values.size();
+    std::size_t get_index(hwloc_obj_t obj)
+    {
+        // on Windows logical_index is always -1
+        if (obj->logical_index == ~0x0u)
+            return static_cast<std::size_t>(obj->os_index);
 
-            std::size_t i = 0;
-            for (std::size_t value : values)
-            {
-            LTM_(debug) << "topology: " << valuename //-V128
-                            << "(" << i++ << "): " << value;
-            }
-        }
+        return static_cast<std::size_t>(obj->logical_index);
+    }
 
-        void write_to_log_mask(char const* valuename,
-            std::vector<mask_type> const& values)
-        {
-        LTM_(debug) << "topology: "
-                        << valuename << "s, size: " //-V128
-                        << values.size();
-
-            std::size_t i = 0;
-            for (mask_cref_type value : values)
-            {
-            LTM_(debug) << "topology: " << valuename //-V128
-                            << "(" << i++ << "): " HPX_CPU_MASK_PREFIX
-                            << std::hex << value;
-            }
-        }
-
-        std::size_t get_index(hwloc_obj_t obj)
-        {
-            // on Windows logical_index is always -1
-            if (obj->logical_index == ~0x0u)
-                return static_cast<std::size_t>(obj->os_index);
-
-            return static_cast<std::size_t>(obj->logical_index);
-        }
-
-        hwloc_obj_t adjust_node_obj(hwloc_obj_t node) noexcept
-        {
+    hwloc_obj_t adjust_node_obj(hwloc_obj_t node) noexcept
+    {
 #if HWLOC_API_VERSION >= 0x00020000
-            // www.open-mpi.org/projects/hwloc/doc/hwloc-v2.0.0-letter.pdf:
-            // Starting with hwloc v2.0, NUMA nodes are not in the main tree
-            // anymore. They are attached under objects as Memory Children
-            // on the side of normal children.
-            while (hwloc_obj_type_is_memory(node->type))
-                  node = node->parent;
-            HPX_ASSERT(node);
+        // www.open-mpi.org/projects/hwloc/doc/hwloc-v2.0.0-letter.pdf:
+        // Starting with hwloc v2.0, NUMA nodes are not in the main tree
+        // anymore. They are attached under objects as Memory Children
+        // on the side of normal children.
+        while (hwloc_obj_type_is_memory(node->type))
+                node = node->parent;
+        HPX_ASSERT(node);
 #endif
-            return node;
-        }
+        return node;
+    }
 }}}
 
 namespace hpx { namespace threads
@@ -516,8 +516,14 @@ namespace hpx { namespace threads
 
         {
             std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
-            int ret = hwloc_get_area_membind_nodeset(topo,
-                reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
+            int ret =
+#if HWLOC_API_VERSION >= 0x00010b06
+                hwloc_get_area_membind(topo, reinterpret_cast<void const*>(lva),
+                    1, nodeset, &policy, HWLOC_MEMBIND_BYNODESET);
+#else
+                hwloc_get_area_membind_nodeset(topo,
+                    reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
+#endif
 
             if (-1 != ret)
             {
@@ -837,7 +843,11 @@ namespace hpx { namespace threads
     {
         hwloc_bitmap_t cpuset  = mask_to_bitmap(mask, HWLOC_OBJ_PU);
         hwloc_bitmap_t nodeset = hwloc_bitmap_alloc();
+#if HWLOC_API_VERSION >= 0x00020000
+        hwloc_cpuset_to_nodeset(topo, cpuset, nodeset);
+#else
         hwloc_cpuset_to_nodeset_strict(topo, cpuset, nodeset);
+#endif
         hwloc_bitmap_free(cpuset);
         return std::make_shared<hpx::threads::hpx_hwloc_bitmap_wrapper>(nodeset);
     }
@@ -1231,17 +1241,33 @@ namespace hpx { namespace threads
         hwloc_bitmap_ptr bitmap,
         hpx_hwloc_membind_policy policy, int flags) const
     {
-        return hwloc_alloc_membind_nodeset(topo, len, bitmap->get_bmp(),
-            (hwloc_membind_policy_t)(policy), flags);
+        return
+#if HWLOC_API_VERSION >= 0x00010b06
+            hwloc_alloc_membind(topo, len, bitmap->get_bmp(),
+                (hwloc_membind_policy_t)(policy),
+                flags | HWLOC_MEMBIND_BYNODESET);
+#else
+            hwloc_alloc_membind_nodeset(topo, len, bitmap->get_bmp(),
+                (hwloc_membind_policy_t)(policy), flags);
+#endif
     }
 
     bool topology::set_area_membind_nodeset(
         const void *addr, std::size_t len, void *nodeset) const
     {
+#if !defined(__APPLE__)
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
-        int ret = hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
-        if (ret<0) {
+        int ret =
+#if HWLOC_API_VERSION >= 0x00010b06
+            hwloc_set_area_membind(
+                topo, addr, len, ns, policy, HWLOC_MEMBIND_BYNODESET);
+#else
+            hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
+#endif
+
+        if (ret < 0)
+        {
             std::string msg = std::strerror(errno);
             if (errno == ENOSYS) msg = "the action is not supported";
             if (errno == EXDEV)  msg = "the binding cannot be enforced";
@@ -1250,6 +1276,7 @@ namespace hpx { namespace threads
               , "hwloc_set_area_membind_nodeset failed : " + msg);
             return false;
         }
+#endif
         return true;
     }
 
@@ -1270,19 +1297,27 @@ namespace hpx { namespace threads
         hwloc_membind_policy_t policy;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset->get_bmp());
 
-        if (hwloc_get_area_membind_nodeset(topo, addr, len, ns, &policy, 0)==-1) {
-            HPX_THROW_EXCEPTION(kernel_error
-              , "hpx::threads::topology::get_area_membind_nodeset"
-              , "hwloc_get_area_membind_nodeset failed");
+        if (
+#if HWLOC_API_VERSION >= 0x00010b06
+            hwloc_get_area_membind(
+                topo, addr, len, ns, &policy, HWLOC_MEMBIND_BYNODESET)
+#else
+            hwloc_get_area_membind_nodeset(topo, addr, len, ns, &policy, 0)
+#endif
+            == -1)
+        {
+            HPX_THROW_EXCEPTION(kernel_error,
+                "hpx::threads::topology::get_area_membind_nodeset",
+                "hwloc_get_area_membind_nodeset failed");
             return -1;
-            std::cout << "error in  " ;
+            std::cout << "error in  ";
         }
         return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
     }
 
     int topology::get_numa_domain(const void *addr) const
     {
-#if HWLOC_API_VERSION >= 0x00010b03
+#if HWLOC_API_VERSION >= 0x00010b00
         hpx_hwloc_bitmap_wrapper *nodeset = topology::bitmap_storage_.get();
         if (nullptr == nodeset)
         {
@@ -1303,7 +1338,7 @@ namespace hpx { namespace threads
             return -1;
         }
         threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
-        return threads::find_first(mask);
+        return static_cast<int>(threads::find_first(mask));
 #else
         return 0;
 #endif
