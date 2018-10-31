@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_library name)
+function(add_hpx_library name)
   # retrieve arguments
   set(options EXCLUDE_FROM_ALL NOLIBS AUTOGLOB STATIC PLUGIN NONAMEPREFIX)
   set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
@@ -189,5 +189,5 @@ macro(add_hpx_library name)
     ${install_optional}
   )
 
-endmacro()
+endfunction()
 

@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_executable name)
+function(add_hpx_executable name)
   # retrieve arguments
   set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB NOLIBS NOHPX_INIT)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE HPX_PREFIX)
@@ -174,5 +174,5 @@ macro(add_hpx_executable name)
     HPX_PREFIX ${${name}_HPX_PREFIX}
     ${_target_flags}
   )
-endmacro()
+endfunction()
 

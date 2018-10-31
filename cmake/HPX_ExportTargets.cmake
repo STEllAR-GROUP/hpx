@@ -5,11 +5,11 @@
 
 set(HPX_EXPORT_TARGETS "" CACHE INTERNAL "" FORCE)
 
-macro(hpx_export_targets)
+function(hpx_export_targets)
   foreach(target ${ARGN})
     list(FIND HPX_EXPORT_TARGETS ${target} _found)
     if(_found EQUAL -1)
       set(HPX_EXPORT_TARGETS ${HPX_EXPORT_TARGETS} ${target} CACHE INTERNAL "" FORCE)
     endif()
   endforeach()
-endmacro()
+endfunction()

@@ -94,8 +94,8 @@ if(NOT HPX_CMAKE_LOGLEVEL)
 endif()
 
 # print initial diagnostics
-hpx_info("CMake version: " ${CMAKE_VERSION})
-hpx_info("HPX version: " ${HPX_VERSION})
+hpx_info("CMake version: ${CMAKE_VERSION}")
+hpx_info("HPX version: ${HPX_VERSION}")
 
 ################################################################################
 # Fortran compiler detection
@@ -1713,14 +1713,14 @@ hpx_include(SetOutputPaths)
 ################################################################################
 # Provide a macro for generating config headers
 ################################################################################
-macro(generate_config_defines_header TARGET_DIRECTORY)
+function(generate_config_defines_header TARGET_DIRECTORY)
   # Generate a defines.hpp to be used in the build directory ...
   set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
   write_config_defines_file(
     TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
     NAMESPACE default
     FILENAME "${TARGET_DIRECTORY}/hpx/config/defines.hpp")
-endmacro()
+endfunction()
 
 ################################################################################
 # Set basic search paths for the generated HPX headers

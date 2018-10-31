@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 # adds hpx_ prefix to give hpx_${name} to libraries and components
 #-------------------------------------------------------------------------------
-MACRO (hpx_set_lib_name target name)
+function(hpx_set_lib_name target name)
   # there is no need to change debug/release names explicitly
   # as we use CMAKE_DEBUG_POSTFIX to alter debug names
 
@@ -19,4 +19,4 @@ MACRO (hpx_set_lib_name target name)
       MINSIZEREL_OUTPUT_NAME     hpx_${name}
       RELWITHDEBINFO_OUTPUT_NAME hpx_${name}
   )
-ENDMACRO()
+endfunction()

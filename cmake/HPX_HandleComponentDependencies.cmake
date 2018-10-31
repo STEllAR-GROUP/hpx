@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(hpx_handle_component_dependencies components)
+function(hpx_handle_component_dependencies components)
   set(tmp "")
 
   foreach(component ${${components}})
@@ -16,6 +16,6 @@ macro(hpx_handle_component_dependencies components)
     hpx_debug("hpx_handle_component_dependencies: ${tmp}")
   endforeach()
 
-  set(${components} ${tmp})
-endmacro()
+  set(${components} ${tmp} PARENT_SCOPE)
+endfunction()
 

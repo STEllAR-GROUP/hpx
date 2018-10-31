@@ -98,7 +98,7 @@ macro(add_static_parcelports)
   endif()
 endmacro()
 
-macro(add_parcelport_modules)
+function(add_parcelport_modules)
   if(HPX_WITH_NETWORKING)
     hpx_debug("creating static_parcelports.hpp: " ${HPX_STATIC_PARCELPORT_PLUGINS})
 
@@ -117,7 +117,7 @@ macro(add_parcelport_modules)
   configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
                  "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
                  @ONLY)
-endmacro()
+endfunction()
 
 #------------------------------------------------------------------------------
 # Write parcelport_defines.hpp
