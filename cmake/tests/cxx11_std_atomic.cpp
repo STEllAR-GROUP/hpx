@@ -6,6 +6,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <atomic>
+#include <cstdint>
+
+template <typename T>
+void test_atomic()
+{
+    std::atomic<T> a;
+    a.store(T{});
+    T i = a.load();
+}
+
+struct uint128_type
+{
+    std::uint64_t left;
+    std::uint64_t right;
+};
 
 int main()
 {
@@ -13,9 +28,12 @@ int main()
     if (af.test_and_set())
         af.clear();
 
-    std::atomic<int> ai;
-    ai.store(0);
-    int i = ai.load();
+    test_atomic<int>();
+    test_atomic<std::uint8_t>();
+    test_atomic<std::uint16_t>();
+    test_atomic<std::uint32_t>();
+    test_atomic<std::uint64_t>();
+    test_atomic<uint128_type>();
 
     std::memory_order mo;
     mo = std::memory_order_relaxed;
