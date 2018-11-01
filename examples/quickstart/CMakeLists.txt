@@ -36,13 +36,11 @@ set(example_programs
     latch_local
     latch_remote
     local_channel
-    non_atomic_rma
     partitioned_vector_spmd_foreach
     pingpong
     pipeline1
     print_to_console
     potpourri
-    quicksort
     receive_buffer
     safe_object
     shared_mutex

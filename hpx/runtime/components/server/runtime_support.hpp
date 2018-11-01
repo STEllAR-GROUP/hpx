@@ -143,10 +143,6 @@ namespace hpx { namespace components { namespace server
         naming::gid_type migrate_component_to_here(
             std::shared_ptr<Component> const& p, naming::id_type);
 
-        /// \brief Action to create new memory block
-        naming::gid_type create_memory_block(std::size_t count,
-            hpx::actions::manage_object_action_base const& act);
-
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout, naming::id_type const& respond_to);
 
@@ -196,7 +192,6 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_memory_block);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
@@ -587,9 +582,6 @@ HPX_ACTION_USES_MEDIUM_STACK(
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::dijkstra_termination_action)
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::create_memory_block_action,
-    create_memory_block_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::load_components_action,
     load_components_action)

@@ -27,39 +27,6 @@
 
 namespace hpx { namespace components { namespace stubs
 {
-    ///////////////////////////////////////////////////////////////////////
-    /// Create a new memory block using the runtime_support with the
-    /// given \a targetgid. This is a non-blocking call. The caller needs
-    /// to call \a future#get on the result of this function
-    /// to obtain the global id of the newly created object.
-    template <typename T, typename Config>
-    lcos::future<naming::id_type>
-    runtime_support::create_memory_block_async(
-        naming::id_type const& id, std::size_t count,
-        hpx::actions::manage_object_action<T, Config> const& act)
-    {
-        if (!naming::is_locality(id))
-        {
-            HPX_THROW_EXCEPTION(bad_parameter,
-                "stubs::runtime_support::create_memory_block_async",
-                "The id passed as the first argument is not representing"
-                    " a locality");
-            return make_ready_future(naming::invalid_id);
-        }
-
-        // Create a future, execute the required action,
-        // we simply return the initialized future, the caller needs
-        // to call get() on the return value to obtain the result
-        typedef server::runtime_support::create_memory_block_action
-            action_type;
-        return hpx::async<action_type>(id, count, act);
-    }
-
-    template lcos::future<naming::id_type>
-    HPX_EXPORT runtime_support::create_memory_block_async<std::uint8_t, void>(
-        naming::id_type const& id, std::size_t count,
-        hpx::actions::manage_object_action<std::uint8_t, void> const& act);
-
     lcos::future<int>
     runtime_support::load_components_async(naming::id_type const& gid)
     {
