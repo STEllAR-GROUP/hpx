@@ -642,11 +642,12 @@ hpx_option(HPX_WITH_ITTNOTIFY BOOL
 hpx_option(HPX_WITH_HPXMP BOOL
   "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP")
 if(HPX_WITH_HPXMP)
-  if(NOT MSVC AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+  if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") 
+	OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
     hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
       "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
   else()
-    hpx_warn("hpxMP can be used only when compiling with clang")
+    hpx_warn("hpxMP can be used only when compiling with clang or gcc")
     set(HPX_WITH_HPXMP OFF)
   endif()
 endif()
@@ -1604,12 +1605,17 @@ if(HPX_WITH_HPXMP)
   if(HPX_WITH_HPXMP_NO_UPDATE)
     set(_hpxmp_no_update NO_UPDATE)
   endif()
+  set(_hpx_hpxmp_tag "v0.1.0")
+  if(HPX_WITH_HPXMP_TAG)
+    message("Overriding hpxMP git tag ${_hpx_hpxmp_tag} with ${HPX_WITH_HPXMP_TAG}")
+    set(_hpx_hpxmp_tag ${HPX_WITH_HPXMP_TAG})
+  endif()
 
   # handle hpxMP library
   include(GitExternal)
   git_external(hpxmp
     https://github.com/STEllAR-GROUP/hpxMP.git
-    master
+    ${_hpx_hpxmp_tag}
     ${_hpxmp_no_update}
     VERBOSE)
 
