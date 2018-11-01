@@ -40,7 +40,7 @@ version: 2
 jobs:
   checkout_code:
     docker:
-      - image: stellargroup/build_env:debian_clang
+      - image: stellargroup/build_env:ubuntu
     working_directory: /hpx
     steps:
       # Try to restore source cache. Keys are tried in order. The checkout step
@@ -868,7 +868,7 @@ jobs:
 
   install:
     docker:
-      - image: stellargroup/build_env:debian_clang
+      - image: stellargroup/build_env:ubuntu
     environment:
       TARGET_IMAGE_NAME: stellargroup/hpx:dev
     steps:
