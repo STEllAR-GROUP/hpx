@@ -642,7 +642,7 @@ hpx_option(HPX_WITH_ITTNOTIFY BOOL
 hpx_option(HPX_WITH_HPXMP BOOL
   "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP")
 if(HPX_WITH_HPXMP)
-  if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") 
+  if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
     hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
       "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
