@@ -163,4 +163,7 @@ function(hpx_detect_cpp_dialect)
     hpx_add_target_compile_option(${CXX_FLAG} PUBLIC)
   endif()
 
+  # Re-export the local CXX_FLAG varaible.
+  set(CXX_FLAG ${CXX_FLAG} PARENT_SCOPE)
+
 endfunction()
