@@ -209,7 +209,7 @@ namespace util {
                     0, (ar << ts,0)...  // Takes advantage of the comma operator
                 };
                 (void) sequencer;    // Suppress unused param. warnings
-                return c;
+                return std::move(c);
             }
         };
     }
