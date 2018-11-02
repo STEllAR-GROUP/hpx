@@ -53,9 +53,6 @@ struct mult_functor
 
 struct adaptable_mult_functor : mult_functor
 {
-    typedef int result_type;
-    typedef int argument_type;
-
     // Functors used with transform_iterator must be
     // DefaultConstructible, as the transform_iterator must be
     // DefaultConstructible to satisfy the requirements for
@@ -72,8 +69,6 @@ struct adaptable_mult_functor : mult_functor
 
 struct const_select_first
 {
-    typedef int const& result_type;
-
     int const& operator()(std::pair<int, int> const* p) const
     {
         return p->first;
@@ -82,8 +77,6 @@ struct const_select_first
 
 struct select_first : const_select_first    // derivation to allow conversions
 {
-    typedef int& result_type;
-
     int& operator()(std::pair<int, int>* p) const
     {
         return p->first;
@@ -92,8 +85,6 @@ struct select_first : const_select_first    // derivation to allow conversions
 
 struct select_second
 {
-    typedef int& result_type;
-
     int& operator()(std::pair<int, int>* p) const
     {
         return p->second;
@@ -102,8 +93,6 @@ struct select_second
 
 struct value_select_first
 {
-    typedef int result_type;
-
     int operator()(std::pair<int, int> const* p) const
     {
         return p->first;

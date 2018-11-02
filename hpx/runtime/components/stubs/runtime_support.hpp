@@ -229,28 +229,6 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// Create a new memory block using the runtime_support with the
-        /// given \a targetgid. This is a non-blocking call. The caller needs
-        /// to call \a future#get on the result of this function
-        /// to obtain the global id of the newly created object.
-        template <typename T, typename Config>
-        static lcos::future<naming::id_type>
-        create_memory_block_async(
-            naming::id_type const& id, std::size_t count,
-            hpx::actions::manage_object_action<T, Config> const& act);
-
-        /// Create a new memory block using the runtime_support with the
-        /// given \a targetgid. Block for the creation to finish.
-        template <typename T, typename Config>
-        static naming::id_type create_memory_block(
-            naming::id_type const& id, std::size_t count,
-            hpx::actions::manage_object_action<T, Config> const& act)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the future
-            return create_memory_block_async(id, count, act).get();
-        }
-
         static lcos::future<int>
         load_components_async(naming::id_type const& gid);
         static int load_components(naming::id_type const& gid);
