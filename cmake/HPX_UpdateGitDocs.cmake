@@ -32,7 +32,7 @@ else()
 endif()
 
 # We copy the documentation files from DOCS_SOURCE
-set(DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+set(DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx/docs/html")
 
 # If a branch name has been set, we copy files to a corresponding directory
 message("HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\"")

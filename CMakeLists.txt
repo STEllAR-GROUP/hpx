@@ -1807,12 +1807,6 @@ endif()
 add_plugin_modules()
 
 ################################################################################
-# Prepare the Build Directory
-################################################################################
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/share)
-
-
-################################################################################
 # Configure the header to include all compile definitions
 ################################################################################
 generate_config_defines_header(${CMAKE_BINARY_DIR})
@@ -1958,19 +1952,19 @@ endif()
 
 install(
   FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
-  DESTINATION share/hpx-${HPX_VERSION}
+  DESTINATION share/hpx
   COMPONENT license)
 
 if(HPX_WITH_DOCUMENTATION)
   # Install HPX documentation files
   install(
     FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
-    DESTINATION share/hpx-${HPX_VERSION}/
+    DESTINATION share/hpx/
     COMPONENT docs)
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs"
-    DESTINATION share/hpx-${HPX_VERSION}/docs
+    DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
+    DESTINATION share/hpx/docs/html
     COMPONENT docs
     PATTERN ".git" EXCLUDE)
 endif()
@@ -1998,10 +1992,6 @@ include(HPX_PrintSummary)
 ################################################################################
 
 include(HPX_GeneratePackage)
-
-# Create a symlink in share pointing to the latest HPX installation
-create_symbolic_link("${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}"
-                     "${CMAKE_BINARY_DIR}/share/hpx")
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
