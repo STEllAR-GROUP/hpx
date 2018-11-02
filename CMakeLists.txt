@@ -1854,39 +1854,6 @@ install(
   PATTERN "CMakeFiles" EXCLUDE
   PATTERN "CTestFiles" EXCLUDE)
 
-install( # install all hpx header files
-  DIRECTORY hpx
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
-install( # install all hpx source files
-  DIRECTORY src
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
-install( # install all hpx examples source files
-  DIRECTORY examples
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
-install( # install all hpx tests source files
-  DIRECTORY tests
-  DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-  COMPONENT core
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
-
 install( # Install all HPX cmake utility files
   DIRECTORY cmake/
   DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
