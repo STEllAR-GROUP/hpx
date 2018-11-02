@@ -956,13 +956,10 @@ namespace std
     template <>
     struct hash<hpx::naming::gid_type>
     {
-        typedef hpx::naming::gid_type argument_type;
-        typedef std::size_t result_type;
-
-        result_type operator()(argument_type const& gid) const
+        std::size_t operator()(::hpx::naming::gid_type const& gid) const
         {
-            result_type const h1 (std::hash<std::uint64_t>()(gid.get_lsb()));
-            result_type const h2 (std::hash<std::uint64_t>()(
+            std::size_t const h1 (std::hash<std::uint64_t>()(gid.get_lsb()));
+            std::size_t const h2 (std::hash<std::uint64_t>()(
                 hpx::naming::detail::strip_internal_bits_from_gid(gid.get_msb())));
             return h1 ^ (h2 << 1);
         }

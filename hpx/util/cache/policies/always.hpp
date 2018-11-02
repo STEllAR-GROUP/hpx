@@ -7,14 +7,13 @@
 #define HPX_UTIL_CACHE_POLICIES_ALWAYS_NOV_19_2008_0803AM
 
 #include <hpx/config.hpp>
-#include <functional>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Entry>
-    struct always : public std::unary_function<Entry, bool>
+    struct always
     {
         bool operator() (Entry const&)
         {
