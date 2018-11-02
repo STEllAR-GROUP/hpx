@@ -352,6 +352,7 @@ add_custom_command(
     "${SPHINX_DOCS_OUTPUT_DIR}")
 
 add_custom_target(docs
+  ALL
   DEPENDS ${SPHINX_DOCS_OUTPUT_DIR})
 
 add_custom_target(git_docs
