@@ -17,7 +17,7 @@ set(set_parcel_write_handler_PARAMETERS LOCALITIES 2)
 if(HPX_WITH_PARCEL_COALESCING)
   set(tests ${tests} put_parcels_with_coalescing)
   set(put_parcels_with_coalescing_PARAMETERS LOCALITIES 2)
-  set(put_parcels_with_coalescing_FLAGS DEPENDENCIES iostreams_component parcel_coalescing_lib)
+  set(put_parcels_with_coalescing_FLAGS DEPENDENCIES iostreams_component parcel_coalescing)
 endif()
 
 if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB OR HPX_WITH_COMPRESSION_SNAPPY)

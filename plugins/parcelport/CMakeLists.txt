@@ -78,7 +78,7 @@ macro(add_parcelport name)
         LINK_FLAGS ${${name}_LINK_FLAGS}
         DEPENDENCIES ${${name}_DEPENDENCIES})
 
-    add_hpx_pseudo_dependencies(plugins.parcelport.${name_short} ${name}_lib)
+    add_hpx_pseudo_dependencies(plugins.parcelport.${name_short} ${name})
     add_hpx_pseudo_dependencies(core plugins.parcelport.${name_short})
   endif()
 

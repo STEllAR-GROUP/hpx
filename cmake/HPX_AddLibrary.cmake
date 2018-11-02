@@ -36,10 +36,10 @@ function(add_hpx_library name)
     endif()
     hpx_debug("add_library.${name}" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
 
-    add_hpx_library_sources(${name}_lib
+    add_hpx_library_sources(${name}
       GLOB_RECURSE GLOBS "${${name}_SOURCE_GLOB}")
 
-    set(${name}_SOURCES ${${name}_lib_SOURCES})
+    set(${name}_SOURCES ${${name}_SOURCES})
     add_hpx_source_group(
       NAME ${name}
       CLASS "Source Files"
@@ -52,33 +52,33 @@ function(add_hpx_library name)
     endif()
     hpx_debug("add_library.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
-    add_hpx_library_headers(${name}_lib
+    add_hpx_library_headers(${name}
       GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
 
-    set(${name}_HEADERS ${${name}_lib_HEADERS})
+    set(${name}_HEADERS ${${name}_HEADERS})
     add_hpx_source_group(
       NAME ${name}
       CLASS "Header Files"
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_HEADERS})
   else()
-    add_hpx_library_sources_noglob(${name}_lib
+    add_hpx_library_sources_noglob(${name}
         SOURCES "${${name}_SOURCES}")
 
     add_hpx_source_group(
       NAME ${name}
       CLASS "Source Files"
       ROOT ${${name}_SOURCE_ROOT}
-      TARGETS ${${name}_lib_SOURCES})
+      TARGETS ${${name}_SOURCES})
 
-    add_hpx_library_headers_noglob(${name}_lib
+    add_hpx_library_headers_noglob(${name}
         HEADERS "${${name}_HEADERS}")
 
     add_hpx_source_group(
       NAME ${name}
       CLASS "Header Files"
       ROOT ${${name}_HEADER_ROOT}
-      TARGETS ${${name}_lib_HEADERS})
+      TARGETS ${${name}_HEADERS})
   endif()
 
   hpx_print_list("DEBUG" "add_library.${name}" "Sources for ${name}" ${name}_SOURCES)
@@ -119,12 +119,12 @@ function(add_hpx_library name)
   endif()
 
   if(${name}_STATIC)
-    set(${name}_lib_linktype STATIC)
+    set(${name}_linktype STATIC)
   else()
     if(HPX_WITH_STATIC_LINKING)
-      set(${name}_lib_linktype STATIC)
+      set(${name}_linktype STATIC)
     else()
-      set(${name}_lib_linktype SHARED)
+      set(${name}_linktype SHARED)
     endif()
   endif()
 
@@ -140,16 +140,16 @@ function(add_hpx_library name)
   endif()
 
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    cuda_add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
+    cuda_add_library(${name} ${${name}_linktype} ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   else()
-    add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
+    add_library(${name} ${${name}_linktype} ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   endif()
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
-      set_target_properties("${name}_lib" PROPERTIES
+      set_target_properties(${name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
         LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
@@ -163,7 +163,7 @@ function(add_hpx_library name)
         LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}")
     else()
-      set_target_properties("${name}_lib" PROPERTIES
+      set_target_properties(${name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}"
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}")
@@ -176,7 +176,7 @@ function(add_hpx_library name)
   endif()
 
   hpx_setup_target(
-    ${name}_lib
+    ${name}
     TYPE LIBRARY
     NAME ${name}
     EXPORT
