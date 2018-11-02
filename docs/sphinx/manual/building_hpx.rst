@@ -193,21 +193,48 @@ speed up the execution of your code significantly. We currently support the
 following C++ compilers: GCC, MSVC, ICPC and clang. For the status of your
 favorite compiler with |hpx| visit |hpx_buildbot|_.
 
-.. table:: Software Prerequisites for |hpx| on Linux systems.
+.. list-table:: Software prerequisites for |hpx| on Linux systems.
 
-    ====================== =================== =================== =====
-    Name                   Recommended version Minimum version     Notes
-    ====================== =================== =================== =====
-    **Compilers**
-    |gcc|_                 4.9 or newer        4.9
-    |icpc|_                2014 or newer       2014
-    |clang|_               3.8 or newer        3.8
-    **Build System**
-    |cmake|_               3.9.0               3.3.2    Cuda support 3.9
-    **Required Libraries**
-    |boost_libraries|_     1.62.0 or newer     1.58.0
-    |hwloc|_               2.0.1 or newer      1.2 (Xeon Phi: 1.6)
-    ====================== =================== =================== =====
+   * * Name
+     * Recommended version
+     * Minimum version
+     * Notes
+   * * **Compilers**
+     *
+     *
+     *
+   * * |gcc|_
+     * 4.9 or newer
+     * 4.9
+     *
+   * * |icpc|_
+     * 2014 or newer
+     * 2014
+     *
+   * * |clang|_
+     * 3.8 or newer
+     * 3.8
+     *
+   * * **Build System**
+     *
+     *
+     *
+   * * |cmake|_
+     * 3.9.0
+     * 3.3.2
+     * Cuda support 3.9
+   * * **Required Libraries**
+     *
+     *
+     *
+   * * |boost_libraries|_
+     * 1.62.0 or newer
+     * 1.58.0
+     *
+   * * |hwloc|_
+     * 2.0.1 or newer
+     * 1.2 (Xeon Phi: 1.6)
+     *
 
 .. note::
 
@@ -1284,7 +1311,7 @@ How to install |hpx| on Arch distributions
   .. code-block:: bash
 
      sudo pacman -S doxygen python-pip
-  
+
      pip install --user sphinx sphinx_rtd_theme breathe
 
 The rest of the installation steps are same as provided with Fedora
