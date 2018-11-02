@@ -41,8 +41,6 @@
 #include <boost/integer/common_factor_ct.hpp>
 // boost::simple_segregated_storage
 #include <boost/pool/simple_segregated_storage.hpp>
-// boost::alignment_of
-#include <boost/type_traits/alignment_of.hpp>
 
 #ifdef BOOST_POOL_INSTRUMENT
 # include <iostream>
@@ -293,8 +291,7 @@ namespace details
             (::boost::integer::static_lcm<sizeof(void *), sizeof(size_type)>::value) );
 
         BOOST_STATIC_CONSTANT(size_type, min_align =
-            (::boost::integer::static_lcm< ::boost::alignment_of<void *>::value,
-                ::boost::alignment_of<size_type>::value>::value) );
+            (::boost::integer::static_lcm<alignof(void*), alignof(size_type)>::value) );
 
         //! \returns 0 if out-of-memory.
         //! Called if malloc needs to resize the free list.
