@@ -64,19 +64,20 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // helper functions
             void add_no_count(closure_type&& f);
             void thread_wrapper(closure_type&& f);
 
             // detaches this object from the underlying thread pool object
-            void detach();
+            void detach() override;
 
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(
-                threads::detail::executor_parameter p, error_code& ec) const;
+                threads::detail::executor_parameter p,
+                error_code& ec) const override;
 
         private:
             util::io_service_pool* pool_;
