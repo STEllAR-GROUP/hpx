@@ -24,6 +24,7 @@
 #include <hpx/util/logging/gather/ostream_like.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -152,7 +153,13 @@ namespace hpx { namespace util { namespace logging {
 
     public:
         // called after all data has been gathered
-        void do_write(msg_type  msg) const{}
+        void do_write(msg_type msg) const
+        {
+            if ( cache().is_cache_turned_off() )
+                writer()(msg);
+            else
+                cache().add_msg(std::move(msg));
+        }
 
     private:
         cache_type m_cache;
