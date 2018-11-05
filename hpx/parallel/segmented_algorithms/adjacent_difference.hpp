@@ -52,6 +52,9 @@ namespace hpx { namespace parallel { inline namespace v1
 
             typedef util::detail::algorithm_result<ExPolicy, FwdIter2> result;
 
+            FwdIter2 end_dest = dest;
+            std::advance(end_dest, std::distance(first, last));
+
             segment_iterator1 sit = traits1::segment(first);
             segment_iterator1 send = traits1::segment(last);
             segment_iterator2 sdest =  traits2::segment(dest);
@@ -81,6 +84,12 @@ namespace hpx { namespace parallel { inline namespace v1
                         std::true_type(), beg, end, ldest, op);
                 }
 
+                FwdIter1 ending = traits1::compose(sit, std::prev(end));
+                FwdIter2 curr = std::next(traits2::compose(sdest, out));
+                // printf("%ld\n", std::distance(first,curr));
+                // if(curr != end_dest && std::next(ending) != last)
+                    // *curr = hpx::util::invoke(op, *ending, *std::next(ending));
+
                 // handle all of the full partitions
                 for (++sit, ++sdest; sit != send; ++sit, ++sdest)
                 {
@@ -92,6 +101,11 @@ namespace hpx { namespace parallel { inline namespace v1
                         out = dispatch(traits2::get_id(sdest), algo, policy,
                             std::true_type(), beg, end, ldest, op);
                     }
+                    // ending = traits1::compose(sit, std::prev(end));
+                    // curr = std::next(traits2::compose(sdest, out));
+                    // printf("%ld\n", std::distance(first,curr));
+                    // if(curr != end_dest && std::next(ending) != last)
+                        // *curr = hpx::util::invoke(op, *ending, *std::next(ending));
                 }
 
                 // handle the beginning of the last partition
