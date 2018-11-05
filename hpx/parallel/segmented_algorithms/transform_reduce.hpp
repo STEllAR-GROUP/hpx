@@ -279,7 +279,8 @@ namespace hpx { namespace parallel { inline namespace v1
                 {
                     overall_result = hpx::util::invoke(red_op, overall_result,
                         dispatch(traits1::get_id(sit1), algo, policy,
-                            std::true_type(), beg1, end1, beg2, red_op, conv_op));
+                            std::true_type(), beg1, end1, beg2, red_op, conv_op)
+                    );
                 }
             }
             else {
