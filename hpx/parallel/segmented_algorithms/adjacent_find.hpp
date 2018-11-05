@@ -157,9 +157,10 @@ namespace hpx { namespace parallel { inline namespace v1
 
             typedef std::vector<future<FwdIter> > segment_type;
             segment_type segments;
-            std::vector<FwdIter> between_segments;
             segments.reserve(std::distance(sit, send));
-            between_segments.reserve(2*std::distance(sit, send));
+
+            std::vector<FwdIter> between_segments;
+            between_segments.reserve(std::distance(sit, send));
 
             if (sit == send)
             {
@@ -200,7 +201,6 @@ namespace hpx { namespace parallel { inline namespace v1
                                 else
                                     return last;
                             }));
-                    between_segments.push_back(traits::compose(sit,std::prev(end)));
                 }
 
                 // handle all of the full partitions
@@ -223,7 +223,6 @@ namespace hpx { namespace parallel { inline namespace v1
                                     else
                                         return last;
                                 }));
-                        between_segments.push_back(traits::compose(sit,std::prev(end)));
                     }
                 }
 
@@ -265,11 +264,11 @@ namespace hpx { namespace parallel { inline namespace v1
                         {
                             if(*it != last)
                                 return *it;
-                            if(hpx::util::invoke(op, *(between_segments[i]),
-                                *(between_segments[i+1])))
-                                return between_segments[i];
+                            if(hpx::util::invoke(op, *std::prev(between_segments[i]),
+                                *(between_segments[i])))
+                                return std::prev(between_segments[i]);
                             ++it;
-                            i+=2;
+                            i+=1;
                         }
                         return res.back();
                     },

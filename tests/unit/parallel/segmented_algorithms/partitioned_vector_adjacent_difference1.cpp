@@ -113,7 +113,7 @@ void test_adjacent_difference_async(ExPolicy&& policy,
 template <typename T>
 void adjacent_difference_tests(std::vector<hpx::id_type>& localities)
 {
-    std::size_t const length = 100;
+    std::size_t const length = 12;
 
     {
         hpx::partitioned_vector<T> v;

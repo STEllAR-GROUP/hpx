@@ -443,7 +443,8 @@ namespace hpx { namespace parallel { inline namespace v1
             typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy, T>::type
         transform_reduce_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op, std::true_type)
+            FwdIter2 first2, T init, Reduce && red_op,
+            Convert && conv_op, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<
                     ExPolicy
@@ -468,7 +469,8 @@ namespace hpx { namespace parallel { inline namespace v1
             typename Reduce, typename Convert>
         typename util::detail::algorithm_result<ExPolicy, T>::type
         transform_reduce_(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce && red_op, Convert && conv_op, std::false_type);
+            FwdIter2 first2, T init, Reduce && red_op,
+            Convert && conv_op, std::false_type);
         /// \endcond
     }
 }}}
