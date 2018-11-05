@@ -4,6 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    partitioned_vector_adjacent_difference1
+    partitioned_vector_adjacent_difference2
+    partitioned_vector_adjacent_find1
+    partitioned_vector_adjacent_find2
     partitioned_vector_all_of1
     partitioned_vector_all_of2
     partitioned_vector_any_of1

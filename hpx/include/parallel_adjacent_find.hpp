@@ -8,6 +8,6 @@
 #define HPX_PARALLEL_ADJACENT_FIND_SEP_20_2014_0732PM
 
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
+#include <hpx/parallel/segmented_algorithms/adjacent_find.hpp>
 
 #endif
-
