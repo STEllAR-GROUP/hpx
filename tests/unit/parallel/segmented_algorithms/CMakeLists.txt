@@ -4,6 +4,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    partitioned_vector_all_of1
+    partitioned_vector_all_of2
+    partitioned_vector_any_of1
+    partitioned_vector_any_of2
     partitioned_vector_copy
     partitioned_vector_for_each
     partitioned_vector_handle_values
@@ -24,6 +28,8 @@ set(tests
     partitioned_vector_inclusive_scan2
     partitioned_vector_exclusive_scan
     partitioned_vector_exclusive_scan2
+    partitioned_vector_none1
+    partitioned_vector_none2
     partitioned_vector_transform_scan
     partitioned_vector_transform_scan2
     partitioned_vector_reduce
