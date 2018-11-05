@@ -9,11 +9,16 @@ set(example_programs
   simplest_resource_partitioner_1
   simplest_resource_partitioner_2
 )
-if (HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
-  set(example_programs ${example_programs}
-    async_customization
-    guided_pool_test
-  )
+
+if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5.0)
+    if (HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+      set(example_programs ${example_programs}
+        async_customization
+        guided_pool_test
+      )
+    endif()
+  endif()
 endif()
 
 set(guided_pool_test_FLAGS DEPENDENCIES iostreams_component)
