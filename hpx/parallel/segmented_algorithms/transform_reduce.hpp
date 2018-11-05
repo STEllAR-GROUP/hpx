@@ -266,7 +266,6 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits1::segment(first2);
-            segment_iterator2 send2 = traits1::segment(last2);
 
             T overall_result = init;
 
@@ -349,7 +348,6 @@ namespace hpx { namespace parallel { inline namespace v1
             segment_iterator1 sit1 = traits1::segment(first1);
             segment_iterator1 send1 = traits1::segment(last1);
             segment_iterator2 sit2 = traits1::segment(first2);
-            segment_iterator2 send2 = traits1::segment(last2);
 
             typedef std::integral_constant<bool,
                     !hpx::traits::is_forward_iterator<FwdIter1>::value

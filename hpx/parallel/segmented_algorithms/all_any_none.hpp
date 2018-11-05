@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_ALL_ANY_NONE_AUG_12_2017_0836PM)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHM_FOR_EACH_OCT_15_2014_0839PM
+#define HPX_PARALLEL_SEGMENTED_ALGORITHM_ALL_ANY_NONE_AUG_12_2017_0836PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
