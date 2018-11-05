@@ -20,7 +20,10 @@ set(tests
     partitioned_vector_transform_binary1
     partitioned_vector_transform_binary2
     partitioned_vector_transform_binary3
-    partitioned_vector_transform_reduce
+    partitioned_vector_transform_reduce1
+    partitioned_vector_transform_reduce2
+    partitioned_vector_transform_reduce_binary1
+    partitioned_vector_transform_reduce_binary2
     partitioned_vector_fill
     partitioned_vector_find
     partitioned_vector_find2
