@@ -57,20 +57,6 @@ void test_adjacent_difference(ExPolicy&& policy, hpx::partitioned_vector<T>& v,
 }
 
 template <typename ExPolicy, typename T>
-void verify_values_count_async(
-    ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
-{
-    HPX_TEST_EQ(
-        std::size_t(
-            hpx::parallel::count(policy, v.begin(), v.end(), val).get()),
-        v.size());
-    HPX_TEST_EQ(std::size_t(hpx::parallel::count_if(
-                    policy, v.begin(), v.end(), cmp<T>(val))
-                                .get()),
-        v.size());
-}
-
-template <typename ExPolicy, typename T>
 void test_adjacent_difference_async(ExPolicy&& policy,
     hpx::partitioned_vector<T>& v, hpx::partitioned_vector<T>& w, T val)
 {

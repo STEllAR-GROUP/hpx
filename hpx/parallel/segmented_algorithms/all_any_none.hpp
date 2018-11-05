@@ -357,7 +357,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type
-        any_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
+        any_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
@@ -373,7 +373,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type
-        any_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
+        any_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F && f,
             Proj && proj, std::false_type);
 
         ///////////////////////////////////////////////////////////////////////
@@ -530,8 +530,8 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type
-        all_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj, std::true_type)
+        all_of_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            Proj && proj, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
@@ -547,8 +547,8 @@ namespace hpx { namespace parallel { inline namespace v1
         template <typename ExPolicy, typename FwdIter, typename F,
             typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type
-        all_of_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj, std::false_type);
+        all_of_(ExPolicy && policy, FwdIter first, FwdIter last, F && f,
+            Proj && proj, std::false_type);
 
         /// \endcond
     }

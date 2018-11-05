@@ -18,8 +18,8 @@ set(tests
     partitioned_vector_iter
     partitioned_vector_move
     partitioned_vector_target
-    partitioned_vector_transform
     partitioned_vector_transform1
+    partitioned_vector_transform2
     partitioned_vector_transform_binary
     partitioned_vector_transform_binary1
     partitioned_vector_transform_binary2

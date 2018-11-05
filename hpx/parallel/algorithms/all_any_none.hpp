@@ -327,10 +327,10 @@ namespace hpx { namespace parallel { inline namespace v1
 
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F>
+        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         any_of_(ExPolicy && policy, FwdIter first, FwdIter last,
-            F && f, std::true_type);
+            F && f, Proj && proj, std::true_type);
         /// \endcond
     }
 
@@ -520,10 +520,10 @@ namespace hpx { namespace parallel { inline namespace v1
                 first, last, std::forward<F>(f), std::forward<Proj>(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename F>
+        template <typename ExPolicy, typename FwdIter, typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         all_of_(ExPolicy && policy, FwdIter first, FwdIter last,
-            F && f, std::true_type);
+            F && f, Proj && proj, std::true_type);
         /// \endcond
     }
 
