@@ -19,8 +19,8 @@
 template <typename T>
 void initialize(hpx::partitioned_vector<T>& xvalues)
 {
-    T init_array[SIZE] = {1, 2, 3, 4, 5, 1, 1, 3, 3, 5, 5, 3, 4, 2, 3, 2, 1, 2,
-        3, 4, 5, 6, 5, 6, 1, 2, 3, 4, 1, 1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 2, 3, 4,
+    T init_array[SIZE] = {1, 2, 3, 4, 5, 1, 2, 3, 1, 5, 2, 3, 4, 2, 3, 2, 1, 2,
+        3, 4, 5, 6, 5, 6, 1, 2, 3, 4, 2, 1, 2, 3, 3, 5, 4, 3, 2, 1, 1, 2, 3, 4,
         1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 7, 5, 4, 2, 3, 4, 5, 2};
     for (int i = 0; i < SIZE; i++)
     {
@@ -33,7 +33,7 @@ void test_adjacent_find(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues)
 {
     auto result =
         hpx::parallel::adjacent_find(policy, xvalues.begin(), xvalues.end());
-    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 5);
+    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 31);
 }
 
 template <typename ExPolicy, typename T>
@@ -43,7 +43,7 @@ void test_adjacent_find_async(ExPolicy&& policy,
     auto result =
         hpx::parallel::adjacent_find(policy, xvalues.begin(), xvalues.end())
             .get();
-    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 5);
+    HPX_TEST_EQ(std::distance(xvalues.begin(), result), 31);
 }
 
 template <typename T>
