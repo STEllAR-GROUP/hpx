@@ -1631,7 +1631,7 @@ The predefined command line options for any application using
    and ``csv`` or ``csv-short`` format specified with
    :option:`--hpx:print-counter-format` without header
 
-.. option:: --hpx:printer-counter-at arg
+.. option:: --hpx:print-counter-at arg
 
    print the performance counter(s) specified with :option:`--hpx:print-counter`
    (or :option:`--hpx:print-counter-reset` at the given point in time, possible
