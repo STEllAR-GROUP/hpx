@@ -66,18 +66,20 @@ namespace hpx { namespace threads { namespace executors
             }
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // Reset internal (round robin) thread distribution scheme
-            void reset_thread_distribution();
+            void reset_thread_distribution() override;
 
             /// Set the new scheduler mode
-            void set_scheduler_mode(threads::policies::scheduler_mode mode);
+            void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) override;
 
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(
-                threads::detail::executor_parameter p, error_code& ec) const;
+                threads::detail::executor_parameter p,
+                error_code& ec) const override;
         };
     }
 

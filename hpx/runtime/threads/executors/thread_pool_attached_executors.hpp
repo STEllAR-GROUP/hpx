@@ -62,15 +62,16 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // Reset internal (round robin) thread distribution scheme
-            void reset_thread_distribution();
+            void reset_thread_distribution() override;
 
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(
-                threads::detail::executor_parameter p, error_code& ec) const;
+                threads::detail::executor_parameter p,
+                error_code& ec) const override;
 
             std::size_t get_next_thread_num()
             {
