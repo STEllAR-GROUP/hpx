@@ -11,7 +11,18 @@
 // For more information, see http://www.boost.org
 
 #include <hpx/hpx_main.hpp>
+
+// NOTE: Warning caused by assignment of hpx::util::function_nonser<float()> to
+// hpx::util::function_nonser<double()> in test_emptiness.
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
 #include <hpx/include/util.hpp>
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
+
 #include <hpx/util/lightweight_test.hpp>
 
 #include <functional>

@@ -42,7 +42,8 @@ void test_uninitialized_value_construct(ExPolicy && policy, IteratorTag)
 
     value_constructable* p = (value_constructable*)std::malloc(
         data_size * sizeof(value_constructable));
-    std::memset(p, 0xcd, data_size * sizeof(value_constructable));
+    std::memset(
+        static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
     hpx::parallel::uninitialized_value_construct(
         std::forward<ExPolicy>(policy),
@@ -68,7 +69,8 @@ void test_uninitialized_value_construct_async(ExPolicy && policy, IteratorTag)
 
     value_constructable* p = (value_constructable*)std::malloc(
         data_size * sizeof(value_constructable));
-    std::memset(p, 0xcd, data_size * sizeof(value_constructable));
+    std::memset(
+        static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
     auto f =
         hpx::parallel::uninitialized_value_construct(
@@ -102,7 +104,7 @@ void test_uninitialized_value_construct_exception(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
     std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
@@ -147,7 +149,7 @@ void test_uninitialized_value_construct_exception_async(
         decorated_iterator;
 
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
     std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
@@ -204,7 +206,7 @@ void test_uninitialized_value_construct_bad_alloc(ExPolicy policy, IteratorTag)
         decorated_iterator;
 
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
     std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();
@@ -250,7 +252,7 @@ void test_uninitialized_value_construct_bad_alloc_async(
         decorated_iterator;
 
     data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
     std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
     std::size_t throw_after_ = throw_after.load();

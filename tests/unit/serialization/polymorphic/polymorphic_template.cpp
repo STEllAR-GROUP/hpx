@@ -25,6 +25,8 @@ struct A
   }
   A() = default;
 
+  virtual ~A(){};
+
   virtual void foo() const = 0;
 
   template <class Ar>
