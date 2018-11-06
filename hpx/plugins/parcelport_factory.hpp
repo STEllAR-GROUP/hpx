@@ -101,9 +101,6 @@ namespace hpx { namespace plugins
                 "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
                     "_ZERO_COPY_OPTIMIZATION:"
                     "$[hpx.parcel.zero_copy_optimization]}",
-                "enable_security = ${HPX_PARCEL_" + name_uc +
-                    "_ENABLE_SECURITY:"
-                    "$[hpx.parcel.enable_security]}",
                 "async_serialization = ${HPX_PARCEL_" + name_uc +
                     "_ASYNC_SERIALIZATION:"
                     "$[hpx.parcel.async_serialization]}",
