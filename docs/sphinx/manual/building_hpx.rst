@@ -284,7 +284,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |boost|_
      * 1.62.0 or newer
      * 1.58.0
-     * See below for an important limitation when using Boost V1.55.0.
+     *
    * * |hwloc|_
      * 2.0.1 or newer
      * 1.5
