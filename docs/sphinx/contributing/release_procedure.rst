@@ -196,9 +196,9 @@ are completed to avoid confusion.
 
 #. Announce the release on hpx-users@stellar.cct.lsu.edu, stellar@cct.lsu.edu,
    allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
-   xpress@crest.iu.edu, Sonia Sachs, our list of external collaborators,
-   isocpp.org, reddit.com, HPC Wire, Inside HPC, Heise Online, and a CCT press
-   release.
+   xpress@crest.iu.edu, the |hpx| Slack channel, the IRC channel, Sonia Sachs,
+   our list of external collaborators, isocpp.org, reddit.com, HPC Wire, Inside
+   HPC, Heise Online, and a CCT press release.
 
 #. Beer and pizza.
 
