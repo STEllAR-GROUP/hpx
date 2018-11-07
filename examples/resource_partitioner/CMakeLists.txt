@@ -11,7 +11,7 @@ set(example_programs
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5.0)
+  if(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
     if (HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
       set(example_programs ${example_programs}
         async_customization
