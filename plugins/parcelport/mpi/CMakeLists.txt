@@ -29,6 +29,10 @@ if(HPX_WITH_PARCELPORT_MPI)
     #    hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
   endif()
 
+  if(MPI_CXX_COMPILE_DEFINITIONS)
+    add_compile_definitions(${MPI_CXX_COMPILE_DEFINITIONS})
+  endif()
+
   # This list is to detect whether we run inside an mpi environment.
   # If one of those environment variables is set, the MPI parcelport
   # is enabled by default.

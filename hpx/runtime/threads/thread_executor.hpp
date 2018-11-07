@@ -232,6 +232,20 @@ namespace hpx { namespace threads
         class scheduled_executor_base : public executor_base
         {
         public:
+
+            scheduled_executor_base()
+              : stacksize_(thread_stacksize_default),
+                priority_(thread_priority_default),
+                schedulehint_(thread_schedule_hint())
+            {}
+
+            scheduled_executor_base(thread_priority priority,
+                thread_stacksize stacksize, thread_schedule_hint schedulehint)
+              : stacksize_(stacksize),
+                priority_(priority),
+                schedulehint_(schedulehint)
+            {}
+
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
@@ -263,6 +277,14 @@ namespace hpx { namespace threads
                 return add_after(rel_time.value(), std::move(f), desc,
                     stacksize, ec);
             }
+
+            thread_priority  get_priority() const { return priority_; }
+            thread_stacksize get_stacksize() const { return stacksize_; }
+
+        protected:
+            thread_stacksize     stacksize_;
+            thread_priority      priority_;
+            thread_schedule_hint schedulehint_;
         };
     }
 
@@ -442,6 +464,16 @@ namespace hpx { namespace threads
         void detach()
         {
             executor_data_->detach();
+        }
+
+        thread_priority get_priority() const {
+            return static_cast<detail::scheduled_executor_base*>
+                    (executor_data_.get())->get_priority();
+        }
+
+        thread_stacksize get_stacksize() const {
+            return static_cast<detail::scheduled_executor_base*>
+                    (executor_data_.get())->get_stacksize();
         }
 
         /// Return a reference to the default executor for this process.
