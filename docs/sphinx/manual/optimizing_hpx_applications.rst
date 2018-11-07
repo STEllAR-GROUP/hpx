@@ -275,7 +275,7 @@ The following table summarizes the available command line options:
      * print the performance counter(s) specified with ``--hpx:print-counter``
        and ``csv`` or ``csv-short`` format specified with
        ``--hpx:print-counter-format`` without header.
-   * * ``--hpx:printer-counter-at arg``
+   * * ``--hpx:print-counter-at arg``
      * print the performance counter(s) specified with ``--hpx:print-counter``
        (or ``--hpx:print-counter-reset``) at the given point in time, possible
        argument values: ``startup``, ``shutdown`` (default), ``noshutdown``.
