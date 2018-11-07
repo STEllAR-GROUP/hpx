@@ -686,8 +686,6 @@ namespace hpx { namespace actions
         terminate_action_id,
         terminate_all_action_id,
         update_agas_cache_action_id,
-        register_worker_security_action_id,
-        notify_worker_security_action_id,
 
         base_lco_with_value_gid_get,
         base_lco_with_value_gid_set,

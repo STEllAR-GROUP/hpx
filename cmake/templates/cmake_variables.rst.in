@@ -73,12 +73,6 @@ custom directory for ``BOOST``, specify ``BOOST_ROOT=/custom/boost/root``.
    tools, which customizes the generated information for your application and
    improves the generated diagnostics.
 
-.. option:: SODIUM_ROOT:PATH
-
-   Specifies where to look for the |sodium|_ library. The Sodium library is
-   necessary to enable the security related functionality (see
-   ``HPX_HAVE_SECURITY``).
-
 In addition, some of the examples may need the following variables:
 
 .. option:: HDF5_ROOT:PATH
