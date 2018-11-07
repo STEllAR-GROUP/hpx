@@ -23,7 +23,6 @@
 #include <cstring>
 #include <string>
 #include <type_traits>
-#include <typeinfo>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
@@ -152,11 +151,6 @@ namespace hpx { namespace util { namespace detail
         explicit operator bool() const noexcept
         {
             return !empty();
-        }
-
-        std::type_info const& target_type() const noexcept
-        {
-            return empty() ? typeid(void) : vptr->get_type();
         }
 
         template <typename T>

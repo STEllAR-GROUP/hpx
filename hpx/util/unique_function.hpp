@@ -86,7 +86,6 @@ namespace hpx { namespace util
         using base_type::assign;
         using base_type::reset;
         using base_type::empty;
-        using base_type::target_type;
         using base_type::target;
     };
 

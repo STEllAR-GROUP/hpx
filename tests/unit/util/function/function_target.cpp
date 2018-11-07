@@ -20,14 +20,12 @@ int main()
     {
         hpx::util::function<int()> fun = foo();
 
-        HPX_TEST(fun.target_type() == typeid(foo));
         HPX_TEST(fun.target<foo>() != nullptr);
     }
 
     {
         hpx::util::function<int()> fun = foo();
 
-        HPX_TEST(fun.target_type() == typeid(foo const));
         HPX_TEST(fun.target<foo const>() != nullptr);
     }
 
