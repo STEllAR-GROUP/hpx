@@ -114,7 +114,6 @@ Bug fixes (closed tickets)
 Here is a list of the important tickets we closed for this release.
 
 * :hpx-pr:`3250` - Apex refactoring with guids
-* :hpx-pr:`3250` - Apex refactoring with guids
 * :hpx-pr:`3249` - Updating People.qbk
 * :hpx-pr:`3246` - Assorted fixes for CUDA
 * :hpx-pr:`3245` - Apex refactoring with guids
