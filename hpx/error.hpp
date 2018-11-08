@@ -126,19 +126,17 @@ namespace hpx
         ///< An unknown error occurred
         bad_plugin_type = 49,
         ///< The specified plugin type is not known or otherwise invalid
-        security_error = 50,
-        ///< An error occurred in the security component
-        filesystem_error = 51,
+        filesystem_error = 50,
         ///< The specified file does not exist or other filesystem related error
-        bad_function_call = 52,
+        bad_function_call = 51,
         ///< equivalent of std::bad_function_call
-        task_canceled_exception = 53,
+        task_canceled_exception = 52,
         ///< parallel::v2::task_canceled_exception
-        task_block_not_active = 54,
+        task_block_not_active = 53,
         ///< task_region is not active
-        out_of_range = 55,
+        out_of_range = 54,
         ///< Equivalent to std::out_of_range
-        length_error = 56,
+        length_error = 55,
         ///< Equivalent to std::length_error
 
         /// \cond NOINTERNAL
@@ -202,13 +200,12 @@ namespace hpx
         /* 47 */ "duplicate_component_id",
         /* 48 */ "unknown_error",
         /* 49 */ "bad_plugin_type",
-        /* 50 */ "security_error",
-        /* 51 */ "filesystem_error",
-        /* 52 */ "bad_function_call",
-        /* 53 */ "task_canceled_exception",
-        /* 54 */ "task_block_not_active",
-        /* 55 */ "out_of_range",
-        /* 56 */ "length_error",
+        /* 50 */ "filesystem_error",
+        /* 51 */ "bad_function_call",
+        /* 52 */ "task_canceled_exception",
+        /* 53 */ "task_block_not_active",
+        /* 54 */ "out_of_range",
+        /* 55 */ "length_error",
 
         /*    */ ""
     };

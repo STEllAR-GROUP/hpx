@@ -53,6 +53,12 @@ are completed to avoid confusion.
    <http://github.com/khuck/xpress-apex>`_ to generate a new release to
    synchronize with the HPX release.
 
+#. Change the hpxMP release branch to be the most current release tag available
+   in the ``git_external`` hpxMP section of the main ``CMakeLists.txt``. Please
+   contact the maintainers at the `hpxMP repository
+   <https://github.com/STEllAR-GROUP/hpxMP>`_ to generate a new release to
+   synchronize with the HPX release.
+
 #. If there have been any commits to the release branch since the last release
    create a tag from the old release branch before deleting the old release
    branch in the next step.

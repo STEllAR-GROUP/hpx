@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_uninitialized_value_construct.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -36,20 +36,19 @@ void test_uninitialized_value_construct_n(ExPolicy policy, IteratorTag)
     typedef value_constructable* base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    value_constructable* p = (value_constructable*)std::malloc(
+    value_constructable* p = (value_constructable*) std::malloc(
         data_size * sizeof(value_constructable));
-    std::memset(p, 0xcd, data_size * sizeof(value_constructable));
+    std::memset(
+        static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
-    hpx::parallel::uninitialized_value_construct_n(policy,
-        iterator(p), data_size);
+    hpx::parallel::uninitialized_value_construct_n(
+        policy, iterator(p), data_size);
 
     std::size_t count = 0;
-    std::for_each(p, p + data_size,
-        [&count](value_constructable v1)
-        {
-            HPX_TEST_EQ(v1.value_, 0);
-            ++count;
-        });
+    std::for_each(p, p + data_size, [&count](value_constructable v1) {
+        HPX_TEST_EQ(v1.value_, 0);
+        ++count;
+    });
     HPX_TEST_EQ(count, data_size);
 
     std::free(p);
@@ -61,22 +60,20 @@ void test_uninitialized_value_construct_n_async(ExPolicy policy, IteratorTag)
     typedef value_constructable* base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    value_constructable* p =
-        (value_constructable*)std::malloc(data_size * sizeof(value_constructable));
-    std::memset(p, 0xcd, data_size * sizeof(value_constructable));
+    value_constructable* p = (value_constructable*) std::malloc(
+        data_size * sizeof(value_constructable));
+    std::memset(
+        static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
-    auto f =
-        hpx::parallel::uninitialized_value_construct_n(policy,
-            iterator(p), data_size);
+    auto f = hpx::parallel::uninitialized_value_construct_n(
+        policy, iterator(p), data_size);
     f.wait();
 
     std::size_t count = 0;
-    std::for_each(p, p + data_size,
-        [&count](value_constructable v1)
-        {
-            HPX_TEST_EQ(v1.value_, 0);
-            ++count;
-        });
+    std::for_each(p, p + data_size, [&count](value_constructable v1) {
+        HPX_TEST_EQ(v1.value_, 0);
+        ++count;
+    });
     HPX_TEST_EQ(count, data_size);
 
     std::free(p);
@@ -91,10 +88,10 @@ void test_uninitialized_value_construct_n()
     test_uninitialized_value_construct_n(execution::par, IteratorTag());
     test_uninitialized_value_construct_n(execution::par_unseq, IteratorTag());
 
-    test_uninitialized_value_construct_n_async(execution::seq(execution::task),
-        IteratorTag());
-    test_uninitialized_value_construct_n_async(execution::par(execution::task),
-        IteratorTag());
+    test_uninitialized_value_construct_n_async(
+        execution::seq(execution::task), IteratorTag());
+    test_uninitialized_value_construct_n_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_value_construct_n_test()
@@ -104,8 +101,9 @@ void uninitialized_value_construct_n_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template<typename ExPolicy, typename IteratorTag>
-void test_uninitialized_value_construct_n_exception(ExPolicy policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_uninitialized_value_construct_n_exception(
+    ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -116,33 +114,34 @@ void test_uninitialized_value_construct_n_exception(ExPolicy policy, IteratorTag
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    data_type* p = (data_type*) std::malloc(data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size);    //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);
     data_type::max_instance_count.store(0);
 
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::parallel::uninitialized_value_construct_n(policy,
-            decorated_iterator(
-                p,
-                [&throw_after]()
-                {
+            decorated_iterator(p,
+                [&throw_after]() {
                     if (throw_after-- == 0)
                         throw std::runtime_error("test");
                 }),
             data_size);
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -162,10 +161,10 @@ void test_uninitialized_value_construct_n_exception_async(
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    data_type* p = (data_type*) std::malloc(data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size);    //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);
@@ -173,28 +172,28 @@ void test_uninitialized_value_construct_n_exception_async(
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::uninitialized_value_construct_n(policy,
-                decorated_iterator(
-                    p,
-                    [&throw_after]()
-                    {
-                        if (throw_after-- == 0)
-                            throw std::runtime_error("test");
-                    }),
-                data_size);
+    try
+    {
+        auto f = hpx::parallel::uninitialized_value_construct_n(policy,
+            decorated_iterator(p,
+                [&throw_after]() {
+                    if (throw_after-- == 0)
+                        throw std::runtime_error("test");
+                }),
+            data_size);
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -206,7 +205,7 @@ void test_uninitialized_value_construct_n_exception_async(
     std::free(p);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_uninitialized_value_construct_n_exception()
 {
     using namespace hpx::parallel;
@@ -214,26 +213,28 @@ void test_uninitialized_value_construct_n_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_value_construct_n_exception(execution::seq, IteratorTag());
-    test_uninitialized_value_construct_n_exception(execution::par, IteratorTag());
+    test_uninitialized_value_construct_n_exception(
+        execution::seq, IteratorTag());
+    test_uninitialized_value_construct_n_exception(
+        execution::par, IteratorTag());
 
     test_uninitialized_value_construct_n_exception_async(
-        execution::seq(execution::task),
-        IteratorTag());
+        execution::seq(execution::task), IteratorTag());
     test_uninitialized_value_construct_n_exception_async(
-        execution::par(execution::task),
-        IteratorTag());
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_value_construct_n_exception_test()
 {
-    test_uninitialized_value_construct_n_exception<std::random_access_iterator_tag>();
+    test_uninitialized_value_construct_n_exception<
+        std::random_access_iterator_tag>();
     test_uninitialized_value_construct_n_exception<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template< typename ExPolicy, typename IteratorTag>
-void test_uninitialized_value_construct_n_bad_alloc(ExPolicy policy, IteratorTag)
+template <typename ExPolicy, typename IteratorTag>
+void test_uninitialized_value_construct_n_bad_alloc(
+    ExPolicy policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -244,22 +245,21 @@ void test_uninitialized_value_construct_n_bad_alloc(ExPolicy policy, IteratorTag
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    data_type* p = (data_type*) std::malloc(data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size);    //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);
     data_type::max_instance_count.store(0);
 
     bool caught_bad_alloc = false;
-    try {
+    try
+    {
         hpx::parallel::uninitialized_value_construct_n(policy,
-            decorated_iterator(
-                p,
-                [&throw_after]()
-                {
+            decorated_iterator(p,
+                [&throw_after]() {
                     if (throw_after-- == 0)
                         throw std::bad_alloc();
                 }),
@@ -267,10 +267,12 @@ void test_uninitialized_value_construct_n_bad_alloc(ExPolicy policy, IteratorTag
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -290,10 +292,10 @@ void test_uninitialized_value_construct_n_bad_alloc_async(
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    data_type* p = (data_type*)std::malloc(data_size * sizeof(data_type));
-    std::memset(p, 0xcd, data_size * sizeof(data_type));
+    data_type* p = (data_type*) std::malloc(data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
 
-    std::atomic<std::size_t> throw_after(std::rand() % data_size); //-V104
+    std::atomic<std::size_t> throw_after(std::rand() % data_size);    //-V104
     std::size_t throw_after_ = throw_after.load();
 
     data_type::instance_count.store(0);
@@ -301,27 +303,27 @@ void test_uninitialized_value_construct_n_bad_alloc_async(
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::uninitialized_value_construct_n(policy,
-                decorated_iterator(
-                    p,
-                    [&throw_after]()
-                    {
-                        if (throw_after-- == 0)
-                            throw std::bad_alloc();
-                    }),
-                data_size);
+    try
+    {
+        auto f = hpx::parallel::uninitialized_value_construct_n(policy,
+            decorated_iterator(p,
+                [&throw_after]() {
+                    if (throw_after-- == 0)
+                        throw std::bad_alloc();
+                }),
+            data_size);
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(std::bad_alloc const&) {
+    catch (std::bad_alloc const&)
+    {
         caught_bad_alloc = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -333,7 +335,7 @@ void test_uninitialized_value_construct_n_bad_alloc_async(
     std::free(p);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void test_uninitialized_value_construct_n_bad_alloc()
 {
     using namespace hpx::parallel;
@@ -341,26 +343,27 @@ void test_uninitialized_value_construct_n_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_uninitialized_value_construct_n_bad_alloc(execution::seq, IteratorTag());
-    test_uninitialized_value_construct_n_bad_alloc(execution::par, IteratorTag());
+    test_uninitialized_value_construct_n_bad_alloc(
+        execution::seq, IteratorTag());
+    test_uninitialized_value_construct_n_bad_alloc(
+        execution::par, IteratorTag());
 
     test_uninitialized_value_construct_n_bad_alloc_async(
-        execution::seq(execution::task),
-        IteratorTag());
+        execution::seq(execution::task), IteratorTag());
     test_uninitialized_value_construct_n_bad_alloc_async(
-        execution::par(execution::task),
-        IteratorTag());
+        execution::par(execution::task), IteratorTag());
 }
 
 void uninitialized_value_construct_n_bad_alloc_test()
 {
-    test_uninitialized_value_construct_n_bad_alloc<std::random_access_iterator_tag>();
+    test_uninitialized_value_construct_n_bad_alloc<
+        std::random_access_iterator_tag>();
     test_uninitialized_value_construct_n_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -380,15 +383,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

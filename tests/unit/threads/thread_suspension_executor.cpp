@@ -32,13 +32,15 @@ namespace hpx { namespace threads
 void test_executor_association_yield()
 {
     hpx::threads::thread_id_type id = hpx::threads::get_self_id();
-    hpx::threads::executor exec_before = hpx::threads::get_executor(id);
+    hpx::threads::executors::current_executor exec_before
+            = hpx::threads::get_executor(id);
 
     for (int i = 0; i != NUM_YIELD_TESTS; ++i)
     {
         hpx::this_thread::yield();
 
-        hpx::threads::executor exec_after = hpx::threads::get_executor(id);
+        hpx::threads::executors::current_executor exec_after
+                = hpx::threads::get_executor(id);
         HPX_TEST_EQ(exec_before, exec_after);
     }
 }
@@ -52,7 +54,8 @@ void wakeup_thread(hpx::threads::thread_id_type id)
 void test_executor_association_suspend()
 {
     hpx::threads::thread_id_type id = hpx::threads::get_self_id();
-    hpx::threads::executor exec_before = hpx::threads::get_executor(id);
+    hpx::threads::executors::current_executor exec_before
+            = hpx::threads::get_executor(id);
 
     for (int i = 0; i != NUM_YIELD_TESTS; ++i)
     {
@@ -60,7 +63,8 @@ void test_executor_association_suspend()
 
         hpx::this_thread::suspend(hpx::threads::suspended);
 
-        hpx::threads::executor exec_after = hpx::threads::get_executor(id);
+        hpx::threads::executors::current_executor exec_after
+                = hpx::threads::get_executor(id);
         HPX_TEST_EQ(exec_before, exec_after);
     }
 }

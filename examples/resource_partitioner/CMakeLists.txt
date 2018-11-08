@@ -10,6 +10,18 @@ set(example_programs
   simplest_resource_partitioner_2
 )
 
+if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
+  if(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
+    if (HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
+      set(example_programs ${example_programs}
+        async_customization
+        guided_pool_test
+      )
+    endif()
+  endif()
+endif()
+
+set(guided_pool_test_FLAGS DEPENDENCIES iostreams_component)
 set(oversubscribing_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 set(simple_resource_partitioner_FLAGS DEPENDENCIES iostreams_component)
 
@@ -17,8 +29,14 @@ set(oversubscribing_resource_partitioner_PARAMETERS
     THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
 set(simple_resource_partitioner_PARAMETERS
     THREADS_PER_LOCALITY 4 "--use-pools" "--use-scheduler")
-set(simplest_resource_partitioner_1_PARAMETERS THREADS_PER_LOCALITY 4)
-set(simplest_resource_partitioner_2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(simplest_resource_partitioner_1_PARAMETERS
+    THREADS_PER_LOCALITY 4)
+set(simplest_resource_partitioner_2_PARAMETERS
+    THREADS_PER_LOCALITY 4)
+set(guided_pool_test_PARAMETERS
+    THREADS_PER_LOCALITY 4)
+set(async_customization_PARAMETERS
+    THREADS_PER_LOCALITY 4)
 
 foreach(example_program ${example_programs})
   set(sources

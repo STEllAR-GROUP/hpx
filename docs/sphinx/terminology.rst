@@ -48,9 +48,7 @@ This section gives definitions for some of the terms used throughout the
       as the coarse grained parallelism achieved through concurrency of multiple
       processes of an executing user job. |hpx| processes provide a hierarchical
       name space within the framework of the active global address space and
-      support multiple means of internal state access from external sources. It
-      also incorporates capabilities based access rights for protection and
-      security.
+      support multiple means of internal state access from external sources.
 
    Parcel
 

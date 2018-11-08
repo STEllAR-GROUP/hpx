@@ -39,7 +39,6 @@ namespace hpx { namespace parcelset
         max_outbound_message_size_(ini.get_max_outbound_message_size()),
         allow_array_optimizations_(true),
         allow_zero_copy_optimizations_(true),
-        enable_security_(false),
         async_serialization_(false),
         priority_(hpx::util::get_entry_as<int>(ini,
             "hpx.parcel." + type + ".priority", "0")),
@@ -61,12 +60,6 @@ namespace hpx { namespace parcelset
             {
                 allow_zero_copy_optimizations_ = false;
             }
-        }
-
-        if (hpx::util::get_entry_as<int>(
-                ini, key + ".enable_security", "0") != 0)
-        {
-            enable_security_ = true;
         }
 
         if (hpx::util::get_entry_as<int>(

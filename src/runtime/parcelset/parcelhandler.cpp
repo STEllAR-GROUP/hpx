@@ -1577,7 +1577,6 @@ namespace hpx { namespace parcelset
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.array_optimization]}",
-            "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}",
 #if defined(HPX_HAVE_PARCEL_COALESCING)
             "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:1}"

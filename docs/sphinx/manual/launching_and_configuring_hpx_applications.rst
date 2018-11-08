@@ -441,7 +441,6 @@ The ``hpx.parcel`` configuration section
     array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
     zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}
-    enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}
     message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}
 
 .. _ini_hpx_parcel:
@@ -500,9 +499,6 @@ The ``hpx.parcel`` configuration section
      * This property defines whether this :term:`locality` is allowed to spawn a
        new thread for serialization (this is both for encoding and decoding
        parcels). The default is ``1``.
-   * * ``hpx.parcel.enable_security``
-     * This property defines whether this :term:`locality` is encrypting
-       parcels. The default is ``0``.
    * * ``hpx.parcel.message_handlers``
      * This property defines whether message handlers are loaded. The default is
        ``0``.
@@ -516,7 +512,6 @@ The following settings relate to the TCP/IP parcelport.
    array_optimization = ${HPX_PARCEL_TCP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
    zero_copy_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
    async_serialization = ${HPX_PARCEL_TCP_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
-   enable_security = ${HPX_PARCEL_TCP_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
    parcel_pool_size = ${HPX_PARCEL_TCP_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
    max_connections =  ${HPX_PARCEL_TCP_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
    max_connections_per_locality = ${HPX_PARCEL_TCP_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
@@ -549,10 +544,6 @@ The following settings relate to the TCP/IP parcelport.
        new thread for serialization in the TCP/IP parcelport (this is both for
        encoding and decoding parcels). The default is the same value as set for
        ``hpx.parcel.async_serialization``.
-   * * ``hpx.parcel.tcp.enable_security``
-     * This property defines whether this :term:`locality` is encrypting parcels
-       in the TCP/IP parcelport. The default is the same value as set for
-       ``hpx.parcel.enable_security``.
    * * ``hpx.parcel.tcp.parcel_pool_size``
      * The value of this property defines the number of OS-threads created for
        the internal parcel thread pool of the TCP :term:`parcel` port. The default is
@@ -591,7 +582,6 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    zero_copy_optimization = ${HPX_HAVE_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
    use_io_pool = ${HPX_HAVE_PARCEL_MPI_USE_IO_POOL:$1}
    async_serialization = ${HPX_HAVE_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
-   enable_security = ${HPX_HAVE_PARCEL_MPI_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
    parcel_pool_size = ${HPX_HAVE_PARCEL_MPI_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
    max_connections =  ${HPX_HAVE_PARCEL_MPI_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
    max_connections_per_locality = ${HPX_HAVE_PARCEL_MPI_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
@@ -643,10 +633,6 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        new thread for serialization in the MPI parcelport (this is both for
        encoding and decoding parcels). The default is the same value as set for
        ``hpx.parcel.async_serialization``.
-   * * ``hpx.parcel.mpi.enable_security``
-     * This property defines whether this :term:`locality` is encrypting parcels
-       in the MPI parcelport. The default is the same value as set for
-       ``hpx.parcel.enable_security``.
    * * ``hpx.parcel.mpi.parcel_pool_size``
      * The value of this property defines the number of OS-threads created for
        the internal parcel thread pool of the MPI :term:`parcel` port. The default is
@@ -1631,7 +1617,7 @@ The predefined command line options for any application using
    and ``csv`` or ``csv-short`` format specified with
    :option:`--hpx:print-counter-format` without header
 
-.. option:: --hpx:printer-counter-at arg
+.. option:: --hpx:print-counter-at arg
 
    print the performance counter(s) specified with :option:`--hpx:print-counter`
    (or :option:`--hpx:print-counter-reset` at the given point in time, possible

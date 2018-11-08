@@ -340,7 +340,7 @@ create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
 hpx_source_to_doxygen(hpx_autodoc
   DEPENDENCIES ${doxygen_dependencies})
 
-set(SPHINX_DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+set(SPHINX_DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx/docs/html")
 
 add_custom_command(
   OUTPUT "${SPHINX_DOCS_OUTPUT_DIR}"
@@ -352,6 +352,7 @@ add_custom_command(
     "${SPHINX_DOCS_OUTPUT_DIR}")
 
 add_custom_target(docs
+  ALL
   DEPENDS ${SPHINX_DOCS_OUTPUT_DIR})
 
 add_custom_target(git_docs
