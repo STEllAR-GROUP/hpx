@@ -236,12 +236,13 @@ NERSC, and the Gauss Center for Supercomputing.
 
 |hpx| is currently funded by the following grants:
 
-* The National Science Foundation through awards 1117470 (APX), 1240655 (STAR),
-  1447831 (PXFS), 1339782 (STORM), and 1737785 (Phylanx). Any opinions,
+* The National Science Foundation through awards 1240655 (STAR), 
+  1339782 (STORM), and 1737785 (Phylanx). Any opinions,
   findings, and conclusions or recommendations expressed in this material are
   those of the author(s) and do not necessarily reflect the views of the
   National Science Foundation.
-* The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS).
+* The Department of Energy (DoE) through the awards 
+  DE-AC52-06NA25396 (FLeCSI) and DE-NA0003525 (Resilience).
   Neither the United States Government nor any agency thereof, nor any of their
   employees, makes any warranty, express or implied, or assumes any legal
   liability or responsibility for the accuracy, completeness, or usefulness of
@@ -253,6 +254,13 @@ NERSC, and the Gauss Center for Supercomputing.
   any agency thereof. The views and opinions of authors expressed herein do not
   necessarily state or reflect those of the United States Government or any
   agency thereof.
+* The Defense Technical Infromation Center (DTIC) under contract
+  FA8075-14-D-0002/0007.
+  Neither the United States Government nor any agency thereof, nor any of
+  their employees makes any warranty, express or implied, or assumes any
+  legal liability or responsibility for the accuracy, completeness, or
+  usefulness of any information, apparatus, product, or process disclosed,
+  or represents that its use would not infringe privately owned rights.
 * The Bavarian Research Foundation (Bayerische Forschungsstfitung) through the
   grant AZ-987-11.
 * The European Commission's Horizon 2020 programme through the grant

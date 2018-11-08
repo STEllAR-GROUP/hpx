@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2017 Louisiana State University
+.. Copyright (c) 2007-2018 Louisiana State University
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -384,7 +384,8 @@ the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/buil
  Acknowledgements
 ******************
 
-We would like to acknowledge the NSF, DoE, DARPA, the Center for Computation
+We would like to acknowledge the NSF, DoE, DTIC, DARPA,
+the Center for Computation
 and Technology (CCT) at Louisiana State University, and the Department of
 Computer Science 3 - Computer Architecture at the University of Erlangen
 Nuremberg who fund and support our work.
@@ -395,14 +396,15 @@ and the Gauss Center for Supercomputing.
 
 HPX is currently funded by
 
-* The National Science Foundation through awards 1117470 (APX),
-  1240655 (STAR), 1447831 (PXFS), and 1339782 (STORM).
+* The National Science Foundation through awards 1240655 (STAR), 
+  1339782 (STORM), and 1737785 (Phylanx).
 
   Any opinions, findings, and conclusions or
   recommendations expressed in this material are those of the author(s)
   and do not necessarily reflect the views of the National Science Foundation.
 
-* The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS).
+* The Department of Energy (DoE) through the awards 
+  DE-AC52-06NA25396 (FLeCSI) and DE-NA0003525 (Resilience).
 
   Neither the United States Government nor any agency thereof, nor any of
   their employees makes any warranty, express or implied, or assumes any
@@ -415,6 +417,15 @@ HPX is currently funded by
   United States Government or any agency thereof. The views and opinions of
   authors expressed herein do not necessarily state or reflect those of the
   United States Government or any agency thereof.
+
+* The Defense Technical Infromation Center (DTIC) under contract
+  FA8075-14-D-0002/0007
+
+  Neither the United States Government nor any agency thereof, nor any of
+  their employees makes any warranty, express or implied, or assumes any
+  legal liability or responsibility for the accuracy, completeness, or
+  usefulness of any information, apparatus, product, or process disclosed,
+  or represents that its use would not infringe privately owned rights.
 
 * The Bavarian Research Foundation (Bayerische Forschungsstiftung) through
   the grant AZ-987-11.
