@@ -533,10 +533,10 @@ influence the build process. The build process consists of the following parts:
 
 * |hpx| Examples (target ``examples``): This target is enabled by default and
   builds all |hpx| examples (disable by setting
-  :option:`HPX_WITH_BUILD_EXAMPLES:BOOL`\ ``=Off``). |hpx| examples are part of
-  the ``all`` target and are included in the installation if enabled.
+  :option:`HPX_WITH_EXAMPLES:BOOL`\ ``=Off``). |hpx| examples are part of the
+  ``all`` target and are included in the installation if enabled.
 * |hpx| Tests (target ``tests``): This target builds the |hpx| test suite and is
-  enabled by default (disable by setting :option:`HPX_WITH_BUILD_TESTS:BOOL`\
+  enabled by default (disable by setting :option:`HPX_WITH_TESTS:BOOL`
   ``=Off``). They are not built by the ``all`` target and have to be built
   separately.
 * |hpx| Documentation (target ``docs``): This target builds the documentation,
@@ -1017,8 +1017,8 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
 
 * Set four new environment variables (in CMake, not in Windows environment, by
   the way): ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX`` and
-  :option:`HPX_WITH_BOOST_ALL_DYNAMIC_LINK:BOOL`. The meaning of these variables
-  is as follows:
+  ``HPX_WITH_BOOST_ALL_DYNAMIC_LINK``. The meaning of these variables is as
+  follows:
 
   * ``BOOST_ROOT`` the root directory of the unpacked Boost headers/cpp files.
   * ``HWLOC_ROOT`` the root directory of the unpacked Portable Hardware Locality
@@ -1032,29 +1032,29 @@ How to build HPX under Windows 10 x64 with Visual Studio 2015
        default ``C:\Program Files\hpx``. I prefer simpler paths *without* white
        space, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
 
-    To insert new env-vars click on "Add Entry" and then insert the name inside
-    "Name", select ``PATH`` as Type and put the path-name in "Path" text field.
-    Repeat this for the first three variables.
+  To insert new env-vars click on "Add Entry" and then insert the name inside
+  "Name", select ``PATH`` as Type and put the path-name in "Path" text field.
+  Repeat this for the first three variables.
 
-    The last one: :option:`HPX_WITH_BOOST_ALL_DYNAMIC_LINK:BOOL` is a ``BOOL`` and
-    must be checked (there will be a checkbox instead of a textfield).
+  The last one: ``HPX_WITH_BOOST_ALL_DYNAMIC_LINK`` is a ``BOOL`` and must be
+  checked (there will be a checkbox instead of a textfield).
 
-    This is how variable insertion looks like:
+  This is how variable insertion looks like:
 
-    .. _win32_cmake_settings2:
+  .. _win32_cmake_settings2:
 
-    .. figure:: /_static/images/cmake_settings2.png
+  .. figure:: /_static/images/cmake_settings2.png
 
-       Example CMake adding entry.
+     Example CMake adding entry.
 
-    Alternatively you could provide ``BOOST_LIBRARYDIR`` instead of
-    ``BOOST_ROOT`` with a difference that ``BOOST_LIBRARYDIR`` should point to
-    the subdirectory inside Boost root where all the compiled DLLs/LIBs are. I
-    myself have used ``BOOST_LIBRARYDIR`` which pointed to the ``bin.v2``
-    subdirectory under the Boost rootdir. Important is to keep the meanings of
-    these two variables separated from each other: ``BOOST_DIR`` points to the
-    ROOT folder of the boost library. ``BOOST_LIBRARYDIR`` points to the subdir
-    inside Boost root folder where the compiled binaries are.
+  Alternatively you could provide ``BOOST_LIBRARYDIR`` instead of
+  ``BOOST_ROOT`` with a difference that ``BOOST_LIBRARYDIR`` should point to
+  the subdirectory inside Boost root where all the compiled DLLs/LIBs are. I
+  myself have used ``BOOST_LIBRARYDIR`` which pointed to the ``bin.v2``
+  subdirectory under the Boost rootdir. Important is to keep the meanings of
+  these two variables separated from each other: ``BOOST_DIR`` points to the
+  ROOT folder of the boost library. ``BOOST_LIBRARYDIR`` points to the subdir
+  inside Boost root folder where the compiled binaries are.
 
 * Click the 'Configure' button of CMake-GUI. You will be immediately presented a
   small window where you can select the C++ compiler to be used within Visual
@@ -1254,7 +1254,7 @@ How to install |hpx| on Fedora distributions
 
    This section of the manual is based off of our collaborators Patrick Diehl's
    blog post `Installing HPX on Fedora 22
-   <http://diehlpk.github.io/2015/08/04/hpx-fedora.html>`.
+   <http://diehlpk.github.io/2015/08/04/hpx-fedora.html>`_.
 
 * Install all packages for minimal installation:
 
