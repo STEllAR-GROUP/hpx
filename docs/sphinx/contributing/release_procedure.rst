@@ -127,13 +127,21 @@ are completed to avoid confusion.
    ``hpx/config/version.hpp`` with an empty string.
 
 #. Add the release date to the caption of the current "What's New" section in
-   the docs.
+   the docs, and change the value of ``HPX_VERSION_DATE`` in
+   ``hpx/config/version.hpp``.
 
 #. Tag the release from the release branch, where tag name is the version to be
    released and description is "HPX V$VERSION: The C++ Standards Library for
-   Parallelism and Concurrency".
+   Parallelism and Concurrency". Sign the release tag with the
+   ``contact@stellar-group.org`` key by adding the ``-s`` flag to ``git tag``.
+   Make sure you change git to sign with the ``contact@stellar-group.org`` key,
+   rather than your own key if you use one. You also need to change the name and
+   email used for commits. Change them to ``Ste||ar Group`` and
+   ``contact@stellar-group.org``, respectively. Finally, the
+   ``contact@stellar-group.org`` email address needs to be added to your GitHub
+   account for the tag to show up as verified.
 
-   * ``git tag -a [tag name] -m '[description]'``
+   * ``git tag -s -a [tag name] -m '[description]'``
    * ``git push origin [tag name]``
 
 #. Create a release on github
@@ -160,7 +168,8 @@ are completed to avoid confusion.
       http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.bz2
       http://stellar.cct.lsu.edu/files/hpx_#.#.#.7z
 
-#. Update the website with the following:
+#. Update the websites (`stellar-group.org`_ and `stellar.cct.lsu.edu`_) with
+   the following:
 
    * Download links on the download page
    * Documentation links on the docs page (link to generated documentation on
