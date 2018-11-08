@@ -121,14 +121,16 @@ namespace hpx { namespace threads { namespace executors
                     hpx::launch::sync,
                     executor_.get_priority(),
                     executor_.get_stacksize(),
-                    threads::thread_schedule_hint(domain));
+                    threads::thread_schedule_hint(
+                                thread_schedule_hint_mode_numa, domain));
             }
             else {
                 p.apply(
                     hpx::launch::async,
                     executor_.get_priority(),
                     executor_.get_stacksize(),
-                    threads::thread_schedule_hint(domain));
+                    threads::thread_schedule_hint(
+                                thread_schedule_hint_mode_numa, domain));
             }
 
             return p.get_future();
@@ -181,14 +183,16 @@ namespace hpx { namespace threads { namespace executors
                     hpx::launch::sync,
                     executor_.get_priority(),
                     executor_.get_stacksize(),
-                    threads::thread_schedule_hint(domain));
+                    threads::thread_schedule_hint(
+                                thread_schedule_hint_mode_numa, domain));
             }
             else {
                 p.apply(
                     hpx::launch::async,
                     executor_.get_priority(),
                     executor_.get_stacksize(),
-                    threads::thread_schedule_hint(domain));
+                    threads::thread_schedule_hint(
+                                thread_schedule_hint_mode_numa, domain));
             }
 
             return p.get_future();
@@ -248,8 +252,8 @@ namespace hpx { namespace threads { namespace executors
                       << util::debug::print_type<result_type>() << "\n"
                       << "async_execute : Numa Hint   : "
                       << util::debug::print_type<pool_numa_hint<Tag>>() << "\n"
-                      << "async_execute : Hint   : "
-                      << util::debug::print_type<H>() << "\n";
+/*                      << "async_execute : Hint   : "
+                      << util::debug::print_type<H>() << "\n"*/;
 #endif
 
             // hold onto the function until all futures have become ready
@@ -457,14 +461,16 @@ namespace hpx { namespace threads { namespace executors
                     hpx::launch::sync,
                     pool_executor_.get_priority(),
                     pool_executor_.get_stacksize(),
-                    threads::thread_schedule_hint(domain));
+                    threads::thread_schedule_hint(
+                                thread_schedule_hint_mode_numa, domain));
             }
             else {
                 p.apply(
                     hpx::launch::async,
                     pool_executor_.get_priority(),
                     pool_executor_.get_stacksize(),
-                    threads::thread_schedule_hint(domain));
+                    threads::thread_schedule_hint(
+                                thread_schedule_hint_mode_numa, domain));
             }
             return p.get_future();
         }
