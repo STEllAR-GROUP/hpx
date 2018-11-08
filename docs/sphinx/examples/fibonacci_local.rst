@@ -155,8 +155,8 @@ When this termination condition is reached, the futures can then be added up,
 producing the n-th value of the Fibonacci sequence.
 
 Note that calling ``get`` potentially blocks the calling |hpx|-thread, and lets
-other |hpx|-run in the meantime. There are, however, more efficient ways of
-doing this. ``examples/quickstart/fibonacci_futures.cpp`` contains many more
+other |hpx|-threads run in the meantime. There are, however, more efficient ways
+of doing this. ``examples/quickstart/fibonacci_futures.cpp`` contains many more
 variations of locally computing the Fibonacci numbers, where each method makes
 different tradeoffs in where asynchrony and parallelism is applied. To get
 started, however, the method above is sufficient and optimizations can be
