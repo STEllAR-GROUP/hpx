@@ -254,7 +254,7 @@ NERSC, and the Gauss Center for Supercomputing.
   any agency thereof. The views and opinions of authors expressed herein do not
   necessarily state or reflect those of the United States Government or any
   agency thereof.
-* The Defense Technical Infromation Center (DTIC) under contract
+* The Defense Technical Information Center (DTIC) under contract
   FA8075-14-D-0002/0007.
   Neither the United States Government nor any agency thereof, nor any of
   their employees makes any warranty, express or implied, or assumes any

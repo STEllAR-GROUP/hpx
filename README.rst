@@ -418,7 +418,7 @@ HPX is currently funded by
   authors expressed herein do not necessarily state or reflect those of the
   United States Government or any agency thereof.
 
-* The Defense Technical Infromation Center (DTIC) under contract
+* The Defense Technical Information Center (DTIC) under contract
   FA8075-14-D-0002/0007
 
   Neither the United States Government nor any agency thereof, nor any of
