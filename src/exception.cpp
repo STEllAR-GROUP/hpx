@@ -221,7 +221,7 @@ namespace hpx { namespace detail
         std::string retval = hpx::util::format("{} entries:\n", env.size());
         for (std::string const& s : env)
         {
-            if (retval.find("DOCKER") == std::string::npos)
+            if (s.find("DOCKER") == std::string::npos)
             {
                 retval += "  " + s + "\n";
             }
