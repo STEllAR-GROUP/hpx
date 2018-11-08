@@ -107,13 +107,16 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Jakub Golinowski, for implementing an |hpx| backend for OpenCV and in the
+  process improving documentation and reporting issues.
 * Mikael Simberg (|cscs|_), for his tireless help cleaning up and maintaining
   |hpx|.
 * Christopher Ogle, for his contributions to the parallel algorithms.
 * Surya Priy, for his work with statistic performance counters.
 * Anushi Maheshwari, for her work on random number generation.
 * Bruno Pitrus, for his work with parallel algorithms.
-* Nikunj Gupta, for his fixes for tests.
+* Nikunj Gupta, for rewriting the implementation of ``hpx_main.hpp`` and for his
+  fixes for tests.
 * Christopher Taylor, for his interest in |hpx| and the fixes he provided.
 * Shoshana Jakobovits, for her work on the resource partitioner.
 * Denis Blank, who re-wrote our unwrapped function to accept plain values
