@@ -30,7 +30,9 @@ if(HPX_WITH_PARCELPORT_MPI)
   endif()
 
   if(MPI_CXX_COMPILE_DEFINITIONS)
-    add_compile_definitions(${MPI_CXX_COMPILE_DEFINITIONS})
+    # Emulate add_compile_definitions.
+    # This command was only introduced as part of CMake 3.11, but we already require it for versions >= 3.10.
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${MPI_CXX_COMPILE_DEFINITIONS})
   endif()
 
   # This list is to detect whether we run inside an mpi environment.
