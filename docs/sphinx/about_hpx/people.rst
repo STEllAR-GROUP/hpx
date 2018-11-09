@@ -109,6 +109,8 @@ the project through discussions, pull requests, documentation patches, etc.
 
 * Mikael Simberg (|cscs|_), for his tireless help cleaning up and maintaining
   |hpx|.
+* Tianyi Zhang, for his work on HPXMP
+* Shahrzad Shirzad, for her contributions related to Phylanx
 * Christopher Ogle, for his contributions to the parallel algorithms.
 * Surya Priy, for his work with statistic performance counters.
 * Anushi Maheshwari, for her work on random number generation.
@@ -224,8 +226,11 @@ the project through discussions, pull requests, documentation patches, etc.
 * Jakub Golinowski, Praveen Velliengiri, Jean-Loup Tastet, Michael Levine,
   Aalekh Nigam, HadrienG2, Prayag Verma, and Avyav Kumar who improved the
   documentation.
-* J. F. Bastien, Christopher Hinz, Brandon Kohn, Mario Lang, pierrele, hendrx,
-  Dekken, woodmeister123, Andrew Kemp, Dylan Stark, and Matthew Anderson who
+* Jayesh Badwaik, J. F. Bastien, Christoph Garth, 
+  Christopher Hinz, Brandon Kohn, 
+  Mario Lang, Maikel Nadolski, pierrele, hendrx,
+  Dekken, woodmeister123, xaguilar, Andrew Kemp, Dylan Stark,
+  and Matthew Anderson who
   contributed to the general improvement of |hpx|
 
 In addition to the people who worked directly with |hpx| development we would
