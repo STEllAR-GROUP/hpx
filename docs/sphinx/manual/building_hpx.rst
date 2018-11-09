@@ -232,9 +232,9 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      * 1.58.0
      *
    * * |hwloc|_
-     * 2.0.1 or newer
+     * 1.11 or newer
      * 1.2 (Xeon Phi: 1.6)
-     *
+     * NUMA domains are not handled correctly with 2.0.0 and newer (see :hpx-issue:`3538`)
 
 .. note::
 
@@ -286,9 +286,9 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      * 1.58.0
      *
    * * |hwloc|_
-     * 2.0.1 or newer
+     * 1.11
      * 1.5
-     * Used for OS-thread pinning and NUMA awareness.
+     * NUMA domains are not handled correctly with 2.0.0 and newer (see :hpx-issue:`3538`)
 
 .. note::
 
