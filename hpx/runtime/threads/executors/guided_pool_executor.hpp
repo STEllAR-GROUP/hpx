@@ -251,9 +251,7 @@ namespace hpx { namespace threads { namespace executors
                       << "async_execute : Result      : "
                       << util::debug::print_type<result_type>() << "\n"
                       << "async_execute : Numa Hint   : "
-                      << util::debug::print_type<pool_numa_hint<Tag>>() << "\n"
-/*                      << "async_execute : Hint   : "
-                      << util::debug::print_type<H>() << "\n"*/;
+                      << util::debug::print_type<pool_numa_hint<Tag>>() << "\n";
 #endif
 
             // hold onto the function until all futures have become ready
