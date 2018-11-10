@@ -111,6 +111,8 @@ the project through discussions, pull requests, documentation patches, etc.
   process improving documentation and reporting issues.
 * Mikael Simberg (|cscs|_), for his tireless help cleaning up and maintaining
   |hpx|.
+* Tianyi Zhang, for his work on HPXMP
+* Shahrzad Shirzad, for her contributions related to Phylanx
 * Christopher Ogle, for his contributions to the parallel algorithms.
 * Surya Priy, for his work with statistic performance counters.
 * Anushi Maheshwari, for her work on random number generation.
@@ -224,11 +226,13 @@ the project through discussions, pull requests, documentation patches, etc.
   improved examples in |hpx|.
 * Joseph Kleinhenz, Markus Elfring, Kirill Kropivyansky, Alexander Neundorf,
   Bryant Lam, and Alex Hirsch who improved our CMake.
-* Jakub Golinowski, Praveen Velliengiri, Jean-Loup Tastet, Michael Levine,
-  Aalekh Nigam, HadrienG2, Prayag Verma, and Avyav Kumar who improved the
-  documentation.
-* J. F. Bastien, Christopher Hinz, Brandon Kohn, Mario Lang, pierrele, hendrx,
-  Dekken, woodmeister123, Andrew Kemp, Dylan Stark, and Matthew Anderson who
+* Praveen Velliengiri, Jean-Loup Tastet, Michael Levine, Aalekh Nigam,
+  HadrienG2, Prayag Verma, and Avyav Kumar who improved the documentation.
+* Jayesh Badwaik, J. F. Bastien, Christoph Garth,
+  Christopher Hinz, Brandon Kohn,
+  Mario Lang, Maikel Nadolski, pierrele, hendrx,
+  Dekken, woodmeister123, xaguilar, Andrew Kemp, Dylan Stark,
+  and Matthew Anderson who
   contributed to the general improvement of |hpx|
 
 In addition to the people who worked directly with |hpx| development we would
@@ -239,12 +243,13 @@ NERSC, and the Gauss Center for Supercomputing.
 
 |hpx| is currently funded by the following grants:
 
-* The National Science Foundation through awards 1117470 (APX), 1240655 (STAR),
-  1447831 (PXFS), 1339782 (STORM), and 1737785 (Phylanx). Any opinions,
+* The National Science Foundation through awards 1240655 (STAR),
+  1339782 (STORM), and 1737785 (Phylanx). Any opinions,
   findings, and conclusions or recommendations expressed in this material are
   those of the author(s) and do not necessarily reflect the views of the
   National Science Foundation.
-* The Department of Energy (DoE) through the award DE-SC0008714 (XPRESS).
+* The Department of Energy (DoE) through the awards
+  DE-AC52-06NA25396 (FLeCSI) and DE-NA0003525 (Resilience).
   Neither the United States Government nor any agency thereof, nor any of their
   employees, makes any warranty, express or implied, or assumes any legal
   liability or responsibility for the accuracy, completeness, or usefulness of
@@ -256,6 +261,13 @@ NERSC, and the Gauss Center for Supercomputing.
   any agency thereof. The views and opinions of authors expressed herein do not
   necessarily state or reflect those of the United States Government or any
   agency thereof.
+* The Defense Technical Information Center (DTIC) under contract
+  FA8075-14-D-0002/0007.
+  Neither the United States Government nor any agency thereof, nor any of
+  their employees makes any warranty, express or implied, or assumes any
+  legal liability or responsibility for the accuracy, completeness, or
+  usefulness of any information, apparatus, product, or process disclosed,
+  or represents that its use would not infringe privately owned rights.
 * The Bavarian Research Foundation (Bayerische Forschungsstfitung) through the
   grant AZ-987-11.
 * The European Commission's Horizon 2020 programme through the grant
