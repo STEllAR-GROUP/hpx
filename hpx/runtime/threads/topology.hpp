@@ -314,10 +314,7 @@ namespace hpx { namespace threads
             return init_node_number(num_thread, HWLOC_OBJ_SOCKET);
         }
 
-        std::size_t init_numa_node_number(std::size_t num_thread)
-        {
-            return init_node_number(num_thread, HWLOC_OBJ_NODE);
-        }
+        std::size_t init_numa_node_number(std::size_t num_thread);
 
         std::size_t init_core_number(std::size_t num_thread)
         {
