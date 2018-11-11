@@ -556,6 +556,36 @@ namespace hpx { namespace threads
         return empty_mask;
     } // }}}
 
+    std::size_t topology::init_numa_node_number(std::size_t num_thread)
+    {
+#if HWLOC_API_VERSION >= 0x00020000
+        if (std::size_t(-1) == num_thread)
+            return std::size_t(-1);
+
+        std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
+
+        hwloc_obj_t obj;
+        {
+            std::unique_lock<hpx::util::spinlock> lk(topo_mtx);
+            obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
+                static_cast<unsigned>(num_pu));
+            HPX_ASSERT(num_pu == detail::get_index(obj));
+        }
+
+        hwloc_obj_t tmp = nullptr;
+        while ((tmp = hwloc_get_next_obj_by_type(topo, HWLOC_OBJ_NUMANODE, tmp))
+                != nullptr) {
+            if (hwloc_bitmap_intersects(tmp->cpuset, obj->cpuset)) {
+                /* tmp matches, use it */
+                return tmp->logical_index;
+            }
+        }
+        return 0;
+#else
+        return init_node_number(num_thread, HWLOC_OBJ_NODE);
+#endif
+    }
+
     std::size_t topology::init_node_number(
         std::size_t num_thread, hwloc_obj_type_t type
         )
@@ -678,7 +708,7 @@ namespace hpx { namespace threads
 
     std::size_t topology::get_number_of_numa_nodes() const
     {
-        int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
+        int nobjs =  hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NUMANODE);
         if(0 > nobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
