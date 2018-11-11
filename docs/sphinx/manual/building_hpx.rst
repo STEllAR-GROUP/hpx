@@ -234,7 +234,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |hwloc|_
      * 1.11
      * 1.2 (Xeon Phi: 1.6)
-     * NUMA domains are not handled correctly with 2.0.0 and newer (see :hpx-issue:`3538`)
+     *
 
 .. note::
 
@@ -288,7 +288,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |hwloc|_
      * 1.11
      * 1.5
-     * NUMA domains are not handled correctly with 2.0.0 and newer (see :hpx-issue:`3538`)
+     *
 
 .. note::
 
