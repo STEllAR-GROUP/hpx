@@ -32,7 +32,7 @@ It is also recommended that you check out the latest stable tag:
 
 .. code-block:: sh
 
-    git checkout 1.1.0
+    git checkout 1.2.0
 
 |hpx| dependencies
 ==================
