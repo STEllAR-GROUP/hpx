@@ -166,5 +166,5 @@ HPX is currently funded by
      :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master
      :alt: HPX master branch build status
 
-.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1206917.svg
-     :target: https://doi.org/10.5281/zenodo.1206917
+.. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.598202.svg
+     :target: https://doi.org/10.5281/zenodo.598202
