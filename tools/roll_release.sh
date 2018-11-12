@@ -10,9 +10,10 @@ VERSION_MINOR=`grep '#define HPX_VERSION_MINOR' hpx/config/version.hpp | awk {' 
 VERSION_SUBMINOR=`grep '#define HPX_VERSION_SUBMINOR' hpx/config/version.hpp | awk {' print $3 '}`
 
 DOT_VERSION=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
-DASH_VERSION=$VERSION_MAJOR-$VERSION_MINOR-$VERSION_SUBMINOR
+UNDERSCORE_VERSION=${VERSION_MAJOR}_${VERSION_MINOR}_$VERSION_SUBMINOR
 
-WEBSITE="http://stellar.cct.lsu.edu"
+DOCS_WEBSITE="https://stellar-group.github.io"
+SOURCE_WEBSITE="http://stellar.cct.lsu.edu"
 
 ZIP=hpx_$DOT_VERSION.zip
 TARGZ=hpx_$DOT_VERSION.tar.gz
@@ -52,7 +53,7 @@ rm -rf packages/tar.bz2/hpx_$DOT_VERSION
 (cd packages/tar.bz2 && tar -xf ../$TARBZ2)
 echo "DONE"
 
-if type -t "7za" > /dev/null; 
+if type -t "7za" > /dev/null;
 then
 	SEVENZIP=7za
 else
@@ -78,13 +79,13 @@ TARBZ2_SIZE=`ls -s -h packages/$TARBZ2 | awk {'print $1'}`
 SEVENZ_SIZE=`ls -s -h packages/$SEVENZ | awk {'print $1'}`
 
 echo "<ul>"
-echo "  <li>HPX V$DOT_VERSION: <a title=\"HPX V$DOT_VERSION Release Notes\" href=\"$WEBSITE/downloads/hpx-v$DASH_VERSION-release-notes/\">release notes</a>"
+echo "  <li>HPX V$DOT_VERSION: <a title=\"HPX V$DOT_VERSION Release Notes\" href=\"$DOCS_WEBSITE/hpx/docs/sphinx/tags/$DOT_VERSION/html/releases/whats_new_$UNDERSCORE_VERSION.html\">release notes</a>"
 echo "  <table>"
 echo "    <tr><th>File</th><th>MD5 Hash</th></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (zip)\" href=\"$WEBSITE/files/$ZIP\">zip ($ZIP_SIZE)</a></td><td><code>$ZIP_MD5</code></td></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (gz)\" href=\"$WEBSITE/files/$TARGZ\">gz ($TARGZ_SIZE)</a></td><td><code>$TARGZ_MD5</code></td></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (bz2)\" href=\"$WEBSITE/files/$TARBZ2\">bz2 ($TARBZ2_SIZE)</a></td><td><code>$TARBZ2_MD5</code></td></tr>"
-echo "    <tr><td><a title=\"HPX V$DOT_VERSION (7z)\" href=\"$WEBSITE/files/$SEVENZ\">7z ($SEVENZ_SIZE)</a></td><td><code>$SEVENZ_MD5</code></td></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (zip)\" href=\"$SOURCE_WEBSITE/files/$ZIP\">zip ($ZIP_SIZE)</a></td><td><code>$ZIP_MD5</code></td></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (gz)\" href=\"$SOURCE_WEBSITE/files/$TARGZ\">gz ($TARGZ_SIZE)</a></td><td><code>$TARGZ_MD5</code></td></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (bz2)\" href=\"$SOURCE_WEBSITE/files/$TARBZ2\">bz2 ($TARBZ2_SIZE)</a></td><td><code>$TARBZ2_MD5</code></td></tr>"
+echo "    <tr><td><a title=\"HPX V$DOT_VERSION (7z)\" href=\"$SOURCE_WEBSITE/files/$SEVENZ\">7z ($SEVENZ_SIZE)</a></td><td><code>$SEVENZ_MD5</code></td></tr>"
 echo "  </table>"
 echo "  </li>"
 echo "</ul>"
