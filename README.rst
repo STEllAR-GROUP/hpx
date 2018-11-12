@@ -8,7 +8,7 @@
 Documentation: `latest
 <https://stellar-group.github.io/hpx/docs/sphinx/latest/html/index.html>`_,
 `development (master)
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/index.html>`_
+<https://stellar-group.github.io/hpx/docs/sphinx/branches/master/html/index.html>`_
 
 ===
 HPX
