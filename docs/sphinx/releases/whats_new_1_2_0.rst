@@ -88,8 +88,10 @@ Breaking changes
 Closed issues
 =============
 
+* :hpx-issue:`3538` - numa handling incorrect for hwloc 2
 * :hpx-issue:`3533` - Cmake version 3.5.1does not work (git ff26b35 2018-11-06)
 * :hpx-issue:`3526` - Failed building hpx-1.2.0-rc1 on Ubuntu16.04 x86-64 Virtualbox VM
+* :hpx-issue:`3512` - Build on aarch64 fails
 * :hpx-issue:`3475` - HPX fails to link if the MPI parcelport is enabled
 * :hpx-issue:`3462` - CMake configuration shows a minor and inconsequential failure to create a symlink
 * :hpx-issue:`3461` - Compilation Problems with the most recent Clang
@@ -138,6 +140,12 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`3542` - Fix numa lookup from pu when using hwloc 2.x
+* :hpx-pr:`3541` - Fixing the build system of the MPI parcelport
+* :hpx-pr:`3540` - Updating HPX people section
+* :hpx-pr:`3539` - Splitting test to avoid OOM on CircleCI
+* :hpx-pr:`3537` - Fix guided exec
+* :hpx-pr:`3536` - Updating grants which support the LSU team
 * :hpx-pr:`3535` - Fix hiding of docker credentials
 * :hpx-pr:`3534` - Fixing #3533
 * :hpx-pr:`3532` - fixing minor doc typo --hpx:print-counter-at arg
