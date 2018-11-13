@@ -130,6 +130,10 @@ Linux
 
       sudo apt install cmake libboost-all-dev hwloc google-perftools
 
+    Ubuntu::
+
+      sudo apt install cmake libboost-all-dev hwloc libgoogle-perftools-dev
+
     Fedora::
 
       sudo dnf install cmake boost-devel hwloc gperftools-devel
