@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_test category name)
+function(add_hpx_test category name)
   set(options FAILURE_EXPECTED)
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY)
   set(multi_value_args ARGS PARCELPORTS)
@@ -128,18 +128,18 @@ macro(add_hpx_test category name)
         endif()
       endif()
     endif()
-endmacro()
+endfunction()
 
-macro(add_hpx_unit_test category name)
+function(add_hpx_unit_test category name)
   add_hpx_test("tests.unit.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
-macro(add_hpx_regression_test category name)
+function(add_hpx_regression_test category name)
   add_hpx_test("tests.regressions.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
-macro(add_hpx_example_test category name)
+function(add_hpx_example_test category name)
   add_hpx_test("tests.examples.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
 

@@ -23,7 +23,6 @@ hpx_include(
   AddLibraryHeaders
   AddSourceGroup
   ExportTargets
-  IsTarget
   HandleComponentDependencies
   ForceOutOfTreeBuild
   SetCMakePolicy

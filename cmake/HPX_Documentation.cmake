@@ -22,7 +22,7 @@ if(HPX_WITH_DOCUMENTATION)
 endif()
 
 # C++ Source -> Doxygen XML
-macro(hpx_source_to_doxygen name)
+function(hpx_source_to_doxygen name)
   set(options)
   set(one_value_args)
   set(multi_value_args DEPENDENCIES DOXYGEN_ARGS)
@@ -34,4 +34,4 @@ macro(hpx_source_to_doxygen name)
     COMMENT "Generating Doxygen."
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy" ${${name}_DEPENDENCIES}
     VERBATIM)
-endmacro()
+endfunction()

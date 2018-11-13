@@ -7,7 +7,7 @@
 # if the link doesn't exist yet.
 # Since `create_symlink` is only available for unix derivates,
 # we work around that in this macro.
-macro(create_symbolic_link SYM_TARGET SYM_DESTINATION)
+function(create_symbolic_link SYM_TARGET SYM_DESTINATION)
   if(WIN32)
     if(NOT EXISTS ${SYM_DESTINATION})
       # Create a junction for windows links
@@ -18,4 +18,4 @@ macro(create_symbolic_link SYM_TARGET SYM_DESTINATION)
     # Only available on unix derivates
     execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink ${SYM_TARGET} ${SYM_DESTINATION})
   endif()
-endmacro(create_symbolic_link)
+endfunction(create_symbolic_link)

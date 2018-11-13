@@ -9,7 +9,7 @@
 ################################################################################
 # C++ feature tests
 ################################################################################
-macro(hpx_perform_cxx_feature_tests)
+function(hpx_perform_cxx_feature_tests)
 
   # Check the availability of certain C++11 language features
   hpx_check_for_cxx11_alias_templates(
@@ -190,4 +190,4 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
   endif()
-endmacro()
+endfunction()
