@@ -10,17 +10,22 @@
 
 // For more information, see http://www.boost.org
 
-#include <hpx/hpx_main.hpp>
-
 // NOTE: Warning caused by assignment of hpx::util::function_nonser<float()> to
-// hpx::util::function_nonser<double()> in test_emptiness.
+// hpx::util::function_nonser<double()> in test_emptiness. Triggered in
+// hpx/util/function.hpp which is included latest by hpx/include/util.hpp.
 #if defined(__clang__)
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wdouble-promotion"
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wdouble-promotion"
 #endif
+#include <hpx/hpx_main.hpp>
 #include <hpx/include/util.hpp>
 #if defined(__clang__)
 #  pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
 #endif
 
 #include <hpx/util/lightweight_test.hpp>
@@ -91,7 +96,16 @@ static void
 
     // Invocation and self-assignment
     global_int = 0;
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#endif
     v1 = v1;
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
+
     v1();
     HPX_TEST(global_int == 3);
 
@@ -100,7 +114,16 @@ static void
 
     // Invocation and self-assignment
     global_int = 0;
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#endif
     v1 = (v1);
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
+
     v1();
     HPX_TEST(global_int == 5);
 
