@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v2
                     errors.add(f.get_exception_ptr());
             }
             if (errors.size() != 0)
-                throw errors;
+                throw std::forward<parallel::exception_list>(errors);
         }
 
         // return future representing the execution of all tasks
