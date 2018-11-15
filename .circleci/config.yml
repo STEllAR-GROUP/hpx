@@ -22,6 +22,8 @@ gh_pages_filter: &gh_pages_filter
     filters:
       branches:
         ignore: gh-pages
+      tags:
+        only: /.*/
 
 docs_push_filter: &docs_push_filter
     filters:
@@ -29,6 +31,8 @@ docs_push_filter: &docs_push_filter
         only:
           - master
           - release
+      tags:
+        only: /.*/
 
 core_dependency: &core_dependency
     requires:
@@ -43,25 +47,14 @@ jobs:
       - image: stellargroup/build_env:ubuntu
     working_directory: /hpx
     steps:
-      # Try to restore source cache. Keys are tried in order. The checkout step
-      # correctly handles the case when there is a cache entry.
-      - restore_cache:
-          keys:
-            - source-v2-{{ .Branch }}-{{ .Revision }}
-            - source-v2-{{ .Branch }}-
-            - source-v2-
       - checkout:
-          path: /hpx/source-cache
-      - save_cache:
-          key: source-v2-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - /hpx/source-cache
+          path: /hpx/source-full
       # Make a shallow clone of the current commit so that we don't have to copy
       # the whole repository between work steps.
       - run:
           name: Creating shallow clone
           command: |
-              git clone --depth=1 file:///hpx/source-cache source
+              git clone --depth=1 file:///hpx/source-full source
       - run:
           name: Downloading CTest XML to Junit XML
           command: |
@@ -925,7 +918,8 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - checkout_code
+      - checkout_code:
+          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
