@@ -190,12 +190,6 @@ are completed to avoid confusion.
 #. Create a new "What's New" section for the docs of the next anticipated
    release. Set the date to "unreleased".
 
-#. Update ``$HPX_SOURCE/README.rst``
-
-   * Update version (to the about-to-be-released version)
-   * Update links to documentation
-   * Fix zenodo reference number
-
 #. Merge new branch containing next version numbers to master, resolve conflicts
    if necessary.
 
