@@ -283,10 +283,6 @@ The following table summarizes the available command line options:
    * * ``--hpx:reset-counters``
      * reset all performance counter(s) specified with ``--hpx:print-counter``
        after they have been evaluated)
-   * * ``--hpx:print-counter-at``
-     * print the performance counter(s) specified with ``--hpx:print-counter``
-       (or ``--hpx:print-counter-reset``) at the given point in time, possible
-       argument are values: ``startup``, ``shutdown`` (default), ``noshutdown``.
 
 While the options ``--hpx:list-counters`` and ``--hpx:list-counter-infos`` give
 a short listing of all available counters, the full documentation for those can
