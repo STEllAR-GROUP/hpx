@@ -47,25 +47,14 @@ jobs:
       - image: stellargroup/build_env:ubuntu
     working_directory: /hpx
     steps:
-      # Try to restore source cache. Keys are tried in order. The checkout step
-      # correctly handles the case when there is a cache entry.
-      - restore_cache:
-          keys:
-            - source-v2-{{ .Branch }}-{{ .Revision }}
-            - source-v2-{{ .Branch }}-
-            - source-v2-
       - checkout:
-          path: /hpx/source-cache
-      - save_cache:
-          key: source-v2-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - /hpx/source-cache
+          path: /hpx/source-full
       # Make a shallow clone of the current commit so that we don't have to copy
       # the whole repository between work steps.
       - run:
           name: Creating shallow clone
           command: |
-              git clone --depth=1 file:///hpx/source-cache source
+              git clone --depth=1 file:///hpx/source-full source
       - run:
           name: Downloading CTest XML to Junit XML
           command: |
