@@ -26,8 +26,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 
-#include <boost/smart_ptr/scoped_ptr.hpp>
-
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -346,7 +344,7 @@ namespace hpx
 
         // certain components (such as PAPI) require all threads to be
         // registered with the library
-        boost::scoped_ptr<util::thread_mapper> thread_support_;
+        std::unique_ptr<util::thread_mapper> thread_support_;
 
         // topology and affinity data
         threads::topology& topology_;
@@ -357,8 +355,8 @@ namespace hpx
 
         std::atomic<state> state_;
 
-        boost::scoped_ptr<components::server::memory> memory_;
-        boost::scoped_ptr<components::server::runtime_support> runtime_support_;
+        std::unique_ptr<components::server::memory> memory_;
+        std::unique_ptr<components::server::runtime_support> runtime_support_;
 
         // support tieing in external functions to be called for thread events
         notification_policy_type::on_startstop_type on_start_func_;
