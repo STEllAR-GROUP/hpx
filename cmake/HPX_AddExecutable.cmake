@@ -129,30 +129,30 @@ function(add_hpx_executable name)
   endif()
 
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    cuda_add_executable(${name}_exe
+    cuda_add_executable(${name}
       ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   else()
-    add_executable(${name}_exe
+    add_executable(${name}
       ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY})
   endif()
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
-      set_target_properties("${name}_exe" PROPERTIES
+      set_target_properties(${name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}")
     else()
-      set_target_properties("${name}_exe" PROPERTIES
+      set_target_properties(${name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}")
     endif()
   endif()
 
-  set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
+  set_target_properties(${name} PROPERTIES OUTPUT_NAME ${name})
 
   if(exclude_from_all)
-    set_target_properties(${name}_exe PROPERTIES ${exclude_from_all})
+    set_target_properties(${name} PROPERTIES ${exclude_from_all})
   endif()
 
   if(${${name}_NOLIBS})
@@ -164,7 +164,7 @@ function(add_hpx_executable name)
   endif()
 
   hpx_setup_target(
-    ${name}_exe
+    ${name}
     TYPE EXECUTABLE
     FOLDER ${${name}_FOLDER}
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}

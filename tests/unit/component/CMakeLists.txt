@@ -48,7 +48,7 @@ if(HPX_WITH_NETWORKING)
         DEPENDENCIES iostreams_component process_component
                      launch_process_test_server_component)
     set(launch_process_PARAMETERS
-      --launch=$<TARGET_FILE:launched_process_test_exe>
+      --launch=$<TARGET_FILE:launched_process_test>
 )
 endif()
 
@@ -145,10 +145,10 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.component.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 
 endforeach()
 
 if(HPX_WITH_NETWORKING)
-    add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test_exe)
+    add_hpx_pseudo_dependencies(tests.unit.component.launch_process launched_process_test)
 endif()

@@ -71,7 +71,7 @@ foreach(example_program ${example_programs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.1d_stencil.${example_program}
-                              ${example_program}_exe)
+                              ${example_program})
 
     if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
       NOT ("${example_program}" IN_LIST disabled_tests))
@@ -80,19 +80,19 @@ foreach(example_program ${example_programs})
     add_hpx_pseudo_dependencies(tests.examples.1d_stencil
                                 tests.examples.1d_stencil.${example_program})
     add_hpx_pseudo_dependencies(tests.examples.1d_stencil.${example_program}
-                                ${example_program}_exe)
+                                ${example_program})
   endif()
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set_target_properties(1d_stencil_1_omp_exe
+  set_target_properties(1d_stencil_1_omp
     PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
-  set_target_properties(1d_stencil_3_omp_exe
+  set_target_properties(1d_stencil_3_omp
     PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
   if(NOT MSVC)
-    set_target_properties(1d_stencil_1_omp_exe
+    set_target_properties(1d_stencil_1_omp
       PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
-    set_target_properties(1d_stencil_3_omp_exe
+    set_target_properties(1d_stencil_3_omp
       PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
   endif()
 endif()

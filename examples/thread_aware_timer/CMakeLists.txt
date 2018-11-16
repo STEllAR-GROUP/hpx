@@ -9,7 +9,7 @@ add_hpx_executable(thread_aware_timer
                    DEPENDENCIES iostreams_component)
 
 # add pseudo-target dependencies
-add_hpx_pseudo_dependencies(examples.thread_aware_timer thread_aware_timer_exe)
+add_hpx_pseudo_dependencies(examples.thread_aware_timer thread_aware_timer)
 
 if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
   add_hpx_example_test("thread_aware_timer" thread_aware_timer THREADS_PER_LOCALITY 4)
@@ -17,5 +17,5 @@ if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
   add_hpx_pseudo_dependencies(tests.examples.thread_aware_timer
                               tests.examples.thread_aware_timer.thread_aware_timer)
   add_hpx_pseudo_dependencies(tests.examples.thread_aware_timer.thread_aware_timer
-                              thread_aware_timer_exe)
+                              thread_aware_timer)
 endif()
