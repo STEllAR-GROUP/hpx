@@ -60,10 +60,6 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
-if(NOT LIB)
-  set(LIB "lib")
-endif()
-
 set(HPX_LINK_LIBRARIES "@HPX_LINK_LIBRARIES@")
 
 enable_language(C)
