@@ -9,11 +9,10 @@
 #include <hpx/hpx.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <string>
 
 #include "../dimension.hpp"
-
-#include <boost/scoped_array.hpp>
 
 namespace interpolate1d { namespace server
 {
@@ -44,7 +43,7 @@ namespace interpolate1d { namespace server
         static mutex_type mtx_;     // one for whole application
 
         dimension dim_;
-        boost::scoped_array<double> values_;
+        std::unique_ptr<double[]> values_;
         double min_value_, max_value_, delta_;
     };
 }}
