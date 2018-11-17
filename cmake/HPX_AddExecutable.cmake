@@ -149,7 +149,7 @@ function(add_hpx_executable name)
     endif()
   endif()
 
-  set_target_properties(${name} PROPERTIES OUTPUT_NAME ${name})
+  set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME "${HPX_OUTPUT_PREFIX}${name}")
 
   if(exclude_from_all)
     set_target_properties(${name} PROPERTIES ${exclude_from_all})
