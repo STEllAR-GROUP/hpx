@@ -89,6 +89,14 @@ namespace hpx
         LERR_(error) << "created exception: " << this->what();
     }
 
+    /// Construct a hpx::exception from a boost#system#error_code (this is
+    /// new for Boost V1.69).
+    exception::exception(boost::system::error_code const& e)
+      : boost::system::system_error(e)
+    {
+        LERR_(error) << "created exception: " << this->what();
+    }
+
     /// Construct a hpx::exception from a \a hpx::error and an error message.
     ///
     /// \param e      The parameter \p e holds the hpx::error code the new
