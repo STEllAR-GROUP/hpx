@@ -168,8 +168,8 @@ namespace hpx
     {
         LPROGRESS_;
 
-        components::server::get_error_dispatcher().register_error_sink(
-            &runtime_impl::default_errorsink, default_error_sink_);
+        components::server::get_error_dispatcher().
+            set_error_sink(&runtime_impl::default_errorsink);
 
         // in AGAS v2, the runtime pointer (accessible through get_runtime
         // and get_runtime_ptr) is already initialized at this point.
