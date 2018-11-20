@@ -365,7 +365,6 @@ namespace hpx
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
         applier::applier applier_;
-        std::size_t default_error_sink_id_;
 
         compat::mutex mtx_;
         std::exception_ptr exception_;
