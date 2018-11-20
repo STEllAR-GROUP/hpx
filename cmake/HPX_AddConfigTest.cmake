@@ -9,6 +9,8 @@
 
 set(HPX_ADDCONFIGTEST_LOADED TRUE)
 
+include (CheckLibraryExists)
+
 function(add_hpx_config_test variable)
   set(options FILE EXECUTE)
   set(one_value_args SOURCE ROOT CMAKECXXFEATURE)
@@ -388,25 +390,15 @@ endfunction()
 function(hpx_check_for_cxx11_std_atomic)
   # Sometimes linking against libatomic is required for atomic ops, if
   # the platform doesn't support lock-free atomics.
+  check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
+  if(HPX_HAVE_LIBATOMIC)
+    set(HPX_CXX11_STD_ATOMIC_LIBRARIES atomic)
+  endif()
 
-  # First check if atomics work without the library.
   add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
     SOURCE cmake/tests/cxx11_std_atomic.cpp
+    LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
     FILE ${ARGN})
-
-  # If not, check if the library exists, and atomics work with it.
-  if(NOT HPX_WITH_CXX11_ATOMIC)
-    check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
-    if(HPX_HAVE_LIBATOMIC)
-      add_hpx_config_test(HPX_WITH_CXX11_ATOMIC
-        SOURCE cmake/tests/cxx11_std_atomic.cpp
-        LIBRARIES "atomic"
-        FILE ${ARGN})
-    else()
-      message(FATAL_ERROR
-        "Host compiler appears to require libatomic, but cannot find it.")
-    endif()
-  endif()
 endfunction()
 
 ###############################################################################

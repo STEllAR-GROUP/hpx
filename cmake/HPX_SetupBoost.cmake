@@ -63,7 +63,6 @@ endif()
 
 set(__boost_libraries
   ${__boost_libraries}
-  atomic
   filesystem
   program_options
   regex

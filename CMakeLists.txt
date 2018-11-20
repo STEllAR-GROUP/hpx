@@ -1270,6 +1270,10 @@ if(WIN32)
       # qualification conformance
       hpx_add_target_compile_option(-Zc:rvalueCast PUBLIC)
       hpx_add_target_compile_option(-Zc:strictStrings PUBLIC)
+
+      # Update 8 requires to set _ENABLE_EXTENDED_ALIGNED_STORAGE for it to
+      # compile atomics
+      hpx_add_config_cond_define(_ENABLE_EXTENDED_ALIGNED_STORAGE)
     endif()
 
     # Runtime type information
