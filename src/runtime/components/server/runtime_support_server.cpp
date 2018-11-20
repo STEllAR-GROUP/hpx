@@ -272,7 +272,7 @@ namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     runtime_support::runtime_support(hpx::util::runtime_configuration & cfg)
-      : stop_called_(false), stop_done_(false), terminated_(false),
+      : stop_called_(true), stop_done_(true), terminated_(false),
         dijkstra_color_(false), shutdown_all_invoked_(false),
         modules_(cfg.modules())
     {}
