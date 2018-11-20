@@ -648,7 +648,8 @@ namespace hpx { namespace util
         ini_config += std::string("hpx.expect_connecting_localities=") +
             (expect_connections ? "1" : "0");
 
-        if (num_localities_ != 1 || expect_connections)
+        if (num_localities_ != 1 || expect_connections ||
+            env.found_batch_environment())
         {
             initial_hpx_port =
                 boost::lexical_cast<std::uint16_t>(
