@@ -11,7 +11,6 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
-#include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
@@ -166,7 +165,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
-    boost::scoped_array<char> send_buffer_orig(new char[max_size + align_size]);
+    std::unique_ptr<char[]> send_buffer_orig(new char[max_size + align_size]);
     char* send_buffer = align_buffer(send_buffer_orig.get(), align_size);
 
     // perform actual measurements
