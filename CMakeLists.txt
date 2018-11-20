@@ -226,7 +226,7 @@ hpx_option(HPX_WITH_COMPILER_WARNINGS BOOL
   "Enable compiler warnings (default: ON)"
   ON ADVANCED)
 
-hpx_option(HPX_OUTPUT_PREFIX STRING
+hpx_option(HPX_WITH_EXECUTABLE_PREFIX STRING
 	"Executable prefix (default none), 'hpx_' useful for system install."
   "" CATEGORY "Build Targets")
 
