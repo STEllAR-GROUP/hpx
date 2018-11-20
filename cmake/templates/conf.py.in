@@ -182,6 +182,12 @@ rst_prolog += '''
 .. |macports| replace:: MacPorts
 .. _macports: https://www.macports.org/
 
+.. |apex| replace:: APEX
+.. _apex: https://khuck.github.io/xpress-apex/
+.. |apex_hpx_doc| replace:: APEX |hpx| documentation
+.. _apex_hpx_doc: https://khuck.github.io/xpress-apex/usage/#hpx-louisiana-state-university
+.. |tau| replace:: TAU
+.. _tau: https://www.cs.uoregon.edu/research/tau/home.php
 .. |cmake| replace:: CMake
 .. _cmake: https://www.cmake.org
 .. |ctest| replace:: CTest

@@ -1628,12 +1628,6 @@ The predefined command line options for any application using
    reset all performance counter(s) specified with :option:`--hpx:print-counter`
    after they have been evaluated.
 
-.. option:: --hpx:print-counter-at
-
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
-   (or :option:`--hpx:print-counter-reset` at the given point in time, possible
-   argument are values: ``startup``, ``shutdown`` (default), ``noshutdown``.
-
 .. option:: --hpx:print-counters-locally
 
    Each :term:`locality` prints only its own local counters. If this is used
