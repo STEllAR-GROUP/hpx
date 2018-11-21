@@ -226,6 +226,10 @@ hpx_option(HPX_WITH_COMPILER_WARNINGS BOOL
   "Enable compiler warnings (default: ON)"
   ON ADVANCED)
 
+hpx_option(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS BOOL
+  "Turn compiler warnings into errors (default: OFF)"
+  OFF ADVANCED)
+
 hpx_option(HPX_WITH_EXECUTABLE_PREFIX STRING
   "Executable prefix (default none), 'hpx_' useful for system install."
   "" CATEGORY "Build Targets")
@@ -1408,6 +1412,15 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
+  endif()
+endif()
+
+# Configure compiler warnings as errors
+if(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS)
+  if(MSVC)
+    hpx_add_compile_flag(-WX LANGUAGES C CXX Fortran)
+  else()
+    hpx_add_compile_flag_if_available(-Werror LANGUAGES CXX C Fortran)
   endif()
 endif()
 
