@@ -35,6 +35,39 @@ namespace hpx { namespace parallel { namespace execution
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Tag, typename Executor, typename F>
+        struct then_execute_helper
+        {
+        public:
+            template <typename Executor_, typename F_>
+            then_execute_helper(Executor_&& exec, F_&& call)
+              : exec_(std::forward<Executor_>(exec))
+              , call_(std::forward<F_>(call))
+            {}
+
+            auto operator()(hpx::future<void> && fut)
+            ->  decltype(
+                    Tag()(std::move(fut), std::declval<Executor>(), std::declval<F>())
+                )
+            {
+                return Tag()(std::move(fut), std::move(exec_), std::move(call_));
+            }
+
+        private:
+            Executor exec_;
+            F call_;
+        };
+
+        template <typename Tag, typename Executor, typename F>
+        then_execute_helper<Tag,
+            typename std::decay<Executor>::type,
+            typename std::decay<F>::type>
+        make_then_execute_helper(Executor&& exec, F&& call)
+        {
+            return {std::forward<Executor>(exec), std::forward<F>(call)};
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Tag>
         struct sync_execute_at_helper
         {
@@ -63,11 +96,11 @@ namespace hpx { namespace parallel { namespace execution
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(sequenced_executor(),
-                    hpx::util::one_shot(hpx::util::bind(
-                        sync_execute_at_helper(),
-                        hpx::util::placeholders::_1, std::ref(exec),
+                    make_then_execute_helper<sync_execute_at_helper>(
+                        std::forward<Executor>(exec),
                         hpx::util::deferred_call(
-                            std::forward<F>(f), std::forward<Ts>(ts)...))),
+                            std::forward<F>(f), std::forward<Ts>(ts)...)
+                        ),
                     predecessor).get();
             }
 
@@ -171,11 +204,11 @@ namespace hpx { namespace parallel { namespace execution
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(sequenced_executor(),
-                    hpx::util::one_shot(hpx::util::bind(
-                        async_execute_at_helper(),
-                        hpx::util::placeholders::_1, std::forward<Executor>(exec),
+                    make_then_execute_helper<async_execute_at_helper>(
+                        std::forward<Executor>(exec),
                         hpx::util::deferred_call(
-                            std::forward<F>(f), std::forward<Ts>(ts)...))),
+                            std::forward<F>(f), std::forward<Ts>(ts)...)
+                        ),
                     predecessor);
             }
 
@@ -270,11 +303,11 @@ namespace hpx { namespace parallel { namespace execution
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 execution::then_execute(sequenced_executor(),
-                    hpx::util::one_shot(hpx::util::bind(
-                        post_at_helper(),
-                        hpx::util::placeholders::_1, std::forward<Executor>(exec),
-                        hpx::util::deferred_call(std::forward<F>(f),
-                            std::forward<Ts>(ts)...))),
+                    make_then_execute_helper<post_at_helper>(
+                        std::forward<Executor>(exec),
+                        hpx::util::deferred_call(
+                            std::forward<F>(f), std::forward<Ts>(ts)...)
+                        ),
                     predecessor);
             }
 
