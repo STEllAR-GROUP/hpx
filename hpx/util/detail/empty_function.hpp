@@ -9,7 +9,6 @@
 #define HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/throw_exception.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 
 namespace hpx { namespace util { namespace detail
@@ -17,12 +16,7 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct empty_function {}; // must be trivial and empty
 
-    HPX_NORETURN inline void throw_bad_function_call()
-    {
-        hpx::throw_exception(bad_function_call,
-            "empty function object should not be used",
-            "empty_function::operator()");
-    }
+    HPX_NORETURN HPX_EXPORT void throw_bad_function_call();
 
     // Pseudo registration for empty functions.
     // We don't want to serialize empty functions.
