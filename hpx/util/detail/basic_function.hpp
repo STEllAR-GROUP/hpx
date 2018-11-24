@@ -59,19 +59,19 @@ namespace hpx { namespace util { namespace detail
     {
         // make sure the empty table instance is initialized in time, even
         // during early startup
-        static VTable const* get_empty_table()
+        static VTable const* get_empty_vtable()
         {
             static VTable const empty_table =
-                detail::construct_vtable<detail::empty_function<R(Ts...)> >();
+                detail::construct_vtable<detail::empty_function>();
             return &empty_table;
         }
 
     public:
         function_base() noexcept
-          : vptr(get_empty_table())
+          : vptr(get_empty_vtable())
         {
             std::memset(object, 0, vtable::function_storage_size);
-            vtable::default_construct<empty_function<R(Ts...)> >(object);
+            vtable::default_construct<empty_function>(object);
         }
 
         function_base(function_base&& other) noexcept
@@ -79,8 +79,8 @@ namespace hpx { namespace util { namespace detail
         {
             // move-construct
             std::memcpy(object, other.object, vtable::function_storage_size);
-            other.vptr = get_empty_table();
-            vtable::default_construct<empty_function<R(Ts...)> >(other.object);
+            other.vptr = get_empty_vtable();
+            vtable::default_construct<empty_function>(other.object);
         }
 
         ~function_base()
@@ -116,7 +116,7 @@ namespace hpx { namespace util { namespace detail
                     vtable::reconstruct<target_type>(object, std::forward<F>(f));
                 } else {
                     reset();
-                    vtable::_delete<empty_function<R(Ts...)> >(object);
+                    vtable::_delete<empty_function>(object);
 
                     vptr = f_vptr;
                     vtable::construct<target_type>(object, std::forward<F>(f));
@@ -132,8 +132,8 @@ namespace hpx { namespace util { namespace detail
             {
                 vptr->delete_(object);
 
-                vptr = get_empty_table();
-                vtable::default_construct<empty_function<R(Ts...)> >(object);
+                vptr = get_empty_vtable();
+                vtable::default_construct<empty_function>(object);
             }
         }
 

@@ -8,40 +8,33 @@
 #ifndef HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 #define HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
-    struct empty_function; // must be trivial and empty
+    struct empty_function {}; // must be trivial and empty
 
-    template <typename R, typename ...Ts>
-    struct empty_function<R(Ts...)>
+    HPX_NORETURN inline void throw_bad_function_call()
     {
-        R operator()(Ts...) const
-        {
-            hpx::throw_exception(bad_function_call,
-                "empty function object should not be used",
-                "empty_function::operator()");
-        }
-    };
+        hpx::throw_exception(bad_function_call,
+            "empty function object should not be used",
+            "empty_function::operator()");
+    }
 
     // Pseudo registration for empty functions.
     // We don't want to serialize empty functions.
-    template <typename VTable, typename Sig>
+    template <typename VTable>
     struct get_function_name_impl<
         VTable
-      , hpx::util::detail::empty_function<Sig>
+      , hpx::util::detail::empty_function
     >
     {
-        static char const* call()
+        HPX_NORETURN static char const* call()
         {
-            hpx::throw_exception(bad_function_call,
-                "empty function object should not be used",
-                "get_function_name<empty_function>");
-            return "";
+            throw_bad_function_call();
         }
     };
 }}}
