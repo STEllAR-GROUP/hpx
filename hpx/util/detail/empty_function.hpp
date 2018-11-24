@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/detail/function_registration.hpp>
+#include <hpx/util/detail/vtable/vtable.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -31,6 +32,16 @@ namespace hpx { namespace util { namespace detail
             throw_bad_function_call();
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // make sure the empty table instance is initialized in time, even
+    // during early startup
+    template <typename VTable>
+    VTable const* get_empty_function_vtable()
+    {
+        static VTable const empty_vtable = construct_vtable<empty_function>();
+        return &empty_vtable;
+    }
 }}}
 
 #endif

@@ -57,10 +57,7 @@ namespace hpx { namespace util
             detail::vtable::_delete<detail::empty_function>(this->object);
 
             this->vptr = other.vptr;
-            if (!this->vptr->empty)
-            {
-                this->vptr->copy(this->object, other.object);
-            }
+            this->vptr->copy(this->object, other.object);
         }
 
         function(function&& other) noexcept
@@ -89,10 +86,7 @@ namespace hpx { namespace util
                 detail::vtable::_delete<detail::empty_function>(this->object);
 
                 this->vptr = other.vptr;
-                if (!this->vptr->empty)
-                {
-                    this->vptr->copy(this->object, other.object);
-                }
+                this->vptr->copy(this->object, other.object);
             }
             return *this;
         }
