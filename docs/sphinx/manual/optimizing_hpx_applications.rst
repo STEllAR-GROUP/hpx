@@ -1,5 +1,6 @@
 ..
     Copyright (C) 2007-2017 Hartmut Kaiser
+                  2014 University of Oregon
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -282,10 +283,6 @@ The following table summarizes the available command line options:
    * * ``--hpx:reset-counters``
      * reset all performance counter(s) specified with ``--hpx:print-counter``
        after they have been evaluated)
-   * * ``--hpx:print-counter-at``
-     * print the performance counter(s) specified with ``--hpx:print-counter``
-       (or ``--hpx:print-counter-reset``) at the given point in time, possible
-       argument are values: ``startup``, ``shutdown`` (default), ``noshutdown``.
 
 While the options ``--hpx:list-counters`` and ``--hpx:list-counter-infos`` give
 a short listing of all available counters, the full documentation for those can
@@ -2615,3 +2612,17 @@ system and application performance.
    :c:macro:`HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW`).
 
 .. [#] A message can potentially consist of more than one :term:`parcel`.
+
+APEX integration
+================
+
+|hpx| provides integration with |apex|_, which is a framework for application
+profiling using task timers and various performance counters. It can be added as
+a ``git`` submodule by turning on the option :option:`HPX_WITH_APEX:BOOL` during
+|cmake|_ configuration. |tau|_ is an optional dependency when using |apex|_.
+
+To build |hpx| with |apex|_ add :option:`HPX_WITH_APEX`\ ``=ON``, and,
+optionally, ``TAU_ROOT=$PATH_TO_TAU`` to your |cmake|_ configuration. In
+addition, you can override the tag used for |apex|_ with the
+:option:`HPX_WITH_APEX_TAG` option. Please see the |apex_hpx_doc|_ for detailed
+instructions on using |apex|_ with |hpx|.

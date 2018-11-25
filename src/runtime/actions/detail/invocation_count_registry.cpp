@@ -11,9 +11,9 @@
 #include <hpx/util/format.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 
+#include <regex>
 #include <string>
 
-#include <boost/regex.hpp>
 
 namespace hpx { namespace actions { namespace detail
 {
@@ -105,12 +105,12 @@ namespace hpx { namespace actions { namespace detail
             if (ec) return false;
 
             bool found_one = false;
-            boost::regex rx(str_rx, boost::regex::perl);
+            std::regex rx(str_rx);
 
             map_type::const_iterator end = map_.end();
             for (map_type::const_iterator it = map_.begin(); it != end; ++it)
             {
-                if (!boost::regex_match((*it).first, rx))
+                if (!std::regex_match((*it).first, rx))
                     continue;
                 found_one = true;
 

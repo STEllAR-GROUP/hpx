@@ -8,12 +8,12 @@
 #define HPX_COMPONENTS_CONSOLE_ERROR_SINK_SINGLETON_JAN_26_2009_0503PM
 
 #include <hpx/config.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/util/spinlock.hpp>
-
-#include <boost/signals2.hpp>
 
 #include <mutex>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -26,30 +26,31 @@ namespace hpx { namespace components { namespace server
 
     public:
         typedef util::spinlock mutex_type;
-        typedef void dispatcher_type(std::string const&);
-
-        typedef boost::signals2::scoped_connection scoped_connection_type;
+        typedef util::function_nonser<void(std::string const&)> sink_type;
 
         console_error_dispatcher()
           : mtx_()
         {}
 
-        template <typename F, typename Connection>
-        bool register_error_sink(F sink, Connection& conn)
+        template <typename F>
+        sink_type set_error_sink(F&& sink)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            return (conn = dispatcher_.connect(sink)).connected();
+            sink_type old_sink = std::move(sink_);
+            sink_ = std::forward<F>(sink);
+            return old_sink;
         }
 
         void operator()(std::string const& msg)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            dispatcher_(msg);
+            if (sink_)
+                sink_(msg);
         }
 
     private:
         mutex_type mtx_;
-        boost::signals2::signal<dispatcher_type> dispatcher_;
+        sink_type sink_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

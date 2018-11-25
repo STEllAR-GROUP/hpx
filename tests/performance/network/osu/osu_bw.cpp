@@ -12,12 +12,12 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/util.hpp>
 
-#include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
     (void)align_size;
     HPX_ASSERT(align_size <= MAX_ALIGNMENT);
 
-    boost::scoped_array<char> send_buffer(new char[size]);
+    std::unique_ptr<char[]> send_buffer(new char[size]);
     std::memset(send_buffer.get(), 'a', size);
 
     hpx::util::high_resolution_timer t;

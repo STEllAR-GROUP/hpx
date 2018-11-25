@@ -477,7 +477,7 @@ namespace hpx { namespace threads
                 // Strict binding not supported or failed, try weak binding.
                 if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
-                    std::unique_ptr<char> buffer(new char [1024]);
+                    std::unique_ptr<char[]> buffer(new char [1024]);
 
                     hwloc_bitmap_snprintf(buffer.get(), 1024, cpuset);
                     hwloc_bitmap_free(cpuset);

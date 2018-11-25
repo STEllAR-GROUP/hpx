@@ -33,11 +33,10 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <regex>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/regex.hpp>
 
 namespace hpx { namespace agas
 {
@@ -385,13 +384,13 @@ symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
     if (pattern.find_first_of("*?[]") != std::string::npos)
     {
         std::string str_rx(util::regex_from_pattern(pattern, throws));
-        boost::regex rx(str_rx, boost::regex::perl);
+        std::regex rx(str_rx);
 
         std::unique_lock<mutex_type> l(mutex_);
         for (gid_table_type::iterator it = gids_.begin(); it != gids_.end();
              ++it)
         {
-            if (!boost::regex_match(it->first, rx))
+            if (!std::regex_match(it->first, rx))
                 continue;
 
             // hold on to entry while map is unlocked
