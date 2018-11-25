@@ -11,7 +11,8 @@ if(NOT BOOST_SIMD_ROOT)
   hpx_error("Using Boost.SIMD requires to set the variable BOOST_SIMD_ROOT to the Boost.SIMD installation directory.")
 endif()
 
-include_directories(SYSTEM ${BOOST_SIMD_ROOT}/include)
+add_library(hpx::boost::simd INTERFACE IMPORTED)
+target_include_directories(hpx::boost::simd INTERFACE ${BOOST_SIMD_ROOT}/include)
 
 hpx_add_config_define(HPX_HAVE_DATAPAR)
 hpx_add_config_define(HPX_HAVE_DATAPAR_BOOST_SIMD)

@@ -8,7 +8,6 @@ if(HPX_WITH_EXAMPLES_QT4)
     include(${QT_USE_FILE})
 
     QT4_WRAP_CPP(QT_MOC_SOURCES widget.hpp OPTIONS -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED)
-    include_directories(./)
 
     set(qt_sources
         qt.cpp
@@ -16,15 +15,14 @@ if(HPX_WITH_EXAMPLES_QT4)
 #       hpx_qt.cpp
         ${QT_MOC_SOURCES})
 
-    include_directories(${QT4_INCLUDE_DIRS})
-
     add_hpx_executable(qt
         MODULE qt
         SOURCES ${qt_sources}
         ${qt_FLAGS}
         FOLDER "Examples/Qt")
 
-    target_link_libraries(qt PRIVATE ${QT_LIBRARIES})
+    target_include_directories(qt PRIVATE ./ PRIVATE ${QT4_INCLUDE_DIRS})
+    target_link_libraries(qt PRIVATE ${HPX_TLL_PUBLIC} ${QT_LIBRARIES})
 
     add_hpx_example_target_dependencies("qt" qt)
 

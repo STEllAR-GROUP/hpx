@@ -5,13 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_PAPI)
-  find_package(PAPI)
-
-  if(NOT PAPI_FOUND)
-    hpx_error("PAPI could not be found and HPX_WITH_PAPI=On, please specify PAPI_ROOT to point to the root of your PAPI installation")
-  endif()
-
-  include_directories(${PAPI_INCLUDE_DIR})
 
   if(NOT HPX_WITH_DEFAULT_TARGETS)
     set(_exclude_from_all_flag EXCLUDE_FROM_ALL)
@@ -38,11 +31,12 @@ if(HPX_WITH_PAPI)
     PREPEND_SOURCE_ROOT
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
     SOURCES ${papi_counters_sources}
-    DEPENDENCIES ${PAPI_LIBRARIES}
+    DEPENDENCIES hpx::papi hpx::boost
     ${_exclude_from_all_flag})
 
   add_hpx_pseudo_dependencies(components.performance_counters.papi papi_counters_component)
 
   add_subdirectory(tests)
   add_subdirectory(examples)
+
 endif()

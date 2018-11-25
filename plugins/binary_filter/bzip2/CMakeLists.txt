@@ -21,10 +21,6 @@ endif()
 function(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
   if(HPX_WITH_COMPRESSION_BZIP2)
-    if(NOT MSVC)
-      include_directories(${BZIP2_INCLUDE_DIR})
-    endif()
-
     add_hpx_library(compress_bzip2
       PLUGIN
       SOURCES
@@ -34,6 +30,12 @@ function(add_bzip2_module)
         "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARIES})
+
+    if(NOT MSVC)
+      target_include_directories(compress_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
+    endif()
+
+    target_link_libraries(compress_bzip2 PRIVATE hpx::boost)
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)

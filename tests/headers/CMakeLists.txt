@@ -23,19 +23,24 @@ set(exclude_from_headers
 # If we compile with the MPI parcelport enabled, we need to additionally
 # add the MPI include path here, because for the main library, it's only
 # added for the plugin.
+# TODO: pass plugins to target directives, to simplify the following code
 if(HPX_WITH_PARCELPORT_MPI)
   find_package(MPI)
-
-  if(MPI_CXX_INCLUDE_PATH)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
+  if(NOT MPI_FOUND)
+    hpx_error("MPI could not be found and HPX_WITH_PARCELPORT_MPI=ON, please specify \
+    MPI_ROOT to point to the root of your MPI installation")
   endif()
+  add_library(hpx::mpi INTERFACE IMPORTED)
+  target_include_directories(hpx::mpi INTERFACE ${MPI_INCLUDE_DIR})
+  target_link_libraries(hpx::mpi INTERFACE ${MPI_LIBRARY})
+  set(test_deps hpx::mpi)
 endif()
 
 # If we compile with PAPI performance counters, we need to additionally
 # add the PAPI include path here
-if(HPX_WITH_PAPI)
-  find_package(PAPI)
-  include_directories(${PAPI_INCLUDE_DIR})
+include(HPX_SetupPapi)
+if (HPX_WITH_PAPI)
+  set(test_deps ${test_deps} hpx::papi)
 endif()
 
 add_hpx_header_tests(
@@ -43,4 +48,6 @@ add_hpx_header_tests(
   HEADER_ROOT ${PROJECT_SOURCE_DIR}
   HEADERS ${headers}
   EXCLUDE ${exclude_from_headers}
-  EXCLUDE_FROM_ALL ${exclude_from_all_headers})
+  EXCLUDE_FROM_ALL ${exclude_from_all_headers}
+  DEPENDENCIES ${test_deps}
+  )

@@ -23,7 +23,10 @@ function(add_coalescing_module)
         FOLDER "Core/Plugins/MessageHandler"
         )
 
-    add_definitions(-DHPX_PARCEL_COALESCING_MODULE_EXPORTS)
+    if (TARGET hpx::apex)
+      target_link_libraries(parcel_coalescing PRIVATE hpx::apex)
+    endif()
+    target_compile_definitions(parcel_coalescing PRIVATE HPX_PARCEL_COALESCING_MODULE_EXPORTS)
 
     add_hpx_pseudo_dependencies(plugins.parcel.coalescing parcel_coalescing)
     add_hpx_pseudo_dependencies(core plugins.parcel.coalescing)

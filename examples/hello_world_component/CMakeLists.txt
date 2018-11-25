@@ -16,10 +16,6 @@ if(EXISTS "${HPX_DIR}")
     message(FATAL_ERROR "HPX could not be found")
   endif()
 
-  include_directories(${test_SOURCE_DIR})
-  include_directories(${HPX_INCLUDE_DIRS})
-  link_directories(${HPX_LIBRARY_DIR})
-
   add_library(hello_world_component SHARED hello_world_component.cpp)
   hpx_setup_target(
     hello_world_component
@@ -28,6 +24,7 @@ if(EXISTS "${HPX_DIR}")
   )
 
   add_executable(hello_world_client hello_world_client.cpp)
+  target_include_directories(hello_world_client PRIVATE ${test_SOURCE_DIR})
   target_compile_definitions(hello_world_client PUBLIC -DHPX_DEBUG)
   hpx_setup_target(hello_world_client
     DEPENDENCIES hello_world_component

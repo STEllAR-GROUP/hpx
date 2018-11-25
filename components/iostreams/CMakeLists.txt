@@ -42,6 +42,8 @@ add_hpx_component(iostreams
 target_compile_definitions(iostreams_component
   PRIVATE HPX_IOSTREAMS_MODULE_EXPORTS)
 
+target_link_libraries(iostreams_component PRIVATE hpx::boost)
+
 add_hpx_pseudo_dependencies(components.iostreams iostreams_component)
 
 add_subdirectory(tests)

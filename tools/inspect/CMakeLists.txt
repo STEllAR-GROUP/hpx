@@ -15,8 +15,9 @@ if(NOT Boost_REGEX_FOUND)
   hpx_error("HPX inspect tool requires Boost.Regex")
 endif()
 
-target_link_libraries(inspect PRIVATE ${Boost_LIBRARIES} 
-  hpx_config hpx_filesystem hpx_program_options)
+# Set the basic search paths for the generated HPX headers
+target_include_directories(inspect PRIVATE ${CMAKE_BINARY_DIR})
+target_link_libraries(inspect PRIVATE hpx::boost hpx_config hpx_filesystem hpx_program_options)
 target_compile_definitions(inspect PRIVATE HPX_MODULE_STATIC_LINKING)
 
 # add dependencies to pseudo-target

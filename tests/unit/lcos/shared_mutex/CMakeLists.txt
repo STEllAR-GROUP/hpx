@@ -12,6 +12,8 @@ set(tests
 set(shared_future1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(shared_future2_PARAMETERS THREADS_PER_LOCALITY 4)
 
+set(shared_mutex1_LIBRARIES hpx::boost)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -25,6 +27,8 @@ foreach(test ${tests})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/LCOs/SharedMutex")
+
+  target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})
 
   add_hpx_unit_test("lcos.shared_mutex" ${test} ${${test}_PARAMETERS})
 

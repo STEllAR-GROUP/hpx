@@ -263,6 +263,48 @@ endforeach()
 #  add_dependencies(hpx static_component_data_hpp)
 #endif()
 
+target_link_libraries(hpx PUBLIC hpx::boost)
+
+# Set the basic search paths for the HPX headers
+target_include_directories(hpx PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+  $<INSTALL_INTERFACE:include>
+  )
+
+target_link_libraries(hpx PUBLIC hpx::allocator)
+
+target_link_libraries(hpx PRIVATE hpx::hwloc)
+
+# Enable SIMD via Boost.SIMD if it is available
+if (TARGET hpx::boost::simd)
+  # Private because the headers are in details
+  target_link_libraries(hpx PRIVATE hpx::boost::simd)
+endif()
+
+# Enable SIMD via VC if it is available
+if (TARGET hpx::vc)
+  target_link_libraries(hpx PRIVATE hpx::vc)
+endif()
+
+if (TARGET hpx::amplifier)
+  target_link_libraries(hpx PRIVATE hpx::amplifier)
+endif()
+
+if (TARGET hpx::apex)
+  target_link_libraries(hpx PRIVATE hpx::apex)
+  get_target_property(_apex_inc_dir hpx::apex INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
+  target_include_directories(hpx INTERFACE "${_apex_inc_dir}")
+endif()
+
+if (TARGET hpx::gperftools)
+  target_link_libraries(hpx PRIVATE hpx::gperftools)
+endif()
+
+if (TARGET hpx::valgrind)
+  target_link_libraries(hpx PRIVATE hpx::valgrind)
+endif()
+
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   set_target_properties(hpx PROPERTIES
     CLEAN_DIRECT_OUTPUT 1
@@ -313,11 +355,8 @@ foreach(_module ${HPX_LIBS})
   target_include_directories(hpx PUBLIC ${_module_includes})
 endforeach()
 
-set_property(TARGET hpx APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_COMPONENT_NAME=hpx"
-  "HPX_EXPORTS"
-  "HPX_ENABLE_ASSERT_HANDLER")
+target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
+  HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
 ################################################################################
 # Emulation of SwapContext on Windows
@@ -363,10 +402,16 @@ if(NOT HPX_WITH_STATIC_LINKING)
     target_include_directories(hpx_init PRIVATE ${_module_includes})
   endforeach()
 
-  set_property(TARGET hpx_init APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    "HPX_APPLICATION_EXPORTS"
-    "HPX_ENABLE_ASSERT_HANDLER")
+  # Set the basic search paths for the generated HPX headers
+  target_include_directories(hpx_init
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+      $<INSTALL_INTERFACE:include>)
+  target_link_libraries(hpx_init PRIVATE hpx::boost)
+
+  target_compile_definitions(hpx_init PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
+    HPX_APPLICATION_EXPORTS)
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
@@ -396,12 +441,23 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       endif()
     endif()
 
-    set_property(TARGET hpx_wrap APPEND
-      PROPERTY COMPILE_DEFINITIONS
-      "HPX_APPLICATION_EXPORTS"
-      "HPX_ENABLE_ASSERT_HANDLER")
+    target_compile_definitions(hpx_wrap PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
+      HPX_APPLICATION_EXPORTS)
 
-    target_include_directories(hpx_wrap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+    # Set the basic search paths for the generated HPX headers
+    target_include_directories(hpx_wrap
+      PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(hpx_wrap PUBLIC hpx)
+    if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+      set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-wrap=main)
+    elseif(APPLE)
+      set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-e,_initialize_main)
+    else()
+      hpx_error("hpx_main is not supported on ${CMAKE_SYSTEM_NAME}.")
+    endif()
 
     foreach(_module ${HPX_LIBS})
       # add module include directories as PRIVATE to the hpx_wrap library to
