@@ -12,6 +12,11 @@ add_hpx_component(process
     HEADER_ROOT ${root}
     AUTOGLOB)
 
+target_link_libraries(process_component PRIVATE Boost::iostreams
+                                                Boost::filesystem
+                                                Boost::system
+                                                Boost::disable_autolinking)
+
 add_hpx_pseudo_dependencies(components.process_ process_component)
 add_hpx_pseudo_dependencies(core components.process_)
 

@@ -46,8 +46,6 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
-  include_directories(${QTHREADS_INCLUDE_DIR})
-
   set(benchmarks
       ${benchmarks}
       qthreads_homogeneous_timed_task_spawn
@@ -61,11 +59,11 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
                   ${QTHREADS_LIBRARIES})
+
+  set(qthreads_heterogeneous_timed_task_spawn_INCLUDE_DIRECTORIES ${QTHREADS_INCLUDE_DIR})
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
-  include_directories(${TBB_INCLUDE_DIR})
-
   set(benchmarks
       ${benchmarks}
       tbb_homogeneous_timed_task_spawn
@@ -74,6 +72,8 @@ if(HPX_WITH_EXAMPLES_TBB)
   set(tbb_homogeneous_timed_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${boost_library_dependencies}
                    ${TBB_LIBRARIES})
+
+  set(tbb_homogeneous_timed_task_spawn_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIR})
 endif()
 
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component)
@@ -95,6 +95,8 @@ set(benchmarks ${benchmarks}
     hpx_tls_overhead
     native_tls_overhead
    )
+
+set(native_tls_overhead_LIBRARIES Boost::thread Boost::program_options)
 
 set(benchmarks ${benchmarks}
     coroutines_call_overhead
@@ -168,6 +170,9 @@ foreach(benchmark ${benchmarks})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Local")
+
+  target_include_directories(${benchmark}_test SYSTEM PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
+  target_link_libraries(${benchmark}_test PRIVATE ${${benchmark}_LIBRARIES})
 
   if(NOT "${${benchmark}_PARAMETERS}" MATCHES NO_HPX_MAIN)
     add_hpx_test("tests.performance.local" ${benchmark} ${${benchmark}_PARAMETERS})

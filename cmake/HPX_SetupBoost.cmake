@@ -1,3 +1,4 @@
+# Copyright (c) 2018 Christopher Hinz
 # Copyright (c) 2014 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,91 +24,20 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.58.0" "1.58"
     "1.57.0" "1.57")
 
-set(__boost_libraries)
-if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
-   HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
-  set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
-endif()
-
-if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
-  set(__boost_libraries ${__boost_libraries} thread)
-  set(__boost_need_thread ON)
-endif()
-
-if(__boost_need_thread)
-  set(__boost_libraries ${__boost_libraries} chrono)
-endif()
-
-# Set configuration option to use Boost.Context or not. This depends on the
-# platform.
-set(__use_generic_coroutine_context OFF)
-if(APPLE)
-  set(__use_generic_coroutine_context ON)
-endif()
-if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ" AND Boost_VERSION GREATER 105500)
-  set(__use_generic_coroutine_context ON)
-endif()
-hpx_option(
-  HPX_WITH_GENERIC_CONTEXT_COROUTINES
-  BOOL
-  "Use Boost.Context as the underlying coroutines context switch implementation."
-  ${__use_generic_coroutine_context} ADVANCED)
-
-if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
-  set(__boost_libraries ${__boost_libraries} context)
-  # if context is needed, we should still link with boost thread and chrono
-  if(NOT __boost_need_thread)
-    set(__boost_libraries ${__boost_libraries} thread chrono)
-  endif()
-endif()
-
-set(__boost_libraries
-  ${__boost_libraries}
-  filesystem
-  program_options
-  system)
-
-find_package(Boost 1.55 REQUIRED COMPONENTS ${__boost_libraries})
+find_package(Boost 1.55 REQUIRED
+                        COMPONENTS
+                          filesystem
+                          iostreams
+                          program_options
+                          system
+                        OPTIONAL_COMPONENTS
+                          context
+                          thread
+                          log
+                          regex)
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
-endif()
-
-set(Boost_TMP_LIBRARIES ${Boost_LIBRARIES})
-if(UNIX AND NOT CYGWIN)
-  find_library(BOOST_UNDERLYING_THREAD_LIBRARY NAMES pthread DOC "The threading library used by boost.thread")
-  if(NOT BOOST_UNDERLYING_THREAD_LIBRARY AND (HPX_PLATFORM_UC STREQUAL "XEONPHI"))
-    set(BOOST_UNDERLYING_THREAD_LIBRARY "-pthread")
-  endif()
-  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${BOOST_UNDERLYING_THREAD_LIBRARY})
-endif()
-
-set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-
-if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
-  find_package(Boost 1.55 QUIET COMPONENTS iostreams)
-  if(Boost_IOSTREAMS_FOUND)
-    hpx_info("  iostreams")
-  else()
-    hpx_error("Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or HPX_WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including the iostreams library")
-  endif()
-  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-endif()
-
-# attempt to load Boost.Regex (if available), it's needed for inspect
-find_package(Boost 1.55 QUIET COMPONENTS regex)
-if(Boost_REGEX_FOUND)
-  hpx_info("  regex")
-  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
-endif()
-
-set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
-
-# If we compile natively for the MIC, we need some workarounds for certain
-# Boost headers
-# FIXME: push changes upstream
-if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-  set(Boost_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/external/asio ${Boost_INCLUDE_DIRS})
 endif()
 
 # Boost preprocessor definitions
@@ -123,12 +53,3 @@ else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
-
-include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-if((NOT MSVC) OR HPX_WITH_BOOST_ALL_DYNAMIC_LINK OR HPX_WITH_VCPKG)
-  hpx_libraries(${Boost_LIBRARIES})
-  hpx_library_dir(${Boost_LIBRARY_DIRS})
-else()
-  hpx_library_dir(${Boost_LIBRARY_DIRS})
-endif()

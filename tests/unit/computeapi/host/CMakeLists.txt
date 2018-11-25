@@ -7,8 +7,6 @@ set(tests
     block_allocator
    )
 
-include_directories(${CUDA_INCLUDE_DIRS})
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -25,6 +23,8 @@ foreach(test ${tests})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/Compute/Host")
+
+  target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
 
   add_hpx_unit_test("host_" ${test} ${${test}_PARAMETERS})
 

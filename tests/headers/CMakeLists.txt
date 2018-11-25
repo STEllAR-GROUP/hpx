@@ -35,18 +35,13 @@ endif()
 # add the MPI include path here, because for the main library, it's only
 # added for the plugin.
 if(HPX_WITH_PARCELPORT_MPI)
-  find_package(MPI)
-
-  if(MPI_CXX_INCLUDE_PATH)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
-  endif()
+    find_package(MPI REQUIRED)
 endif()
 
 # If we compile with PAPI performance counters, we need to additionally
 # add the PAPI include path here
 if(HPX_WITH_PAPI)
-  find_package(PAPI)
-  include_directories(${PAPI_INCLUDE_DIR})
+    find_package(PAPI REQUIRED)
 endif()
 
 # for each of the found headers, generate a test executable
@@ -96,8 +91,18 @@ foreach(header ${headers})
         SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
         FOLDER "Tests/Headers/${header_dir}")
 
+      if(HPX_WITH_PARCELPORT_MPI)
+          if(MPI_CXX_INCLUDE_PATH)
+              target_include_directories(${test_name} SYSTEM PRIVATE ${MPI_CXX_INCLUDE_PATH})
+          endif()
+      endif()
+
+      if(HPX_WITH_PAPI)
+          target_include_directories(${test_name} SYSTEM PRIVATE ${PAPI_INCLUDE_DIR})
+      endif()
+
       # make sure #including 'hpx/config/autolink.hpp' does not cause errors
-      target_compile_definitions(${test_name} PUBLIC -DHPX_AUTOLINK_LIB_NAME=hpx)
+      target_compile_definitions(${test_name} PRIVATE -DHPX_AUTOLINK_LIB_NAME=hpx)
 
       # add a custom target for this example
       add_hpx_pseudo_target(tests.headers.${test_name})

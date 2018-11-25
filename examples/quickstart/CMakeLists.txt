@@ -91,6 +91,7 @@ set(partitioned_vector_spmd_foreach_FLAGS
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(shared_mutex_LIBRARIES Boost::thread)
 set(simplest_hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simplest_hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -148,6 +149,8 @@ foreach(example_program ${example_programs})
                      SOURCES ${sources}
                      ${${example_program}_FLAGS}
                      FOLDER "Examples/Quickstart")
+
+  target_link_libraries(${example_program} PRIVATE ${${example_program}_LIBRARIES})
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.quickstart.${example_program})

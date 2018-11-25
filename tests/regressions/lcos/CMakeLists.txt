@@ -80,6 +80,7 @@ set(multiple_gather_ops_2001_PARAMETERS LOCALITIES 2)
 set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
+set(shared_mutex_1702_LIBRARIES Boost::thread)
 set(sliding_semaphore_2338_PARAMETERS THREADS_PER_LOCALITY 2)
 set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
@@ -99,6 +100,8 @@ foreach(test ${tests})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/LCOs")
+
+  target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})
 
   add_hpx_regression_test("lcos_dir" ${test} ${${test}_PARAMETERS})
 

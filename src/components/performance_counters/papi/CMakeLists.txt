@@ -11,13 +11,13 @@ set(root "${PROJECT_SOURCE_DIR}/hpx/components/performance_counters/papi_counter
 # PAPI event counters
 ################################################################################
 if(HPX_WITH_PAPI)
-  find_package(PAPI)
+  find_package(PAPI REQUIRED)
 
   if(NOT PAPI_FOUND)
     hpx_error("PAPI could not be found and HPX_WITH_PAPI=On, please specify PAPI_ROOT to point to the root of your PAPI installation")
   endif()
 
-  include_directories(${PAPI_INCLUDE_DIR})
+  find_package(Boost 1.55 REQUIRED COMPONENTS program_options)
 
   if(HPX_WITH_DEFAULT_TARGETS)
     add_hpx_component(papi_counters
@@ -26,6 +26,9 @@ if(HPX_WITH_PAPI)
       DEPENDENCIES ${PAPI_LIBRARIES}
       AUTOGLOB
       PLUGIN)
+
+    target_include_directories(papi_counters SYSTEM PRIVATE ${PAPI_INCLUDE_DIR})
+    target_link_libraries(papi_counters PRIVATE Boost::program_options Boost::disable_autolinking)
   endif()
 
   add_hpx_pseudo_dependencies(components.performance_counters_.papi

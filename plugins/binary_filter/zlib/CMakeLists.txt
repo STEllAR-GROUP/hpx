@@ -20,10 +20,6 @@ endif()
 function(add_zlib_module)
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
   if(HPX_WITH_COMPRESSION_ZLIB)
-    if(NOT MSVC)
-      include_directories(${ZLIB_INCLUDE_DIRS})
-    endif()
-
     add_hpx_library(compress_zlib
       PLUGIN
       SOURCES
@@ -33,6 +29,12 @@ function(add_zlib_module)
         "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARIES})
+
+    if(NOT MSVC)
+      target_include_directories(compress_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
+    endif()
+
+    target_link_libraries(compress_zlib PRIVATE Boost::iostreams Boost::filesystem Boost::disable_autolinking)
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)

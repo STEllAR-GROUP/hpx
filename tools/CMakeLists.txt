@@ -8,17 +8,14 @@ set(subdirs inspect)
 
 
 if((NOT MSVC) OR HPX_WITH_VCPKG)
-  set(tools ${tools} cpu_features)
-  set(cpu_features NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY})
-endif()
+  add_hpx_executable(cpu_features
+    SOURCES cpu_features.cpp
+    NOLIBS
+    FOLDER "Tools/cpu_features")
 
-foreach(tool ${tools})
-  add_hpx_executable(${tool}
-    SOURCES ${tool}.cpp ${${tool}}
-    FOLDER "Tools/${tool}")
-  add_hpx_pseudo_dependencies(tools ${tool})
-  target_link_libraries(${tool} ${HPX_TLL_PUBLIC} ${Boost_LIBRARIES})
-endforeach()
+  add_hpx_pseudo_dependencies(tools cpu_features)
+  target_link_libraries(cpu_features PRIVATE ${HPX_TLL_PUBLIC} Boost::program_options)
+endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tools.${subdir})

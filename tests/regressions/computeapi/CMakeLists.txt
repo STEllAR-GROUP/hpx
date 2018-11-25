@@ -7,8 +7,6 @@ set(tests
     for_each_value_proxy
    )
 
-include_directories(${CUDA_INCLUDE_DIRS})
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -25,6 +23,8 @@ foreach(test ${tests})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Regressions/Compute")
+
+  target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
 
   add_hpx_regression_test("computeapi_dir" ${test} ${${test}_PARAMETERS})
 

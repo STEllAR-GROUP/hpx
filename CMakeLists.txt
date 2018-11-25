@@ -803,7 +803,8 @@ hpx_option(HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
   CATEGORY "Build Targets" ADVANCED)
 if(HPX_WITH_EXAMPLES_HDF5)
-  find_package(HDF5 COMPONENTS CXX)
+  enable_language(Fortran)
+  find_package(HDF5 COMPONENTS CXX Fortran)
   if(NOT HDF5_FOUND)
     set(HPX_WITH_EXAMPLES_HDF5 OFF)
   endif()
@@ -995,12 +996,6 @@ hpx_option(HPX_WITH_UNWRAPPED_COMPATIBILITY BOOL
 if(HPX_WITH_UNWRAPPED_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_UNWRAPPED_COMPATIBILITY)
 endif()
-
-################################################################################
-# Set basic search paths for HPX
-################################################################################
-include_directories("${PROJECT_SOURCE_DIR}")
-link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
 # Check for compiler compatibility
@@ -1558,8 +1553,10 @@ find_package(Hwloc)
 if(NOT HWLOC_FOUND)
   hpx_error("Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
 endif()
-hpx_libraries(${HWLOC_LIBRARIES})
-include_directories(${HWLOC_INCLUDE_DIR})
+
+add_library(hpx::hwloc INTERFACE IMPORTED)
+target_include_directories(hpx::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
+target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
 
 ################################################################################
 # Enable integration with Intel Amplifier
@@ -1569,8 +1566,11 @@ if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
   if(NOT AMPLIFIER_FOUND)
     hpx_error("Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
   endif()
-  hpx_libraries(${AMPLIFIER_LIBRARIES})
-  include_directories(${AMPLIFIER_INCLUDE_DIR})
+
+  add_library(hpx::amplifier INTERFACE IMPORTED)
+  target_include_directories(hpx::amplifier SYSTEM INTERFACE ${AMPLIFIER_INCLUDE_DIR})
+  target_link_libraries(hpx::amplifier INTERFACE ${AMPLIFIER_LIBRARIES})
+
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
 endif()
@@ -1613,20 +1613,30 @@ if(HPX_WITH_APEX)
     hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
   endif()
 
-  include_directories(${APEX_SOURCE_DIR})
-  set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-      ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} apex)
+  add_library(hpx::apex INTERFACE IMPORTED)
+
+  target_include_directories(hpx::apex SYSTEM INTERFACE ${APEX_SOURCE_DIR})
+
   if(APEX_WITH_MSR)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
+    add_library(hpx::msr INTERFACE IMPORTED)
+    # TODO: Use an absolute path.
+    target_link_libraries(hpx::msr INTERFACE -L${MSR_ROOT}/lib -lmsr)
+
+    target_link_libraries(hpx::apex INTERFACE hpx::msr)
   endif()
   if(APEX_WITH_ACTIVEHARMONY)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+    add_library(hpx::activeharmony INTERFACE IMPORTED)
+    # TODO: Use an absolute path.
+    target_link_libraries(hpx::activeharmony INTERFACE -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+
+    target_link_libraries(hpx::apex INTERFACE hpx::activeharmony)
   endif()
   if(APEX_WITH_OTF2)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${OTF2_ROOT}/lib -lotf2)
+    add_library(hpx::otf2 INTERFACE IMPORTED)
+    # TODO: Use an absolute path.
+    target_link_libraries(hpx::otf2 INTERFACE -L${OTF2_ROOT}/lib -lotf2)
+
+    target_link_libraries(hpx::apex INTERFACE hpx::otf2)
   endif()
 
   # handle optional ITTNotify library
@@ -1635,10 +1645,13 @@ if(HPX_WITH_APEX)
     if(NOT ITTNOTIFY_FOUND)
       hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
     endif()
-    include_directories(${ITTNOTIFY_SOURCE_DIR})
+
+    add_library(hpx::ittnotify INTERFACE IMPORTED)
+    target_include_directories(hpx::ittnotify SYSTEM INTERFACE ${ITTNOTIFY_SOURCE_DIR})
+
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-    set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify)
+
+    target_link_libraries(hpx::apex INTERFACE hpx::ittnotify)
   endif()
 endif()
 
@@ -1677,8 +1690,10 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
   if(NOT GOOGLE_PERFTOOLS_FOUND)
     hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
   endif()
-  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
-  include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+
+  add_library(hpx::gperftools INTERFACE IMPORTED)
+  target_include_directories(hpx::gperftool SYSTEM INTERFACE ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+  target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
 endif()
 
 if(HPX_WITH_VALGRIND)
@@ -1686,7 +1701,10 @@ if(HPX_WITH_VALGRIND)
   if(NOT VALGRIND_FOUND)
     hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
   endif()
-  include_directories(${VALGRIND_INCLUDE_DIR})
+
+  add_library(hpx::valgrind INTERFACE IMPORTED)
+  target_include_directories(hpx::valgrind SYSTEM INTERFACE ${VALGRIND_INCLUDE_DIR})
+
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
 
@@ -1770,11 +1788,6 @@ function(generate_config_defines_header TARGET_DIRECTORY)
 endfunction()
 
 ################################################################################
-# Set basic search paths for the generated HPX headers
-################################################################################
-include_directories("${CMAKE_BINARY_DIR}")
-
-################################################################################
 # Configure compression and other plugins
 ################################################################################
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
@@ -1829,13 +1842,11 @@ if(HPX_WITH_TESTS)
   enable_testing()
   include(CTest)
 
-  include_directories(tests)
   add_subdirectory(tests)
 endif()
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
-  include_directories(examples)
   add_subdirectory(examples)
 endif()
 

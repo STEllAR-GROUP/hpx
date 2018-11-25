@@ -13,7 +13,8 @@ if(Boost_VERSION LESS 106000)
   hpx_error("Boost.SIMD requires using Boost V1.60 or above")
 endif()
 
-include_directories(SYSTEM ${BOOST_SIMD_ROOT}/include)
+add_library(hpx::boost::simd INTERFACE IMPORTED)
+set_property(TARGET hpx::boost::simd PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${BOOST_SIMD_ROOT}/include)
 
 hpx_add_config_define(HPX_HAVE_DATAPAR)
 hpx_add_config_define(HPX_HAVE_DATAPAR_BOOST_SIMD)

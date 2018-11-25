@@ -21,17 +21,15 @@ if(HPX_WITH_EXAMPLES_OPENMP)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
-  include_directories(${QTHREADS_INCLUDE_DIR})
-
   set(benchmarks ${benchmarks} htts2_qthreads)
   set(htts2_qthreads_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARY})
+  set(htts2_qthreads_INCLUDE_DIRECTORIES ${QTHREADS_INCLUDE_DIR})
 endif()
 
 if(HPX_WITH_EXAMPLES_TBB)
-  include_directories(${TBB_INCLUDE_DIR})
-
   set(benchmarks ${benchmarks} htts2_tbb)
   set(htts2_tbb_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARY})
+  set(htts2_tbb_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIR})
 endif()
 
 foreach(benchmark ${benchmarks})
@@ -46,6 +44,8 @@ foreach(benchmark ${benchmarks})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
+
+  target_include_directories(${benchmark} SYSTEM PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.htts_v2.${benchmark})
