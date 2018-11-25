@@ -455,6 +455,8 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       endif()
     endif()
 
+    target_link_libraries(hpx_wrap PUBLIC hpx)
+
     set_property(TARGET hpx_wrap APPEND
       PROPERTY COMPILE_DEFINITIONS
       "HPX_APPLICATION_EXPORTS"
