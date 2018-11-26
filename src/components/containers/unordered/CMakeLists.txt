@@ -12,5 +12,9 @@ add_hpx_component(unordered
   AUTOGLOB
   ESSENTIAL)
 
+if (TARGET hpx::apex)
+    target_link_libraries(unordered_component PRIVATE hpx::apex)
+endif()
+
 add_hpx_pseudo_dependencies(components.containers_.unordered unordered_component)
 

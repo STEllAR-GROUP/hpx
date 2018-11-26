@@ -298,11 +298,11 @@ if (TARGET hpx::vc)
 endif()
 
 if (TARGET hpx::amplifier)
-  target_link_libraries(hpx INTERFACE hpx::amplifier)
+  target_link_libraries(hpx PRIVATE hpx::amplifier)
 endif()
 
 if (TARGET hpx::apex)
-  target_link_libraries(hpx PRIVATE hpx::apex)
+  target_link_libraries(hpx PUBLIC hpx::apex)
 endif()
 
 if (TARGET hpx::gperftools)
@@ -456,6 +456,10 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
     endif()
 
     target_link_libraries(hpx_wrap PUBLIC hpx)
+
+    if (TARGET hpx::apex)
+      target_link_libraries(hpx_wrap PRIVATE hpx::apex)
+    endif()
 
     set_property(TARGET hpx_wrap APPEND
       PROPERTY COMPILE_DEFINITIONS

@@ -12,6 +12,10 @@ add_hpx_component(partitioned_vector
   AUTOGLOB
   ESSENTIAL)
 
+if (TARGET hpx::apex)
+    target_link_libraries(partitioned_vector_component PRIVATE hpx::apex)
+endif()
+
 target_compile_definitions(partitioned_vector_component
   PRIVATE HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
 

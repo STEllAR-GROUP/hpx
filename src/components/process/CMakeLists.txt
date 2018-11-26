@@ -17,6 +17,10 @@ target_link_libraries(process_component PRIVATE Boost::iostreams
                                                 Boost::system
                                                 Boost::disable_autolinking)
 
+if (TARGET hpx::apex)
+    target_link_libraries(process_component PRIVATE hpx::apex)
+endif()
+
 add_hpx_pseudo_dependencies(components.process_ process_component)
 add_hpx_pseudo_dependencies(core components.process_)
 

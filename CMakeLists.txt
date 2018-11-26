@@ -1616,6 +1616,7 @@ if(HPX_WITH_APEX)
   add_library(hpx::apex INTERFACE IMPORTED)
 
   target_include_directories(hpx::apex SYSTEM INTERFACE ${APEX_SOURCE_DIR})
+  target_link_libraries(hpx::apex INTERFACE apex)
 
   if(APEX_WITH_MSR)
     add_library(hpx::msr INTERFACE IMPORTED)

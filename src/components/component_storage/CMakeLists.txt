@@ -22,6 +22,10 @@ else()
     EXCLUDE_FROM_ALL)
 endif()
 
+if (TARGET hpx::apex)
+  target_link_libraries(component_storage_component PRIVATE hpx::apex)
+endif()
+
 add_hpx_pseudo_dependencies(components.component_storage_
   component_storage_component)
 add_hpx_pseudo_dependencies(core components.component_storage_)

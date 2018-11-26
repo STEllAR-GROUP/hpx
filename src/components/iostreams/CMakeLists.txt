@@ -21,6 +21,10 @@ else()
     EXCLUDE_FROM_ALL)
 endif()
 
+if (TARGET hpx::apex)
+  target_link_libraries(iostreams_component PRIVATE hpx::apex)
+endif()
+
 target_link_libraries(iostreams_component PRIVATE Boost::iostreams Boost::filesystem Boost::disable_autolinking)
 
 add_hpx_pseudo_dependencies(components.iostreams_ iostreams_component)
