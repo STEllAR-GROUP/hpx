@@ -97,7 +97,7 @@ foreach(header ${headers})
         FOLDER "Tests/Headers/${header_dir}")
 
       # make sure #including 'hpx/config/autolink.hpp' does not cause errors
-      target_compile_definitions("${test_name}_lib" PUBLIC -DHPX_AUTOLINK_LIB_NAME=hpx)
+      target_compile_definitions(${test_name} PUBLIC -DHPX_AUTOLINK_LIB_NAME=hpx)
 
       # add a custom target for this example
       add_hpx_pseudo_target(tests.headers.${test_name})
@@ -106,7 +106,7 @@ foreach(header ${headers})
       add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
       # add dependencies to pseudo-target
-      add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")
+      add_hpx_pseudo_dependencies(tests.headers.${test_name} ${test_name})
     endif()
 
   endif()
@@ -136,4 +136,4 @@ add_hpx_pseudo_target(tests.headers.${test_name})
 add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")
+add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}")

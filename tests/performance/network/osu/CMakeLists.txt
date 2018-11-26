@@ -35,7 +35,7 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.network.osu_perf.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark})
 endforeach()
 
 
@@ -67,6 +67,6 @@ foreach(benchmark ${coll_benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.network.osu_perf.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark})
 endforeach()
 

@@ -281,10 +281,8 @@ After adding the component, the way you add the executable is as follows:
 
 .. note::
 
-   ``add_hpx_executable`` adds a ``_exe`` suffix to the target name. In the
-   example above a ``hello_world_exe`` target will be created. In addition, a
-   ``_component`` suffix will automatically be added to dependencies specified
-   in ``COMPONENT_DEPENDENCIES``, meaning you can directly use the name given
+   ``add_hpx_executable`` automatically adds a ``_component`` suffix to dependencies
+   specified in ``COMPONENT_DEPENDENCIES``, meaning you can directly use the name given
    when adding a component using ``add_hpx_component``.
 
 When you configure your application, all you need to do is set the ``HPX_DIR``

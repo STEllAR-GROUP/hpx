@@ -34,7 +34,7 @@ function(add_bzip2_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARIES})
 
-    add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2_lib)
+    add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)
   endif()
 endfunction()

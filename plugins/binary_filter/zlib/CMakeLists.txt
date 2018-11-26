@@ -34,7 +34,7 @@ function(add_zlib_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARIES})
 
-    add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib_lib)
+    add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)
   endif()
 endfunction()

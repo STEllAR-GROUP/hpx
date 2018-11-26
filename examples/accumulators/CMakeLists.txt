@@ -41,5 +41,5 @@ foreach(example ${examples})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.accumulators.${example}
-                              ${example}_client_exe)
+                              ${example}_client)
 endforeach()

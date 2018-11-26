@@ -7,5 +7,5 @@ add_hpx_executable(hpx_runtime
     SOURCES hpx_runtime.cpp
     FOLDER "Runtime")
 
-add_hpx_pseudo_dependencies(runtime hpx_runtime_exe)
+add_hpx_pseudo_dependencies(runtime hpx_runtime)
 

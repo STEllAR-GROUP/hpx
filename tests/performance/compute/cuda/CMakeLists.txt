@@ -38,5 +38,5 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.compute.cuda.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark})
 endforeach()
