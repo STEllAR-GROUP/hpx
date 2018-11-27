@@ -185,7 +185,11 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_HAVE_MAX_CPU_COUNT)
+    mask_type topology::empty_mask = mask_type(hardware_concurrency());
+#else
     mask_type topology::empty_mask = mask_type();
+#endif
 
     topology::topology()
       : topo(nullptr), machine_affinity_mask_(0)
@@ -1054,7 +1058,9 @@ namespace hpx { namespace threads
         ) const
     { // {{{
         if (std::size_t(-1) == core)
+        {
             return default_mask;
+        }
 
         hwloc_obj_t core_obj = nullptr;
 
@@ -1344,7 +1350,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(kernel_error,
                 "hpx::threads::topology::get_area_membind_nodeset",
                 "hwloc_get_area_membind_nodeset failed");
-            return -1;
+            return bitmap_to_mask(ns, HWLOC_OBJ_MACHINE);
             std::cout << "error in  ";
         }
         return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
@@ -1410,6 +1416,7 @@ namespace hpx { namespace threads
         hwloc_obj_type_t htype) const
     {
         mask_type mask = mask_type();
+        resize(mask, get_number_of_pus());
         std::size_t num = hwloc_get_nbobjs_by_type(topo, htype);
         //
         int const pu_depth = hwloc_get_type_or_below_depth(topo, htype);

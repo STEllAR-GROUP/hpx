@@ -7,6 +7,7 @@
 #define HPX_SERIALIZATION_DYNAMIC_BITSET_HPP
 
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <cstddef>
 #include <vector>
