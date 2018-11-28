@@ -50,6 +50,12 @@ namespace hpx
         /// Construct a hpx::exception from a boost#system_error.
         explicit exception(boost::system::system_error const& e);
 
+        /// Construct a hpx::exception from a boost#system#error_code (this is
+        /// new for Boost V1.69). This constructor is required to compensate
+        /// for the changes introduced as a resolution to LWG3162
+        /// (https://cplusplus.github.io/LWG/issue3162).
+        explicit exception(boost::system::error_code const& e);
+
         /// Construct a hpx::exception from a \a hpx::error and an error message.
         ///
         /// \param e      The parameter \p e holds the hpx::error code the new
