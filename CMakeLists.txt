@@ -643,7 +643,7 @@ hpx_option(HPX_WITH_HPXMP BOOL
   "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP")
 if(HPX_WITH_HPXMP)
   if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
+    OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
     hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
       "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
   else()
@@ -1344,6 +1344,17 @@ if(HPX_WITH_COMPILER_WARNINGS)
       # The file contains a character starting at offset ... that is illegal in
       # the current source character set
       hpx_add_compile_flag(-wd4828)
+    endif()
+
+    if(HPX_WITH_DATAPAR_VC)
+      # unary minus operator applied to unsigned type, result still unsigned
+      hpx_add_compile_flag(-wd4146)
+
+      # '<=': signed/unsigned mismatch
+      hpx_add_compile_flag(-wd4018)
+
+      # 'return': conversion from 'short' to 'Vc_1::schar', possible loss of data
+      hpx_add_compile_flag(-wd4244)
     endif()
 
   else() # Trial and error approach for any other compiler ...
