@@ -1,9 +1,7 @@
-////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//  Copyright (c) 2018 Maximilian Bremer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
@@ -20,7 +18,7 @@ bool b_dtor = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Concrete
-struct A : hpx::components::managed_component_base<A>
+struct A : hpx::components::component_base<A>
 {
     A() { a_ctor = true; }
     virtual ~A() { a_dtor = true; }
@@ -30,7 +28,7 @@ struct A : hpx::components::managed_component_base<A>
     HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
 };
 
-typedef hpx::components::managed_component<A> serverA_type;
+typedef hpx::components::simple_component<A> serverA_type;
 HPX_REGISTER_COMPONENT(serverA_type, A);
 
 typedef A::test0_action test0_action;
@@ -39,14 +37,16 @@ HPX_REGISTER_ACTION(test0_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Concrete
-struct B : A, hpx::components::managed_component_base<B>
+struct B : A, hpx::components::component_base<B>
 {
-    typedef hpx::components::managed_component_base<B>::wrapping_type
+    typedef hpx::components::component_base<B>::wrapping_type
         wrapping_type;
-    typedef hpx::components::managed_component_base<B>::wrapped_type
+    typedef hpx::components::component_base<B>::wrapped_type
         wrapped_type;
-    using hpx::components::managed_component_base<B>::set_back_ptr;
-    using hpx::components::managed_component_base<B>::finalize;
+
+    using hpx::components::component_base<B>::finalize;
+    using hpx::components::component_base<B>::get_base_gid;
+    using hpx::components::component_base<B>::get_current_address;
 
     typedef B type_holder;
     typedef A base_type_holder;
@@ -60,7 +60,7 @@ struct B : A, hpx::components::managed_component_base<B>
     HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action);
 };
 
-typedef hpx::components::managed_component<B> serverB_type;
+typedef hpx::components::simple_component<B> serverB_type;
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverB_type, B, "A");
 
 typedef B::test1_action test1_action;
@@ -164,4 +164,3 @@ int main()
 
     return 0;
 }
-
