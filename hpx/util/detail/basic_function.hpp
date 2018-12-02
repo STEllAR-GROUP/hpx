@@ -57,21 +57,12 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename R, typename ...Ts>
     class function_base<VTable, R(Ts...)>
     {
-        // make sure the empty table instance is initialized in time, even
-        // during early startup
-        static VTable const* get_empty_table()
-        {
-            static VTable const empty_table =
-                detail::construct_vtable<detail::empty_function<R(Ts...)> >();
-            return &empty_table;
-        }
-
     public:
         function_base() noexcept
-          : vptr(get_empty_table())
+          : vptr(detail::get_empty_function_vtable<VTable>())
         {
             std::memset(object, 0, vtable::function_storage_size);
-            vtable::default_construct<empty_function<R(Ts...)> >(object);
+            vtable::default_construct<empty_function>(object);
         }
 
         function_base(function_base&& other) noexcept
@@ -79,8 +70,8 @@ namespace hpx { namespace util { namespace detail
         {
             // move-construct
             std::memcpy(object, other.object, vtable::function_storage_size);
-            other.vptr = get_empty_table();
-            vtable::default_construct<empty_function<R(Ts...)> >(other.object);
+            other.vptr = detail::get_empty_function_vtable<VTable>();
+            vtable::default_construct<empty_function>(other.object);
         }
 
         ~function_base()
@@ -116,7 +107,7 @@ namespace hpx { namespace util { namespace detail
                     vtable::reconstruct<target_type>(object, std::forward<F>(f));
                 } else {
                     reset();
-                    vtable::_delete<empty_function<R(Ts...)> >(object);
+                    vtable::_delete<empty_function>(object);
 
                     vptr = f_vptr;
                     vtable::construct<target_type>(object, std::forward<F>(f));
@@ -128,12 +119,12 @@ namespace hpx { namespace util { namespace detail
 
         void reset() noexcept
         {
-            if (!vptr->empty)
+            if (!empty())
             {
                 vptr->delete_(object);
 
-                vptr = get_empty_table();
-                vtable::default_construct<empty_function<R(Ts...)> >(object);
+                vptr = detail::get_empty_function_vtable<VTable>();
+                vtable::default_construct<empty_function>(object);
             }
         }
 
@@ -145,7 +136,7 @@ namespace hpx { namespace util { namespace detail
 
         bool empty() const noexcept
         {
-            return vptr->empty;
+            return vptr == detail::get_empty_function_vtable<VTable>();
         }
 
         explicit operator bool() const noexcept

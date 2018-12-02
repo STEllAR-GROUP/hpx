@@ -14,6 +14,7 @@
 #include <hpx/traits/get_function_annotation.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
+#include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/function_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
@@ -53,15 +54,10 @@ namespace hpx { namespace util
         function(function const& other)
           : base_type()
         {
-            detail::vtable::_delete<
-                detail::empty_function<R(Ts...)>
-            >(this->object);
+            detail::vtable::_delete<detail::empty_function>(this->object);
 
             this->vptr = other.vptr;
-            if (!this->vptr->empty)
-            {
-                this->vptr->copy(this->object, other.object);
-            }
+            this->vptr->copy(this->object, other.object);
         }
 
         function(function&& other) noexcept
@@ -87,15 +83,10 @@ namespace hpx { namespace util
             if (this != &other)
             {
                 reset();
-                detail::vtable::_delete<
-                    detail::empty_function<R(Ts...)>
-                >(this->object);
+                detail::vtable::_delete<detail::empty_function>(this->object);
 
                 this->vptr = other.vptr;
-                if (!this->vptr->empty)
-                {
-                    this->vptr->copy(this->object, other.object);
-                }
+                this->vptr->copy(this->object, other.object);
             }
             return *this;
         }
