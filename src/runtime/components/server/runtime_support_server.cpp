@@ -1566,20 +1566,34 @@ namespace hpx { namespace components { namespace server
             bool pre_startup = true;
             if (startup_shutdown->get_startup_function(startup, pre_startup))
             {
-                if (pre_startup)
-                    pre_startup_functions_.push_back(std::move(startup));
-                else
-                    startup_functions_.push_back(std::move(startup));
+                if (!startup.empty())
+                {
+                    if (pre_startup)
+                    {
+                        pre_startup_functions_.push_back(std::move(startup));
+                    }
+                    else
+                    {
+                        startup_functions_.push_back(std::move(startup));
+                    }
+                }
             }
 
             shutdown_function_type shutdown;
             bool pre_shutdown = false;
             if (startup_shutdown->get_shutdown_function(shutdown, pre_shutdown))
             {
-                if (pre_shutdown)
-                    pre_shutdown_functions_.push_back(std::move(shutdown));
-                else
-                    shutdown_functions_.push_back(std::move(shutdown));
+                if (!shutdown.empty())
+                {
+                    if (pre_shutdown)
+                    {
+                        pre_shutdown_functions_.push_back(std::move(shutdown));
+                    }
+                    else
+                    {
+                        shutdown_functions_.push_back(std::move(shutdown));
+                    }
+                }
             }
         }
         catch (hpx::exception const&) {
