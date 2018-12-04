@@ -136,7 +136,7 @@ namespace hpx { namespace util { namespace detail
 
         bool empty() const noexcept
         {
-            return vptr == detail::get_empty_function_vtable<VTable>();
+            return vptr->empty;
         }
 
         explicit operator bool() const noexcept
