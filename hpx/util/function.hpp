@@ -54,10 +54,12 @@ namespace hpx { namespace util
         function(function const& other)
           : base_type()
         {
-            detail::vtable::_delete<detail::empty_function>(this->object);
-
             this->vptr = other.vptr;
-            this->vptr->copy(this->object, other.object);
+            if (other.object != nullptr)
+            {
+                this->object = this->vptr->copy(
+                    this->storage, detail::function_storage_size, other.object);
+            }
         }
 
         function(function&& other) noexcept
@@ -83,10 +85,15 @@ namespace hpx { namespace util
             if (this != &other)
             {
                 reset();
-                detail::vtable::_delete<detail::empty_function>(this->object);
 
                 this->vptr = other.vptr;
-                this->vptr->copy(this->object, other.object);
+                if (other.object != nullptr)
+                {
+                    this->object = this->vptr->copy(
+                        this->storage, detail::function_storage_size, other.object);
+                } else {
+                    this->object = nullptr;
+                }
             }
             return *this;
         }

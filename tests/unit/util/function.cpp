@@ -177,7 +177,7 @@ int hpx_main(variables_map& vm)
 {
     {
         {
-            if (sizeof(small_object) <= hpx::util::detail::vtable::function_storage_size)
+            if (sizeof(small_object) <= hpx::util::detail::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
@@ -198,7 +198,7 @@ int hpx_main(variables_map& vm)
         }
 
         {
-            if (sizeof(big_object) <= hpx::util::detail::vtable::function_storage_size)
+            if (sizeof(big_object) <= hpx::util::detail::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
@@ -223,7 +223,7 @@ int hpx_main(variables_map& vm)
     // non serializable version
     {
         {
-            if (sizeof(small_object) <= hpx::util::detail::vtable::function_storage_size)
+            if (sizeof(small_object) <= hpx::util::detail::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
@@ -244,7 +244,7 @@ int hpx_main(variables_map& vm)
         }
 
         {
-            if (sizeof(big_object) <= hpx::util::detail::vtable::function_storage_size)
+            if (sizeof(big_object) <= hpx::util::detail::function_storage_size)
                 std::cout << "object is small\n";
             else
                 std::cout << "object is large\n";
