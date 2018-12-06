@@ -11,21 +11,24 @@
 #include <hpx/config.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
+#include <cstddef>
+
 namespace hpx { namespace util { namespace detail
 {
     struct copyable_vtable
     {
         template <typename T>
-        HPX_FORCEINLINE static void _copy(void** v, void* const* src)
+        HPX_FORCEINLINE static void* _copy(
+            void* storage, std::size_t storage_size, void const* src)
         {
-            if (sizeof(T) <= vtable::function_storage_size)
+            if (sizeof(T) <= storage_size)
             {
-                new (v) T(vtable::get<T>(src));
+                return new (storage) T(vtable::get<T>(src));
             } else {
-                *v = new T(vtable::get<T>(src));
+                return new T(vtable::get<T>(src));
             }
         }
-        void (*copy)(void**, void* const*);
+        void* (*copy)(void*, std::size_t, void const*);
 
         template <typename T>
         HPX_CONSTEXPR copyable_vtable(construct_vtable<T>) noexcept

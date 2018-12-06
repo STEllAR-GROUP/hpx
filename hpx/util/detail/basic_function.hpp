@@ -27,6 +27,8 @@
 
 namespace hpx { namespace util { namespace detail
 {
+    static const std::size_t function_storage_size = 3*sizeof(void*);
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     static bool is_empty_function(F const&, std::false_type) noexcept
@@ -60,23 +62,25 @@ namespace hpx { namespace util { namespace detail
     public:
         function_base() noexcept
           : vptr(detail::get_empty_function_vtable<VTable>())
-        {
-            std::memset(object, 0, vtable::function_storage_size);
-            vtable::default_construct<empty_function>(object);
-        }
+          , object(nullptr)
+        {}
 
         function_base(function_base&& other) noexcept
           : vptr(other.vptr)
+          , object(other.object)
         {
-            // move-construct
-            std::memcpy(object, other.object, vtable::function_storage_size);
+            if (object == &other.storage)
+            {
+                std::memcpy(storage, other.storage, function_storage_size);
+                object = &storage;
+            }
             other.vptr = detail::get_empty_function_vtable<VTable>();
-            vtable::default_construct<empty_function>(other.object);
+            other.object = nullptr;
         }
 
         ~function_base()
         {
-            vptr->delete_(object);
+            reset();
         }
 
         function_base& operator=(function_base&& other) noexcept
@@ -97,46 +101,42 @@ namespace hpx { namespace util { namespace detail
         template <typename F>
         void assign(F&& f)
         {
+            reset();
+
             if (!is_empty_function(f))
             {
                 typedef typename std::decay<F>::type target_type;
-
-                VTable const* f_vptr = get_vtable<target_type>();
-                if (vptr == f_vptr)
-                {
-                    vtable::reconstruct<target_type>(object, std::forward<F>(f));
-                } else {
-                    reset();
-                    vtable::_delete<empty_function>(object);
-
-                    vptr = f_vptr;
-                    vtable::construct<target_type>(object, std::forward<F>(f));
-                }
-            } else {
-                reset();
+                vptr = get_vtable<target_type>();
+                object = vtable::construct<target_type>(
+                    storage, function_storage_size, std::forward<F>(f));
             }
         }
 
         void reset() noexcept
         {
-            if (!empty())
+            if (object != nullptr)
             {
-                vptr->delete_(object);
+                vptr->delete_(object, function_storage_size);
 
                 vptr = detail::get_empty_function_vtable<VTable>();
-                vtable::default_construct<empty_function>(object);
+                object = nullptr;
             }
         }
 
         void swap(function_base& f) noexcept
         {
             std::swap(vptr, f.vptr);
-            std::swap(object, f.object); // swap
+            std::swap(object, f.object);
+            std::swap(storage, f.storage);
+            if (object == &f.storage)
+                object = &storage;
+            if (f.object == &storage)
+                f.object = &f.storage;
         }
 
         bool empty() const noexcept
         {
-            return vptr->empty;
+            return object == nullptr;
         }
 
         explicit operator bool() const noexcept
@@ -218,7 +218,8 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         VTable const *vptr;
-        mutable void* object[(vtable::function_storage_size / sizeof(void*))];
+        void* object;
+        mutable unsigned char storage[function_storage_size];
     };
 
     template <typename Sig, typename VTable>
@@ -273,7 +274,8 @@ namespace hpx { namespace util { namespace detail
                 ar >> name;
 
                 this->vptr = detail::get_vtable<vtable>(name);
-                this->vptr->load_object(this->object, ar, version);
+                this->object = this->vptr->load_object(
+                    this->storage, function_storage_size, ar, version);
             }
         }
 
