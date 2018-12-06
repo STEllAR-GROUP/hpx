@@ -82,8 +82,16 @@ namespace hpx { namespace util
 
         function& operator=(function const& other)
         {
-            if (this != &other)
+            if (this->vptr == other.vptr)
             {
+                if (this != &other)
+                {
+                    // reuse object storage
+                    this->vptr->destruct(this->object);
+                    this->object = this->vptr->copy(
+                        this->object, -1, other.object);
+                }
+            } else {
                 reset();
 
                 this->vptr = other.vptr;
