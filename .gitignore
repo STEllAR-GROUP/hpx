@@ -12,3 +12,4 @@
 /.dockerignore
 .ycm_extra_conf.py
 apex
+CMakeLists.txt.user
