@@ -1,0 +1,38 @@
+#  Copyright (c) 2018 Thomas Heller
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# The cmake configure step. This should be reused for the different configurations
+# Environment variables affecting the build:
+#  - CMAKE_BUILD_TYPE: Set the CMAKE_BUILD_TYPE
+#  - CMAKE_EXTRA_FLAGS: Extra flags passed to cmake (for example to enable clang-tidy checks)
+#
+#  TODO: add more options
+.cmake:
+    image: stellargroup/build_env:ubuntu
+    stage: cmake
+    script:
+        - mkdir -p build
+        - cd build
+        - cmake --version
+        - cmake source -G "Ninja"
+            -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
+            -DHPX_WITH_MALLOC=system
+            -DHPX_WITH_GIT_COMMIT=${CI_COMMIT_SHA}
+            -DHPX_WITH_GIT_BRANCH="${CI_COMMIT_REF_NAME}"
+            -DHPX_WITH_GIT_TAG="${CI_COMMIT_TAG}"
+            -DHPX_WITH_TOOLS=On
+            -DCMAKE_CXX_FLAGS="-fcolor-diagnostics"
+            -DHPX_WITH_TESTS_HEADERS=On
+            -DHPX_WITH_DEPRECATION_WARNINGS=Off
+            -DHPX_WITH_THREAD_LOCAL_STORAGE=On
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+            -DHPX_WITH_DOCUMENTATION=On
+            ${CMAKE_EXTRA_FLAGS}
+    except:
+        - gh-pages
+    artifacts:
+        paths:
+            - build
+
