@@ -1,0 +1,40 @@
+#  Copyright (c) 2018 Thomas Heller
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# The docker step builds the Docker image for the corresponding build.
+# The target image can be set via the TARGET_IMAGE_NAME variable
+.docker:
+    image: stellargroup/build_env:ubuntu
+    stage: deploy
+    script:
+        - cp source/tools/docker/Dockerfile /usr/local/
+        - cd build
+        - cmake . -DHPX_WITH_DOCUMENTATION=Off
+        - ninja install
+        - curl -L -o /tmp/docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-18.03.0-ce.tgz
+        - tar -xz -C /tmp -f /tmp/docker.tgz
+        - mv /tmp/docker/* /usr/bin
+        - cd /usr/local
+        - docker build -t ${TARGET_IMAGE_NAME} .
+        - docker create -v /hpx --name sources-${CI_JOB_ID} stellargroup/hpx:dev /bin/true
+        - docker cp /builds/stellar-group/hpx/source/examples/quickstart/hello_world.cpp sources-${CI_JOB_ID}:/hpx
+        - docker run --volumes-from sources-${CI_JOB_ID} -w /hpx ${TARGET_IMAGE_NAME}
+            hpxcxx --exe=hello_world_test_build
+            hello_world.cpp -g -lhpx_iostreamsd
+        - docker run --volumes-from sources-${CI_JOB_ID} -w /hpx ${TARGET_IMAGE_NAME}
+            ./hello_world_test_build --hpx:bind=none
+        - docker run --volumes-from sources-${CI_JOB_ID} -w /hpx ${TARGET_IMAGE_NAME}
+            hpxrun.py -l 2 -t 2 ./hello_world_test_build -- --hpx:bind=none
+        - if [ -z "$CI_MERGE_REQUEST_ID" ] && [ "$CI_COMMIT_REF_NAME" == "master" ]; then
+            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+            docker push ${TARGET_IMAGE_NAME}
+          else
+            echo "Skipping docker push on non-master branch";
+          fi
+    after_script:
+        - docker rm sources-${CI_JOB_ID}
+    except:
+        - gh-pages
+

@@ -1,0 +1,55 @@
+#  Copyright (c) 2018 Thomas Heller
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# These are the doc steps. They are factored out, but merely depend on
+# one single build.
+
+build docs:
+    image: stellargroup/build_env:ubuntu
+    stage: build
+    script:
+        - cd build
+        - ninja docs
+    except:
+        - gh-pages
+    artifacts:
+        when: on_success
+        paths:
+            - build
+    dependencies:
+        - checkout
+        - cmake Debug x86
+    tags:
+        - linux
+        - x86
+        - clang-7.0.1
+        - boost-1.65.1
+
+push docs:
+    image: stellargroup/build_env:ubuntu
+    stage: deploy
+    variables:
+      # This is the public key of GitHub. If it changes it needs to be changed
+      # manually here. It can be retrieved with ssh-keyscan -H github.com.
+      GITHUB_PUBLIC_KEY: "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
+    script:
+        - mkdir -p ~/.ssh
+        - echo $GITHUB_PUBLIC_KEY >> ~/.ssh/known_hosts
+        - git config --global user.name "StellarBot"
+        - git config --global user.email "stellar@cct.lsu.edu"
+        - cd build
+        - ninja git_docs
+    only:
+        - master
+        - release
+    dependencies:
+        - checkout
+        - build docs
+    tags:
+        - linux
+        - x86
+        - clang-7.0.1
+        - boost-1.65.1
+
