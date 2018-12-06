@@ -101,14 +101,26 @@ namespace hpx { namespace util { namespace detail
         template <typename F>
         void assign(F&& f)
         {
-            reset();
-
             if (!is_empty_function(f))
             {
                 typedef typename std::decay<F>::type target_type;
-                vptr = get_vtable<target_type>();
-                object = vtable::construct<target_type>(
-                    storage, function_storage_size, std::forward<F>(f));
+
+                VTable const* f_vptr = get_vtable<target_type>();
+                if (vptr == f_vptr)
+                {
+                    // reuse object storage
+                    vtable::_destruct<target_type>(object);
+                    object = vtable::construct<target_type>(
+                        object, -1, std::forward<F>(f));
+                } else {
+                    reset();
+
+                    vptr = f_vptr;
+                    object = vtable::construct<target_type>(
+                        storage, function_storage_size, std::forward<F>(f));
+                }
+            } else {
+                reset();
             }
         }
 
