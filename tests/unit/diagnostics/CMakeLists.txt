@@ -5,10 +5,18 @@
 
 set(tests
     handled_exception
-    unhandled_exception
    )
 
-set(unhandled_exception_PARAMETERS FAILURE_EXPECTED)
+if(HPX_WITH_FAIL_COMPILE_TESTS)
+  set(fail_compile_tests
+      unhandled_exception
+     )
+  foreach(fail_compile_test ${fail_compile_tests})
+    set(${fail_compile_test}_PARAMETERS FAILURE_EXPECTED)
+  endforeach()
+
+  set(tests ${tests} ${fail_compile_tests})
+endif()
 
 foreach(test ${tests})
   set(sources
@@ -35,6 +43,6 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.diagnostics.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 

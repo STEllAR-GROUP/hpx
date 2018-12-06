@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <exception>
 #include <string>
 #include <stdexcept>
@@ -519,12 +520,9 @@ namespace std
     template <typename T>
     struct hash<hpx::util::optional<T>>
     {
-        typedef typename hash<T>::result_type result_type;
-        typedef hpx::util::optional<T> argument_type;
-
-        HPX_CONSTEXPR result_type operator()(argument_type const& arg) const
+        HPX_CONSTEXPR std::size_t operator()(::hpx::util::optional<T> const& arg) const
         {
-            return arg ? std::hash<T>{}(*arg) : result_type{};
+            return arg ? std::hash<T>{}(*arg) : std::size_t{};
         }
     };
 }

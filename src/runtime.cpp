@@ -12,10 +12,10 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>    // EXPORTS get_next_id
 #include <hpx/runtime/config_entry.hpp>
@@ -45,6 +45,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -239,6 +240,11 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier::on_startstop_type global_on_start_func;
+    threads::policies::callback_notifier::on_startstop_type global_on_stop_func;
+    threads::policies::callback_notifier::on_error_type global_on_error_func;
+
+    ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(util::runtime_configuration & rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
@@ -246,7 +252,10 @@ namespace hpx
         topology_(resource::get_partitioner().get_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
-        runtime_support_(new components::server::runtime_support(ini_))
+        runtime_support_(new components::server::runtime_support(ini_)),
+        on_start_func_(global_on_start_func),
+        on_stop_func_(global_on_stop_func),
+        on_error_func_(global_on_error_func)
     {
         LPROGRESS_;
 
@@ -691,6 +700,146 @@ namespace hpx
             hpx::resource::get_partitioner().assign_cores(first_core);
 
         return static_cast<std::uint32_t>(cores_needed);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier::on_startstop_type
+        runtime::on_start_func() const
+    {
+        return on_start_func_;
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+        runtime::on_stop_func() const
+    {
+        return on_stop_func_;
+    }
+
+    threads::policies::callback_notifier::on_error_type
+        runtime::on_error_func() const
+    {
+        return on_error_func_;
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    runtime::on_start_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(on_start_func_, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    runtime::on_stop_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(on_stop_func_, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_error_type
+    runtime::on_error_func(
+        threads::policies::callback_notifier::on_error_type&& f)
+    {
+        threads::policies::callback_notifier::on_error_type newf =
+            std::move(f);
+        std::swap(on_error_func_, newf);
+        return newf;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier::on_startstop_type
+        get_thread_on_start_func()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_start_func();
+        }
+        else
+        {
+            return global_on_start_func;
+        }
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+        get_thread_on_stop_func()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_stop_func();
+        }
+        else
+        {
+            return global_on_stop_func;
+        }
+    }
+
+    threads::policies::callback_notifier::on_error_type
+        get_thread_on_error_func()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_error_func();
+        }
+        else
+        {
+            return global_on_error_func;
+        }
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    register_thread_on_start_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_start_func(std::move(f));
+        }
+
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(global_on_start_func, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_startstop_type
+    register_thread_on_stop_func(
+        threads::policies::callback_notifier::on_startstop_type&& f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_stop_func(std::move(f));
+        }
+
+        threads::policies::callback_notifier::on_startstop_type newf =
+            std::move(f);
+        std::swap(global_on_stop_func, newf);
+        return newf;
+    }
+
+    threads::policies::callback_notifier::on_error_type
+    register_thread_on_error_func(
+        threads::policies::callback_notifier::on_error_type&& f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+        {
+            return rt->on_error_func(std::move(f));
+        }
+
+        threads::policies::callback_notifier::on_error_type newf =
+            std::move(f);
+        std::swap(global_on_error_func, newf);
+        return newf;
     }
 
     ///////////////////////////////////////////////////////////////////////////

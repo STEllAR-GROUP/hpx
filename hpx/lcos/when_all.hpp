@@ -144,6 +144,7 @@ namespace hpx
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
+#include <hpx/util/internal_allocator.hpp>
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -240,7 +241,8 @@ namespace hpx { namespace lcos
 
             typename frame_type::base_type::init_no_addref no_addref;
 
-            auto frame = util::traverse_pack_async(
+            auto frame = util::traverse_pack_async_allocator(
+                util::internal_allocator<>{},
                 util::async_traverse_in_place_tag<frame_type>{}, no_addref,
                 func(std::forward<T>(args))...);
 

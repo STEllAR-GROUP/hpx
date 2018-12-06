@@ -12,17 +12,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
-#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
-#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -35,11 +36,11 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/pp/cat.hpp>
 #include <hpx/util/detail/pp/expand.hpp>
 #include <hpx/util/detail/pp/nargs.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
-#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/tuple.hpp>
@@ -359,8 +360,8 @@ namespace hpx { namespace actions
                 Policy const& policy, IdOrPolicy const& id_or_policy,
                 error_code& ec, Ts&&... vs)
             {
-                return hpx::async<basic_action>(policy, id_or_policy,
-                    std::forward<Ts>(vs)...).get(ec);
+                return hpx::sync<basic_action>(policy, id_or_policy,
+                    std::forward<Ts>(vs)...);
             }
         };
 
@@ -621,7 +622,6 @@ namespace hpx { namespace actions
         console_error_sink_action_id,
         console_logging_action_id,
         console_print_action_id,
-        create_memory_block_action_id,
         create_performance_counter_action_id,
         dijkstra_termination_action_id,
         free_component_action_id,
@@ -647,11 +647,6 @@ namespace hpx { namespace actions
         locality_namespace_get_num_threads_action_id,
         locality_namespace_get_num_overall_threads_action_id,
         locality_namespace_statistics_counter_action_id,
-        memory_block_checkin_action_id,
-        memory_block_checkout_action_id,
-        memory_block_clone_action_id,
-        memory_block_get_action_id,
-        memory_block_get_config_action_id,
         output_stream_write_async_action_id,
         output_stream_write_sync_action_id,
         performance_counter_get_counter_info_action_id,
@@ -691,8 +686,6 @@ namespace hpx { namespace actions
         terminate_action_id,
         terminate_all_action_id,
         update_agas_cache_action_id,
-        register_worker_security_action_id,
-        notify_worker_security_action_id,
 
         base_lco_with_value_gid_get,
         base_lco_with_value_gid_set,

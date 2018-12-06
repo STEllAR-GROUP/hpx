@@ -5,10 +5,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(hpx_detect_cpp_dialect_non_msvc)
+function(hpx_detect_cpp_dialect_non_msvc)
 
   if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    set(CXX_FLAG -std=c++11)
+    set(CXX_FLAG -std=c++11 PARENT_SCOPE)
     hpx_info("C++ mode used: C++11")
   else()
 
@@ -19,7 +19,7 @@ macro(hpx_detect_cpp_dialect_non_msvc)
     endif()
 
     if(HPX_WITH_CXX17)
-      set(CXX_FLAG -std=c++17)
+      set(CXX_FLAG -std=c++17 PARENT_SCOPE)
       hpx_add_config_cond_define(BOOST_NO_AUTO_PTR)
       hpx_info("C++ mode used: C++17")
     else()
@@ -30,7 +30,7 @@ macro(hpx_detect_cpp_dialect_non_msvc)
       endif()
 
       if(HPX_WITH_CXX1Z)
-        set(CXX_FLAG -std=c++1z)
+        set(CXX_FLAG -std=c++1z PARENT_SCOPE)
         hpx_add_config_cond_define(BOOST_NO_AUTO_PTR)
         hpx_info("C++ mode used: C++1z")
       else()
@@ -41,7 +41,7 @@ macro(hpx_detect_cpp_dialect_non_msvc)
         endif()
 
         if(HPX_WITH_CXX14)
-          set(CXX_FLAG -std=c++14)
+          set(CXX_FLAG -std=c++14 PARENT_SCOPE)
           # The Intel compiler doesn't appear to have a fully functional
           # implementation of C++14 constexpr. It's fine with our C++14 constexpr
           # usage in HPX but chokes on Boost.
@@ -59,19 +59,19 @@ macro(hpx_detect_cpp_dialect_non_msvc)
           endif()
 
           if(HPX_WITH_CXX1Y)
-            set(CXX_FLAG -std=c++1y)
+            set(CXX_FLAG -std=c++1y PARENT_SCOPE)
             hpx_info("C++ mode used: C++1y")
           else()
             # ... otherwise try -std=c++11
             check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
             if(HPX_WITH_CXX11)
-              set(CXX_FLAG -std=c++11)
+              set(CXX_FLAG -std=c++11 PARENT_SCOPE)
               hpx_info("C++ mode used: C++11")
             else()
               # ... otherwise try -std=c++0x
               check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
               if(HPX_WITH_CXX0X)
-                set(CXX_FLAG -std=c++0x)
+                set(CXX_FLAG -std=c++0x PARENT_SCOPE)
                 hpx_info("C++ mode used: C++0x")
               endif()
             endif()
@@ -80,9 +80,9 @@ macro(hpx_detect_cpp_dialect_non_msvc)
       endif()
     endif()
   endif()
-endmacro()
+endfunction()
 
-macro(hpx_detect_cpp_dialect)
+function(hpx_detect_cpp_dialect)
 
   if(MSVC)
     set(CXX_FLAG)
@@ -160,7 +160,10 @@ macro(hpx_detect_cpp_dialect)
   endif(MSVC)
 
   if(CXX_FLAG)
-    hpx_add_target_compile_option(${CXX_FLAG})
+    hpx_add_target_compile_option(${CXX_FLAG} PUBLIC)
   endif()
 
-endmacro()
+  # Re-export the local CXX_FLAG varaible.
+  set(CXX_FLAG ${CXX_FLAG} PARENT_SCOPE)
+
+endfunction()

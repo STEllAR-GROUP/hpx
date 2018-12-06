@@ -1724,7 +1724,7 @@ ebmpBYTE BMP::FindClosestColor( RGBApixel& input )
   if( TempMatch < BestMatch )
   { BestI = (ebmpBYTE) i; BestMatch = TempMatch; }
   if( BestMatch < 1 )
-  { i = NumberOfColors; }
+  { break; }
   i++;
  }
  return BestI;

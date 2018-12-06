@@ -6,7 +6,7 @@
 // Simple test verifying basic resource_partitioner functionality.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/include/apply.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -39,7 +39,7 @@ int hpx_main(int argc, char* argv[])
     // Schedule some dummy work
     for (std::size_t i = 0; i < 100000; ++i)
     {
-        hpx::async([](){});
+        hpx::apply([](){});
     }
 
     // Start shutdown
@@ -73,11 +73,18 @@ int main(int argc, char* argv[])
         // These schedulers should succeed
         std::vector<hpx::resource::scheduling_policy> schedulers =
             {
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
                 hpx::resource::scheduling_policy::local,
                 hpx::resource::scheduling_policy::local_priority_fifo,
                 hpx::resource::scheduling_policy::local_priority_lifo,
+#endif
+#if defined(HPX_HAVE_ABP_SCHEDULER)
                 hpx::resource::scheduling_policy::abp_priority_fifo,
-                hpx::resource::scheduling_policy::abp_priority_lifo
+                hpx::resource::scheduling_policy::abp_priority_lifo,
+#endif
+#if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
+                hpx::resource::scheduling_policy::shared_priority,
+#endif
             };
 
         for (auto const scheduler : schedulers)
@@ -90,8 +97,12 @@ int main(int argc, char* argv[])
         // These schedulers should fail
         std::vector<hpx::resource::scheduling_policy> schedulers =
         {
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
             hpx::resource::scheduling_policy::static_,
+#endif
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
             hpx::resource::scheduling_policy::static_priority,
+#endif
         };
 
         for (auto const scheduler : schedulers)

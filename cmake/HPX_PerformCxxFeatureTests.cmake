@@ -9,7 +9,7 @@
 ################################################################################
 # C++ feature tests
 ################################################################################
-macro(hpx_perform_cxx_feature_tests)
+function(hpx_perform_cxx_feature_tests)
 
   # Check the availability of certain C++11 language features
   hpx_check_for_cxx11_alias_templates(
@@ -122,6 +122,9 @@ macro(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_reference_wrapper(
     REQUIRED "HPX needs support for C++11 std::ref and std::reference_wrapper")
 
+  hpx_check_for_cxx11_std_regex(
+    REQUIRED "HPX needs support for C++11 std::regex")
+
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
 
@@ -190,4 +193,4 @@ macro(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx17_fallthrough_attribute(
       DEFINITIONS HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
   endif()
-endmacro()
+endfunction()

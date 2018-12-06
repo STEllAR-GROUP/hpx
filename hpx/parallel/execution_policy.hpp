@@ -27,9 +27,6 @@
 
 #include <memory>
 #include <type_traits>
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-#include <typeinfo>
-#endif
 #include <utility>
 
 namespace hpx { namespace parallel { namespace execution
@@ -86,7 +83,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_task_policy
         ///
         HPX_CONSTEXPR sequenced_task_policy operator()(
-            task_policy_tag tag) const
+            task_policy_tag /*tag*/) const
         {
             return *this;
         }
@@ -115,14 +112,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -263,14 +254,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -395,7 +380,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new sequenced_task_policy
         ///
         HPX_CONSTEXPR sequenced_task_policy operator()(
-            task_policy_tag tag) const
+            task_policy_tag /*tag*/) const
         {
             return sequenced_task_policy();
         }
@@ -423,14 +408,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -567,14 +546,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -702,7 +675,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_task_policy
         ///
         HPX_CONSTEXPR parallel_task_policy operator()(
-            task_policy_tag tag) const
+            task_policy_tag /*tag*/) const
         {
             return *this;
         }
@@ -729,14 +702,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -871,14 +838,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -1002,7 +963,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_policy
         ///
         HPX_CONSTEXPR parallel_task_policy operator()(
-            task_policy_tag tag) const
+            task_policy_tag /*tag*/) const
         {
             return parallel_task_policy();
         }
@@ -1025,14 +986,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -1167,14 +1122,8 @@ namespace hpx { namespace parallel { namespace execution
             typedef typename std::decay<Executor>::type executor_type;
 
             static_assert(
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                hpx::traits::is_executor<executor_type>::value ||
-#endif
                 hpx::traits::is_threads_executor<executor_type>::value ||
                 hpx::traits::is_executor_any<executor_type>::value,
-#if defined(HPX_HAVE_EXECUTOR_COMPATIBILITY)
-                "hpx::traits::is_executor<Executor>::value || "
-#endif
                 "hpx::traits::is_threads_executor<Executor>::value || "
                 "hpx::traits::is_executor_any<Executor>::value");
 
@@ -1285,7 +1234,7 @@ namespace hpx { namespace parallel { namespace execution
         /// \returns The new parallel_unsequenced_policy
         ///
         parallel_unsequenced_policy operator()(
-            task_policy_tag tag) const
+            task_policy_tag /*tag*/) const
         {
             return *this;
         }
@@ -1496,298 +1445,5 @@ namespace hpx { namespace parallel { namespace execution
         /// \endcond
     }
 }}}
-
-#if defined(HPX_HAVE_EXECUTION_POLICY_COMPATIBILITY)
-///////////////////////////////////////////////////////////////////////////////
-// Compatibility layer for changes introduced by C++17
-namespace hpx { namespace parallel { inline namespace v1
-{
-    ///////////////////////////////////////////////////////////////////////////
-    using sequential_task_execution_policy =
-        parallel::execution::sequenced_task_policy;
-    using sequential_execution_policy =
-        parallel::execution::sequenced_policy;
-
-    template <typename Executor, typename Parameters>
-    using sequential_task_execution_policy_shim =
-        parallel::execution::sequenced_task_policy_shim<Executor, Parameters>;
-    template <typename Executor, typename Parameters>
-    using sequential_execution_policy_shim =
-        parallel::execution::sequenced_policy_shim<Executor, Parameters>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    using parallel_task_execution_policy =
-        parallel::execution::parallel_task_policy;
-    using parallel_execution_policy =
-        parallel::execution::parallel_policy;
-
-    template <typename Executor, typename Parameters>
-    using parallel_task_execution_policy_shim =
-        parallel::execution::parallel_task_policy_shim<Executor, Parameters>;
-    template <typename Executor, typename Parameters>
-    using parallel_execution_policy_shim =
-        parallel::execution::parallel_policy_shim<Executor, Parameters>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    using parallel_vector_execution_policy =
-        parallel::execution::parallel_unsequenced_policy;
-
-    using task_execution_policy_tag = parallel::execution::task_policy_tag;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_STATIC_CONSTEXPR sequential_execution_policy seq;
-    HPX_STATIC_CONSTEXPR parallel_execution_policy par;
-    HPX_STATIC_CONSTEXPR parallel_vector_execution_policy par_vec;
-
-    HPX_STATIC_CONSTEXPR task_execution_policy_tag task;
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    ///////////////////////////////////////////////////////////////////////////
-    class execution_policy;
-
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        struct execution_policy_base
-        {
-            virtual ~execution_policy_base() {}
-
-            virtual std::type_info const& type() const noexcept  = 0;
-
-            virtual execution_policy make_async(
-                task_policy_tag tag) const = 0;
-            virtual launch launch_policy() const = 0;
-
-            virtual void* get() noexcept = 0;
-            virtual void const* get() const noexcept = 0;
-        };
-
-        template <typename ExPolicy>
-        struct execution_policy_shim : execution_policy_base
-        {
-            execution_policy_shim(ExPolicy const& policy)
-              : policy_(policy)
-            {}
-            execution_policy_shim(ExPolicy && policy)
-              : policy_(std::move(policy))
-            {}
-
-            std::type_info const& type() const noexcept
-            {
-                return typeid(ExPolicy);
-            }
-
-            // defined below
-            execution_policy make_async(task_policy_tag tag) const;
-            launch launch_policy() const;
-
-            void* get() noexcept
-            {
-                return &policy_;
-            }
-
-            void const* get() const noexcept
-            {
-                return &policy_;
-            }
-
-        private:
-            ExPolicy policy_;
-        };
-
-        template <>
-        struct is_execution_policy<execution_policy>
-          : std::true_type
-        {};
-        /// \endcond
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    ///
-    /// An execution policy is an object that expresses the requirements on the
-    /// ordering of functions invoked as a consequence of the invocation of a
-    /// standard algorithm. Execution policies afford standard algorithms the
-    /// discretion to execute in parallel.
-    ///
-    /// 1. The class execution_policy is a dynamic container for execution
-    ///    policy objects. execution_policy allows dynamic control over
-    ///    standard algorithm execution.
-    /// 2. Objects of type execution_policy shall be constructible and
-    ///    assignable from objects of type T for which
-    ///    is_execution_policy<T>::value is true.
-    ///
-    class execution_policy
-    {
-    private:
-        std::shared_ptr<detail::execution_policy_base> inner_;
-
-    public:
-        /// Effects: Constructs an execution_policy object with a copy of
-        ///          exec's state
-        /// Requires: is_execution_policy<T>::value is true
-        ///
-        /// \param policy Specifies the inner execution policy
-        template <typename ExPolicy>
-        execution_policy(ExPolicy const& policy,
-                typename std::enable_if<
-                    execution::is_execution_policy<ExPolicy>::value &&
-                        !is_rebound_execution_policy<ExPolicy>::value,
-                    ExPolicy
-                >::type* = nullptr)
-          : inner_(std::make_shared<
-                    detail::execution_policy_shim<ExPolicy>
-                >(policy))
-        {}
-
-        /// Move constructs a new execution_policy object.
-        ///
-        /// \param policy Specifies the inner execution policy
-        execution_policy(execution_policy && policy)
-          : inner_(std::move(policy.inner_))
-        {}
-
-        /// Copy constructs a new execution_policy object.
-        ///
-        /// \param rhs Specifies the inner execution policy
-        execution_policy(execution_policy const& rhs)
-          : inner_(rhs.inner_)
-        {}
-
-        /// Extension: Create a new execution_policy holding the current policy
-        /// made asynchronous.
-        ///
-        /// \param tag  [in] Specify that the corresponding asynchronous
-        ///             execution policy should be used
-        ///
-        /// \returns The new execution_policy
-        ///
-        execution_policy operator()(task_policy_tag tag) const
-        {
-            return inner_->make_async(tag);
-        }
-
-        /// Extension: Retrieve default launch policy for this execution policy.
-        ///
-        /// \returns The associated default launch policy
-        ///
-        launch launch_policy() const
-        {
-            return inner_->launch_policy();
-        }
-
-        /// Effects: Assigns a copy of exec's state to *this
-        /// Returns: *this
-        /// Requires: is_execution_policy<T>::value is true
-        ///
-        /// \param policy Specifies the inner execution policy
-        template <typename ExPolicy>
-        typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value &&
-                !is_rebound_execution_policy<ExPolicy>::value,
-            execution_policy
-        >::type&
-        operator=(ExPolicy const& policy)
-        {
-            if (this != &policy)
-            {
-                inner_ = std::make_shared<
-                        detail::execution_policy_shim<ExPolicy>
-                    >(policy);
-            }
-            return *this;
-        }
-
-        /// Move assigns a new execution policy to the object.
-        ///
-        /// \param policy Specifies the inner execution policy
-        execution_policy& operator=(execution_policy && policy)
-        {
-            if (this != &policy)
-                inner_ = std::move(policy.inner_);
-            return *this;
-        }
-
-        /// Returns: typeid(T), such that T is the type of the execution policy
-        ///          object contained by *this
-        std::type_info const& type() const noexcept
-        {
-            return inner_->type();
-        }
-
-        /// Returns: If target_type() == typeid(T), a pointer to the stored
-        ///          execution policy object; otherwise a null pointer
-        /// Requires: is_execution_policy<T>::value is true
-        template <typename ExPolicy>
-        ExPolicy* get() noexcept
-        {
-            static_assert(
-                !(std::is_same<ExPolicy, execution_policy>::value),
-                "Incorrect execution policy parameter.");
-            static_assert(
-                execution::is_execution_policy<ExPolicy>::value,
-                "Execution policy type required.");
-
-            if (inner_->type() != typeid(ExPolicy))
-                return 0;
-
-            return static_cast<ExPolicy*>(inner_->get());
-        }
-
-        /// Returns: If target_type() == typeid(T), a pointer to the stored
-        ///          execution policy object; otherwise a null pointer
-        /// Requires: is_execution_policy<T>::value is true
-        template <typename ExPolicy>
-        ExPolicy const* get() const noexcept
-        {
-            static_assert(
-                !(std::is_same<ExPolicy, execution_policy>::value),
-                "Incorrect execution policy parameter.");
-            static_assert(
-                execution::is_execution_policy<ExPolicy>::value,
-                "Execution policy type required.");
-
-            if (inner_->type() != typeid(ExPolicy))
-                return 0;
-
-            return static_cast<ExPolicy const*>(inner_->get());
-        }
-    };
-
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename ExPolicy>
-        execution_policy execution_policy_shim<ExPolicy>::make_async(
-            task_policy_tag tag) const
-        {
-            return policy_(tag);
-        }
-
-        template <typename ExPolicy, typename Enable = void>
-        struct extract_launch_policy
-        {
-            static launch call() { return launch::async; }
-        };
-
-        template <typename ExPolicy>
-        struct extract_launch_policy<ExPolicy,
-            typename std::enable_if<
-                is_sequenced_execution_policy<ExPolicy>::value
-            >::type>
-        {
-            static launch call() { return launch::deferred; }
-        };
-
-        template <typename ExPolicy>
-        launch
-        execution_policy_shim<ExPolicy>::launch_policy() const
-        {
-            return extract_launch_policy<ExPolicy>::call();
-        }
-        /// \endcond
-    }
-#endif
-}}}
-#endif
 
 #endif

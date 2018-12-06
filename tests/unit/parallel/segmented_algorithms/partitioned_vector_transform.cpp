@@ -14,10 +14,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-// The vector types to be used are defined in partitioned_vector module.
-// HPX_REGISTER_PARTITIONED_VECTOR(double);
-// HPX_REGISTER_PARTITIONED_VECTOR(int);
-
 template <typename U>
 struct pfo
 {
@@ -171,8 +167,7 @@ int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    transform_tests<int,int>(localities);
-    transform_tests<double,int>(localities);
+    transform_tests<int, int>(localities);
 
     return hpx::util::report_errors();
 }

@@ -46,7 +46,9 @@ namespace hpx { namespace threads { namespace executors
             void add(closure_type && f,
                 util::thread_description const& description,
                 threads::thread_state_enum initial_state, bool run_now,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize,
+                threads::thread_schedule_hint schedulehint,
+                error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
@@ -54,7 +56,7 @@ namespace hpx { namespace threads { namespace executors
             void add_at(
                 util::steady_clock::time_point const& abs_time,
                 closure_type && f, util::thread_description const& description,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
@@ -62,24 +64,25 @@ namespace hpx { namespace threads { namespace executors
             void add_after(
                 util::steady_clock::duration const& rel_time,
                 closure_type && f, util::thread_description const& description,
-                threads::thread_stacksize stacksize, error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
-            std::uint64_t num_pending_closures(error_code& ec) const;
+            std::uint64_t num_pending_closures(error_code& ec) const override;
 
             // Reset internal (round robin) thread distribution scheme
-            void reset_thread_distribution();
+            void reset_thread_distribution() override;
 
             /// Return the mask for processing units the given thread is allowed
             /// to run on.
             mask_cref_type get_pu_mask(topology const& /*topology*/,
-                std::size_t num_thread) const
+                std::size_t num_thread) const override
             {
                 return hpx::resource::get_partitioner().get_pu_mask(num_thread);
             }
 
             /// Set the new scheduler mode
-            void set_scheduler_mode(threads::policies::scheduler_mode mode)
+            void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) const
             {
                 pool_->set_scheduler_mode(mode);
             }
@@ -87,7 +90,8 @@ namespace hpx { namespace threads { namespace executors
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(
-                threads::detail::executor_parameter p, error_code& ec) const;
+                threads::detail::executor_parameter p,
+                error_code& ec) const override;
 
             static threads::thread_result_type thread_function_nullary(
                 closure_type func);

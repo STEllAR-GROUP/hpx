@@ -9,7 +9,7 @@ include(HPX_Include)
 
 hpx_include(Message)
 
-macro(add_hpx_pseudo_dependencies)
+function(add_hpx_pseudo_dependencies)
 
   if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug")
     set(args)
@@ -27,9 +27,9 @@ macro(add_hpx_pseudo_dependencies)
     endforeach()
     add_dependencies(${shortened_args})
   endif()
-endmacro()
+endfunction()
 
-macro(add_hpx_pseudo_dependencies_no_shortening)
+function(add_hpx_pseudo_dependencies_no_shortening)
 
   if("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug")
     set(args)
@@ -42,5 +42,5 @@ macro(add_hpx_pseudo_dependencies_no_shortening)
   if(HPX_WITH_PSEUDO_DEPENDENCIES)
     add_dependencies(${ARGV})
   endif()
-endmacro()
+endfunction()
 

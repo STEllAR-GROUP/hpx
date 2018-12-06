@@ -19,6 +19,7 @@
 #include <iostream>
 #include <list>
 #include <mutex>
+#include <regex>
 #include <string>
 #include <vector>
 #include <utility>
@@ -34,7 +35,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/regex.hpp>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -204,13 +204,11 @@ void section::parse (std::string const& sourcename,
     int linenum = 0;
     section* current = this;
 
-    boost::regex regex_comment (pattern_comment, boost::regex::perl
-        | boost::regex::icase);
-    boost::regex regex_section (pattern_section, boost::regex::perl
-        | boost::regex::icase);
-    boost::regex regex_qualified_entry
-        (pattern_qualified_entry, boost::regex::perl | boost::regex::icase);
-    boost::regex regex_entry (pattern_entry,   boost::regex::perl | boost::regex::icase);
+    std::regex regex_comment (pattern_comment, std::regex_constants::icase);
+    std::regex regex_section (pattern_section, std::regex_constants::icase);
+    std::regex regex_qualified_entry (pattern_qualified_entry,
+        std::regex_constants::icase);
+    std::regex regex_entry (pattern_entry, std::regex_constants::icase);
 
     std::vector<std::string>::const_iterator end = lines.end();
     for (std::vector<std::string>::const_iterator it = lines.begin();
@@ -228,8 +226,8 @@ void section::parse (std::string const& sourcename,
         // weed out comments
         if (weed_out_comments)
         {
-            boost::smatch what_comment;
-            if (boost::regex_match (line, what_comment, regex_comment))
+            std::smatch what_comment;
+            if (std::regex_match (line, what_comment, regex_comment))
             {
                 HPX_ASSERT(3 == what_comment.size());
 
@@ -241,8 +239,8 @@ void section::parse (std::string const& sourcename,
 
         // no comments anymore: line is either section, key=val,
         // or garbage/empty
-        boost::smatch what;
-        if (boost::regex_match(line, what, regex_qualified_entry))
+        std::smatch what;
+        if (std::regex_match(line, what, regex_qualified_entry))
         {
             // found a entry line
             if (4 != what.size()) //-V112
@@ -286,7 +284,7 @@ void section::parse (std::string const& sourcename,
             current = s;
         }
 
-        else if (boost::regex_match(line, what, regex_section))
+        else if (std::regex_match(line, what, regex_section))
         {
             // found a section line
             if (2 != what.size())
@@ -312,7 +310,7 @@ void section::parse (std::string const& sourcename,
         }
 
         // did not match section, so might be key/val entry
-        else if ( boost::regex_match (line, what, regex_entry) )
+        else if ( std::regex_match (line, what, regex_entry) )
         {
             // found a entry line
             if (3 != what.size())

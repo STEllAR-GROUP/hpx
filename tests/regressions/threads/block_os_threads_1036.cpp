@@ -14,10 +14,9 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <boost/scoped_array.hpp>
-
 #include <atomic>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -25,7 +24,7 @@
 void blocker(
     std::atomic<std::uint64_t>* entered
   , std::atomic<std::uint64_t>* started
-  , boost::scoped_array<std::atomic<std::uint64_t> >* blocked_threads
+  , std::unique_ptr<std::atomic<std::uint64_t>[]>* blocked_threads
   , std::uint64_t worker
     )
 {
@@ -35,7 +34,8 @@ void blocker(
         hpx::threads::register_work(
             hpx::util::bind(&blocker, entered, started, blocked_threads, worker),
             "blocker", hpx::threads::pending,
-            hpx::threads::thread_priority_normal, worker);
+            hpx::threads::thread_priority_normal,
+            hpx::threads::thread_schedule_hint(worker));
         return;
     }
 
@@ -63,7 +63,7 @@ int hpx_main()
 
         std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
-        boost::scoped_array<std::atomic<std::uint64_t> >
+        std::unique_ptr<std::atomic<std::uint64_t>[]>
             blocked_threads(
                 new std::atomic<std::uint64_t>[os_thread_count]);
 
@@ -79,7 +79,8 @@ int hpx_main()
             hpx::threads::register_work(
                 hpx::util::bind(&blocker, &entered, &started, &blocked_threads, i),
                 "blocker", hpx::threads::pending,
-                hpx::threads::thread_priority_normal, i);
+                hpx::threads::thread_priority_normal,
+                hpx::threads::thread_schedule_hint(i));
             ++scheduled;
         }
         HPX_TEST_EQ(scheduled, os_thread_count - 1);

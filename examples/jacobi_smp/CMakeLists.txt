@@ -7,6 +7,15 @@ set(jacobi_smp_applications
     jacobi_hpx
     jacobi_nonuniform_hpx)
 
+set(jacobi_hpx_PARAMETERS THREADS_PER_LOCALITY 4)
+set(jacobi_nonuniform_hpx_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(disabled_tests
+    # Disabled because requires external input data. TODO: Download data when
+    # running test.
+    jacobi_nonuniform_hpx
+   )
+
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(jacobi_smp_applications ${jacobi_smp_applications}
       jacobi_omp_static
@@ -17,6 +26,12 @@ if(HPX_WITH_EXAMPLES_OPENMP)
   set(jacobi_omp_dynamic_sources jacobi.cpp)
   set(jacobi_nonuniform_omp_static_sources jacobi_nonuniform.cpp)
   set(jacobi_nonuniform_omp_dynamic_sources jacobi_nonuniform.cpp)
+
+  set(disabled_tests ${disabled_tests}
+      jacobi_omp_static
+      jacobi_omp_dynamic
+      jacobi_nonuniform_omp_static
+      jacobi_nonuniform_omp_dynamic)
 endif()
 
 set(jacobi_hpx_sources jacobi.cpp)
@@ -44,47 +59,57 @@ foreach(jacobi_smp_application ${jacobi_smp_applications})
 
     # add dependencies to pseudo-target
     add_hpx_pseudo_dependencies(examples.jacobi_smp.${jacobi_smp_application}
-        ${jacobi_smp_application}_exe)
+        ${jacobi_smp_application})
+
+    if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
+        NOT ("${jacobi_smp_application}" IN_LIST disabled_tests))
+        add_hpx_example_test("jacobi_smp" ${jacobi_smp_application} ${${jacobi_smp_application}_PARAMETERS})
+        add_hpx_pseudo_target(tests.examples.jacobi_smp.${jacobi_smp_application})
+        add_hpx_pseudo_dependencies(tests.examples.jacobi_smp
+                                    tests.examples.jacobi_smp.${jacobi_smp_application})
+        add_hpx_pseudo_dependencies(tests.examples.jacobi_smp.${jacobi_smp_application}
+                                    ${jacobi_smp_application})
+    endif()
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set_target_properties(jacobi_omp_static_exe
+  set_target_properties(jacobi_omp_static
       PROPERTIES
       COMPILE_DEFINITIONS JACOBI_SMP_NO_HPX)
-  set_target_properties(jacobi_omp_static_exe
+  set_target_properties(jacobi_omp_static
       PROPERTIES
       COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
-  set_target_properties(jacobi_omp_static_exe
+  set_target_properties(jacobi_omp_static
       PROPERTIES
       LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
-  set_target_properties(jacobi_omp_dynamic_exe
+  set_target_properties(jacobi_omp_dynamic
       PROPERTIES
       COMPILE_DEFINITIONS JACOBI_SMP_NO_HPX)
-  set_target_properties(jacobi_omp_dynamic_exe
+  set_target_properties(jacobi_omp_dynamic
       PROPERTIES
       COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
-  set_target_properties(jacobi_omp_dynamic_exe
+  set_target_properties(jacobi_omp_dynamic
       PROPERTIES
       LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
-  set_target_properties(jacobi_nonuniform_omp_static_exe
+  set_target_properties(jacobi_nonuniform_omp_static
       PROPERTIES
       COMPILE_DEFINITIONS JACOBI_SMP_NO_HPX)
-  set_target_properties(jacobi_nonuniform_omp_static_exe
+  set_target_properties(jacobi_nonuniform_omp_static
       PROPERTIES
       COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
-  set_target_properties(jacobi_nonuniform_omp_static_exe
+  set_target_properties(jacobi_nonuniform_omp_static
       PROPERTIES
       LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
-  set_target_properties(jacobi_nonuniform_omp_dynamic_exe
+  set_target_properties(jacobi_nonuniform_omp_dynamic
       PROPERTIES
       COMPILE_DEFINITIONS JACOBI_SMP_NO_HPX)
-  set_target_properties(jacobi_nonuniform_omp_dynamic_exe
+  set_target_properties(jacobi_nonuniform_omp_dynamic
       PROPERTIES
       COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
-  set_target_properties(jacobi_nonuniform_omp_dynamic_exe
+  set_target_properties(jacobi_nonuniform_omp_dynamic
       PROPERTIES
       LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 endif()

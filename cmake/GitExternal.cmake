@@ -34,11 +34,11 @@ endif()
 
 include(CMakeParseArguments)
 
-macro(GIT_EXTERNAL_MESSAGE msg)
+function(GIT_EXTERNAL_MESSAGE msg)
   if(${GIT_EXTERNAL_VERBOSE})
     message(STATUS "${NAME} : ${msg}")
   endif()
-endmacro(GIT_EXTERNAL_MESSAGE)
+endfunction(GIT_EXTERNAL_MESSAGE)
 
 function(GIT_EXTERNAL DIR REPO TAG)
   cmake_parse_arguments(GIT_EXTERNAL "NO_UPDATE;VERBOSE" "" "RESET" ${ARGN})

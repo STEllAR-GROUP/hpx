@@ -36,6 +36,7 @@ endif()
 # added for the plugin.
 if(HPX_WITH_PARCELPORT_MPI)
   find_package(MPI)
+
   if(MPI_CXX_INCLUDE_PATH)
     include_directories(${MPI_CXX_INCLUDE_PATH})
   endif()
@@ -47,9 +48,6 @@ if(HPX_WITH_PAPI)
   find_package(PAPI)
   include_directories(${PAPI_INCLUDE_DIR})
 endif()
-
-# make sure #including 'hpx/config/autolink.hpp' does not cause errors
-hpx_add_compile_flag(-DHPX_AUTOLINK_LIB_NAME=hpx)
 
 # for each of the found headers, generate a test executable
 foreach(header ${headers})
@@ -98,6 +96,9 @@ foreach(header ${headers})
         SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
         FOLDER "Tests/Headers/${header_dir}")
 
+      # make sure #including 'hpx/config/autolink.hpp' does not cause errors
+      target_compile_definitions(${test_name} PUBLIC -DHPX_AUTOLINK_LIB_NAME=hpx)
+
       # add a custom target for this example
       add_hpx_pseudo_target(tests.headers.${test_name})
 
@@ -105,7 +106,7 @@ foreach(header ${headers})
       add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
       # add dependencies to pseudo-target
-      add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")
+      add_hpx_pseudo_dependencies(tests.headers.${test_name} ${test_name})
     endif()
 
   endif()
@@ -135,4 +136,4 @@ add_hpx_pseudo_target(tests.headers.${test_name})
 add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")
+add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}")

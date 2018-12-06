@@ -222,7 +222,8 @@ std::pair<naming::id_type, naming::address>
 primary_namespace::begin_migration(naming::gid_type id)
 {
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.begin_migration_.time_
+        counter_data_.begin_migration_.time_,
+        counter_data_.begin_migration_.enabled_
     );
     counter_data_.increment_begin_migration_count();
     using hpx::util::get;
@@ -269,7 +270,8 @@ primary_namespace::begin_migration(naming::gid_type id)
 bool primary_namespace::end_migration(naming::gid_type id)
 {
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.end_migration_.time_
+        counter_data_.end_migration_.time_,
+        counter_data_.end_migration_.enabled_
     );
     counter_data_.increment_end_migration_count();
 
@@ -319,7 +321,8 @@ bool primary_namespace::bind_gid(
     )
 { // {{{ bind_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.bind_gid_.time_
+        counter_data_.bind_gid_.time_,
+        counter_data_.bind_gid_.enabled_
     );
     counter_data_.increment_bind_gid_count();
     using hpx::util::get;
@@ -502,7 +505,8 @@ bool primary_namespace::bind_gid(
 primary_namespace::resolved_type primary_namespace::resolve_gid(naming::gid_type id)
 { // {{{ resolve_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.resolve_gid_.time_
+        counter_data_.resolve_gid_.time_,
+        counter_data_.resolve_gid_.enabled_
     );
     counter_data_.increment_resolve_gid_count();
     using hpx::util::get;
@@ -551,7 +555,8 @@ naming::address primary_namespace::unbind_gid(
     )
 { // {{{ unbind_gid implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.unbind_gid_.time_
+        counter_data_.unbind_gid_.time_,
+        counter_data_.unbind_gid_.enabled_
     );
     counter_data_.increment_unbind_gid_count();
 
@@ -621,7 +626,8 @@ std::int64_t primary_namespace::increment_credit(
     )
 { // increment_credit implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.increment_credit_.time_
+        counter_data_.increment_credit_.time_,
+        counter_data_.increment_credit_.enabled_
     );
     counter_data_.increment_increment_credit_count();
 
@@ -655,7 +661,8 @@ std::vector<std::int64_t> primary_namespace::decrement_credit(
     )
 { // decrement_credit implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.decrement_credit_.time_
+        counter_data_.decrement_credit_.time_,
+        counter_data_.decrement_credit_.enabled_
     );
     counter_data_.increment_decrement_credit_count();
 
@@ -699,7 +706,8 @@ std::pair<naming::gid_type, naming::gid_type> primary_namespace::allocate(
     )
 { // {{{ allocate implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
-        counter_data_.allocate_.time_
+        counter_data_.allocate_.time_,
+        counter_data_.allocate_.enabled_
     );
     counter_data_.increment_allocate_count();
 
@@ -1300,42 +1308,52 @@ naming::gid_type primary_namespace::statistics_counter(std::string const& name)
         case primary_ns_route:
             get_data_func = util::bind_front(&cd::get_route_count,
                 &counter_data_);
+            counter_data_.route_.enabled_ = true;
             break;
         case primary_ns_bind_gid:
             get_data_func = util::bind_front(&cd::get_bind_gid_count,
                 &counter_data_);
+            counter_data_.bind_gid_.enabled_ = true;
             break;
         case primary_ns_resolve_gid:
             get_data_func = util::bind_front(&cd::get_resolve_gid_count,
                 &counter_data_);
+            counter_data_.resolve_gid_.enabled_ = true;
             break;
         case primary_ns_unbind_gid:
             get_data_func = util::bind_front(&cd::get_unbind_gid_count,
                 &counter_data_);
+            counter_data_.unbind_gid_.enabled_ = true;
             break;
         case primary_ns_increment_credit:
             get_data_func = util::bind_front(&cd::get_increment_credit_count,
                 &counter_data_);
+            counter_data_.increment_credit_.enabled_ = true;
             break;
         case primary_ns_decrement_credit:
             get_data_func = util::bind_front(&cd::get_decrement_credit_count,
                 &counter_data_);
+            counter_data_.decrement_credit_.enabled_ = true;
             break;
         case primary_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_count,
                 &counter_data_);
+            counter_data_.allocate_.enabled_ = true;
             break;
         case primary_ns_begin_migration:
             get_data_func = util::bind_front(&cd::get_begin_migration_count,
                 &counter_data_);
+            counter_data_.begin_migration_.enabled_ = true;
             break;
         case primary_ns_end_migration:
             get_data_func = util::bind_front(&cd::get_end_migration_count,
                 &counter_data_);
+            counter_data_.end_migration_.enabled_ = true;
             break;
         case primary_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_count,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -1349,42 +1367,52 @@ naming::gid_type primary_namespace::statistics_counter(std::string const& name)
         case primary_ns_route:
             get_data_func = util::bind_front(&cd::get_route_time,
                 &counter_data_);
+            counter_data_.route_.enabled_ = true;
             break;
         case primary_ns_bind_gid:
             get_data_func = util::bind_front(&cd::get_bind_gid_time,
                 &counter_data_);
+            counter_data_.bind_gid_.enabled_ = true;
             break;
         case primary_ns_resolve_gid:
             get_data_func = util::bind_front(&cd::get_resolve_gid_time,
                 &counter_data_);
+            counter_data_.resolve_gid_.enabled_ = true;
             break;
         case primary_ns_unbind_gid:
             get_data_func = util::bind_front(&cd::get_unbind_gid_time,
                 &counter_data_);
+            counter_data_.unbind_gid_.enabled_ = true;
             break;
         case primary_ns_increment_credit:
             get_data_func = util::bind_front(&cd::get_increment_credit_time,
                 &counter_data_);
+            counter_data_.increment_credit_.enabled_ = true;
             break;
         case primary_ns_decrement_credit:
             get_data_func = util::bind_front(&cd::get_decrement_credit_time,
                 &counter_data_);
+            counter_data_.decrement_credit_.enabled_ = true;
             break;
         case primary_ns_allocate:
             get_data_func = util::bind_front(&cd::get_allocate_time,
                 &counter_data_);
+            counter_data_.allocate_.enabled_ = true;
             break;
         case primary_ns_begin_migration:
             get_data_func = util::bind_front(&cd::get_begin_migration_time,
                 &counter_data_);
+            counter_data_.begin_migration_.enabled_ = true;
             break;
         case primary_ns_end_migration:
             get_data_func = util::bind_front(&cd::get_end_migration_time,
                 &counter_data_);
+            counter_data_.end_migration_.enabled_ = true;
             break;
         case primary_ns_statistics_counter:
             get_data_func = util::bind_front(&cd::get_overall_time,
                 &counter_data_);
+            counter_data_.enable_all();
             break;
         default:
             HPX_THROW_EXCEPTION(bad_parameter
@@ -1525,50 +1553,90 @@ std::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
         util::get_and_reset_value(end_migration_.time_, reset);
 }
 
+void primary_namespace::counter_data::enable_all()
+{
+    route_.enabled_ = true;
+    bind_gid_.enabled_ = true;
+    resolve_gid_.enabled_ = true;
+    unbind_gid_.enabled_ = true;
+    increment_credit_.enabled_ = true;
+    decrement_credit_.enabled_ = true;
+    allocate_.enabled_ = true;
+    begin_migration_.enabled_ = true;
+    end_migration_.enabled_ = true;
+}
+
 // increment counter values
 void primary_namespace::counter_data::increment_route_count()
 {
-    ++route_.count_;
+    if (route_.enabled_)
+    {
+        ++route_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_bind_gid_count()
 {
-    ++bind_gid_.count_;
+    if (bind_gid_.enabled_)
+    {
+        ++bind_gid_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_resolve_gid_count()
 {
-    ++resolve_gid_.count_;
+    if (resolve_gid_.enabled_)
+    {
+        ++resolve_gid_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_unbind_gid_count()
 {
-    ++unbind_gid_.count_;
+    if (unbind_gid_.enabled_)
+    {
+        ++unbind_gid_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_increment_credit_count()
 {
-    ++increment_credit_.count_;
+    if (increment_credit_.enabled_)
+    {
+        ++increment_credit_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_decrement_credit_count()
 {
-    ++decrement_credit_.count_;
+    if (decrement_credit_.enabled_)
+    {
+        ++decrement_credit_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_allocate_count()
 {
-    ++allocate_.count_;
+    if (allocate_.enabled_)
+    {
+        ++allocate_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_begin_migration_count()
 {
-    ++begin_migration_.count_;
+    if (begin_migration_.enabled_)
+    {
+        ++begin_migration_.count_;
+    }
 }
 
 void primary_namespace::counter_data::increment_end_migration_count()
 {
-    ++end_migration_.count_;
+    if (end_migration_.enabled_)
+    {
+        ++end_migration_.count_;
+    }
 }
 
 }}}

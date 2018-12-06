@@ -117,7 +117,7 @@ namespace throttle { namespace server
             description.c_str(),
             hpx::threads::pending, true,
             hpx::threads::thread_priority_high,
-            shepherd);
+            hpx::threads::thread_schedule_hint(shepherd));
     }
 
     // schedule a high priority task on the given shepherd thread to suspend
@@ -131,7 +131,7 @@ namespace throttle { namespace server
             description.c_str(),
             hpx::threads::pending, true,
             hpx::threads::thread_priority_high,
-            shepherd);
+            hpx::threads::thread_schedule_hint(shepherd));
     }
 }}
 

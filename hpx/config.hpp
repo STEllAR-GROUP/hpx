@@ -29,6 +29,7 @@
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/threads_stack.hpp>
 #include <hpx/config/version.hpp>
+#include <hpx/config/weak_symbol.hpp>
 
 #include <boost/version.hpp>
 

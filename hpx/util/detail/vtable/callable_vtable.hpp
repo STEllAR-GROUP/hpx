@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/get_function_annotation.hpp>
+#include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/invoke.hpp>
 
@@ -80,6 +81,16 @@ namespace hpx { namespace util { namespace detail
         HPX_CONSTEXPR callable_vtable(construct_vtable<T>) noexcept
           : callable_vtable_base(construct_vtable<T>())
           , invoke(&callable_vtable::template _invoke<T>)
+        {}
+
+        HPX_NORETURN static R _empty_invoke(void**, Ts&&...)
+        {
+            throw_bad_function_call();
+        }
+
+        HPX_CONSTEXPR callable_vtable(construct_vtable<empty_function>) noexcept
+          : callable_vtable_base(construct_vtable<empty_function>())
+          , invoke(&callable_vtable::_empty_invoke)
         {}
     };
 }}}

@@ -25,9 +25,6 @@
 
 struct mult_functor
 {
-    typedef int result_type;
-    typedef int argument_type;
-
     // Functors used with transform_iterator must be
     // DefaultConstructible, as the transform_iterator must be
     // DefaultConstructible to satisfy the requirements for
@@ -49,7 +46,7 @@ struct mult_functor
 };
 
 template <typename Pair>
-struct select1st_ : public std::unary_function<Pair, typename Pair::first_type>
+struct select1st_
 {
     const typename Pair::first_type& operator()(const Pair& x) const
     {

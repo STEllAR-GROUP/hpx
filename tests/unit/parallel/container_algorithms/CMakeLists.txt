@@ -10,6 +10,8 @@ set(tests
     copyif_range
     count_range
     countif_range
+    find_end_range
+    find_first_of_range
     foreach_range
     foreach_range_projection
     generate_range
@@ -73,5 +75,5 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.parallel.container_algorithms.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()

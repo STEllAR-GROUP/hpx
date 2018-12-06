@@ -15,7 +15,6 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/array.hpp>
-#include <boost/type_traits/integral_constant.hpp>
 
 #include <array>
 #include <algorithm>
@@ -560,22 +559,22 @@ namespace hpx { namespace util
 
     template <typename ...Ts>
     struct tuple_size<tuple<Ts...> >
-      : boost::integral_constant<std::size_t, sizeof...(Ts)>
+      : std::integral_constant<std::size_t, sizeof...(Ts)>
     {};
 
     template <typename T0, typename T1>
     struct tuple_size<std::pair<T0, T1> >
-      : boost::integral_constant<std::size_t, 2>
+      : std::integral_constant<std::size_t, 2>
     {};
 
     template <typename Type, std::size_t Size>
     struct tuple_size<boost::array<Type, Size> >
-      : boost::integral_constant<std::size_t, Size>
+      : std::integral_constant<std::size_t, Size>
     {};
 
     template <typename Type, std::size_t Size>
     struct tuple_size<std::array<Type, Size> >
-      : boost::integral_constant<std::size_t, Size>
+      : std::integral_constant<std::size_t, Size>
     {};
 
     // template <size_t I, class Tuple>
@@ -1079,7 +1078,7 @@ namespace hpx { namespace serialization
     void serialize(
         Archive& ar
       , ::hpx::util::tuple<Ts...>& t
-      , unsigned int const version = 0
+      , unsigned int const /*version*/ = 0
     )
     {
         ar & t._impl;

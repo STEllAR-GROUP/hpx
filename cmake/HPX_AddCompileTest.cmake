@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_compile_test category name)
+function(add_hpx_compile_test category name)
   set(options FAILURE_EXPECTED)
   set(one_value_args SOURCE_ROOT FOLDER)
   set(multi_value_args SOURCES)
@@ -28,7 +28,7 @@ macro(add_hpx_compile_test category name)
   add_test(NAME "${category}.${name}"
     COMMAND ${CMAKE_COMMAND}
       --build .
-      --target "${name}_lib"
+      --target ${name}
       --config $<CONFIGURATION>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
@@ -36,17 +36,17 @@ macro(add_hpx_compile_test category name)
     set_tests_properties("${category}.${name}" PROPERTIES WILL_FAIL TRUE)
   endif()
 
-endmacro()
+endfunction()
 
-macro(add_hpx_unit_compile_test category name)
+function(add_hpx_unit_compile_test category name)
   add_hpx_compile_test("tests.unit.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
-macro(add_hpx_regression_compile_test category name)
+function(add_hpx_regression_compile_test category name)
   add_hpx_compile_test("tests.regressions.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 
-macro(add_hpx_headers_compile_test category name)
+function(add_hpx_headers_compile_test category name)
   add_hpx_compile_test("tests.headers.${category}" ${name} ${ARGN})
-endmacro()
+endfunction()
 

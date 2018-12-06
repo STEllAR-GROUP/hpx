@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-macro(add_hpx_library_headers name globtype)
+function(add_hpx_library_headers name globtype)
   if(MSVC)
     set(options APPEND)
     set(one_value_args)
@@ -36,10 +36,10 @@ macro(add_hpx_library_headers name globtype)
       endif()
     endforeach()
   endif()
-endmacro()
+endfunction()
 
 ###############################################################################
-macro(add_hpx_library_headers_noglob name)
+function(add_hpx_library_headers_noglob name)
   if(MSVC)
     set(options APPEND)
     set(one_value_args)
@@ -74,5 +74,5 @@ macro(add_hpx_library_headers_noglob name)
       endif()
     endforeach()
   endif()
-endmacro()
+endfunction()
 

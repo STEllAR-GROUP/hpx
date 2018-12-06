@@ -17,11 +17,6 @@
 #ifndef JT28092007_format_write_HPP_DEFINED
 #define JT28092007_format_write_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/format.hpp>
 
 #endif
-

@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -20,7 +21,7 @@
 #include "sort_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-// this function times a sort and outputs the time for cDash to plot it
+// this function times a sort and outputs the time for CDash to plot it
 void sort_benchmark()
 {
     try {
@@ -38,8 +39,8 @@ void sort_benchmark()
         bool is_sorted = (verify_(c, std::less<double>(), elapsed, true)!=0);
         HPX_TEST(is_sorted);
         if (is_sorted) {
-            std::cout << "<DartMeasurement name=\"SortDoublesTime\" \n"
-                << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+            // CDash graph plotting
+            hpx::util::print_cdash_timing("SortDoublesTime", elapsed);
         }
     }
     catch (...) {
@@ -108,16 +109,6 @@ void test_sort1()
         std::greater<std::string>());
     test_sort1_async_str(execution::par(execution::task),
         std::greater<std::string>());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_sort1(execution_policy(execution::seq),       int());
-    test_sort1(execution_policy(execution::par),       int());
-    test_sort1(execution_policy(execution::par_unseq),   int());
-    test_sort1(execution_policy(execution::seq(execution::task)), int());
-    test_sort1(execution_policy(execution::par(execution::task)), int());
-    test_sort1(execution_policy(execution::seq(execution::task)), std::string());
-    test_sort1(execution_policy(execution::par(execution::task)), std::string());
-#endif
 }
 
 void test_sort2()
@@ -159,14 +150,6 @@ void test_sort2()
         std::greater<double>());
     test_sort2_async(execution::par(execution::task), float(),
         std::greater<float>());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_sort2(execution_policy(execution::seq),       int());
-    test_sort2(execution_policy(execution::par),       int());
-    test_sort2(execution_policy(execution::par_unseq),   int());
-    test_sort2(execution_policy(execution::seq(execution::task)), int());
-    test_sort2(execution_policy(execution::par(execution::task)), int());
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,17 +162,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    // if benchmark is requested we run it even in debug mode
-    if (vm.count("benchmark")) {
-        sort_benchmark();
-    }
-    else {
-        test_sort1();
-        test_sort2();
-#ifndef HPX_DEBUG
-        sort_benchmark();
-#endif
-    }
+    test_sort1();
+    test_sort2();
+    sort_benchmark();
+
     return hpx::finalize();
 }
 
@@ -202,8 +178,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ("benchmark", "run a timing benchmark only");
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {

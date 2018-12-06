@@ -17,10 +17,6 @@
 #ifndef JT28092007_high_precision_time_HPP_DEFINED
 #define JT28092007_high_precision_time_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
 
 #include <hpx/util/logging/format/formatter/convert_format.hpp>
@@ -30,6 +26,7 @@
 #include <chrono>
 #include <cstdint>
 #include <ctime>
+#include <string>
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 #elif defined(HPX_MSVC)
@@ -85,10 +82,9 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
     /**
         constructs a high_precision_time object
     */
-    high_precision_time_t(const hold_string_type & format)
+    high_precision_time_t(const std::string & format)
         : non_const_context_base(format) {}
 
-    template<class msg_type>
     void write_high_precision_time(msg_type & msg,
         std::chrono::time_point<std::chrono::system_clock> val) const
     {
@@ -120,7 +116,7 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
                 std::chrono::milliseconds
             >(val.time_since_epoch());
 
-        char_type buffer[64];
+        char buffer[64];
 
         non_const_context_base::context().write_time(buffer,
             local_tm.tm_mday, local_tm.tm_mon + 1, local_tm.tm_year + 1900,
@@ -131,7 +127,7 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
         convert::write(buffer, msg);
     }
 
-    template<class msg_type> void operator()(msg_type & msg) const {
+    void operator()(msg_type & msg) const {
         write_high_precision_time(msg, std::chrono::system_clock::now());
     }
 
@@ -144,7 +140,7 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
 
         the string = the time format
     */
-    void configure(const hold_string_type & str) {
+    void configure(const std::string & str) {
         non_const_context_base::context().set_format(str);
     }
 
@@ -162,4 +158,3 @@ typedef high_precision_time_t<> high_precision_time;
 }}}}
 
 #endif
-

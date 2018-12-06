@@ -169,7 +169,9 @@ namespace hpx { namespace threads
             virtual void add(closure_type&& f,
                 util::thread_description const& desc,
                 threads::thread_state_enum initial_state, bool run_now,
-                threads::thread_stacksize stacksize, error_code& ec) = 0;
+                threads::thread_stacksize stacksize,
+                threads::thread_schedule_hint schedulehint,
+                error_code& ec) = 0;
 
             // Return an estimate of the number of waiting closures.
             virtual std::uint64_t num_pending_closures(error_code& ec) const = 0;
@@ -188,7 +190,7 @@ namespace hpx { namespace threads
 
             // Set the new scheduler mode
             virtual void set_scheduler_mode(
-                threads::policies::scheduler_mode mode) {}
+                threads::policies::scheduler_mode /*mode*/) {}
 
             // retrieve executor id
             virtual executor_id get_id() const
@@ -230,6 +232,20 @@ namespace hpx { namespace threads
         class scheduled_executor_base : public executor_base
         {
         public:
+
+            scheduled_executor_base()
+              : stacksize_(thread_stacksize_default),
+                priority_(thread_priority_default),
+                schedulehint_(thread_schedule_hint())
+            {}
+
+            scheduled_executor_base(thread_priority priority,
+                thread_stacksize stacksize, thread_schedule_hint schedulehint)
+              : stacksize_(stacksize),
+                priority_(priority),
+                schedulehint_(schedulehint)
+            {}
+
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
@@ -261,6 +277,14 @@ namespace hpx { namespace threads
                 return add_after(rel_time.value(), std::move(f), desc,
                     stacksize, ec);
             }
+
+            thread_priority  get_priority() const { return priority_; }
+            thread_stacksize get_stacksize() const { return stacksize_; }
+
+        protected:
+            thread_stacksize     stacksize_;
+            thread_priority      priority_;
+            thread_schedule_hint schedulehint_;
         };
     }
 
@@ -299,11 +323,14 @@ namespace hpx { namespace threads
             util::thread_description const& desc = util::thread_description(),
             threads::thread_state_enum initial_state = threads::pending,
             bool run_now = true,
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
+            threads::thread_schedule_hint schedulehint =
+                threads::thread_schedule_hint(),
             error_code& ec = throws)
         {
             executor_data_->add(std::move(f), desc, initial_state, run_now,
-                stacksize, ec);
+                stacksize, schedulehint, ec);
         }
 
         /// Return an estimate of the number of waiting closures.
@@ -437,6 +464,16 @@ namespace hpx { namespace threads
         void detach()
         {
             executor_data_->detach();
+        }
+
+        thread_priority get_priority() const {
+            return static_cast<detail::scheduled_executor_base*>
+                    (executor_data_.get())->get_priority();
+        }
+
+        thread_stacksize get_stacksize() const {
+            return static_cast<detail::scheduled_executor_base*>
+                    (executor_data_.get())->get_stacksize();
         }
 
         /// Return a reference to the default executor for this process.

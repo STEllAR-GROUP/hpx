@@ -179,17 +179,6 @@ void test_partition()
 
     test_partition_async(execution::seq(execution::task), DataType());
     test_partition_async(execution::par(execution::task), DataType());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partition(execution_policy(execution::seq), DataType());
-    test_partition(execution_policy(execution::par), DataType());
-    test_partition(execution_policy(execution::par_unseq), DataType());
-
-    test_partition(execution_policy(execution::seq(execution::task)),
-        DataType());
-    test_partition(execution_policy(execution::par(execution::task)),
-        DataType());
-#endif
 }
 
 void test_partition()

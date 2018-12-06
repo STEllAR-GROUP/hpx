@@ -17,21 +17,13 @@
 #ifndef JT28092007_logging_HPP_DEFINED
 #define JT28092007_logging_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/filter.hpp>
 #include <hpx/util/logging/detail/logger.hpp>
 #include <hpx/util/logging/detail/log_keeper.hpp>
 #include <hpx/util/logging/detail/macros.hpp>
-#include <hpx/util/logging/detail/tss/tss.hpp>
 #include <hpx/util/logging/detail/level.hpp>
-#include <hpx/util/logging/detail/scoped_log.hpp>
 
-// just in case we might think of using formatters
-#include <hpx/util/logging/detail/format_msg_type.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -52,4 +44,3 @@ then you can include this one instead:
 }}}
 
 #endif
-

@@ -30,5 +30,5 @@ add_hpx_pseudo_dependencies(examples.performance_counters
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.performance_counters.sine_client
-                            sine_client_exe)
+                            sine_client)
 

@@ -80,14 +80,6 @@ void test_partitioned1()
 
     test_partitioned1_async(execution::seq(execution::task), IteratorTag());
     test_partitioned1_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partitioned1(execution_policy(execution::seq), IteratorTag());
-    test_partitioned1(execution_policy(execution::par), IteratorTag());
-    test_partitioned1(execution_policy(execution::par_unseq), IteratorTag());
-    test_partitioned1(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_partitioned1(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void partitioned_test1()
@@ -168,14 +160,6 @@ void test_partitioned2()
 
     test_partitioned2_async(execution::seq(execution::task), IteratorTag());
     test_partitioned2_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partitioned2(execution_policy(execution::seq), IteratorTag());
-    test_partitioned2(execution_policy(execution::par), IteratorTag());
-    test_partitioned2(execution_policy(execution::par_unseq), IteratorTag());
-    test_partitioned2(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_partitioned2(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void partitioned_test2()
@@ -271,14 +255,6 @@ void test_partitioned3()
 
     test_partitioned3_async(execution::seq(execution::task), IteratorTag());
     test_partitioned3_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partitioned3(execution_policy(execution::seq), IteratorTag());
-    test_partitioned3(execution_policy(execution::par), IteratorTag());
-    test_partitioned3(execution_policy(execution::par_unseq), IteratorTag());
-    test_partitioned3(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_partitioned3(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void partitioned_test3()
@@ -387,14 +363,6 @@ void test_partitioned_exception()
 
     test_partitioned_async_exception(execution::seq(execution::task), IteratorTag());
     test_partitioned_async_exception(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partitioned_exception(execution_policy(execution::par), IteratorTag());
-    test_partitioned_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_partitioned_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void partitioned_exception_test()
@@ -501,15 +469,6 @@ void test_partitioned_bad_alloc()
 
     test_partitioned_async_bad_alloc(execution::seq(execution::task), IteratorTag());
     test_partitioned_async_bad_alloc(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_partitioned_bad_alloc(execution_policy(execution::par), IteratorTag());
-    test_partitioned_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_partitioned_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_partitioned_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void partitioned_bad_alloc_test()

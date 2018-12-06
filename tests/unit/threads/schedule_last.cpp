@@ -91,6 +91,7 @@ int main(int argc, char* argv[])
         test_scheduler<scheduler_type>(argc, argv);
     }
 
+#if defined(HPX_HAVE_ABP_SCHEDULER)
     {
         using scheduler_type =
             hpx::threads::policies::local_priority_queue_scheduler<
@@ -106,6 +107,7 @@ int main(int argc, char* argv[])
             >;
         test_scheduler<scheduler_type>(argc, argv);
     }
+#endif
 
     return hpx::util::report_errors();
 }

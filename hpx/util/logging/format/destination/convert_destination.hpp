@@ -17,11 +17,9 @@
 #ifndef JT28092007_convert_destination_HPP_DEFINED
 #define JT28092007_convert_destination_HPP_DEFINED
 
-#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-# pragma once
-#endif
-
 #include <hpx/util/logging/detail/fwd.hpp>
+#include <ostream>
+#include <string>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 
@@ -37,24 +35,24 @@ It has 2 function overloads:
 FIXME
 */
 namespace convert {
-    template<class obj, class char_traits, class char_type> void write(const obj & m,
-        std::basic_ostream<char_type, char_traits> & out) {
+    template<class obj> inline void write(const obj & m,
+        std::ostream & out) {
         out << m;
     }
 
-    template<class char_traits, class char_type> void write(const char_type* m,
-        std::basic_ostream<char_type, char_traits> & out) {
+    inline void write(const char* m,
+        std::ostream & out) {
         out << m;
     }
 
-    inline const char_type * do_convert(const char_type * c,
-        const into<const char_type*> &) { return c; }
-    inline const char_type * do_convert(const std::basic_string<char_type> & s,
-        const into<const char_type* > &) { return s.c_str(); }
+    inline const char * do_convert(const char * c,
+        const into<const char*> &) { return c; }
+    inline const char * do_convert(const std::string & s,
+        const into<const char* > &) { return s.c_str(); }
 
-    inline const std::basic_string<char_type> &
-        do_convert(const std::basic_string<char_type> & s,
-            const into< std::basic_string<char_type> > &) {
+    inline const std::string &
+        do_convert(const std::string & s,
+            const into< std::string > &) {
         return s;
     }
 }
@@ -74,4 +72,3 @@ struct do_convert_destination {
 }}}}
 
 #endif
-

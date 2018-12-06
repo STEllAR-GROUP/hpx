@@ -8,6 +8,7 @@
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/sort_by_key.hpp>
+#include <hpx/util/lightweight_test.hpp>
 //
 #include <iostream>
 #include <numeric>
@@ -98,8 +99,8 @@ void sort_by_key_benchmark()
         bool is_equal = std::equal(keys.begin(), keys.end(), o_values.begin());
         HPX_TEST(is_equal);
         if (is_equal) {
-            std::cout << "<DartMeasurement name=\"SortByKeyTime\" \n"
-            << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+            // CDash graph plotting
+            hpx::util::print_cdash_timing("SortByKeyTime", elapsed);
         }
     }
     catch (...) {
@@ -275,16 +276,9 @@ int hpx_main(boost::program_options::variables_map &vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    // if benchmark is requested we run it even in debug mode
-    if (vm.count("benchmark")) {
-        sort_by_key_benchmark();
-    }
-    else {
-#ifndef HPX_DEBUG
-        test_sort_by_key1();
-#endif
-        sort_by_key_benchmark();
-    }
+    test_sort_by_key1();
+    sort_by_key_benchmark();
+
     return hpx::finalize();
 }
 
@@ -296,8 +290,7 @@ int main(int argc, char *argv[])
 
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ("benchmark", "run a timing benchmark only");
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {

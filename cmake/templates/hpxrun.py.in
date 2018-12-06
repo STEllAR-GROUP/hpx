@@ -70,11 +70,13 @@ def run_none(cmd, localities, verbose):
 def run_mpi(cmd, localities, verbose):
     mpiexec = '@MPIEXEC@'
     if mpiexec == '':
+        mpiexec = '@MPIEXEC_EXECUTABLE@'
+    if mpiexec == '':
         msg = 'mpiexec not available on this platform. '
         msg += 'Please rerun CMake with HPX_PARCELPORT_MPI=True.'
         print(msg, sys.stderr)
         sys.exit(1)
-    exec_cmd = ['@MPIEXEC@', '@MPIEXEC_NUMPROC_FLAG@', str(localities)] + cmd
+    exec_cmd = [mpiexec, '@MPIEXEC_NUMPROC_FLAG@', str(localities)] + cmd
     if verbose:
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
@@ -114,7 +116,9 @@ def build_cmd(options, args):
     # set number of threads
     if options.threads == -1:
         cmd += ['--hpx:threads=all']
-    else:
+    if options.threads == -2:
+        cmd += ['--hpx:threads=cores']
+    if options.threads >= 1:
         cmd += ['--hpx:threads=' + str(options.threads)]
 
     # set number of localities
@@ -141,7 +145,7 @@ def check_options(parser, options, args):
         print('Can not start less than one locality', sys.stderr)
         sys.exit(1)
 
-    if options.threads < 1 and options.threads != -1:
+    if options.threads < 1 and options.threads != -1 and options.threads != -2:
         print('Can not start less than one thread per locality', sys.stderr)
         sys.exit(1)
 

@@ -60,6 +60,11 @@ namespace hpx { namespace util
         DECL_TYPE_SPECIFIER(double, lf);
         DECL_TYPE_SPECIFIER(long double, Lf);
 
+        // the following type-specifiers are used elsewhere, we add them for
+        // completeness
+        DECL_TYPE_SPECIFIER(char const*, s);
+        DECL_TYPE_SPECIFIER(wchar_t const*, ls);
+
 #       undef DECL_TYPE_SPECIFIER
 
         ///////////////////////////////////////////////////////////////////////
@@ -104,7 +109,7 @@ namespace hpx { namespace util
         struct formatter<void const*, /*IsFundamental=*/false>
         {
             static void call(
-                std::ostream& os, boost::string_ref spec, void const* ptr)
+                std::ostream& os, boost::string_ref /*spec*/, void const* ptr)
             {
                 os << ptr;
             }
@@ -320,7 +325,7 @@ namespace hpx { namespace util { namespace detail
     inline void format_to(
         std::ostream& os,
         boost::string_ref format_str,
-        format_arg const* args, std::size_t count)
+        format_arg const* args, std::size_t /*count*/)
     {
         std::size_t index = 0;
         while (!format_str.empty())

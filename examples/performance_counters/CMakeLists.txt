@@ -10,6 +10,9 @@ set(example_programs
     simplest_performance_counter
    )
 
+set(access_counter_set_PARAMETERS THREADS_PER_LOCALITY 4)
+set(simplest_performance_counter_PARAMETERS THREADS_PER_LOCALITY 4)
+
 set(access_counter_set_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 foreach(example_program ${example_programs})
@@ -35,7 +38,14 @@ foreach(example_program ${example_programs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.performance_counters.${example_program}
-                              ${example_program}_exe)
+                              ${example_program})
+
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_example_test("performance_counters" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_pseudo_target(tests.examples.performance_counters.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.performance_counters
+                                tests.examples.performance_counters.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.performance_counters.${example_program}
+                                ${example_program})
+  endif()
 endforeach()
-
-

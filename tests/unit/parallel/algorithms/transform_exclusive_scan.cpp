@@ -88,22 +88,6 @@ void test_transform_exclusive_scan()
         IteratorTag());
     test_transform_exclusive_scan_async(execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_exclusive_scan(execution_policy(execution::par),
-        IteratorTag());
-    test_transform_exclusive_scan(execution_policy(execution::par_unseq),
-        IteratorTag());
-
-    test_transform_exclusive_scan(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_exclusive_scan(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_exclusive_scan_test()
@@ -215,20 +199,6 @@ void test_transform_exclusive_scan_exception()
     test_transform_exclusive_scan_exception_async(
         execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan_exception(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_exclusive_scan_exception(execution_policy(execution::par),
-        IteratorTag());
-
-    test_transform_exclusive_scan_exception(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_exclusive_scan_exception(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_exclusive_scan_exception_test()
@@ -338,20 +308,6 @@ void test_transform_exclusive_scan_bad_alloc()
     test_transform_exclusive_scan_bad_alloc_async(
         execution::par(execution::task),
         IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_transform_exclusive_scan_bad_alloc(execution_policy(execution::seq),
-        IteratorTag());
-    test_transform_exclusive_scan_bad_alloc(execution_policy(execution::par),
-        IteratorTag());
-
-    test_transform_exclusive_scan_bad_alloc(
-        execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_transform_exclusive_scan_bad_alloc(
-        execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void transform_exclusive_scan_bad_alloc_test()

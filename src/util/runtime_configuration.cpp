@@ -178,13 +178,13 @@ namespace hpx { namespace util
             "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
-            "os_threads = all",
+            "os_threads = cores",
             "cores = all",
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
             "scheduler = local-priority-fifo",
-            "affinity = pu",
+            "affinity = core",
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
@@ -237,12 +237,18 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.threadpools]",
+#if defined(HPX_HAVE_IO_POOL)
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
+#endif
+#if defined(HPX_HAVE_NETWORKING)
             "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
+#endif
+#if defined(HPX_HAVE_TIMER_POOL)
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:"
                 HPX_PP_STRINGIZE(HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
+#endif
 
             "[hpx.thread_queue]",
             "min_tasks_to_steal_pending = "
@@ -328,11 +334,6 @@ namespace hpx { namespace util
             "enabled = 1",
 
             "[hpx.components.elapsed_time_counter]",
-            "name = hpx",
-            "path = $[hpx.location]/bin/" HPX_DLL_STRING,
-            "enabled = 1",
-
-            "[hpx.components.component_memory_block]",
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"

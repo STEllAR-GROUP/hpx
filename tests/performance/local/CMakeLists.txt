@@ -128,6 +128,26 @@ set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
 set(partitioned_vector_foreach_FLAGS
   DEPENDENCIES iostreams_component partitioned_vector_component)
 
+set(future_overhead_PARAMETERS THREADS_PER_LOCALITY 4)
+
+# These tests do not run on hpx threads, so we don't want to pass hpx params into them
+set(delay_baseline_PARAMETERS NO_HPX_MAIN)
+set(delay_baseline_threaded_PARAMETERS NO_HPX_MAIN)
+set(function_object_wrapper_overhead_PARAMETERS NO_HPX_MAIN)
+set(nonconcurrent_fifo_overhead_PARAMETERS NO_HPX_MAIN)
+set(nonconcurrent_lifo_overhead_PARAMETERS NO_HPX_MAIN)
+set(print_heterogeneous_payloads_PARAMETERS NO_HPX_MAIN)
+
+# These tests fail, so I am marking them as non HPX tests until they are fixed
+set(print_heterogeneous_payloads_PARAMETERS NO_HPX_MAIN)
+set(hpx_homogeneous_timed_task_spawn_executors_PARAMETERS NO_HPX_MAIN)
+set(skynet_PARAMETERS NO_HPX_MAIN)
+set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
+set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
+set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
+set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
+set(serialization_performance_PARAMETERS NO_HPX_MAIN)
+
 if(HPX_WITH_CUDA)
   set_source_files_properties(stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
 endif()
@@ -142,12 +162,16 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${benchmark}
+  add_hpx_executable(${benchmark}_test
                      SOURCES ${sources}
                      ${${benchmark}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Local")
+
+  if(NOT "${${benchmark}_PARAMETERS}" MATCHES NO_HPX_MAIN)
+    add_hpx_test("tests.performance.local" ${benchmark} ${${benchmark}_PARAMETERS})
+  endif()
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.${benchmark})
@@ -158,17 +182,18 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.local.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark}_test)
+
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe
+  set_target_properties(openmp_homogeneous_timed_task_spawn_test
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe
+  set_target_properties(openmp_homogeneous_timed_task_spawn_test
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_parallel_region_exe
+  set_target_properties(openmp_parallel_region_test
     PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_parallel_region_exe
+  set_target_properties(openmp_parallel_region_test
     PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 

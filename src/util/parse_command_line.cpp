@@ -18,7 +18,6 @@
 #include <vector>
 
 #include <boost/filesystem.hpp>
-#include <boost/scoped_array.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

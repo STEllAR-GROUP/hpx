@@ -9,6 +9,8 @@ set(tests
     schedule_last
     set_thread_state
     stack_check
+    error_callback
+    start_stop_callbacks
     thread
     thread_affinity
     thread_id
@@ -78,10 +80,10 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.threads.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()
 
-set_property(TARGET lockfree_fifo_test_exe APPEND
+set_property(TARGET lockfree_fifo_test APPEND
     PROPERTY COMPILE_DEFINITIONS "HPX_NO_VERSION_CHECK")
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)

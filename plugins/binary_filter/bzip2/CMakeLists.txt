@@ -17,7 +17,7 @@ if(HPX_WITH_COMPRESSION_BZIP2)
   endif()
 endif()
 
-macro(add_bzip2_module)
+function(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
   if(HPX_WITH_COMPRESSION_BZIP2)
     if(NOT MSVC)
@@ -34,7 +34,7 @@ macro(add_bzip2_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARIES})
 
-    add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2_lib)
+    add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)
   endif()
-endmacro()
+endfunction()

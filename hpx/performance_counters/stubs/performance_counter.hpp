@@ -37,29 +37,6 @@ namespace hpx { namespace performance_counters { namespace stubs
             launch::async_policy, naming::id_type const& targetid,
             bool reset = false);
 
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static lcos::future<counter_info> get_info_async(
-            naming::id_type const& targetid)
-        {
-            return get_info(launch::async, targetid);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static lcos::future<counter_value> get_value_async(
-            naming::id_type const& targetid, bool reset = false)
-        {
-            return get_value(launch::async, targetid, reset);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static lcos::future<counter_values_array> get_values_array_async(
-            naming::id_type const& targetid, bool reset = false)
-        {
-            return get_values_array(launch::async, targetid, reset);
-        }
-#endif
-
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<bool> start(launch::async_policy,
             naming::id_type const& targetid);
@@ -78,47 +55,6 @@ namespace hpx { namespace performance_counters { namespace stubs
             error_code& ec = throws);
         static void reinit(launch::sync_policy, naming::id_type const& targetid,
             bool reset, error_code& ec = throws);
-
-#if defined(HPX_HAVE_ASYNC_FUNCTION_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static bool start(naming::id_type const& targetid,
-            error_code& ec = throws)
-        {
-            return start(launch::sync, targetid, ec);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static bool stop(naming::id_type const& targetid,
-            error_code& ec = throws)
-        {
-            return stop(launch::sync, targetid, ec);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static void reset(naming::id_type const& targetid,
-            error_code& ec = throws)
-        {
-            reset(launch::sync, targetid, ec);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static lcos::future<bool> start_async(naming::id_type const& targetid)
-        {
-            return start(launch::async, targetid);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static lcos::future<bool> stop_async(naming::id_type const& targetid)
-        {
-            return stop(launch::async, targetid);
-        }
-
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        static lcos::future<void> reset_async(naming::id_type const& targetid)
-        {
-            return reset(launch::async, targetid);
-        }
-#endif
 
         template <typename T>
         static T

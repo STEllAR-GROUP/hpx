@@ -110,8 +110,8 @@ namespace lcos {
         {
             template <typename SharedState>
             HPX_FORCEINLINE static void call(hpx::traits::detail::wrap_int,
-                SharedState const& shared_state, id_type const& id,
-                bool& id_retrieved)
+                SharedState const& /*shared_state*/, id_type const& /*id*/,
+                bool& /*id_retrieved*/)
             {
                 // by default, do nothing
             }

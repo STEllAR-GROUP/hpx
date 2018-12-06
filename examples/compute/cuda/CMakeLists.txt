@@ -14,11 +14,17 @@ if(HPX_WITH_CUDA)
       hello_compute
     )
 
+  set(cublas_matmul_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(cuda_future_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(data_copy_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(hello_compute_PARAMETERS THREADS_PER_LOCALITY 4)
+
 # Append example programs that only compiles with Cuda Clang
   if(HPX_WITH_CUDA_CLANG)
     list(APPEND example_programs
          partitioned_vector
         )
+    set(partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
   endif()
 
   include_directories(${CUDA_INCLUDE_DIRS})
@@ -66,5 +72,14 @@ foreach(example_program ${example_programs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.compute.cuda.${example_program}
-                              ${example_program}_exe)
+                              ${example_program})
+
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_example_test("cuda" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_pseudo_target(tests.examples.compute.cuda.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.compute.cuda
+                                tests.examples.compute.cuda.${example_program})
+    add_hpx_pseudo_dependencies(tests.examples.compute.cuda.${example_program}
+                                ${example_program})
+  endif()
 endforeach()

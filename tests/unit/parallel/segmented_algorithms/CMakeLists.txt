@@ -11,6 +11,7 @@ set(tests
     partitioned_vector_move
     partitioned_vector_target
     partitioned_vector_transform
+    partitioned_vector_transform1
     partitioned_vector_transform_binary
     partitioned_vector_transform_binary1
     partitioned_vector_transform_binary2
@@ -22,6 +23,7 @@ set(tests
     partitioned_vector_inclusive_scan
     partitioned_vector_inclusive_scan2
     partitioned_vector_exclusive_scan
+    partitioned_vector_exclusive_scan2
     partitioned_vector_transform_scan
     partitioned_vector_transform_scan2
     partitioned_vector_reduce
@@ -65,5 +67,5 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.parallel.segmented_algorithms.${test}
-                              ${test}_test_exe)
+                              ${test}_test)
 endforeach()

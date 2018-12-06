@@ -84,15 +84,6 @@ void test_find_if()
 
     test_find_if_async(execution::seq(execution::task), IteratorTag());
     test_find_if_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_if(execution_policy(execution::seq), IteratorTag());
-    test_find_if(execution_policy(execution::par), IteratorTag());
-    test_find_if(execution_policy(execution::par_unseq), IteratorTag());
-
-    test_find_if(execution_policy(execution::seq(execution::task)), IteratorTag());
-    test_find_if(execution_policy(execution::par(execution::task)), IteratorTag());
-#endif
 }
 
 void find_if_test()
@@ -191,16 +182,6 @@ void test_find_if_exception()
 
     test_find_if_exception_async(execution::seq(execution::task), IteratorTag());
     test_find_if_exception_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_if_exception(execution_policy(execution::seq), IteratorTag());
-    test_find_if_exception(execution_policy(execution::par), IteratorTag());
-
-    test_find_if_exception(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_find_if_exception(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void find_if_exception_test()
@@ -298,16 +279,6 @@ void test_find_if_bad_alloc()
 
     test_find_if_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_find_if_bad_alloc_async(execution::par(execution::task), IteratorTag());
-
-#if defined(HPX_HAVE_GENERIC_EXECUTION_POLICY)
-    test_find_if_bad_alloc(execution_policy(execution::seq), IteratorTag());
-    test_find_if_bad_alloc(execution_policy(execution::par), IteratorTag());
-
-    test_find_if_bad_alloc(execution_policy(execution::seq(execution::task)),
-        IteratorTag());
-    test_find_if_bad_alloc(execution_policy(execution::par(execution::task)),
-        IteratorTag());
-#endif
 }
 
 void find_if_bad_alloc_test()

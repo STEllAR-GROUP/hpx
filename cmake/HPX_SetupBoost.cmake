@@ -34,7 +34,7 @@ if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
   set(__boost_need_thread ON)
 endif()
 
-if(HPX_WITH_BOOST_CHRONO_COMPATIBILITY OR __boost_need_thread)
+if(__boost_need_thread)
   set(__boost_libraries ${__boost_libraries} chrono)
 endif()
 
@@ -63,10 +63,8 @@ endif()
 
 set(__boost_libraries
   ${__boost_libraries}
-  atomic
   filesystem
   program_options
-  regex
   system)
 
 find_package(Boost 1.55 REQUIRED COMPONENTS ${__boost_libraries})
@@ -96,6 +94,13 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
+# attempt to load Boost.Regex (if available), it's needed for inspect
+find_package(Boost 1.55 QUIET COMPONENTS regex)
+if(Boost_REGEX_FOUND)
+  hpx_info("  regex")
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+endif()
+
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
 
 # If we compile natively for the MIC, we need some workarounds for certain
@@ -117,8 +122,6 @@ if(MSVC)
 else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
-hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
 hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})

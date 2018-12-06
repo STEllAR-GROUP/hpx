@@ -50,8 +50,8 @@ void inclusive_scan_benchmark()
         bool ok = std::equal(std::begin(d), std::end(d), std::begin(e));
         HPX_TEST(ok);
         if (ok) {
-            std::cout << "<DartMeasurement name=\"InclusiveScanTime\" \n"
-                << "type=\"numeric/double\">" << elapsed << "</DartMeasurement> \n";
+            // CDash graph plotting
+            hpx::util::print_cdash_timing("InclusiveScanTime", elapsed);
         }
     }
     catch (...)

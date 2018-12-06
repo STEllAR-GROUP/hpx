@@ -3,48 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-hpx_write_boostbook_catalog("${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml")
-
-file(GLOB base_files "${PROJECT_SOURCE_DIR}/docs/*.qbk")
-file(GLOB manual_files "${PROJECT_SOURCE_DIR}/docs/manual/*.qbk")
-file(GLOB build_system_files "${PROJECT_SOURCE_DIR}/docs/manual/build_system/*.qbk")
-file(GLOB_RECURSE releases_files "${PROJECT_SOURCE_DIR}/docs/releases/*.qbk")
-file(GLOB_RECURSE tutorial_files "${PROJECT_SOURCE_DIR}/docs/tutorial/*.qbk")
-file(GLOB_RECURSE index_files "${PROJECT_SOURCE_DIR}/docs/*.idx")
-
-set(documentation_files
-    ${manual_files} ${build_system_files} ${releases_files} ${tutorial_files}
-    ${base_files} ${index_files})
-
-set(documentation_dependencies
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_1.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_2.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_3.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_4.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_5.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_6.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_7.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_8.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/quickstart/hello_world.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/quickstart/potpourri.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/quickstart/simplest_hello_world_1.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/quickstart/simplest_hello_world_2.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulators/server/accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator_client.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp"
-    "${PROJECT_SOURCE_DIR}/examples/performance_counters/sine/server/sine.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/performance_counter.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/base_performance_counter.hpp")
-
-set(all_documentation_dependencies
-    ${documentation_files}
-    ${documentation_dependencies})
-
 # Add all files here which should be passed to doxygen
 set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
@@ -118,6 +76,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/copy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/count.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/fill.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/find.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/for_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/generate.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/container_algorithms/is_heap.hpp"
@@ -144,7 +103,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/service_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/v1/timed_executor_traits.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
@@ -177,6 +135,9 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/resource/partitioner_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/policies/scheduler_mode.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_helpers.hpp"
@@ -209,7 +170,6 @@ set(doxygen_dependencies
 foreach(doxygen_input ${doxygen_dependencies})
   set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
 endforeach()
-#hpx_info("doxygen" "${doxygen_inputs}")
 
 set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
 set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
@@ -226,9 +186,8 @@ set(doxygen_definition_list
     "HPX_CONSTEXPR="
     "HPX_FORCEINLINE="
     "HPX_INLINE_NAMESPACE(x)=namespace x"
-    "HPX_CONCEPT_REQUIRES_(x)=")
+    "HPX_CONCEPT_REQUIRES_(...)=")
 
-#############################################################################
 # Definitions for autodoc.doxy.in
 set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
 set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
@@ -246,52 +205,38 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/autodoc.doxy.in"
                 "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy"
                 @ONLY)
 
-#############################################################################
-set(all_documentation_dependencies ${all_documentation_dependencies}
-    ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
-
-# Generate Doxygen from the source code.
-hpx_source_to_boostbook(hpx_autodoc
-    CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
-    DEPENDENCIES ${doxygen_dependencies})
-
-set(quickbook_fixme_mode "-D__hpx_disable_fixme__")
-if(HPX_DOCUMENTATION_DEVELOPMENT)
-  set(quickbook_fixme_mode "-D__hpx_enable_fixme__")
-endif()
-
-if(BOOSTAUTOINDEX_FOUND)
-  set(auto_index_mode "-D__use_auto_index__")
-  set(auto_index_xsl_param index.on.type=1)
-endif()
-
-set(image
-    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}_draft.png)
-
-set(HPX_CMAKE_OPTIONS "")
+# Generate rst files with CMake variables and toolchains
+set(HPX_CMAKE_OPTIONS_RST "")
 foreach(_cat ${HPX_OPTION_CATEGORIES})
   string(REPLACE " " "_" _cat_link "${_cat}")
-  set(HPX_CMAKE_OPTIONS
-    "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_cat_link} ${_cat} Options]\n")
+  set(HPX_CMAKE_OPTIONS_RST
+    "${HPX_CMAKE_OPTIONS_RST}* :ref:`${_cat} options <${_cat_link}>`\n")
 endforeach()
-set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}\n")
+set(HPX_CMAKE_OPTIONS_RST "${HPX_CMAKE_OPTIONS_RST}\n")
 
 get_cmake_property(_variableNames CACHE_VARIABLES)
 foreach(_cat ${HPX_OPTION_CATEGORIES})
   string(REPLACE " " "_" _cat_anchor "${_cat}")
-  set(HPX_CMAKE_OPTIONS
-    "${HPX_CMAKE_OPTIONS}[#build_system.cmake_variables.${_cat_anchor}][h3 ${_cat} Options]\n")
+  set(_cat_title "${_cat} options")
+  string(REGEX REPLACE "." "-" _cat_title_underline "${_cat_title}")
+  set(HPX_CMAKE_OPTIONS_RST
+    "${HPX_CMAKE_OPTIONS_RST}.. _${_cat_anchor}:\n\n${_cat_title}\n${_cat_title_underline}\n\n")
   foreach (_variableName ${_variableNames})
     if(${_variableName}Category)
       if(_cat STREQUAL ${_variableName}Category)
         string(REPLACE " " "_" _variableName_anchor "${_variableName}")
-        set(HPX_CMAKE_OPTIONS
-          "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_variableName_anchor} ${_variableName}]\n")
+
+        get_property(_doc CACHE "${_variableName}" PROPERTY HELPSTRING)
+        get_property(_type CACHE "${_variableName}" PROPERTY TYPE)
+        if(NOT _type STREQUAL "UNINITIALIZED")
+          set(_variableName "${_variableName}:${_type}")
+        endif()
+        set(HPX_CMAKE_OPTIONS_RST
+          "${HPX_CMAKE_OPTIONS_RST}* :option:`${_variableName}`\n")
       endif()
     endif()
   endforeach()
-  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}\n")
-  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}[variablelist\n")
+  set(HPX_CMAKE_OPTIONS_RST "${HPX_CMAKE_OPTIONS_RST}\n")
 
   foreach (_variableName ${_variableNames})
     if(${_variableName}Category)
@@ -303,160 +248,123 @@ foreach(_cat ${HPX_OPTION_CATEGORIES})
         if(NOT _type STREQUAL "UNINITIALIZED")
           set(_variableName "${_variableName}:${_type}")
         endif()
-        set(HPX_CMAKE_OPTIONS
-          "${HPX_CMAKE_OPTIONS}    ")
-        set(HPX_CMAKE_OPTIONS
-          "${HPX_CMAKE_OPTIONS}    [[[#build_system.cmake_variables.${_variableName_anchor}] `${_variableName}`][${_doc}]]\n")
+        set(HPX_CMAKE_OPTIONS_RST
+          "${HPX_CMAKE_OPTIONS_RST}.. option:: ${_variableName}\n\n   ${_doc}\n\n")
       endif()
     endif()
   endforeach()
-
-  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}] [/ ${_cat} Options]\n\n")
 endforeach()
 
-set(QUICKBOOK_CMAKE_VARIABLES_DEST
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/build_system/cmake_variables.qbk")
+set(SPHINX_CMAKE_VARIABLES_RST_DEST
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/cmake_variables.rst")
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_variables.qbk.in"
-  ${QUICKBOOK_CMAKE_VARIABLES_DEST}
+  "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_variables.rst.in"
+  ${SPHINX_CMAKE_VARIABLES_RST_DEST}
   @ONLY
 )
 
 set(toolchains_base_dir ${PROJECT_SOURCE_DIR}/cmake/toolchains/)
 file(GLOB _toolchain_files ${toolchains_base_dir} ${toolchains_base_dir}*.cmake)
 
-set(HPX_CMAKE_TOOLCHAINS_LIST "")
-set(HPX_CMAKE_TOOLCHAINS "")
+set(HPX_CMAKE_TOOLCHAINS_LIST_RST "")
+set(HPX_CMAKE_TOOLCHAINS_RST "")
 foreach(_toolchain ${_toolchain_files})
   get_filename_component(_toolchain_name ${_toolchain} NAME_WE)
   string(REGEX REPLACE "[ -]" "_" _toolchain_anchor "${_toolchain_name}")
-  set(HPX_CMAKE_TOOLCHAINS_LIST
-   "${HPX_CMAKE_TOOLCHAINS_LIST}* [link hpx.manual.build_system.building_hpx.cmake_toolchains.${_toolchain_anchor} ${_toolchain_name}]\n")
-  set(HPX_CMAKE_TOOLCHAINS
-    "${HPX_CMAKE_TOOLCHAINS}[heading:${_toolchain_anchor} ${_toolchain_name}]\n")
-  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n``\n")
+  set(HPX_CMAKE_TOOLCHAINS_LIST_RST
+   "${HPX_CMAKE_TOOLCHAINS_LIST_RST}* :ref:`${_toolchain_name} <${_toolchain_anchor}>`\n")
+  string(REGEX REPLACE "." "-" _toolchain_underline ${_toolchain_name})
+  set(HPX_CMAKE_TOOLCHAINS_RST
+    "${HPX_CMAKE_TOOLCHAINS_RST}.. _${_toolchain_anchor}:\n\n${_toolchain_name}\n${_toolchain_underline}\n")
+  set(HPX_CMAKE_TOOLCHAINS_RST "${HPX_CMAKE_TOOLCHAINS_RST}\n.. code-block:: cmake\n\n")
   file(STRINGS ${_toolchain} _toolchain_content)
   foreach(_line ${_toolchain_content})
-    set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}    ${_line}\n")
+    set(HPX_CMAKE_TOOLCHAINS_RST "${HPX_CMAKE_TOOLCHAINS_RST}   ${_line}\n")
   endforeach()
-  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}``\n")
-  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n")
+  set(HPX_CMAKE_TOOLCHAINS_RST "${HPX_CMAKE_TOOLCHAINS_RST}\n")
 endforeach()
 
-set(QUICKBOOK_CMAKE_TOOLCHAINS_DEST
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/build_system/cmake_toolchains.qbk")
+set(SPHINX_CMAKE_TOOLCHAINS_RST_DEST
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/cmake_toolchains.rst")
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_toolchains.qbk.in"
-  ${QUICKBOOK_CMAKE_TOOLCHAINS_DEST}
+  "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_toolchains.rst.in"
+  ${SPHINX_CMAKE_TOOLCHAINS_RST_DEST}
   @ONLY
 )
 
-hpx_quickbook_to_html(hpx
-  SOURCE hpx.qbk
-  INDEX hpx.idx
-  DEPENDENCIES
-    ${all_documentation_dependencies}
-    ${QUICKBOOK_CMAKE_VARIABLES_DEST}
-    ${QUICKBOOK_CMAKE_TOOLCHAINS_DEST}
-  CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
-  XSLTPROC_ARGS chunk.section.depth=4
-                chunk.first.sections=1
-                toc.section.depth=4
-                toc.max.depth=4
-                generate.section.toc.level=4
-                boost.image.src=${image}
-                boost.image.w=567
-                boost.image.h=125
-                boost.image.alt="HPX"
-                ${auto_index_xsl_param}
-  QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
-  AUTOINDEX_ARGS --internal-index
-  SINGLEPAGE ${HPX_WITH_DOCUMENTATION_SINGLEPAGE})
-
-if(FOP_FOUND)
-  # This assumes that Quickbook -> BoostBook succeeded above.
-#  hpx_quickbook_to_boostbook(hpx_pdf SOURCE hpx.qbk
-#    DEPENDENCIES ${all_documentation_dependencies}
-#    QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
-#    NODOXYGEN)
-
-  if(BOOSTAUTOINDEX_FOUND)
-    hpx_docbook_to_xslfo(hpx SOURCE hpx_auto_index.dbk
-                         XSLTPROC_ARGS index.on.type=1)
-  else()
-    hpx_docbook_to_xslfo(hpx SOURCE hpx.dbk)
-  endif()
-
-  hpx_xslfo_to_pdf(hpx SOURCE hpx.fo)
-endif()
-
-if(FOP_FOUND)
-  add_custom_target(docs
-    DEPENDS hpx_HTML.manifest hpx.pdf
-    SOURCES ${documentation_files})
+# Configure Sphinx conf.py
+if(HPX_WITH_GIT_TAG)
+  set(HPX_CONF_DOCUMENTATION_VERSION "${HPX_WITH_GIT_TAG}")
+elseif(HPX_WITH_GIT_BRANCH)
+  set(HPX_CONF_DOCUMENTATION_VERSION "${HPX_WITH_GIT_BRANCH}")
 else()
-  add_custom_target(docs
-    DEPENDS hpx_HTML.manifest
-    SOURCES ${documentation_files})
+  # HPX_VERSION is always available, use as fallback
+  set(HPX_CONF_DOCUMENTATION_VERSION "${HPX_VERSION}")
 endif()
 
-set_target_properties(docs
-    PROPERTIES FOLDER "Documentation/")
+set(SPHINX_CONF_PY_DEST
+    "${CMAKE_CURRENT_BINARY_DIR}/sphinx/conf.py")
+configure_file(
+  "${PROJECT_SOURCE_DIR}/cmake/templates/conf.py.in"
+  ${SPHINX_CONF_PY_DEST}
+  @ONLY
+)
 
-if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
-  add_custom_target(singlepage_docs
-    DEPENDS hpx_singlepage_HTML.manifest
-    SOURCES ${documentation_files})
-  set_target_properties(singlepage_docs
-      PROPERTIES FOLDER "Documentation/")
-endif()
+# Copy the Sphinx source files to build directory
+file(GLOB_RECURSE sphinx_source_files LIST_DIRECTORIES false RELATIVE
+    "${CMAKE_CURRENT_SOURCE_DIR}/" "sphinx/*")
 
-# Create links to properly view the docs in the build directory
-set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+foreach(sphinx_source_file ${sphinx_source_files})
+  add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${sphinx_source_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${sphinx_source_file}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${CMAKE_CURRENT_SOURCE_DIR}/${sphinx_source_file}"
+      "${CMAKE_CURRENT_BINARY_DIR}/${sphinx_source_file}")
+endforeach()
 
-execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}" )
-execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}/code" )
+foreach(sphinx_source_file ${sphinx_source_files})
+  set(sphinx_source_files_build ${sphinx_source_files_build} "${CMAKE_CURRENT_BINARY_DIR}/${sphinx_source_file}")
+endforeach()
 
-create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/src"
-                     "${DOCS_OUTPUT_DIR}/src")
-create_symbolic_link("${PROJECT_SOURCE_DIR}/docs/html/images"
-                     "${DOCS_OUTPUT_DIR}/images")
-create_symbolic_link("${PROJECT_SOURCE_DIR}/hpx"
-                     "${DOCS_OUTPUT_DIR}/code/hpx")
+# Create links to source files so that they are visible to sphinx
 create_symbolic_link("${PROJECT_SOURCE_DIR}/src"
-                     "${DOCS_OUTPUT_DIR}/code/src")
+                     "${CMAKE_CURRENT_BINARY_DIR}/src")
+create_symbolic_link("${PROJECT_SOURCE_DIR}/hpx"
+                     "${CMAKE_CURRENT_BINARY_DIR}/hpx")
 create_symbolic_link("${PROJECT_SOURCE_DIR}/examples"
-                     "${DOCS_OUTPUT_DIR}/code/examples")
+                     "${CMAKE_CURRENT_BINARY_DIR}/examples")
 create_symbolic_link("${PROJECT_SOURCE_DIR}/tests"
-                     "${DOCS_OUTPUT_DIR}/code/tests")
+                     "${CMAKE_CURRENT_BINARY_DIR}/tests")
 
-source_group(Documentation FILES ${base_files})
-source_group("Documentation\\Manual" FILES ${manual_files})
-source_group("Documentation\\Manual\\BuildSystem" FILES ${build_system_files})
-source_group("Documentation\\Releases" FILES ${releases_files})
-source_group("Documentation\\Tutorial" FILES ${tutorial_files})
-if(BOOSTAUTOINDEX_FOUND)
-  source_group("Documentation\\Index" FILES ${index_files})
-endif()
+hpx_source_to_doxygen(hpx_autodoc
+  DEPENDENCIES ${doxygen_dependencies})
 
-set_source_files_properties(${documentation_files}
-  PROPERTIES HEADER_FILE_ONLY TRUE)
+set(SPHINX_DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx/docs/html")
 
-###############################################################################
-# handle generating docs for github pages
+add_custom_command(
+  OUTPUT "${SPHINX_DOCS_OUTPUT_DIR}"
+  DEPENDS "${sphinx_source_files_build}"
+    "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc/index.xml"
+  COMMAND ${SPHINX_EXECUTABLE} -b html -n -d
+    "${CMAKE_CURRENT_BINARY_DIR}/doctree"
+    "${CMAKE_CURRENT_BINARY_DIR}/sphinx"
+    "${SPHINX_DOCS_OUTPUT_DIR}")
+
+add_custom_target(docs
+  ALL
+  DEPENDS ${SPHINX_DOCS_OUTPUT_DIR})
+
 add_custom_target(git_docs
   COMMAND "${CMAKE_COMMAND}"
     -DHPX_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
+    -DHPX_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}
     -DHPX_VERSION:STRING=${HPX_VERSION}
-    -DHPX_DOCUMENTATION_FILES="${documentation_dependencies};${doxygen_dependencies}"
+    -DHPX_WITH_GIT_BRANCH=${HPX_WITH_GIT_BRANCH}
+    -DHPX_WITH_GIT_TAG=${HPX_WITH_GIT_TAG}
     -P "${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake")
-#  VERBATIM)
 
 set_target_properties(git_docs
     PROPERTIES FOLDER "Documentation/")
 
 add_dependencies(git_docs docs)
-if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
-  add_dependencies(git_docs singlepage_docs)
-endif()
-

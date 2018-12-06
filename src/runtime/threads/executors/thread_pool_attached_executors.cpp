@@ -42,9 +42,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             thread_priority priority, thread_stacksize stacksize)
       : first_thread_(first_thread),
         num_threads_(num_threads),
-        os_thread_(0),
-        priority_(priority),
-        stacksize_(stacksize)
+        os_thread_(0)
     {
 //         if (first_thread + num_threads > hpx::get_os_thread_count())
 //         {
@@ -63,14 +61,19 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_attached_executor<Scheduler>::add(closure_type && f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         if (stacksize == threads::thread_stacksize_default)
             stacksize = stacksize_;
 
         register_thread_nullary(std::move(f), desc, initial_state, run_now,
-            priority_, get_next_thread_num(), stacksize, ec);
+            priority_,
+            threads::thread_schedule_hint(
+                static_cast<std::int16_t>(get_next_thread_num())),
+            stacksize, ec);
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -86,9 +89,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             stacksize = stacksize_;
 
         // create new thread
-        thread_id_type id = register_thread_nullary(
-            std::move(f), description, suspended, false,
-            priority_, get_next_thread_num(), stacksize, ec);
+        thread_id_type id = register_thread_nullary(std::move(f), description,
+            suspended, false, priority_,
+            threads::thread_schedule_hint(
+                static_cast<std::int16_t>(get_next_thread_num())),
+            stacksize, ec);
         if (ec) return;
 
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise

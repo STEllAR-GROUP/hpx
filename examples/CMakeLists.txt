@@ -55,7 +55,17 @@ if(HPX_WITH_COMPUTE)
      )
 endif()
 
+if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+  add_hpx_pseudo_target(tests.examples)
+  add_hpx_pseudo_dependencies(tests tests.examples)
+endif()
+
 foreach(subdir ${subdirs})
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
+    add_hpx_pseudo_target(tests.examples.${subdir})
+    add_hpx_pseudo_dependencies(tests.examples tests.examples.${subdir})
+  endif()
+
   add_hpx_pseudo_target(examples.${subdir})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(examples examples.${subdir})

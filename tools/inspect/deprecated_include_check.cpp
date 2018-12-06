@@ -26,7 +26,8 @@ namespace boost
       { "boost/move/move\\.hpp", "utility" },
       { "boost/atomic/atomic\\.hpp", "boost/atomic.hpp" },
 //       { "boost/thread/locks.hpp", "mutex" },
-      { "boost/type_traits\\.hpp", "separate type-traits headers" },
+      { "boost/type_traits\\.hpp", "type_traits" },
+      { "boost/type_traits/([^\\s]*)\\.hpp", "type_traits" },
       { "boost/unordered_map\\.hpp", "unordered_map" },
       { "boost/unordered_set\\.hpp", "unordered_set" },
       { "boost/utility/enable_if\\.hpp", "type_traits" },
@@ -49,6 +50,7 @@ namespace boost
       { "boost/nondet_random.hpp", "random" },
       { "boost/random/([^\\s]*)\\.hpp", "random" },
       { "boost/format\\.hpp", "hpx/util/format.hpp" },
+      { "boost/regex.hpp", "regex" },
       { nullptr, nullptr }
     };
 

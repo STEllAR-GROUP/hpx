@@ -18,8 +18,6 @@
 #include "partition3d.hpp"
 #include "../read_values.hpp"
 
-#include <boost/scoped_array.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace sheneos
 {
@@ -38,7 +36,7 @@ namespace sheneos { namespace server
 
     inline void
     partition3d::init_dimension(std::string const& datafilename, int d,
-        dimension const& dim, char const* name, boost::scoped_array<double>& values)
+        dimension const& dim, char const* name, std::unique_ptr<double[]>& values)
     {
         // Store all parameters.
         dim_[d] = dim;
@@ -65,7 +63,7 @@ namespace sheneos { namespace server
 
     inline void
     partition3d::init_data(std::string const& datafilename,
-        char const* name, boost::scoped_array<double>& values,
+        char const* name, std::unique_ptr<double[]>& values,
         std::size_t array_size)
     {
         values.reset(new double[array_size]);

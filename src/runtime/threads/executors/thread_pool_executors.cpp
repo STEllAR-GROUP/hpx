@@ -156,8 +156,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add(closure_type && f,
         util::thread_description const& desc,
-        threads::thread_state_enum initial_state,
-        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
+        threads::thread_state_enum initial_state, bool run_now,
+        threads::thread_stacksize stacksize,
+        threads::thread_schedule_hint schedulehint,
+        error_code& ec)
     {
         // create a new thread
         thread_init_data data(util::bind(
@@ -343,10 +345,18 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             std::int64_t idle_loop_count = 0, busy_loop_count = 0;
             std::uint8_t task_active = 0;
 
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+            std::uint64_t bg_work = 0;
+            threads::detail::scheduling_counters counters(
+                executed_threads, executed_thread_phases,
+                overall_times, thread_times, idle_loop_count, busy_loop_count,
+                task_active, bg_work);
+#else
             threads::detail::scheduling_counters counters(
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times, idle_loop_count, busy_loop_count,
                 task_active);
+#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
             threads::detail::scheduling_callbacks callbacks(
                 threads::detail::scheduling_callbacks::callback_type(),
@@ -423,12 +433,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             ++curr_punits_;
             register_thread_nullary(
-                util::bind(
-                    util::one_shot(&thread_pool_executor::run),
-                    this, virt_core, thread_num
-                ),
+                util::bind(util::one_shot(&thread_pool_executor::run), this,
+                    virt_core, thread_num),
                 "thread_pool_executor thread", threads::pending, true,
-                threads::thread_priority_normal, thread_num,
+                threads::thread_priority_normal,
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(thread_num)),
                 threads::thread_stacksize_default, ec);
         }
     }

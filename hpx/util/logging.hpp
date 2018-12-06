@@ -13,12 +13,10 @@
 
 #if defined(HPX_HAVE_LOGGING)
 
-#include <hpx/util/logging/format/named_write.hpp>
+#include <hpx/util/logging/logging.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
 
 #include <boost/current_function.hpp>
-
-HPX_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
 
 ///////////////////////////////////////////////////////////////////////////////
 // specific logging
@@ -30,7 +28,6 @@ HPX_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
 #define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
 #define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
 #define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
-#define LSEC_(lvl)  LHPX_(lvl, " [SEC] ")   /* security */
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -39,7 +36,7 @@ namespace hpx { namespace util
     HPX_API_EXPORT std::string levelname(int level);
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef hpx::util::logging::named_logger<>::type logger_type;
+    typedef hpx::util::logging::logger logger_type;
     typedef hpx::util::logging::level::holder filter_type;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -156,7 +153,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    typedef hpx::util::logging::named_logger<>::type logger_type;
+    typedef hpx::util::logging::logger logger_type;
     typedef hpx::util::logging::level::holder filter_type;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -277,7 +274,6 @@ namespace hpx { namespace util { namespace detail
     #define LPCS_(lvl)            if(true) {} else hpx::util::detail::dummy_log
     #define LAS_(lvl)             if(true) {} else hpx::util::detail::dummy_log
     #define LBT_(lvl)             if(true) {} else hpx::util::detail::dummy_log
-    #define LSEC_(lvl)            if(true) {} else hpx::util::detail::dummy_log
 
     #define LFATAL_               if(true) {} else hpx::util::detail::dummy_log
 

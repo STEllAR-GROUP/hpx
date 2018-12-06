@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <memory>
 
 struct thread_data
 {
@@ -28,7 +29,7 @@ int get_thread_num()
 
 int main()
 {
-    boost::scoped_ptr<thread_data> data_struct(new thread_data());
+    std::unique_ptr<thread_data> data_struct(new thread_data());
     data_struct->thread_num = 42;
 
     hpx::threads::thread_id_type thread_id = hpx::threads::get_self_id();

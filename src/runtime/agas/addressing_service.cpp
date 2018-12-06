@@ -927,7 +927,7 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     // NOTE: This should still be migration safe.
-    return naming::detail::strip_internal_bits_from_gid(msb) ==
+    return naming::detail::strip_internal_bits_and_component_type_from_gid(msb) ==
         get_local_locality().get_msb();
 }
 
@@ -954,20 +954,20 @@ bool addressing_service::resolve_locally_known_addresses(
             return true;
         }
 
+        if (naming::refers_to_local_lva(id))
+        {
+            // handle (non-migratable) components located on this locality first
+            addr.type_ = naming::detail::get_component_type_from_gid(msb);
+            addr.address_ = lsb;
+            return true;
+        }
+
         if (naming::refers_to_virtual_memory(msb))
         {
             HPX_ASSERT(mem_lva_);
 
             addr.type_ = components::component_memory;
             addr.address_ = mem_lva_;
-            return true;
-        }
-
-        if (naming::refers_to_local_lva(id))
-        {
-            // handle (non-migratable) components located on this locality first
-            addr.type_ = naming::detail::get_component_type_from_gid(msb);
-            addr.address_ = lsb;
             return true;
         }
     }
@@ -1099,7 +1099,11 @@ bool addressing_service::resolve_cached(
 
     // special cases
     if (resolve_locally_known_addresses(id, addr))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return true;
+    }
 
     // If caching is disabled, bail
     if (!caching_)
@@ -1420,7 +1424,8 @@ void addressing_service::route(
             util::deferred_call(
                 route_ptr, this, std::move(p), std::move(f), local_priority),
             "addressing_service::route", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(),
             threads::thread_stacksize_default);
         return;
     }
@@ -1575,7 +1580,8 @@ void addressing_service::decref(
         threads::register_thread_nullary(
             util::deferred_call(decref_ptr, this, raw, credit, std::ref(throws)),
             "addressing_service::decref", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(),
             threads::thread_stacksize_default, ec);
 
         return;
@@ -1822,7 +1828,8 @@ void addressing_service::update_cache_entry(
         threads::register_thread_nullary(
             util::deferred_call(update_cache_entry_ptr, this, id, g, std::ref(throws)),
             "addressing_service::update_cache_entry", threads::pending, true,
-            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_priority_normal,
+            threads::thread_schedule_hint(),
             threads::thread_stacksize_default, ec);
     }
 
