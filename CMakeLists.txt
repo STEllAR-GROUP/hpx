@@ -1055,6 +1055,12 @@ if((MSVC14 AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
 endif()
 
 ################################################################################
+# Some special handling of the compilation is need on build infrastructure for
+# generating packages for target architecture, see issue #3575
+
+hpx_option(HPX_WITH_BUILD_BINARY_PACKAGE BOOL
+  "Build HPX on the build infrastructure on any LINUX distribution (default: OFF)."
+  OFF ADVANCED)
 
 ################################################################################
 # Add necessary compiler flags. Flags added here include flags to disable/enable
@@ -1478,17 +1484,25 @@ else()
     hpx_add_compile_flag_if_available(-wd2536)
   endif()
 
+
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
   # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
   # a serializing instruction.
   hpx_cpuid("rdtsc" HPX_WITH_RDTSC
     DEFINITIONS HPX_HAVE_RDTSC)
 
+ # One can not assume if RDTSCP is available on the hardware
+ # of the build infrastructure, that it will be available on
+ # all potential target hardware, see Issue  #3575
+ if(NOT ${HPX_WITH_BUILD_BINARY_PACKAGE})
+
   # XeonPhi's do not support RDTSCP
   if(NOT ("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI"))
     hpx_cpuid("rdtscp" HPX_WITH_RDTSCP
       DEFINITIONS HPX_HAVE_RDTSCP)
   endif()
+
+ endif()
 
   if(NOT HPX_WITH_RDTSC AND NOT HPX_WITH_RDTSCP)
     hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
