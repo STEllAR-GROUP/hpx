@@ -115,6 +115,14 @@ namespace hpx { namespace parallel { namespace execution
             {
                 return exec.processing_units_count();
             }
+
+            template <typename AnyExecutor, typename Parameters>
+            struct result
+            {
+                using type = decltype(call(0,
+                    std::declval<AnyExecutor>(), std::declval<Parameters&>()
+                ));
+            };
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -141,6 +149,14 @@ namespace hpx { namespace parallel { namespace execution
             {
                 return exec.has_pending_closures();
             }
+
+            template <typename AnyExecutor>
+            struct result
+            {
+                using type = decltype(call(0,
+                    std::declval<AnyExecutor>()
+                ));
+            };
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -171,6 +187,16 @@ namespace hpx { namespace parallel { namespace execution
             {
                 return exec.get_pu_mask(topo, thread_num);
             }
+
+            template <typename AnyExecutor>
+            struct result
+            {
+                using type = decltype(call(0,
+                    std::declval<AnyExecutor>(),
+                    std::declval<threads::topology&>(),
+                    std::declval<std::size_t>()
+                ));
+            };
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -197,6 +223,14 @@ namespace hpx { namespace parallel { namespace execution
             {
                 exec.set_scheduler_mode(mode);
             }
+
+            template <typename AnyExecutor, typename Mode>
+            struct result
+            {
+                using type = decltype(call(0,
+                    std::declval<AnyExecutor>(), std::declval<Mode const&>()
+                ));
+            };
         };
 
         /// \endcond
