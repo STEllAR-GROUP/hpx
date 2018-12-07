@@ -314,6 +314,9 @@ configure_file(
 file(GLOB_RECURSE sphinx_source_files LIST_DIRECTORIES false RELATIVE
     "${CMAKE_CURRENT_SOURCE_DIR}/" "sphinx/*")
 
+# exclude api.rst...
+list(FILTER sphinx_source_files EXCLUDE REGEX ".*api.rst")
+
 foreach(sphinx_source_file ${sphinx_source_files})
   add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${sphinx_source_file}"
@@ -325,6 +328,25 @@ endforeach()
 
 foreach(sphinx_source_file ${sphinx_source_files})
   set(sphinx_source_files_build ${sphinx_source_files_build} "${CMAKE_CURRENT_BINARY_DIR}/${sphinx_source_file}")
+endforeach()
+
+# Copy the Sphinx source files of the libs directory to build directory
+file(GLOB_RECURSE sphinx_libs_source_files LIST_DIRECTORIES false RELATIVE
+    "${CMAKE_SOURCE_DIR}/libs" "${CMAKE_SOURCE_DIR}/libs/*/docs/*")
+
+set(sphinx_libs_source_files "index.rst" ${sphinx_libs_source_files})
+
+foreach(sphinx_source_file ${sphinx_libs_source_files})
+  add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/sphinx/libs/${sphinx_source_file}"
+    DEPENDS "${CMAKE_SOURCE_DIR}/libs/${sphinx_source_file}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${CMAKE_SOURCE_DIR}/libs/${sphinx_source_file}"
+      "${CMAKE_CURRENT_BINARY_DIR}/sphinx/libs/${sphinx_source_file}")
+endforeach()
+
+foreach(sphinx_source_file ${sphinx_libs_source_files})
+  set(sphinx_source_files_build ${sphinx_source_files_build} "${CMAKE_CURRENT_BINARY_DIR}/sphinx/libs/${sphinx_source_file}")
 endforeach()
 
 # Create links to source files so that they are visible to sphinx
