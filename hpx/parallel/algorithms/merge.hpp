@@ -847,7 +847,7 @@ namespace hpx { namespace parallel { inline namespace v1
 
         typedef std::integral_constant<bool,
                 execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_random_access_iterator<RandIter>::value ||
+               !hpx::traits::is_random_access_iterator<RandIter>::value
             > is_seq;
 #else
         static_assert(
