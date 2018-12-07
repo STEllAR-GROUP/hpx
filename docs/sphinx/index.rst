@@ -83,6 +83,8 @@ What's so special about |hpx|?
    manual
    additional_material
 
+.. include:: libs/index.rst
+
 .. toctree::
    :caption: Reference
    :maxdepth: 2
