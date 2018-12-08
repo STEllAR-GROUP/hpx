@@ -378,6 +378,10 @@ if(NOT HPX_WITH_STATIC_LINKING)
   endif()
 
   target_include_directories(hpx_init PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}> $<INSTALL_INTERFACE:include>)
+
+  # Set the basic search paths for the generated HPX headers
+  target_include_directories(hpx_init PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}> $<INSTALL_INTERFACE:include>)
+
   target_link_libraries(hpx_init PRIVATE hpx::boost)
 
   set_property(TARGET hpx_init APPEND
@@ -412,6 +416,11 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
           ${hpx_wrap_SOURCES})
       endif()
     endif()
+
+    target_include_directories(hpx_wrap PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}> $<INSTALL_INTERFACE:include>)
+
+    # Set the basic search paths for the generated HPX headers
+    target_include_directories(hpx_wrap PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}> $<INSTALL_INTERFACE:include>)
 
     target_link_libraries(hpx_wrap PUBLIC hpx)
 
