@@ -96,7 +96,7 @@ set(benchmarks ${benchmarks}
     native_tls_overhead
    )
 
-set(native_tls_overhead_LIBRARIES Boost::thread Boost::program_options)
+set(native_tls_overhead_LIBRARIES hpx::boost)
 
 set(benchmarks ${benchmarks}
     coroutines_call_overhead

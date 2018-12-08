@@ -268,14 +268,7 @@ endforeach()
 #  add_dependencies(hpx static_component_data_hpp)
 #endif()
 
-target_link_libraries(hpx
-                        PUBLIC
-                          Boost::boost
-                        PRIVATE
-                          Boost::filesystem
-                          Boost::program_options
-                          Boost::system
-                          Boost::disable_autolinking)
+target_link_libraries(hpx PUBLIC hpx::boost)
 
 # Set the basic search paths for the HPX headers
 target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}> $<INSTALL_INTERFACE:include>)
@@ -311,41 +304,6 @@ endif()
 
 if (TARGET hpx::valgrind)
   target_link_libraries(hpx PRIVATE hpx::valgrind)
-endif()
-
-if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
-        HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
-  target_link_libraries(hpx PRIVATE Boost::log)
-endif()
-
-if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
-  target_link_libraries(hpx PUBLIC Boost::thread Boost::disable_autolinking)
-endif()
-
-# Set configuration option to use Boost.Context or not. This depends on the
-# platform.
-set(__use_generic_coroutine_context OFF)
-if(APPLE)
-  set(__use_generic_coroutine_context ON)
-endif()
-if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ" AND Boost_VERSION GREATER 105500)
-  set(__use_generic_coroutine_context ON)
-endif()
-hpx_option(
-        HPX_WITH_GENERIC_CONTEXT_COROUTINES
-        BOOL
-        "Use Boost.Context as the underlying coroutines context switch implementation."
-        ${__use_generic_coroutine_context} ADVANCED)
-
-if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
-  target_link_libraries(hpx PUBLIC Boost::context Boost::disable_autolinking)
-endif()
-
-# If we compile natively for the MIC, we need some workarounds for certain
-# Boost headers
-# FIXME: push changes upstream
-if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-  target_include_directories(hpx BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/external/asio)
 endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
@@ -420,7 +378,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
   endif()
 
   target_include_directories(hpx_init PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}> $<INSTALL_INTERFACE:include>)
-  target_link_libraries(hpx_init PRIVATE Boost::program_options Boost::disable_autolinking)
+  target_link_libraries(hpx_init PRIVATE hpx::boost)
 
   set_property(TARGET hpx_init APPEND
     PROPERTY COMPILE_DEFINITIONS

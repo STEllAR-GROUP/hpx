@@ -10,12 +10,8 @@ add_hpx_executable(inspect
   NOLIBS
   FOLDER "Tools/Inspect")
 
-if(NOT TARGET Boost::regex)
-  hpx_error("HPX inspect tool requires Boost.Regex")
-endif()
-
 if((NOT MSVC) OR HPX_WITH_VCPKG)
-  target_link_libraries(inspect PRIVATE ${HPX_TLL_PUBLIC} Boost::regex Boost::program_options Boost::filesystem)
+  target_link_libraries(inspect PRIVATE ${HPX_TLL_PUBLIC} hpx::boost)
 endif()
 
 # add dependencies to pseudo-target

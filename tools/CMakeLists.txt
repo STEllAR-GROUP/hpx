@@ -14,7 +14,7 @@ if((NOT MSVC) OR HPX_WITH_VCPKG)
     FOLDER "Tools/cpu_features")
 
   add_hpx_pseudo_dependencies(tools cpu_features)
-  target_link_libraries(cpu_features PRIVATE ${HPX_TLL_PUBLIC} Boost::program_options)
+  target_link_libraries(cpu_features PRIVATE ${HPX_TLL_PUBLIC} hpx::boost)
 endif()
 
 foreach(subdir ${subdirs})

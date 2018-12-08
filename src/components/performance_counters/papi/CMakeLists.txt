@@ -28,7 +28,7 @@ if(HPX_WITH_PAPI)
       PLUGIN)
 
     target_include_directories(papi_counters SYSTEM PRIVATE ${PAPI_INCLUDE_DIR})
-    target_link_libraries(papi_counters PRIVATE Boost::program_options Boost::disable_autolinking)
+    target_link_libraries(papi_counters PRIVATE hpx::boost)
   endif()
 
   add_hpx_pseudo_dependencies(components.performance_counters_.papi

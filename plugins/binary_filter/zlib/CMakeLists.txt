@@ -34,7 +34,7 @@ function(add_zlib_module)
       target_include_directories(compress_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
     endif()
 
-    target_link_libraries(compress_zlib PRIVATE Boost::iostreams Boost::filesystem Boost::disable_autolinking)
+    target_link_libraries(compress_zlib PRIVATE hpx::boost)
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)

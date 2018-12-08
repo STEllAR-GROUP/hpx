@@ -32,7 +32,7 @@ function(add_snappy_module)
       target_link_directories(compress_snappy PRIVATE ${SNAPPY_LIBRARY_DIR})
     endif()
 
-    target_link_libraries(compress_snappy PRIVATE Boost::iostreams Boost::filesystem Boost::disable_autolinking)
+    target_link_libraries(compress_snappy PRIVATE hpx::boost)
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compress_snappy)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.snappy)

@@ -12,10 +12,7 @@ add_hpx_component(process
     HEADER_ROOT ${root}
     AUTOGLOB)
 
-target_link_libraries(process_component PRIVATE Boost::iostreams
-                                                Boost::filesystem
-                                                Boost::system
-                                                Boost::disable_autolinking)
+target_link_libraries(process_component PRIVATE hpx::boost)
 
 if (TARGET hpx::apex)
     target_link_libraries(process_component PRIVATE hpx::apex)

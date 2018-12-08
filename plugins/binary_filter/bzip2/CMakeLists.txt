@@ -34,7 +34,7 @@ function(add_bzip2_module)
       target_include_directories(compress_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
     endif()
 
-    target_link_libraries(compress_bzip2 PRIVATE Boost::iostreams Boost::filesystem Boost::disable_autolinking)
+    target_link_libraries(compress_bzip2 PRIVATE hpx::boost)
 
     add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)

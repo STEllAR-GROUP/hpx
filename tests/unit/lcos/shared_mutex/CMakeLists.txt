@@ -11,7 +11,7 @@ set(tests
 set(shared_future1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(shared_future2_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(shared_mutex1_LIBRARIES Boost::thread)
+set(shared_mutex1_LIBRARIES hpx::boost)
 
 foreach(test ${tests})
   set(sources

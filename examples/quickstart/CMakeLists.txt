@@ -91,7 +91,7 @@ set(partitioned_vector_spmd_foreach_FLAGS
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(shared_mutex_LIBRARIES Boost::thread)
+set(shared_mutex_LIBRARIES hpx::boost)
 set(simplest_hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simplest_hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)

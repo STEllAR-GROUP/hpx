@@ -30,11 +30,8 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-if((NOT MSVC) OR HPX_WITH_VCPKG)
-  set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${Boost_LIBRARIES})
-else()
-  set(lockfree_fifo_FLAGS NOLIBS)
-endif()
+set(lockfree_fifo_FLAGS NOLIBS)
+set(lockfree_fifo_LIBRARIES hpx::boost)
 
 set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -68,6 +65,8 @@ foreach(test ${tests})
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/Threads")
+
+  target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})
 
   add_hpx_unit_test("threads" ${test} ${${test}_PARAMETERS})
 

@@ -24,20 +24,65 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.58.0" "1.58"
     "1.57.0" "1.57")
 
-find_package(Boost 1.55 REQUIRED
-                        COMPONENTS
-                          filesystem
-                          iostreams
-                          program_options
-                          system
-                        OPTIONAL_COMPONENTS
-                          context
-                          thread
-                          log
-                          regex)
+set(required_Boost_components filesystem iostreams program_options system)
+
+if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
+        HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
+    set(required_Boost_components ${required_Boost_components} log log_setup date_time chrono thread)
+endif()
+
+if(HPX_WITH_THREAD_COMPATIBILITY OR NOT(HPX_WITH_CXX11_THREAD))
+    set(required_Boost_components ${required_Boost_components} thread chrono)
+endif()
+
+if (HPX_WITH_TOOLS)
+    set(required_Boost_components ${required_Boost_components} regex)
+endif()
+
+# Set configuration option to use Boost.Context or not. This depends on the
+# platform.
+set(__use_generic_coroutine_context OFF)
+if(APPLE)
+    set(__use_generic_coroutine_context ON)
+endif()
+
+if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ" AND Boost_VERSION GREATER 105500)
+    set(__use_generic_coroutine_context ON)
+endif()
+
+hpx_option(
+        HPX_WITH_GENERIC_CONTEXT_COROUTINES
+        BOOL
+        "Use Boost.Context as the underlying coroutines context switch implementation."
+        ${__use_generic_coroutine_context} ADVANCED)
+
+if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
+    set(required_Boost_components ${required_Boost_components} context thread chrono)
+endif()
+
+find_package(Boost 1.55 REQUIRED COMPONENTS ${required_Boost_components})
+
+add_library(hpx::boost INTERFACE IMPORTED)
+
+target_include_directories(hpx::boost INTERFACE ${Boost_INCLUDE_DIRS})
+target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
+
+# The Boost find module already links against the system thread library for versions >= 3.11.
+if (CMAKE_VERSION VERSION_LESS 3.11)
+    find_package(Threads REQUIRED)
+
+    target_link_libraries(hpx::boost INTERFACE Threads::Threads)
+endif()
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
+endif()
+
+# If we compile natively for the MIC, we need some workarounds for certain
+# Boost headers
+# FIXME: push changes upstream
+if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
+    target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
 endif()
 
 # Boost preprocessor definitions
