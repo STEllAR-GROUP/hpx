@@ -37,6 +37,7 @@ set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
+set(thread_affinity_LIBRARIES hpx::hwloc)
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
