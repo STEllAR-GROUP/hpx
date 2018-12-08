@@ -86,7 +86,6 @@ if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
 endif()
 
 # Boost preprocessor definitions
-hpx_add_config_cond_define(BOOST_PARAMETER_MAX_ARITY 7)
 if(MSVC)
   hpx_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL
     "Add BOOST_ALL_DYN_LINK to compile flags (default: OFF)"
