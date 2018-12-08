@@ -75,19 +75,19 @@ endif()
 set(__boost_include_dirs ${__boost_include_dirs} ${Boost_INCLUDE_DIRS})
 
 # Emulate target_include_directories to support CMake < 3.11.
-set_property(TARGET hpx::boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${__boost_include_dirs})
+set_property(TARGET hpx::boost PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${__boost_include_dirs})
 
-set(__boost_libraries ${Boost_LIBRARIES})
+# Emulate target_link_libraries to support CMake < 3.11.
+set_property(TARGET hpx::boost PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_LIBRARIES})
 
 # The Boost find module already links against the system thread library for versions >= 3.11.
 if (CMAKE_VERSION VERSION_LESS 3.11)
     find_package(Threads REQUIRED)
 
-    set(__boost_libraries ${__boost_libraries} Threads::Threads)
+    set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)
 endif()
 
-# Emulate target_link_libraries to support CMake < 3.11.
-set_property(TARGET hpx::boost PROPERTY INTERFACE_LINK_LIBRARIES ${__boost_libraries})
+
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")

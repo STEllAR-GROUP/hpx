@@ -1555,8 +1555,8 @@ if(NOT HWLOC_FOUND)
 endif()
 
 add_library(hpx::hwloc INTERFACE IMPORTED)
-target_include_directories(hpx::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
-target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
+set_property(TARGET hpx::hwloc PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${HWLOC_INCLUDE_DIR})
+set_property(TARGET hpx::hwloc PROPERTY INTERFACE_LINK_LIBRARIES ${HWLOC_LIBRARIES})
 
 ################################################################################
 # Enable integration with Intel Amplifier
@@ -1568,8 +1568,8 @@ if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
   endif()
 
   add_library(hpx::amplifier INTERFACE IMPORTED)
-  target_include_directories(hpx::amplifier SYSTEM INTERFACE ${AMPLIFIER_INCLUDE_DIR})
-  target_link_libraries(hpx::amplifier INTERFACE ${AMPLIFIER_LIBRARIES})
+  set_property(TARGET hpx::hwloc PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${AMPLIFIER_INCLUDE_DIR})
+  set_property(TARGET hpx::hwloc PROPERTY INTERFACE_LINK_LIBRARIES ${AMPLIFIER_LIBRARIES})
 
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
@@ -1615,29 +1615,29 @@ if(HPX_WITH_APEX)
 
   add_library(hpx::apex INTERFACE IMPORTED)
 
-  target_include_directories(hpx::apex SYSTEM INTERFACE ${APEX_SOURCE_DIR})
-  target_link_libraries(hpx::apex INTERFACE apex)
+  set_property(TARGET hpx::apex PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${APEX_SOURCE_DIR})
+  set_property(TARGET hpx::apex PROPERTY INTERFACE_LINK_LIBRARIES apex)
 
   if(APEX_WITH_MSR)
     add_library(hpx::msr INTERFACE IMPORTED)
     # TODO: Use an absolute path.
-    target_link_libraries(hpx::msr INTERFACE -L${MSR_ROOT}/lib -lmsr)
+    set_property(TARGET hpx::msr PROPERTY INTERFACE_LINK_LIBRARIES -L${MSR_ROOT}/lib -lmsr)
 
-    target_link_libraries(hpx::apex INTERFACE hpx::msr)
+    set_property(TARGET hpx::apex PROPERTY INTERFACE_LINK_LIBRARIES hpx::msr)
   endif()
   if(APEX_WITH_ACTIVEHARMONY)
     add_library(hpx::activeharmony INTERFACE IMPORTED)
     # TODO: Use an absolute path.
-    target_link_libraries(hpx::activeharmony INTERFACE -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+    set_property(TARGET hpx::activeharmony PROPERTY INTERFACE_LINK_LIBRARIES -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
 
-    target_link_libraries(hpx::apex INTERFACE hpx::activeharmony)
+    set_property(TARGET hpx::apex PROPERTY INTERFACE_LINK_LIBRARIES hpx::activeharmony)
   endif()
   if(APEX_WITH_OTF2)
     add_library(hpx::otf2 INTERFACE IMPORTED)
     # TODO: Use an absolute path.
-    target_link_libraries(hpx::otf2 INTERFACE -L${OTF2_ROOT}/lib -lotf2)
+    set_property(TARGET hpx::otf2 PROPERTY INTERFACE_LINK_LIBRARIES -L${OTF2_ROOT}/lib -lotf2)
 
-    target_link_libraries(hpx::apex INTERFACE hpx::otf2)
+    set_property(TARGET hpx::apex PROPERTY INTERFACE_LINK_LIBRARIES hpx::otf2)
   endif()
 
   # handle optional ITTNotify library
@@ -1648,11 +1648,11 @@ if(HPX_WITH_APEX)
     endif()
 
     add_library(hpx::ittnotify INTERFACE IMPORTED)
-    target_include_directories(hpx::ittnotify SYSTEM INTERFACE ${ITTNOTIFY_SOURCE_DIR})
+    set_property(TARGET hpx::ittnotify PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${ITTNOTIFY_SOURCE_DIR})
 
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
 
-    target_link_libraries(hpx::apex INTERFACE hpx::ittnotify)
+    set_property(TARGET hpx::apex PROPERTY INTERFACE_LINK_LIBRARIES hpx::ittnotify)
   endif()
 endif()
 
@@ -1693,8 +1693,8 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
   endif()
 
   add_library(hpx::gperftools INTERFACE IMPORTED)
-  target_include_directories(hpx::gperftool SYSTEM INTERFACE ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-  target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
+  set_property(TARGET hpx::gperftool PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+  set_property(TARGET hpx::gperftool PROPERTY INTERFACE_LINK_LIBRARIES ${GOOGLE_PERFTOOLS_LIBRARIES})
 endif()
 
 if(HPX_WITH_VALGRIND)
@@ -1704,7 +1704,7 @@ if(HPX_WITH_VALGRIND)
   endif()
 
   add_library(hpx::valgrind INTERFACE IMPORTED)
-  target_include_directories(hpx::valgrind SYSTEM INTERFACE ${VALGRIND_INCLUDE_DIR})
+  set_property(TARGET hpx::valgrind PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${VALGRIND_INCLUDE_DIR})
 
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()
