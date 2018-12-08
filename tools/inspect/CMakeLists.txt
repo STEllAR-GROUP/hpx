@@ -10,6 +10,9 @@ add_hpx_executable(inspect
   NOLIBS
   FOLDER "Tools/Inspect")
 
+# Set the basic search paths for the generated HPX headers
+target_include_directories(inspect PRIVATE ${CMAKE_BINARY_DIR})
+
 if((NOT MSVC) OR HPX_WITH_VCPKG)
   target_link_libraries(inspect PRIVATE ${HPX_TLL_PUBLIC} hpx::boost)
 endif()
