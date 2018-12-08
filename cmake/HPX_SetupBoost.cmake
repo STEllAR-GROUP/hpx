@@ -64,7 +64,18 @@ find_package(Boost 1.55 REQUIRED COMPONENTS ${required_Boost_components})
 
 add_library(hpx::boost INTERFACE IMPORTED)
 
-target_include_directories(hpx::boost INTERFACE ${Boost_INCLUDE_DIRS})
+# If we compile natively for the MIC, we need some workarounds for certain
+# Boost headers
+# FIXME: push changes upstream
+if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
+    # This directory need to appear before the regular Boost include directories.
+    set(__boost_include_dirs ${PROJECT_SOURCE_DIR}/external/asio)
+endif()
+
+set(__boost_include_dirs ${__boost_include_dirs} ${Boost_INCLUDE_DIRS})
+
+# Emulate target_include_directories to support CMake < 3.11.
+set_property(TARGET hpx::boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${__boost_include_dirs})
 target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
 
 # The Boost find module already links against the system thread library for versions >= 3.11.
@@ -76,13 +87,6 @@ endif()
 
 if(NOT Boost_FOUND)
   hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
-endif()
-
-# If we compile natively for the MIC, we need some workarounds for certain
-# Boost headers
-# FIXME: push changes upstream
-if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
 endif()
 
 # Boost preprocessor definitions
