@@ -82,7 +82,7 @@ set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
 
-set(delay_baseline_FLAGS NOLIBS
+set(delay_baseline_FLAGS
     DEPENDENCIES ${boost_library_dependencies})
 
 set(delay_baseline_threaded_FLAGS
