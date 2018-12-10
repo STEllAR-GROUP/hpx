@@ -88,7 +88,7 @@ set(delay_baseline_FLAGS NOLIBS
 set(delay_baseline_threaded_FLAGS
     DEPENDENCIES ${boost_library_dependencies})
 
-set(print_heterogeneous_payloads_FLAGS NOLIBS
+set(print_heterogeneous_payloads_FLAGS
     DEPENDENCIES ${boost_library_dependencies})
 
 set(benchmarks ${benchmarks}

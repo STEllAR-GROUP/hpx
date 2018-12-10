@@ -30,7 +30,6 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-set(lockfree_fifo_FLAGS NOLIBS)
 set(lockfree_fifo_LIBRARIES hpx::boost)
 
 set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
