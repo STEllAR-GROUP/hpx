@@ -276,6 +276,8 @@ target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}> $
 # Set the basic search paths for the generated HPX headers
 target_include_directories(hpx PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}> $<INSTALL_INTERFACE:include>)
 
+target_compile_definitions(hpx PUBLIC $<$<CONFIG:Debug>:HPX_DEBUG>)
+
 target_link_libraries(hpx PUBLIC hpx::allocator)
 
 target_link_libraries(hpx PRIVATE hpx::hwloc)
@@ -423,6 +425,8 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
     target_include_directories(hpx_wrap PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}> $<INSTALL_INTERFACE:include>)
 
     target_link_libraries(hpx_wrap PUBLIC hpx)
+
+    set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-wrap=main)
 
     if (TARGET hpx::apex)
       target_link_libraries(hpx_wrap PRIVATE hpx::apex)
