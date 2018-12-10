@@ -1,3 +1,4 @@
+# Copyright (c) 2018 Christopher Hinz
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2012 Bryce Adelstein-Lelbach
 #
@@ -10,8 +11,7 @@ libdir=${exec_prefix}/@HPX_CONF_LIBDIR@
 includedir=${exec_prefix}/@HPX_CONF_INCLUDEDIR@
 
 Name: hpx_component
-Description: High Performance ParalleX (application configuration)
+Description: High Performance ParalleX (component configuration)$<$<CONFIG:Debug>: - debug build>
 Version: @HPX_VERSION@
-Libs: @CXX_FLAG@ -shared -L${libdir} @HPX_PKG_LIBRARY_DIR@ @HPX_PKG_LIBRARIES@
-Cflags: @CXX_FLAG@ @HPX_CONF_INCLUDE_DIRS@ -fPIC -DHPX_COMPONENT_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
-
+Libs: -shared -L${libdir} @hpx_cflags_list@
+Cflags: -fPIC @hpx_library_list@
