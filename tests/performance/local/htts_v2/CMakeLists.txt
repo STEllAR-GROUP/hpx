@@ -13,7 +13,7 @@ set(benchmarks
     htts2_hpx
    )
 
-set(htts2_payload_precision_FLAGS NOLIBS DEPENDENCIES ${boost_library_dependencies})
+set(htts2_payload_precision_FLAGS DEPENDENCIES ${boost_library_dependencies})
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(benchmarks ${benchmarks} htts2_omp)
