@@ -12,13 +12,19 @@ namespace hpx { namespace threads { namespace policies
 {
     class HPX_EXPORT ffwd_scheduler : public scheduler_base
     {
+    public:
         ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads)
         {
-
+            std::cout << "ffwd_scheduler constructor" << std::endl;
         }
 
         ~ffwd_scheduler() {
             std::cout << "ffwd_scheduler desctructor" << std::endl;
+        }
+
+        std::string get_scheduler_name()
+        {
+            return "ffwd_scheduler";
         }
 
         void suspend(std::size_t num_thread)
@@ -186,3 +192,5 @@ namespace hpx { namespace threads { namespace policies
         }
     };
 }}}
+
+#endif

@@ -606,6 +606,34 @@ namespace hpx { namespace threads
 #endif
                 break;
             }
+
+            case resource::ffwd:
+            {
+#if defined(HPX_HAVE_FFWD_SCHEDULER)
+                // set parameters for scheduler and pool instantiation and
+                // TODO: Compatibility checks
+                // instantiate the scheduler
+
+                std::cout << "threadmanager - creating thread pool..." << std::endl;
+                typedef hpx::threads::policies::ffwd_scheduler local_sched_type;
+
+                std::unique_ptr<local_sched_type> sched(
+                    new local_sched_type(num_threads_in_pool));
+
+                // instantiate the pool
+                std::unique_ptr<thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<local_sched_type>(std::move(sched),
+                        notifier_, i, name.c_str(), scheduler_mode, thread_offset));
+                pools_.push_back(std::move(pool));
+                std::cout << "threadmanager - done." << std::endl;
+#else
+                throw hpx::detail::command_line_error(
+                    "Command line option --hpx:queuing=ffwd "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=ffwd'.");
+#endif
+                break;
+            }
             }
 
             // update the thread_offset for the next pool

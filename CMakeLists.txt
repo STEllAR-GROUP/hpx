@@ -656,7 +656,7 @@ endif()
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static, shared-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are built. Options are: all, abp-priority, local, static-priority, static, shared-priority, ffwd. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -685,6 +685,10 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "SHARED-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
     set(HPX_WITH_SHARED_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "FFWD" OR _all)
+    hpx_add_config_define(HPX_HAVE_FFWD_SCHEDULER)
+    set(HPX_WITH_FFWD_SCHEDULER ON CACHE INTERNAL "")
   endif()
   unset(_all)
 endforeach()

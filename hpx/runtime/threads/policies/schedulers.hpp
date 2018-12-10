@@ -21,4 +21,7 @@
 #if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp>
 #endif
+#if defined(HPX_HAVE_FFWD_SCHEDULER)
+#include <hpx/runtime/threads/policies/ffwd_scheduler.hpp>
+#endif
 #endif

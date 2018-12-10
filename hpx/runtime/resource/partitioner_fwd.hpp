@@ -76,6 +76,7 @@ namespace hpx
             abp_priority_fifo = 5,
             abp_priority_lifo = 6,
             shared_priority = 7,
+            ffwd = 8,
         };
     }
 }
