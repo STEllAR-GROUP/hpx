@@ -44,6 +44,13 @@ function(create_cmake_test name hpx_dir)
   if(NOT HPX_WITH_STATIC_LINKING)
     add_dependencies(${name}.make_configure hpx_init)
   endif()
+
+  if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+    if(NOT HPX_WITH_STATIC_LINKING)
+      add_dependencies(${name}.make_configure hpx_wrap)
+    endif()
+  endif()
+
   add_custom_target(${name}.make_compile
     COMMAND
       "${CMAKE_COMMAND}"
@@ -87,6 +94,13 @@ function(create_pkgconfig_test name hpx_dir)
   if(NOT HPX_WITH_STATIC_LINKING)
     add_dependencies(${name}.make_compile hpx_init)
   endif()
+
+  if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+    if(NOT HPX_WITH_STATIC_LINKING)
+      add_dependencies(${name}.make_compile hpx_wrap)
+    endif()
+  endif()
+
   add_hpx_pseudo_target(${name})
   add_hpx_pseudo_dependencies(${name} ${name}.make_compile)
 
