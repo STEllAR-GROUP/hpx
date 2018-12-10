@@ -6,13 +6,13 @@
 .PHONY: all
 
 ifeq ($(BUILD_TYPE),Debug)
+  debug_suffix = d
   hpx_application = hpx_application_debug
   hpx_component = hpx_component_debug
-  debug_suffix = d
 else
-  hpx_application = hpx_application
-  hpx_component = hpx_component
   debug_suffix =
+  hpx_application = hpx_application_release
+  hpx_component = hpx_component_release
 endif
 
 APP_CFLAGS = $(CXX_FLAGS)

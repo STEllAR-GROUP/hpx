@@ -28,8 +28,7 @@ if(EXISTS "${HPX_DIR}")
   target_compile_definitions(hello_world_client PUBLIC -DHPX_DEBUG)
   hpx_setup_target(hello_world_client
     DEPENDENCIES hello_world_component
-    COMPONENT_DEPENDENCIES iostreams
-  )
+    )
 else()
   message(WARNING "HPX_DIR=${HPX_DIR} does not exist. Did you forget to run the install rule?")
 endif()

@@ -525,3 +525,14 @@ hpx_export_targets(${hpx_targets})
 foreach(target ${hpx_targets})
   add_hpx_pseudo_dependencies(core ${target})
 endforeach()
+
+# Add particular targets for the pkgconfig / bazel setup
+add_library(hpx_application INTERFACE)
+target_link_libraries(hpx_application INTERFACE hpx_wrap)
+target_compile_definitions(hpx_application INTERFACE HPX_APPLICATION_EXPORTS)
+add_library(hpx::application ALIAS hpx_application)
+
+add_library(hpx_component INTERFACE)
+target_compile_definitions(hpx_component INTERFACE HPX_COMPONENT_EXPORTS)
+target_link_libraries(hpx_component INTERFACE hpx)
+add_library(hpx::component ALIAS hpx_component)
