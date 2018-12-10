@@ -1,8 +1,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// FFWD_TODO: Remove all these comments!
 
-/// First experiments for ffwd scheduler -> TODO: implement scheduler_base
+/* FFWD_TODO: Take scheduling_loop as "server", Threadpool thread as "clients"
+    - Ffwd_scheduler is running per node => it should act as server -> have message-list in here
+    - Scheduling_loop periodically calls this to get next task (get_next_thread / schedule_next) -> first look at message-list, then work of task
+    - Test this with fibonacci_dataflow
+*/
+
+/// First experiments for ffwd scheduler -> FFWD_TODO: implement scheduler_base
 #include "scheduler_base.hpp"
 
 #if !defined(HPX_THREADMANAGER_SCHEDULING_FFWD_SCHEDULER)

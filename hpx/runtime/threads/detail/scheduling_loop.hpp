@@ -602,7 +602,7 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
         thread_data* next_thrd = nullptr;
-        while (true) {
+        while (true) { // FFWD_TODO: Add debug output to see what is called when
             thread_data* thrd = next_thrd;
             // Get the next HPX thread from the queue
             bool running = this_state.load(
