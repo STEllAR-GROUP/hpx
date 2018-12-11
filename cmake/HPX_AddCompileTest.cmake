@@ -28,7 +28,7 @@ function(add_hpx_compile_test category name)
   add_test(NAME "${category}.${name}"
     COMMAND ${CMAKE_COMMAND}
       --build .
-      --target "${name}_lib"
+      --target ${name}
       --config $<CONFIGURATION>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

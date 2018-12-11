@@ -34,7 +34,7 @@ foreach(subdir ${subdirs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.throttle.${subdir}_dir
-                              ${subdir}_client_exe)
+                              ${subdir}_client)
 endforeach()
 
 add_hpx_executable(spin
@@ -48,4 +48,4 @@ add_hpx_pseudo_target(examples.throttle.spin)
 add_hpx_pseudo_dependencies(examples.throttle examples.throttle.spin)
 
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.throttle.spin spin_exe)
+add_hpx_pseudo_dependencies(examples.throttle.spin spin)

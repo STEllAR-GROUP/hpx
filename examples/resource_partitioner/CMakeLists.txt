@@ -63,7 +63,7 @@ foreach(example_program ${example_programs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.resource_partitioner.${example_program}
-                              ${example_program}_exe)
+                              ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_example_test("resource_partitioner" ${example_program} ${${example_program}_PARAMETERS})
@@ -71,6 +71,6 @@ foreach(example_program ${example_programs})
     add_hpx_pseudo_dependencies(tests.examples.resource_partitioner
                                 tests.examples.resource_partitioner.${example_program})
     add_hpx_pseudo_dependencies(tests.examples.resource_partitioner.${example_program}
-                                ${example_program}_exe)
+                                ${example_program})
   endif()
 endforeach()

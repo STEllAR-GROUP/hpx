@@ -16,6 +16,9 @@ General changes
 Breaking changes
 ================
 
+* Executable and library targets are now created without the ``_exe`` and ``_lib`` suffix respectively.
+  For example, the target ``hello_world_exe`` is now simply called ``hello_world``.
+
 Closed issues
 =============
 

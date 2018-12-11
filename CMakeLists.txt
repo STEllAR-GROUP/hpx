@@ -647,7 +647,7 @@ hpx_option(HPX_WITH_HPXMP BOOL
   "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP")
 if(HPX_WITH_HPXMP)
   if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
+    OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")))
     hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
       "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
   else()
@@ -1350,6 +1350,17 @@ if(HPX_WITH_COMPILER_WARNINGS)
       hpx_add_compile_flag(-wd4828)
     endif()
 
+    if(HPX_WITH_DATAPAR_VC)
+      # unary minus operator applied to unsigned type, result still unsigned
+      hpx_add_compile_flag(-wd4146)
+
+      # '<=': signed/unsigned mismatch
+      hpx_add_compile_flag(-wd4018)
+
+      # 'return': conversion from 'short' to 'Vc_1::schar', possible loss of data
+      hpx_add_compile_flag(-wd4244)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
@@ -1576,7 +1587,7 @@ if(HPX_WITH_APEX)
 
   include_directories(${APEX_SOURCE_DIR})
   set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-      ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} apex_lib)
+      ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} apex)
   if(APEX_WITH_MSR)
     set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
@@ -1599,7 +1610,7 @@ if(HPX_WITH_APEX)
     include_directories(${ITTNOTIFY_SOURCE_DIR})
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
     set(HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify_lib)
+        ${HPX_ADDITIONAL_PRIVATE_RUNTIME_DEPENDENCIES} ittnotify)
   endif()
 endif()
 

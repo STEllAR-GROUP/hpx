@@ -30,7 +30,7 @@ function(add_snappy_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${SNAPPY_LIBRARY})
 
-    add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compress_snappy_lib)
+    add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compress_snappy)
     add_hpx_pseudo_dependencies(core plugins.binary_filter.snappy)
   endif()
 endfunction()

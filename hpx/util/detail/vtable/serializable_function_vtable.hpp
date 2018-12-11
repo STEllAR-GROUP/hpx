@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/util/detail/function_registration.hpp>
+#include <hpx/util/detail/empty_function.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
@@ -30,11 +31,17 @@ namespace hpx { namespace util { namespace detail
         serializable_function_vtable(construct_vtable<T>) noexcept
           : VTable(construct_vtable<T>())
           , serializable_vtable(construct_vtable<T>())
-          , name(this->empty ? "empty" : get_function_name<VTable, T>())
+          , name(get_function_name<VTable, T>())
         {
             hpx::serialization::detail::polymorphic_intrusive_factory::instance().
                 register_class(name, &serializable_function_vtable::get_vtable<T>);
         }
+
+        serializable_function_vtable(construct_vtable<empty_function>) noexcept
+          : VTable(construct_vtable<empty_function>())
+          , serializable_vtable(construct_vtable<empty_function>())
+          , name("empty")
+        {}
 
         template <typename T>
         static void* get_vtable()

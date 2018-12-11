@@ -13,7 +13,6 @@
 #include <cstddef>
 #include <memory>
 #include <type_traits>
-#include <typeinfo>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
@@ -98,13 +97,6 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T>
-        HPX_FORCEINLINE static std::type_info const& _get_type()
-        {
-            return typeid(T);
-        }
-        std::type_info const& (*get_type)();
-
-        template <typename T>
         HPX_FORCEINLINE static void _destruct(void** v)
         {
             get<T>(v).~T();
@@ -125,8 +117,7 @@ namespace hpx { namespace util { namespace detail
 
         template <typename T>
         HPX_CONSTEXPR vtable(construct_vtable<T>) noexcept
-          : get_type(&vtable::template _get_type<T>)
-          , destruct(&vtable::template _destruct<T>)
+          : destruct(&vtable::template _destruct<T>)
           , delete_(&vtable::template _delete<T>)
         {}
     };

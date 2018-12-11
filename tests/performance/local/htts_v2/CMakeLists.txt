@@ -56,11 +56,11 @@ foreach(benchmark ${benchmarks})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.performance.local.htts_v2.${benchmark}
-                              ${benchmark}_exe)
+                              ${benchmark})
 endforeach()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
-  set_target_properties(htts2_omp_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(htts2_omp_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(htts2_omp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(htts2_omp PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 

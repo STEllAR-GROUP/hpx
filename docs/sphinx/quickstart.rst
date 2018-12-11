@@ -111,7 +111,7 @@ If you did not run ``make install`` earlier do so now or build the
 
 .. code-block:: sh
 
-   make simplest_hello_world_1_exe
+   make simplest_hello_world_1
 
 |hpx| executables end up in the ``bin`` directory in your build directory. You
 can now run ``simplest_hello_world_1`` and should see the following output:
@@ -130,8 +130,8 @@ gentle introduction to the distributed aspects of |hpx|.
 
 .. tip::
 
-   Most build targets in |hpx| have two names: a simple name suffixed with
-   ``_exe`` and a hierarchical name corresponding to what type of example or
+   Most build targets in |hpx| have two names: a simple name and
+   a hierarchical name corresponding to what type of example or
    test the target is. If you are developing |hpx| it is often helpful to run
    ``make help`` to get a list of available targets. For example, ``make help |
    grep hello_world`` outputs the following:
@@ -139,10 +139,10 @@ gentle introduction to the distributed aspects of |hpx|.
    .. code-block:: sh
 
       ... examples.quickstart.simplest_hello_world_2
-      ... simplest_hello_world_2_exe
+      ... simplest_hello_world_2
       ... examples.quickstart.simplest_hello_world_1
-      ... simplest_hello_world_1_exe
-      ... hello_world_exe
+      ... simplest_hello_world_1
+      ... hello_world
       ... examples.quickstart.hello_world
 
    It is also possible to build e.g. all quickstart examples using ``make

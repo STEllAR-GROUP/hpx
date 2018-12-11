@@ -27,6 +27,6 @@ if(HPX_WITH_CXX11_DEFAULTED_FUNCTIONS)
                               tests.regressions.block_matrix_dir.block_matrix)
 
   add_hpx_pseudo_dependencies(tests.regressions.block_matrix_dir.block_matrix
-                              block_matrix_test_exe)
+                              block_matrix_test)
 
 endif()
