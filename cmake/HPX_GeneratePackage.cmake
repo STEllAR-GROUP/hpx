@@ -126,11 +126,11 @@ endif()
 
 # Configure config for the install dir ...
 set(HPX_CONF_INCLUDE_DIRS
-  "-I${CMAKE_INSTALL_PREFIX}/include -I${CMAKE_INSTALL_PREFIX}/include/hpx/external ${_NEEDED_INCLUDE_DIRS}"
+  "-I${CMAKE_INSTALL_FULL_INCLUDEDIR} -I${CMAKE_INSTALL_FULL_INCLUDEDIR}/hpx/external ${_NEEDED_INCLUDE_DIRS}"
 )
 set(HPX_CMAKE_CONF_INCLUDE_DIRS
-  "${CMAKE_INSTALL_PREFIX}/include"
-  "${CMAKE_INSTALL_PREFIX}/include/hpx/external"
+  "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
+  "${CMAKE_INSTALL_FULL_INCLUDEDIR}/hpx/external"
   "${_NEEDED_CMAKE_INCLUDE_DIRS}"
 )
 set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
@@ -196,7 +196,7 @@ configure_file(${hpx_bazel_file}
   @ONLY)
 
 # Configure macros for the install dir ...
-set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/lib/cmake/${HPX_PACKAGE_NAME}")
+set(HPX_CMAKE_MODULE_PATH "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}")
 configure_file(cmake/templates/HPXMacros.cmake.in
   "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake"
   ESCAPE_QUOTES @ONLY)
