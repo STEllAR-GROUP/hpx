@@ -574,7 +574,7 @@ namespace policies {
         // create a new thread and schedule it if the initial state
         // is equal to pending
         void create_thread(thread_init_data& data, thread_id_type* thrd,
-            thread_state_enum initial_state, bool run_now, error_code& ec) override
+            thread_state_enum initial_state, error_code& ec) override
         {
             // safety check that task was created by this thread/scheduler
             HPX_ASSERT(data.scheduler_base == this);
@@ -649,7 +649,7 @@ namespace policies {
 
                 hp_queues_[domain_num].queues_[hp_lookup_[
                     q_index % hp_queues_[domain_num].num_cores]]->
-                    create_thread(data, thrd, initial_state, run_now, ec);
+                    create_thread(data, thrd, initial_state, ec);
 
                 return;
             }
@@ -658,7 +658,7 @@ namespace policies {
             {
                 lp_queues_[domain_num].queues_[lp_lookup_[
                     q_index % lp_queues_[domain_num].num_cores]]->
-                    create_thread(data, thrd, initial_state, run_now, ec);
+                    create_thread(data, thrd, initial_state, ec);
 
                 return;
             }
@@ -666,7 +666,7 @@ namespace policies {
             // normal priority
             np_queues_[domain_num].queues_[np_lookup_[
                 q_index % np_queues_[domain_num].num_cores]]->
-                create_thread(data, thrd, initial_state, run_now, ec);
+                create_thread(data, thrd, initial_state, ec);
         }
 
         /// Return the next thread to be executed, return false if none available
@@ -1059,76 +1059,6 @@ namespace policies {
                 result = result &&
                     lp_queues_[d].enumerate_threads(f, state);
             }
-            return result;
-        }
-
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// has to be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t thread_num,
-            bool running, std::int64_t& idle_loop_count) override
-        {
-            std::size_t added = 0;
-            bool result = true;
-
-            if (thread_num == std::size_t(-1)) {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "shared_priority_queue_scheduler::wait_or_add_new",
-                    "Invalid thread number: " + std::to_string(thread_num));
-            }
-
-            // find the numa domain from the local thread index
-            std::size_t domain_num = d_lookup_[thread_num];
-
-            // is there a high priority task, take first from our numa domain
-            // and then try to steal from others
-            for (std::size_t d=0; d<num_domains_; ++d) {
-                std::size_t dom = (domain_num+d) % num_domains_;
-                // set the preferred queue for this domain, if applicable
-                std::size_t q_index = q_lookup_[thread_num];
-                // get next task, steal if from another domain
-                result = hp_queues_[dom].wait_or_add_new(q_index, running,
-                    idle_loop_count, added);
-                if (0 != added) return result;
-            }
-
-            // try a normal priority task
-            if (!result) {
-                for (std::size_t d=0; d<num_domains_; ++d) {
-                    std::size_t dom = (domain_num+d) % num_domains_;
-                    // set the preferred queue for this domain, if applicable
-                    std::size_t q_index = q_lookup_[thread_num];
-                    // get next task, steal if from another domain
-                    result = np_queues_[dom].wait_or_add_new(q_index, running,
-                        idle_loop_count, added);
-                    if (0 != added) return result;
-                }
-            }
-
-            // low priority task
-            if (!result) {
-#ifdef JB_LP_STEALING
-                for (std::size_t d=domain_num; d<domain_num+num_domains_; ++d) {
-                    std::size_t dom = d % num_domains_;
-                    // set the preferred queue for this domain, if applicable
-                    std::size_t q_index = (dom==domain_num) ?
-                        q_lookup_[thread_num] :
-                        lp_lookup_[(counters_[dom]++ %
-                            lp_queues_[dom].num_cores)];
-
-                    result = lp_queues_[dom].wait_or_add_new(q_index, running,
-                        idle_loop_count, added);
-                    if (0 != added) return result;
-                }
-#else
-                // no cross domain stealing for LP queues
-                result = lp_queues_[domain_num].wait_or_add_new(0, running,
-                    idle_loop_count, added);
-                if (0 != added) return result;
-#endif
-            }
-
             return result;
         }
 
