@@ -22,11 +22,14 @@ namespace hpx { namespace threads { namespace policies
     public:
         ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads)
         {
-            std::cout << "ffwd_scheduler constructor" << std::endl;
+            std::cout << "ffwd_scheduler constructor - make necessary queues" << std::endl;
         }
 
         ~ffwd_scheduler() {
             std::cout << "ffwd_scheduler desctructor" << std::endl;
+            messages.clear();
+            responses.clear();
+
         }
 
         std::string get_scheduler_name()
@@ -197,6 +200,10 @@ namespace hpx { namespace threads { namespace policies
         void reset_thread_distribution() {
             std::cout << "reset_thread_distribution not implemented yet" << std::endl;
         }
+
+    private:
+        std::list<int> messages;
+        std::list<int> responses;
     };
 }}}
 
