@@ -509,7 +509,7 @@ namespace hpx { namespace threads { namespace policies
                 while (true)
                 {
                     std::lock_guard<mutex_type> lk(mtx_);
-                    if (cleanup_terminated_locked(false))
+                    if (cleanup_terminated_locked(true))
                     {
                         return true;
                     }
