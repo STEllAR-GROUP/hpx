@@ -11,15 +11,26 @@
 
 /// First experiments for ffwd scheduler -> FFWD_TODO: implement scheduler_base
 #include "scheduler_base.hpp"
+#include "thread_queue.hpp"
 
 #if !defined(HPX_THREADMANAGER_SCHEDULING_FFWD_SCHEDULER)
 #define HPX_THREADMANAGER_SCHEDULING_FFWD_SCHEDULER
 
 namespace hpx { namespace threads { namespace policies
 {
+    template <typename Mutex = compat::mutex,
+        typename PendingQueuing = lockfree_lifo,
+        typename StagedQueuing = lockfree_lifo,
+        typename TerminatedQueuing = lockfree_fifo>
     class HPX_EXPORT ffwd_scheduler : public scheduler_base
     {
     public:
+        //////////////////////////////////////////////////////////////////////////////////
+        typedef thread_queue<
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
+        > thread_queue_type;
+
+        //////////////////////////////////////////////////////////////////////////////////
         ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads)
         {
             std::cout << "ffwd_scheduler constructor - make necessary queues" << std::endl;
@@ -32,6 +43,7 @@ namespace hpx { namespace threads { namespace policies
 
         }
 
+        //////////////////////////////////////////////////////////////////////////////////
         std::string get_scheduler_name()
         {
             return "ffwd_scheduler";
@@ -139,7 +151,27 @@ namespace hpx { namespace threads { namespace policies
 
         void create_thread(thread_init_data& data, thread_id_type* id,
                                    thread_state_enum initial_state, bool run_now, error_code& ec) {
-            std::cout << "create_thread not implemented yet" << std::endl;
+            std::cout << "create_thread..." << std::endl;
+            std::size_t num_thread =
+                data.schedulehint.mode == thread_schedule_hint_mode_thread ?
+                data.schedulehint.hint : std::size_t(-1);
+            std::size_t queue_size = queues_.size();
+
+            if (std::size_t(-1) == num_thread)
+            {
+                num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread);
+
+            HPX_ASSERT(num_thread < queue_size);
+            queues_[num_thread]->create_thread(data, id, initial_state,
+                run_now, ec);
         }
 
         bool get_next_thread(std::size_t num_thread, bool running,
@@ -194,7 +226,7 @@ namespace hpx { namespace threads { namespace policies
         void start_periodic_maintenance(
             std::atomic<hpx::state>& /*global_state*/)
         {
-            std::cout << "start_periodic_maintenance not implemented yet" << std::endl;
+//            std::cout << "start_periodic_maintenance not implemented yet, is empty in other schedulers - leave empty?" << std::endl;
         }
 
         void reset_thread_distribution() {
@@ -204,6 +236,8 @@ namespace hpx { namespace threads { namespace policies
     private:
         std::list<int> messages;
         std::list<int> responses;
+        std::vector<thread_queue_type*> queues_;
+        std::atomic<std::size_t> curr_queue_;
     };
 }}}
 

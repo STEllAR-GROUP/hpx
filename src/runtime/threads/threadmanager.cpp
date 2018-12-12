@@ -615,7 +615,7 @@ namespace hpx { namespace threads
                 // instantiate the scheduler
 
                 std::cout << "threadmanager - creating thread pool..." << std::endl;
-                typedef hpx::threads::policies::ffwd_scheduler local_sched_type;
+                typedef hpx::threads::policies::ffwd_scheduler<> local_sched_type;
 
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(num_threads_in_pool));

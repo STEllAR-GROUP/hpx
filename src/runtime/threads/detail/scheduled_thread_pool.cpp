@@ -63,7 +63,7 @@ template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
 
 #if defined(HPX_HAVE_FFWD_SCHEDULER)
 #include <hpx/runtime/threads/policies/ffwd_scheduler.hpp>
-class HPX_EXPORT hpx::threads::policies::ffwd_scheduler;
+template class HPX_EXPORT hpx::threads::policies::ffwd_scheduler<>; // <- this is not needed if there're no template arguments! FFWD_TODO: Delete this line, or use it!
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
-    hpx::threads::policies::ffwd_scheduler>;
+    hpx::threads::policies::ffwd_scheduler<>>;
 #endif
