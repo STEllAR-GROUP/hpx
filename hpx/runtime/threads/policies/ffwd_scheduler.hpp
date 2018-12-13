@@ -31,9 +31,10 @@ namespace hpx { namespace threads { namespace policies
         > thread_queue_type;
 
         //////////////////////////////////////////////////////////////////////////////////
-        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads)
+        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), queues_(num_threads+1)
         {
-            std::cout << "ffwd_scheduler constructor - make necessary queues" << std::endl;
+            std::cout << "ffwd_scheduler constructor - make " << num_threads << " queues" << std::endl;
+
         }
 
         ~ffwd_scheduler() {
@@ -155,6 +156,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode_thread ?
                 data.schedulehint.hint : std::size_t(-1);
+            std::cout << "num_thread " << num_thread << std::endl;
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
@@ -170,7 +172,7 @@ namespace hpx { namespace threads { namespace policies
             num_thread = select_active_pu(l, num_thread);
 
             HPX_ASSERT(num_thread < queue_size);
-            queues_[num_thread]->create_thread(data, id, initial_state,
+            queues_.at(num_thread)->create_thread(data, id, initial_state,
                 run_now, ec);
         }
 
@@ -201,19 +203,57 @@ namespace hpx { namespace threads { namespace policies
 
         bool wait_or_add_new(std::size_t num_thread, bool running,
                              std::int64_t& idle_loop_count) {
-            std::cout << "wait_or_add_new not implemented yet" << std::endl;
+            std::cout << "wait_or_add_new.." << std::endl;
+            std::size_t queues_size = queues_.size();
+            HPX_ASSERT(num_thread < queues_.size());
+
+            std::size_t added = 0;
+            bool result = true;
+
+            result = queues_[num_thread]->wait_or_add_new(running,
+                idle_loop_count, added) && result;
+            if (0 != added) return result;
+
+            // Check if we have been disabled
+            if (!running)
+            {
+                return true;
+            }
+
+            // NUMA sensitivity not yet implemented, so we don't need it here
+            for (std::size_t i = 1; i != queues_size; ++i)
+            {
+                // FIXME: Do a better job here.
+                std::size_t const idx = (i + num_thread) % queues_size;
+
+                HPX_ASSERT(idx != num_thread);
+
+                result = queues_[num_thread]->wait_or_add_new(running,
+                    idle_loop_count, added, queues_[idx]) && result;
+                if (0 != added)
+                {
+                    queues_[idx]->increment_num_stolen_from_staged(added);
+                    queues_[num_thread]->increment_num_stolen_to_staged(added);
+                    return result;
+                }
+            }
+
+            // nothing was found
             return false;
         }
 
-        void on_start_thread(std::size_t num_thread) {
-            std::cout << "wait_or_add_new not implemented yet" << std::endl;
+        void on_start_thread(std::size_t num_thread) override {
+            std::cout << "on_start_thread.." << std::endl;
+            queues_[num_thread]->on_start_thread(num_thread);
         }
-        void on_stop_thread(std::size_t num_thread) {
-            std::cout << "on_stop_thread not implemented yet" << std::endl;
+        void on_stop_thread(std::size_t num_thread) override {
+            std::cout << "on_stop_thread..." << std::endl;
+            queues_[num_thread]->on_stop_thread(num_thread);
         }
         void on_error(std::size_t num_thread,
-            std::exception_ptr const& e) {
-            std::cout << "on_error not implemented yet" << std::endl;
+            std::exception_ptr const& e) override {
+            std::cout << "on_error..." << std::endl;
+            queues_[num_thread]->on_error(num_thread, e);
         }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
