@@ -33,17 +33,15 @@ namespace hpx { namespace threads { namespace policies
         //////////////////////////////////////////////////////////////////////////////////
         ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), queues_(num_threads), max_queue_thread_count_(1000)
         {
-            std::cout << "ffwd_scheduler constructor - make " << num_threads << " queues" << std::endl;
+//            std::cout << "ffwd_scheduler constructor - make " << num_threads << " queues" << std::endl;
             HPX_ASSERT(num_threads != 0);
             for (std::size_t i = 0; i < num_threads; ++i)
                 queues_[i] = new thread_queue_type(max_queue_thread_count_);
         }
 
         ~ffwd_scheduler() {
-            std::cout << "ffwd_scheduler desctructor" << std::endl;
             messages.clear();
             responses.clear();
-
         }
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -69,23 +67,6 @@ namespace hpx { namespace threads { namespace policies
 
             HPX_ASSERT(expected == state_sleeping ||
                 expected == state_stopping || expected == state_terminating);
-        }
-
-        void resume(std::size_t num_thread)
-        {
-            std::cout << "resume called" << std::endl;
-            if (num_thread == std::size_t(-1))
-            {
-                for (compat::condition_variable& c : suspend_conds_)
-                {
-                    c.notify_one();
-                }
-            }
-            else
-            {
-                HPX_ASSERT(num_thread < suspend_conds_.size());
-                suspend_conds_[num_thread].notify_one();
-            }
         }
 
         ////////////////////////////////////////////////////////////////
@@ -202,13 +183,18 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool cleanup_terminated(bool delete_all) {
-            std::cout << "cleanup_terminated not implemented yet" << std::endl;
-            return true;
+//            std::cout << "cleanup_terminated not implemented yet" << std::endl;
+
+            bool empty = true;
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+                empty = queues_[i]->cleanup_terminated(delete_all) && empty;
+
+            return empty;
         }
 
         bool cleanup_terminated(std::size_t num_thread, bool delete_all) {
-            std::cout << "cleanup_terminated not implemented yet" << std::endl;
-            return true;
+//            std::cout << "cleanup_terminated not implemented yet" << std::endl;
+            return queues_[num_thread]->cleanup_terminated(delete_all);
         }
 
         void create_thread(thread_init_data& data, thread_id_type* id,
@@ -239,9 +225,9 @@ namespace hpx { namespace threads { namespace policies
             std::int64_t& idle_loop_count, threads::thread_data*& thrd){
 
             if(!messages.empty()) {
-                std::cout << "get_next_thread - message" << std::endl;
+//                std::cout << "get_next_thread - message" << std::endl;
             } else {
-                std::cout << "get_next_thread - no message" << std::endl;
+//                std::cout << "get_next_thread - no message" << std::endl;
             }
 
             std::size_t queues_size = queues_.size();
@@ -275,24 +261,83 @@ namespace hpx { namespace threads { namespace policies
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
                              thread_priority priority = thread_priority_normal){
-            std::cout << "schedule_thread not implemented yet" << std::endl;
+//            std::cout << "schedule_thread not implemented yet" << std::endl;
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread = std::size_t(-1);
+            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            {
+                num_thread = schedulehint.hint;
+            }
+            else
+            {
+                allow_fallback = false;
+            }
+
+            std::size_t queue_size = queues_.size();
+
+            if (std::size_t(-1) == num_thread)
+            {
+                num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, allow_fallback);
+
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+
+            HPX_ASSERT(num_thread < queues_.size());
+            queues_[num_thread]->schedule_thread(thrd);
         }
 
         void schedule_thread_last(threads::thread_data* thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
                                   thread_priority priority = thread_priority_normal) {
-            std::cout << "schedule_thread_last not implemented yet" << std::endl;
+//            std::cout << "schedule_thread_last not implemented yet" << std::endl;
+            // NOTE: This scheduler ignores NUMA hints.
+            std::size_t num_thread = std::size_t(-1);
+            if (schedulehint.mode == thread_schedule_hint_mode_thread)
+            {
+                num_thread = schedulehint.hint;
+            }
+            else
+            {
+                allow_fallback = false;
+            }
+
+            std::size_t queue_size = queues_.size();
+
+            if (std::size_t(-1) == num_thread)
+            {
+                num_thread = curr_queue_++ % queue_size;
+            }
+            else if (num_thread >= queue_size)
+            {
+                num_thread %= queue_size;
+            }
+
+            std::unique_lock<pu_mutex_type> l;
+            num_thread = select_active_pu(l, num_thread, allow_fallback);
+
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+
+            HPX_ASSERT(num_thread < queues_.size());
+            queues_[num_thread]->schedule_thread(thrd, true);
         }
 
         void destroy_thread(threads::thread_data* thrd,
                             std::int64_t& busy_count) {
-            std::cout << "destroy_thread not implemented yet" << std::endl;
+            HPX_ASSERT(thrd->get_scheduler_base() == this);
+            thrd->get_queue<thread_queue_type>().destroy_thread(thrd, busy_count);
         }
 
         bool wait_or_add_new(std::size_t num_thread, bool running,
                              std::int64_t& idle_loop_count) {
-            std::cout << "wait_or_add_new.." << std::endl;
+//            std::cout << "wait_or_add_new.." << std::endl;
 
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
@@ -302,11 +347,15 @@ namespace hpx { namespace threads { namespace policies
 
             result = queues_[num_thread]->wait_or_add_new(running,
                 idle_loop_count, added) && result;
-            if (0 != added) return result;
+            if (0 != added) {
+//                std::cout << "wait_or_add_new returning " << result << std::endl;
+                return result;
+            }
 
             // Check if we have been disabled
             if (!running)
             {
+//                std::cout << "wait_or_add_new returning true" << std::endl;
                 return true;
             }
 
@@ -324,11 +373,13 @@ namespace hpx { namespace threads { namespace policies
                 {
                     queues_[idx]->increment_num_stolen_from_staged(added);
                     queues_[num_thread]->increment_num_stolen_to_staged(added);
+//                    std::cout << "wait_or_add_new returning " << result << std::endl;
                     return result;
                 }
             }
 
             // nothing was found
+//            std::cout << "wait_or_add_new returning false" << std::endl;
             return false;
         }
 
@@ -336,12 +387,10 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_start_thread(num_thread);
         }
         void on_stop_thread(std::size_t num_thread) override {
-            std::cout << "on_stop_thread..." << std::endl;
             queues_[num_thread]->on_stop_thread(num_thread);
         }
         void on_error(std::size_t num_thread,
             std::exception_ptr const& e) override {
-            std::cout << "on_error..." << std::endl;
             queues_[num_thread]->on_error(num_thread, e);
         }
 

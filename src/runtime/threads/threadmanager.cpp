@@ -614,7 +614,6 @@ namespace hpx { namespace threads
                 // TODO: Compatibility checks
                 // instantiate the scheduler
 
-                std::cout << "threadmanager - creating thread pool..." << std::endl;
                 typedef hpx::threads::policies::ffwd_scheduler<> local_sched_type;
 
                 std::unique_ptr<local_sched_type> sched(
@@ -625,7 +624,6 @@ namespace hpx { namespace threads
                     new hpx::threads::detail::scheduled_thread_pool<local_sched_type>(std::move(sched),
                         notifier_, i, name.c_str(), scheduler_mode, thread_offset));
                 pools_.push_back(std::move(pool));
-                std::cout << "threadmanager - done." << std::endl;
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=ffwd "

@@ -484,7 +484,6 @@ namespace hpx { namespace threads { namespace detail
         bool running)
 #endif
     {
-        std::cout << "call background thread .." << std::endl;
         if (HPX_UNLIKELY(background_thread))
         {
             thread_state state = background_thread->get_state();
@@ -608,12 +607,11 @@ namespace hpx { namespace threads { namespace detail
             // Get the next HPX thread from the queue
             bool running = this_state.load(
                 std::memory_order_relaxed) < state_pre_sleep;
-            std::cout << "scheduling loop ....." << std::endl;
             if (HPX_LIKELY(thrd ||
                            scheduler.SchedulingPolicy::get_next_thread(
                         num_thread, running, idle_loop_count, thrd)))
             {
-                std::cout << "scheduling_loop - get_next_thread or thrd.." << std::endl;
+//                std::cout << "scheduling_loop - get_next_thread worked" << std::endl;
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
                 HPX_ASSERT(thrd->get_scheduler_base() == &scheduler);
 
@@ -822,12 +820,12 @@ namespace hpx { namespace threads { namespace detail
             else
             {
                 ++idle_loop_count;
-                std::cout << "scheduling_loop - get_next_thread returned false" << std::endl;
+//                std::cout << "scheduling_loop - get_next_thread returned false" << std::endl;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))
                 {
-                    std::cout << "scheduling loop wait_or_add_new returned with some gold" << std::endl;
+//                    std::cout << "scheduling loop wait_or_add_new returned with some gold" << std::endl;
                     // Clean up terminated threads before trying to exit
                     bool can_exit =
                         !running &&
