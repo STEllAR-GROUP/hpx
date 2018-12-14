@@ -460,7 +460,6 @@ namespace hpx { namespace threads { namespace detail
 
         // Create in suspended to prevent the thread from being scheduled
         // directly...
-        std::cout << "scheduling loop create background thread" << std::endl;
         scheduler.SchedulingPolicy::create_thread(background_init,
             &background_thread, suspended, true, hpx::throws);
         HPX_ASSERT(background_thread);
@@ -823,6 +822,7 @@ namespace hpx { namespace threads { namespace detail
             else
             {
                 ++idle_loop_count;
+                std::cout << "scheduling_loop - get_next_thread returned false" << std::endl;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(
                         num_thread, running, idle_loop_count))

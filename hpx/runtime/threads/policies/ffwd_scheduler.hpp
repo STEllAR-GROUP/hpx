@@ -213,7 +213,6 @@ namespace hpx { namespace threads { namespace policies
 
         void create_thread(thread_init_data& data, thread_id_type* id,
                                    thread_state_enum initial_state, bool run_now, error_code& ec) {
-            std::cout << "create_thread..." << std::endl;
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode_thread ?
                 data.schedulehint.hint : std::size_t(-1);
@@ -227,7 +226,6 @@ namespace hpx { namespace threads { namespace policies
             {
                 num_thread %= queue_size;
             }
-            std::cout << "num_thread " << num_thread << std::endl;
 
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread);
@@ -239,7 +237,12 @@ namespace hpx { namespace threads { namespace policies
 
         bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd){
-            std::cout << "get_next_thread..." << std::endl;
+
+            if(!messages.empty()) {
+                std::cout << "get_next_thread - message" << std::endl;
+            } else {
+                std::cout << "get_next_thread - no message" << std::endl;
+            }
 
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_size);
@@ -290,6 +293,7 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
                              std::int64_t& idle_loop_count) {
             std::cout << "wait_or_add_new.." << std::endl;
+
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
 
@@ -329,7 +333,6 @@ namespace hpx { namespace threads { namespace policies
         }
 
         void on_start_thread(std::size_t num_thread) override {
-            std::cout << "on_start_thread.." << std::endl;
             queues_[num_thread]->on_start_thread(num_thread);
         }
         void on_stop_thread(std::size_t num_thread) override {
