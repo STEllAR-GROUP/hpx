@@ -610,11 +610,11 @@ namespace hpx { namespace threads { namespace detail
             bool running = this_state.load(
                 std::memory_order_relaxed) < state_pre_sleep;
             std::cout << "scheduling loop ....." << std::endl;
-            if (HPX_LIKELY(/*thrd*/true || true
-                    /*scheduler.SchedulingPolicy::get_next_thread(
-                        num_thread, running, idle_loop_count, thrd)*/))
+            if (HPX_LIKELY(thrd ||
+                           scheduler.SchedulingPolicy::get_next_thread(
+                        num_thread, running, idle_loop_count, thrd)))
             {
-                std::cout << "scheduling_loop - get_next_thread returned something useful" << std::endl;
+                std::cout << "scheduling_loop - get_next_thread or thrd.." << std::endl;
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
                 HPX_ASSERT(thrd->get_scheduler_base() == &scheduler);
 
