@@ -22,8 +22,7 @@ export(TARGETS ${HPX_EXPORT_TARGETS}
 # https://github.com/boost-cmake/bcm/blob/master/share/bcm/cmake/BCMPkgConfig.cmake
 # https://gitlab.kitware.com/cmake/cmake/issues/17984
 
-# TODO: Handle PIC
-function(hpx_collect_usage_requirements target compile_definitions compile_options include_directories system_include_directories link_libraries link_options already_processed_targets)
+function(hpx_collect_usage_requirements target compile_definitions compile_options requires_pic include_directories system_include_directories link_libraries link_options already_processed_targets)
   if(NOT TARGET ${target})
     message(ERROR "'${target}' should be a target.")
   endif()
@@ -33,6 +32,8 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
   get_property(target_compile_definitions TARGET ${target} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
 
   get_property(target_compile_options TARGET ${target} PROPERTY INTERFACE_COMPILE_OPTIONS)
+
+  get_property(target_requires_pic TARGET ${target} PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE)
 
   get_property(target_include_directories TARGET ${target} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
 
@@ -70,6 +71,7 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
       if (NOT dep IN_LIST _already_processed_targets)
         set(dep_compile_definitions)
         set(dep_compile_options)
+        set(dep_requires_pic)
         set(dep_include_directories)
         set(dep_system_include_directories)
         set(dep_link_libraries)
@@ -77,6 +79,7 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
 
         hpx_collect_usage_requirements(${dep} dep_compile_definitions
                                               dep_compile_options
+                                              dep_requires_pic
                                               dep_include_directories
                                               dep_system_include_directories
                                               dep_link_libraries
@@ -89,6 +92,10 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
         set(target_system_include_directories ${target_system_include_directories} ${dep_system_include_directories})
         set(libraries ${libraries} ${dep_link_libraries})
         set(target_link_options ${target_link_options} ${dep_link_options})
+
+        if(dep_requires_pic)
+          set(target_requires_pic ON)
+        endif()
       endif()
     elseif(dep MATCHES "\\$<")
       # This is a plain generator expression. As we can not determine its type at this point,
@@ -109,6 +116,7 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
 
   set(${compile_definitions} ${target_compile_definitions} PARENT_SCOPE)
   set(${compile_options} ${target_compile_options} PARENT_SCOPE)
+  set(${requires_pic} ${target_requires_pic} PARENT_SCOPE)
   set(${include_directories} ${target_include_directories} PARENT_SCOPE)
   set(${system_include_directories} ${target_system_include_directories} PARENT_SCOPE)
   set(${link_libraries} ${libraries} PARENT_SCOPE)
@@ -133,10 +141,14 @@ function(hpx_sanitize_usage_requirements property sanitized_property is_build)
   set(${sanitized_property} ${_sanitized_property} PARENT_SCOPE)
 endfunction()
 
-function(hpx_construct_cflag_list compile_definitions compile_options include_directories system_include_directories cflag_list)
+function(hpx_construct_cflag_list compile_definitions compile_options requires_pic include_directories system_include_directories cflag_list)
   set(_cflag_list "${_cflag_list} $<$<BOOL:${${compile_definitions}}>:-D$<JOIN:${${compile_definitions}}, -D>>")
 
   set(_cflag_list "${_cflag_list} $<JOIN:${${compile_options}}, >")
+
+  if (requires_pic)
+    set(_cflag_list "${_cflag_list} -fPIC")
+  endif()
 
   set(_cflag_list "${_cflag_list} $<$<BOOL:${${include_directories}}>:-I$<JOIN:${${include_directories}}, -I>>")
 
@@ -167,12 +179,13 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
   endif()
 
   hpx_collect_usage_requirements(${target} hpx_compile_definitions
-                                             hpx_compile_options
-                                             hpx_include_directories
-                                             hpx_system_include_directories
-                                             hpx_link_libraries
-                                             hpx_link_options
-                                             processed_targets)
+                                           hpx_compile_options
+                                           hpx_requires_pic
+                                           hpx_include_directories
+                                           hpx_system_include_directories
+                                           hpx_link_libraries
+                                           hpx_link_options
+                                           processed_targets)
 
   hpx_sanitize_usage_requirements(hpx_compile_definitions hpx_compile_definitions is_build)
   hpx_sanitize_usage_requirements(hpx_compile_options hpx_compile_options is_build)
@@ -181,7 +194,7 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
   hpx_sanitize_usage_requirements(hpx_link_libraries hpx_link_libraries is_build)
   hpx_sanitize_usage_requirements(hpx_link_options hpx_link_options is_build)
 
-  hpx_construct_cflag_list(hpx_compile_definitions hpx_compile_options hpx_include_directories hpx_system_include_directories hpx_cflags_list)
+  hpx_construct_cflag_list(hpx_compile_definitions hpx_compile_options hpx_requires_pic hpx_include_directories hpx_system_include_directories hpx_cflags_list)
   hpx_construct_library_list(hpx_link_libraries hpx_link_options hpx_library_list)
 
   configure_file(cmake/templates/${template}.pc.in ${CMAKE_BINARY_DIR}/${template}.pc.in @ONLY ESCAPE_QUOTES)

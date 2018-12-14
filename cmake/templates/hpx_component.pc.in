@@ -14,4 +14,4 @@ Name: hpx_component
 Description: High Performance ParalleX (component configuration)$<$<CONFIG:Debug>: - debug build>
 Version: @HPX_VERSION@
 Libs: -shared -L${libdir} @hpx_cflags_list@
-Cflags: -fPIC @hpx_library_list@
+Cflags: @hpx_library_list@
