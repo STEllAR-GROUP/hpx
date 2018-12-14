@@ -337,11 +337,7 @@ foreach(_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   endif()
 endforeach()
 
-set_property(TARGET hpx APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_COMPONENT_NAME=hpx"
-  "HPX_EXPORTS"
-  "HPX_ENABLE_ASSERT_HANDLER")
+target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
 ################################################################################
 # Emulation of SwapContext on Windows
@@ -386,10 +382,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
 
   target_link_libraries(hpx_init PRIVATE hpx::boost)
 
-  set_property(TARGET hpx_init APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    "HPX_APPLICATION_EXPORTS"
-    "HPX_ENABLE_ASSERT_HANDLER")
+  target_compile_definitions(hpx_init PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE HPX_APPLICATION_EXPORTS)
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
@@ -438,10 +431,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
       target_link_libraries(hpx_wrap PRIVATE hpx::apex)
     endif()
 
-    set_property(TARGET hpx_wrap APPEND
-      PROPERTY COMPILE_DEFINITIONS
-      "HPX_APPLICATION_EXPORTS"
-      "HPX_ENABLE_ASSERT_HANDLER")
+    target_compile_definitions(hpx_wrap PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE HPX_APPLICATION_EXPORTS)
 
     set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
     set(hpx_targets ${hpx_targets} hpx_wrap)
