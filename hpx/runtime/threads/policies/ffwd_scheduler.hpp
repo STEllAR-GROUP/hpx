@@ -31,10 +31,12 @@ namespace hpx { namespace threads { namespace policies
         > thread_queue_type;
 
         //////////////////////////////////////////////////////////////////////////////////
-        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), queues_(num_threads+1)
+        ffwd_scheduler(std::size_t num_threads) : scheduler_base(num_threads), queues_(num_threads), max_queue_thread_count_(1000)
         {
             std::cout << "ffwd_scheduler constructor - make " << num_threads << " queues" << std::endl;
-
+            HPX_ASSERT(num_threads != 0);
+            for (std::size_t i = 0; i < num_threads; ++i)
+                queues_[i] = new thread_queue_type(max_queue_thread_count_);
         }
 
         ~ffwd_scheduler() {
@@ -115,8 +117,18 @@ namespace hpx { namespace threads { namespace policies
 
         std::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const {
-            std::cout << "get_queue_length called" << std::endl;
-            return 1;
+            // Return queue length of one specific queue.
+            std::int64_t count = 0;
+            if (std::size_t(-1) != num_thread) {
+                HPX_ASSERT(num_thread < queues_.size());
+
+                return queues_[num_thread]->get_queue_length();
+            }
+
+            for (std::size_t i = 0; i != queues_.size(); ++i)
+                count += queues_[i]->get_queue_length();
+
+            return count;
         }
 
         std::int64_t get_thread_count(
@@ -124,8 +136,57 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const {
-            std::cout << "get_thread_count called" << std::endl;
-            return 1;
+            // Return thread count of one specific queue.
+            std::int64_t count = 0;
+            if (std::size_t(-1) != num_thread)
+            {
+                HPX_ASSERT(num_thread < queues_.size());
+
+                switch (priority) {
+                case thread_priority_default:
+                case thread_priority_low:
+                case thread_priority_normal:
+                case thread_priority_boost:
+                case thread_priority_high:
+                case thread_priority_high_recursive:
+                    return queues_[num_thread]->get_thread_count(state);
+
+                default:
+                case thread_priority_unknown:
+                    {
+                        HPX_THROW_EXCEPTION(bad_parameter,
+                            "local_queue_scheduler::get_thread_count",
+                            "unknown thread priority value (thread_priority_unknown)");
+                        return 0;
+                    }
+                }
+                return 0;
+            }
+
+            // Return the cumulative count for all queues.
+            switch (priority) {
+            case thread_priority_default:
+            case thread_priority_low:
+            case thread_priority_normal:
+            case thread_priority_boost:
+            case thread_priority_high:
+            case thread_priority_high_recursive:
+                {
+                    for (std::size_t i = 0; i != queues_.size(); ++i)
+                        count += queues_[i]->get_thread_count(state);
+                    break;
+                }
+
+            default:
+            case thread_priority_unknown:
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "local_queue_scheduler::get_thread_count",
+                        "unknown thread priority value (thread_priority_unknown)");
+                    return 0;
+                }
+            }
+            return count;
         }
 
         // Enumerate all matching threads
@@ -156,7 +217,6 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode_thread ?
                 data.schedulehint.hint : std::size_t(-1);
-            std::cout << "num_thread " << num_thread << std::endl;
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
@@ -167,6 +227,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 num_thread %= queue_size;
             }
+            std::cout << "num_thread " << num_thread << std::endl;
 
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread);
@@ -178,7 +239,32 @@ namespace hpx { namespace threads { namespace policies
 
         bool get_next_thread(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, threads::thread_data*& thrd){
-            std::cout << "get_next_thread not implemented yet" << std::endl;
+            std::cout << "get_next_thread..." << std::endl;
+
+            std::size_t queues_size = queues_.size();
+            HPX_ASSERT(num_thread < queues_size);
+            thread_queue_type* this_queue = queues_[num_thread];
+
+            // we only have our local queue right now
+            bool result = this_queue->get_next_thread(thrd);
+
+            this_queue->increment_num_pending_accesses();
+            if (result)
+                return true;
+            this_queue->increment_num_pending_misses();
+
+            bool have_staged = this_queue->
+                get_staged_queue_length(std::memory_order_relaxed) != 0;
+
+            // Give up, we should have work to convert.
+            if (have_staged)
+                return false;
+
+            if (!running)
+            {
+                return false;
+            }
+
             return false;
         }
 
@@ -278,6 +364,7 @@ namespace hpx { namespace threads { namespace policies
         std::list<int> responses;
         std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
+        std::size_t max_queue_thread_count_;
     };
 }}}
 
