@@ -426,7 +426,13 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
 
     target_link_libraries(hpx_wrap PUBLIC hpx)
 
-    set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-wrap=main)
+    if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+      set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-wrap=main)
+    elseif(APPLE)
+      set_property(TARGET hpx_wrap APPEND PROPERTY INTERFACE_LINK_OPTIONS -Wl,-e,_initialize_main)
+    else()
+      hpx_error("hpx_main is not supported on ${CMAKE_SYSTEM_NAME}.")
+    endif()
 
     if (TARGET hpx::apex)
       target_link_libraries(hpx_wrap PRIVATE hpx::apex)
