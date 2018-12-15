@@ -171,7 +171,7 @@ foreach(benchmark ${benchmarks})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/Local")
 
-  target_include_directories(${benchmark}_test SYSTEM PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
+  target_include_directories(${benchmark}_test PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
   target_link_libraries(${benchmark}_test PRIVATE ${${benchmark}_LIBRARIES})
 
   if(NOT "${${benchmark}_PARAMETERS}" MATCHES NO_HPX_MAIN)

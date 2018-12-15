@@ -60,7 +60,7 @@ foreach(example_program ${example_programs})
                      ${${example_program}_FLAGS}
                      FOLDER "Examples/Compute/CUDA")
 
-  target_include_directories(${example_program} SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
+  target_include_directories(${example_program} PRIVATE ${CUDA_INCLUDE_DIRS})
   target_link_libraries(${example_program} PRIVATE ${${example_program}_LIBRARIES})
 
   # add a custom target for this example

@@ -41,7 +41,7 @@ if(HPX_WITH_APEX)
         endif()
 
         add_library(hpx::ittnotify INTERFACE IMPORTED)
-        set_property(TARGET hpx::ittnotify PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${ITTNOTIFY_SOURCE_DIR})
+        set_property(TARGET hpx::ittnotify PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${ITTNOTIFY_SOURCE_DIR})
 
         hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
 

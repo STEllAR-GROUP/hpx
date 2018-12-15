@@ -1555,7 +1555,7 @@ if(NOT HWLOC_FOUND)
 endif()
 
 add_library(hpx::hwloc INTERFACE IMPORTED)
-set_property(TARGET hpx::hwloc PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${HWLOC_INCLUDE_DIR})
+set_property(TARGET hpx::hwloc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${HWLOC_INCLUDE_DIR})
 set_property(TARGET hpx::hwloc PROPERTY INTERFACE_LINK_LIBRARIES ${HWLOC_LIBRARIES})
 
 ################################################################################
@@ -1568,7 +1568,7 @@ if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
   endif()
 
   add_library(hpx::amplifier INTERFACE IMPORTED)
-  set_property(TARGET hpx::hwloc PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${AMPLIFIER_INCLUDE_DIR})
+  set_property(TARGET hpx::hwloc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${AMPLIFIER_INCLUDE_DIR})
   set_property(TARGET hpx::hwloc PROPERTY INTERFACE_LINK_LIBRARIES ${AMPLIFIER_LIBRARIES})
 
   hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)

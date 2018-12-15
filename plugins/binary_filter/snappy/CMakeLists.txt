@@ -25,7 +25,7 @@ function(add_snappy_module)
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${SNAPPY_LIBRARY})
 
-    target_include_directories(compress_snappy SYSTEM PRIVATE ${SNAPPY_INCLUDE_DIR})
+    target_include_directories(compress_snappy PRIVATE ${SNAPPY_INCLUDE_DIR})
 
     # FIXME: target_link_directories only exists for CMake >= 3.13
     if(MSVC)

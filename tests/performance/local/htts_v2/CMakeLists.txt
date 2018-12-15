@@ -45,7 +45,7 @@ foreach(benchmark ${benchmarks})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Benchmarks/HTTS v2/${benchmark}")
 
-  target_include_directories(${benchmark} SYSTEM PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
+  target_include_directories(${benchmark} PRIVATE ${${benchmark}_INCLUDE_DIRECTORIES})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.local.htts_v2.${benchmark})

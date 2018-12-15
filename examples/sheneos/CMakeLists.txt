@@ -54,7 +54,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
         DEPENDENCIES sheneos_component
         FOLDER "Examples/ShenEOS")
 
-      target_include_directories(sheneos_compare SYSTEM PRIVATE ${HDF5_INCLUDE_DIRS})
+      target_include_directories(sheneos_compare PRIVATE ${HDF5_INCLUDE_DIRS})
       target_link_libraries(sheneos_compare PRIVATE ${HDF5_FORTRAN_LIBRARY})
 
       target_compile_options(sheneos_compare ${OpenMP_CXX_FLAGS})

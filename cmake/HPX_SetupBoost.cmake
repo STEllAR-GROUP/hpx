@@ -75,7 +75,7 @@ endif()
 set(__boost_include_dirs ${__boost_include_dirs} ${Boost_INCLUDE_DIRS})
 
 # Emulate target_include_directories to support CMake < 3.11.
-set_property(TARGET hpx::boost PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${__boost_include_dirs})
+set_property(TARGET hpx::boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${__boost_include_dirs})
 
 # Emulate target_link_libraries to support CMake < 3.11.
 set_property(TARGET hpx::boost PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_LIBRARIES})

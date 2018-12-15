@@ -53,7 +53,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER ${folder_name})
   if(HPX_WITH_CUDA)
-    target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
+    target_include_directories(${test}_test PRIVATE ${CUDA_INCLUDE_DIRS})
     target_link_libraries(${test}_test PRIVATE ${${${test}}_LIBRARIES})
   endif()
 

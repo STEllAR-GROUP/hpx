@@ -93,12 +93,12 @@ foreach(header ${headers})
 
       if(HPX_WITH_PARCELPORT_MPI)
           if(MPI_CXX_INCLUDE_PATH)
-              target_include_directories(${test_name} SYSTEM PRIVATE ${MPI_CXX_INCLUDE_PATH})
+              target_include_directories(${test_name} PRIVATE ${MPI_CXX_INCLUDE_PATH})
           endif()
       endif()
 
       if(HPX_WITH_PAPI)
-          target_include_directories(${test_name} SYSTEM PRIVATE ${PAPI_INCLUDE_DIR})
+          target_include_directories(${test_name} PRIVATE ${PAPI_INCLUDE_DIR})
       endif()
 
       # make sure #including 'hpx/config/autolink.hpp' does not cause errors

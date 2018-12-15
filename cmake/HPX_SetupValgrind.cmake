@@ -10,7 +10,7 @@ if(HPX_WITH_VALGRIND)
     endif()
 
     add_library(hpx::valgrind INTERFACE IMPORTED)
-    set_property(TARGET hpx::valgrind PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${VALGRIND_INCLUDE_DIR})
+    set_property(TARGET hpx::valgrind PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${VALGRIND_INCLUDE_DIR})
 
     hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()

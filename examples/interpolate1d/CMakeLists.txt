@@ -56,7 +56,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
     NOLIBS
     FOLDER "Examples/Interpolate1D")
 
-  target_include_directories(create_1d_testdata SYSTEM PRIVATE ${HDF5_INCLUDE_DIRS})
+  target_include_directories(create_1d_testdata PRIVATE ${HDF5_INCLUDE_DIRS})
   target_link_libraries(create_1d_testdata PRIVATE ${HDF5_CXX_LIBRARIES})
 
   # add a custom target for this example

@@ -7,5 +7,5 @@ add_hpx_component(interpolate1d
   FOLDER "Examples/Interpolate1D"
   AUTOGLOB)
 
-target_include_directories(interpolate1d_component SYSTEM PRIVATE ${HDF5_INCLUDE_DIRS})
+target_include_directories(interpolate1d_component PRIVATE ${HDF5_INCLUDE_DIRS})
 target_link_libraries(interpolate1d_component PRIVATE ${HDF5_CXX_LIBRARIES})

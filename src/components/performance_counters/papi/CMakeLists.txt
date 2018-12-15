@@ -27,7 +27,7 @@ if(HPX_WITH_PAPI)
       AUTOGLOB
       PLUGIN)
 
-    target_include_directories(papi_counters SYSTEM PRIVATE ${PAPI_INCLUDE_DIR})
+    target_include_directories(papi_counters PRIVATE ${PAPI_INCLUDE_DIR})
     target_link_libraries(papi_counters PRIVATE hpx::boost)
   endif()
 

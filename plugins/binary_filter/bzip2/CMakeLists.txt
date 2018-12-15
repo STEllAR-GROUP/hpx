@@ -31,7 +31,7 @@ function(add_bzip2_module)
       DEPENDENCIES ${BZIP2_LIBRARIES})
 
     if(NOT MSVC)
-      target_include_directories(compress_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
+      target_include_directories(compress_bzip2 PRIVATE ${BZIP2_INCLUDE_DIR})
     endif()
 
     target_link_libraries(compress_bzip2 PRIVATE hpx::boost)

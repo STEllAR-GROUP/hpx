@@ -31,7 +31,7 @@ function(add_zlib_module)
       DEPENDENCIES ${ZLIB_LIBRARIES})
 
     if(NOT MSVC)
-      target_include_directories(compress_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
+      target_include_directories(compress_zlib PRIVATE ${ZLIB_INCLUDE_DIRS})
     endif()
 
     target_link_libraries(compress_zlib PRIVATE hpx::boost)

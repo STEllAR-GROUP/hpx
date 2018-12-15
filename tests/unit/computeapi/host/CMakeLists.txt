@@ -24,7 +24,7 @@ foreach(test ${tests})
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
                      FOLDER "Tests/Unit/Compute/Host")
 
-  target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
+  target_include_directories(${test}_test PRIVATE ${CUDA_INCLUDE_DIRS})
 
   add_hpx_unit_test("host_" ${test} ${${test}_PARAMETERS})
 
