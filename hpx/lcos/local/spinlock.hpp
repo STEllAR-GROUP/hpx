@@ -2,8 +2,8 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011-2018 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
-//
 //  Copyright (c) 2008 Peter Dimov
+//  Copyright (c) 2018 Patrick Diehl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,7 +28,7 @@
 #    include <boost/detail/interlocked.hpp>
 #  endif
 #else
-#  if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__arm__)
+#  if !defined(__ANDROID__) && !defined(ANDROID)
 #    include <boost/smart_ptr/detail/spinlock.hpp>
 #    if defined(__ia64__) && defined(__INTEL_COMPILER)
 #      include <ia64intrin.h>
