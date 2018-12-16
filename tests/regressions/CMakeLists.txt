@@ -21,10 +21,6 @@ set(subdirs
     util
    )
 
-if(HPX_HAVE_CXX11_LAMBDAS)
-    set(subdirs ${subdirs} parallel)
-endif()
-
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.regressions.${subdir}_dir)
   add_subdirectory(${subdir})
