@@ -6,8 +6,8 @@
 
 prefix=@HPX_CONF_PREFIX@
 exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${exec_prefix}/include
+libdir=${exec_prefix}/@HPX_CONF_LIBDIR@
+includedir=${exec_prefix}/@HPX_CONF_INCLUDEDIR@
 
 Name: hpx_component
 Description: High Performance ParalleX (application configuration) - debug build
